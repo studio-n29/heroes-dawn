@@ -46,7 +46,9 @@ namespace N29.HeroesDawn.Content.Prototype
         static ComboDef C(string id, Family a, Family b, TargetRule t, params EffectDef[] fx)
             => new ComboDef(id, "combos." + id + ".name", a, b, S("combo_" + id, SkillSlot.A3, 0, t, fx));
 
-        public static ContentCatalog Build()
+        public static ContentCatalog Build() => Build(new BalanceConfig());
+
+        public static ContentCatalog Build(BalanceConfig balance)
         {
             var members = new List<MemberDef>
             {
@@ -115,7 +117,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 C("resonance_perception", Family.Perception, Family.Perception, TargetRule.AllAllies, St(StatusType.Haste, 2)),
             };
 
-            return new ContentCatalog(new BalanceConfig(), members, enemies, combos, new[] { BuildZone11() });
+            return new ContentCatalog(balance, members, enemies, combos, new[] { BuildZone11() });
         }
 
         /// <summary>Red Hook — les quais : 25 cases, 3 embranchements, 6 combats (1 Élite fixe : Brick).</summary>

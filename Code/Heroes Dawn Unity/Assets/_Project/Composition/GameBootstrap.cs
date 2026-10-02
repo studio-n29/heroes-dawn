@@ -5,6 +5,7 @@ using N29.HeroesDawn.Application.Events;
 using N29.HeroesDawn.Application.Features;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Content.Prototype;
+using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Infrastructure.Platform;
 using N29.HeroesDawn.Infrastructure.Simulated;
 using N29.HeroesDawn.Presentation;
@@ -52,12 +53,12 @@ namespace N29.HeroesDawn.Composition
             }
 
             // ---- Contenu & état
-            var content = PrototypeContent.Build();
+            var log = new UnityLogger();
+            var content = PrototypeContent.Build(LoadBalance(log));
             Session = new GameSession(content);
             var events = new GameEvents();
 
             // ---- Adaptateurs (réseau simulé : placeholders des services UGS du M2)
-            var log = new UnityLogger();
             var clock = new SystemClock();
             var seeds = new LocalSeedProvider();
             var auth = new FakeAuthGateway();
@@ -75,6 +76,17 @@ namespace N29.HeroesDawn.Composition
             var services = new UiServices(Session, authService, hub, zones, combat, events, log, PrototypeContent.Zone11);
             Ui = UiRoot.Create(transform, services);
             log.Info($"Prototype M1 prêt — {content.Members.Count} recrues, {content.Zones.Count} zone(s). Données : {UnityEngine.Application.persistentDataPath}");
+        }
+
+        /// <summary>Équilibrage importé du tableur (Resources/Balance/balance.json) ; valeurs par défaut sinon.</summary>
+        static BalanceConfig LoadBalance(UnityLogger log)
+        {
+            var asset = Resources.Load<TextAsset>("Balance/balance");
+            if (asset == null) return new BalanceConfig();
+            var parsed = BalanceJson.Deserialize(asset.text);
+            if (parsed.IsSuccess) return parsed.Value;
+            log.Warn("Équilibrage illisible (balance.json) : valeurs par défaut");
+            return new BalanceConfig();
         }
 
         void OnApplicationPause(bool paused)
