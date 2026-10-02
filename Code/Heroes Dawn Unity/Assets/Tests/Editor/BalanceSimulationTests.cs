@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using N29.HeroesDawn.Content.Prototype;
 using N29.HeroesDawn.Core;
@@ -39,6 +40,20 @@ namespace N29.HeroesDawn.Tests.Editor
         {
             var s = BalanceSimulation.Run(PrototypeContent.Build(), PrototypeContent.Zone11, Req(3, maxTicks: 1));
             Assert.That(s.Sum(e => e.Timeouts), Is.EqualTo(s.Count * 3));
+        }
+
+        [Test] // la fenêtre recharge balance.json à chaque lancement (pas de valeurs périmées après un import)
+        public void LoadContent_ReadsCurrentFileContent()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "hd_balance_test.json");
+            try
+            {
+                File.WriteAllText(path, "{ \"DefK\": 777 }");
+                Assert.That(BalanceSimulatorWindow.LoadContent(path).Balance.DefK, Is.EqualTo(777));
+                File.WriteAllText(path, "{ \"DefK\": 555 }");
+                Assert.That(BalanceSimulatorWindow.LoadContent(path).Balance.DefK, Is.EqualTo(555));
+            }
+            finally { File.Delete(path); }
         }
 
         [Test]

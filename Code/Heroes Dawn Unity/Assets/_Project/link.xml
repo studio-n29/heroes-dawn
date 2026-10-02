@@ -1,0 +1,7 @@
+<!-- Empêche le stripping IL2CPP de retirer les setters de BalanceConfig,
+     que BalanceJson écrit par réflexion (Resources/Balance/balance.json). -->
+<linker>
+  <assembly fullname="N29.HeroesDawn.Definitions">
+    <type fullname="N29.HeroesDawn.Definitions.BalanceConfig" preserve="all" />
+  </assembly>
+</linker>

@@ -72,7 +72,7 @@ Chaque clé porte un champ `schemaVersion` ; les migrations sont écrites côté
 ## Remote Config
 - Une clé JSON `balance` = tout `BalanceConfig` (généré depuis `05_Equilibrage.xlsx` par le menu *Heroes Dawn ▸ Équilibrage ▸ Importer*, qui écrit `Assets/_Project/Backend/RemoteConfig/balance.rc` et `Resources/Balance/balance.json`).
 - Clés séparées : `season` (id, dates, paliers), `event` (id, dates, mini-plateau), `shop_rotation`, `feature_flags`.
-- Le serveur lit **la même** configuration que le client (Remote Config lu par les scripts Cloud Code ; le client embarque le même `balance.json`) : une valeur ne peut pas différer entre les deux.
+- Le client embarque `balance.json` au build ; les scripts Cloud Code lisent la clé `balance` de Remote Config. Les deux viennent du **même import**, mais ils sont publiés séparément et peuvent donc diverger. Procédure obligatoire après chaque changement du tableur : *Importer* → redéployer `balance.rc` (Deployment) → reconstruire le client. Au M2, le client lira la clé `balance` de Remote Config au démarrage, avec `balance.json` comme valeur de secours.
 
 ## Pipeline de contenu
 ```mermaid

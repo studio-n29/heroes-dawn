@@ -29,15 +29,14 @@ namespace N29.HeroesDawn.EditorTools.Balance
 
         void OnEnable()
         {
-            _content = LoadContent();
+            _content = LoadContent(BalanceImportMenu.ClientJsonPath);
             _memberIds = _content.Members.Select(m => m.Id.Value).ToArray();
             for (int i = 0; i < _team.Length; i++) _team[i] = Math.Max(0, Array.IndexOf(_memberIds, DefaultTeam[i]));
         }
 
         /// <summary>Contenu du prototype avec l'équilibrage importé (balance.json) s'il existe.</summary>
-        static ContentCatalog LoadContent()
+        public static ContentCatalog LoadContent(string path)
         {
-            var path = BalanceImportMenu.ClientJsonPath;
             if (!File.Exists(path)) return PrototypeContent.Build();
             var parsed = BalanceJson.Deserialize(File.ReadAllText(path));
             if (parsed.IsSuccess) return PrototypeContent.Build(parsed.Value);
@@ -73,6 +72,7 @@ namespace N29.HeroesDawn.EditorTools.Balance
 
         void Simulate()
         {
+            _content = LoadContent(BalanceImportMenu.ClientJsonPath); // relu à chaque lancement : prend en compte le dernier import
             var req = new SimulationRequest
             {
                 Team = _team.Select(i => new MemberId(_memberIds[i])).ToArray(),
@@ -99,7 +99,7 @@ namespace N29.HeroesDawn.EditorTools.Balance
         /// <summary>Batchmode : équipe par défaut, niveau 5, 1 000 combats par rencontre, export CSV.</summary>
         public static void RunDefaultAndExport()
         {
-            var content = LoadContent();
+            var content = LoadContent(BalanceImportMenu.ClientJsonPath);
             var req = new SimulationRequest
             {
                 Team = DefaultTeam.Select(id => new MemberId(id)).ToArray(), TeamLevel = 5, RunsPerEncounter = 1000, BaseSeed = 42,

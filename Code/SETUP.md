@@ -31,7 +31,7 @@ Les packages UGS sont installés (menu **Heroes Dawn ▸ Setup ▸ 3. Installer 
 ```bash
 "/c/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Unity.exe" -batchmode -nographics -projectPath "C:/Users/dnath/Documents/Heroes Dawn/Code/Heroes Dawn Unity" -runTests -testPlatform EditMode -testResults "$TEMP/editmode.xml" -logFile "$TEMP/unity.log"
 ```
-  Résumé : `grep -o '<test-run [^>]*' "$TEMP/editmode.xml"`. Un seul test : ajouter `-testFilter "<Namespace>.<Classe>.<Test>"`. Lancer un menu : `-executeMethod <Classe>.<Méthode> -quit`.
+  Résumé : `grep -o '<test-run [^>]*' "$TEMP/editmode.xml"`. Un seul test : ajouter `-testFilter "<Namespace>.<Classe>.<Test>"`. Lancer un menu : `-executeMethod <Namespace>.<Classe>.<Méthode> -quit` (ex. `N29.HeroesDawn.EditorTools.Balance.BalanceImportMenu.ImportDefault`).
 - Optionnel : supprimer `Assets/TutorialInfo` et `Assets/Readme.asset` (contenu d'exemple du modèle).
 
 ## 7. Git

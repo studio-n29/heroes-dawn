@@ -33,6 +33,12 @@ namespace N29.HeroesDawn.Tests.Editor
             }
         }
 
+        [Test] // la fenêtre Deployment ne liste que les .rc importés par le ScriptedImporter de Remote Config
+        public void RemoteConfig_File_UsesScriptedImporter()
+        {
+            StringAssert.Contains("ScriptedImporter:", File.ReadAllText(Root + "/RemoteConfig/balance.rc.meta"));
+        }
+
         [Test] // garde-fou « tout dans Unity »
         public void NoDotnetProjectOutsideUnity()
         {
