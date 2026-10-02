@@ -35,6 +35,7 @@ namespace N29.HeroesDawn.EditorTools
             "com.unity.remote-config",
             "com.unity.services.analytics",
             "com.unity.purchasing",
+            "com.unity.services.deployment",
         };
 
         const string PresentationAsmdef = "Assets/_Project/Presentation/N29.HeroesDawn.Presentation.asmdef";
@@ -57,8 +58,22 @@ namespace N29.HeroesDawn.EditorTools
             Debug.Log("[Heroes Dawn] Références d'assemblies branchées (TextMeshPro, Input System, PrimeTween, Newtonsoft.Json).");
         }
 
-        [MenuItem("Heroes Dawn/Setup/3. Installer les packages backend (M2)")]
+        [MenuItem("Heroes Dawn/Setup/3. Installer les packages backend (UGS)")]
         static void InstallBackend() => Install(BackendPackages);
+
+        /// <summary>Batchmode (sans -quit) : installe les packages backend puis ferme Unity (code 0 = succès).</summary>
+        public static void InstallBackendBatch()
+        {
+            Install(BackendPackages);
+            EditorApplication.update += ExitWhenDone;
+        }
+
+        static void ExitWhenDone()
+        {
+            if (_request == null || !_request.IsCompleted) return;
+            EditorApplication.update -= ExitWhenDone;
+            EditorApplication.Exit(_request.Status == StatusCode.Success ? 0 : 1);
+        }
 
         static void Install(string[] packages)
         {
