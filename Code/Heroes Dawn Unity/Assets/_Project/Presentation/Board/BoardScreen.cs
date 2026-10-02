@@ -3,7 +3,10 @@ using MessagePipe;
 using System;
 using System.Collections.Generic;
 using N29.HeroesDawn.Application.Messages;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Application.Features;
+using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Board;
@@ -20,8 +23,14 @@ namespace N29.HeroesDawn.Presentation.Board
     public sealed class BoardScreen : UiScreen
     {
         System.IDisposable? _subs;
+        System.IDisposable? _zoneValidatedSub;
+        ZoneRewards? _lastRewards;
 
-        void OnDestroy() => _subs?.Dispose();
+        void OnDestroy()
+        {
+            _subs?.Dispose();
+            _zoneValidatedSub?.Dispose();
+        }
         BoardMapView _map = null!;
         Text _zoneTitle = null!;
         RectTransform _objectiveList = null!;
@@ -39,6 +48,8 @@ namespace N29.HeroesDawn.Presentation.Board
 
         protected override void Build()
         {
+            // Abonnement pour toute la vie de l'écran : la validation peut arriver depuis l'écran de combat.
+            _zoneValidatedSub = Ctx.S.ZoneValidated.Subscribe(m => _lastRewards = m.Rewards);
             Backdrop(Theme.WithAlpha(Theme.Info, 0.16f), Theme.Hex(0x0E1420));
             ArtBackdrop(Sprites.BackgroundLandscape, 1f, 0.86f);
 
@@ -209,17 +220,30 @@ namespace N29.HeroesDawn.Presentation.Board
         void OnRoll()
         {
             if (_busy || _run == null || _run.Phase != ZoneRunPhase.AwaitingRoll) return;
-            var r = Ctx.S.Zones.Roll();
-            if (r.IsFailure) { Ctx.Error(r.Error); return; }
-            AnimateDie(r.Value);
+            RunBoard(ct => Ctx.S.RollDice.ExecuteAsync(ct), AnimateDie);
         }
 
         void OnBonus()
         {
             if (_busy || _run == null || _run.Dice.BonusDice == 0) return;
-            var r = Ctx.S.Zones.UseBonusDie();
-            if (r.IsFailure) { Ctx.Error(r.Error); return; }
-            AnimateDie(r.Value);
+            RunBoard(ct => Ctx.S.UseBonusDie.ExecuteAsync(ct), AnimateDie);
+        }
+
+        /// <summary>Exécute une action de plateau : entrées bloquées pendant l'appel, erreur affichée, puis suite.</summary>
+        void RunBoard(Func<CancellationToken, UniTask<Result<IReadOnlyList<BoardEvent>>>> action, Action<IReadOnlyList<BoardEvent>> then)
+        {
+            _busy = true;
+            RunBoardAsync(action, then).Forget();
+        }
+
+        async UniTaskVoid RunBoardAsync(Func<CancellationToken, UniTask<Result<IReadOnlyList<BoardEvent>>>> action,
+                                        Action<IReadOnlyList<BoardEvent>> then)
+        {
+            Result<IReadOnlyList<BoardEvent>> r;
+            try { r = await action(this.GetCancellationTokenOnDestroy()); }
+            finally { _busy = false; }
+            if (r.IsFailure) { Ctx.Error(r.Error); RefreshAll(); return; }
+            then(r.Value);
         }
 
         void AnimateDie(IReadOnlyList<BoardEvent> events)
@@ -241,18 +265,14 @@ namespace N29.HeroesDawn.Presentation.Board
         void OnEndMove()
         {
             if (_busy || _run == null || _run.Phase != ZoneRunPhase.ChoosingDestination) return;
-            var r = Ctx.S.Zones.EndMove();
-            if (r.IsFailure) { Ctx.Error(r.Error); return; }
-            ProcessEvents(r.Value);
+            RunBoard(ct => Ctx.S.EndMove.ExecuteAsync(ct), ProcessEvents);
         }
 
         void OnNodeTapped(CaseId id)
         {
             if (_busy || _run == null || Ctx.Modal.AnyOpen) return;
             if (_run.Phase != ZoneRunPhase.ChoosingDestination || !_run.Destinations.ContainsKey(id)) return;
-            var r = Ctx.S.Zones.MoveTo(id);
-            if (r.IsFailure) { Ctx.Error(r.Error); return; }
-            ProcessEvents(r.Value);
+            RunBoard(ct => Ctx.S.MoveTo.ExecuteAsync(id, ct), ProcessEvents);
         }
 
         /// <summary>Joue les événements du domaine dans l'ordre : déplacement animé, puis messages, puis case déclenchée.</summary>
@@ -369,7 +389,7 @@ namespace N29.HeroesDawn.Presentation.Board
 
         void ShowZoneComplete()
         {
-            var rewards = Ctx.S.Zones.LastRewards;
+            var rewards = _lastRewards;
             var w = Ctx.Modal.Open(Loc.T("board.zone_complete"), 1000, 520, Theme.Success);
             string text = rewards == null ? ""
                         : rewards.FirstClear ? Loc.F("board.zone_rewards", rewards.Credits, rewards.Pr)
@@ -380,11 +400,19 @@ namespace N29.HeroesDawn.Presentation.Board
             var btn = Ui.Btn(w.Content, Loc.T("board.to_hq"), Theme.Primary, Theme.TextDark, () =>
             {
                 w.Close();
-                Ctx.S.Zones.CloseCompletedRun();
-                _run = null;
-                Ctx.Nav.Show(Ctx.Hub);
+                LeaveToHq();
             }, 44);
             btn.Rect.At(0.5f, 0f, 0, 0, 440, 100);
+        }
+
+        void LeaveToHq() => LeaveToHqAsync().Forget();
+
+        async UniTaskVoid LeaveToHqAsync()
+        {
+            var r = await Ctx.S.LeaveZone.ExecuteAsync(this.GetCancellationTokenOnDestroy());
+            if (r.IsFailure) { Ctx.Error(r.Error); return; }
+            _run = null;
+            Ctx.Nav.Show(Ctx.Hub);
         }
 
         void OnBackToHq()
@@ -392,9 +420,7 @@ namespace N29.HeroesDawn.Presentation.Board
             if (_busy) return;
             Ctx.Modal.Confirm(Loc.T("board.back_hq.title"), Loc.T("board.back_hq.body"), Loc.T("ui.confirm"), () =>
             {
-                Ctx.S.Zones.Abandon();
-                _run = null;
-                Ctx.Nav.Show(Ctx.Hub);
+                LeaveToHq();
             }, Loc.T("ui.cancel"), null, Theme.Danger);
         }
     }

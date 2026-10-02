@@ -12,7 +12,7 @@ namespace N29.HeroesDawn.Presentation.Common
     /// <summary>Pastilles Crédits / PR, mises à jour sur l'événement WalletChanged.</summary>
     public sealed class WalletView : MonoBehaviour
     {
-        GameSession _session = null!;
+        ISessionReadModel _session = null!;
         ISubscriber<WalletChanged> _walletEvents = null!;
         ISubscriber<SaveStateChanged> _savingEvents = null!;
         IDisposable? _subs;
@@ -22,7 +22,7 @@ namespace N29.HeroesDawn.Presentation.Common
         int _lastCredits = -1;
         int _lastPr = -1;
 
-        public static WalletView Create(RectTransform parent, GameSession session, ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving)
+        public static WalletView Create(RectTransform parent, ISessionReadModel session, ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving)
         {
             var rt = Ui.Rect(parent, "Wallet");
             var v = rt.gameObject.AddComponent<WalletView>();

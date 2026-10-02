@@ -40,7 +40,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var roster = _app.Publisher<RosterChanged>();
             _auth = new AuthService(_session, _app.Auth, _profiles, _clock, _app.Save, wallet, roster, _app.Logger);
             _hub = new HubService(_session, _app.Save, wallet, roster);
-            _zones = new ZoneService(_session, _app.SeedSource, _app.Save, wallet, roster, _app.Logger);
+            _zones = new ZoneService(_app.Effects, _app.Zone.Leave);
             _combat = new CombatService(_session, _app.SeedSource, _zones, _app.Save, wallet, roster, _app.CombatVerifier, _app.Logger);
         }
 
@@ -87,12 +87,12 @@ namespace N29.HeroesDawn.Tests.Domain
         public void Zone_Combat_Flow_AppliesRewardsAndFatigue()
         {
             _auth.SignInAsGuestAsync(CancellationToken.None).GetAwaiter().GetResult();
-            Assert.IsTrue(_zones.StartZone(PrototypeContent.Zone11).IsSuccess);
+            Assert.IsTrue(_app.Zone.Start.ExecuteAsync(PrototypeContent.Zone11).GetAwaiter().GetResult().IsSuccess);
             var run = _session.Run!;
             // Place l'équipe devant un combat facile pour tester le cycle combat.
             var forced = ZoneRun.ForTests(_session.Content, _session.RunZone!, 3UL, 1, true, "n02");
             _session.Run = forced;
-            Assert.IsTrue(_zones.MoveTo(new CaseId("n03")).IsSuccess);
+            Assert.IsTrue(_app.Zone.Move.ExecuteAsync(new CaseId("n03")).GetAwaiter().GetResult().IsSuccess);
             Assert.AreEqual(ZoneRunPhase.InCombat, forced.Phase);
 
             var begin = _combat.Begin();
@@ -118,8 +118,8 @@ namespace N29.HeroesDawn.Tests.Domain
         public void Zone_Abandon_ClearsRun()
         {
             _auth.SignInAsGuestAsync(CancellationToken.None).GetAwaiter().GetResult();
-            _zones.StartZone(PrototypeContent.Zone11);
-            _zones.Abandon();
+            _app.Zone.Start.ExecuteAsync(PrototypeContent.Zone11).GetAwaiter().GetResult();
+            _app.Zone.Leave.ExecuteAsync().GetAwaiter().GetResult();
             Assert.IsNull(_session.Run);
         }
     }

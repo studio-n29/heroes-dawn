@@ -1,4 +1,6 @@
 #nullable enable
+using System.Linq;
+using Cysharp.Threading.Tasks;
 using MessagePipe;
 using System.Collections.Generic;
 using N29.HeroesDawn.Application.Messages;
@@ -213,7 +215,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             return frame;
         }
 
-        void TeamCard(TeamMember m)
+        void TeamCard(ITeamMemberReadModel m)
         {
             var frame = CardBase(m.Def, m.Level, out var fill);
             var skills = SkillsLine(m.Def);
@@ -312,7 +314,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (r.IsFailure) Ctx.Error(r.Error);
         }
 
-        void OnTrain(TeamMember m)
+        void OnTrain(ITeamMemberReadModel m)
         {
             var r = Ctx.S.Hub.Train(m.Id);
             if (r.IsFailure) { Ctx.Error(r.Error); return; }
@@ -333,9 +335,20 @@ namespace N29.HeroesDawn.Presentation.Hub
             Ctx.Toast(Loc.T("hub.healed"), ToastKind.Reward);
         }
 
+        bool _deploying;
+
         void OnDeploy()
         {
-            var r = Ctx.S.Zones.StartZone(Ctx.S.FirstZone);
+            if (_deploying) return;
+            DeployAsync().Forget();
+        }
+
+        async UniTaskVoid DeployAsync()
+        {
+            _deploying = true;
+            Core.Result r;
+            try { r = await Ctx.S.StartZone.ExecuteAsync(Ctx.S.FirstZone, this.GetCancellationTokenOnDestroy()); }
+            finally { _deploying = false; }
             if (r.IsFailure) { Ctx.Error(r.Error); return; }
             Ctx.Nav.Show(Ctx.Board);
         }

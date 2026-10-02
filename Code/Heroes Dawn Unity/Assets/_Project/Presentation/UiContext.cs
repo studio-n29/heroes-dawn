@@ -14,29 +14,6 @@ using AppLogger = N29.HeroesDawn.Application.Ports.ILogger;
 
 namespace N29.HeroesDawn.Presentation
 {
-    /// <summary>Services applicatifs fournis par la racine de composition.</summary>
-    public sealed class UiServices
-    {
-        public GameSession Session { get; }
-        public AuthService Auth { get; }
-        public HubService Hub { get; }
-        public ZoneService Zones { get; }
-        public CombatService Combat { get; }
-        public ISubscriber<WalletChanged> Wallet { get; }
-        public ISubscriber<RosterChanged> Roster { get; }
-        public ISubscriber<ToastRequested> Toasts { get; }
-        public ISubscriber<SaveStateChanged> Saving { get; }
-        public AppLogger Log { get; }
-        public ZoneId FirstZone { get; }
-
-        public UiServices(GameSession session, AuthService auth, HubService hub, ZoneService zones, CombatService combat,
-                          ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, ISubscriber<ToastRequested> toasts,
-                          ISubscriber<SaveStateChanged> saving, AppLogger log, ZoneId firstZone)
-        {
-            Session = session; Auth = auth; Hub = hub; Zones = zones; Combat = combat; Wallet = wallet; Roster = roster; Toasts = toasts; Saving = saving; Log = log; FirstZone = firstZone;
-        }
-    }
-
     /// <summary>Tout ce dont les écrans ont besoin : services, navigation, modales, messages.</summary>
     public sealed class UiContext
     {

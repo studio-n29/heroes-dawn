@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MessagePipe;
+using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Content.Prototype;
 using N29.HeroesDawn.Core;
+using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Domain.Combat;
 
 namespace N29.HeroesDawn.Tests.Domain.Application
@@ -72,6 +74,8 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public Log Logger { get; } = new Log();
         public Verifier CombatVerifier { get; } = new Verifier();
         public SaveScheduler Save { get; }
+        public ZoneEffects Effects { get; }
+        public ZoneUseCases Zone { get; }
 
         public TestApp()
         {
@@ -81,14 +85,18 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             b.AddMessageBroker<RosterChanged>();
             b.AddMessageBroker<ToastRequested>();
             b.AddMessageBroker<SaveStateChanged>();
+            b.AddMessageBroker<ZoneValidated>();
             _bus = b.BuildServiceProvider();
             Record<WalletChanged>();
             Record<RosterChanged>();
             Record<ToastRequested>();
             Record<SaveStateChanged>();
+            Record<ZoneValidated>();
 
             Session = new GameSession(PrototypeContent.Build());
             Save = new SaveScheduler(Session, Profiles, Time, Logger, Publisher<SaveStateChanged>());
+            Effects = new ZoneEffects(Session, Publisher<WalletChanged>(), Publisher<ZoneValidated>(), Save, Logger);
+            Zone = new ZoneUseCases(this);
         }
 
         public IPublisher<T> Publisher<T>() => _bus.GetRequiredService<IPublisher<T>>();
@@ -110,5 +118,67 @@ namespace N29.HeroesDawn.Tests.Domain.Application
 
         /// <summary>Pose un compte sans passer par l'authentification.</summary>
         public void SignInDirect(string playerId) => Session.Account = new PlayerAccount(playerId, "Invité-TEST");
+
+        public sealed class ZoneUseCases
+        {
+            public readonly IStartZoneUseCase Start;
+            public readonly IRollDiceUseCase Roll;
+            public readonly IUseBonusDieUseCase Bonus;
+            public readonly IMoveToUseCase Move;
+            public readonly IEndMoveUseCase End;
+            public readonly IResolveMiniGameUseCase MiniGame;
+            public readonly IResolveNarrativeUseCase Narrative;
+            public readonly IResolveRestUseCase Rest;
+            public readonly ILeaveZoneUseCase Leave;
+
+            public ZoneUseCases(TestApp a)
+            {
+                var roster = a.Publisher<RosterChanged>();
+                Start = new StartZoneUseCase(a.Session, a.SeedSource, a.Logger);
+                Roll = new RollDiceUseCase(a.Effects);
+                Bonus = new UseBonusDieUseCase(a.Effects);
+                Move = new MoveToUseCase(a.Effects);
+                End = new EndMoveUseCase(a.Effects);
+                MiniGame = new ResolveMiniGameUseCase(a.Effects);
+                Narrative = new ResolveNarrativeUseCase(a.Effects, roster);
+                Rest = new ResolveRestUseCase(a.Effects, roster);
+                Leave = new LeaveZoneUseCase(a.Session, a.Save, a.Logger);
+            }
+        }
+
+        /// <summary>Place le pion de la zone 1.1 (brouillard levé) avec <paramref name="pm"/> PM en main.</summary>
+        public ZoneRun Place(string position, int pm)
+        {
+            var zone = Session.Content.Zone(PrototypeContent.Zone11);
+            var run = ZoneRun.ForTests(Session.Content, zone, 3UL, pm, true, position);
+            Session.Run = run;
+            Session.RunZone = zone;
+            return run;
+        }
+
+        /// <summary>
+        /// Joue la zone 1.1 directement sur le domaine jusqu'à la case n23 gagnée (2 objectifs sur 3) ;
+        /// il ne reste qu'à atteindre n24 avec 1 PM en main.
+        /// </summary>
+        public void DriveZone11ToLastStep()
+        {
+            var run = Place("n09", 1);
+            Step(run, "n08", ZoneRunPhase.InCaseInteraction); run.ResolveCase(true);          // générateur (mini-jeu)
+            run.SetPmForTests(2); Step(run, "n10", ZoneRunPhase.InCaseInteraction); run.ResolveCase(false);
+            run.SetPmForTests(1); Step(run, "n11", ZoneRunPhase.InCombat); run.ResolveCombat(true);
+            run.SetPmForTests(2); Step(run, "n13", ZoneRunPhase.InCaseInteraction); run.ResolveCase(true);
+            run.SetPmForTests(2); Step(run, "n18", ZoneRunPhase.AwaitingRoll);
+            run.SetPmForTests(1); Step(run, "n19", ZoneRunPhase.InCombat); run.ResolveCombat(true);
+            run.SetPmForTests(1); Step(run, "n20", ZoneRunPhase.InCaseInteraction); run.ResolveCase(true);
+            run.SetPmForTests(1); Step(run, "n23", ZoneRunPhase.InCombat); run.ResolveCombat(true);   // entrepôt (combat)
+            run.SetPmForTests(1);
+            if (!run.Destinations.ContainsKey(new CaseId("n24"))) throw new InvalidOperationException("n24 inaccessible");
+        }
+
+        static void Step(ZoneRun run, string to, ZoneRunPhase expected)
+        {
+            run.MoveTo(new CaseId(to));
+            if (run.Phase != expected) throw new InvalidOperationException($"Après {to} : phase {run.Phase}, attendue {expected}");
+        }
     }
 }

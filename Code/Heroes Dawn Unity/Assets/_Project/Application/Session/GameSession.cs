@@ -31,7 +31,7 @@ namespace N29.HeroesDawn.Application.Session
     }
 
     /// <summary>Copie locale du portefeuille (l'autorité sera UGS Economy au M2).</summary>
-    public sealed class Wallet
+    public sealed class Wallet : IWalletReadModel
     {
         public int Credits { get; private set; }
         public int Pr { get; private set; }
@@ -46,7 +46,7 @@ namespace N29.HeroesDawn.Application.Session
         }
     }
 
-    public sealed class TeamMember
+    public sealed class TeamMember : ITeamMemberReadModel
     {
         public MemberId Id { get; }
         public MemberDef Def { get; }
@@ -60,7 +60,7 @@ namespace N29.HeroesDawn.Application.Session
     }
 
     /// <summary>État du joueur pour la session. Lu par la présentation, modifié uniquement par les services.</summary>
-    public sealed class GameSession
+    public sealed class GameSession : ISessionReadModel
     {
         public ContentCatalog Content { get; }
         public Wallet Wallet { get; } = new Wallet();
@@ -99,6 +99,19 @@ namespace N29.HeroesDawn.Application.Session
         }
 
         public bool SquadExhausted => Fighters.Count == 0;
+
+        // ---- ISessionReadModel
+        IWalletReadModel ISessionReadModel.Wallet => Wallet;
+        IReadOnlyList<ITeamMemberReadModel> ISessionReadModel.Roster => Roster;
+        IReadOnlyList<ITeamMemberReadModel> ISessionReadModel.Squad => Squad;
+        IReadOnlyCollection<string> ISessionReadModel.CompletedZones => CompletedZones;
+
+        public IReadOnlyList<MemberDef> AvailableRecruits()
+        {
+            var list = new List<MemberDef>();
+            foreach (var m in Content.Members) if (!Owns(m.Id)) list.Add(m);
+            return list;
+        }
 
         public TeamMember? Find(MemberId id)
         {

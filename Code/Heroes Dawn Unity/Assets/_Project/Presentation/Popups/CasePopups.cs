@@ -1,7 +1,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using N29.HeroesDawn.Application.Features;
+using Cysharp.Threading.Tasks;
+using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Common;
@@ -20,8 +21,9 @@ namespace N29.HeroesDawn.Presentation.Popups
             body.rectTransform.Stretch(0, 120, 0, 10);
             var row = Ui.Rect(w.Content, "Buttons").BottomBand(96);
             row.HLayout(40);
-            Ui.Btn(row, Loc.T("rest.skip"), Theme.Surface3, Theme.Text, () => Finish(ctx, w, ctx.S.Zones.ResolveRest(false), done), 34).Rect.Pref(280, 90);
-            Ui.Btn(row, Loc.T("rest.take"), Theme.Success, Theme.TextDark, () => Finish(ctx, w, ctx.S.Zones.ResolveRest(true), done), 40).Rect.Pref(380, 90);
+            var gate = new OnceGate();
+            Ui.Btn(row, Loc.T("rest.skip"), Theme.Surface3, Theme.Text, () => Finish(ctx, w, gate, () => ctx.S.ResolveRest.ExecuteAsync(false), done), 34).Rect.Pref(280, 90);
+            Ui.Btn(row, Loc.T("rest.take"), Theme.Success, Theme.TextDark, () => Finish(ctx, w, gate, () => ctx.S.ResolveRest.ExecuteAsync(true), done), 40).Rect.Pref(380, 90);
         }
 
         public static void Narrative(UiContext ctx, CaseId at, Action<IReadOnlyList<BoardEvent>> done)
@@ -35,15 +37,16 @@ namespace N29.HeroesDawn.Presentation.Popups
 
             var list = Ui.Rect(w.Content, "Choices").BottomBand(310);
             list.VLayout(14, 0, TextAnchor.LowerCenter);
-            Choice(ctx, w, list, Loc.F("ev.choice.credits", ZoneService.NarrativeCredits), NarrativeChoice.Credits, Theme.Credits, done);
-            Choice(ctx, w, list, Loc.F("ev.choice.research", ZoneService.NarrativePr), NarrativeChoice.Research, Theme.Pr, done);
-            Choice(ctx, w, list, Loc.F("ev.choice.morale", ZoneService.NarrativeMorale), NarrativeChoice.Morale, Theme.Success, done);
+            var gate = new OnceGate();
+            Choice(ctx, w, gate, list, Loc.F("ev.choice.credits", ResolveNarrativeUseCase.Credits), NarrativeChoice.Credits, Theme.Credits, done);
+            Choice(ctx, w, gate, list, Loc.F("ev.choice.research", ResolveNarrativeUseCase.Pr), NarrativeChoice.Research, Theme.Pr, done);
+            Choice(ctx, w, gate, list, Loc.F("ev.choice.morale", ResolveNarrativeUseCase.Morale), NarrativeChoice.Morale, Theme.Success, done);
         }
 
-        static void Choice(UiContext ctx, ModalWindow w, RectTransform list, string label, NarrativeChoice c, Color color,
+        static void Choice(UiContext ctx, ModalWindow w, OnceGate gate, RectTransform list, string label, NarrativeChoice c, Color color,
                            Action<IReadOnlyList<BoardEvent>> done)
         {
-            var b = Ui.Btn(list, label, color, Theme.TextDark, () => Finish(ctx, w, ctx.S.Zones.ResolveNarrative(c), done), 30, FontKind.Body);
+            var b = Ui.Btn(list, label, color, Theme.TextDark, () => Finish(ctx, w, gate, () => ctx.S.ResolveNarrative.ExecuteAsync(c), done), 30, FontKind.Body);
             b.Rect.Pref(-1, 86);
         }
 
@@ -54,26 +57,39 @@ namespace N29.HeroesDawn.Presentation.Popups
             var body = Ui.Txt(w.Content, Loc.Or(key + ".body", "mg.default.body") + "\n<size=26>" + Loc.T("mg.rules") + "</size>",
                               30, Theme.Text, TextAnchor.UpperCenter, FontKind.Regular);
             body.rectTransform.Stretch(10, 400, 10, 10);
+            var gate = new OnceGate();
             var game = w.Content.gameObject.AddComponent<TimingMiniGame>();
             game.Build(w.Content, success =>
             {
                 var b = ctx.S.Session.Content.Balance;
                 if (success) ctx.Toast(Loc.F("mg.success", b.MiniGameCredits, b.MiniGamePr), Application.Messages.ToastKind.Reward);
                 else ctx.Toast(Loc.T("mg.fail"), Application.Messages.ToastKind.Warning);
-                Finish(ctx, w, ctx.S.Zones.ResolveMiniGame(success), done);
+                Finish(ctx, w, gate, () => ctx.S.ResolveMiniGame.ExecuteAsync(success), done);
             });
         }
 
-        static void Finish(UiContext ctx, ModalWindow w, Result<IReadOnlyList<BoardEvent>> r, Action<IReadOnlyList<BoardEvent>> done)
+        /// <summary>Une seule résolution par fenêtre, même en cas de double clic.</summary>
+        sealed class OnceGate { public bool Used; }
+
+        static void Finish(UiContext ctx, ModalWindow w, OnceGate gate, Func<UniTask<Result<IReadOnlyList<BoardEvent>>>> run,
+                           Action<IReadOnlyList<BoardEvent>> done)
         {
-            w.Close();
-            if (r.IsFailure)
+            if (gate.Used) return;
+            gate.Used = true;
+            FinishAsync().Forget();
+
+            async UniTaskVoid FinishAsync()
             {
-                ctx.Error(r.Error);
-                done(Array.Empty<BoardEvent>());
-                return;
+                var r = await run();
+                w.Close();
+                if (r.IsFailure)
+                {
+                    ctx.Error(r.Error);
+                    done(Array.Empty<BoardEvent>());
+                    return;
+                }
+                done(r.Value);
             }
-            done(r.Value);
         }
     }
 

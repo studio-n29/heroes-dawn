@@ -2,6 +2,7 @@
 using MessagePipe;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features;
+using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Content.Prototype;
@@ -32,12 +33,14 @@ namespace N29.HeroesDawn.Composition
             // ---- Contenu & état
             builder.RegisterInstance(content);
             builder.RegisterInstance<ILogger>(log);
-            builder.Register<GameSession>(Lifetime.Singleton);
+            builder.Register<GameSession>(Lifetime.Singleton).AsSelf().As<ISessionReadModel>();
+            builder.RegisterInstance(PrototypeContent.Zone11);
             var pipe = builder.RegisterMessagePipe();
             builder.RegisterMessageBroker<WalletChanged>(pipe);
             builder.RegisterMessageBroker<RosterChanged>(pipe);
             builder.RegisterMessageBroker<ToastRequested>(pipe);
             builder.RegisterMessageBroker<SaveStateChanged>(pipe);
+            builder.RegisterMessageBroker<ZoneValidated>(pipe);
 
             // ---- Ports (réseau simulé : placeholders des services UGS du M2)
             builder.Register<IClock, SystemClock>(Lifetime.Singleton);
@@ -51,13 +54,22 @@ namespace N29.HeroesDawn.Composition
             builder.Register<AuthService>(Lifetime.Singleton);
             builder.Register<HubService>(Lifetime.Singleton);
             builder.Register<ZoneService>(Lifetime.Singleton);
+
+            // ---- Use cases : plateau
+            builder.Register<ZoneEffects>(Lifetime.Singleton);
+            builder.Register<StartZoneUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<RollDiceUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<UseBonusDieUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<MoveToUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<EndMoveUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<ResolveMiniGameUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<ResolveNarrativeUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<ResolveRestUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<LeaveZoneUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<CombatService>(Lifetime.Singleton);
 
             // ---- Interface
-            builder.Register<UiServices>(c => new UiServices(
-                c.Resolve<GameSession>(), c.Resolve<AuthService>(), c.Resolve<HubService>(), c.Resolve<ZoneService>(),
-                c.Resolve<CombatService>(), c.Resolve<ISubscriber<WalletChanged>>(), c.Resolve<ISubscriber<RosterChanged>>(),
-                c.Resolve<ISubscriber<ToastRequested>>(), c.Resolve<ISubscriber<SaveStateChanged>>(), c.Resolve<ILogger>(), PrototypeContent.Zone11), Lifetime.Singleton);
+            builder.Register<UiServices>(Lifetime.Singleton);
 
             builder.RegisterBuildCallback(c =>
             {
