@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using N29.HeroesDawn.Application.Messages;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using N29.HeroesDawn.Application.Features;
+using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
@@ -365,7 +365,16 @@ namespace N29.HeroesDawn.Presentation.Board
         void StartCombat()
         {
             if (_run == null || _run.Phase != ZoneRunPhase.InCombat || Ctx.Nav.Current != this) return;
-            var r = Ctx.S.Combat.Begin();
+            StartCombatAsync().Forget();
+        }
+
+        async UniTaskVoid StartCombatAsync()
+        {
+            if (_busy) return;
+            _busy = true;
+            Result<Domain.Combat.CombatSimulation> r;
+            try { r = await Ctx.S.BeginCombat.ExecuteAsync(this.GetCancellationTokenOnDestroy()); }
+            finally { _busy = false; }
             if (r.IsFailure)
             {
                 Ctx.Error(r.Error);

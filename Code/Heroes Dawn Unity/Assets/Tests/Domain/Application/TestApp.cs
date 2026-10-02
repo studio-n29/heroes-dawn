@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MessagePipe;
+using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
@@ -59,8 +60,8 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public sealed class Log : ILogger { public void Info(string m) { } public void Warn(string m) { } public void Error(string m) { } }
         public sealed class Verifier : ICombatVerifier
         {
-            public Task<bool> VerifyAsync(CombatSetup s, IReadOnlyList<CombatInput> i, ulong h, CancellationToken ct)
-                => Task.FromResult(CombatReplay.Run(PrototypeContent.Build(), s, i).StateHash == h);
+            public Cysharp.Threading.Tasks.UniTask<bool> VerifyAsync(CombatSetup s, IReadOnlyList<CombatInput> i, ulong h, CancellationToken ct)
+                => Cysharp.Threading.Tasks.UniTask.FromResult(CombatReplay.Run(PrototypeContent.Build(), s, i).StateHash == h);
         }
 
         readonly IServiceProvider _bus;
@@ -76,6 +77,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public SaveScheduler Save { get; }
         public ZoneEffects Effects { get; }
         public ZoneUseCases Zone { get; }
+        public CombatUseCases Combat { get; }
 
         public TestApp()
         {
@@ -86,17 +88,20 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             b.AddMessageBroker<ToastRequested>();
             b.AddMessageBroker<SaveStateChanged>();
             b.AddMessageBroker<ZoneValidated>();
+            b.AddMessageBroker<CombatFinished>();
             _bus = b.BuildServiceProvider();
             Record<WalletChanged>();
             Record<RosterChanged>();
             Record<ToastRequested>();
             Record<SaveStateChanged>();
             Record<ZoneValidated>();
+            Record<CombatFinished>();
 
             Session = new GameSession(PrototypeContent.Build());
             Save = new SaveScheduler(Session, Profiles, Time, Logger, Publisher<SaveStateChanged>());
             Effects = new ZoneEffects(Session, Publisher<WalletChanged>(), Publisher<ZoneValidated>(), Save, Logger);
             Zone = new ZoneUseCases(this);
+            Combat = new CombatUseCases(this);
         }
 
         public IPublisher<T> Publisher<T>() => _bus.GetRequiredService<IPublisher<T>>();
@@ -143,6 +148,25 @@ namespace N29.HeroesDawn.Tests.Domain.Application
                 Narrative = new ResolveNarrativeUseCase(a.Effects, roster);
                 Rest = new ResolveRestUseCase(a.Effects, roster);
                 Leave = new LeaveZoneUseCase(a.Session, a.Save, a.Logger);
+            }
+        }
+
+        public sealed class CombatUseCases
+        {
+            public readonly ActiveCombat Active = new ActiveCombat();
+            public readonly IBeginCombatUseCase Begin;
+            public readonly ISetAutoCombatUseCase SetAuto;
+            public readonly IFinishCombatUseCase Finish;
+            public readonly IVerifyCombatUseCase Verify;
+            public readonly IForceCombatWinUseCase ForceWin;
+
+            public CombatUseCases(TestApp a)
+            {
+                Begin = new BeginCombatUseCase(a.Session, a.SeedSource, Active, a.Logger);
+                SetAuto = new SetAutoCombatUseCase(a.Session, Active, a.Save);
+                Finish = new FinishCombatUseCase(Active, a.Effects, a.Publisher<RosterChanged>(), a.Publisher<CombatFinished>(), a.Zone.Leave);
+                Verify = new VerifyCombatUseCase(Active, a.CombatVerifier, a.Logger);
+                ForceWin = new ForceCombatWinUseCase(Active);
             }
         }
 

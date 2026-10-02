@@ -1,7 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Combat;
@@ -18,11 +18,12 @@ namespace N29.HeroesDawn.Infrastructure.Simulated
 
         public LocalCombatVerifier(ContentCatalog content, int latencyMs = 300) { _content = content; _latencyMs = latencyMs; }
 
-        public async Task<bool> VerifyAsync(CombatSetup setup, IReadOnlyList<CombatInput> inputs, ulong expectedHash, CancellationToken ct)
+        public async UniTask<bool> VerifyAsync(CombatSetup setup, IReadOnlyList<CombatInput> inputs, ulong expectedHash, CancellationToken ct)
         {
             var copy = new List<CombatInput>(inputs);
-            var replay = await Task.Run(() => CombatReplay.Run(_content, setup, copy), ct);
-            await Task.Delay(_latencyMs, ct);
+            // Rejeu hors du thread principal, puis retour sur le thread principal (configureAwait par défaut).
+            var replay = await UniTask.RunOnThreadPool(() => CombatReplay.Run(_content, setup, copy), cancellationToken: ct);
+            await UniTask.Delay(_latencyMs, cancellationToken: ct);
             return replay.StateHash == expectedHash;
         }
     }

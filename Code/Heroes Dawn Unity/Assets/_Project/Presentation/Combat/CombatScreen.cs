@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using N29.HeroesDawn.Application.Messages;
-using N29.HeroesDawn.Application.Features;
+using Cysharp.Threading.Tasks;
+using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Combat;
@@ -117,7 +118,7 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         public override void OnShow()
         {
-            var sim = Ctx.S.Combat.Current;
+            var sim = Ctx.S.Combat.Simulation;
             if (sim == null)
             {
                 Ctx.Nav.Show(Ctx.Board);
@@ -135,7 +136,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             _logText.text = "";
             _banner.text = "";
             BuildCards();
-            var pending = Ctx.S.Combat.CurrentCase;
+            var pending = Ctx.S.Combat.Case;
             _title.text = pending != null ? Loc.F("combat.rank", Loc.RankName(pending.Rank)).ToUpperInvariant() : "";
             RefreshAuto();
             RefreshAll();
@@ -459,7 +460,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             var sim = _sim;
             if (sim == null || sim.IsOver) return;
             bool on = !sim.Auto;
-            Ctx.S.Combat.SetAuto(on);
+            Ctx.S.SetAutoCombat.ExecuteAsync(on, this.GetCancellationTokenOnDestroy()).Forget();
             // La commande est appliquée au prochain tick : on anticipe l'affichage.
             _auto.SetColors(on ? Theme.Primary : Theme.Surface3, on ? Theme.TextDark : Theme.Text);
             CancelTargeting();
@@ -478,13 +479,24 @@ namespace N29.HeroesDawn.Presentation.Combat
                               () => _sim?.Submit(CombatCommand.Retreat()), Loc.T("ui.cancel"), null, Theme.Danger);
         }
 
-        void OnDebugWin() => Ctx.S.Combat.ForceWinForDebug();
+        void OnDebugWin() => Ctx.S.ForceCombatWin.ExecuteAsync(this.GetCancellationTokenOnDestroy()).Forget();
 
         // ------------------------------------------------------------------ Fin
 
+        bool _finishing;
+
         void Finish()
         {
-            var r = Ctx.S.Combat.Finish();
+            if (_finishing) return;
+            FinishAsync().Forget();
+        }
+
+        async UniTaskVoid FinishAsync()
+        {
+            _finishing = true;
+            Result<CombatReport> r;
+            try { r = await Ctx.S.FinishCombat.ExecuteAsync(this.GetCancellationTokenOnDestroy()); }
+            finally { _finishing = false; }
             if (r.IsFailure)
             {
                 Ctx.Error(r.Error);
@@ -531,7 +543,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 var hq = Ui.Txt(w.Content, Loc.T("combat.to_hq"), 26, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Body);
                 hq.rectTransform.At(0.5f, 0f, 0, 150, 900, 34);
             }
-            VerifyAsync(verify);
+            VerifyAsync(verify).Forget();
 
             var btn = Ui.Btn(w.Content, Loc.T("ui.continue"), Theme.Primary, Theme.TextDark, () =>
             {
@@ -543,14 +555,14 @@ namespace N29.HeroesDawn.Presentation.Combat
             btn.Rect.At(0.5f, 0f, 0, 0, 420, 100);
         }
 
-        async void VerifyAsync(Text label)
+        async UniTaskVoid VerifyAsync(Text label)
         {
             _cts?.Cancel();
             _cts = new CancellationTokenSource();
             bool? ok;
             try
             {
-                ok = await Ctx.S.Combat.VerifyLastAsync(_cts.Token);
+                ok = await Ctx.S.VerifyCombat.ExecuteAsync(_cts.Token);
             }
             catch (Exception e)
             {

@@ -26,8 +26,6 @@ namespace N29.HeroesDawn.Tests.Domain
         TestApp.Clock _clock = null!;
         AuthService _auth = null!;
         HubService _hub = null!;
-        ZoneService _zones = null!;
-        CombatService _combat = null!;
 
         [SetUp]
         public void SetUp()
@@ -40,8 +38,6 @@ namespace N29.HeroesDawn.Tests.Domain
             var roster = _app.Publisher<RosterChanged>();
             _auth = new AuthService(_session, _app.Auth, _profiles, _clock, _app.Save, wallet, roster, _app.Logger);
             _hub = new HubService(_session, _app.Save, wallet, roster);
-            _zones = new ZoneService(_app.Effects, _app.Zone.Leave);
-            _combat = new CombatService(_session, _app.SeedSource, _zones, _app.Save, wallet, roster, _app.CombatVerifier, _app.Logger);
         }
 
         [Test]
@@ -95,14 +91,14 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.IsTrue(_app.Zone.Move.ExecuteAsync(new CaseId("n03")).GetAwaiter().GetResult().IsSuccess);
             Assert.AreEqual(ZoneRunPhase.InCombat, forced.Phase);
 
-            var begin = _combat.Begin();
+            var begin = _app.Combat.Begin.ExecuteAsync().GetAwaiter().GetResult();
             Assert.IsTrue(begin.IsSuccess);
             var sim = begin.Value;
-            _combat.SetAuto(true);
+            _app.Combat.SetAuto.ExecuteAsync(true).GetAwaiter().GetResult();
             sim.Step(20000);
             Assert.IsTrue(sim.IsOver);
             int credits = _session.Wallet.Credits;
-            var report = _combat.Finish().Value;
+            var report = _app.Combat.Finish.ExecuteAsync().GetAwaiter().GetResult().Value;
             Assert.IsTrue(report.Fatigue.All(f => f.After > f.Before));
             if (report.Victory)
             {
@@ -110,7 +106,7 @@ namespace N29.HeroesDawn.Tests.Domain
                 Assert.IsTrue(forced.IsSpent(new CaseId("n03")));
             }
             else Assert.AreEqual(new CaseId("n02"), forced.Position);
-            var ok = _combat.VerifyLastAsync(CancellationToken.None).GetAwaiter().GetResult();
+            var ok = _app.Combat.Verify.ExecuteAsync().GetAwaiter().GetResult();
             Assert.AreEqual(true, ok, "le rejeu doit redonner la même empreinte");
         }
 

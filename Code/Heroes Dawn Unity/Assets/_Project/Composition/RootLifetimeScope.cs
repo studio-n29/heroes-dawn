@@ -2,6 +2,7 @@
 using MessagePipe;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features;
+using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
@@ -41,6 +42,7 @@ namespace N29.HeroesDawn.Composition
             builder.RegisterMessageBroker<ToastRequested>(pipe);
             builder.RegisterMessageBroker<SaveStateChanged>(pipe);
             builder.RegisterMessageBroker<ZoneValidated>(pipe);
+            builder.RegisterMessageBroker<CombatFinished>(pipe);
 
             // ---- Ports (réseau simulé : placeholders des services UGS du M2)
             builder.Register<IClock, SystemClock>(Lifetime.Singleton);
@@ -53,7 +55,6 @@ namespace N29.HeroesDawn.Composition
             builder.Register<SaveScheduler>(Lifetime.Singleton);
             builder.Register<AuthService>(Lifetime.Singleton);
             builder.Register<HubService>(Lifetime.Singleton);
-            builder.Register<ZoneService>(Lifetime.Singleton);
 
             // ---- Use cases : plateau
             builder.Register<ZoneEffects>(Lifetime.Singleton);
@@ -66,7 +67,14 @@ namespace N29.HeroesDawn.Composition
             builder.Register<ResolveNarrativeUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<ResolveRestUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<LeaveZoneUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<CombatService>(Lifetime.Singleton);
+
+            // ---- Use cases : combat
+            builder.Register<ActiveCombat>(Lifetime.Singleton).AsSelf().As<IActiveCombatReadModel>();
+            builder.Register<BeginCombatUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<SetAutoCombatUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<FinishCombatUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<VerifyCombatUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<ForceCombatWinUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
 
             // ---- Interface
             builder.Register<UiServices>(Lifetime.Singleton);

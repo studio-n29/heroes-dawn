@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Domain.Combat;
 
@@ -73,6 +74,6 @@ namespace N29.HeroesDawn.Application.Ports
     /// <summary>Vérification serveur d'un combat (M1 : rejeu local ; M2 : Cloud Code).</summary>
     public interface ICombatVerifier
     {
-        Task<bool> VerifyAsync(CombatSetup setup, IReadOnlyList<CombatInput> inputs, ulong expectedHash, CancellationToken ct);
+        UniTask<bool> VerifyAsync(CombatSetup setup, IReadOnlyList<CombatInput> inputs, ulong expectedHash, CancellationToken ct);
     }
 }
