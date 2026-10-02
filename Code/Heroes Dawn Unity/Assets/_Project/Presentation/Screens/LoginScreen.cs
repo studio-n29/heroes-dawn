@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Threading;
-using N29.HeroesDawn.Application.Events;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Presentation.Common;
 using UnityEngine;
 using UnityEngine.UI;

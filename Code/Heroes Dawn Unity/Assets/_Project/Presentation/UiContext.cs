@@ -1,5 +1,6 @@
 #nullable enable
-using N29.HeroesDawn.Application.Events;
+using MessagePipe;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
@@ -21,14 +22,18 @@ namespace N29.HeroesDawn.Presentation
         public HubService Hub { get; }
         public ZoneService Zones { get; }
         public CombatService Combat { get; }
-        public GameEvents Events { get; }
+        public ISubscriber<WalletChanged> Wallet { get; }
+        public ISubscriber<RosterChanged> Roster { get; }
+        public ISubscriber<ToastRequested> Toasts { get; }
+        public ISubscriber<SaveStateChanged> Saving { get; }
         public AppLogger Log { get; }
         public ZoneId FirstZone { get; }
 
         public UiServices(GameSession session, AuthService auth, HubService hub, ZoneService zones, CombatService combat,
-                          GameEvents events, AppLogger log, ZoneId firstZone)
+                          ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, ISubscriber<ToastRequested> toasts,
+                          ISubscriber<SaveStateChanged> saving, AppLogger log, ZoneId firstZone)
         {
-            Session = session; Auth = auth; Hub = hub; Zones = zones; Combat = combat; Events = events; Log = log; FirstZone = firstZone;
+            Session = session; Auth = auth; Hub = hub; Zones = zones; Combat = combat; Wallet = wallet; Roster = roster; Toasts = toasts; Saving = saving; Log = log; FirstZone = firstZone;
         }
     }
 

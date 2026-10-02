@@ -2,7 +2,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using N29.HeroesDawn.Application.Events;
+using MessagePipe;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
@@ -23,14 +24,15 @@ namespace N29.HeroesDawn.Application.Features
         readonly IAuthGateway _auth;
         readonly IProfileGateway _profiles;
         readonly IClock _clock;
-        readonly SaveService _save;
-        readonly GameEvents _events;
+        readonly SaveScheduler _save;
+        readonly IPublisher<WalletChanged> _wallet;
+        readonly IPublisher<RosterChanged> _roster;
         readonly ILogger _log;
 
         public AuthService(GameSession session, IAuthGateway auth, IProfileGateway profiles, IClock clock,
-                           SaveService save, GameEvents events, ILogger log)
+                           SaveScheduler save, IPublisher<WalletChanged> wallet, IPublisher<RosterChanged> roster, ILogger log)
         {
-            _session = session; _auth = auth; _profiles = profiles; _clock = clock; _save = save; _events = events; _log = log;
+            _session = session; _auth = auth; _profiles = profiles; _clock = clock; _save = save; _wallet = wallet; _roster = roster; _log = log;
         }
 
         public bool IsSignedIn => _session.Account != null;
@@ -73,8 +75,8 @@ namespace N29.HeroesDawn.Application.Features
                 recovered = RecoverFatigue(data.lastSeenUtcTicks);
             }
             _log.Info($"Connecté : {account.DisplayName} ({account.PlayerId}) — profil {(isNew ? "nouveau" : "chargé")}");
-            _events.RaiseWallet();
-            _events.RaiseRoster();
+            _wallet.PublishWallet(_session);
+            _roster.PublishRoster();
             await _save.SaveAsync(ct);
             return Result<SignInReport>.Ok(new SignInReport(isNew, recovered));
         }
@@ -109,8 +111,8 @@ namespace N29.HeroesDawn.Application.Features
         {
             if (_session.Account != null) _profiles.Delete(_session.Account.PlayerId);
             _session.ResetToNewProfile();
-            _events.RaiseWallet();
-            _events.RaiseRoster();
+            _wallet.PublishWallet(_session);
+            _roster.PublishRoster();
             _save.RequestSave();
         }
     }

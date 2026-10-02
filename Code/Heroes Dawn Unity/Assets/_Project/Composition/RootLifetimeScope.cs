@@ -1,5 +1,6 @@
 #nullable enable
-using N29.HeroesDawn.Application.Events;
+using MessagePipe;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
@@ -32,7 +33,11 @@ namespace N29.HeroesDawn.Composition
             builder.RegisterInstance(content);
             builder.RegisterInstance<ILogger>(log);
             builder.Register<GameSession>(Lifetime.Singleton);
-            builder.Register<GameEvents>(Lifetime.Singleton);
+            var pipe = builder.RegisterMessagePipe();
+            builder.RegisterMessageBroker<WalletChanged>(pipe);
+            builder.RegisterMessageBroker<RosterChanged>(pipe);
+            builder.RegisterMessageBroker<ToastRequested>(pipe);
+            builder.RegisterMessageBroker<SaveStateChanged>(pipe);
 
             // ---- Ports (réseau simulé : placeholders des services UGS du M2)
             builder.Register<IClock, SystemClock>(Lifetime.Singleton);
@@ -42,7 +47,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<ICombatVerifier>(_ => new LocalCombatVerifier(content), Lifetime.Singleton);
 
             // ---- Services applicatifs
-            builder.Register<SaveService>(Lifetime.Singleton);
+            builder.Register<SaveScheduler>(Lifetime.Singleton);
             builder.Register<AuthService>(Lifetime.Singleton);
             builder.Register<HubService>(Lifetime.Singleton);
             builder.Register<ZoneService>(Lifetime.Singleton);
@@ -51,7 +56,8 @@ namespace N29.HeroesDawn.Composition
             // ---- Interface
             builder.Register<UiServices>(c => new UiServices(
                 c.Resolve<GameSession>(), c.Resolve<AuthService>(), c.Resolve<HubService>(), c.Resolve<ZoneService>(),
-                c.Resolve<CombatService>(), c.Resolve<GameEvents>(), c.Resolve<ILogger>(), PrototypeContent.Zone11), Lifetime.Singleton);
+                c.Resolve<CombatService>(), c.Resolve<ISubscriber<WalletChanged>>(), c.Resolve<ISubscriber<RosterChanged>>(),
+                c.Resolve<ISubscriber<ToastRequested>>(), c.Resolve<ISubscriber<SaveStateChanged>>(), c.Resolve<ILogger>(), PrototypeContent.Zone11), Lifetime.Singleton);
 
             builder.RegisterBuildCallback(c =>
             {

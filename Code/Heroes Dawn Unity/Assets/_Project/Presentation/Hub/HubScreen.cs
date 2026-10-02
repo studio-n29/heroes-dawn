@@ -1,6 +1,7 @@
 #nullable enable
+using MessagePipe;
 using System.Collections.Generic;
-using N29.HeroesDawn.Application.Events;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Combat;
@@ -14,6 +15,9 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// <summary>QG : effectif (escouade, entraînement), recrutement, salle des opérations, infirmerie.</summary>
     public sealed class HubScreen : UiScreen
     {
+        System.IDisposable? _subs;
+
+        void OnDestroy() => _subs?.Dispose();
         enum Tab { Team, Recruit }
 
         Tab _tab = Tab.Team;
@@ -51,7 +55,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _player = Ui.Txt(top, "", 24, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Player");
             _player.rectTransform.At(0f, 0.5f, 152, -32, 700, 34);
 
-            var wallet = WalletView.Create(top, Ctx.S.Session, Ctx.S.Events);
+            var wallet = WalletView.Create(top, Ctx.S.Session, Ctx.S.Wallet, Ctx.S.Saving);
             ((RectTransform)wallet.transform).At(1f, 0.5f, -330, 0, 700, 70);
             var logout = Ui.Btn(top, Loc.T("hub.logout"), Theme.Surface3, Theme.Text, OnLogout, 22, FontKind.Body);
             logout.Rect.At(1f, 0.5f, -20, 22, 290, 46);
@@ -133,15 +137,17 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public override void OnShow()
         {
-            Ctx.S.Events.RosterChanged += Refresh;
-            Ctx.S.Events.WalletChanged += Refresh;
+            var bag = DisposableBag.CreateBuilder();
+            Ctx.S.Roster.Subscribe(_ => Refresh()).AddTo(bag);
+            Ctx.S.Wallet.Subscribe(_ => Refresh()).AddTo(bag);
+            _subs = bag.Build();
             Refresh();
         }
 
         public override void OnHide()
         {
-            Ctx.S.Events.RosterChanged -= Refresh;
-            Ctx.S.Events.WalletChanged -= Refresh;
+            _subs?.Dispose();
+            _subs = null;
         }
 
         void SetTab(Tab t)

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using N29.HeroesDawn.Application.Events;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;

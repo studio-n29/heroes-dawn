@@ -1,4 +1,6 @@
 #nullable enable
+using Cysharp.Threading.Tasks;
+using MessagePipe;
 using N29.HeroesDawn.Presentation.Board;
 using N29.HeroesDawn.Presentation.Combat;
 using N29.HeroesDawn.Presentation.Common;
@@ -48,7 +50,7 @@ namespace N29.HeroesDawn.Presentation
             var ui = go.AddComponent<UiRoot>();
             var ctx = new UiContext(services, new Navigator(), modals, toasts, screens);
             ui.Context = ctx;
-            services.Events.Toast += (text, kind) => ctx.Toast(text, kind);
+            services.Toasts.Subscribe(t => ctx.Toast(t.Text, t.Kind)).AddTo(ui.destroyCancellationToken);
 
             ctx.Login = CreateScreen<LoginScreen>(screens, "Login", ctx);
             ctx.Hub = CreateScreen<HubScreen>(screens, "Hub", ctx);

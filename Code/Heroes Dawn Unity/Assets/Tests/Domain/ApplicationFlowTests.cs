@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using N29.HeroesDawn.Application.Events;
+using N29.HeroesDawn.Application.Messages;
+using N29.HeroesDawn.Tests.Domain.Application;
 using N29.HeroesDawn.Application.Features;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
@@ -19,35 +20,10 @@ namespace N29.HeroesDawn.Tests.Domain
     /// <summary>Parcours applicatif complet sans Unity : connexion, QG, zone, combat, sauvegarde.</summary>
     public sealed class ApplicationFlowTests
     {
-        sealed class MemoryProfiles : IProfileGateway
-        {
-            public readonly Dictionary<string, ProfileData> Store = new Dictionary<string, ProfileData>();
-            public int Saves;
-            public Task<ProfileData?> LoadAsync(string id, CancellationToken ct)
-                => Task.FromResult(Store.TryGetValue(id, out var p) ? p : (ProfileData?)null);
-            public Task SaveAsync(string id, ProfileData data, CancellationToken ct) { Store[id] = data; Saves++; return Task.CompletedTask; }
-            public void Delete(string id) => Store.Remove(id);
-        }
-
-        sealed class FakeAuth : IAuthGateway
-        {
-            public Task<Result<PlayerAccount>> SignInAsGuestAsync(CancellationToken ct)
-                => Task.FromResult(Result<PlayerAccount>.Ok(new PlayerAccount("p1", "Invité-TEST")));
-            public void SignOut() { }
-        }
-
-        sealed class Seeds : ISeedProvider { ulong _n = 11; public ulong NextSeed(string p) => _n += 7919; }
-        sealed class Clock : IClock { public DateTime UtcNow { get; set; } = new DateTime(2026, 9, 30, 12, 0, 0, DateTimeKind.Utc); }
-        sealed class Log : ILogger { public void Info(string m) { } public void Warn(string m) { } public void Error(string m) { } }
-        sealed class Verifier : ICombatVerifier
-        {
-            public Task<bool> VerifyAsync(CombatSetup s, IReadOnlyList<CombatInput> i, ulong h, CancellationToken ct)
-                => Task.FromResult(CombatReplay.Run(PrototypeContent.Build(), s, i).StateHash == h);
-        }
-
+        TestApp _app = null!;
         GameSession _session = null!;
-        MemoryProfiles _profiles = null!;
-        Clock _clock = null!;
+        TestApp.MemoryProfiles _profiles = null!;
+        TestApp.Clock _clock = null!;
         AuthService _auth = null!;
         HubService _hub = null!;
         ZoneService _zones = null!;
@@ -56,18 +32,16 @@ namespace N29.HeroesDawn.Tests.Domain
         [SetUp]
         public void SetUp()
         {
-            var content = PrototypeContent.Build();
-            _session = new GameSession(content);
-            _profiles = new MemoryProfiles();
-            _clock = new Clock();
-            var events = new GameEvents();
-            var log = new Log();
-            var seeds = new Seeds();
-            var save = new SaveService(_session, _profiles, _clock, log, events);
-            _auth = new AuthService(_session, new FakeAuth(), _profiles, _clock, save, events, log);
-            _hub = new HubService(_session, save, events);
-            _zones = new ZoneService(_session, seeds, save, events, log);
-            _combat = new CombatService(_session, seeds, _zones, save, events, new Verifier(), log);
+            _app = new TestApp();
+            _session = _app.Session;
+            _profiles = _app.Profiles;
+            _clock = _app.Time;
+            var wallet = _app.Publisher<WalletChanged>();
+            var roster = _app.Publisher<RosterChanged>();
+            _auth = new AuthService(_session, _app.Auth, _profiles, _clock, _app.Save, wallet, roster, _app.Logger);
+            _hub = new HubService(_session, _app.Save, wallet, roster);
+            _zones = new ZoneService(_session, _app.SeedSource, _app.Save, wallet, roster, _app.Logger);
+            _combat = new CombatService(_session, _app.SeedSource, _zones, _app.Save, wallet, roster, _app.CombatVerifier, _app.Logger);
         }
 
         [Test]

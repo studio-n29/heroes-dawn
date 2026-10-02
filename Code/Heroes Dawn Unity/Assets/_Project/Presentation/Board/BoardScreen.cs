@@ -1,7 +1,8 @@
 #nullable enable
+using MessagePipe;
 using System;
 using System.Collections.Generic;
-using N29.HeroesDawn.Application.Events;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
@@ -18,6 +19,9 @@ namespace N29.HeroesDawn.Presentation.Board
     /// <summary>Plateau : dé, déplacement, brouillard, objectifs ; ouvre les combats et les cases interactives.</summary>
     public sealed class BoardScreen : UiScreen
     {
+        System.IDisposable? _subs;
+
+        void OnDestroy() => _subs?.Dispose();
         BoardMapView _map = null!;
         Text _zoneTitle = null!;
         RectTransform _objectiveList = null!;
@@ -43,7 +47,7 @@ namespace N29.HeroesDawn.Presentation.Board
             _zoneTitle = Ui.Txt(top, "", 46, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Zone");
             _zoneTitle.rectTransform.At(0f, 0.5f, 30, 0, 900, 70);
             _zoneTitle.Inked(2.5f);
-            var wallet = WalletView.Create(top, Ctx.S.Session, Ctx.S.Events);
+            var wallet = WalletView.Create(top, Ctx.S.Session, Ctx.S.Wallet, Ctx.S.Saving);
             ((RectTransform)wallet.transform).At(1f, 0.5f, -290, 0, 700, 66);
             var back = Ui.Btn(top, Loc.T("board.back_hq"), Theme.Surface3, Theme.Text, OnBackToHq, 30);
             back.Rect.At(1f, 0.5f, -20, 0, 250, 66);
@@ -114,7 +118,8 @@ namespace N29.HeroesDawn.Presentation.Board
             _map.Build(run, leader.Family, Loc.MemberName(leader));
             var zone = Ctx.S.Session.RunZone;
             _zoneTitle.text = zone != null ? Loc.T("zones.ny_1_1.code") + " · " + Loc.T(zone.NameKey) : "";
-            Ctx.S.Events.RosterChanged += RefreshSquad;
+            _subs?.Dispose();
+            _subs = Ctx.S.Roster.Subscribe(_ => RefreshSquad());
             RefreshAll();
 
             // Reprise d'une case interactive laissée ouverte.
@@ -124,7 +129,8 @@ namespace N29.HeroesDawn.Presentation.Board
 
         public override void OnHide()
         {
-            Ctx.S.Events.RosterChanged -= RefreshSquad;
+            _subs?.Dispose();
+            _subs = null;
         }
 
         void Update()

@@ -58,8 +58,8 @@ namespace N29.HeroesDawn.Presentation.Popups
             game.Build(w.Content, success =>
             {
                 var b = ctx.S.Session.Content.Balance;
-                if (success) ctx.Toast(Loc.F("mg.success", b.MiniGameCredits, b.MiniGamePr), Application.Events.ToastKind.Reward);
-                else ctx.Toast(Loc.T("mg.fail"), Application.Events.ToastKind.Warning);
+                if (success) ctx.Toast(Loc.F("mg.success", b.MiniGameCredits, b.MiniGamePr), Application.Messages.ToastKind.Reward);
+                else ctx.Toast(Loc.T("mg.fail"), Application.Messages.ToastKind.Warning);
                 Finish(ctx, w, ctx.S.Zones.ResolveMiniGame(success), done);
             });
         }

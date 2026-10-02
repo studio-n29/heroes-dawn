@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
-using N29.HeroesDawn.Application.Events;
+using MessagePipe;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
@@ -24,12 +25,13 @@ namespace N29.HeroesDawn.Application.Features
     public sealed class HubService
     {
         readonly GameSession _s;
-        readonly SaveService _save;
-        readonly GameEvents _events;
+        readonly SaveScheduler _save;
+        readonly IPublisher<WalletChanged> _wallet;
+        readonly IPublisher<RosterChanged> _roster;
 
-        public HubService(GameSession session, SaveService save, GameEvents events)
+        public HubService(GameSession session, SaveScheduler save, IPublisher<WalletChanged> wallet, IPublisher<RosterChanged> roster)
         {
-            _s = session; _save = save; _events = events;
+            _s = session; _save = save; _wallet = wallet; _roster = roster;
         }
 
         public IReadOnlyList<MemberDef> AvailableRecruits()
@@ -55,7 +57,7 @@ namespace N29.HeroesDawn.Application.Features
                 if (count >= MetaRules.SquadSize) return Result.Fail(HubErrors.SquadFull);
                 m.InSquad = true;
             }
-            _events.RaiseRoster();
+            _roster.PublishRoster();
             _save.RequestSave();
             return Result.Ok();
         }
@@ -67,8 +69,8 @@ namespace N29.HeroesDawn.Application.Features
             if (m.Level >= MetaRules.MaxLevel) return Result.Fail(HubErrors.MaxLevel);
             if (!_s.Wallet.TrySpend(MetaRules.TrainCost(m.Level), 0)) return Result.Fail(HubErrors.NotEnoughCredits);
             m.Level++;
-            _events.RaiseWallet();
-            _events.RaiseRoster();
+            _wallet.PublishWallet(_s);
+            _roster.PublishRoster();
             _save.RequestSave();
             return Result.Ok();
         }
@@ -83,8 +85,8 @@ namespace N29.HeroesDawn.Application.Features
             var member = new TeamMember(def, MetaRules.RecruitLevel);
             member.InSquad = _s.Squad.Count < MetaRules.SquadSize && _s.Run == null;
             _s.Roster.Add(member);
-            _events.RaiseWallet();
-            _events.RaiseRoster();
+            _wallet.PublishWallet(_s);
+            _roster.PublishRoster();
             _save.RequestSave();
             return Result.Ok();
         }
@@ -97,8 +99,8 @@ namespace N29.HeroesDawn.Application.Features
             if (!any) return Result.Fail(HubErrors.NothingToHeal);
             if (!_s.Wallet.TrySpend(MetaRules.InfirmaryCost, 0)) return Result.Fail(HubErrors.NotEnoughCredits);
             foreach (var m in _s.Roster) m.AddFatigue(-MetaRules.InfirmaryReduction);
-            _events.RaiseWallet();
-            _events.RaiseRoster();
+            _wallet.PublishWallet(_s);
+            _roster.PublishRoster();
             _save.RequestSave();
             return Result.Ok();
         }

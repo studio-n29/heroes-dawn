@@ -1,7 +1,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using N29.HeroesDawn.Application.Events;
+using MessagePipe;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
@@ -38,15 +39,16 @@ namespace N29.HeroesDawn.Application.Features
 
         readonly GameSession _s;
         readonly ISeedProvider _seeds;
-        readonly SaveService _save;
-        readonly GameEvents _events;
+        readonly SaveScheduler _save;
+        readonly IPublisher<WalletChanged> _wallet;
+        readonly IPublisher<RosterChanged> _roster;
         readonly ILogger _log;
 
         public ZoneRewards? LastRewards { get; private set; }
 
-        public ZoneService(GameSession session, ISeedProvider seeds, SaveService save, GameEvents events, ILogger log)
+        public ZoneService(GameSession session, ISeedProvider seeds, SaveScheduler save, IPublisher<WalletChanged> wallet, IPublisher<RosterChanged> roster, ILogger log)
         {
-            _s = session; _seeds = seeds; _save = save; _events = events; _log = log;
+            _s = session; _seeds = seeds; _save = save; _wallet = wallet; _roster = roster; _log = log;
         }
 
         public ZoneRun? Run => _s.Run;
@@ -78,7 +80,7 @@ namespace N29.HeroesDawn.Application.Features
             if (res.IsSuccess && success)
             {
                 _s.Wallet.Add(Balance.MiniGameCredits, Balance.MiniGamePr);
-                _events.RaiseWallet();
+                _wallet.PublishWallet(_s);
                 _save.RequestSave();
             }
             return res;
@@ -94,8 +96,8 @@ namespace N29.HeroesDawn.Application.Features
                 case NarrativeChoice.Research: _s.Wallet.Add(0, NarrativePr); break;
                 case NarrativeChoice.Morale: foreach (var m in _s.Squad) m.AddFatigue(-NarrativeMorale); break;
             }
-            _events.RaiseWallet();
-            _events.RaiseRoster();
+            _wallet.PublishWallet(_s);
+            _roster.PublishRoster();
             _save.RequestSave();
             return res;
         }
@@ -107,7 +109,7 @@ namespace N29.HeroesDawn.Application.Features
             if (res.IsSuccess && take)
             {
                 foreach (var m in _s.Squad) m.AddFatigue(-Balance.RestFatigueReduction);
-                _events.RaiseRoster();
+                _roster.PublishRoster();
                 _save.RequestSave();
             }
             return res;
@@ -167,7 +169,7 @@ namespace N29.HeroesDawn.Application.Features
                         break;
                 }
             }
-            if (wallet) _events.RaiseWallet();
+            if (wallet) _wallet.PublishWallet(_s);
             if (wallet) _save.RequestSave();
         }
 

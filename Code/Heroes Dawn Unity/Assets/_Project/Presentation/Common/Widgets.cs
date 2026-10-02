@@ -1,5 +1,7 @@
 #nullable enable
-using N29.HeroesDawn.Application.Events;
+using System;
+using MessagePipe;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Definitions;
 using UnityEngine;
@@ -11,19 +13,22 @@ namespace N29.HeroesDawn.Presentation.Common
     public sealed class WalletView : MonoBehaviour
     {
         GameSession _session = null!;
-        GameEvents _events = null!;
+        ISubscriber<WalletChanged> _walletEvents = null!;
+        ISubscriber<SaveStateChanged> _savingEvents = null!;
+        IDisposable? _subs;
         Text _credits = null!;
         Text _pr = null!;
         Text _saving = null!;
         int _lastCredits = -1;
         int _lastPr = -1;
 
-        public static WalletView Create(RectTransform parent, GameSession session, GameEvents events)
+        public static WalletView Create(RectTransform parent, GameSession session, ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving)
         {
             var rt = Ui.Rect(parent, "Wallet");
             var v = rt.gameObject.AddComponent<WalletView>();
             v._session = session;
-            v._events = events;
+            v._walletEvents = wallet;
+            v._savingEvents = saving;
             rt.HLayout(16, 0, TextAnchor.MiddleRight);
             v._saving = Ui.Txt(rt, "", 22, Theme.TextMuted, TextAnchor.MiddleRight, FontKind.Regular, "Saving");
             v._saving.Pref(170, 60);
@@ -47,17 +52,18 @@ namespace N29.HeroesDawn.Presentation.Common
 
         void OnEnable()
         {
-            if (_events == null) return;
-            _events.WalletChanged += Refresh;
-            _events.SaveStateChanged += OnSaving;
+            if (_walletEvents == null) return;
+            var bag = DisposableBag.CreateBuilder();
+            _walletEvents.Subscribe(_ => Refresh()).AddTo(bag);
+            _savingEvents.Subscribe(m => OnSaving(m.Saving)).AddTo(bag);
+            _subs = bag.Build();
             Refresh();
         }
 
         void OnDisable()
         {
-            if (_events == null) return;
-            _events.WalletChanged -= Refresh;
-            _events.SaveStateChanged -= OnSaving;
+            _subs?.Dispose();
+            _subs = null;
         }
 
         void OnSaving(bool saving) { if (_saving != null) _saving.text = saving ? Loc.T("ui.saving") : ""; }

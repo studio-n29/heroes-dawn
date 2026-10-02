@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using N29.HeroesDawn.Application.Events;
+using MessagePipe;
+using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
@@ -53,8 +54,9 @@ namespace N29.HeroesDawn.Application.Features
         readonly GameSession _s;
         readonly ISeedProvider _seeds;
         readonly ZoneService _zones;
-        readonly SaveService _save;
-        readonly GameEvents _events;
+        readonly SaveScheduler _save;
+        readonly IPublisher<WalletChanged> _wallet;
+        readonly IPublisher<RosterChanged> _roster;
         readonly ICombatVerifier _verifier;
         readonly ILogger _log;
         readonly List<TeamMember> _fighters = new List<TeamMember>();
@@ -66,10 +68,10 @@ namespace N29.HeroesDawn.Application.Features
         public IReadOnlyList<TeamMember> Fighters => _fighters;
         public bool DebugUsed { get; private set; }
 
-        public CombatService(GameSession session, ISeedProvider seeds, ZoneService zones, SaveService save, GameEvents events,
+        public CombatService(GameSession session, ISeedProvider seeds, ZoneService zones, SaveScheduler save, IPublisher<WalletChanged> wallet, IPublisher<RosterChanged> roster,
                              ICombatVerifier verifier, ILogger log)
         {
-            _s = session; _seeds = seeds; _zones = zones; _save = save; _events = events; _verifier = verifier; _log = log;
+            _s = session; _seeds = seeds; _zones = zones; _save = save; _wallet = wallet; _roster = roster; _verifier = verifier; _log = log;
         }
 
         public Result<CombatSimulation> Begin()
@@ -165,8 +167,8 @@ namespace N29.HeroesDawn.Application.Features
 
             var report = new CombatReport(victory, credits, pending.Rank, boss, changes, boardEvents, toHq);
             _log.Info($"Combat terminé : {(victory ? "victoire" : "défaite")} en {sim.Tick} ticks, +{credits} Crédits");
-            _events.RaiseWallet();
-            _events.RaiseRoster();
+            _wallet.PublishWallet(_s);
+            _roster.PublishRoster();
             _save.RequestSave();
             return Result<CombatReport>.Ok(report);
         }
