@@ -17,12 +17,12 @@
 | Authentication | Invité, Google Play Games, Apple, Steam ; liaison de comptes (cross-progression mobile ↔ PC) |
 | Cloud Save | Progression, équipe, état des zones (sauvegarde à chaque case) |
 | Economy | Crédits, PR, Gemmes, inventaire, achats |
-| Cloud Code | Logique **côté serveur** : récompenses, recrutement, rotation de pool, pass, horloge des objectifs secondaires |
+| Cloud Code | Scripts **JS** déployés depuis Unity (`Assets/_Project/Backend/CloudCode`) : contrôles légers des récompenses et coûts, rotation de pool, pass, horloge des objectifs secondaires |
 | Remote Config | Paramètres d'équilibrage (issus de `05_Equilibrage.xlsx`), événements, A/B tests |
 | Analytics | KPIs, entonnoirs (voir Live-ops) |
 | IAP | Unity IAP (Google Play, App Store) ; Steam : microtransactions Steamworks |
 
-**Règle** : toute récompense et tout coût sont validés par Cloud Code. Le client ne fait qu'afficher.
+**Règle** : le client calcule les règles du jeu ; toute récompense et tout coût passent par un script Cloud Code qui applique des contrôles légers (plafonds, idempotence, heure serveur). Toute la configuration UGS vit dans Unity et se déploie par *Window ▸ Deployment*.
 
 ## Architecture client (résumé — détail dans 02 à 07)
 - **Data-driven** : ScriptableObjects pour membres, compétences (gabarits par famille), ennemis, cases, pools, événements, plateaux.
@@ -33,9 +33,9 @@
 
 ## Outils à produire
 - Éditeur de plateau (placement de cases, chemins, pools).
-- Import des paramètres du tableur vers Remote Config.
-- Simulateur de combat en lot (équilibrage des combos et des rangs).
+- Import des paramètres du tableur (menu *Heroes Dawn ▸ Équilibrage ▸ Importer*) vers `balance.json` (client) et `balance.rc` (Remote Config).
+- Simulateur de combat en lot dans l'éditeur (menu *Heroes Dawn ▸ Équilibrage ▸ Simulateur*).
 
 ## Tests
-- Tests unitaires sur la simulation de combat et l'économie (Cloud Code).
+- Tests unitaires (Unity Test Framework) sur la simulation de combat, l'équilibrage et la configuration backend.
 - Matrice d'appareils : 3 Android bas/milieu/haut de gamme, 2 iPhone, 1 PC minimum.

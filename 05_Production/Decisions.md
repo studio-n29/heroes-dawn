@@ -84,3 +84,6 @@
 | 2026-09-29 | Simulation déterministe (entiers/virgule fixe, PCG32, ticks 50 ms) + checkpoints serveur rejoués | Anti-triche, tests, simulateur |
 | 2026-09-29 | Plan d'implémentation du prototype M1 (20 tâches, 2 parties) | `Code/docs/plans/` |
 | 2026-09-29 | Projet Unity `Code/Heroes Dawn Unity` (6000.6.3f1, URP) ; squelette : 11 assemblies, package partagé, VContainer/UniTask/MessagePipe via Git, PrimeTween via OpenUPM | |
+| 2026-10-02 | Tout se passe dans Unity : aucun script ni projet .NET hors du projet Unity | Remplace `Tools/`, `Server/`, `dotnet test` |
+| 2026-10-02 | Backend UGS piloté depuis l'éditeur (Deployment) ; logique serveur en scripts Cloud Code JS ; contrôles légers, pas de rejeu de combat côté serveur | Remplace le module Cloud Code C# et les checkpoints rejoués |
+| 2026-10-02 | Simulateur et import du tableur = outils éditeur (menu Heroes Dawn ▸ Équilibrage) | Remplace les consoles .NET `BalanceSimulator` / `BalanceImport` |

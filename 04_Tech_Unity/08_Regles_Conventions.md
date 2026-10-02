@@ -4,7 +4,7 @@
 1. **Direction des dépendances** : Présentation → Application → Domaine → Core. Jamais l'inverse (garanti par les `.asmdef`).
 2. **Domaine pur** : aucun `using UnityEngine` dans `Core`, `Definitions`, `Domain.*`, `Application`.
 3. **Déterminisme** : règles de `05_Simulation_Deterministe.md` (pas de `float`, RNG injecté, ordre stable).
-4. **Serveur autoritaire** : toute dépense, récompense ou fin de timer passe par un use case qui appelle Cloud Code.
+4. **Contrôle serveur** : toute dépense, récompense ou fin de timer passe par un use case qui appelle un script Cloud Code (JS, déployé depuis Unity).
 5. **Un use case par intention**, un agrégat modifié de façon autoritaire par appel serveur.
 6. **Vues passives** : une vue n'a ni état de jeu ni référence à la session.
 7. **Événements publiés après l'état** : jamais d'événement « optimiste » sur une donnée autoritaire.
@@ -53,7 +53,7 @@
 ## Checklist de revue (à chaque pull request)
 - [ ] Aucune dépendance vers une couche supérieure ; pas de `UnityEngine` dans le code pur.
 - [ ] Aucune règle de jeu dans une vue ou un présentateur.
-- [ ] Toute dépense/récompense passe par Cloud Code.
+- [ ] Toute dépense/récompense passe par un script Cloud Code.
 - [ ] Nouvelle règle de simulation → test unitaire + test de rejeu.
 - [ ] Nouveau contenu → validateur de contenu vert.
 - [ ] Textes localisés, pas de chaîne en dur.

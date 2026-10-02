@@ -1,7 +1,9 @@
-# Simulation déterministe et vérification serveur
+# Simulation déterministe et contrôles serveur
 
 ## Objectif
-Le combat et le plateau tournent **sur le client** (réactivité, pas de latence), mais le serveur doit pouvoir **rejouer exactement** la même partie pour valider les récompenses. Même code (domaine partagé), même graine, mêmes entrées → même résultat.
+Le combat et le plateau tournent **sur le client** (réactivité, pas de latence). Le déterminisme reste obligatoire : même code, même graine, mêmes entrées → même résultat. Il sert aux tests de rejeu, au simulateur d'équilibrage, au lecteur de journaux et à la reprise des zones.
+
+> **Décision 2026-10-02 :** tout se passe dans Unity. Le serveur (scripts Cloud Code JS) **ne rejoue pas** les parties ; il applique des contrôles légers. Les sections « Points de contrôle » et « Ce que le serveur contrôle » ci-dessous en tiennent compte.
 
 ## Règles de déterminisme (obligatoires dans `Core`, `Definitions`, `Domain.*`)
 1. **Pas de `float` ni de `double`** dans les calculs de simulation. Entiers (`int`, `long`) et `Fixed` (virgule fixe 32.32).
@@ -45,42 +47,42 @@ L'**empreinte** = hachage (FNV-1a 64) de l'état final (PV, statuts, tick). Le s
 - Le client simule librement ; le journal enregistre : lancers, dés bonus, destinations, choix d'événements, résultats de mini-jeux.
 
 ## Points de contrôle (checkpoints)
-Le client envoie le journal au serveur **à chaque case qui donne quelque chose** (ressource, combat, mini-jeu, événement, objectif) — ce qui sert aussi de **sauvegarde de zone reprenable**.
+Le client envoie un **état résumé** et les gains déclarés au serveur **à chaque case qui donne quelque chose** (ressource, combat, mini-jeu, événement, objectif) — ce qui sert aussi de **sauvegarde de zone reprenable**.
 
 ```mermaid
 sequenceDiagram
   participant C as Client (simulation)
-  participant CC as Cloud Code (même domaine)
+  participant CC as Cloud Code (script JS)
   participant SV as Cloud Save / Economy
-  C->>CC: Checkpoint(runId, depuis=n, actions[n..m], empreinte)
-  CC->>CC: Charge board_run, rejoue actions n..m
-  alt empreintes identiques
+  C->>CC: Checkpoint(runId, requestId, état résumé, gains déclarés)
+  CC->>CC: Charge board_run, vérifie cohérence + plafonds (balance)
+  alt contrôles OK
     CC->>SV: Écrit board_run + accorde les récompenses (atomique)
     CC-->>C: OK + récompenses + nouvelle position de journal
-  else divergence
+  else contrôle refusé
     CC-->>C: Refus + état serveur
     C->>C: Recharge l'état serveur (la partie reprend au dernier point valide)
   end
 ```
 
-- Coût : 1 appel par case significative (environ 10-15 par zone), acceptable pour Cloud Code.
+- Coût : 1 appel par case significative (environ 10-15 par zone), acceptable pour Cloud Code (script léger, sans rejeu).
 - Latence : l'animation de la case masque l'appel ; les récompenses s'affichent à la réponse.
-- Combat : checkpoint unique à la fin (`ResolveCombat`), qui rejoue le journal de combat.
+- Combat : checkpoint unique à la fin (`ResolveCombat`) : résultat, durée et empreinte ; le serveur vérifie la plausibilité (durée minimale, plafonds du rang) sans rejouer.
 
-## Ce que le serveur rejoue, ce qu'il ne rejoue pas
-| Élément | Rejoué | Vérification |
-|---|---|---|
-| Déplacements, dés, pools, cases | Oui | Rejeu complet |
-| Combat | Oui | Rejeu complet + empreinte |
-| Événements narratifs | Oui | Choix valide + tirage |
-| Mini-jeux d'adresse (Démonstration, Piratage, Poursuite) | Non | Plausibilité : durée ≥ minimum, nombre d'entrées cohérent, taux de réussite du joueur suivi |
-| Intervention | Oui | Tirage avec la graine |
+## Ce que le serveur contrôle
+| Élément | Contrôle (sans rejeu) |
+|---|---|
+| Déplacements, dés, pools, cases | Case atteinte cohérente avec le plateau, gain ≤ plafond de la case |
+| Combat | Durée ≥ minimum, gains ≤ plafond du rang, empreinte journalisée (audit) |
+| Événements narratifs | Choix valide pour l'événement |
+| Mini-jeux d'adresse (Démonstration, Piratage, Poursuite) | Plausibilité : durée ≥ minimum, taux de réussite du joueur suivi |
+| Toutes les récompenses | Idempotence (`requestId`), plafonds quotidiens, débit/crédit par Economy |
 
 ## Versionnement des règles
 - Chaque build embarque `RulesVersion` (hash des définitions + version du package partagé).
 - Le serveur accepte la version courante et la précédente pendant un déploiement ; au-delà, il demande une mise à jour de l'application.
-- Une zone en cours avec une ancienne version est **terminée avec l'ancienne** (le module Cloud Code garde N-1).
+- Une zone en cours avec une ancienne version est **terminée avec l'ancienne** (les scripts Cloud Code acceptent N-1).
 
 ## Performances
 - Combat : ≤ 0,2 ms par tick sur un Android d'entrée de gamme (cible), zéro allocation par tick (structs, tableaux pré-alloués, pools d'événements).
-- Rejeu serveur d'un combat de 90 s (1 800 ticks) : < 20 ms.
+- Rejeu d'un combat de 90 s (1 800 ticks) dans l'éditeur (tests, simulateur) : < 20 ms.

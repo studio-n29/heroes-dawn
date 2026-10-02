@@ -15,7 +15,8 @@
 | `N29.HeroesDawn.Presentation` | Présentation | Oui | Application (interfaces + événements), Definitions, Core, PrimeTween, MessagePipe | Vues, présentateurs, UI, audio |
 | `N29.HeroesDawn.Composition` | Composition | Oui | **Tout** | LifetimeScopes VContainer, GameFlow, point d'entrée |
 | `N29.HeroesDawn.Editor` | Outils | Éditeur | Tout | Éditeur de plateau, import d'équilibrage, simulateur |
-| `N29.HeroesDawn.Tests.Domain` | Tests | Non | Core, Definitions, Domain.*, Application | Tests unitaires (aussi lancés avec `dotnet test`) |
+| `N29.HeroesDawn.Tests.Domain` | Tests | Non | Core, Definitions, Domain.*, Application | Tests unitaires (Test Runner ou batchmode) |
+| `N29.HeroesDawn.Tests.Editor` | Tests | Éditeur | Editor, Content, Domain.* | Tests des outils éditeur et de la configuration backend |
 | `N29.HeroesDawn.Tests.PlayMode` | Tests | Oui | Tout | Tests d'intégration en scène |
 
 Réglages des assemblies pures : `noEngineReferences: true`, `autoReferenced: false`, `overrideReferences: true` (aucune DLL implicite).
@@ -52,10 +53,8 @@ flowchart LR
 - Deux modules du domaine qui ont besoin l'un de l'autre → l'orchestration remonte dans **Application**.
 - `Presentation` ne référence **jamais** `Infrastructure` ni un `Domain.*` en écriture : elle lit des **vues en lecture seule** (interfaces `IReadOnly…`) et appelle des **use cases**.
 
-## Partage avec le serveur
-Le code de `Core`, `Definitions` et `Domain.*` vit dans un **package local** et est compilé deux fois :
-- par Unity via les `.asmdef` ;
-- par le module Cloud Code C# via un `.csproj` qui inclut les mêmes fichiers source (`<Compile Include="..\..\Packages\com.n29.heroesdawn.domain\**\*.cs" />`).
+## Code partagé
+Le code de `Core`, `Definitions` et `Domain.*` vit dans un **package local** compilé par Unity via les `.asmdef`. Il n'est plus compilé hors de Unity (décision 2026-10-02 : pas de module Cloud Code C#, pas de `dotnet test`) ; il reste du C# pur pour être testable et rejouable.
 
 Cible commune : **netstandard2.1**, C# 9 (pas de fonctionnalités plus récentes dans le code partagé).
 
@@ -83,19 +82,14 @@ HeroesDawn/
 │  │  │  │  └─ Features/<Feature>/         Views/, Presenters/
 │  │  │  ├─ Editor/                        N29.HeroesDawn.Editor
 │  │  │  ├─ Art/  Audio/  Prefabs/  Scenes/  Localization/
-│  │  │  └─ AddressableGroups/             Core, Hub, Board, Combat, City_NewYork…
-│  │  └─ Tests/                            Domain/, PlayMode/
+│  │  │  ├─ AddressableGroups/             Core, Hub, Board, Combat, City_NewYork…
+│  │  │  └─ Backend/                       CloudCode/ (JS), Economy/ (.ecc), RemoteConfig/ (balance.rc) — déployés par Window ▸ Deployment
+│  │  └─ Tests/                            Domain/, Editor/, PlayMode/
 │  └─ Packages/
 │     └─ com.n29.heroesdawn.domain/        ← code partagé
 │        ├─ Core/
 │        ├─ Definitions/
 │        └─ Domain/<Module>/
-├─ Server/
-│  ├─ HeroesDawn.CloudCode/                module Cloud Code C# (.csproj, référence le code partagé)
-│  └─ HeroesDawn.CloudCode.Tests/
-├─ Tools/
-│  ├─ BalanceSimulator/                    console .NET : simulations de combat en lot
-│  └─ BalanceImport/                       xlsx → JSON Remote Config
 └─ Docs/  → lien vers « Documents/Heroes Dawn »
 ```
 

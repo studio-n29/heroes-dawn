@@ -20,8 +20,8 @@
 
 Chaque port a aussi une implémentation **factice** (`Fake…`) pour les tests et le mode hors ligne du développement.
 
-## Cloud Code — module C# `HeroesDawn.CloudCode`
-Le module référence le code partagé (`Core`, `Definitions`, `Domain.*`) et charge le contenu depuis un JSON versionné.
+## Cloud Code — scripts JS déployés depuis Unity
+Un script par point d'entrée dans `Assets/_Project/Backend/CloudCode/<PointDEntrée>.js`, déployé par *Window ▸ Deployment* (décision 2026-10-02 : tout dans Unity, pas de module C# séparé). Le client calcule les règles ; le serveur applique des **contrôles légers** et ne rejoue pas les parties : plafonds de gain lus dans la clé Remote Config `balance`, cohérence des entrées, heure serveur, débits et crédits par Economy.
 
 | Point d'entrée | Entrée | Effet autoritaire | Sortie |
 |---|---|---|---|
@@ -35,9 +35,9 @@ Le module référence le code partagé (`Core`, `Definitions`, `Domain.*`) et ch
 | `StartExpedition` / `ClaimExpedition` | membres, zone, durée | Timer / récompenses | HQ, wallet |
 | `CollectLab` | — | Accorde les PR accumulés | Wallet |
 | `OpenZone` | `zoneId`, difficulté, équipe | Crée ou reprend `board_run`, donne la graine | État de zone |
-| `Checkpoint` | `runId`, actions, empreinte | Rejoue, sauvegarde, accorde les récompenses | Récompenses, état |
+| `Checkpoint` | `runId`, état résumé, gains déclarés | Vérifie la cohérence et les plafonds, sauvegarde, accorde les récompenses | Récompenses, état |
 | `StartCombat` | `runId`, `caseId` | Graine de combat | Seed, setup ennemi |
-| `ResolveCombat` | journal de combat | Rejoue, XP, fatigue, récompenses, progression | Résultat validé |
+| `ResolveCombat` | résultat, durée, empreinte | Vérifie la plausibilité (rang, durée minimale, plafonds), XP, fatigue, récompenses, progression | Résultat validé |
 | `LeaveZone` | `runId` | Ferme le brouillard, conserve les objectifs | État de campagne |
 | `ClaimPassTier` | palier, piste | Récompense | Wallet, pass |
 | `ClaimMission` / `ClaimAchievement` | id | Récompense | Wallet, pass |
@@ -70,21 +70,20 @@ Chaque clé porte un champ `schemaVersion` ; les migrations sont écrites côté
 | Achats réels | `GEMS_100` … `GEMS_6000`, `WELCOME_PACK`, `PASS_PREMIUM_S<n>` |
 
 ## Remote Config
-- Une clé JSON `balance` = tout `BalanceConfig` (généré depuis `05_Equilibrage.xlsx` par l'outil `BalanceImport`).
+- Une clé JSON `balance` = tout `BalanceConfig` (généré depuis `05_Equilibrage.xlsx` par le menu *Heroes Dawn ▸ Équilibrage ▸ Importer*, qui écrit `Assets/_Project/Backend/RemoteConfig/balance.rc` et `Resources/Balance/balance.json`).
 - Clés séparées : `season` (id, dates, paliers), `event` (id, dates, mini-plateau), `shop_rotation`, `feature_flags`.
-- Le serveur lit **la même** configuration que le client (Remote Config côté Cloud Code) : une valeur ne peut pas différer entre les deux.
+- Le serveur lit **la même** configuration que le client (Remote Config lu par les scripts Cloud Code ; le client embarque le même `balance.json`) : une valeur ne peut pas différer entre les deux.
 
 ## Pipeline de contenu
 ```mermaid
 flowchart LR
   SO["ScriptableObjects<br/>(éditeur Unity)"] -->|Validateur| DEF["Definitions<br/>(C# immuables)"]
-  SO -->|Export| JSON["content_v{n}.json"]
-  JSON -->|déployé avec| CCM["Module Cloud Code"]
   SO -->|Addressables| BUN["Bundles par ville<br/>(sprites, prefabs, audio)"]
-  XLSX["05_Equilibrage.xlsx"] -->|BalanceImport| RC["Remote Config : balance"]
+  XLSX["05_Equilibrage.xlsx"] -->|Menu Importer| BJ["balance.json (client)"]
+  XLSX -->|Menu Importer| RC["balance.rc → Remote Config (Deployment)"]
 ```
 - **Validateur de contenu** (menu éditeur + CI) : ids uniques, références valides, 4 compétences par recrue, pools non vides, objectifs atteignables, clés de localisation existantes.
-- **Un seul export** produit le JSON serveur et le hash `RulesVersion`.
+- `RulesVersion` (hash des définitions) est calculé dans Unity et envoyé avec chaque appel serveur.
 
 ### Groupes Addressables
 | Groupe | Contenu | Chargement |

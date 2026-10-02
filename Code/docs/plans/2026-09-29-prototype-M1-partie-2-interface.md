@@ -1886,6 +1886,8 @@ namespace N29.HeroesDawn.Presentation.Combat
 
 ### Tâche 19 : Simulateur d'équilibrage (console .NET)
 
+> **Remplacée** par `2026-10-02-integration-tout-dans-unity.md`, tâche 3 (simulateur dans l'éditeur Unity).
+
 **Fichiers :** `Tools/BalanceSimulator/HeroesDawn.BalanceSimulator.csproj`, `Program.cs`
 
 **Interfaces :**

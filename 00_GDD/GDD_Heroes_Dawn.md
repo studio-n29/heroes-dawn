@@ -205,7 +205,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 ## 10bis. Technique
 - Unity 6.6, Unity Gaming Services (Authentication, Cloud Save, Economy, Cloud Code, Remote Config, Analytics).
 - **Économie validée côté serveur** ; client data-driven (ScriptableObjects), combat simulé indépendamment du rendu.
-- **Architecture** : couches Clean (Domaine C# pur partagé avec Cloud Code → Application → Infrastructure / Présentation MVP), VContainer + MessagePipe + UniTask, simulation déterministe rejouée par le serveur.
+- **Architecture** : couches Clean (Domaine C# pur → Application → Infrastructure / Présentation MVP), simulation déterministe ; **tout dans Unity** : backend UGS (scripts Cloud Code JS, Economy, Remote Config) déployé depuis l'éditeur, contrôles serveur légers.
 - Détail : `04_Tech_Unity/00_Vue_Ensemble.md` et suivants.
 
 ## 10ter. Live-ops, obligations, production

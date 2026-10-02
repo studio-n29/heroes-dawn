@@ -21,8 +21,8 @@
 
 ### Pourquoi pas un MVC classique
 Dans Unity, un MonoBehaviour mélange souvent vue et contrôleur, et le « modèle » finit dans des composants de scène. Résultat : logique impossible à tester sans lancer le jeu, et impossible à exécuter sur le serveur. Or Heroes Dawn a deux besoins qui imposent une séparation plus stricte :
-1. **L'économie est validée côté serveur** (Cloud Code) : les règles de récompense, de recrutement et de combat doivent tourner **hors de Unity**.
-2. **Le combat ATB et le plateau doivent être rejouables à l'identique** (vérification anti-triche, tests, simulateur d'équilibrage).
+1. **L'économie est contrôlée côté serveur** (scripts Cloud Code JS déployés depuis Unity) : le client calcule les règles, le serveur applique des **contrôles légers** (plafonds, idempotence, heure serveur, monnaies via Economy). Décision 2026-10-02 : tout se passe dans Unity, pas de projet .NET séparé.
+2. **Le combat ATB et le plateau doivent être rejouables à l'identique** (tests, simulateur d'équilibrage, lecteur de journaux dans l'éditeur).
 
 ### L'architecture retenue
 | Couche | Patron | Rôle |
@@ -46,13 +46,13 @@ flowchart TB
     I["Infrastructure<br/>Adaptateurs UGS, Addressables, IAP…"]
     C["Composition<br/>VContainer scopes, GameFlow"]
   end
-  subgraph Shared["Partagé client / serveur (C# pur, netstandard2.1)"]
+  subgraph Shared["Domaine partagé (C# pur, netstandard2.1)"]
     D["Domaine<br/>Board, Combat, Roster, Economy…"]
     K["Core<br/>Ids, Fixed, Rng, Result"]
     DEF["Definitions<br/>données de jeu immuables"]
   end
-  subgraph Server["UGS Cloud Code (C# .NET)"]
-    S["Modules serveur<br/>Economy, Board, Combat, Timers…"]
+  subgraph Server["UGS (déployé depuis Unity : Assets/_Project/Backend)"]
+    S["Scripts Cloud Code JS<br/>contrôles légers, timers"]
   end
   P --> A
   A --> D
@@ -60,7 +60,6 @@ flowchart TB
   C --> P & A & I
   D --> DEF --> K
   D --> K
-  S --> D
   I <-->|HTTPS| S
 ```
 
@@ -80,7 +79,7 @@ flowchart TB
 | Bus de messages | **MessagePipe** | Pub/sub typé, s'intègre à VContainer, sans allocation |
 | Asynchrone | **UniTask** | Async/await sans allocation, annulation par scope |
 | Animations UI / tweens | **PrimeTween** | Sans allocation, API simple |
-| Tests | NUnit (Unity Test Framework) + `dotnet test` pour le domaine | Tests rapides hors éditeur |
+| Tests | NUnit (Unity Test Framework), lancés dans l'éditeur ou en batchmode | Tout dans Unity |
 | Backend | Unity Gaming Services SDK | Voir `01_Architecture.md` |
 | Plateforme PC | Steamworks.NET | Authentification et microtransactions Steam |
 
