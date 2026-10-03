@@ -141,6 +141,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public override void OnShow()
         {
+            _subs?.Dispose(); // OnShow peut être rappelé sans OnHide (écran déjà courant)
             var bag = DisposableBag.CreateBuilder();
             Ctx.S.Roster.Subscribe(_ => Refresh()).AddTo(bag);
             Ctx.S.Wallet.Subscribe(_ => Refresh()).AddTo(bag);

@@ -98,6 +98,21 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(_auth.Calls, Is.EqualTo(1));
         }
 
+        [UnityTest] // Review Focus 3 : ré-afficher le QG déjà courant ne double pas ses abonnements
+        public IEnumerator ShowHubTwice_WalletChangedRefreshesHubOnce()
+        {
+            yield return Boot();
+            Visible<LoginScreen>()!.Play();
+            yield return WaitFor(() => Visible<HubScreen>() != null);
+            var ctx = GameBootstrap.Instance!.Ui.Context;
+            ctx.Nav.Show(ctx.Hub);          // écran déjà courant : OnShow rappelé sans OnHide
+            yield return null;
+            var hub = Visible<HubScreen>()!;
+            int before = hub.RefreshCount;
+            GameBootstrap.Instance.Scope.Container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));
+            Assert.That(hub.RefreshCount - before, Is.EqualTo(1));
+        }
+
         [UnityTest] // Review Focus 3 : pas d'abonnement en double après déconnexion / reconnexion
         public IEnumerator SignOutThenSignIn_WalletChangedRefreshesHubOnce()
         {
