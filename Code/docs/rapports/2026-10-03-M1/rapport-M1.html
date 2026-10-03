@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Heroes Dawn — Rapport M1</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+  :root { --ink:#1b1f2a; --muted:#5a6275; --line:#d9dde6; --accent:#e0a800; --ok:#1f8a4c; --ko:#c0392b; --soft:#f5f6f9; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--ink); font-size: 10.5pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 24pt; margin: 0 0 4mm; }
+  h2 { font-size: 15pt; margin: 9mm 0 3mm; padding-bottom: 1.5mm; border-bottom: 2px solid var(--accent); break-after: avoid; }
+  h3 { font-size: 12pt; margin: 5mm 0 2mm; break-after: avoid; }
+  p, li { margin: 0 0 2mm; }
+  ul { margin: 0 0 3mm; padding-left: 5mm; }
+  code { font-family: Consolas, monospace; font-size: 9pt; background: var(--soft); padding: 0 1mm; border-radius: 2px; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9.5pt; break-inside: auto; }
+  th, td { border: 1px solid var(--line); padding: 1.6mm 2mm; text-align: left; vertical-align: top; }
+  th { background: var(--soft); }
+  tr { break-inside: avoid; }
+  .cover { height: 250mm; display: flex; flex-direction: column; justify-content: center; break-after: page; }
+  .cover .sub { font-size: 13pt; color: var(--muted); margin-bottom: 10mm; }
+  .cover img { width: 100%; border-radius: 3mm; margin-bottom: 8mm; }
+  .kpi { display: flex; gap: 4mm; margin: 4mm 0; }
+  .kpi div { flex: 1; border: 1px solid var(--line); border-radius: 2mm; padding: 3mm; background: var(--soft); }
+  .kpi b { display: block; font-size: 16pt; }
+  .kpi span { color: var(--muted); font-size: 9pt; }
+  figure { margin: 3mm 0 5mm; break-inside: avoid; }
+  figure img { width: 100%; border: 1px solid var(--line); border-radius: 1.5mm; display: block; }
+  figcaption { color: var(--muted); font-size: 9pt; margin-top: 1.5mm; }
+  .pair { display: flex; gap: 3mm; break-inside: avoid; }
+  .pair figure { flex: 1; margin: 2mm 0 4mm; }
+  .ok { color: var(--ok); font-weight: 600; }
+  .ko { color: var(--ko); font-weight: 600; }
+  .note { border-left: 3px solid var(--accent); background: #fffaf0; padding: 2.5mm 3mm; margin: 3mm 0; break-inside: avoid; }
+  .page { break-before: page; }
+  .small { font-size: 9pt; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <h1>Heroes Dawn — Rapport d'implémentation du prototype M1</h1>
+  <div class="sub">Écrans en prefabs (architecture MVP) · Boutique éphémère de recrutement · Validation de la boucle de jeu<br>Studio N29 · 3 octobre 2026 · branche <code>integration/tout-dans-unity</code> (commit <code>bd45326</code>)</div>
+  <img src="img/02b-boutique.png" alt="Onglet Boutique du QG">
+  <div class="kpi">
+    <div><b class="ok">229 / 229</b><span>tests EditMode (domaine, application, présentation, éditeur)</span></div>
+    <div><b class="ok">18 / 18</b><span>tests PlayMode sur les vraies scènes, dont une partie complète au clic</span></div>
+    <div><b>21</b><span>commits, 178 fichiers C# modifiés ou créés, 28 prefabs générés</span></div>
+  </div>
+</section>
+
+<h2>1. Résumé</h2>
+<p>Le prototype M1 est jouable de bout en bout : connexion invité, QG (équipe, escouade, entraînement, infirmerie), <b>boutique éphémère</b> de recrutement, déploiement sur le plateau de la zone 1.1 (dé, déplacements, brouillard, cases), combat ATB (manuel ou automatique, compétences, combos), écran de résultats, retour au plateau puis au QG. La sauvegarde locale conserve toute la progression.</p>
+<p>Deux chantiers ont été menés ce jour :</p>
+<ul>
+  <li><b>Sous-projet 3 — écrans en prefabs (MVP).</b> Les cinq écrans et toutes les popups, auparavant construits par le code au lancement, sont devenus des prefabs <b>générés une fois puis retouchables à la main</b> dans Unity. Toute la logique d'écran est passée dans des présentateurs C# testés sans Unity. Le texte passe en TextMeshPro, et la touche Retour (◄, Échap, geste Android) est gérée partout.</li>
+  <li><b>Boutique éphémère.</b> L'onglet Recrutement est remplacé par une boutique de <b>3 héros tirés chaque jour à 9h00</b> (heure du téléphone), pondérés par rareté (70 / 25 / 5). On peut la renouveler une fois gratuitement par jour, puis contre des Crédits.</li>
+</ul>
+<p>Chaque chantier a suivi le même cycle : conception validée avec toi, spec écrite, plan, implémentation pilotée par les tests (chaque test écrit et vu en échec avant le code), relecture indépendante de la branche entière, puis correction des défauts trouvés.</p>
+
+<div class="note"><b>Hors de ce rapport :</b> l'intégration audio (musiques et effets), développée en parallèle par une autre session dans le dossier principal, n'est pas encore commitée. Elle n'est donc ni intégrée ni validée ici (voir §8).</div>
+
+<h2 class="page">2. Ce que le joueur peut faire</h2>
+<figure><img src="img/01-connexion.png"><figcaption>Connexion — « Jouer en invité » crée ou recharge le profil local. Logo et fond en assets importés, textes TextMeshPro encrés.</figcaption></figure>
+<figure><img src="img/02-qg.png"><figcaption>QG, onglet Équipe — cartes des 4 membres de départ (stats, compétences, fatigue), escouade (1 à 4), entraînement en Crédits ; salle des opérations : zone 1.1, objectifs, infirmerie, Déployer.</figcaption></figure>
+<figure><img src="img/02b-boutique.png"><figcaption>QG, onglet Boutique — 3 héros du jour, prix en PR (bouton grisé si les PR manquent), bande de couleur de rareté sous chaque carte, compte à rebours jusqu'à 9h00 et bouton Renouveler (gratuit une fois par jour).</figcaption></figure>
+<figure><img src="img/03-plateau.png"><figcaption>Plateau de la zone 1.1 — dé, points de mouvement, destinations proposées par le domaine, brouillard de guerre, objectifs et escouade ; « Retour QG » demande confirmation.</figcaption></figure>
+<figure><img src="img/04-combat.png"><figcaption>Combat — jauges ATB, compétences (touches 1-3), combo (C), mode Auto (A), vitesse ×1/×2/×3, Retraite ; journal et bandeau d'annonces.</figcaption></figure>
+<figure><img src="img/05-resultats.png"><figcaption>Résultats — victoire ou défaite, Crédits gagnés, fatigue animée par membre, vérification du combat par rejeu (simulée au M1), Continuer (ou Retour).</figcaption></figure>
+
+<h3>La boucle validée automatiquement</h3>
+<p>Le test <code>FullRunTests</code> joue une partie complète <b>uniquement par des clics réels</b> sur les prefabs, sans aucun raccourci de test :</p>
+<ul>
+  <li>connexion et recrutement dans la boutique avec les PR de départ ;</li>
+  <li>déploiement, lancers de dé et déplacements jusqu'au combat ;</li>
+  <li>combat en automatique à vitesse ×3, résultats ;</li>
+  <li>retour au plateau, puis « Retour au QG » confirmé.</li>
+</ul>
+<p>À l'arrivée, la recrue est toujours dans l'équipe.</p>
+
+<h2 class="page">3. Sous-projet 3 — écrans en prefabs (MVP)</h2>
+<h3>3.1 Architecture retenue</h3>
+<table>
+  <tr><th>Pièce</th><th>Rôle</th><th>Règle</th></tr>
+  <tr><td><b>Vue</b> (<code>…View</code>, MonoBehaviour dans un prefab)</td><td>Affiche des données prêtes, joue animations et raccourcis, relaie les intentions (clics)</td><td>Ne lit jamais la session et n'appelle aucun cas d'usage</td></tr>
+  <tr><td><b>Présentateur</b> (<code>…Presenter</code>, C# pur)</td><td>Lit l'état, formate les textes, écoute le bus de messages, appelle les cas d'usage</td><td>Ne touche jamais un objet Unity ; testé avec un double de la vue</td></tr>
+  <tr><td><b>Recette</b> (éditeur)</td><td>Construit le prefab d'un écran ou d'un widget</td><td>Un prefab existant n'est <b>jamais écrasé</b> sans demande : les retouches manuelles sont conservées</td></tr>
+  <tr><td><b>ScreenCatalog</b></td><td>Associe chaque scène et chaque popup à son prefab</td><td>Rempli par le générateur</td></tr>
+  <tr><td><b>ModalService</b> / <b>BackButtonRouter</b></td><td>Popups en file d'attente (jamais superposées) ; Retour ferme d'abord la popup du dessus, sinon l'écran visible</td><td>Un écran masqué ne répond plus à Retour</td></tr>
+</table>
+
+<h3>3.2 Étapes réalisées</h3>
+<table>
+  <tr><th>#</th><th>Étape</th><th>Résultat</th></tr>
+  <tr><td>1</td><td>Assets d'interface et TextMeshPro (Bangers / Comic Neue, matériau encré)</td><td>Sprites et illustrations en assets, polices dynamiques</td></tr>
+  <tr><td>2</td><td>Socle MVP : vues, présentateurs, modales en file, routeur Retour, garde anti-double-clic</td><td>123 tests verts</td></tr>
+  <tr><td>3</td><td>Générateur de prefabs, catalogue, widgets communs</td><td>Retouche d'un widget propagée aux écrans</td></tr>
+  <tr><td>4-8</td><td>Connexion, QG, popups de case, plateau, combat</td><td>Captures identiques aux anciens écrans</td></tr>
+  <tr><td>9</td><td>Retrait de l'ancien code, tests de bout en bout, documentation</td><td>Garde-fou : aucune interface construite par code</td></tr>
+</table>
+
+<h3>3.3 Avant / après (le rendu est conservé)</h3>
+<div class="pair">
+  <figure><img src="img/avant-04-combat.png"><figcaption>Avant — combat construit par code.</figcaption></figure>
+  <figure><img src="img/04-combat.png"><figcaption>Après — combat en prefabs (écart de quelques pixels sur les jauges).</figcaption></figure>
+</div>
+
+<h2 class="page">4. Boutique éphémère</h2>
+<h3>4.1 Règles validées avec toi</h3>
+<table>
+  <tr><th>Règle</th><th>Valeur</th></tr>
+  <tr><td>Renouvellement</td><td>Chaque jour à <b>9h00, heure du téléphone</b> ; de 9h00 à 8h59 le lendemain = même boutique</td></tr>
+  <tr><td>Offres</td><td>3 héros non possédés, sans doublon ; moins si moins d'éligibles ; « Collection de New York complète ! » si aucun</td></tr>
+  <tr><td>Taux par emplacement</td><td>Agent 70 %, Élite 25 %, Légende 5 % ; une rareté épuisée voit son poids réparti sur les autres</td></tr>
+  <tr><td>Prix</td><td>Inchangés : 150 / 450 / 1 200 PR ; l'emplacement passe à « Recruté », les autres offres restent</td></tr>
+  <tr><td>Renouveler</td><td>1er du jour gratuit, puis 100, 200, 400, 800 Crédits (plafond) ; dépense confirmée par une popup</td></tr>
+  <tr><td>Condition d'entrée</td><td>Une recrue peut exiger une zone validée ; au M1, Verre (Légende) entre après la zone 1.1</td></tr>
+  <tr><td>Tirage</td><td>Déterministe : graine = joueur + jour + numéro de tirage. Un serveur pourra le refaire à l'identique (vérification UGS plus tard)</td></tr>
+  <tr><td>Sauvegarde</td><td>Offres mémorisées (profil v3) : relancer le jeu redonne la même boutique ; les profils v2 restent compatibles</td></tr>
+</table>
+
+<h3>4.2 Découpage</h3>
+<ul>
+  <li><b>Domaine</b> (C# pur, assembly <code>Domain.Shop</code>) : <code>ShopDay</code>, <code>ShopSeed</code>, <code>ShopDraw</code>, <code>ShopWeights</code>, <code>ShopRules</code>. Les paramètres <code>Shop*</code> sont dans l'équilibrage.</li>
+  <li><b>Application</b> : état <code>ShopState</code> dans la session et trois cas d'usage, Ouvrir, Recruter et Renouveler. Une boutique expirée (9h00 passée) est refusée sans débit.</li>
+  <li><b>Écran</b> : l'onglet Boutique du QG. Le présentateur retire lui-même la boutique à 9h00 si l'onglet est affiché.</li>
+</ul>
+
+<h2 class="page">5. Défauts trouvés et corrigés</h2>
+<table>
+  <tr><th>Défaut</th><th>Effet pour le joueur</th><th>Comment il a été trouvé</th></tr>
+  <tr><td>Premier clic sur « Jouer » perdu au premier lancement</td><td>Il fallait cliquer deux fois (défaut antérieur à cette branche)</td><td>Test du Retour, exécuté en premier dans la passe</td></tr>
+  <tr><td>Verdict de vérification écrasé par « en cours… »</td><td>Résultats figés sur « Vérification serveur (simulée)… »</td><td>Comparaison des captures avant / après</td></tr>
+  <tr><td>« Retour au QG ? » pendant le démarrage d'un combat</td><td>Confirmer abandonnait le combat sans retraite ni fatigue</td><td>Relecture indépendante (sous-projet 3)</td></tr>
+  <tr><td>Renouvellement payant validé après 9h00</td><td>Consommait le renouvellement gratuit du nouveau jour</td><td>Relecture indépendante (boutique)</td></tr>
+  <tr><td>Boutique vide après « Effacer la sauvegarde »</td><td>« Collection complète » affiché à tort pendant jusqu'à une minute</td><td>Relecture indépendante (boutique)</td></tr>
+  <tr><td>QG reconstruit chaque minute</td><td>Un clic tombant au changement de minute pouvait être perdu</td><td>Relecture indépendante (boutique)</td></tr>
+</table>
+<p>Chaque correctif a d'abord été reproduit par un test vu en échec, puis corrigé. La suite complète a été relancée après chaque correction.</p>
+
+<h2>6. Tests</h2>
+<table>
+  <tr><th>Domaine testé</th><th>Tests</th><th>Ce que les tests prouvent</th></tr>
+  <tr><td>Règles du jeu et application (domaine, cas d'usage, machine d'états)</td><td class="ok">104 / 104</td><td>Dé, plateau, combat, économie, sauvegarde, navigation ; boutique : jour à 9h00 (y compris changement d'heure), graine, tirage pondéré sur 10 000 tirages, achat, renouvellement, boutique expirée, profil v3</td></tr>
+  <tr><td>Présentateurs (sans Unity)</td><td class="ok">79 / 79</td><td>Ce que chaque écran affiche, les actions qu'il déclenche, double clic ignoré, Retour, popups, compte à rebours, confirmation de dépense</td></tr>
+  <tr><td>Éditeur (prefabs, scènes, outils)</td><td class="ok">46 / 46</td><td>Pas d'écrasement des prefabs, retouche conservée, structure des prefabs, scènes générées, aucune interface construite par code, import de l'équilibrage, descriptions de tests obligatoires</td></tr>
+  <tr><td>PlayMode (vraies scènes)</td><td class="ok">18 / 18</td><td>Enchaînement des scènes, Retour, partie complète au clic, renouvellement de la boutique au clic ; captures d'écran à la demande</td></tr>
+  <tr><td>Build Windows</td><td class="ok">Réussi</td><td>Build Windows 64 bits réussi (172 Mo) ; le jeu construit démarre sans erreur (« Prototype M1 prêt — 8 recrues, 1 zone »)</td></tr>
+</table>
+<p class="small">Rapports détaillés de chaque test (ce qu'il vérifie et pourquoi) : <code>Code/docs/test-reports/latest-EditMode.html</code> et <code>latest-PlayMode.html</code>.</p>
+
+
+<h2 class="page">7. Décisions prises en cours de route</h2>
+<table>
+  <tr><th>Décision</th><th>Pourquoi</th><th>Coût si c'est faux</th></tr>
+  <tr><td>Canvas de la scène Boot générés dans la scène, plus au lancement</td><td>Aucune interface ne doit être construite par code</td><td>Aucun</td></tr>
+  <tr><td>La machine d'états démarre après les présentateurs (<code>FlowStarter</code>)</td><td>Corrige le premier clic perdu</td><td>Aucun</td></tr>
+  <tr><td>Paramètres de renouvellement en 4 entiers (<code>ShopRerollCost1..4</code>)</td><td>L'import de l'équilibrage ne lit que des entiers</td><td>Aucun</td></tr>
+  <tr><td>Renouvellement gratuit sans confirmation ; payant avec confirmation</td><td>Seule une dépense demande confirmation</td><td>Aucun</td></tr>
+  <tr><td>Recruter sans confirmation</td><td>Comme avant ; le geste principal reste rapide</td><td>Ajouter une confirmation</td></tr>
+  <tr><td>Option <code>-overwrite</code> du générateur (écraser seulement les prefabs nommés)</td><td>Tout écraser renouvelle les identifiants internes et casse les liens imbriqués</td><td>Aucun</td></tr>
+  <tr><td>Images sources encore dans <code>Resources/Art</code></td><td>Le générateur d'assets les lit</td><td>Poids du build (à sortir au M2)</td></tr>
+</table>
+
+<h3>Petits défauts reportés (ne bloquent pas la jouabilité)</h3>
+<ul>
+  <li>Compte à rebours décalé d'une heure les deux nuits de changement d'heure (le renouvellement reste bien à 9h00).</li>
+  <li>Une valeur <code>ShopResetHour</code> hors 0-23 dans l'équilibrage ferait planter le QG (à valider au chargement).</li>
+  <li>Le renouvellement d'une boutique vide n'est bloqué que par le bouton désactivé.</li>
+  <li>Résultats du combat : le verdict peut s'écrire dans la popup déjà fermée (erreur dans les logs).</li>
+  <li>Six popups gardent une petite référence en mémoire jusqu'à la fin de la zone ; une popup manquante au catalogue bloquerait la file ; le bouton Auto peut afficher « activé » si l'activation échoue.</li>
+</ul>
+
+<h2 class="page">8. État des branches et suite</h2>
+<table>
+  <tr><th>Branche</th><th>Contenu</th><th>État</th></tr>
+  <tr><td><code>integration/tout-dans-unity</code></td><td>Sous-projet 2 + écrans en prefabs + boutique éphémère</td><td class="ok">Intégrée localement (avance rapide, rien poussé), testée</td></tr>
+  <tr><td><code>architecture/ecrans-prefabs</code></td><td>Écrans en prefabs (inclus dans l'intégration)</td><td>Dossier principal ; porte aussi le travail audio non commité</td></tr>
+  <tr><td><code>feature/boutique-ephemere</code></td><td>Boutique éphémère (incluse dans l'intégration)</td><td>Copie de travail <code>Documents/Heroes Dawn - boutique</code></td></tr>
+</table>
+
+<div class="note"><b>Audio (session « M1 - Music and SFX integration ») :</b> le travail est en cours, non commité, dans le dossier principal (<code>AudioCatalog</code>, <code>AudioRig</code>, sons des boutons, changements dans plusieurs présentateurs dont celui du QG). Une fois commité, il faudra le fusionner dans l'intégration. Les deux chantiers touchent le présentateur du QG et le scope racine : la fusion demandera une petite réconciliation et une nouvelle passe de tests.</div>
+
+<h3>À reporter par toi (documents que tu maintiens)</h3>
+<p><b>GDD §Recrutement</b>, texte proposé :</p>
+<p class="note">Boutique éphémère : chaque jour à 9h00 (heure locale), 3 recrues de la ville sont proposées, tirées selon leur rareté (Agent 70 %, Élite 25 %, Légende 5 %), sans doublon ni recrue déjà possédée. Achat direct à coût fixe en PR (pas de gacha). Renouvellement : 1 gratuit par jour, puis 100 / 200 / 400 / 800 Crédits (puis premium, plus tard). Certaines recrues n'entrent dans la boutique qu'après une étape de l'histoire (ex. Légende après la validation d'une zone).</p>
+<p><b>Tableur <code>05_Equilibrage.xlsx</code>, onglet « Paramètres »</b>, à ajouter pour que l'import les reprenne : <code>ShopResetHour</code> (9), <code>ShopWeightAgent</code> (70), <code>ShopWeightElite</code> (25), <code>ShopWeightLegend</code> (5), <code>ShopRerollCost1</code> (100), <code>ShopRerollCost2</code> (200), <code>ShopRerollCost3</code> (400), <code>ShopRerollCost4</code> (800).</p>
+
+<h3>Prochains chantiers proposés</h3>
+<ol>
+  <li>Éditeur de carte en graphe et nouveaux types de cases (Vide, Combat, Activité, Interaction), avec cases verrouillées.</li>
+  <li>Plateau v2 : carte stylisée de la ville, chemin vert, validation de la case choisie, effets de survol.</li>
+  <li>Socle de mini-jeux, puis pêche et Chasse-neige en 3D.</li>
+  <li>Fusion de l'audio, une fois commité.</li>
+</ol>
+
+<h2 class="page">Annexe — historique des commits</h2>
+<table>
+  <tr><th>Commit</th><th>Heure</th><th>Description</th></tr>
+  <tr><td>8fb82c3</td><td>14:18</td><td>Spec : sous-projet 3, écrans MVP en prefabs générés</td></tr>
+  <tr><td>c1b1420</td><td>15:15</td><td>Plan : sous-projet 3</td></tr>
+  <tr><td>ad18181</td><td>16:16</td><td>Sprites et illustrations en assets, TextMeshPro</td></tr>
+  <tr><td>c671a35</td><td>16:22</td><td>Socle vues / présentateurs, modales en file, routeur Retour</td></tr>
+  <tr><td>508e8db</td><td>16:32</td><td>Générateur de prefabs, catalogue, widgets et modales communs</td></tr>
+  <tr><td>1bdfe77</td><td>16:38</td><td>Connexion en prefab</td></tr>
+  <tr><td>e760a0a</td><td>16:47</td><td>QG en prefabs</td></tr>
+  <tr><td>341343f</td><td>16:53</td><td>Popups de case en prefabs</td></tr>
+  <tr><td>2a30b4c</td><td>17:03</td><td>Plateau en prefabs</td></tr>
+  <tr><td>67e272f</td><td>20:57</td><td>Combat en prefabs</td></tr>
+  <tr><td>06e4237</td><td>21:28</td><td>Retrait de l'interface construite par code, tests de bout en bout, docs</td></tr>
+  <tr><td>5dc5ed5</td><td>21:38</td><td>Correctif : pas de « Retour au QG ? » au démarrage d'un combat</td></tr>
+  <tr><td>fd714a2</td><td>21:51</td><td>Spec : boutique éphémère</td></tr>
+  <tr><td>2438be0</td><td>21:55</td><td>Plan : boutique éphémère</td></tr>
+  <tr><td>48731f4</td><td>22:02</td><td>Règles de la boutique (domaine)</td></tr>
+  <tr><td>5dbb4ab</td><td>22:08</td><td>État, sauvegarde v3 et cas d'usage</td></tr>
+  <tr><td>8785bfd</td><td>23:41</td><td>Onglet Boutique éphémère au QG</td></tr>
+  <tr><td>c4aaaae</td><td>23:41</td><td>Nettoyage des données d'atlas de polices</td></tr>
+  <tr><td>b61fc88</td><td>23:42</td><td>Documentation de la boutique</td></tr>
+  <tr><td>bd45326</td><td>23:49</td><td>Correctif : renouvellement refusé si 9h00 passe pendant la confirmation</td></tr>
+</table>
+
+</body>
+</html>
