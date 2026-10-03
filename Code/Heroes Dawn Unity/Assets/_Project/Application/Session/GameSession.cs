@@ -70,6 +70,7 @@ namespace N29.HeroesDawn.Application.Session
         public ZoneDef? RunZone { get; set; }
         public PlayerAccount? Account { get; set; }
         public bool AutoCombat { get; set; }
+        public ShopState Shop { get; } = new ShopState();
 
         public GameSession(ContentCatalog content)
         {
@@ -105,6 +106,7 @@ namespace N29.HeroesDawn.Application.Session
         IReadOnlyList<ITeamMemberReadModel> ISessionReadModel.Roster => Roster;
         IReadOnlyList<ITeamMemberReadModel> ISessionReadModel.Squad => Squad;
         IReadOnlyCollection<string> ISessionReadModel.CompletedZones => CompletedZones;
+        IShopReadModel ISessionReadModel.Shop => Shop;
 
         public IReadOnlyList<MemberDef> AvailableRecruits()
         {
@@ -137,6 +139,7 @@ namespace N29.HeroesDawn.Application.Session
             Run = null;
             RunZone = null;
             AutoCombat = false;
+            Shop.Clear();
             Wallet.Set(MetaRules.StartCredits, MetaRules.StartPr);
             foreach (var id in MetaRules.StarterTeam)
             {
@@ -176,6 +179,7 @@ namespace N29.HeroesDawn.Application.Session
                 ResetToNewProfile();
                 return;
             }
+            ApplyShop(data.shop);
             // Escouade cohérente : 1 à 4 membres.
             int inSquad = 0;
             foreach (var m in Roster)
@@ -200,7 +204,29 @@ namespace N29.HeroesDawn.Application.Session
             p.completedZones.Sort(StringComparer.Ordinal);
             foreach (var m in Roster)
                 p.team.Add(new MemberSave { id = m.Id.Value, level = m.Level, fatigue = m.Fatigue, inSquad = m.InSquad });
+            p.shop.day = Shop.Day;
+            p.shop.draw = Shop.Draw;
+            foreach (var o in Shop.Offers)
+            {
+                p.shop.offers.Add(o.Id.Value);
+                p.shop.recruited.Add(o.Recruited);
+            }
             return p;
+        }
+
+        /// <summary>Restaure la boutique sauvegardée ; une offre dont la recrue n'existe plus est ignorée.</summary>
+        void ApplyShop(ShopSave? save)
+        {
+            if (save == null || string.IsNullOrEmpty(save.day)) { Shop.Clear(); return; }
+            var offers = new List<ShopOffer>();
+            for (int i = 0; i < (save.offers?.Count ?? 0); i++)
+            {
+                var def = FindDef(new MemberId(save.offers![i] ?? ""));
+                if (def == null) continue;
+                bool recruited = save.recruited != null && i < save.recruited.Count && save.recruited[i];
+                offers.Add(new ShopOffer(def.Id, recruited));
+            }
+            Shop.Replace(save.day, Math.Max(0, save.draw), offers);
         }
     }
 }

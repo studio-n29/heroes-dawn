@@ -23,6 +23,7 @@ namespace N29.HeroesDawn.Application.Session
         /// <summary>Plus aucun membre de l'escouade ne peut combattre.</summary>
         bool SquadExhausted { get; }
         IReadOnlyCollection<string> CompletedZones { get; }
+        IShopReadModel Shop { get; }
         IReadOnlyList<MemberDef> AvailableRecruits();
     }
 }

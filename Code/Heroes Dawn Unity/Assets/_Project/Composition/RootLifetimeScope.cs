@@ -5,6 +5,7 @@ using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
+using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
@@ -45,6 +46,7 @@ namespace N29.HeroesDawn.Composition
             var pipe = builder.RegisterMessagePipe();
             builder.RegisterMessageBroker<WalletChanged>(pipe);
             builder.RegisterMessageBroker<RosterChanged>(pipe);
+            builder.RegisterMessageBroker<ShopChanged>(pipe);
             builder.RegisterMessageBroker<ToastRequested>(pipe);
             builder.RegisterMessageBroker<SaveStateChanged>(pipe);
             builder.RegisterMessageBroker<ZoneValidated>(pipe);
@@ -89,6 +91,11 @@ namespace N29.HeroesDawn.Composition
             builder.Register<ToggleSquadUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<TrainMemberUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<RecruitMemberUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+
+            // ---- Use cases : boutique éphémère
+            builder.Register<OpenShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<RecruitFromShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<RerollShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<HealRosterUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
 
             // ---- Use cases : combat

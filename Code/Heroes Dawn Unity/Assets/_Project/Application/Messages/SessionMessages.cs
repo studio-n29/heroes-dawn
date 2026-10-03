@@ -17,6 +17,9 @@ namespace N29.HeroesDawn.Application.Messages
     /// <summary>L'effectif a changé (niveau, fatigue, escouade, recrue).</summary>
     public readonly struct RosterChanged { }
 
+    /// <summary>La boutique éphémère a changé (nouveau jour, achat, renouvellement).</summary>
+    public readonly struct ShopChanged { }
+
     /// <summary>Message court à afficher au joueur.</summary>
     public readonly struct ToastRequested
     {

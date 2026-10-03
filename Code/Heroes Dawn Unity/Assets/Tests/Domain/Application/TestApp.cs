@@ -7,6 +7,7 @@ using MessagePipe;
 using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
+using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
@@ -69,7 +70,11 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         }
 
         public sealed class Seeds : ISeedProvider { ulong _n = 11; public ulong NextSeed(string p) => _n += 7919; }
-        public sealed class Clock : IClock { public DateTime UtcNow { get; set; } = new DateTime(2026, 9, 30, 12, 0, 0, DateTimeKind.Utc); }
+        public sealed class Clock : IClock
+        {
+            public DateTime UtcNow { get; set; } = new DateTime(2026, 9, 30, 12, 0, 0, DateTimeKind.Utc);
+            public DateTime LocalNow { get; set; } = new DateTime(2026, 9, 30, 12, 0, 0);
+        }
         public sealed class Log : ILogger { public void Info(string m) { } public void Warn(string m) { } public void Error(string m) { } }
         public sealed class Verifier : ICombatVerifier
         {
@@ -93,6 +98,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public CombatUseCases Combat { get; }
         public HubUseCases Hub { get; }
         public AuthUseCases Account { get; }
+        public ShopUseCases Shop { get; }
 
         public TestApp()
         {
@@ -107,6 +113,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             b.AddMessageBroker<NavigateRequested>();
             b.AddMessageBroker<CombatResultsClosed>();
             b.AddMessageBroker<ReturnedToBoard>();
+            b.AddMessageBroker<ShopChanged>();
             _bus = b.BuildServiceProvider();
             Record<WalletChanged>();
             Record<RosterChanged>();
@@ -117,6 +124,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Record<NavigateRequested>();
             Record<CombatResultsClosed>();
             Record<ReturnedToBoard>();
+            Record<ShopChanged>();
 
             Session = new GameSession(PrototypeContent.Build());
             Save = new SaveScheduler(Session, Profiles, Time, Logger, Publisher<SaveStateChanged>());
@@ -125,6 +133,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Combat = new CombatUseCases(this);
             Hub = new HubUseCases(this);
             Account = new AuthUseCases(this);
+            Shop = new ShopUseCases(this);
         }
 
         public IPublisher<T> Publisher<T>() => _bus.GetRequiredService<IPublisher<T>>();
@@ -224,6 +233,21 @@ namespace N29.HeroesDawn.Tests.Domain.Application
                 SignIn = new SignInAsGuestUseCase(a.Session, a.Auth, a.Profiles, a.Time, a.Save, w, r, a.Logger);
                 SignOut = new SignOutUseCase(a.Session, a.Auth, a.Save);
                 Reset = new ResetProgressUseCase(a.Session, a.Profiles, a.Save, w, r);
+            }
+        }
+
+        public sealed class ShopUseCases
+        {
+            public readonly IOpenShopUseCase Open;
+            public readonly IRecruitFromShopUseCase Recruit;
+            public readonly IRerollShopUseCase Reroll;
+
+            public ShopUseCases(TestApp a)
+            {
+                var shop = a.Publisher<ShopChanged>();
+                Open = new OpenShopUseCase(a.Session, a.Time, a.Save, shop);
+                Recruit = new RecruitFromShopUseCase(a.Session, a.Time, a.Save, Open, a.Publisher<WalletChanged>(), a.Publisher<RosterChanged>(), shop);
+                Reroll = new RerollShopUseCase(a.Session, a.Time, a.Save, Open, a.Publisher<WalletChanged>(), shop);
             }
         }
 

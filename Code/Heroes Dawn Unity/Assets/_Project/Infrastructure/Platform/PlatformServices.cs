@@ -24,6 +24,7 @@ namespace N29.HeroesDawn.Infrastructure.Platform
     public sealed class SystemClock : IClock
     {
         public DateTime UtcNow => DateTime.UtcNow;
+        public DateTime LocalNow => DateTime.Now;
     }
 
     public sealed class UnityLogger : Application.Ports.ILogger

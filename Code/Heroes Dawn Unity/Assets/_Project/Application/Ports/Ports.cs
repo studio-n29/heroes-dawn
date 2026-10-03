@@ -18,6 +18,8 @@ namespace N29.HeroesDawn.Application.Ports
     public interface IClock
     {
         DateTime UtcNow { get; }
+        /// <summary>Heure du téléphone (jour de boutique, compte à rebours).</summary>
+        DateTime LocalNow { get; }
     }
 
     public interface ILogger
@@ -54,13 +56,25 @@ namespace N29.HeroesDawn.Application.Ports
     [Serializable]
     public sealed class ProfileData
     {
-        public int schemaVersion = 2;
+        public int schemaVersion = 3;
         public int credits;
         public int pr;
         public List<string> completedZones = new List<string>();
         public List<MemberSave> team = new List<MemberSave>();
         public long lastSeenUtcTicks;
         public bool autoCombat;
+        /// <summary>Boutique éphémère (v3). Absente en v2 : JsonUtility crée un bloc vide (jour "").</summary>
+        public ShopSave shop = new ShopSave();
+    }
+
+    /// <summary>Boutique du jour : offres mémorisées pour qu'un achat ou une relance ne relance pas le tirage.</summary>
+    [Serializable]
+    public sealed class ShopSave
+    {
+        public string day = "";
+        public int draw;
+        public List<string> offers = new List<string>();
+        public List<bool> recruited = new List<bool>();
     }
 
     public interface IProfileGateway
