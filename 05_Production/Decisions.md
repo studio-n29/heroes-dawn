@@ -89,3 +89,5 @@
 | 2026-10-02 | Simulateur et import du tableur = outils éditeur (menu Heroes Dawn ▸ Équilibrage) | Remplace les consoles .NET `BalanceSimulator` / `BalanceImport` |
 | 2026-10-02 | Versions figées : VContainer 1.19.0, UniTask 2.5.11, MessagePipe 1.8.2 (+ MessagePipe.VContainer 1.8.2) via OpenUPM | Remplace « versions à figer au démarrage de M1 » |
 | 2026-10-02 | Sous-projet 1 (fondations) : un use case par intention, messages MessagePipe, `RootLifetimeScope` ; UI encore construite par code | Scènes et flux : sous-projet 2 ; vues en prefabs générés : sous-projet 3 |
+| 2026-10-03 | Rapport HTML à chaque exécution des tests (ce que chaque test vérifie et pourquoi) + synthèse en chat ; `[Description]` obligatoire sur chaque test | Demande de l'utilisateur ; garde-fou `EveryTestHasADescription` |
+| 2026-10-03 | Sous-projet 2 : scènes `Boot`/`Hub`/`Board`/`Combat` générées par menu, un scope par scène, `GameFlowMachine` (Application, testable sans Unity) seule autorité de navigation | Écrans encore construits par code ; prefabs MVP au sous-projet 3 |

@@ -99,6 +99,89 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(PlayModeHarness.Visible<BoardScreen>(), Is.True);
             Assert.That(Flow.Current, Is.EqualTo(GameState.Board));
             Assert.That(Container.Resolve<GameSession>().Run!.IsSpent(new CaseId("n03")), Is.True, "victoire appliquée au plateau");
+            Assert.That(UnityEngine.Object.FindAnyObjectByType<BoardScreen>()!.ReportsApplied, Is.EqualTo(1), "le plateau a reçu le rapport du combat");
+        }
+
+        IEnumerator InEasyCombat()
+        {
+            yield return OnBoardBeforeEasyCombat();
+            UnityEngine.Object.FindAnyObjectByType<BoardScreen>()!.TapNode(new CaseId("n03"));
+            yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Combat) && Flow.Current == GameState.Combat && !Flow.IsTransitioning, 600);
+        }
+
+        [UnityTest, Description("Vérifie que « Retour QG » depuis le plateau décharge le plateau et recharge le QG — parce que quitter la zone referme le brouillard et ramène au hub (screen flow F01)")]
+        public IEnumerator LeaveZone_UnloadsBoard_LoadsHub()
+        {
+            yield return OnBoardBeforeEasyCombat();
+            UnityEngine.Object.FindAnyObjectByType<BoardScreen>()!.LeaveToHq();
+            yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Hub) && !Flow.IsTransitioning);
+            Assert.That(Loaded(SceneNames.Board), Is.False);
+            Assert.That(Loaded(SceneNames.Hub), Is.True);
+            Assert.That(Container.Resolve<GameSession>().Run, Is.Null);
+        }
+
+        [UnityTest, Description("Vérifie que deux demandes de plateau rapprochées ne chargent qu'une seule scène Board — parce qu'un double clic sur Déployer ne doit pas dupliquer le plateau (Review Focus 2)")]
+        public IEnumerator DoubleDeploy_SingleBoardScene()
+        {
+            yield return SignedIn();
+            var nav = Container.Resolve<IPublisher<NavigateRequested>>();
+            Container.Resolve<Application.Features.Zone.IStartZoneUseCase>().ExecuteAsync(PrototypeContent.Zone11).Forget();
+            nav.Publish(new NavigateRequested(GameState.Board));
+            nav.Publish(new NavigateRequested(GameState.Board));
+            yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Board) && !Flow.IsTransitioning);
+            int boards = 0;
+            for (int i = 0; i < SceneManager.sceneCount; i++) if (SceneManager.GetSceneAt(i).name == SceneNames.Board) boards++;
+            Assert.That(boards, Is.EqualTo(1));
+        }
+
+        [UnityTest, Description("Vérifie qu'une validation de zone annoncée pendant que le plateau est masqué (combat en cours) est conservée pour l'écran de fin de zone — parce que le plateau masqué ne doit perdre aucun abonnement à vie (Review Focus 1)")]
+        public IEnumerator ZoneValidatedWhileBoardHidden_IsKeptForZoneComplete()
+        {
+            yield return InEasyCombat();
+            Assert.That(PlayModeHarness.Visible<BoardScreen>(), Is.False);
+            var rewards = new Application.Features.Zone.ZoneRewards(1500, 40, true);
+            Container.Resolve<IPublisher<ZoneValidated>>().Publish(new ZoneValidated(rewards));
+            var board = UnityEngine.Object.FindAnyObjectByType<BoardScreen>(UnityEngine.FindObjectsInactive.Include)!;
+            Assert.That(board.LastZoneRewards, Is.SameAs(rewards));
+        }
+
+        [UnityTest, Description("Vérifie qu'après le déchargement du QG, un changement de portefeuille ne provoque aucune erreur — parce que les abonnements d'une scène déchargée doivent disparaître avec elle (Review Focus 3)")]
+        public IEnumerator HubUnloaded_WalletChanged_NoErrorNoDestroyedRefresh()
+        {
+            yield return SignedIn();
+            var hub = UnityEngine.Object.FindAnyObjectByType<HubScreen>()!;
+            hub.Deploy();
+            yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Board) && !Flow.IsTransitioning);
+            Assert.That(hub == null, Is.True, "l'écran du QG est détruit avec sa scène");
+            Container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));
+            yield return null;
+            // Une erreur ou exception journalisée (ex. MissingReferenceException sur l'écran détruit) fait échouer le test d'office.
+        }
+
+        [UnityTest, Description("Vérifie qu'une défaite qui épuise l'escouade ramène au QG en déchargeant combat et plateau — parce que l'équipe entière à 100 % de fatigue rentre au QG (GDD §6)")]
+        public IEnumerator DefeatWithExhaustedSquad_ReturnsToHub_UnloadsBoardAndCombat()
+        {
+            yield return SignedIn();
+            var session = Container.Resolve<GameSession>();
+            var b = session.Content.Balance;
+            foreach (var m in session.Roster) m.Fatigue = 100 - b.FatiguePerWin - b.FatiguePerLossExtra;
+            var zone = session.Content.Zone(PrototypeContent.Zone11);
+            session.Run = ZoneRun.ForTests(session.Content, zone, 3UL, 1, true, "n02");
+            session.RunZone = zone;
+            Container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Board));
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardScreen>() && !Flow.IsTransitioning);
+            UnityEngine.Object.FindAnyObjectByType<BoardScreen>()!.TapNode(new CaseId("n03"));
+            yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Combat) && Flow.Current == GameState.Combat && !Flow.IsTransitioning, 600);
+
+            Container.Resolve<IActiveCombatReadModel>().Simulation!.Submit(Domain.Combat.CombatCommand.Retreat());
+            var combat = UnityEngine.Object.FindAnyObjectByType<CombatScreen>()!;
+            yield return PlayModeHarness.WaitFor(() => combat.ContinueForTests(), 600);
+            yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Hub) && !Flow.IsTransitioning, 600);
+
+            Assert.That(Loaded(SceneNames.Hub), Is.True);
+            Assert.That(Loaded(SceneNames.Board), Is.False);
+            Assert.That(Loaded(SceneNames.Combat), Is.False);
+            Assert.That(Flow.Current, Is.EqualTo(GameState.Hub));
         }
     }
 }

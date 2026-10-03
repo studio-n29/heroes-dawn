@@ -11,6 +11,8 @@
 - Les vues sont enregistrées dans le scope avec `RegisterComponentInHierarchy<RecruitmentScreenView>().As<IRecruitmentView>()`.
 
 ## Scènes
+
+> **État réel (sous-projet 2, 2026-10-03)** — scènes `Boot`, `Hub`, `Board`, `Combat` générées par *Heroes Dawn ▸ Setup ▸ Générer les scènes* (`Assets/_Project/Scenes`, Build Settings dans cet ordre). Chaque scène d'écran a un `SceneScreenScope` (`HubLifetimeScope`, `BoardLifetimeScope` enfants de `RootLifetimeScope` ; `CombatLifetimeScope` enfant de `BoardLifetimeScope`) qui crée son écran (encore construit par code) à sa construction. `CityMap` et `Prologue` : M2. La navigation « Retour » (◄ / Échap / geste Android) : sous-projet 3.
 | Scène | Chargement | Scope VContainer | Contenu |
 |---|---|---|---|
 | `Boot` | Seule, au lancement | `RootLifetimeScope` (vit tout le jeu) | Services globaux, session, bus, flux de jeu, écran de chargement |
@@ -48,8 +50,23 @@ stateDiagram-v2
   Board --> ConnectionLost
   ConnectionLost --> Hub: reconnexion
 ```
-- Chaque état implémente `IGameState { UniTask EnterAsync(Payload, ct); UniTask ExitAsync(ct); }`.
-- Seule la machine d'états charge ou décharge des scènes. Un présentateur demande une navigation en publiant `NavigateTo(...)`.
+- **Implémentation (sous-projet 2)** : `Application/Flow/GameFlowMachine` (C# pur, testable sans Unity), états `Boot`, `Login`, `Hub`, `Board`, `Combat`. Chaque transition autorisée est une suite d'effets sur le port `ISceneLoader` (adaptateur `UnitySceneLoader`) et sur `IScreenVisibility` (écran de connexion, dans `Boot`) :
+
+| De → vers | Effets |
+|---|---|
+| Boot → Login | afficher la connexion |
+| Login → Hub | masquer la connexion, charger `Hub` |
+| Hub → Login | décharger `Hub`, afficher la connexion |
+| Hub → Board | décharger `Hub`, charger `Board` |
+| Board → Hub | décharger `Board`, charger `Hub` |
+| Board → Combat | charger `Combat`, masquer `Board` (pause) |
+| Combat → Board | décharger `Combat`, réafficher `Board`, publier `ReturnedToBoard` |
+| Combat → Hub | décharger `Combat` puis `Board`, charger `Hub` |
+
+- Transition non prévue : refusée. Demande pendant une transition ou vers l'état courant : ignorée. Échec d'un effet : effets déjà faits annulés dans l'ordre inverse, message `errors.navigation`.
+- Seule la machine d'états charge, décharge, affiche ou masque des scènes. Un écran demande une navigation en publiant `NavigateRequested(GameState)` (via `UiContext.Navigate`). Le combat publie `CombatResultsClosed(report)` à « Continuer » ; la machine renvoie au plateau (puis `ReturnedToBoard`) ou au QG.
+- Le plateau masqué est désactivé : ses abonnements « à vie » (`ZoneValidated`, `ReturnedToBoard`) sont pris à la construction de l'écran et libérés à sa destruction, jamais au masquage.
+- Les états `IGameState` avec `EnterAsync`/`ExitAsync` restent la cible quand les écrans auront des présentateurs (sous-projet 3).
 - `NarrativeEvent` et `MiniGame` sont des **overlays** dans la scène Board (pas de chargement).
 
 ## Écrans internes et modales

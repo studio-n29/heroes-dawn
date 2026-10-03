@@ -26,6 +26,13 @@ public void Move_StopsOnCombatCase_AndStoresRemainingPm()
 }
 ```
 
+## Rapports de test
+- À chaque exécution du Test Runner (éditeur ou batchmode `-runTests`), `Editor/Testing/TestRunReporter` écrit un rapport HTML : `Code/docs/test-reports/<date>_<EditMode|PlayMode>.html` et `latest-<EditMode|PlayMode>.html` (seuls les `latest-*` sont versionnés).
+- Pour chaque test : ce qu'il vérifie et pourquoi, résultat, durée, et pour un échec le message et la première ligne de pile ; en-tête avec totaux, branche et commit.
+- **Description obligatoire** : chaque test porte `[Description("Vérifie que … — parce que …")]` ; le « parce que » cite la règle (GDD/spec), le point de Review Focus ou le risque couvert. Le garde-fou `TestDescriptionsTests.EveryTestHasADescription` échoue sinon.
+- Après chaque série de tests, une synthèse est faite en chat (ce que la série prouve, échecs et causes, chemin du rapport).
+- Pour prouver qu'un test ajouté après coup sait échouer : casser temporairement le code qu'il couvre (mutation), constater l'échec, restaurer.
+
 ## Outils éditeur
 | Outil | Rôle |
 |---|---|

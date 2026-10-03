@@ -395,7 +395,15 @@ namespace N29.HeroesDawn.Presentation.Board
         /// Retour du combat (message <see cref="ReturnedToBoard"/>, publié une fois le plateau réaffiché) :
         /// joue les événements du plateau (recul, objectifs, validation). Le retour au QG est géré par la machine d'états.
         /// </summary>
-        void OnReturnedToBoard(ReturnedToBoard m) => ProcessEvents(m.Report.BoardEvents);
+        void OnReturnedToBoard(ReturnedToBoard m)
+        {
+            ReportsApplied++;
+            ProcessEvents(m.Report.BoardEvents);
+        }
+
+        /// <summary>Diagnostic (tests PlayMode) : rapports de combat appliqués, dernières récompenses de validation reçues.</summary>
+        public int ReportsApplied { get; private set; }
+        public ZoneRewards? LastZoneRewards => _lastRewards;
 
         void ShowZoneComplete()
         {
@@ -415,7 +423,8 @@ namespace N29.HeroesDawn.Presentation.Board
             btn.Rect.At(0.5f, 0f, 0, 0, 440, 100);
         }
 
-        void LeaveToHq() => LeaveToHqAsync().Forget();
+        /// <summary>Intention « Retour QG » confirmée : quitte la zone puis demande le QG.</summary>
+        public void LeaveToHq() => LeaveToHqAsync().Forget();
 
         async UniTaskVoid LeaveToHqAsync()
         {

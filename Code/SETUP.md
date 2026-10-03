@@ -25,6 +25,10 @@ Les packages UGS sont installés (menu **Heroes Dawn ▸ Setup ▸ 3. Installer 
 - **Heroes Dawn ▸ Équilibrage ▸ Importer 05_Equilibrage.xlsx** : lit l'onglet « Paramètres » de `01_Game_Design/05_Equilibrage.xlsx`, puis écrit `Resources/Balance/balance.json` (chargé par le jeu) et `Backend/RemoteConfig/balance.rc`. Le tableur peut rester ouvert dans Excel.
 - **Heroes Dawn ▸ Équilibrage ▸ Simulateur** : combats automatiques en série sur la zone 1.1, taux de victoire par rencontre, export CSV dans `Heroes Dawn Unity/BalanceReports/` (ignoré par Git).
 
+## 5 bis. Scènes et démarrage
+- Les scènes `Boot`, `Hub`, `Board`, `Combat` sont générées par **Heroes Dawn ▸ Setup ▸ Générer les scènes** (déjà fait et versionné ; à relancer seulement si le générateur change).
+- **Play** démarre toujours par `Boot`, quelle que soit la scène ouverte (sauf pendant les tests).
+
 ## 6. Tests
 - Dans l'éditeur : *Window ▸ General ▸ Test Runner ▸ EditMode ▸ Run All*.
 - En ligne de commande (bash), **Unity fermé** sur ce projet :
@@ -32,6 +36,7 @@ Les packages UGS sont installés (menu **Heroes Dawn ▸ Setup ▸ 3. Installer 
 "/c/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Unity.exe" -batchmode -nographics -projectPath "C:/Users/dnath/Documents/Heroes Dawn/Code/Heroes Dawn Unity" -runTests -testPlatform EditMode -testResults "$TEMP/editmode.xml" -logFile "$TEMP/unity.log"
 ```
   Résumé : `grep -o '<test-run [^>]*' "$TEMP/editmode.xml"`. Un seul test : ajouter `-testFilter "<Namespace>.<Classe>.<Test>"`. Lancer un menu : `-executeMethod <Namespace>.<Classe>.<Méthode> -quit` (ex. `N29.HeroesDawn.EditorTools.Balance.BalanceImportMenu.ImportDefault`).
+- Rapports lisibles : `Code/docs/test-reports/latest-EditMode.html` et `latest-PlayMode.html` (ce que chaque test vérifie et pourquoi).
 - Optionnel : supprimer `Assets/TutorialInfo` et `Assets/Readme.asset` (contenu d'exemple du modèle).
 
 ## 7. Git
