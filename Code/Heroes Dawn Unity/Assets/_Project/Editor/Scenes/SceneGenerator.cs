@@ -1,6 +1,7 @@
 #nullable enable
 using System.IO;
 using N29.HeroesDawn.Composition;
+using N29.HeroesDawn.EditorTools.Audio;
 using N29.HeroesDawn.EditorTools.Prefabs;
 using N29.HeroesDawn.Presentation;
 using UnityEditor;
@@ -72,6 +73,7 @@ namespace N29.HeroesDawn.EditorTools.Scenes
             var rootScope = app.AddComponent<RootLifetimeScope>();
             var rso = new SerializedObject(rootScope);
             rso.FindProperty("catalog").objectReferenceValue = PrefabGenerator.EnsureCatalog();
+            rso.FindProperty("audioCatalog").objectReferenceValue = AudioCatalogBuilder.EnsureCatalog();
             rso.ApplyModifiedPropertiesWithoutUndo();
             app.AddComponent<GameBootstrap>();
 

@@ -11,6 +11,7 @@ Documentation : `../00_GDD`, `../04_Tech_Unity` (architecture), `docs/plans` (pl
 | `Heroes Dawn Unity/Assets/_Project/` | Application, Content, Infrastructure, Presentation, Composition, Editor |
 | `Heroes Dawn Unity/Assets/Tests/` | Tests EditMode (`Domain/`, `Presentation/`, `Editor/`) et PlayMode |
 | `Heroes Dawn Unity/Assets/_Project/Prefabs/` | Écrans, popups et widgets en prefabs (générés par les recettes de `Editor/Prefabs/Recipes`, puis retouchables) |
+| `Heroes Dawn Unity/Assets/_Project/Audio/` | Musiques (`Music/<thème>`) et effets (`Sfx/<effet>`, Kenney CC0) ; catalogue `Settings/AudioCatalog.asset` reconstruit par *Heroes Dawn ▸ Setup ▸ Audio* |
 | `Heroes Dawn Unity/Assets/_Project/Backend/` | Backend UGS : scripts Cloud Code JS, monnaies Economy, Remote Config (déployés par *Window ▸ Deployment*) |
 | `Heroes Dawn Unity/Assets/_Project/Editor/Balance/` | Outils d'équilibrage : import du tableur, simulateur (menu *Heroes Dawn ▸ Équilibrage*) |
 | `docs/plans/` | Plans d'implémentation |

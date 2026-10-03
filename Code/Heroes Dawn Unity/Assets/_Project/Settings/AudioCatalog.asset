@@ -1,0 +1,378 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0df5569cde56935ccf1dc7c836339ac3, type: 3}
+  m_Name: AudioCatalog
+  m_EditorClassIdentifier: N29.HeroesDawn.Presentation::N29.HeroesDawn.Presentation.Audio.AudioCatalog
+  voices: 10
+  music:
+  - id: 1
+    tracks:
+    - clip: {fileID: 8300000, guid: cde33c5637cf936231174f37db1825a6, type: 3}
+      trimEnd: 3
+    volume: 0.85
+    fadeIn: 2.5
+    trackCrossfade: 5
+    resumePosition: 0
+  - id: 2
+    tracks:
+    - clip: {fileID: 8300000, guid: f898da3f5047c569eebf3cfb457e09e6, type: 3}
+      trimEnd: 5.5
+    volume: 0.7
+    fadeIn: 2.5
+    trackCrossfade: 5
+    resumePosition: 0
+  - id: 3
+    tracks:
+    - clip: {fileID: 8300000, guid: 65562f756828e8847253d52cf14d4f1f, type: 3}
+      trimEnd: 4
+    - clip: {fileID: 8300000, guid: d3d707dae02e0bd91af51bf73a9f5ee3, type: 3}
+      trimEnd: 8
+    volume: 0.75
+    fadeIn: 2
+    trackCrossfade: 5
+    resumePosition: 1
+  - id: 4
+    tracks:
+    - clip: {fileID: 8300000, guid: 596e61512e195f7d47444ae8226d6a0c, type: 3}
+      trimEnd: 3
+    - clip: {fileID: 8300000, guid: f35101d0d7900f15c42ae5b8ec65330b, type: 3}
+      trimEnd: 4
+    volume: 0.8
+    fadeIn: 0.8
+    trackCrossfade: 3
+    resumePosition: 0
+  sfx:
+  - id: 1
+    clips:
+    - {fileID: 8300000, guid: aad8106024b6dd3710a8d3a8ee6df093, type: 3}
+    - {fileID: 8300000, guid: d2f05cfbe0c7d998a78778d73f6e1eb4, type: 3}
+    volume: 0.6
+    pitchJitter: 0.04
+    cooldown: 0.04
+    maxInstances: 2
+    priority: 100
+    duckMusicTo: 1
+  - id: 2
+    clips:
+    - {fileID: 8300000, guid: cddbe09727b20d869efae2220bdb760b, type: 3}
+    volume: 0.6
+    pitchJitter: 0.03
+    cooldown: 0.05
+    maxInstances: 1
+    priority: 100
+    duckMusicTo: 1
+  - id: 3
+    clips:
+    - {fileID: 8300000, guid: 51ce6f8a8beef3d60600077e969a53b3, type: 3}
+    volume: 0.7
+    pitchJitter: 0
+    cooldown: 0.05
+    maxInstances: 1
+    priority: 120
+    duckMusicTo: 1
+  - id: 4
+    clips:
+    - {fileID: 8300000, guid: 9c66291a00138f6d7ab54fe29d338d2c, type: 3}
+    volume: 0.6
+    pitchJitter: 0
+    cooldown: 0.2
+    maxInstances: 1
+    priority: 150
+    duckMusicTo: 1
+  - id: 5
+    clips:
+    - {fileID: 8300000, guid: d54bb509219319d5002c1ba0e0c7576b, type: 3}
+    volume: 0.5
+    pitchJitter: 0.02
+    cooldown: 0.1
+    maxInstances: 1
+    priority: 90
+    duckMusicTo: 1
+  - id: 6
+    clips:
+    - {fileID: 8300000, guid: fff93c93ab1a8261d0b48486ae4248c2, type: 3}
+    volume: 0.45
+    pitchJitter: 0.02
+    cooldown: 0.1
+    maxInstances: 1
+    priority: 90
+    duckMusicTo: 1
+  - id: 7
+    clips:
+    - {fileID: 8300000, guid: 717ca4ac1be41462d34e1a84948dbf56, type: 3}
+    volume: 0.5
+    pitchJitter: 0.03
+    cooldown: 0.15
+    maxInstances: 1
+    priority: 80
+    duckMusicTo: 1
+  - id: 8
+    clips:
+    - {fileID: 8300000, guid: 92b78123743a07ec55c048afe2508151, type: 3}
+    - {fileID: 8300000, guid: 844a55b6f4771fdc75c47a09938dd45f, type: 3}
+    volume: 0.7
+    pitchJitter: 0.05
+    cooldown: 0.15
+    maxInstances: 1
+    priority: 110
+    duckMusicTo: 1
+  - id: 9
+    clips:
+    - {fileID: 8300000, guid: f51bed3a6aacd1ee7ebfc8094a6257af, type: 3}
+    volume: 0.55
+    pitchJitter: 0
+    cooldown: 0.2
+    maxInstances: 1
+    priority: 120
+    duckMusicTo: 1
+  - id: 10
+    clips:
+    - {fileID: 8300000, guid: 743e516db43594d37887e84efcf11237, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    cooldown: 0.5
+    maxInstances: 1
+    priority: 200
+    duckMusicTo: 0.6
+  - id: 20
+    clips:
+    - {fileID: 8300000, guid: 51470e052e0a8ee94f0ef881f2be514a, type: 3}
+    - {fileID: 8300000, guid: 6ff1fc6056d2328e8d7ffb4204caf1d8, type: 3}
+    - {fileID: 8300000, guid: 388a04e446ec395ce7e4203ea30f8e84, type: 3}
+    volume: 0.8
+    pitchJitter: 0.05
+    cooldown: 0.1
+    maxInstances: 1
+    priority: 140
+    duckMusicTo: 1
+  - id: 21
+    clips:
+    - {fileID: 8300000, guid: 2e99f550cf6e53f723539c3c35883bc7, type: 3}
+    - {fileID: 8300000, guid: 0a0ac694f2398af31541b8845ac22872, type: 3}
+    - {fileID: 8300000, guid: 502395234e5c780c397b99ca2bcc9e6e, type: 3}
+    volume: 0.85
+    pitchJitter: 0.05
+    cooldown: 0.1
+    maxInstances: 1
+    priority: 140
+    duckMusicTo: 1
+  - id: 22
+    clips:
+    - {fileID: 8300000, guid: d5924c92bbad29a2b2cfca67b91f8455, type: 3}
+    - {fileID: 8300000, guid: 932d46a705890b6baa3c0de020f3b21a, type: 3}
+    - {fileID: 8300000, guid: 4cfdbe86120e11dc773237c0e563f9f0, type: 3}
+    - {fileID: 8300000, guid: e4db59e2e6f4eaddde97de36df4520ff, type: 3}
+    - {fileID: 8300000, guid: 58378ea7a95a06e946f5e0d6924381dc, type: 3}
+    volume: 0.6
+    pitchJitter: 0.08
+    cooldown: 0.08
+    maxInstances: 2
+    priority: 90
+    duckMusicTo: 1
+  - id: 23
+    clips:
+    - {fileID: 8300000, guid: 0e62f9074d113ab36e77aa4161e7f056, type: 3}
+    volume: 0.7
+    pitchJitter: 0
+    cooldown: 0.3
+    maxInstances: 1
+    priority: 130
+    duckMusicTo: 1
+  - id: 24
+    clips:
+    - {fileID: 8300000, guid: 478868974660aa0a96f8eee1557a55d8, type: 3}
+    - {fileID: 8300000, guid: b1867f60b96c2f34cd5277cd88092d5f, type: 3}
+    volume: 0.75
+    pitchJitter: 0.03
+    cooldown: 0.5
+    maxInstances: 1
+    priority: 180
+    duckMusicTo: 0.7
+  - id: 25
+    clips:
+    - {fileID: 8300000, guid: 2a8a49f6c576c460e283b11486771d05, type: 3}
+    volume: 0.85
+    pitchJitter: 0
+    cooldown: 1
+    maxInstances: 1
+    priority: 220
+    duckMusicTo: 0.4
+  - id: 26
+    clips:
+    - {fileID: 8300000, guid: df244a40970f447b5b09e0f90a6cae39, type: 3}
+    volume: 0.75
+    pitchJitter: 0
+    cooldown: 0.1
+    maxInstances: 1
+    priority: 150
+    duckMusicTo: 1
+  - id: 27
+    clips:
+    - {fileID: 8300000, guid: 95067ac9f3ad16d3def4361ca1dc5c5b, type: 3}
+    volume: 0.7
+    pitchJitter: 0
+    cooldown: 0.1
+    maxInstances: 1
+    priority: 150
+    duckMusicTo: 1
+  - id: 40
+    clips:
+    - {fileID: 8300000, guid: 69fbad1425fae6cfbade9aecc3603352, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    cooldown: 0.5
+    maxInstances: 1
+    priority: 200
+    duckMusicTo: 0.5
+  - id: 41
+    clips:
+    - {fileID: 8300000, guid: eb76e7a7a5a25965173ccc351e29774e, type: 3}
+    volume: 0.75
+    pitchJitter: 0.03
+    cooldown: 0.2
+    maxInstances: 1
+    priority: 150
+    duckMusicTo: 1
+  - id: 42
+    clips:
+    - {fileID: 8300000, guid: a5678be1e37c7c42e93bacd45a545968, type: 3}
+    volume: 0.7
+    pitchJitter: 0.03
+    cooldown: 0.3
+    maxInstances: 1
+    priority: 150
+    duckMusicTo: 1
+  - id: 60
+    clips:
+    - {fileID: 8300000, guid: 21398cd37c21072fd61f7a4f620a1882, type: 3}
+    - {fileID: 8300000, guid: 4cf0d2bf4da5b7db041ff4e4dff8825a, type: 3}
+    - {fileID: 8300000, guid: 527080baa4e0f722347ee1efb3daed06, type: 3}
+    - {fileID: 8300000, guid: 547ff41a42b87369d241cbd57f0363cc, type: 3}
+    - {fileID: 8300000, guid: 5dc693dac580435fddb98a8dccf55e62, type: 3}
+    volume: 0.45
+    pitchJitter: 0.08
+    cooldown: 0.06
+    maxInstances: 2
+    priority: 120
+    duckMusicTo: 1
+  - id: 61
+    clips:
+    - {fileID: 8300000, guid: 5f3afbe7a4a4e07ce09aae0393742bf7, type: 3}
+    - {fileID: 8300000, guid: 440bb7bc1211848c966f82c264a30ba6, type: 3}
+    - {fileID: 8300000, guid: 15b4d68cbdffc524356e7af83c40c1af, type: 3}
+    - {fileID: 8300000, guid: d47f61e3ff0ca4f110f0ec2806573aea, type: 3}
+    - {fileID: 8300000, guid: 9097617d210d0fb7429bcdb8ef5beac1, type: 3}
+    volume: 0.7
+    pitchJitter: 0.08
+    cooldown: 0.05
+    maxInstances: 3
+    priority: 130
+    duckMusicTo: 1
+  - id: 62
+    clips:
+    - {fileID: 8300000, guid: 9f50a2b19bdd405659c85ab8f5e6216d, type: 3}
+    - {fileID: 8300000, guid: 6e4ad4a4c24dc389d124ab9c7706ab4a, type: 3}
+    - {fileID: 8300000, guid: 4660501ba60e461b70e5da6aa9bcbdeb, type: 3}
+    - {fileID: 8300000, guid: 790761b0319eb8f40dd8fd870465b614, type: 3}
+    - {fileID: 8300000, guid: c4dbc362bb7b78b9b969c1c8b8dad141, type: 3}
+    volume: 0.85
+    pitchJitter: 0.06
+    cooldown: 0.06
+    maxInstances: 2
+    priority: 170
+    duckMusicTo: 1
+  - id: 63
+    clips:
+    - {fileID: 8300000, guid: acb70cf2a43508dd6a14f522b5f00336, type: 3}
+    volume: 0.55
+    pitchJitter: 0.05
+    cooldown: 0.1
+    maxInstances: 2
+    priority: 110
+    duckMusicTo: 1
+  - id: 64
+    clips:
+    - {fileID: 8300000, guid: 437ac538a1379cb86dd86ed55c231ffa, type: 3}
+    volume: 0.5
+    pitchJitter: 0.05
+    cooldown: 0.15
+    maxInstances: 1
+    priority: 110
+    duckMusicTo: 1
+  - id: 65
+    clips:
+    - {fileID: 8300000, guid: c4fb10fb1d74aad861322ef9313c194d, type: 3}
+    - {fileID: 8300000, guid: b72ac3d8cdd11c796d761ad7a6f4064a, type: 3}
+    - {fileID: 8300000, guid: cb1872149eb18907f2c06a9b2965b424, type: 3}
+    volume: 0.6
+    pitchJitter: 0.08
+    cooldown: 0.08
+    maxInstances: 2
+    priority: 100
+    duckMusicTo: 1
+  - id: 66
+    clips:
+    - {fileID: 8300000, guid: a1379903aeefe12314fac72440eef271, type: 3}
+    volume: 0.45
+    pitchJitter: 0.06
+    cooldown: 0.12
+    maxInstances: 2
+    priority: 100
+    duckMusicTo: 1
+  - id: 67
+    clips:
+    - {fileID: 8300000, guid: 66d0747fa1d03a81e55159c655102040, type: 3}
+    - {fileID: 8300000, guid: 1583c2ed623ba61aa19b802a89932797, type: 3}
+    - {fileID: 8300000, guid: dea7b2f990ad8aa80e0245a6c2bbf4d6, type: 3}
+    volume: 0.75
+    pitchJitter: 0.05
+    cooldown: 0.15
+    maxInstances: 2
+    priority: 190
+    duckMusicTo: 1
+  - id: 68
+    clips:
+    - {fileID: 8300000, guid: 113927e0bfb68aebf0436fb92c8a6620, type: 3}
+    - {fileID: 8300000, guid: 510bca89147813392ddbddc177e5c7da, type: 3}
+    volume: 0.8
+    pitchJitter: 0.03
+    cooldown: 0.3
+    maxInstances: 1
+    priority: 210
+    duckMusicTo: 0.75
+  - id: 69
+    clips:
+    - {fileID: 8300000, guid: da7e09f055fe5cd2e99128665aac482a, type: 3}
+    volume: 0.9
+    pitchJitter: 0
+    cooldown: 1
+    maxInstances: 1
+    priority: 255
+    duckMusicTo: 0.35
+  - id: 70
+    clips:
+    - {fileID: 8300000, guid: 10a86662f38b5608af0d06e12ceae084, type: 3}
+    volume: 0.85
+    pitchJitter: 0
+    cooldown: 1
+    maxInstances: 1
+    priority: 255
+    duckMusicTo: 0.35
+  - id: 71
+    clips:
+    - {fileID: 8300000, guid: c41ee6ebf04aae20b16da0472f391ca9, type: 3}
+    volume: 0.4
+    pitchJitter: 0.04
+    cooldown: 0.25
+    maxInstances: 1
+    priority: 80
+    duckMusicTo: 1

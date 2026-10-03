@@ -9,6 +9,7 @@ using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Board;
+using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Mvp;
 using N29.HeroesDawn.Presentation.Popups;
 
@@ -27,11 +28,13 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly ISessionReadModel _session;
         readonly IToastService _toasts;
         readonly ILocalization _loc;
+        readonly IAudioService _audio;
 
         public CasePopupPresenter(IModalService modals, IResolveRestUseCase rest, IResolveNarrativeUseCase narrative, IResolveMiniGameUseCase miniGame,
-                                  ISessionReadModel session, IToastService toasts, ILocalization loc)
+                                  ISessionReadModel session, IToastService toasts, ILocalization loc, IAudioService? audio = null)
         {
             _modals = modals; _rest = rest; _narrative = narrative; _miniGame = miniGame; _session = session; _toasts = toasts; _loc = loc;
+            _audio = audio ?? NullAudioService.Instance;
         }
 
         /// <summary>Joue la case ; liste vide si elle n'est pas interactive ou si sa résolution échoue.</summary>
@@ -97,6 +100,7 @@ namespace N29.HeroesDawn.Presentation.Board
                     ScoreFormat = _loc.T("mg.score"),
                 }, ct);
                 var b = _session.Content.Balance;
+                _audio.Play(success ? SfxId.MiniGameHit : SfxId.MiniGameMiss);
                 if (success) _toasts.Show(_loc.F("mg.success", b.MiniGameCredits, b.MiniGamePr), ToastKind.Reward);
                 else _toasts.Show(_loc.T("mg.fail"), ToastKind.Warning);
                 return Events(await _miniGame.ExecuteAsync(success, ct));

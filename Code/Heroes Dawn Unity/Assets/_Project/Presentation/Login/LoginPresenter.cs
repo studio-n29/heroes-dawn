@@ -6,6 +6,7 @@ using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
+using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Mvp;
 using AppLogger = N29.HeroesDawn.Application.Ports.ILogger;
 
@@ -23,12 +24,14 @@ namespace N29.HeroesDawn.Presentation.Login
         readonly IToastService _toasts;
         readonly ILocalization _loc;
         readonly AppLogger _log;
+        readonly IAudioService _audio;
         readonly BusyGate _gate = new BusyGate();
 
         public LoginPresenter(ILoginView view, ISignInAsGuestUseCase signIn, ISessionReadModel session, IPublisher<NavigateRequested> navigate,
-                              IToastService toasts, ILocalization loc, AppLogger log) : base(view, null)
+                              IToastService toasts, ILocalization loc, AppLogger log, IAudioService? audio = null) : base(view, null)
         {
             _signIn = signIn; _session = session; _navigate = navigate; _toasts = toasts; _loc = loc; _log = log;
+            _audio = audio ?? NullAudioService.Instance;
         }
 
         protected override void OnStart() => View.PlayClicked += Play;
@@ -63,6 +66,7 @@ namespace N29.HeroesDawn.Presentation.Login
                     return;
                 }
                 var report = result.Value;
+                _audio.Play(SfxId.LoginStart);
                 var name = _session.Account?.DisplayName ?? "";
                 _toasts.Show(_loc.F(report.NewProfile ? "login.welcome_new" : "login.welcome_back", name), ToastKind.Info);
                 if (report.FatigueRecovered > 0) _toasts.Show(_loc.F("login.recovered", report.FatigueRecovered), ToastKind.Reward);

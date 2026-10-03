@@ -13,6 +13,7 @@ using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Combat;
+using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using VContainer.Unity;
@@ -38,6 +39,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         readonly IToastService _toasts;
         readonly ILocalization _loc;
         readonly IFrameClock _clock;
+        readonly IAudioService _audio;
 
         CombatSimulation? _sim;
         readonly Dictionary<int, string> _names = new Dictionary<int, string>();
@@ -56,11 +58,13 @@ namespace N29.HeroesDawn.Presentation.Combat
         public CombatPresenter(ICombatView view, IActiveCombatReadModel combat, ISessionReadModel session, ISetAutoCombatUseCase setAuto,
                                IFinishCombatUseCase finish, IVerifyCombatUseCase verify, IForceCombatWinUseCase forceWin,
                                IPublisher<CombatResultsClosed> closed, IPublisher<NavigateRequested> navigate, IModalService modals,
-                               IToastService toasts, ILocalization loc, IFrameClock clock, BackButtonRouter router)
+                               IToastService toasts, ILocalization loc, IFrameClock clock, BackButtonRouter router,
+                               IAudioService? audio = null)
             : base(view, router)
         {
             _combat = combat; _session = session; _setAuto = setAuto; _finish = finish; _verify = verify; _forceWin = forceWin;
             _closed = closed; _navigate = navigate; _modals = modals; _toasts = toasts; _loc = loc; _clock = clock;
+            _audio = audio ?? NullAudioService.Instance;
         }
 
         protected override IBackHandler BackHandler => this;
@@ -175,43 +179,59 @@ namespace N29.HeroesDawn.Presentation.Combat
                 switch (e)
                 {
                     case GaugeFullEvent g:
-                        if (_sim!.Unit(g.Unit).Side == Side.Ally && !_readyOrder.Contains(g.Unit)) _readyOrder.Add(g.Unit);
+                        if (_sim!.Unit(g.Unit).Side == Side.Ally && !_readyOrder.Contains(g.Unit))
+                        {
+                            _readyOrder.Add(g.Unit);
+                            if (!_sim!.Auto) _audio.Play(SfxId.AllyReady);
+                        }
                         break;
                     case SkillUsedEvent su:
                         View.Act(su.Actor);
+                        _audio.Play(SfxId.SkillCast);
                         AddLog(Name(su.Actor) + " : " + SkillLabel(su.Actor, su.Skill));
                         break;
                     case DamageEvent d:
                         View.Float(d.Target, (d.Crit ? "!" : "") + "-" + d.Amount, d.Crit ? Tone.Primary : Tone.Default, d.Crit ? 56 : 44);
                         View.Hit(d.Target);
+                        _audio.Play(d.Crit ? SfxId.CritHit : SfxId.Hit);
                         break;
                     case HealEvent h:
-                        if (h.Amount > 0) View.Float(h.Target, "+" + h.Amount, Tone.Success, 44);
+                        if (h.Amount > 0)
+                        {
+                            View.Float(h.Target, "+" + h.Amount, Tone.Success, 44);
+                            _audio.Play(SfxId.HealFx);
+                        }
                         break;
                     case ShieldAbsorbedEvent sa:
                         View.Float(sa.Target, "(" + sa.Amount + ")", Tone.Shield, 34);
+                        _audio.Play(SfxId.Shield);
                         break;
                     case MissEvent m:
                         View.Float(m.Target, _loc.T("combat.miss"), Tone.Muted, 38);
+                        _audio.Play(SfxId.Miss);
                         break;
                     case StatusAppliedEvent st:
                         if (st.Status != StatusType.Shield) View.Float(st.Target, _loc.StatusName(st.Status), Tone.Perception, 30);
+                        _audio.Play(st.Status == StatusType.Shield ? SfxId.Shield : SfxId.Status);
                         break;
                     case TurnSkippedEvent ts:
                         View.Float(ts.Unit, _loc.T("combat.skip"), Tone.Info, 36);
                         break;
                     case UnitDefeatedEvent ud:
                         AddLog(Name(ud.Unit) + " : K.O.");
+                        _audio.Play(SfxId.KnockOut);
                         _readyOrder.Remove(ud.Unit);
                         break;
                     case ComboUsedEvent cu:
                         var combo = FindCombo(cu.ComboId);
                         var comboName = combo != null ? _loc.ComboName(combo) : cu.ComboId;
                         View.ShowBanner(_loc.T("combat.combo") + " " + comboName, Tone.Danger);
+                        _audio.Play(SfxId.Combo);
                         AddLog(Name(cu.A) + " + " + Name(cu.B) + " : " + comboName);
                         break;
                     case CombatEndedEvent ce:
                         View.ShowBanner(ce.Victory ? _loc.T("combat.victory") : _loc.T("combat.defeat"), ce.Victory ? Tone.Primary : Tone.Danger);
+                        _audio.Play(ce.Victory ? SfxId.Victory : SfxId.Defeat); // atténue la musique (catalogue)
                         break;
                 }
             }

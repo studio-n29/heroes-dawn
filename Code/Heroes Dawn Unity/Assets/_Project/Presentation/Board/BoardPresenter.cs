@@ -13,6 +13,7 @@ using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Board;
+using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Mvp;
@@ -44,6 +45,7 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly IModalService _modals;
         readonly IToastService _toasts;
         readonly ILocalization _loc;
+        readonly IAudioService _audio;
 
         readonly BusyGate _busy = new BusyGate();
         ZoneRun? _run;
@@ -60,12 +62,14 @@ namespace N29.HeroesDawn.Presentation.Board
                               IEndMoveUseCase endMove, IBeginCombatUseCase beginCombat, ILeaveZoneUseCase leave, IGameFlow flow, CasePopupPresenter cases,
                               ISubscriber<ZoneValidated> zoneValidated, ISubscriber<ReturnedToBoard> returned, ISubscriber<RosterChanged> roster,
                               ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving, IPublisher<NavigateRequested> navigate,
-                              IModalService modals, IToastService toasts, ILocalization loc, BackButtonRouter router)
+                              IModalService modals, IToastService toasts, ILocalization loc, BackButtonRouter router,
+                              IAudioService? audio = null)
             : base(view, router)
         {
             _session = session; _roll = roll; _bonus = bonus; _moveTo = moveTo; _endMove = endMove; _beginCombat = beginCombat;
             _leave = leave; _flow = flow; _cases = cases; _zoneValidated = zoneValidated; _returned = returned; _roster = roster;
             _wallet = wallet; _saving = saving; _navigate = navigate; _modals = modals; _toasts = toasts; _loc = loc;
+            _audio = audio ?? NullAudioService.Instance;
         }
 
         protected override IBackHandler BackHandler => this;
@@ -306,6 +310,7 @@ namespace N29.HeroesDawn.Presentation.Board
             foreach (var e in events) if (e is DiceRolledEvent d) value = d.Value;
             _busy.TryEnter();
             RefreshHud();
+            _audio.Play(SfxId.DiceThrow);
             try { await View.RollDieAsync(value, _session.Content.Balance.DieFaces, Lifetime); }
             finally { _busy.Exit(); }
             RefreshAll();
@@ -325,6 +330,7 @@ namespace N29.HeroesDawn.Presentation.Board
             {
                 _busy.TryEnter();
                 RefreshHud();
+                _audio.Play(SfxId.PawnMove);
                 try { await View.Map.MovePawnAsync(path, Lifetime); }
                 finally { _busy.Exit(); }
             }
@@ -353,6 +359,7 @@ namespace N29.HeroesDawn.Presentation.Board
             if (validated)
             {
                 await View.PauseAsync(0.5f, Lifetime);
+                _audio.Play(SfxId.ZoneComplete);
                 await ShowZoneCompleteAsync();
                 return;
             }
@@ -372,6 +379,7 @@ namespace N29.HeroesDawn.Presentation.Board
         async UniTask OpenCaseAsync(CaseOutcome outcome)
         {
             if (_run == null || Disposed || _flow.Current != GameState.Board) return;
+            _audio.Play(outcome.Type == CaseType.Combat ? SfxId.CombatAlert : SfxId.CaseEvent);
             if (outcome.Type == CaseType.Combat)
             {
                 await StartCombatAsync();

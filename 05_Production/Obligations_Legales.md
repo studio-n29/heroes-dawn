@@ -20,6 +20,8 @@
 ## Propriété intellectuelle
 - [ ] Licences des outils IA et des banques audio (usage commercial).
 - [ ] Traçabilité de chaque asset (outil, date, licence).
+  - Musiques (`Assets/_Project/Audio/Music`) : générées avec Google Flow Music le 2026-10-03 (prompts : `03_Art_UI_UX/Prompts_Musique.md`). **À vérifier : conditions d'usage commercial de Google Flow avant publication.**
+  - Effets sonores (`Assets/_Project/Audio/Sfx`) : packs Kenney (Interface Sounds, Impact Sounds, RPG Audio, Casino Audio, Sci-fi Sounds), kenney.nl, licence **CC0** (domaine public, usage commercial libre, crédit facultatif), téléchargés le 2026-10-03 ; licences copiées dans le dossier.
 - [ ] Noms : « SCP » exclu (R8), vérifier « Adam West » (R9), recherche d'antériorité sur « Heroes Dawn » (marque).
 
 ## Accessibilité & localisation

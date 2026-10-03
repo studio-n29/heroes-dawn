@@ -17,6 +17,7 @@ using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Combat;
 using N29.HeroesDawn.Domain.Shop;
+using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 
@@ -48,6 +49,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly IModalService _modals;
         readonly IToastService _toasts;
         readonly ILocalization _loc;
+        readonly IAudioService _audio;
 
         readonly BusyGate _acting = new BusyGate();
         readonly BusyGate _deploying = new BusyGate();
@@ -64,13 +66,15 @@ namespace N29.HeroesDawn.Presentation.Hub
                             IStartZoneUseCase startZone, ISignOutUseCase signOut, IResetProgressUseCase reset,
                             ISubscriber<RosterChanged> rosterChanged, ISubscriber<WalletChanged> walletChanged, ISubscriber<SaveStateChanged> saving,
                             ISubscriber<ShopChanged> shopChanged, IPublisher<NavigateRequested> navigate,
-                            IModalService modals, IToastService toasts, ILocalization loc)
+                            IModalService modals, IToastService toasts, ILocalization loc,
+                            IAudioService? audio = null)
             : base(view, null)
         {
             _session = session; _firstZone = firstZone; _toggleSquad = toggleSquad; _train = train; _heal = heal;
             _openShop = openShop; _recruit = recruit; _reroll = reroll; _clock = clock; _shopChanged = shopChanged;
             _startZone = startZone; _signOut = signOut; _reset = reset; _rosterChanged = rosterChanged; _walletChanged = walletChanged;
             _saving = saving; _navigate = navigate; _modals = modals; _toasts = toasts; _loc = loc;
+            _audio = audio ?? NullAudioService.Instance;
         }
 
         int _lastMinute = -1;
@@ -283,6 +287,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         void Train(MemberId id) => Act(ct => _train.ExecuteAsync(id, ct), () =>
         {
             var m = Member(id);
+            _audio.Play(SfxId.Train);
             if (m != null) _toasts.Show(_loc.F("hub.trained", _loc.MemberName(m.Def), m.Level), ToastKind.Reward);
         });
 
@@ -292,6 +297,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var def = slot >= 0 && slot < offers.Count ? _session.Content.Members.FirstOrDefault(m => m.Id == offers[slot].Id) : null;
             Act(ct => _recruit.ExecuteAsync(slot, ct), () =>
             {
+                _audio.Play(SfxId.Recruit); // atténue la musique (catalogue)
                 if (def != null) _toasts.Show(_loc.F("hub.recruited", _loc.MemberName(def)), ToastKind.Reward);
             });
         }
@@ -325,7 +331,11 @@ namespace N29.HeroesDawn.Presentation.Hub
             Act(ct => _reroll.ExecuteAsync(ct));
         }
 
-        void Heal() => Act(ct => _heal.ExecuteAsync(ct), () => _toasts.Show(_loc.T("hub.healed"), ToastKind.Reward));
+        void Heal() => Act(ct => _heal.ExecuteAsync(ct), () =>
+        {
+            _audio.Play(SfxId.Heal);
+            _toasts.Show(_loc.T("hub.healed"), ToastKind.Reward);
+        });
 
         void Logout() => Act(ct => _signOut.ExecuteAsync(ct), () => _navigate.Publish(new NavigateRequested(GameState.Login)));
 
