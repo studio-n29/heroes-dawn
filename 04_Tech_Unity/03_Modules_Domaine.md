@@ -48,6 +48,8 @@ Records immuables construits depuis les ScriptableObjects (client) ou depuis un 
 - **Règles** : `PoolGenerator` (tirage sans doublon parmi les recrues non possédées de la ville, graine du jour), `RefreshCostRules` (gratuit → Crédits → gemmes).
 - **Événements** : `PoolGenerated`, `MemberRecruited`, `CityCollectionCompleted`.
 
+> **État réel (boutique éphémère, 2026-10-03)** — assembly `Domain.Shop` (C# pur) : **3 offres** par jour de boutique (`ShopDay` : de 9h00 locale à 9h00 le lendemain), graine recalculable `ShopSeed` (joueur + jour + numéro de tirage → `Pcg32`), tirage `ShopDraw` (rareté pondérée Agent 70 / Élite 25 / Légende 5, renormalisée si une rareté est épuisée, puis héros uniforme, sans doublon ni héros possédé), condition d'entrée `MemberDef.UnlockZone` (Verre après la zone 1.1), coût du renouvellement `ShopRules` (gratuit puis 100 / 200 / 400 / 800 Crédits). Paramètres `Shop*` dans `BalanceConfig`. État `ShopState` dans la session (offres mémorisées, profil v3) ; cas d'usage `OpenShop`, `RecruitFromShop`, `RerollShop` ; message `ShopChanged`. Emplacement Légende dédié et renouvellement en gemmes : plus tard.
+
 ### Board — plateau d'une zone
 - **État** : `ZoneRun` (position, cases révélées, contenu tiré des cases, objectifs remplis, jauge de PM, dés bonus, graine et curseur RNG, journal d'actions).
 - **Règles** :

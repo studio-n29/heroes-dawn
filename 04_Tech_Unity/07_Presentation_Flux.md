@@ -77,6 +77,10 @@ stateDiagram-v2
 - **Retour** (◄, Échap, geste Android) : `BackButtonRouter` (racine) ferme d'abord la modale du dessus si elle est annulable (Retour = Annuler, ou Continuer pour les résultats), sinon le gestionnaire de l'écran visible le plus haut. Un écran masqué retire son gestionnaire : Échap en combat n'ouvre jamais « Retour au QG ? » (`BackNavigationTests`).
 - Messages du bus (`ToastRequested`) affichés en toasts par `ToastRelay` (une clé de localisation est traduite).
 
+## QG : boutique éphémère
+- Onglet **Boutique** du QG (`HubView`) : 3 cartes `RecruitCardView` (état Recruté estompé avec tampon, bande de rareté), barre sous les cartes avec compte à rebours jusqu'à 9h00 locale et bouton **Renouveler** (« Gratuit » ou prix en Crédits).
+- `HubPresenter` ouvre la boutique à l'affichage, se rafraîchit sur `ShopChanged`, et, en `ITickable`, vérifie une fois par minute le changement de jour pour retirer la boutique à 9h00 si l'onglet est affiché. Renouveler payant passe par la confirmation commune ; Recruter et Renouveler sont protégés contre le double clic (`BusyGate`).
+
 ## Combat : le lecteur d'événements
 ```mermaid
 flowchart LR

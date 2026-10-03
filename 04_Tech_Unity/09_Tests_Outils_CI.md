@@ -8,6 +8,7 @@
 | **Application** | NUnit + ports factices | Use cases : succès, refus serveur, réseau coupé | À chaque push |
 | **Outils et backend** | NUnit (assembly `Tests.Editor`) | Import du tableur, simulateur, format des fichiers `Backend/` | À chaque push |
 | **Présentateurs** | NUnit (assembly `Tests.Presentation`) + doubles de vue (`Fakes/`) | Chaque présentateur sans Unity : ce qu'il affiche, les use cases qu'il appelle, garde contre le double clic, Retour, modales | À chaque push |
+| **Boutique éphémère** | NUnit (`ShopRulesTests`, `ShopUseCaseTests`, `HubPresenterTests`) + horloge réglable (`TestApp.Time.LocalNow`) ; PlayMode `ShopFlowTests` | Jour de boutique à 9h00, graine, tirage pondéré (10 000 tirages), conditions d'entrée, achat, renouvellement, boutique expirée, sauvegarde v3 | À chaque push |
 | **Prefabs et scènes** | NUnit (assembly `Tests.Editor`) | Générateur de prefabs (pas d'écrasement, retouche conservée), structure des prefabs, `ScreenCatalog`, scènes générées, aucune interface construite par code (`NoCodeBuiltScreensTests`) | À chaque push |
 | **PlayMode** | Unity Test Framework | Flux de jeu sur les vraies scènes : connexion, QG, plateau, combat, résultats, Retour (`BackNavigationTests`) et une partie complète au clic (`FullRunTests`) ; captures d'écran à la demande (`ScreenCaptureTests`, explicite) | Nightly |
 | **Contenu** | Validateur | Références, localisation, pools, objectifs atteignables | À chaque push touchant le contenu |

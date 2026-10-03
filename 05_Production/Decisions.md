@@ -92,3 +92,4 @@
 | 2026-10-03 | Rapport HTML à chaque exécution des tests (ce que chaque test vérifie et pourquoi) + synthèse en chat ; `[Description]` obligatoire sur chaque test | Demande de l'utilisateur ; garde-fou `EveryTestHasADescription` |
 | 2026-10-03 | Sous-projet 2 : scènes `Boot`/`Hub`/`Board`/`Combat` générées par menu, un scope par scène, `GameFlowMachine` (Application, testable sans Unity) seule autorité de navigation | Écrans encore construits par code ; prefabs MVP au sous-projet 3 |
 | 2026-10-03 | Sous-projet 3 : prefabs générés puis éditables (recettes éditeur, `ScreenCatalog`), présentateurs C# purs, TextMeshPro, Retour par `BackButtonRouter` | Mise en page des maquettes : retouche des prefabs |
+| 2026-10-03 | Boutique éphémère : 3 héros/jour à 9h00 locale, tirage déterministe pondéré 70/25/5 (graine joueur + jour + tirage), renouvellement gratuit puis 100→800 Crédits | Remplace l'onglet Recrutement ; vérification serveur avec UGS |
