@@ -33,6 +33,8 @@ window.HD_ROUTES = {
  "M83": "M83-parametres-notifications.html",
  "M84": "M84-parametres-controles.html",
  "M85": "M85-parametres-compte-support.html",
+ "M90": "M90-kit-ui.html",
+ "M91": "M91-screen-flow.html",
  "T01": "T01-bienvenue.html",
  "T02": "T02-escouade.html",
  "T03": "T03-mission.html",
@@ -44,6 +46,5 @@ window.HD_ROUTES = {
  "T09": "T09-resultats.html",
  "T10": "T10-astuce-combo.html",
  "T11": "T11-fin.html",
- "T12": "T12-passer.html",
- "DEMO": "_demo.html"
+ "T12": "T12-passer.html"
 };

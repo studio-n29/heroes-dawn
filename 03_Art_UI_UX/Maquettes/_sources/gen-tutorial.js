@@ -5,13 +5,14 @@ const fs = require("fs"), path = require("path");
 const out = (f) => path.join(__dirname, "pages", f);
 
 const under = (file) => `<iframe class="under" src="${file}?export=1&embed=1"></iframe>`;
-const spot = ([x, y, w, h], round = false) => `<div class="spotlight${round ? " round" : ""}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>`;
+let NEXT = "";
+const spot = ([x, y, w, h], round = false) => `<div class="spotlight${round ? " round" : ""}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div><div class="abs" data-go="${NEXT}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;z-index:41"></div>`;
 const hand = (x, y, rot = 0) => `<div class="hand center" style="left:${x}px;top:${y}px;font-size:96px;transform:rotate(${rot}deg)">👆</div>`;
 const guide = (x, y) => `<div class="guide center t" style="left:${x}px;top:${y}px;--img:none;background:radial-gradient(circle at 35% 30%,#FFE58A,#C9962B);color:#1B1408;font-size:64px">BR</div>`;
 const bubble = ([x, y, w], step, title, text, action = "") => `<div class="bubble tail-l" style="left:${x}px;top:${y}px;width:${w}px">
     <span class="caption">${title}</span>${text}
-    ${action}<div class="foot"><span>BRIE RAYNER · <span class="progress">${step}</span></span><span>PASSER LE TUTORIEL ▸</span></div></div>`;
-const btn = (label) => `<div class="btn primary small" style="margin-top:18px;height:72px;width:280px">${label}</div>`;
+    ${action}<div class="foot"><span>BRIE RAYNER · <span class="progress">${step}</span></span><span data-go="T12">PASSER LE TUTORIEL ▸</span></div></div>`;
+const btn = (label) => `<div class="btn primary small" data-go="${NEXT}" style="margin-top:18px;height:72px;width:280px">${label}</div>`;
 const veil = `<div class="veil"></div>`;
 const pins = (list) => list.map(([n, x, y]) => `  <i class="pin" data-n="${n}" style="left:${x}px;top:${y}px"></i>`).join("\n");
 
@@ -30,6 +31,7 @@ ${legend.map((l) => `<li>${l}</li>`).join("\n")}
 // Guide à gauche de la bulle : la queue de la bulle pointe vers Rayner.
 const say = (gx, gy, w, step, title, text, action) => [guide(gx, gy), bubble([gx + 180, gy, Math.max(w, 1000)], step, title, text, action)];
 
+NEXT = "T02";
 page("T01-bienvenue.html", "T01", "Tutoriel 1/9 · Bienvenue", [
   under("M10-qg.html"), veil,
   ...say(470, 300, 820, "1 / 9", "BIENVENUE À RED HOOK",
@@ -41,6 +43,7 @@ page("T01-bienvenue.html", "T01", "Tutoriel 1/9 · Bienvenue", [
   "« Passer le tutoriel » toujours présent mais discret ; il demande une confirmation (T12).",
 ]);
 
+NEXT = "T03";
 page("T02-escouade.html", "T02", "Tutoriel 2/9 · Escouade", [
   under("M20-effectif.html"), spot([318, 578, 222, 342]), hand(440, 840, -15),
   ...say(620, 600, 720, "2 / 9", "COMPOSE TON ESCOUADE",
@@ -51,6 +54,7 @@ page("T02-escouade.html", "T02", "Tutoriel 2/9 · Escouade", [
   "Une seule notion (l'escouade de 4), au moment où elle sert ; le geste demandé est écrit en gras.",
 ]);
 
+NEXT = "T04";
 page("T03-mission.html", "T03", "Tutoriel 3/9 · Mission", [
   under("M10-qg.html"), spot([1482, 782, 358, 166]), hand(1560, 900, -10),
   ...say(560, 470, 720, "3 / 9", "EN MISSION !",
@@ -60,6 +64,7 @@ page("T03-mission.html", "T03", "Tutoriel 3/9 · Mission", [
   "La bulle se place loin de l'élément désigné pour ne jamais le cacher.",
 ]);
 
+NEXT = "T05";
 page("T04-objectifs.html", "T04", "Tutoriel 4/9 · Objectifs", [
   under("M63-plateau-lancer.html"), spot([80, 128, 346, 352]),
   ...say(560, 200, 760, "4 / 9", "TES OBJECTIFS",
@@ -69,6 +74,7 @@ page("T04-objectifs.html", "T04", "Tutoriel 4/9 · Objectifs", [
   "Le texte annonce aussi la suite (« le premier est déjà en vue ») pour enchaîner sur le lancer.",
 ]);
 
+NEXT = "T06";
 page("T05-lancer.html", "T05", "Tutoriel 5/9 · Lancer le dé", [
   under("M63-plateau-lancer.html"), spot([1472, 782, 368, 186]), hand(1580, 920, -10),
   ...say(560, 470, 720, "5 / 9", "LANCE LE DÉ",
@@ -78,6 +84,7 @@ page("T05-lancer.html", "T05", "Tutoriel 5/9 · Lancer le dé", [
   "Le vocabulaire (PM) est introduit au moment où il apparaît à l'écran.",
 ]);
 
+NEXT = "T07";
 page("T06-destination.html", "T06", "Tutoriel 6/9 · Destination", [
   under("M64-plateau-destination.html"), spot([948, 362, 130, 130], true), hand(1000, 470, -10),
   ...say(220, 600, 720, "6 / 9", "CHOISIS OÙ ALLER",
@@ -87,6 +94,7 @@ page("T06-destination.html", "T06", "Tutoriel 6/9 · Destination", [
   "Deux notions liées en une bulle (portée et brouillard) parce qu'elles se voient au même moment.",
 ]);
 
+NEXT = "T08";
 page("T07-combat-atb.html", "T07", "Tutoriel 7/9 · Temps actif", [
   under("M65-combat-pret.html"), spot([630, 628, 300, 324]),
   ...say(600, 300, 720, "7 / 9", "LE COMBAT EN TEMPS ACTIF",
@@ -96,6 +104,7 @@ page("T07-combat-atb.html", "T07", "Tutoriel 7/9 · Temps actif", [
   "« Compris » relance le combat ; Givre est déjà prête, l'étape suivante enchaîne aussitôt.",
 ]);
 
+NEXT = "T09";
 page("T08-combat-competence.html", "T08", "Tutoriel 8/9 · Compétence et cible", [
   under("M66-combat-ciblage.html"), spot([922, 112, 316, 366]), hand(1060, 380, -10),
   ...say(240, 560, 640, "8 / 9", "VISE !",
@@ -105,6 +114,7 @@ page("T08-combat-competence.html", "T08", "Tutoriel 8/9 · Compétence et cible"
   "Après ce coup, le tutoriel se tait jusqu'à la fin du combat : le joueur finit seul (AUTO et combos seront expliqués par des astuces).",
 ]);
 
+NEXT = "T11";
 page("T09-resultats.html", "T09", "Tutoriel 9/9 · Fatigue", [
   under("M70-resultats-combat.html"), spot([298, 488, 1334, 156]),
   ...say(420, 700, 820, "9 / 9", "VICTOIRE… ET FATIGUE",
@@ -114,6 +124,7 @@ page("T09-resultats.html", "T09", "Tutoriel 9/9 · Fatigue", [
   "Le conseil donne déjà le réflexe suivant (l'infirmerie), sans l'imposer.",
 ]);
 
+NEXT = "M66";
 page("T10-astuce-combo.html", "T10", "Astuce contextuelle · Combo", [
   under("M66-combat-ciblage.html"),
   `<div class="tip-card" style="left:1180px;top:650px;width:640px">
@@ -128,6 +139,7 @@ page("T10-astuce-combo.html", "T10", "Astuce contextuelle · Combo", [
   "Fermeture d'un geste ; la fiche reste consultable dans Pause ▸ Aide. Autres astuces : AUTO et vitesse, dé bonus, Terminer, cases Événement / Mini-jeu / Repos, défaite, fatigue > 60 %, zone sécurisée, recrutement, infirmerie.",
 ]);
 
+NEXT = "M10";
 page("T11-fin.html", "T11", "Tutoriel terminé", [
   under("M10-qg.html"), veil,
   `<div class="burst center" style="left:360px;top:160px;width:1200px;height:170px;font-size:84px;z-index:34">TUTORIEL TERMINÉ !</div>`,
@@ -139,6 +151,7 @@ page("T11-fin.html", "T11", "Tutoriel terminé", [
   "Aucune récompense supplémentaire : l'économie reste côté serveur ; le joueur arrive sur le QG libre de ses choix.",
 ]);
 
+NEXT = "T05";
 page("T12-passer.html", "T12", "Passer le tutoriel ?", [
   under("M63-plateau-lancer.html"), `<div class="scrim" style="z-index:30"></div>`,
   `<div class="panel modal" style="left:560px;top:260px;width:800px;height:520px;z-index:31">
