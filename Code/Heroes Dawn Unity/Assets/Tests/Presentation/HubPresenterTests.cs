@@ -183,6 +183,45 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Last.ShopCountdown, Is.EqualTo("Nouveaux héros dans 24 h 00"));
         }
 
+        [Test, Description("Vérifie que si 9h00 passe pendant la confirmation d'un renouvellement payant, la validation est refusée sans débit et la boutique du nouveau jour reste intacte — parce que le joueur ne doit ni payer pour une boutique expirée ni perdre son renouvellement gratuit (relecture, Important 1 ; Review Focus 1)")]
+        public void Reroll_DayChangesDuringConfirm_RefusedNoCharge()
+        {
+            _app.Session.Wallet.Set(1000, _app.Session.Wallet.Pr);
+            OnShopTab(new DateTime(2026, 10, 3, 8, 58, 0));
+            _view.ClickReroll();
+            Assert.That(_app.Session.Shop.Draw, Is.EqualTo(1));
+            _view.ClickReroll();
+            var confirm = (FakeConfirmPopup)_host.Spawned.Single();
+            _app.Time.LocalNow = new DateTime(2026, 10, 3, 9, 0, 0);
+            _p.Tick();
+            Assert.That(_app.Session.Shop.Day, Is.EqualTo("2026-10-03"));
+            confirm.Answer(true);
+            Assert.That(_app.Session.Shop.Draw, Is.EqualTo(0), "le renouvellement gratuit du nouveau jour n'est pas consommé");
+            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(1000));
+            Assert.That(_toasts.Shown.Select(t => t.Text), Does.Contain(Loc.T("errors.shop.expired")));
+        }
+
+        [Test, Description("Vérifie qu'après l'effacement de la sauvegarde la boutique est aussitôt retirée au lieu d'afficher « collection complète » — parce que la nouvelle partie a une boutique neuve (relecture, Important 2)")]
+        public void Reset_ReopensShopImmediately()
+        {
+            OnShopTab(Noon);
+            _view.ClickReset();
+            ((FakeConfirmPopup)_host.Spawned.Single()).Answer(true);
+            Assert.That(_app.Session.Shop.Offers.Count, Is.EqualTo(3));
+            Assert.That(_view.Last.EmptyRecruitText, Is.Empty);
+        }
+
+        [Test, Description("Vérifie que le tic de la minute ne reconstruit pas l'onglet Équipe — parce qu'une reconstruction perdrait un clic tombé au changement de minute (relecture, mineur reclassé)")]
+        public void Tick_OnTeamTab_DoesNotRebuild()
+        {
+            _app.Time.LocalNow = Noon;
+            Make();
+            int shows = _view.Shown.Count;
+            _app.Time.LocalNow = Noon.AddMinutes(1);
+            _p.Tick();
+            Assert.That(_view.Shown.Count, Is.EqualTo(shows));
+        }
+
         [Test, Description("Vérifie qu'un entraînement trop cher est désactivé sur la carte — parce que le joueur ne doit pas pouvoir lancer une action qu'il ne peut pas payer")]
         public void Train_NotEnoughCredits_CardDisabled()
         {

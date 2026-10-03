@@ -84,7 +84,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (minute == _lastMinute) return;
             _lastMinute = minute;
             OpenShop();
-            Refresh();
+            // Seul le compte à rebours bouge : l'onglet Équipe n'est pas reconstruit (un clic au changement de minute serait perdu).
+            if (_tab == HubTab.Recruit) Refresh();
         }
 
         void OpenShop() => _openShop.ExecuteAsync(Lifetime).Forget();
@@ -301,10 +302,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             int cost = ShopRules.RerollCost(_session.Shop.Draw, _session.Content.Balance);
             if (cost == 0) { Act(ct => _reroll.ExecuteAsync(ct)); return; }
             if (_acting.IsBusy) return;
-            RerollPaidAsync(cost).Forget();
+            RerollPaidAsync(cost, _session.Shop.Day, _session.Shop.Draw).Forget();
         }
 
-        async UniTaskVoid RerollPaidAsync(int cost)
+        async UniTaskVoid RerollPaidAsync(int cost, string day, int draw)
         {
             bool ok;
             try
@@ -313,7 +314,15 @@ namespace N29.HeroesDawn.Presentation.Hub
                                                                 _loc.T("ui.confirm"), _loc.T("ui.cancel"), Tone.Primary), Lifetime);
             }
             catch (OperationCanceledException) { return; }
-            if (ok && !Disposed) Act(ct => _reroll.ExecuteAsync(ct));
+            if (!ok || Disposed) return;
+            // La boutique a changé pendant la confirmation (9h00 passée) : ce qui a été accepté n'existe plus.
+            if (_session.Shop.Day != day || _session.Shop.Draw != draw)
+            {
+                _toasts.Show(_loc.T("errors.shop.expired"), ToastKind.Error);
+                Refresh();
+                return;
+            }
+            Act(ct => _reroll.ExecuteAsync(ct));
         }
 
         void Heal() => Act(ct => _heal.ExecuteAsync(ct), () => _toasts.Show(_loc.T("hub.healed"), ToastKind.Reward));
@@ -331,7 +340,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                                                                 _loc.T("ui.confirm"), _loc.T("ui.cancel"), Tone.Danger), Lifetime);
             }
             catch (OperationCanceledException) { return; }
-            if (ok && !Disposed) Act(ct => _reset.ExecuteAsync(ct));
+            // Nouvelle partie : boutique neuve tout de suite (sinon « collection complète » jusqu'à la minute suivante).
+            if (ok && !Disposed) Act(ct => _reset.ExecuteAsync(ct), OpenShop);
         }
 
         /// <summary>Déployer : démarre la zone puis demande le plateau. Après succès, la garde reste levée jusqu'au prochain affichage.</summary>
