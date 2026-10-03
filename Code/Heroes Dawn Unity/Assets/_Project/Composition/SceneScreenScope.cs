@@ -1,4 +1,5 @@
 #nullable enable
+using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
 using VContainer;
@@ -25,6 +26,11 @@ namespace N29.HeroesDawn.Composition
         protected abstract void ConfigureScreen(IContainerBuilder builder, RectTransform root);
 
         protected override void Configure(IContainerBuilder builder)
-            => ConfigureScreen(builder, screenRoot != null ? screenRoot : (RectTransform)transform);
+        {
+            var root = screenRoot != null ? screenRoot : (RectTransform)transform;
+            ConfigureScreen(builder, root);
+            // Les boutons de l'écran trouvent l'audio parmi leurs parents.
+            builder.RegisterBuildCallback(c => UiSoundRelay.Attach(root.gameObject, c.Resolve<IAudioService>()));
+        }
     }
 }

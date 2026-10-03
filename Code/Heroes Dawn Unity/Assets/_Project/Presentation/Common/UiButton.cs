@@ -1,3 +1,4 @@
+using N29.HeroesDawn.Presentation.Audio;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -5,7 +6,7 @@ using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Common
 {
-    /// <summary>Bouton « comics » : léger écrasement à l'appui.</summary>
+    /// <summary>Bouton « comics » : léger écrasement à l'appui, son de clic (relais audio de la hiérarchie).</summary>
     public sealed class UiButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
     {
         // Sérialisés : le bouton fonctionne aussi dans un prefab.
@@ -14,6 +15,9 @@ namespace N29.HeroesDawn.Presentation.Common
         [SerializeField] TMP_Text label;
         [SerializeField] Color _bg;
         [SerializeField] Color _fg;
+        [Tooltip("Son joué au clic (None : muet).")]
+        [SerializeField] SfxId clickSound = SfxId.UiClick;
+        UiSoundRelay _relay;
 
         public Button Button => button;
         public Image Fill => fill;
@@ -34,6 +38,18 @@ namespace N29.HeroesDawn.Presentation.Common
                 Button.interactable = value;
                 Label.color = value ? _fg : Theme.WithAlpha(_fg, 0.55f);
             }
+        }
+
+        void Awake()
+        {
+            if (button != null) button.onClick.AddListener(PlayClick);
+        }
+
+        void PlayClick()
+        {
+            if (clickSound == SfxId.None) return;
+            if (_relay == null) _relay = GetComponentInParent<UiSoundRelay>(true);
+            if (_relay != null) _relay.Play(clickSound);
         }
 
         public void SetLabel(string s) => Label.text = s;

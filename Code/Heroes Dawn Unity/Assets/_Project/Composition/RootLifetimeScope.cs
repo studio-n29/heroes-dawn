@@ -13,6 +13,7 @@ using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Infrastructure.Platform;
 using N29.HeroesDawn.Infrastructure.Simulated;
 using N29.HeroesDawn.Presentation;
+using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Mvp;
 using N29.HeroesDawn.Presentation.Login;
 using UnityEngine;
@@ -29,6 +30,7 @@ namespace N29.HeroesDawn.Composition
     public sealed class RootLifetimeScope : LifetimeScope
     {
         [SerializeField] ScreenCatalog? catalog;
+        [SerializeField] AudioCatalog? audioCatalog;
 
         public UiRoot? Ui { get; private set; }
 
@@ -104,11 +106,19 @@ namespace N29.HeroesDawn.Composition
                 : throw new System.InvalidOperationException("ScreenCatalog manquant sur RootLifetimeScope : relancer Heroes Dawn ▸ Setup ▸ Générer les scènes.");
             builder.RegisterInstance(screens);
             builder.RegisterComponentInHierarchy<UiRoot>().AsSelf().As<IScreenVisibility>();
-            builder.Register<IPopupHost>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return ui.Modals; }, Lifetime.Singleton);
-            builder.Register<IToastService>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return ui.Toasts; }, Lifetime.Singleton);
+            builder.Register<IFrameClock, UnityFrameClock>(Lifetime.Singleton);
+
+            // ---- Audio (sources créées une fois ; musique pilotée par l'état du jeu)
+            var rig = AudioRig.Create(transform, audioCatalog != null ? audioCatalog.Voices : 10);
+            builder.RegisterInstance(rig);
+            builder.RegisterEntryPoint(c => new AudioService(rig, audioCatalog, c.Resolve<IFrameClock>(), log), Lifetime.Singleton);
+            builder.RegisterEntryPoint<MusicDirector>();
+
+            // Modales et toasts habillés de sons (et la musique s'atténue sous une modale).
+            builder.Register<IPopupHost>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return new AudiblePopupHost(ui.Modals, c.Resolve<IAudioService>()); }, Lifetime.Singleton);
+            builder.Register<IToastService>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return new AudibleToastService(ui.Toasts, c.Resolve<IAudioService>()); }, Lifetime.Singleton);
             builder.Register<IModalService, ModalService>(Lifetime.Singleton);
             builder.Register<ILocalization, LocLocalization>(Lifetime.Singleton);
-            builder.Register<IFrameClock, UnityFrameClock>(Lifetime.Singleton);
             builder.Register<IBackInput, InputSystemBackInput>(Lifetime.Singleton);
             builder.RegisterEntryPoint<BackButtonRouter>().AsSelf();
             builder.RegisterEntryPoint<ToastRelay>();
@@ -120,6 +130,7 @@ namespace N29.HeroesDawn.Composition
             {
                 Ui = c.Resolve<UiRoot>();
                 Ui.EnsureLayers(screens);
+                UiSoundRelay.Attach(Ui.gameObject, c.Resolve<IAudioService>()); // boutons de Boot : connexion, modales
                 log.Info($"Prototype M1 prêt — {content.Members.Count} recrues, {content.Zones.Count} zone(s). Données : {UnityEngine.Application.persistentDataPath}");
             });
         }

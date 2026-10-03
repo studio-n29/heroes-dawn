@@ -105,6 +105,13 @@ flowchart LR
 - `IAudioService` (présentation) : musique par état (hub, arrondissement, combat, boss) avec fondus, SFX par famille, voix de combat.
 - Déclenché par les présentateurs ou par des handlers (jamais par le domaine).
 
+> **État réel (2026-10-03)** — `Presentation/Audio` :
+> - `AudioService` (entrée VContainer, `ITickable`) sur un `AudioRig` créé une fois par `RootLifetimeScope` (écouteur, 2 platines de musique, `voices` sources d'effets) : aucune instanciation ni allocation par son joué.
+> - **Musique** : fondu enchaîné à puissance constante (`Fade` : sinus/cosinus) ; les pistes d'un thème s'enchaînent en fondu avant leur fin (`trimEnd` ignore le silence final) ; position mémorisée pour la reprise (`resumePosition`) ; flux libéré (`UnloadAudioData`) après chaque fondu ; atténuation par calques (`DuckLayer.Modal` sous les modales, `DuckLayer.Stinger` pendant un effet marquant) ; remontée douce au retour d'arrière-plan.
+> - **Effets** : `VoicePool` (C# pur) — voix libre, sinon vol de la plus ancienne voix de priorité inférieure, limite d'instances et délai par effet ; variante et hauteur tirées au hasard.
+> - `MusicDirector` : `GameStateChanged` → thème (connexion, QG, plateau, combat ; reprise au retour du combat). `AudiblePopupHost` / `AudibleToastService` habillent modales et toasts ; `UiButton` joue son `clickSound` via le `UiSoundRelay` de sa hiérarchie (racine de Boot, zone d'écran de chaque scène).
+> - Données : `Settings/AudioCatalog.asset`, reconstruit par *Heroes Dawn ▸ Setup ▸ Audio ▸ Reconstruire le catalogue* depuis `Audio/Music/<MusicId>/` et `Audio/Sfx/<SfxId>/` (réglages conservés). Import mobile (`Editor/Audio/AudioImportRules`) : musique en streaming Vorbis q50 44,1 kHz ; effets ADPCM mono décompressés au chargement. Voix Unity : 24 réelles, 64 virtuelles.
+
 ## Pools et performance
 - Pool d'objets pour : cases, dégâts flottants, FX, cartes de recrutement, lignes de liste.
 - Atlases de sprites par groupe Addressables ; pas plus de 2 atlases actifs par écran.
