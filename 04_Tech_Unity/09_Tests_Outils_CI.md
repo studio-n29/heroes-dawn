@@ -7,7 +7,9 @@
 | **Rejeu (golden tests)** | NUnit | Journaux de combat et de zone enregistrés → empreinte attendue | À chaque push ; un rejeu cassé = changement de règles à assumer (nouvelle `RulesVersion`) |
 | **Application** | NUnit + ports factices | Use cases : succès, refus serveur, réseau coupé | À chaque push |
 | **Outils et backend** | NUnit (assembly `Tests.Editor`) | Import du tableur, simulateur, format des fichiers `Backend/` | À chaque push |
-| **PlayMode** | Unity Test Framework | Flux de jeu : prologue, ouvrir une zone, combat auto, retour au hub | Nightly |
+| **Présentateurs** | NUnit (assembly `Tests.Presentation`) + doubles de vue (`Fakes/`) | Chaque présentateur sans Unity : ce qu'il affiche, les use cases qu'il appelle, garde contre le double clic, Retour, modales | À chaque push |
+| **Prefabs et scènes** | NUnit (assembly `Tests.Editor`) | Générateur de prefabs (pas d'écrasement, retouche conservée), structure des prefabs, `ScreenCatalog`, scènes générées, aucune interface construite par code (`NoCodeBuiltScreensTests`) | À chaque push |
+| **PlayMode** | Unity Test Framework | Flux de jeu sur les vraies scènes : connexion, QG, plateau, combat, résultats, Retour (`BackNavigationTests`) et une partie complète au clic (`FullRunTests`) ; captures d'écran à la demande (`ScreenCaptureTests`, explicite) | Nightly |
 | **Contenu** | Validateur | Références, localisation, pools, objectifs atteignables | À chaque push touchant le contenu |
 | **Manuels** | Matrice d'appareils | Performance, lisibilité, sensations | Fin de chaque jalon |
 
@@ -64,6 +66,7 @@ flowchart LR
 ```
 - Les tests EditMode tournent en batchmode (Unity fermé) :
   `Unity.exe -batchmode -nographics -projectPath "<projet>" -runTests -testPlatform EditMode -testResults <fichier.xml>`.
+- Les tests PlayMode aussi, mais **sans** `-nographics` (rendu des canvas) ; les captures : `-testPlatform PlayMode -testFilter N29.HeroesDawn.Tests.PlayMode.ScreenCaptureTests` → `Code/docs/test-reports/captures/`.
 - Déploiement UGS : fenêtre *Deployment* de Unity en `dev` ; en `staging`/`production`, uniquement depuis la CI (jamais à la main).
 
 ## Ordre de mise en place (jalon M1 — Prototype)

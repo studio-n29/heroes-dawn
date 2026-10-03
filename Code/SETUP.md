@@ -25,9 +25,15 @@ Les packages UGS sont installés (menu **Heroes Dawn ▸ Setup ▸ 3. Installer 
 - **Heroes Dawn ▸ Équilibrage ▸ Importer 05_Equilibrage.xlsx** : lit l'onglet « Paramètres » de `01_Game_Design/05_Equilibrage.xlsx`, puis écrit `Resources/Balance/balance.json` (chargé par le jeu) et `Backend/RemoteConfig/balance.rc`. Le tableur peut rester ouvert dans Excel.
 - **Heroes Dawn ▸ Équilibrage ▸ Simulateur** : combats automatiques en série sur la zone 1.1, taux de victoire par rencontre, export CSV dans `Heroes Dawn Unity/BalanceReports/` (ignoré par Git).
 
-## 5 bis. Scènes et démarrage
-- Les scènes `Boot`, `Hub`, `Board`, `Combat` sont générées par **Heroes Dawn ▸ Setup ▸ Générer les scènes** (déjà fait et versionné ; à relancer seulement si le générateur change).
-- **Play** démarre toujours par `Boot`, quelle que soit la scène ouverte (sauf pendant les tests).
+## 5 bis. Interface, prefabs, scènes et démarrage
+Tout est déjà généré et versionné ; ces menus ne servent que si une recette ou un générateur change. Dans cet ordre :
+1. **Heroes Dawn ▸ Setup ▸ Générer les assets d'interface** : sprites d'interface (`Resources/UI`), illustrations importées (`Art/UI`) et polices TextMeshPro encrées (`Resources/Fonts/TMP`).
+2. **Heroes Dawn ▸ Setup ▸ Générer les prefabs d'écran** : fenêtre listant les recettes (écrans, popups, widgets) ; génère dans `Prefabs/` et met à jour `Settings/ScreenCatalog.asset`. Un prefab existant **n'est pas écrasé** sauf si on coche sa case « écraser ? » : les retouches faites à la main dans les prefabs sont conservées.
+3. **Heroes Dawn ▸ Setup ▸ Générer les scènes** : `Boot`, `Hub`, `Board`, `Combat` (canvas, scopes) et Build Settings.
+
+Pour retoucher un écran : ouvrir son prefab (`Prefabs/Screens/…`, `Prefabs/Popups/…`, `Prefabs/Widgets/…`) et l'éditer ; une retouche d'un widget se propage aux écrans qui l'imbriquent.
+
+**Play** démarre toujours par `Boot`, quelle que soit la scène ouverte (sauf pendant les tests).
 
 ## 6. Tests
 - Dans l'éditeur : *Window ▸ General ▸ Test Runner ▸ EditMode ▸ Run All*.
@@ -35,6 +41,7 @@ Les packages UGS sont installés (menu **Heroes Dawn ▸ Setup ▸ 3. Installer 
 ```bash
 "/c/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Unity.exe" -batchmode -nographics -projectPath "C:/Users/dnath/Documents/Heroes Dawn/Code/Heroes Dawn Unity" -runTests -testPlatform EditMode -testResults "$TEMP/editmode.xml" -logFile "$TEMP/unity.log"
 ```
+  PlayMode : même commande **sans** `-nographics`, avec `-testPlatform PlayMode`. Captures d'écran : `-testPlatform PlayMode -testFilter N29.HeroesDawn.Tests.PlayMode.ScreenCaptureTests` → `Code/docs/test-reports/captures/`. Générer les prefabs en ligne de commande : `-executeMethod N29.HeroesDawn.EditorTools.Prefabs.PrefabGenerator.GenerateAllBatch -quit` (ajouter `-overwritePrefabs` pour écraser).
   Résumé : `grep -o '<test-run [^>]*' "$TEMP/editmode.xml"`. Un seul test : ajouter `-testFilter "<Namespace>.<Classe>.<Test>"`. Lancer un menu : `-executeMethod <Namespace>.<Classe>.<Méthode> -quit` (ex. `N29.HeroesDawn.EditorTools.Balance.BalanceImportMenu.ImportDefault`).
 - Rapports lisibles : `Code/docs/test-reports/latest-EditMode.html` et `latest-PlayMode.html` (ce que chaque test vérifie et pourquoi).
 - Optionnel : supprimer `Assets/TutorialInfo` et `Assets/Readme.asset` (contenu d'exemple du modèle).

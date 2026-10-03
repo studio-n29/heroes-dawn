@@ -42,6 +42,10 @@ namespace N29.HeroesDawn.Presentation.Combat
         public event Action<int>? SkillClicked;
         public event Action<int>? UnitTapped;
 
+        /// <summary>Boutons Auto et vitesse (tests PlayMode : clics réels).</summary>
+        public UnityEngine.UI.Button AutoButton => auto.Button;
+        public UnityEngine.UI.Button SpeedButton => speed.Button;
+
         void Awake()
         {
             retreat.Button.onClick.AddListener(() => RetreatClicked?.Invoke());

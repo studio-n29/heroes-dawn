@@ -103,7 +103,6 @@ namespace N29.HeroesDawn.Composition
             var screens = catalog != null ? catalog
                 : throw new System.InvalidOperationException("ScreenCatalog manquant sur RootLifetimeScope : relancer Heroes Dawn ▸ Setup ▸ Générer les scènes.");
             builder.RegisterInstance(screens);
-            builder.Register<UiServices>(Lifetime.Singleton);
             builder.RegisterComponentInHierarchy<UiRoot>().AsSelf().As<IScreenVisibility>();
             builder.Register<IPopupHost>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return ui.Modals; }, Lifetime.Singleton);
             builder.Register<IToastService>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return ui.Toasts; }, Lifetime.Singleton);
@@ -112,14 +111,15 @@ namespace N29.HeroesDawn.Composition
             builder.Register<IFrameClock, UnityFrameClock>(Lifetime.Singleton);
             builder.Register<IBackInput, InputSystemBackInput>(Lifetime.Singleton);
             builder.RegisterEntryPoint<BackButtonRouter>().AsSelf();
+            builder.RegisterEntryPoint<ToastRelay>();
             builder.Register<ILoginView>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return ui.Login; }, Lifetime.Singleton);
             builder.RegisterEntryPoint<LoginPresenter>().AsSelf();
+            builder.RegisterEntryPoint<FlowStarter>(); // en dernier : après l'abonnement des présentateurs
 
             builder.RegisterBuildCallback(c =>
             {
                 Ui = c.Resolve<UiRoot>();
-                Ui.Build(c.Resolve<UiServices>(), screens);
-                c.Resolve<GameFlowMachine>().Start(); // Boot → Login
+                Ui.EnsureLayers(screens);
                 log.Info($"Prototype M1 prêt — {content.Members.Count} recrues, {content.Zones.Count} zone(s). Données : {UnityEngine.Application.persistentDataPath}");
             });
         }

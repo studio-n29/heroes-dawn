@@ -64,5 +64,17 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(WithScene("Boot", s => Find<UiRoot>(s) != null), Is.True);
             Assert.That(WithScene("Boot", s => Find<Camera>(s) != null), Is.True);
         }
+
+        [Test, Description("Vérifie que Boot contient ses canvas (écrans d'ordre 10, couche commune d'ordre 100) et que l'interface commune y est branchée — parce que modales et toasts doivent couvrir toutes les scènes, sans canvas construit à l'exécution")]
+        public void BootScene_UiRootWiredToScreensAndOverlayCanvases()
+        {
+            var orders = WithScene("Boot", s => s.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Canvas>(true)).Select(c => c.sortingOrder).OrderBy(o => o).ToArray());
+            Assert.That(orders, Is.EqualTo(new[] { 10, 100 }));
+            Assert.That(WithScene("Boot", s =>
+            {
+                var so = new SerializedObject(Find<UiRoot>(s));
+                return so.FindProperty("screensRoot").objectReferenceValue != null && so.FindProperty("overlayRoot").objectReferenceValue != null;
+            }), Is.True);
+        }
     }
 }

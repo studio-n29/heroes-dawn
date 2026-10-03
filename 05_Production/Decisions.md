@@ -91,3 +91,4 @@
 | 2026-10-02 | Sous-projet 1 (fondations) : un use case par intention, messages MessagePipe, `RootLifetimeScope` ; UI encore construite par code | Scènes et flux : sous-projet 2 ; vues en prefabs générés : sous-projet 3 |
 | 2026-10-03 | Rapport HTML à chaque exécution des tests (ce que chaque test vérifie et pourquoi) + synthèse en chat ; `[Description]` obligatoire sur chaque test | Demande de l'utilisateur ; garde-fou `EveryTestHasADescription` |
 | 2026-10-03 | Sous-projet 2 : scènes `Boot`/`Hub`/`Board`/`Combat` générées par menu, un scope par scène, `GameFlowMachine` (Application, testable sans Unity) seule autorité de navigation | Écrans encore construits par code ; prefabs MVP au sous-projet 3 |
+| 2026-10-03 | Sous-projet 3 : prefabs générés puis éditables (recettes éditeur, `ScreenCatalog`), présentateurs C# purs, TextMeshPro, Retour par `BackButtonRouter` | Mise en page des maquettes : retouche des prefabs |

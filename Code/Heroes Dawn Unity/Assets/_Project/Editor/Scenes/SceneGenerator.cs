@@ -75,17 +75,26 @@ namespace N29.HeroesDawn.EditorTools.Scenes
             rso.ApplyModifiedPropertiesWithoutUndo();
             app.AddComponent<GameBootstrap>();
 
-            var ui = new GameObject("UI", typeof(RectTransform));
-            ui.layer = 5;
-            ui.AddComponent<UiRoot>();
+            // Écrans de Boot (canvas d'ordre 10) et couche commune au-dessus de toutes les scènes (canvas imbriqué d'ordre 100).
+            var ui = NewCanvas("UI", 10);
+            var screens = Child(SafeArea(ui.transform), "Screens");
+            var overlay = Child(ui.transform, "Overlay");
+            var overlayCanvas = overlay.gameObject.AddComponent<Canvas>();
+            overlayCanvas.overrideSorting = true;
+            overlayCanvas.sortingOrder = 100;
+            overlay.gameObject.AddComponent<GraphicRaycaster>();
+            var overlaySafe = SafeArea(overlay);
+            var root = ui.AddComponent<UiRoot>();
+            var uso = new SerializedObject(root);
+            uso.FindProperty("screensRoot").objectReferenceValue = screens;
+            uso.FindProperty("overlayRoot").objectReferenceValue = overlaySafe;
+            uso.ApplyModifiedPropertiesWithoutUndo();
             return scene;
         }
 
-        static Scene BuildScreenScene<TScope>(ParentReference parent, int sortingOrder) where TScope : SceneScreenScope
+        static GameObject NewCanvas(string name, int sortingOrder)
         {
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            var canvasGo = new GameObject("Canvas", typeof(RectTransform));
+            var canvasGo = new GameObject(name, typeof(RectTransform));
             canvasGo.layer = 5;
             var canvas = canvasGo.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -96,16 +105,36 @@ namespace N29.HeroesDawn.EditorTools.Scenes
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scaler.matchWidthOrHeight = 0.5f;
             canvasGo.AddComponent<GraphicRaycaster>();
+            return canvasGo;
+        }
 
-            var safe = new GameObject("SafeArea", typeof(RectTransform));
-            safe.layer = 5;
-            var rt = (RectTransform)safe.transform;
-            rt.SetParent(canvasGo.transform, false);
+        /// <summary>Enfant étiré sur tout son parent (calque UI).</summary>
+        static RectTransform Child(Transform parent, string name)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.layer = 5;
+            var rt = (RectTransform)go.transform;
+            rt.SetParent(parent, false);
             rt.anchorMin = Vector2.zero;
             rt.anchorMax = Vector2.one;
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
-            safe.AddComponent<N29.HeroesDawn.Presentation.SafeArea>();
+            return rt;
+        }
+
+        static RectTransform SafeArea(Transform parent)
+        {
+            var rt = Child(parent, "SafeArea");
+            rt.gameObject.AddComponent<N29.HeroesDawn.Presentation.SafeArea>();
+            return rt;
+        }
+
+        static Scene BuildScreenScene<TScope>(ParentReference parent, int sortingOrder) where TScope : SceneScreenScope
+        {
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            var canvasGo = NewCanvas("Canvas", sortingOrder);
+            var rt = SafeArea(canvasGo.transform);
 
             var scopeGo = new GameObject("[Scope]");
             var scope = scopeGo.AddComponent<TScope>();

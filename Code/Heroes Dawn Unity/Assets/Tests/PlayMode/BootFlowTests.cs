@@ -8,7 +8,6 @@ using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Composition;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Login;
-using N29.HeroesDawn.Presentation.Screens;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;

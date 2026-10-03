@@ -33,48 +33,26 @@ namespace N29.HeroesDawn.Presentation.Common
             }
         }
 
-        static readonly System.Collections.Generic.Dictionary<string, Sprite> _art = new System.Collections.Generic.Dictionary<string, Sprite>();
+        /// <summary>Dossier des illustrations importées en textures (générées depuis Resources/Art/*.bytes).</summary>
+        public const string ArtAssetFolder = "Assets/_Project/Art/UI";
 
-        /// <summary>Icône « H » (Resources/Art/HD_Logo_png.bytes).</summary>
+#if UNITY_EDITOR
+        // Illustrations pour les recettes de prefabs (éditeur seulement) : en jeu, les prefabs portent les références.
         public static Sprite Logo => Art("HD_Logo_png");
-        /// <summary>Logo-titre « Heroes Dawn ».</summary>
         public static Sprite Title => Art("HD_Title_png");
         public static Sprite BackgroundLandscape => Art("HD_BG_Landscape_jpg");
         public static Sprite BackgroundPortrait => Art("HD_BG_Portrait_jpg");
 
-        /// <summary>Dossier des illustrations importées en textures (générées depuis Resources/Art/*.bytes).</summary>
-        public const string ArtAssetFolder = "Assets/_Project/Art/UI";
-
-        /// <summary>
-        /// Charge une image stockée en octets bruts (.bytes) et la décode à l'exécution : la résolution d'origine est conservée
-        /// quel que soit le réglage d'import de Unity (pas de redimensionnement en puissance de 2). Renvoie null si absente.
-        /// </summary>
+        /// <summary>Texture importée d'une illustration (« HD_Logo_png » → Art/UI/HD_Logo.png) ; null si absente.</summary>
         public static Sprite Art(string name)
         {
-            if (_art.TryGetValue(name, out var cached)) return cached;
-            Sprite sprite = null;
-#if UNITY_EDITOR
-            // En éditeur hors jeu (recettes de prefabs) : l'asset importé, seul référençable par un prefab.
-            if (!UnityEngine.Application.isPlaying)
-            {
-                int dot = name.LastIndexOf('_');
-                var path = ArtAssetFolder + "/" + name.Substring(0, dot) + "." + name.Substring(dot + 1);
-                sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
-                if (sprite != null) { _art[name] = sprite; return sprite; }
-            }
-#endif
-            var asset = Resources.Load<TextAsset>("Art/" + name);
-            if (asset != null)
-            {
-                var tex = new Texture2D(2, 2, TextureFormat.RGBA32, true) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Trilinear, anisoLevel = 2 };
-                if (tex.LoadImage(asset.bytes, true))
-                    sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
-                Resources.UnloadAsset(asset);
-            }
-            if (sprite == null) Debug.LogWarning("[Heroes Dawn] Image introuvable : Resources/Art/" + name + ".bytes");
-            _art[name] = sprite;
+            int dot = name.LastIndexOf('_');
+            var path = ArtAssetFolder + "/" + name.Substring(0, dot) + "." + name.Substring(dot + 1);
+            var sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (sprite == null) Debug.LogWarning("[Heroes Dawn] Illustration non importée : " + path + " (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface)");
             return sprite;
         }
+#endif
 
         static Texture2D NewTex(int w, int h)
         {

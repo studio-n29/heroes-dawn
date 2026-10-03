@@ -47,6 +47,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         /// <summary>Bouton Déployer (tests PlayMode : clic réel).</summary>
         public Button DeployButton => deploy.Button;
+        public Button RecruitTabButton => tabRecruit.Button;
 
         void Awake()
         {

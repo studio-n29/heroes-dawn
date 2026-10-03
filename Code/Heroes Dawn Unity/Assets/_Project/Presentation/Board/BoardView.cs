@@ -44,6 +44,8 @@ namespace N29.HeroesDawn.Presentation.Board
         /// <summary>Carte et bouton « Retour QG » (tests PlayMode : clics réels).</summary>
         public BoardMapView MapView => map;
         public Button BackButton => back.Button;
+        public Button RollButton => roll.Button;
+        public Button EndMoveButton => end.Button;
 
         void Awake()
         {

@@ -12,7 +12,9 @@
 
 ## Scènes
 
-> **État réel (sous-projet 2, 2026-10-03)** — scènes `Boot`, `Hub`, `Board`, `Combat` générées par *Heroes Dawn ▸ Setup ▸ Générer les scènes* (`Assets/_Project/Scenes`, Build Settings dans cet ordre). Chaque scène d'écran a un `SceneScreenScope` (`HubLifetimeScope`, `BoardLifetimeScope` enfants de `RootLifetimeScope` ; `CombatLifetimeScope` enfant de `BoardLifetimeScope`) qui crée son écran (encore construit par code) à sa construction. `CityMap` et `Prologue` : M2. La navigation « Retour » (◄ / Échap / geste Android) : sous-projet 3.
+> **État réel (sous-projet 2, 2026-10-03)** — scènes `Boot`, `Hub`, `Board`, `Combat` générées par *Heroes Dawn ▸ Setup ▸ Générer les scènes* (`Assets/_Project/Scenes`, Build Settings dans cet ordre). Chaque scène d'écran a un `SceneScreenScope` (`HubLifetimeScope`, `BoardLifetimeScope` enfants de `RootLifetimeScope` ; `CombatLifetimeScope` enfant de `BoardLifetimeScope`) qui instancie le prefab de son écran. `CityMap` et `Prologue` : M2.
+
+> **État réel (sous-projet 3, 2026-10-03)** — les cinq écrans (connexion, QG, plateau, combat, résultats) et toutes les popups sont des **prefabs générés puis éditables** : *Heroes Dawn ▸ Setup ▸ Générer les prefabs d'écran* exécute les recettes éditeur (`Editor/Prefabs/Recipes`, une par écran ou widget) ; un prefab existant n'est **jamais écrasé** sans le demander (option « écraser »), les retouches à la main sont donc conservées. `ScreenCatalog` (`Settings/ScreenCatalog.asset`) associe chaque scène et chaque popup à son prefab. Chaque écran = une vue `MonoBehaviour` (`…View`, interface `I…View`) + un présentateur C# pur (`…Presenter`, base `PresenterBase`, testé en EditMode avec des doubles de vue). Textes en **TextMeshPro** (polices dynamiques encrées). Aucune interface n'est plus construite par code à l'exécution (garde-fou `NoCodeBuiltScreensTests`) ; les canvas de `Boot` (écrans d'ordre 10, couche modales + toasts d'ordre 100) sont dans la scène générée.
 | Scène | Chargement | Scope VContainer | Contenu |
 |---|---|---|---|
 | `Boot` | Seule, au lancement | `RootLifetimeScope` (vit tout le jeu) | Services globaux, session, bus, flux de jeu, écran de chargement |
@@ -64,14 +66,16 @@ stateDiagram-v2
 | Combat → Hub | décharger `Combat` puis `Board`, charger `Hub` |
 
 - Transition non prévue : refusée. Demande pendant une transition ou vers l'état courant : ignorée. Échec d'un effet : effets déjà faits annulés dans l'ordre inverse, message `errors.navigation`.
-- Seule la machine d'états charge, décharge, affiche ou masque des scènes. Un écran demande une navigation en publiant `NavigateRequested(GameState)` (via `UiContext.Navigate`). Le combat publie `CombatResultsClosed(report)` à « Continuer » ; la machine renvoie au plateau (puis `ReturnedToBoard`) ou au QG.
+- Seule la machine d'états charge, décharge, affiche ou masque des scènes. Un écran demande une navigation en publiant `NavigateRequested(GameState)` depuis son présentateur. Le combat publie `CombatResultsClosed(report)` à « Continuer » ; la machine renvoie au plateau (puis `ReturnedToBoard`) ou au QG.
 - Le plateau masqué est désactivé : ses abonnements « à vie » (`ZoneValidated`, `ReturnedToBoard`) sont pris à la construction de l'écran et libérés à sa destruction, jamais au masquage.
-- Les états `IGameState` avec `EnterAsync`/`ExitAsync` restent la cible quand les écrans auront des présentateurs (sous-projet 3).
+- Pas d'états `IGameState` : la machine d'états reste seule autorité de navigation ; les présentateurs naissent et meurent avec le scope de leur scène, et suivent l'affichage par `View.Shown`/`Hidden`. La machine démarre (Boot → Login) par `FlowStarter`, dernier point d'entrée de la racine, une fois les présentateurs abonnés.
 - `NarrativeEvent` et `MiniGame` sont des **overlays** dans la scène Board (pas de chargement).
 
 ## Écrans internes et modales
-- `ScreenStack` (dans le hub) : pile d'écrans avec retour arrière (bouton Android géré).
-- `ModalService` : confirmations, récompenses, erreurs ; une seule modale à la fois, file d'attente.
+- `ScreenStack` (dans le hub) : pile d'écrans avec retour arrière (bouton Android géré). *Pas encore implémenté (M2).*
+- `ModalService` : confirmations, récompenses, résultats ; une seule modale à la fois, file d'attente (`OpenAsync<TView>()`). Les popups sont des prefabs du `ScreenCatalog`, créés dans la couche d'ordre 100 de `Boot` (`ModalLayer`).
+- **Retour** (◄, Échap, geste Android) : `BackButtonRouter` (racine) ferme d'abord la modale du dessus si elle est annulable (Retour = Annuler, ou Continuer pour les résultats), sinon le gestionnaire de l'écran visible le plus haut. Un écran masqué retire son gestionnaire : Échap en combat n'ouvre jamais « Retour au QG ? » (`BackNavigationTests`).
+- Messages du bus (`ToastRequested`) affichés en toasts par `ToastRelay` (une clé de localisation est traduite).
 
 ## Combat : le lecteur d'événements
 ```mermaid
