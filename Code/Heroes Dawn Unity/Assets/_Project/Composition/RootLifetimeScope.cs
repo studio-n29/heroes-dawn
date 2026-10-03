@@ -3,6 +3,7 @@ using MessagePipe;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features;
 using N29.HeroesDawn.Application.Features.Combat;
+using N29.HeroesDawn.Application.Features.Hub;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
@@ -54,7 +55,6 @@ namespace N29.HeroesDawn.Composition
             // ---- Services applicatifs
             builder.Register<SaveScheduler>(Lifetime.Singleton);
             builder.Register<AuthService>(Lifetime.Singleton);
-            builder.Register<HubService>(Lifetime.Singleton);
 
             // ---- Use cases : plateau
             builder.Register<ZoneEffects>(Lifetime.Singleton);
@@ -67,6 +67,12 @@ namespace N29.HeroesDawn.Composition
             builder.Register<ResolveNarrativeUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<ResolveRestUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<LeaveZoneUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+
+            // ---- Use cases : QG
+            builder.Register<ToggleSquadUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<TrainMemberUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<RecruitMemberUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<HealRosterUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
 
             // ---- Use cases : combat
             builder.Register<ActiveCombat>(Lifetime.Singleton).AsSelf().As<IActiveCombatReadModel>();

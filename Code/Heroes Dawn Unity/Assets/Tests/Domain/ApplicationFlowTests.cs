@@ -25,7 +25,6 @@ namespace N29.HeroesDawn.Tests.Domain
         TestApp.MemoryProfiles _profiles = null!;
         TestApp.Clock _clock = null!;
         AuthService _auth = null!;
-        HubService _hub = null!;
 
         [SetUp]
         public void SetUp()
@@ -37,7 +36,6 @@ namespace N29.HeroesDawn.Tests.Domain
             var wallet = _app.Publisher<WalletChanged>();
             var roster = _app.Publisher<RosterChanged>();
             _auth = new AuthService(_session, _app.Auth, _profiles, _clock, _app.Save, wallet, roster, _app.Logger);
-            _hub = new HubService(_session, _app.Save, wallet, roster);
         }
 
         [Test]
@@ -67,15 +65,15 @@ namespace N29.HeroesDawn.Tests.Domain
         public void Hub_RecruitTrainSquadRules()
         {
             _auth.SignInAsGuestAsync(CancellationToken.None).GetAwaiter().GetResult();
-            Assert.IsTrue(_hub.Recruit(new MemberId("etincelle")).IsSuccess, "Agent à 150 PR");
+            Assert.IsTrue(_app.Hub.Recruit.ExecuteAsync(new MemberId("etincelle")).GetAwaiter().GetResult().IsSuccess, "Agent à 150 PR");
             Assert.AreEqual(MetaRules.StartPr - 150, _session.Wallet.Pr);
-            Assert.IsTrue(_hub.Recruit(new MemberId("arc")).IsFailure, "Élite trop chère");
+            Assert.IsTrue(_app.Hub.Recruit.ExecuteAsync(new MemberId("arc")).GetAwaiter().GetResult().IsFailure, "Élite trop chère");
             Assert.AreEqual(4, _session.Squad.Count, "escouade pleine : la recrue reste en réserve");
-            Assert.IsTrue(_hub.ToggleSquad(new MemberId("etincelle")).IsFailure);
-            Assert.IsTrue(_hub.ToggleSquad(new MemberId("seve")).IsSuccess);
-            Assert.IsTrue(_hub.ToggleSquad(new MemberId("etincelle")).IsSuccess);
+            Assert.IsTrue(_app.Hub.ToggleSquad.ExecuteAsync(new MemberId("etincelle")).GetAwaiter().GetResult().IsFailure);
+            Assert.IsTrue(_app.Hub.ToggleSquad.ExecuteAsync(new MemberId("seve")).GetAwaiter().GetResult().IsSuccess);
+            Assert.IsTrue(_app.Hub.ToggleSquad.ExecuteAsync(new MemberId("etincelle")).GetAwaiter().GetResult().IsSuccess);
             int before = _session.Find(new MemberId("ancre"))!.Level;
-            Assert.IsTrue(_hub.Train(new MemberId("ancre")).IsSuccess);
+            Assert.IsTrue(_app.Hub.Train.ExecuteAsync(new MemberId("ancre")).GetAwaiter().GetResult().IsSuccess);
             Assert.AreEqual(before + 1, _session.Find(new MemberId("ancre"))!.Level);
         }
 

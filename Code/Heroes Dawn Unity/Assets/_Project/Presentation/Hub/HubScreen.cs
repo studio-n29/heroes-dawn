@@ -1,4 +1,6 @@
 #nullable enable
+using System.Threading;
+using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
@@ -175,7 +177,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             else
             {
                 _hint.text = Loc.T("hub.recruit.hint");
-                var list = Ctx.S.Hub.AvailableRecruits();
+                var list = Ctx.S.Session.AvailableRecruits();
                 if (list.Count == 0)
                 {
                     var t = Ui.Txt(_grid, Loc.T("hub.recruit.empty"), 30, Theme.Text, TextAnchor.MiddleCenter);
@@ -230,7 +232,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             bool inSquad = m.InSquad;
             var squadBtn = Ui.Btn(fill.transform, inSquad ? Loc.T("hub.squad.in") : Loc.T("hub.squad.add"),
                                   inSquad ? Theme.Primary : Theme.Surface3, inSquad ? Theme.TextDark : Theme.Text,
-                                  () => Report(Ctx.S.Hub.ToggleSquad(m.Id)), 24);
+                                  () => Act(ct => Ctx.S.ToggleSquad.ExecuteAsync(m.Id, ct)), 24);
             squadBtn.Rect.At(0f, 0f, 14, 74, 356, 52);
 
             bool max = m.Level >= MetaRules.MaxLevel;
@@ -309,30 +311,40 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         // ------------------------------------------------------------------ Actions
 
-        void Report(N29.HeroesDawn.Core.Result r)
+        bool _acting;
+
+        /// <summary>Exécute une action du QG : une seule à la fois, erreur affichée, puis suite en cas de succès.</summary>
+        void Act(Func<CancellationToken, UniTask<N29.HeroesDawn.Core.Result>> action, Action? onSuccess = null)
         {
-            if (r.IsFailure) Ctx.Error(r.Error);
+            if (_acting) return;
+            ActAsync(action, onSuccess).Forget();
+        }
+
+        async UniTaskVoid ActAsync(Func<CancellationToken, UniTask<N29.HeroesDawn.Core.Result>> action, Action? onSuccess)
+        {
+            _acting = true;
+            N29.HeroesDawn.Core.Result r;
+            try { r = await action(this.GetCancellationTokenOnDestroy()); }
+            finally { _acting = false; }
+            if (r.IsFailure) { Ctx.Error(r.Error); return; }
+            onSuccess?.Invoke();
         }
 
         void OnTrain(ITeamMemberReadModel m)
         {
-            var r = Ctx.S.Hub.Train(m.Id);
-            if (r.IsFailure) { Ctx.Error(r.Error); return; }
-            Ctx.Toast(Loc.F("hub.trained", Loc.MemberName(m.Def), m.Level), ToastKind.Reward);
+            Act(ct => Ctx.S.TrainMember.ExecuteAsync(m.Id, ct),
+                () => Ctx.Toast(Loc.F("hub.trained", Loc.MemberName(m.Def), m.Level), ToastKind.Reward));
         }
 
         void OnRecruit(MemberDef d)
         {
-            var r = Ctx.S.Hub.Recruit(d.Id);
-            if (r.IsFailure) { Ctx.Error(r.Error); return; }
-            Ctx.Toast(Loc.F("hub.recruited", Loc.MemberName(d)), ToastKind.Reward);
+            Act(ct => Ctx.S.RecruitMember.ExecuteAsync(d.Id, ct),
+                () => Ctx.Toast(Loc.F("hub.recruited", Loc.MemberName(d)), ToastKind.Reward));
         }
 
         void OnHeal()
         {
-            var r = Ctx.S.Hub.Heal();
-            if (r.IsFailure) { Ctx.Error(r.Error); return; }
-            Ctx.Toast(Loc.T("hub.healed"), ToastKind.Reward);
+            Act(ct => Ctx.S.HealRoster.ExecuteAsync(ct), () => Ctx.Toast(Loc.T("hub.healed"), ToastKind.Reward));
         }
 
         bool _deploying;

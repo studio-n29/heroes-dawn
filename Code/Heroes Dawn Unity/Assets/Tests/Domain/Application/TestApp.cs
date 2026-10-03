@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Combat;
+using N29.HeroesDawn.Application.Features.Hub;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
@@ -78,6 +79,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public ZoneEffects Effects { get; }
         public ZoneUseCases Zone { get; }
         public CombatUseCases Combat { get; }
+        public HubUseCases Hub { get; }
 
         public TestApp()
         {
@@ -102,6 +104,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Effects = new ZoneEffects(Session, Publisher<WalletChanged>(), Publisher<ZoneValidated>(), Save, Logger);
             Zone = new ZoneUseCases(this);
             Combat = new CombatUseCases(this);
+            Hub = new HubUseCases(this);
         }
 
         public IPublisher<T> Publisher<T>() => _bus.GetRequiredService<IPublisher<T>>();
@@ -167,6 +170,24 @@ namespace N29.HeroesDawn.Tests.Domain.Application
                 Finish = new FinishCombatUseCase(Active, a.Effects, a.Publisher<RosterChanged>(), a.Publisher<CombatFinished>(), a.Zone.Leave);
                 Verify = new VerifyCombatUseCase(Active, a.CombatVerifier, a.Logger);
                 ForceWin = new ForceCombatWinUseCase(Active);
+            }
+        }
+
+        public sealed class HubUseCases
+        {
+            public readonly IToggleSquadUseCase ToggleSquad;
+            public readonly ITrainMemberUseCase Train;
+            public readonly IRecruitMemberUseCase Recruit;
+            public readonly IHealRosterUseCase Heal;
+
+            public HubUseCases(TestApp a)
+            {
+                var w = a.Publisher<WalletChanged>();
+                var r = a.Publisher<RosterChanged>();
+                ToggleSquad = new ToggleSquadUseCase(a.Session, a.Save, r);
+                Train = new TrainMemberUseCase(a.Session, a.Save, w, r);
+                Recruit = new RecruitMemberUseCase(a.Session, a.Save, w, r);
+                Heal = new HealRosterUseCase(a.Session, a.Save, w, r);
             }
         }
 
