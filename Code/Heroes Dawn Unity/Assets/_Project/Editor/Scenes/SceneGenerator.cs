@@ -20,7 +20,24 @@ namespace N29.HeroesDawn.EditorTools.Scenes
         public const string Directory = "Assets/_Project/Scenes";
         public static string PathOf(string scene) => $"{Directory}/{scene}.unity";
 
+        /// <summary>
+        /// Menu : propose d'enregistrer les scènes modifiées, confirme l'écrasement des 4 scènes du jeu
+        /// (et de leurs retouches manuelles), génère, puis rouvre les scènes qui étaient ouvertes.
+        /// </summary>
         [MenuItem("Heroes Dawn/Setup/Générer les scènes")]
+        static void GenerateAllFromMenu()
+        {
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            if (!EditorUtility.DisplayDialog("Générer les scènes",
+                    "Les scènes Boot, Hub, Board et Combat vont être recréées et les Build Settings remplacés.\n" +
+                    "Toute retouche manuelle de ces scènes sera perdue.", "Générer", "Annuler")) return;
+            var setup = EditorSceneManager.GetSceneManagerSetup();
+            GenerateAll();
+            if (setup.Length > 0 && System.Array.TrueForAll(setup, s => File.Exists(s.path)))
+                EditorSceneManager.RestoreSceneManagerSetup(setup);
+        }
+
+        /// <summary>Génération sans interaction (batchmode : -executeMethod … SceneGenerator.GenerateAll -quit).</summary>
         public static void GenerateAll()
         {
             System.IO.Directory.CreateDirectory(Directory);

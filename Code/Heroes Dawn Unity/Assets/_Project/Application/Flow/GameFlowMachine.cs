@@ -52,7 +52,8 @@ namespace N29.HeroesDawn.Application.Flow
         readonly IPublisher<ToastRequested> _toasts;
         readonly ILogger _log;
         readonly IDisposable _subscriptions;
-        CombatReport? _pendingReport;
+        GameState _inFlight;
+        (GameState Target, CombatReport? Report)? _queued;
 
         public GameState Current { get; private set; } = GameState.Boot;
         public bool IsTransitioning { get; private set; }
@@ -73,58 +74,80 @@ namespace N29.HeroesDawn.Application.Flow
 
         void OnCombatClosed(CombatResultsClosed m)
         {
-            _pendingReport = m.Report.ReturnedToHq ? null : m.Report;
-            RequestAsync(m.Report.ReturnedToHq ? GameState.Hub : GameState.Board).Forget();
+            // Le rapport voyage avec sa demande : il n'est jamais rejoué par une navigation ultérieure.
+            if (m.Report.ReturnedToHq) Request(GameState.Hub, null).Forget();
+            else Request(GameState.Board, m.Report).Forget();
         }
 
-        public async UniTask<bool> RequestAsync(GameState target, CancellationToken ct = default)
+        public UniTask<bool> RequestAsync(GameState target, CancellationToken ct = default) => Request(target, null, ct);
+
+        /// <summary>
+        /// Exécute une transition. Pendant une transition, une demande vers un autre état est mise en attente
+        /// (la dernière l'emporte) et exécutée juste après ; une demande identique à celle en cours est ignorée.
+        /// </summary>
+        async UniTask<bool> Request(GameState target, CombatReport? report, CancellationToken ct = default)
         {
-            if (IsTransitioning || target == Current) return false;
+            if (IsTransitioning)
+            {
+                if (target != _inFlight) _queued = (target, report);
+                return false;
+            }
+            if (target == Current) return false;
             var from = Current;
             if (!Transitions.TryGetValue((from, target), out var steps))
             {
                 _log.Warn($"Navigation refusée : {from} → {target}");
-                _pendingReport = null;
                 return false;
             }
 
             IsTransitioning = true;
+            _inFlight = target;
+            bool succeeded = false;
             var done = new List<Step>();
             try
             {
-                foreach (var step in steps)
+                try
                 {
-                    await Apply(step, ct);
-                    done.Add(step);
+                    foreach (var step in steps)
+                    {
+                        await Apply(step, ct);
+                        done.Add(step);
+                    }
                 }
+                catch (OperationCanceledException)
+                {
+                    await Rollback(done);
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    _log.Error($"Navigation {from} → {target} impossible : {e.Message}");
+                    await Rollback(done);
+                    _toasts.Publish(new ToastRequested("errors.navigation", ToastKind.Error));
+                    return false;
+                }
+                Current = target;
+                succeeded = true;
             }
-            catch (OperationCanceledException)
+            finally
             {
-                await Rollback(done);
-                IsTransitioning = false;
-                _pendingReport = null;
-                throw;
-            }
-            catch (Exception e)
-            {
-                _log.Error($"Navigation {from} → {target} impossible : {e.Message}");
-                _toasts.Publish(new ToastRequested("errors.navigation", ToastKind.Error));
-                await Rollback(done);
-                IsTransitioning = false;
-                _pendingReport = null;
-                return false;
+                IsTransitioning = false; // toujours, même si un abonné plante
+                if (!succeeded) RunQueued();
             }
 
-            Current = target;
-            IsTransitioning = false;
             _changed.Publish(new GameStateChanged(from, target));
-            if (from == GameState.Combat && target == GameState.Board && _pendingReport != null)
-            {
-                var report = _pendingReport;
-                _pendingReport = null;
+            if (from == GameState.Combat && target == GameState.Board && report != null)
                 _returned.Publish(new ReturnedToBoard(report));
-            }
+            RunQueued();
             return true;
+        }
+
+        void RunQueued()
+        {
+            if (_queued == null) return;
+            var (target, report) = _queued.Value;
+            _queued = null;
+            if (target != Current) Request(target, report).Forget();
         }
 
         async UniTask Apply(Step step, CancellationToken ct)

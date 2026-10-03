@@ -184,6 +184,42 @@ namespace N29.HeroesDawn.Tests.Domain.Flow
             Assert.That(_changed, Is.Empty);
         }
 
+        [Test, Description("Vérifie qu'une demande vers un autre état reçue pendant une transition est exécutée juste après — parce qu'un écran qui redirige pendant son affichage (ex. plateau sans partie) ne doit pas laisser le joueur bloqué (relecture, Important 1)")]
+        public void RequestDuringTransition_IsQueued_AndRunsAfter()
+        {
+            Reach(GameState.Hub);
+            var gate = new UniTaskCompletionSource();
+            _scenes.Gate = gate;
+            var first = _flow.RequestAsync(GameState.Board);
+            Assert.That(Go(GameState.Hub), Is.False, "pas exécutée tout de suite");
+            gate.TrySetResult();
+            first.GetAwaiter().GetResult();
+            Assert.That(_flow.Current, Is.EqualTo(GameState.Hub));
+            Assert.That(_calls, Is.EqualTo(new[] { "unload:Hub", "load:Board", "unload:Board", "load:Hub" }));
+        }
+
+        [Test, Description("Vérifie qu'un rapport de combat reçu hors combat n'est jamais réappliqué plus tard au plateau — parce qu'un rapport périmé rejouerait recul ou récompenses (relecture, Minor 2)")]
+        public void StaleCombatReport_IsNotReplayedLater()
+        {
+            Reach(GameState.Board);
+            Pub<CombatResultsClosed>().Publish(new CombatResultsClosed(Report(victory: true, toHq: false)));
+            Assert.That(Go(GameState.Combat), Is.True);
+            Pub<NavigateRequested>().Publish(new NavigateRequested(GameState.Board));
+            Assert.That(_flow.Current, Is.EqualTo(GameState.Board));
+            Assert.That(_returned, Is.Empty);
+        }
+
+        [Test, Description("Vérifie que la machine sort de l'état « en transition » même si un abonné au message d'erreur plante — parce que sinon toute navigation serait bloquée pour la session (relecture, Minor 1)")]
+        public void ToastSubscriberThrows_TransitionStillEnds()
+        {
+            Reach(GameState.Hub);
+            using var bad = Sub<ToastRequested>().Subscribe(_ => throw new InvalidOperationException("abonné en panne"));
+            _scenes.FailOnLoad = SceneNames.Board;
+            try { Go(GameState.Board); } catch (InvalidOperationException) { }
+            Assert.That(_flow.IsTransitioning, Is.False);
+            Assert.That(_flow.Current, Is.EqualTo(GameState.Hub));
+        }
+
         [Test, Description("Vérifie qu'un message NavigateRequested déclenche la transition — parce que les écrans naviguent uniquement par message, sans se référencer entre eux")]
         public void NavigateRequestedMessage_TriggersTransition()
         {

@@ -142,7 +142,8 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public override void OnShow()
         {
-            _subs?.Dispose(); // OnShow peut être rappelé sans OnHide (écran déjà courant)
+            _deploying = false;
+            _subs?.Dispose(); // par sécurité : OnShow et OnHide vont normalement par paires
             var bag = DisposableBag.CreateBuilder();
             Ctx.S.Roster.Subscribe(_ => Refresh()).AddTo(bag);
             Ctx.S.Wallet.Subscribe(_ => Refresh()).AddTo(bag);
@@ -369,8 +370,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             _deploying = true;
             Core.Result r;
             try { r = await Ctx.S.StartZone.ExecuteAsync(Ctx.S.FirstZone, this.GetCancellationTokenOnDestroy()); }
-            finally { _deploying = false; }
-            if (r.IsFailure) { Ctx.Error(r.Error); return; }
+            catch { _deploying = false; throw; }
+            if (r.IsFailure) { _deploying = false; Ctx.Error(r.Error); return; }
+            // Succès : l'écran part (scène déchargée par la machine d'états) ; le drapeau reste levé
+            // jusqu'au prochain affichage pour qu'un second clic ne redémarre pas la zone.
             Ctx.Navigate(GameState.Board);
         }
 

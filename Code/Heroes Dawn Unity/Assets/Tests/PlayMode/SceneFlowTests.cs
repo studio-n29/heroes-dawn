@@ -134,6 +134,21 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(boards, Is.EqualTo(1));
         }
 
+        [UnityTest, Description("Vérifie qu'un double clic sur le bouton « Déployer » du QG ne démarre la zone qu'une fois — parce qu'un second démarrage remplacerait la partie (nouvelle graine) pendant que le plateau se charge (relecture, Important 2)")]
+        public IEnumerator DoubleDeployClick_StartsZoneOnce()
+        {
+            yield return SignedIn();
+            var hub = UnityEngine.Object.FindAnyObjectByType<HubScreen>()!;
+            var session = Container.Resolve<GameSession>();
+            hub.Deploy();
+            var firstRun = session.Run;
+            hub.Deploy();
+            Assert.That(firstRun, Is.Not.Null);
+            Assert.That(session.Run, Is.SameAs(firstRun), "la partie n'est pas remplacée");
+            yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Board) && !Flow.IsTransitioning);
+            Assert.That(session.Run, Is.SameAs(firstRun));
+        }
+
         [UnityTest, Description("Vérifie qu'une validation de zone annoncée pendant que le plateau est masqué (combat en cours) est conservée pour l'écran de fin de zone — parce que le plateau masqué ne doit perdre aucun abonnement à vie (Review Focus 1)")]
         public IEnumerator ZoneValidatedWhileBoardHidden_IsKeptForZoneComplete()
         {
