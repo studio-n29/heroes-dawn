@@ -59,7 +59,7 @@ namespace N29.HeroesDawn.Presentation.Popups
                               30, Theme.Text, TextAnchor.UpperCenter, FontKind.Regular);
             body.rectTransform.Stretch(10, 400, 10, 10);
             var gate = new OnceGate();
-            var game = w.Content.gameObject.AddComponent<TimingMiniGame>();
+            var game = w.Content.gameObject.AddComponent<CodeTimingMiniGame>();
             game.Build(w.Content, success =>
             {
                 var b = ctx.S.Session.Content.Balance;
@@ -95,7 +95,7 @@ namespace N29.HeroesDawn.Presentation.Popups
     }
 
     /// <summary>Mini-jeu de réflexe (QTE) : arrêter un curseur dans une zone verte, 2 réussites sur 3 essais.</summary>
-    public sealed class TimingMiniGame : MonoBehaviour
+    public sealed class CodeTimingMiniGame : MonoBehaviour
     {
         const int Attempts = 3;
         const int Needed = 2;
