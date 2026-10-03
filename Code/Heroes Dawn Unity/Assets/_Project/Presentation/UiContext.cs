@@ -1,36 +1,29 @@
 #nullable enable
-using MessagePipe;
+using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
-using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
-using N29.HeroesDawn.Presentation.Board;
-using N29.HeroesDawn.Presentation.Combat;
 using N29.HeroesDawn.Presentation.Common;
-using N29.HeroesDawn.Presentation.Hub;
-using N29.HeroesDawn.Presentation.Screens;
 using UnityEngine;
-using AppLogger = N29.HeroesDawn.Application.Ports.ILogger;
 
 namespace N29.HeroesDawn.Presentation
 {
-    /// <summary>Tout ce dont les écrans ont besoin : services, navigation, modales, messages.</summary>
+    /// <summary>
+    /// Tout ce dont les écrans ont besoin : services, fenêtres, messages et navigation.
+    /// Aucun écran n'en référence un autre : on navigue en demandant un état à la machine d'états.
+    /// </summary>
     public sealed class UiContext
     {
         public UiServices S { get; }
-        public Navigator Nav { get; }
         public ModalLayer Modal { get; }
         public Toasts Toasts { get; }
-        public RectTransform ScreensLayer { get; }
 
-        public LoginScreen Login { get; internal set; } = null!;
-        public HubScreen Hub { get; internal set; } = null!;
-        public BoardScreen Board { get; internal set; } = null!;
-        public CombatScreen Combat { get; internal set; } = null!;
-
-        public UiContext(UiServices s, Navigator nav, ModalLayer modal, Toasts toasts, RectTransform screens)
+        public UiContext(UiServices s, ModalLayer modal, Toasts toasts)
         {
-            S = s; Nav = nav; Modal = modal; Toasts = toasts; ScreensLayer = screens;
+            S = s; Modal = modal; Toasts = toasts;
         }
+
+        /// <summary>Demande une navigation (publie <see cref="NavigateRequested"/>).</summary>
+        public void Navigate(GameState target) => S.Navigation.Publish(new NavigateRequested(target));
 
         public void Toast(string text, ToastKind kind = ToastKind.Info)
         {

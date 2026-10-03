@@ -4,6 +4,7 @@ using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
 using N29.HeroesDawn.Application.Features.Zone;
+using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
@@ -51,6 +52,12 @@ namespace N29.HeroesDawn.Presentation
         public IVerifyCombatUseCase VerifyCombat { get; }
         public IForceCombatWinUseCase ForceCombatWin { get; }
 
+        // ---- Navigation
+        public IGameFlow Flow { get; }
+        public IPublisher<NavigateRequested> Navigation { get; }
+        public IPublisher<CombatResultsClosed> CombatClosed { get; }
+        public ISubscriber<ReturnedToBoard> ReturnedToBoard { get; }
+
         // ---- Abonnements
         public ISubscriber<WalletChanged> Wallet { get; }
         public ISubscriber<RosterChanged> Roster { get; }
@@ -67,7 +74,9 @@ namespace N29.HeroesDawn.Presentation
                           IToggleSquadUseCase toggleSquad, ITrainMemberUseCase trainMember, IRecruitMemberUseCase recruitMember,
                           IHealRosterUseCase healRoster,
                           ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, ISubscriber<ToastRequested> toasts,
-                          ISubscriber<SaveStateChanged> saving, ISubscriber<ZoneValidated> zoneValidated)
+                          ISubscriber<SaveStateChanged> saving, ISubscriber<ZoneValidated> zoneValidated,
+                          IGameFlow flow, IPublisher<NavigateRequested> navigation, IPublisher<CombatResultsClosed> combatClosed,
+                          ISubscriber<ReturnedToBoard> returnedToBoard)
         {
             Session = session; SignIn = signIn; SignOut = signOut; ResetProgress = resetProgress; Combat = combat; Log = log; FirstZone = firstZone;
             StartZone = startZone; RollDice = rollDice; UseBonusDie = useBonusDie; MoveTo = moveTo; EndMove = endMove;
@@ -76,6 +85,8 @@ namespace N29.HeroesDawn.Presentation
             ForceCombatWin = forceCombatWin;
             ToggleSquad = toggleSquad; TrainMember = trainMember; RecruitMember = recruitMember; HealRoster = healRoster;
             Wallet = wallet; Roster = roster; Toasts = toasts; Saving = saving; ZoneValidated = zoneValidated;
+            Flow = flow; Navigation = navigation; CombatClosed = combatClosed; ReturnedToBoard = returnedToBoard;
         }
+
     }
 }

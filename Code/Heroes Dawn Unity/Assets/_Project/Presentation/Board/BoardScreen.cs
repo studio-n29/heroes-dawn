@@ -2,6 +2,7 @@
 using MessagePipe;
 using System;
 using System.Collections.Generic;
+using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -48,8 +49,12 @@ namespace N29.HeroesDawn.Presentation.Board
 
         protected override void Build()
         {
-            // Abonnement pour toute la vie de l'écran : la validation peut arriver depuis l'écran de combat.
-            _zoneValidatedSub = Ctx.S.ZoneValidated.Subscribe(m => _lastRewards = m.Rewards);
+            // Abonnements pour toute la vie de l'écran (pas OnShow/OnHide) : le plateau est masqué pendant le combat,
+            // et la validation de zone comme le retour du combat arrivent pendant ou juste après ce masquage.
+            var lifetime = DisposableBag.CreateBuilder();
+            Ctx.S.ZoneValidated.Subscribe(m => _lastRewards = m.Rewards).AddTo(lifetime);
+            Ctx.S.ReturnedToBoard.Subscribe(OnReturnedToBoard).AddTo(lifetime);
+            _zoneValidatedSub = lifetime.Build();
             Backdrop(Theme.WithAlpha(Theme.Info, 0.16f), Theme.Hex(0x0E1420));
             ArtBackdrop(Sprites.BackgroundLandscape, 1f, 0.86f);
 
@@ -115,7 +120,7 @@ namespace N29.HeroesDawn.Presentation.Board
             var run = Ctx.S.Session.Run;
             if (run == null)
             {
-                Ctx.Nav.Show(Ctx.Hub);
+                Ctx.Navigate(GameState.Hub);
                 return;
             }
             var squad = Ctx.S.Session.Squad;
@@ -268,6 +273,9 @@ namespace N29.HeroesDawn.Presentation.Board
             RunBoard(ct => Ctx.S.EndMove.ExecuteAsync(ct), ProcessEvents);
         }
 
+        /// <summary>Intention « toucher une case » (carte ou tests).</summary>
+        public void TapNode(CaseId id) => OnNodeTapped(id);
+
         void OnNodeTapped(CaseId id)
         {
             if (_busy || _run == null || Ctx.Modal.AnyOpen) return;
@@ -344,7 +352,7 @@ namespace N29.HeroesDawn.Presentation.Board
 
         void OpenCase(CaseOutcome outcome)
         {
-            if (_run == null || Ctx.Nav.Current != this) return;
+            if (_run == null || Ctx.S.Flow.Current != GameState.Board) return;
             switch (outcome.Type)
             {
                 case CaseType.Combat:
@@ -364,7 +372,7 @@ namespace N29.HeroesDawn.Presentation.Board
 
         void StartCombat()
         {
-            if (_run == null || _run.Phase != ZoneRunPhase.InCombat || Ctx.Nav.Current != this) return;
+            if (_run == null || _run.Phase != ZoneRunPhase.InCombat || Ctx.S.Flow.Current != GameState.Board) return;
             StartCombatAsync().Forget();
         }
 
@@ -380,21 +388,14 @@ namespace N29.HeroesDawn.Presentation.Board
                 Ctx.Error(r.Error);
                 return;
             }
-            Ctx.Nav.Show(Ctx.Combat);
+            Ctx.Navigate(GameState.Combat);
         }
 
-        /// <summary>Retour de l'écran de combat : applique le rapport (recul, objectifs, validation, retour QG).</summary>
-        public void OnCombatReport(CombatReport report)
-        {
-            if (report.ReturnedToHq)
-            {
-                Ctx.Toast(Loc.T("combat.to_hq"), ToastKind.Warning);
-                Ctx.Nav.Show(Ctx.Hub);
-                return;
-            }
-            Ctx.Nav.Show(this);
-            ProcessEvents(report.BoardEvents);
-        }
+        /// <summary>
+        /// Retour du combat (message <see cref="ReturnedToBoard"/>, publié une fois le plateau réaffiché) :
+        /// joue les événements du plateau (recul, objectifs, validation). Le retour au QG est géré par la machine d'états.
+        /// </summary>
+        void OnReturnedToBoard(ReturnedToBoard m) => ProcessEvents(m.Report.BoardEvents);
 
         void ShowZoneComplete()
         {
@@ -421,7 +422,7 @@ namespace N29.HeroesDawn.Presentation.Board
             var r = await Ctx.S.LeaveZone.ExecuteAsync(this.GetCancellationTokenOnDestroy());
             if (r.IsFailure) { Ctx.Error(r.Error); return; }
             _run = null;
-            Ctx.Nav.Show(Ctx.Hub);
+            Ctx.Navigate(GameState.Hub);
         }
 
         void OnBackToHq()

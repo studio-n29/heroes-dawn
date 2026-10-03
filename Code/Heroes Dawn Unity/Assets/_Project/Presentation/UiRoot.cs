@@ -1,10 +1,8 @@
 #nullable enable
 using Cysharp.Threading.Tasks;
 using MessagePipe;
-using N29.HeroesDawn.Presentation.Board;
-using N29.HeroesDawn.Presentation.Combat;
+using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Presentation.Common;
-using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Screens;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -14,12 +12,14 @@ using UnityEngine.UI;
 namespace N29.HeroesDawn.Presentation
 {
     /// <summary>
-    /// Construit toute l'interface : Canvas (référence 1920×1080, paysage), EventSystem (Input System),
-    /// couches écrans / modales / messages, puis les quatre écrans du prototype.
+    /// Interface commune de la scène Boot : EventSystem (Input System), écran de connexion (canvas d'ordre 10)
+    /// et couche fenêtres + messages au-dessus de toutes les scènes (canvas imbriqué d'ordre 100).
+    /// Les écrans du QG, du plateau et du combat vivent dans leurs propres scènes.
     /// </summary>
-    public sealed class UiRoot : MonoBehaviour
+    public sealed class UiRoot : MonoBehaviour, IScreenVisibility
     {
         public UiContext Context { get; private set; } = null!;
+        public LoginScreen Login { get; private set; } = null!;
 
         /// <summary>Construit l'interface commune sur ce GameObject (posé dans la scène Boot). Appelé une fois par le scope racine.</summary>
         public void Build(UiServices services)
@@ -33,40 +33,47 @@ namespace N29.HeroesDawn.Presentation
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 10;
             canvas.pixelPerfect = false;
-            var scaler = go.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
-            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 0.5f;
+            AddScaler(go);
             go.AddComponent<GraphicRaycaster>();
 
             var root = (RectTransform)go.transform;
             var safe = Ui.Rect(root, "SafeArea").Stretch();
             safe.gameObject.AddComponent<SafeArea>();
             var screens = Ui.Rect(safe, "Screens").Stretch();
-            var modals = ModalLayer.Create(safe);
-            var toastLayer = Ui.Rect(safe, "ToastLayer").Stretch();
+
+            // Couche commune au-dessus des scènes (canvas imbriqué, tri propre).
+            var overlayGo = Ui.Rect(root, "Overlay").Stretch().gameObject;
+            var overlay = overlayGo.AddComponent<Canvas>();
+            overlay.overrideSorting = true;
+            overlay.sortingOrder = 100;
+            overlayGo.AddComponent<GraphicRaycaster>();
+            var overlaySafe = Ui.Rect(overlayGo.transform, "SafeArea").Stretch();
+            overlaySafe.gameObject.AddComponent<SafeArea>();
+            var modals = ModalLayer.Create(overlaySafe);
+            var toastLayer = Ui.Rect(overlaySafe, "ToastLayer").Stretch();
             var toasts = Toasts.Create(toastLayer);
 
-            var ui = this;
-            var ctx = new UiContext(services, new Navigator(), modals, toasts, screens);
-            ui.Context = ctx;
-            services.Toasts.Subscribe(t => ctx.Toast(t.Text, t.Kind)).AddTo(ui.destroyCancellationToken);
+            var ctx = new UiContext(services, modals, toasts);
+            Context = ctx;
+            // Un message peut être une clé de localisation (ex. errors.navigation, publié par la machine d'états).
+            services.Toasts.Subscribe(t => ctx.Toast(Loc.Has(t.Text) ? Loc.T(t.Text) : t.Text, t.Kind)).AddTo(destroyCancellationToken);
 
-            ctx.Login = CreateScreen<LoginScreen>(screens, "Login", ctx);
-            ctx.Hub = CreateScreen<HubScreen>(screens, "Hub", ctx);
-            ctx.Board = CreateScreen<BoardScreen>(screens, "Board", ctx);
-            ctx.Combat = CreateScreen<CombatScreen>(screens, "Combat", ctx);
-
-            ctx.Nav.Show(ctx.Login);
+            Login = UiScreen.Create<LoginScreen>(screens, "Login", ctx);
         }
 
-        static T CreateScreen<T>(RectTransform parent, string name, UiContext ctx) where T : UiScreen
+        public void SetLoginVisible(bool visible)
         {
-            var rt = Ui.Rect(parent, name).Stretch();
-            var screen = rt.gameObject.AddComponent<T>();
-            screen.Init(ctx);
-            return screen;
+            if (visible) Login.Show();
+            else Login.Hide();
+        }
+
+        static void AddScaler(GameObject go)
+        {
+            var scaler = go.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            scaler.matchWidthOrHeight = 0.5f;
         }
 
         static void EnsureEventSystem()

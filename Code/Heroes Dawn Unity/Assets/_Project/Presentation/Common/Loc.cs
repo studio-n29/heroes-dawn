@@ -193,6 +193,7 @@ namespace N29.HeroesDawn.Presentation.Common
 
             // --- Erreurs ---
             ["errors.network"] = "Serveur injoignable. Réessaie.",
+            ["errors.navigation"] = "Navigation impossible, réessaie.",
             ["errors.profile_load"] = "Impossible de charger le profil.",
             ["errors.not_enough_credits"] = "Pas assez de Crédits.",
             ["errors.not_enough_pr"] = "Pas assez de PR.",

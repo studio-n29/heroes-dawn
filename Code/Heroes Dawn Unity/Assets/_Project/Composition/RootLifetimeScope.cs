@@ -1,5 +1,6 @@
 #nullable enable
 using MessagePipe;
+using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
@@ -44,6 +45,10 @@ namespace N29.HeroesDawn.Composition
             builder.RegisterMessageBroker<SaveStateChanged>(pipe);
             builder.RegisterMessageBroker<ZoneValidated>(pipe);
             builder.RegisterMessageBroker<CombatFinished>(pipe);
+            builder.RegisterMessageBroker<NavigateRequested>(pipe);
+            builder.RegisterMessageBroker<CombatResultsClosed>(pipe);
+            builder.RegisterMessageBroker<ReturnedToBoard>(pipe);
+            builder.RegisterMessageBroker<GameStateChanged>(pipe);
 
             // ---- Ports (réseau simulé : placeholders des services UGS du M2)
             builder.Register<IClock, SystemClock>(Lifetime.Singleton);
@@ -51,6 +56,10 @@ namespace N29.HeroesDawn.Composition
             builder.Register<IAuthGateway>(_ => new FakeAuthGateway(), Lifetime.Singleton);
             builder.Register<IProfileGateway>(_ => new LocalProfileGateway(), Lifetime.Singleton);
             builder.Register<ICombatVerifier>(_ => new LocalCombatVerifier(content), Lifetime.Singleton);
+            builder.Register<ISceneLoader, UnitySceneLoader>(Lifetime.Singleton);
+
+            // ---- Flux de jeu (seule autorité sur les scènes)
+            builder.Register<GameFlowMachine>(Lifetime.Singleton).AsSelf().As<IGameFlow>();
 
             // ---- Services applicatifs
             builder.Register<SaveScheduler>(Lifetime.Singleton);
@@ -88,12 +97,13 @@ namespace N29.HeroesDawn.Composition
 
             // ---- Interface
             builder.Register<UiServices>(Lifetime.Singleton);
-            builder.RegisterComponentInHierarchy<UiRoot>();
+            builder.RegisterComponentInHierarchy<UiRoot>().AsSelf().As<IScreenVisibility>();
 
             builder.RegisterBuildCallback(c =>
             {
                 Ui = c.Resolve<UiRoot>();
                 Ui.Build(c.Resolve<UiServices>());
+                c.Resolve<GameFlowMachine>().Start(); // Boot → Login
                 log.Info($"Prototype M1 prêt — {content.Members.Count} recrues, {content.Zones.Count} zone(s). Données : {UnityEngine.Application.persistentDataPath}");
             });
         }

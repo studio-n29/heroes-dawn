@@ -12,12 +12,48 @@ namespace N29.HeroesDawn.Presentation.Screens
         CanvasGroup _group = null!;
         public RectTransform Rect => (RectTransform)transform;
 
+        bool _shown;
+
         public void Init(UiContext ctx)
         {
+            gameObject.SetActive(false);
             Ctx = ctx;
             _group = gameObject.AddComponent<CanvasGroup>();
             Build();
-            gameObject.SetActive(false);
+        }
+
+        /// <summary>Crée un écran plein cadre sous <paramref name="parent"/> (inactif jusqu'à <see cref="Show"/>).</summary>
+        public static T Create<T>(RectTransform parent, string name, UiContext ctx) where T : UiScreen
+        {
+            var rt = Ui.Rect(parent, name).Stretch();
+            rt.gameObject.SetActive(false);
+            var screen = rt.gameObject.AddComponent<T>();
+            screen.Init(ctx);
+            return screen;
+        }
+
+        public void Show()
+        {
+            transform.SetAsLastSibling();
+            gameObject.SetActive(true);
+        }
+
+        public void Hide() => gameObject.SetActive(false);
+
+        // OnShow/OnHide suivent l'activation réelle : écran affiché/masqué, ou scène entière masquée par la machine d'états.
+        void OnEnable()
+        {
+            if (Ctx == null || _shown) return;
+            _shown = true;
+            FadeIn();
+            OnShow();
+        }
+
+        void OnDisable()
+        {
+            if (!_shown) return;
+            _shown = false;
+            OnHide();
         }
 
         protected abstract void Build();
@@ -58,27 +94,4 @@ namespace N29.HeroesDawn.Presentation.Screens
         }
     }
 
-    public sealed class Navigator
-    {
-        public UiScreen? Current { get; private set; }
-
-        public void Show(UiScreen screen)
-        {
-            if (Current == screen)
-            {
-                screen.OnShow();
-                return;
-            }
-            if (Current != null)
-            {
-                Current.OnHide();
-                Current.gameObject.SetActive(false);
-            }
-            Current = screen;
-            screen.gameObject.SetActive(true);
-            screen.transform.SetAsLastSibling();
-            screen.FadeIn();
-            screen.OnShow();
-        }
-    }
 }

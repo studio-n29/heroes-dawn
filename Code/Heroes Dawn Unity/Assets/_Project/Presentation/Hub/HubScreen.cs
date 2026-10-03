@@ -5,6 +5,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
 using System.Collections.Generic;
+using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Definitions;
@@ -354,6 +355,9 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         bool _deploying;
 
+        /// <summary>Intention « Déployer » : démarre la zone puis demande le plateau.</summary>
+        public void Deploy() => OnDeploy();
+
         void OnDeploy()
         {
             if (_deploying) return;
@@ -367,12 +371,12 @@ namespace N29.HeroesDawn.Presentation.Hub
             try { r = await Ctx.S.StartZone.ExecuteAsync(Ctx.S.FirstZone, this.GetCancellationTokenOnDestroy()); }
             finally { _deploying = false; }
             if (r.IsFailure) { Ctx.Error(r.Error); return; }
-            Ctx.Nav.Show(Ctx.Board);
+            Ctx.Navigate(GameState.Board);
         }
 
         void OnLogout()
         {
-            Act(ct => Ctx.S.SignOut.ExecuteAsync(ct), () => Ctx.Nav.Show(Ctx.Login));
+            Act(ct => Ctx.S.SignOut.ExecuteAsync(ct), () => Ctx.Navigate(GameState.Login));
         }
 
         void OnReset()

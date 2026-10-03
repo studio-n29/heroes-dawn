@@ -2,6 +2,7 @@
 using System.Collections;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Auth;
+using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Composition;
@@ -85,18 +86,18 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(_auth.Calls, Is.EqualTo(1));
         }
 
-        [UnityTest, Description("Vérifie qu'un QG ré-affiché alors qu'il est déjà à l'écran ne double pas ses abonnements — parce que chaque changement de portefeuille doit rafraîchir l'écran une seule fois")] // Review Focus 3 : ré-afficher le QG déjà courant ne double pas ses abonnements
+        [UnityTest, Description("Vérifie qu'un QG masqué puis ré-affiché ne double pas ses abonnements — parce que chaque changement de portefeuille doit rafraîchir l'écran une seule fois")] // Review Focus 3 : masquer puis ré-afficher le QG ne double pas ses abonnements
         public IEnumerator ShowHubTwice_WalletChangedRefreshesHubOnce()
         {
             yield return Boot();
             Visible<LoginScreen>()!.Play();
             yield return WaitFor(() => Visible<HubScreen>() != null);
-            var ctx = GameBootstrap.Instance!.Ui.Context;
-            ctx.Nav.Show(ctx.Hub);          // écran déjà courant : OnShow rappelé sans OnHide
-            yield return null;
             var hub = Visible<HubScreen>()!;
+            hub.Hide();                     // OnHide : abonnements libérés
+            hub.Show();                     // OnShow : abonnements repris une seule fois
+            yield return null;
             int before = hub.RefreshCount;
-            GameBootstrap.Instance.Scope.Container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));
+            GameBootstrap.Instance!.Scope.Container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));
             Assert.That(hub.RefreshCount - before, Is.EqualTo(1));
         }
 
@@ -108,10 +109,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return WaitFor(() => Visible<HubScreen>() != null);
             var container = GameBootstrap.Instance!.Scope.Container;
             container.Resolve<ISignOutUseCase>().ExecuteAsync().GetAwaiter().GetResult();
-            GameBootstrap.Instance.Ui.Context.Nav.Show(GameBootstrap.Instance.Ui.Context.Login);
-            yield return null;
+            container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Login));
+            yield return WaitFor(() => Visible<LoginScreen>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
             Visible<LoginScreen>()!.Play();
-            yield return WaitFor(() => Visible<HubScreen>() != null);
+            yield return WaitFor(() => Visible<HubScreen>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
             var hub = Visible<HubScreen>()!;
             int before = hub.RefreshCount;
             container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));

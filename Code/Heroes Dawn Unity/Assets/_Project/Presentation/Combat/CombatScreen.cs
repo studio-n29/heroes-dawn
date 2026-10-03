@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Application.Features.Combat;
@@ -121,7 +122,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             var sim = Ctx.S.Combat.Simulation;
             if (sim == null)
             {
-                Ctx.Nav.Show(Ctx.Board);
+                Ctx.Navigate(GameState.Board);
                 return;
             }
             if (sim == _sim) return;
@@ -500,7 +501,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (r.IsFailure)
             {
                 Ctx.Error(r.Error);
-                Ctx.Nav.Show(Ctx.Board);
+                Ctx.Navigate(GameState.Board);
                 return;
             }
             ShowResults(r.Value);
@@ -545,14 +546,28 @@ namespace N29.HeroesDawn.Presentation.Combat
             }
             VerifyAsync(verify).Forget();
 
-            var btn = Ui.Btn(w.Content, Loc.T("ui.continue"), Theme.Primary, Theme.TextDark, () =>
+            _continue = () =>
             {
+                _continue = null;
                 w.Close();
                 Ctx.S.Combat.Clear();
                 _sim = null;
-                Ctx.Board.OnCombatReport(report);
-            }, 42);
+                if (report.ReturnedToHq) Ctx.Toast(Loc.T("combat.to_hq"), ToastKind.Warning);
+                // La machine d'états décharge le combat puis renvoie au plateau (ou au QG si l'escouade est épuisée).
+                Ctx.S.CombatClosed.Publish(new CombatResultsClosed(report));
+            };
+            var btn = Ui.Btn(w.Content, Loc.T("ui.continue"), Theme.Primary, Theme.TextDark, () => _continue?.Invoke(), 42);
             btn.Rect.At(0.5f, 0f, 0, 0, 420, 100);
+        }
+
+        System.Action? _continue;
+
+        /// <summary>Tests PlayMode : « Continuer » sur l'écran de résultats ; false tant que les résultats ne sont pas affichés.</summary>
+        public bool ContinueForTests()
+        {
+            if (_continue == null) return false;
+            _continue();
+            return true;
         }
 
         async UniTaskVoid VerifyAsync(Text label)

@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
+using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Presentation.Common;
 using UnityEngine;
@@ -124,7 +125,7 @@ namespace N29.HeroesDawn.Presentation.Screens
                 var name = Ctx.S.Session.Account?.DisplayName ?? "";
                 Ctx.Toast(Loc.F(report.NewProfile ? "login.welcome_new" : "login.welcome_back", name), ToastKind.Info);
                 if (report.FatigueRecovered > 0) Ctx.Toast(Loc.F("login.recovered", report.FatigueRecovered), ToastKind.Reward);
-                Ctx.Nav.Show(Ctx.Hub);
+                Ctx.Navigate(GameState.Hub);
             }
             catch (OperationCanceledException) { }
             catch (Exception e)
