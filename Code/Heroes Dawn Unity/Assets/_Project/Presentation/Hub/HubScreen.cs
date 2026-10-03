@@ -61,7 +61,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _player = Ui.Txt(top, "", 24, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Player");
             _player.rectTransform.At(0f, 0.5f, 152, -32, 700, 34);
 
-            var wallet = WalletView.Create(top, Ctx.S.Session, Ctx.S.Wallet, Ctx.S.Saving);
+            var wallet = CodeWalletView.Create(top, Ctx.S.Session, Ctx.S.Wallet, Ctx.S.Saving);
             ((RectTransform)wallet.transform).At(1f, 0.5f, -330, 0, 700, 70);
             var logout = Ui.Btn(top, Loc.T("hub.logout"), Theme.Surface3, Theme.Text, OnLogout, 22, FontKind.Body);
             logout.Rect.At(1f, 0.5f, -20, 22, 290, 46);

@@ -13,6 +13,7 @@ using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Infrastructure.Platform;
 using N29.HeroesDawn.Infrastructure.Simulated;
 using N29.HeroesDawn.Presentation;
+using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -26,6 +27,8 @@ namespace N29.HeroesDawn.Composition
     /// </summary>
     public sealed class RootLifetimeScope : LifetimeScope
     {
+        [SerializeField] ScreenCatalog? catalog;
+
         public UiRoot? Ui { get; private set; }
 
         protected override void Configure(IContainerBuilder builder)
@@ -95,14 +98,24 @@ namespace N29.HeroesDawn.Composition
             builder.Register<VerifyCombatUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<ForceCombatWinUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
 
-            // ---- Interface
+            // ---- Interface (écrans et popups depuis le catalogue de prefabs)
+            var screens = catalog != null ? catalog
+                : throw new System.InvalidOperationException("ScreenCatalog manquant sur RootLifetimeScope : relancer Heroes Dawn ▸ Setup ▸ Générer les scènes.");
+            builder.RegisterInstance(screens);
             builder.Register<UiServices>(Lifetime.Singleton);
             builder.RegisterComponentInHierarchy<UiRoot>().AsSelf().As<IScreenVisibility>();
+            builder.Register<IPopupHost>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return ui.Modals; }, Lifetime.Singleton);
+            builder.Register<IToastService>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return ui.Toasts; }, Lifetime.Singleton);
+            builder.Register<IModalService, ModalService>(Lifetime.Singleton);
+            builder.Register<ILocalization, LocLocalization>(Lifetime.Singleton);
+            builder.Register<IFrameClock, UnityFrameClock>(Lifetime.Singleton);
+            builder.Register<IBackInput, InputSystemBackInput>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<BackButtonRouter>().AsSelf();
 
             builder.RegisterBuildCallback(c =>
             {
                 Ui = c.Resolve<UiRoot>();
-                Ui.Build(c.Resolve<UiServices>());
+                Ui.Build(c.Resolve<UiServices>(), screens);
                 c.Resolve<GameFlowMachine>().Start(); // Boot → Login
                 log.Info($"Prototype M1 prêt — {content.Members.Count} recrues, {content.Zones.Count} zone(s). Données : {UnityEngine.Application.persistentDataPath}");
             });

@@ -1,6 +1,7 @@
 #nullable enable
 using System.IO;
 using N29.HeroesDawn.Composition;
+using N29.HeroesDawn.EditorTools.Prefabs;
 using N29.HeroesDawn.Presentation;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -68,7 +69,10 @@ namespace N29.HeroesDawn.EditorTools.Scenes
             cam.tag = "MainCamera";
 
             var app = new GameObject("[Heroes Dawn]");
-            app.AddComponent<RootLifetimeScope>();
+            var rootScope = app.AddComponent<RootLifetimeScope>();
+            var rso = new SerializedObject(rootScope);
+            rso.FindProperty("catalog").objectReferenceValue = PrefabGenerator.EnsureCatalog();
+            rso.ApplyModifiedPropertiesWithoutUndo();
             app.AddComponent<GameBootstrap>();
 
             var ui = new GameObject("UI", typeof(RectTransform));
@@ -108,6 +112,7 @@ namespace N29.HeroesDawn.EditorTools.Scenes
             scope.parentReference = parent; // Create<T>() renseigne Type : TypeName est conservé à la sauvegarde
             var so = new SerializedObject(scope);
             so.FindProperty("screenRoot").objectReferenceValue = rt;
+            so.FindProperty("catalog").objectReferenceValue = PrefabGenerator.EnsureCatalog();
             so.ApplyModifiedPropertiesWithoutUndo();
             return scene;
         }

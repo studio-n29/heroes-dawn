@@ -11,7 +11,7 @@ using UnityEngine.UI;
 namespace N29.HeroesDawn.Presentation.Common
 {
     /// <summary>Pastilles Crédits / PR, mises à jour sur l'événement WalletChanged.</summary>
-    public sealed class WalletView : MonoBehaviour
+    public sealed class CodeWalletView : MonoBehaviour
     {
         ISessionReadModel _session = null!;
         ISubscriber<WalletChanged> _walletEvents = null!;
@@ -23,10 +23,10 @@ namespace N29.HeroesDawn.Presentation.Common
         int _lastCredits = -1;
         int _lastPr = -1;
 
-        public static WalletView Create(RectTransform parent, ISessionReadModel session, ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving)
+        public static CodeWalletView Create(RectTransform parent, ISessionReadModel session, ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving)
         {
             var rt = Ui.Rect(parent, "Wallet");
-            var v = rt.gameObject.AddComponent<WalletView>();
+            var v = rt.gameObject.AddComponent<CodeWalletView>();
             v._session = session;
             v._walletEvents = wallet;
             v._savingEvents = saving;

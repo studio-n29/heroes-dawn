@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Mvp;
 using N29.HeroesDawn.Presentation.Screens;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -21,9 +22,20 @@ namespace N29.HeroesDawn.Presentation
         public UiContext Context { get; private set; } = null!;
         public LoginScreen Login { get; private set; } = null!;
 
-        /// <summary>Construit l'interface commune sur ce GameObject (posé dans la scène Boot). Appelé une fois par le scope racine.</summary>
-        public void Build(UiServices services)
+        /// <summary>Zone des écrans de Boot (connexion), dans la zone sûre.</summary>
+        public RectTransform ScreensRoot { get; private set; } = null!;
+        public ModalLayer Modals { get; private set; } = null!;
+        public ToastsView Toasts { get; private set; } = null!;
+        bool _layersBuilt;
+
+        /// <summary>
+        /// Construit une fois les canvas de Boot (écrans, puis couche commune d'ordre 100) et y instancie
+        /// la couche des modales et les toasts depuis le catalogue. Appelé au premier besoin (résolution des services).
+        /// </summary>
+        public void EnsureLayers(ScreenCatalog catalog)
         {
+            if (_layersBuilt) return;
+            _layersBuilt = true;
             EnsureEventSystem();
 
             var go = gameObject;
@@ -39,7 +51,7 @@ namespace N29.HeroesDawn.Presentation
             var root = (RectTransform)go.transform;
             var safe = Ui.Rect(root, "SafeArea").Stretch();
             safe.gameObject.AddComponent<SafeArea>();
-            var screens = Ui.Rect(safe, "Screens").Stretch();
+            ScreensRoot = Ui.Rect(safe, "Screens").Stretch();
 
             // Couche commune au-dessus des scènes (canvas imbriqué, tri propre).
             var overlayGo = Ui.Rect(root, "Overlay").Stretch().gameObject;
@@ -49,16 +61,26 @@ namespace N29.HeroesDawn.Presentation
             overlayGo.AddComponent<GraphicRaycaster>();
             var overlaySafe = Ui.Rect(overlayGo.transform, "SafeArea").Stretch();
             overlaySafe.gameObject.AddComponent<SafeArea>();
-            var modals = ModalLayer.Create(overlaySafe);
-            var toastLayer = Ui.Rect(overlaySafe, "ToastLayer").Stretch();
-            var toasts = Toasts.Create(toastLayer);
+            Modals = Instantiate(Required(catalog.ModalLayer, "ModalLayer"), overlaySafe).GetComponent<ModalLayer>();
+            ((RectTransform)Modals.transform).Stretch();
+            Modals.Init(catalog);
+            Toasts = Instantiate(Required(catalog.Toasts, "Toasts"), overlaySafe).GetComponent<ToastsView>();
+            ((RectTransform)Toasts.transform).Stretch();
+        }
 
-            var ctx = new UiContext(services, modals, toasts);
+        static GameObject Required(GameObject? prefab, string name)
+            => prefab != null ? prefab : throw new System.InvalidOperationException("Prefab manquant dans ScreenCatalog : " + name);
+
+        /// <summary>Construit l'interface commune (écran de connexion encore construit par code). Appelé une fois par le scope racine.</summary>
+        public void Build(UiServices services, ScreenCatalog catalog)
+        {
+            EnsureLayers(catalog);
+            var ctx = new UiContext(services, Modals, Toasts);
             Context = ctx;
             // Un message peut être une clé de localisation (ex. errors.navigation, publié par la machine d'états).
             services.Toasts.Subscribe(t => ctx.Toast(Loc.Has(t.Text) ? Loc.T(t.Text) : t.Text, t.Kind)).AddTo(destroyCancellationToken);
 
-            Login = UiScreen.Create<LoginScreen>(screens, "Login", ctx);
+            Login = UiScreen.Create<LoginScreen>(ScreensRoot, "Login", ctx);
         }
 
         public void SetLoginVisible(bool visible)
@@ -95,32 +117,4 @@ namespace N29.HeroesDawn.Presentation
         }
     }
 
-    /// <summary>Adapte la zone d'interface à Screen.safeArea (encoches mobiles).</summary>
-    public sealed class SafeArea : MonoBehaviour
-    {
-        Rect _last;
-        Vector2Int _lastSize;
-
-        void OnEnable() => Apply();
-        void Update()
-        {
-            if (Screen.safeArea != _last || Screen.width != _lastSize.x || Screen.height != _lastSize.y) Apply();
-        }
-
-        void Apply()
-        {
-            var rt = (RectTransform)transform;
-            _last = Screen.safeArea;
-            _lastSize = new Vector2Int(Screen.width, Screen.height);
-            if (Screen.width <= 0 || Screen.height <= 0) return;
-            var min = _last.position;
-            var max = _last.position + _last.size;
-            min.x /= Screen.width; min.y /= Screen.height;
-            max.x /= Screen.width; max.y /= Screen.height;
-            rt.anchorMin = min;
-            rt.anchorMax = max;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-        }
-    }
 }

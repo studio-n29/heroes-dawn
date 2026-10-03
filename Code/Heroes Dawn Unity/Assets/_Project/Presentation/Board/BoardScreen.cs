@@ -64,7 +64,7 @@ namespace N29.HeroesDawn.Presentation.Board
             _zoneTitle = Ui.Txt(top, "", 46, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Zone");
             _zoneTitle.rectTransform.At(0f, 0.5f, 30, 0, 900, 70);
             _zoneTitle.Inked(2.5f);
-            var wallet = WalletView.Create(top, Ctx.S.Session, Ctx.S.Wallet, Ctx.S.Saving);
+            var wallet = CodeWalletView.Create(top, Ctx.S.Session, Ctx.S.Wallet, Ctx.S.Saving);
             ((RectTransform)wallet.transform).At(1f, 0.5f, -290, 0, 700, 66);
             var back = Ui.Btn(top, Loc.T("board.back_hq"), Theme.Surface3, Theme.Text, OnBackToHq, 30);
             back.Rect.At(1f, 0.5f, -20, 0, 250, 66);

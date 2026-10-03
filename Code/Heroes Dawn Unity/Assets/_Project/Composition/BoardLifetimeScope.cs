@@ -9,6 +9,6 @@ namespace N29.HeroesDawn.Composition
     /// <summary>Scope de la scène Board : crée et affiche le BoardScreen.</summary>
     public sealed class BoardLifetimeScope : SceneScreenScope
     {
-        protected override UiScreen CreateScreen(RectTransform root, UiContext ctx) => UiScreen.Create<BoardScreen>(root, "Board", ctx);
+        protected override UiScreen? CreateScreen(RectTransform root, UiContext ctx) => UiScreen.Create<BoardScreen>(root, "Board", ctx);
     }
 }
