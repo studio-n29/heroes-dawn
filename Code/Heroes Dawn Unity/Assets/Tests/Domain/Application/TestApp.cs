@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using MessagePipe;
+using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
 using N29.HeroesDawn.Application.Features.Zone;
@@ -27,22 +28,26 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             public readonly Dictionary<string, ProfileData> Store = new Dictionary<string, ProfileData>();
             public int Saves;
-            TaskCompletionSource<bool>? _blocked;
+            UniTaskCompletionSource? _blocked;
+            public bool ThrowOnLoad;
             bool _blockNext;
 
             public void BlockNextSave() => _blockNext = true;
-            public void ReleaseBlockedSave() => _blocked?.TrySetResult(true);
+            public void ReleaseBlockedSave() => _blocked?.TrySetResult();
 
-            public Task<ProfileData?> LoadAsync(string id, CancellationToken ct)
-                => Task.FromResult(Store.TryGetValue(id, out var p) ? p : (ProfileData?)null);
+            public UniTask<ProfileData?> LoadAsync(string id, CancellationToken ct)
+            {
+                if (ThrowOnLoad) throw new System.IO.IOException("disque indisponible");
+                return UniTask.FromResult(Store.TryGetValue(id, out var p) ? p : (ProfileData?)null);
+            }
 
-            public Task SaveAsync(string id, ProfileData data, CancellationToken ct)
+            public UniTask SaveAsync(string id, ProfileData data, CancellationToken ct)
             {
                 Store[id] = data;
                 Saves++;
-                if (!_blockNext) return Task.CompletedTask;
+                if (!_blockNext) return UniTask.CompletedTask;
                 _blockNext = false;
-                _blocked = new TaskCompletionSource<bool>();
+                _blocked = new UniTaskCompletionSource();
                 return _blocked.Task;
             }
 
@@ -51,8 +56,15 @@ namespace N29.HeroesDawn.Tests.Domain.Application
 
         public sealed class FakeAuth : IAuthGateway
         {
-            public Task<Result<PlayerAccount>> SignInAsGuestAsync(CancellationToken ct)
-                => Task.FromResult(Result<PlayerAccount>.Ok(new PlayerAccount("p1", "Invité-TEST")));
+            public bool ThrowOnSignIn;
+            public bool HonourCancellation;
+
+            public UniTask<Result<PlayerAccount>> SignInAsGuestAsync(CancellationToken ct)
+            {
+                if (HonourCancellation) ct.ThrowIfCancellationRequested();
+                if (ThrowOnSignIn) throw new System.Net.WebException("réseau coupé");
+                return UniTask.FromResult(Result<PlayerAccount>.Ok(new PlayerAccount("p1", "Invité-TEST")));
+            }
             public void SignOut() { }
         }
 
@@ -61,8 +73,8 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public sealed class Log : ILogger { public void Info(string m) { } public void Warn(string m) { } public void Error(string m) { } }
         public sealed class Verifier : ICombatVerifier
         {
-            public Cysharp.Threading.Tasks.UniTask<bool> VerifyAsync(CombatSetup s, IReadOnlyList<CombatInput> i, ulong h, CancellationToken ct)
-                => Cysharp.Threading.Tasks.UniTask.FromResult(CombatReplay.Run(PrototypeContent.Build(), s, i).StateHash == h);
+            public UniTask<bool> VerifyAsync(CombatSetup s, IReadOnlyList<CombatInput> i, ulong h, CancellationToken ct)
+                => UniTask.FromResult(CombatReplay.Run(PrototypeContent.Build(), s, i).StateHash == h);
         }
 
         readonly IServiceProvider _bus;
@@ -80,6 +92,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public ZoneUseCases Zone { get; }
         public CombatUseCases Combat { get; }
         public HubUseCases Hub { get; }
+        public AuthUseCases Account { get; }
 
         public TestApp()
         {
@@ -105,6 +118,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Zone = new ZoneUseCases(this);
             Combat = new CombatUseCases(this);
             Hub = new HubUseCases(this);
+            Account = new AuthUseCases(this);
         }
 
         public IPublisher<T> Publisher<T>() => _bus.GetRequiredService<IPublisher<T>>();
@@ -188,6 +202,22 @@ namespace N29.HeroesDawn.Tests.Domain.Application
                 Train = new TrainMemberUseCase(a.Session, a.Save, w, r);
                 Recruit = new RecruitMemberUseCase(a.Session, a.Save, w, r);
                 Heal = new HealRosterUseCase(a.Session, a.Save, w, r);
+            }
+        }
+
+        public sealed class AuthUseCases
+        {
+            public readonly ISignInAsGuestUseCase SignIn;
+            public readonly ISignOutUseCase SignOut;
+            public readonly IResetProgressUseCase Reset;
+
+            public AuthUseCases(TestApp a)
+            {
+                var w = a.Publisher<WalletChanged>();
+                var r = a.Publisher<RosterChanged>();
+                SignIn = new SignInAsGuestUseCase(a.Session, a.Auth, a.Profiles, a.Time, a.Save, w, r, a.Logger);
+                SignOut = new SignOutUseCase(a.Session, a.Auth, a.Save);
+                Reset = new ResetProgressUseCase(a.Session, a.Profiles, a.Save, w, r);
             }
         }
 

@@ -1,24 +1,16 @@
 #nullable enable
 using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 
-namespace N29.HeroesDawn.Application.Features
+namespace N29.HeroesDawn.Application.Features.Auth
 {
-    public sealed class SignInReport
-    {
-        public bool NewProfile { get; }
-        public int FatigueRecovered { get; }
-        public SignInReport(bool newProfile, int fatigueRecovered) { NewProfile = newProfile; FatigueRecovered = fatigueRecovered; }
-    }
-
-    /// <summary>Connexion invité → chargement du profil → récupération passive de fatigue → sauvegarde.</summary>
-    public sealed class AuthService
+    public sealed class SignInAsGuestUseCase : ISignInAsGuestUseCase
     {
         readonly GameSession _session;
         readonly IAuthGateway _auth;
@@ -29,15 +21,13 @@ namespace N29.HeroesDawn.Application.Features
         readonly IPublisher<RosterChanged> _roster;
         readonly ILogger _log;
 
-        public AuthService(GameSession session, IAuthGateway auth, IProfileGateway profiles, IClock clock,
-                           SaveScheduler save, IPublisher<WalletChanged> wallet, IPublisher<RosterChanged> roster, ILogger log)
+        public SignInAsGuestUseCase(GameSession session, IAuthGateway auth, IProfileGateway profiles, IClock clock,
+                                    SaveScheduler save, IPublisher<WalletChanged> wallet, IPublisher<RosterChanged> roster, ILogger log)
         {
             _session = session; _auth = auth; _profiles = profiles; _clock = clock; _save = save; _wallet = wallet; _roster = roster; _log = log;
         }
 
-        public bool IsSignedIn => _session.Account != null;
-
-        public async Task<Result<SignInReport>> SignInAsGuestAsync(CancellationToken ct)
+        public async UniTask<Result<SignInReport>> ExecuteAsync(CancellationToken ct = default)
         {
             Result<PlayerAccount> auth;
             try
@@ -72,48 +62,13 @@ namespace N29.HeroesDawn.Application.Features
             else
             {
                 _session.ApplyProfile(data);
-                recovered = RecoverFatigue(data.lastSeenUtcTicks);
+                recovered = FatigueRecovery.Apply(_session.Roster, _clock.UtcNow, data.lastSeenUtcTicks);
             }
             _log.Info($"Connecté : {account.DisplayName} ({account.PlayerId}) — profil {(isNew ? "nouveau" : "chargé")}");
             _wallet.PublishWallet(_session);
             _roster.PublishRoster();
             await _save.SaveAsync(ct);
             return Result<SignInReport>.Ok(new SignInReport(isNew, recovered));
-        }
-
-        int RecoverFatigue(long lastSeenTicks)
-        {
-            if (lastSeenTicks <= 0) return 0;
-            var elapsed = _clock.UtcNow - new DateTime(lastSeenTicks, DateTimeKind.Utc);
-            if (elapsed.TotalMinutes < 1) return 0;
-            int points = (int)Math.Min(100, elapsed.TotalMinutes * MetaRules.FatigueRecoveryPerMinute);
-            int total = 0;
-            foreach (var m in _session.Roster)
-            {
-                int before = m.Fatigue;
-                m.AddFatigue(-points);
-                total += before - m.Fatigue;
-            }
-            return total;
-        }
-
-        public void SignOut()
-        {
-            _save.RequestSave();
-            _auth.SignOut();
-            _session.Account = null;
-            _session.Run = null;
-            _session.RunZone = null;
-        }
-
-        /// <summary>Efface la sauvegarde locale du joueur courant et repart d'un profil neuf.</summary>
-        public void ResetProgress()
-        {
-            if (_session.Account != null) _profiles.Delete(_session.Account.PlayerId);
-            _session.ResetToNewProfile();
-            _wallet.PublishWallet(_session);
-            _roster.PublishRoster();
-            _save.RequestSave();
         }
     }
 }

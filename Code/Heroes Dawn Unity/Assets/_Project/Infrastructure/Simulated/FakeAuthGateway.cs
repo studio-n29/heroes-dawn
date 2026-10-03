@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Core;
 using UnityEngine;
@@ -21,9 +21,9 @@ namespace N29.HeroesDawn.Infrastructure.Simulated
 
         public FakeAuthGateway(int latencyMs = 700) { _latencyMs = latencyMs; }
 
-        public async Task<Result<PlayerAccount>> SignInAsGuestAsync(CancellationToken ct)
+        public async UniTask<Result<PlayerAccount>> SignInAsGuestAsync(CancellationToken ct)
         {
-            await Task.Delay(_latencyMs, ct);
+            await UniTask.Delay(_latencyMs, cancellationToken: ct);
             if (FailNextSignIn)
             {
                 FailNextSignIn = false;

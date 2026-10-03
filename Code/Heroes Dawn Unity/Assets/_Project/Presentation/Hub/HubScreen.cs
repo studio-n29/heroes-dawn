@@ -161,8 +161,12 @@ namespace N29.HeroesDawn.Presentation.Hub
             _scroll.verticalNormalizedPosition = 1f;
         }
 
+        /// <summary>Nombre de rafraîchissements (diagnostic des abonnements, lu par les tests PlayMode).</summary>
+        public int RefreshCount { get; private set; }
+
         void Refresh()
         {
+            RefreshCount++;
             var s = Ctx.S.Session;
             _player.text = s.Account != null ? s.Account.DisplayName + " · " + s.Account.PlayerId : "";
             _tabTeam.SetColors(_tab == Tab.Team ? Theme.Primary : Theme.Surface3, _tab == Tab.Team ? Theme.TextDark : Theme.Text);
@@ -367,14 +371,13 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         void OnLogout()
         {
-            Ctx.S.Auth.SignOut();
-            Ctx.Nav.Show(Ctx.Login);
+            Act(ct => Ctx.S.SignOut.ExecuteAsync(ct), () => Ctx.Nav.Show(Ctx.Login));
         }
 
         void OnReset()
         {
             Ctx.Modal.Confirm(Loc.T("login.reset.title"), Loc.T("login.reset.body"), Loc.T("ui.confirm"),
-                              () => Ctx.S.Auth.ResetProgress(), Loc.T("ui.cancel"), null, Theme.Danger);
+                              () => Act(ct => Ctx.S.ResetProgress.ExecuteAsync(ct)), Loc.T("ui.cancel"), null, Theme.Danger);
         }
     }
 }

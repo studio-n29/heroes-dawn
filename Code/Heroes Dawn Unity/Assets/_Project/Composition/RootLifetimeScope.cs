@@ -1,7 +1,7 @@
 #nullable enable
 using MessagePipe;
 using N29.HeroesDawn.Application.Messages;
-using N29.HeroesDawn.Application.Features;
+using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
 using N29.HeroesDawn.Application.Features.Zone;
@@ -54,7 +54,11 @@ namespace N29.HeroesDawn.Composition
 
             // ---- Services applicatifs
             builder.Register<SaveScheduler>(Lifetime.Singleton);
-            builder.Register<AuthService>(Lifetime.Singleton);
+
+            // ---- Use cases : compte
+            builder.Register<SignInAsGuestUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<SignOutUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<ResetProgressUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
 
             // ---- Use cases : plateau
             builder.Register<ZoneEffects>(Lifetime.Singleton);

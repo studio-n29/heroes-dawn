@@ -1,4 +1,5 @@
 #nullable enable
+using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 using N29.HeroesDawn.Application.Messages;
@@ -50,7 +51,7 @@ namespace N29.HeroesDawn.Presentation.Screens
             tagline.rectTransform.At(0.5f, 0f, 0, 250, 1400, 50);
             tagline.Inked(2f);
 
-            _play = Ui.Btn(Rect, Loc.T("login.play"), Theme.Primary, Theme.TextDark, OnPlay, 52);
+            _play = Ui.Btn(Rect, Loc.T("login.play"), Theme.Primary, Theme.TextDark, Play, 52);
             _play.Rect.At(0.5f, 0f, 0, 120, 560, 110);
             var pulse = _play.gameObject.AddComponent<Pulse>();
             pulse.Amplitude = 0.04f;
@@ -97,15 +98,21 @@ namespace N29.HeroesDawn.Presentation.Screens
             _status.text = status;
         }
 
-        async void OnPlay()
+        /// <summary>Intention « Jouer » : connexion invité (ignorée si une connexion est déjà en cours).</summary>
+        public void Play()
         {
             if (_busy) return;
+            PlayAsync().Forget();
+        }
+
+        async UniTaskVoid PlayAsync()
+        {
             SetBusy(true, Loc.T("login.connecting"));
             _cts?.Dispose();
             _cts = new CancellationTokenSource();
             try
             {
-                var result = await Ctx.S.Auth.SignInAsGuestAsync(_cts.Token);
+                var result = await Ctx.S.SignIn.ExecuteAsync(_cts.Token);
                 if (this == null) return;
                 if (result.IsFailure)
                 {

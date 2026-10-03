@@ -1,6 +1,6 @@
 #nullable enable
 using MessagePipe;
-using N29.HeroesDawn.Application.Features;
+using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
 using N29.HeroesDawn.Application.Features.Zone;
@@ -18,10 +18,14 @@ namespace N29.HeroesDawn.Presentation
     public sealed class UiServices
     {
         public ISessionReadModel Session { get; }
-        public AuthService Auth { get; }
         public IActiveCombatReadModel Combat { get; }
         public AppLogger Log { get; }
         public ZoneId FirstZone { get; }
+
+        // ---- Compte
+        public ISignInAsGuestUseCase SignIn { get; }
+        public ISignOutUseCase SignOut { get; }
+        public IResetProgressUseCase ResetProgress { get; }
 
         // ---- Zone
         public IStartZoneUseCase StartZone { get; }
@@ -54,7 +58,7 @@ namespace N29.HeroesDawn.Presentation
         public ISubscriber<SaveStateChanged> Saving { get; }
         public ISubscriber<ZoneValidated> ZoneValidated { get; }
 
-        public UiServices(ISessionReadModel session, AuthService auth, IActiveCombatReadModel combat, AppLogger log, ZoneId firstZone,
+        public UiServices(ISessionReadModel session, ISignInAsGuestUseCase signIn, ISignOutUseCase signOut, IResetProgressUseCase resetProgress, IActiveCombatReadModel combat, AppLogger log, ZoneId firstZone,
                           IStartZoneUseCase startZone, IRollDiceUseCase rollDice, IUseBonusDieUseCase useBonusDie, IMoveToUseCase moveTo,
                           IEndMoveUseCase endMove, IResolveMiniGameUseCase resolveMiniGame, IResolveNarrativeUseCase resolveNarrative,
                           IResolveRestUseCase resolveRest, ILeaveZoneUseCase leaveZone,
@@ -65,7 +69,7 @@ namespace N29.HeroesDawn.Presentation
                           ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, ISubscriber<ToastRequested> toasts,
                           ISubscriber<SaveStateChanged> saving, ISubscriber<ZoneValidated> zoneValidated)
         {
-            Session = session; Auth = auth; Combat = combat; Log = log; FirstZone = firstZone;
+            Session = session; SignIn = signIn; SignOut = signOut; ResetProgress = resetProgress; Combat = combat; Log = log; FirstZone = firstZone;
             StartZone = startZone; RollDice = rollDice; UseBonusDie = useBonusDie; MoveTo = moveTo; EndMove = endMove;
             ResolveMiniGame = resolveMiniGame; ResolveNarrative = resolveNarrative; ResolveRest = resolveRest; LeaveZone = leaveZone;
             BeginCombat = beginCombat; SetAutoCombat = setAutoCombat; FinishCombat = finishCombat; VerifyCombat = verifyCombat;

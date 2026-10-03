@@ -26,8 +26,6 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             app.Save.RequestSave();
             app.Save.RequestSave();
             app.Profiles.ReleaseBlockedSave();
-            System.Threading.SpinWait.SpinUntil(() => app.Profiles.Saves >= 2, 1000); // port en Task : relance sur le pool de threads (synchrone après la tâche 6)
-            System.Threading.Thread.Sleep(50);
             Assert.That(app.Profiles.Saves, Is.EqualTo(2));
         }
 

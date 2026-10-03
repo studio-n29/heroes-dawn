@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Domain.Combat;
@@ -38,7 +37,7 @@ namespace N29.HeroesDawn.Application.Ports
     /// <summary>Authentification (M1 : simulée ; M2 : UGS Authentication).</summary>
     public interface IAuthGateway
     {
-        Task<Result<PlayerAccount>> SignInAsGuestAsync(CancellationToken ct);
+        UniTask<Result<PlayerAccount>> SignInAsGuestAsync(CancellationToken ct);
         void SignOut();
     }
 
@@ -66,8 +65,8 @@ namespace N29.HeroesDawn.Application.Ports
 
     public interface IProfileGateway
     {
-        Task<ProfileData?> LoadAsync(string playerId, CancellationToken ct);
-        Task SaveAsync(string playerId, ProfileData data, CancellationToken ct);
+        UniTask<ProfileData?> LoadAsync(string playerId, CancellationToken ct);
+        UniTask SaveAsync(string playerId, ProfileData data, CancellationToken ct);
         void Delete(string playerId);
     }
 

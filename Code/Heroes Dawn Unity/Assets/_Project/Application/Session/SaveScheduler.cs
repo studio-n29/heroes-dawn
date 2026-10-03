@@ -42,7 +42,7 @@ namespace N29.HeroesDawn.Application.Session
                 {
                     _pending = false;
                     var data = _session.ToProfile(_clock.UtcNow);
-                    await _profiles.SaveAsync(_session.Account.PlayerId, data, ct).AsUniTask(useCurrentSynchronizationContext: false);
+                    await _profiles.SaveAsync(_session.Account.PlayerId, data, ct);
                 } while (_pending && !ct.IsCancellationRequested);
             }
             catch (OperationCanceledException) { }

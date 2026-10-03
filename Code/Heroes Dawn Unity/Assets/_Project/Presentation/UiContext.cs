@@ -1,7 +1,6 @@
 #nullable enable
 using MessagePipe;
 using N29.HeroesDawn.Application.Messages;
-using N29.HeroesDawn.Application.Features;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Presentation.Board;

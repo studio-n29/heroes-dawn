@@ -1,7 +1,7 @@
 #nullable enable
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Application.Ports;
 using UnityEngine;
 
@@ -29,9 +29,9 @@ namespace N29.HeroesDawn.Infrastructure.Simulated
             return id;
         }
 
-        public async Task<ProfileData?> LoadAsync(string playerId, CancellationToken ct)
+        public async UniTask<ProfileData?> LoadAsync(string playerId, CancellationToken ct)
         {
-            await Task.Delay(_latencyMs, ct);
+            await UniTask.Delay(_latencyMs, cancellationToken: ct);
             var path = PathFor(playerId);
             if (!File.Exists(path)) return null;
             var json = File.ReadAllText(path);
@@ -39,9 +39,9 @@ namespace N29.HeroesDawn.Infrastructure.Simulated
             return JsonUtility.FromJson<ProfileData>(json);
         }
 
-        public async Task SaveAsync(string playerId, ProfileData data, CancellationToken ct)
+        public async UniTask SaveAsync(string playerId, ProfileData data, CancellationToken ct)
         {
-            await Task.Delay(_latencyMs / 2, ct);
+            await UniTask.Delay(_latencyMs / 2, cancellationToken: ct);
             Directory.CreateDirectory(_dir);
             var path = PathFor(playerId);
             var tmp = path + ".tmp";

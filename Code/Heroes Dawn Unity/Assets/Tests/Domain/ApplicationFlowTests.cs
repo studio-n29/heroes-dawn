@@ -24,7 +24,6 @@ namespace N29.HeroesDawn.Tests.Domain
         GameSession _session = null!;
         TestApp.MemoryProfiles _profiles = null!;
         TestApp.Clock _clock = null!;
-        AuthService _auth = null!;
 
         [SetUp]
         public void SetUp()
@@ -33,15 +32,12 @@ namespace N29.HeroesDawn.Tests.Domain
             _session = _app.Session;
             _profiles = _app.Profiles;
             _clock = _app.Time;
-            var wallet = _app.Publisher<WalletChanged>();
-            var roster = _app.Publisher<RosterChanged>();
-            _auth = new AuthService(_session, _app.Auth, _profiles, _clock, _app.Save, wallet, roster, _app.Logger);
         }
 
         [Test]
         public void SignIn_NewProfile_StarterTeamAndSave()
         {
-            var r = _auth.SignInAsGuestAsync(CancellationToken.None).GetAwaiter().GetResult();
+            var r = _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
             Assert.IsTrue(r.IsSuccess);
             Assert.IsTrue(r.Value.NewProfile);
             Assert.AreEqual(4, _session.Squad.Count);
@@ -52,11 +48,11 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test]
         public void SignIn_ExistingProfile_RecoversFatigueOverTime()
         {
-            _auth.SignInAsGuestAsync(CancellationToken.None).GetAwaiter().GetResult();
+            _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
             foreach (var m in _session.Roster) m.Fatigue = 50;
             _profiles.Store["p1"] = _session.ToProfile(_clock.UtcNow);
             _clock.UtcNow = _clock.UtcNow.AddMinutes(20);
-            var r = _auth.SignInAsGuestAsync(CancellationToken.None).GetAwaiter().GetResult();
+            var r = _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
             Assert.IsFalse(r.Value.NewProfile);
             Assert.IsTrue(_session.Roster.All(m => m.Fatigue == 30));
         }
@@ -64,7 +60,7 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test]
         public void Hub_RecruitTrainSquadRules()
         {
-            _auth.SignInAsGuestAsync(CancellationToken.None).GetAwaiter().GetResult();
+            _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
             Assert.IsTrue(_app.Hub.Recruit.ExecuteAsync(new MemberId("etincelle")).GetAwaiter().GetResult().IsSuccess, "Agent à 150 PR");
             Assert.AreEqual(MetaRules.StartPr - 150, _session.Wallet.Pr);
             Assert.IsTrue(_app.Hub.Recruit.ExecuteAsync(new MemberId("arc")).GetAwaiter().GetResult().IsFailure, "Élite trop chère");
@@ -80,7 +76,7 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test]
         public void Zone_Combat_Flow_AppliesRewardsAndFatigue()
         {
-            _auth.SignInAsGuestAsync(CancellationToken.None).GetAwaiter().GetResult();
+            _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
             Assert.IsTrue(_app.Zone.Start.ExecuteAsync(PrototypeContent.Zone11).GetAwaiter().GetResult().IsSuccess);
             var run = _session.Run!;
             // Place l'équipe devant un combat facile pour tester le cycle combat.
@@ -111,7 +107,7 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test]
         public void Zone_Abandon_ClearsRun()
         {
-            _auth.SignInAsGuestAsync(CancellationToken.None).GetAwaiter().GetResult();
+            _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
             _app.Zone.Start.ExecuteAsync(PrototypeContent.Zone11).GetAwaiter().GetResult();
             _app.Zone.Leave.ExecuteAsync().GetAwaiter().GetResult();
             Assert.IsNull(_session.Run);
