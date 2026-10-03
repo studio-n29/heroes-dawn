@@ -68,8 +68,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return Boot();
             Visible<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return WaitFor(() => Visible<HubScreen>() != null);
-            Assert.That(Visible<HubScreen>(), Is.Not.Null);
+            yield return WaitFor(() => Visible<HubView>() != null);
+            Assert.That(Visible<HubView>(), Is.Not.Null);
             Assert.That(_profiles.Saves, Is.GreaterThanOrEqualTo(1));
             Assert.That(_profiles.Store.ContainsKey(InstantAuthGateway.PlayerId));
         }
@@ -82,8 +82,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var login = Visible<LoginView>()!;
             login.PlayButton.onClick.Invoke();
             login.PlayButton.onClick.Invoke();
-            yield return WaitFor(() => Visible<HubScreen>() != null);
-            Assert.That(Visible<HubScreen>(), Is.Not.Null);
+            yield return WaitFor(() => Visible<HubView>() != null);
+            Assert.That(Visible<HubView>(), Is.Not.Null);
             Assert.That(_auth.Calls, Is.EqualTo(1));
         }
 
@@ -92,14 +92,14 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return Boot();
             Visible<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return WaitFor(() => Visible<HubScreen>() != null);
-            var hub = Visible<HubScreen>()!;
-            hub.Hide();                     // OnHide : abonnements libérés
-            hub.Show();                     // OnShow : abonnements repris une seule fois
+            yield return WaitFor(() => Visible<HubView>() != null);
+            var hub = Visible<HubView>()!;
+            hub.gameObject.SetActive(false);                     // OnHide : abonnements libérés
+            hub.gameObject.SetActive(true);                      // OnShow : abonnements repris une seule fois
             yield return null;
-            int before = hub.RefreshCount;
+            int before = PlayModeHarness.HubPresenter().RefreshCount;
             GameBootstrap.Instance!.Scope.Container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));
-            Assert.That(hub.RefreshCount - before, Is.EqualTo(1));
+            Assert.That(PlayModeHarness.HubPresenter().RefreshCount - before, Is.EqualTo(1));
         }
 
         [UnityTest, Description("Vérifie qu'après déconnexion puis reconnexion le QG ne reçoit chaque message qu'une fois — parce que des abonnements accumulés feraient ramer et dupliqueraient les effets")] // Review Focus 3 : pas d'abonnement en double après déconnexion / reconnexion
@@ -107,17 +107,17 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return Boot();
             Visible<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return WaitFor(() => Visible<HubScreen>() != null);
+            yield return WaitFor(() => Visible<HubView>() != null);
             var container = GameBootstrap.Instance!.Scope.Container;
             container.Resolve<ISignOutUseCase>().ExecuteAsync().GetAwaiter().GetResult();
             container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Login));
             yield return WaitFor(() => Visible<LoginView>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
             Visible<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return WaitFor(() => Visible<HubScreen>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
-            var hub = Visible<HubScreen>()!;
-            int before = hub.RefreshCount;
+            yield return WaitFor(() => Visible<HubView>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
+            var hub = Visible<HubView>()!;
+            int before = PlayModeHarness.HubPresenter().RefreshCount;
             container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));
-            Assert.That(hub.RefreshCount - before, Is.EqualTo(1));
+            Assert.That(PlayModeHarness.HubPresenter().RefreshCount - before, Is.EqualTo(1));
         }
     }
 }

@@ -28,6 +28,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             for (int i = 0; i < 300 && !Visible<LoginView>(); i++) yield return null;
         }
 
+        /// <summary>Présentateur du QG (scope de la scène Hub chargée).</summary>
+        public static N29.HeroesDawn.Presentation.Hub.HubPresenter HubPresenter()
+            => Object.FindAnyObjectByType<N29.HeroesDawn.Composition.HubLifetimeScope>()!.Container.Resolve<N29.HeroesDawn.Presentation.Hub.HubPresenter>();
+
         public static bool Visible<T>() where T : Component
         {
             var s = Object.FindAnyObjectByType<T>();

@@ -81,7 +81,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return Capture("01-connexion");
 
             Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<HubScreen>() && !Flow.IsTransitioning);
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<HubView>() && !Flow.IsTransitioning);
             yield return Capture("02-qg");
 
             var session = Container.Resolve<GameSession>();
