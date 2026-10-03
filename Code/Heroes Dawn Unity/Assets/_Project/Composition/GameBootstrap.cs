@@ -6,15 +6,15 @@ using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Infrastructure.Simulated;
 using N29.HeroesDawn.Presentation;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using VContainer;
 
 namespace N29.HeroesDawn.Composition
 {
     /// <summary>
-    /// Point d'entrée du jeu : démarre automatiquement en mode Play, quelle que soit la scène ouverte.
-    /// Règle l'application (cadence, orientation), crée le <see cref="RootLifetimeScope"/> et gère la sauvegarde de sortie.
+    /// Point d'entrée du jeu, posé dans la scène Boot (index 0 des Build Settings) à côté du <see cref="RootLifetimeScope"/>.
+    /// Règle l'application (cadence, orientation) et gère la sauvegarde de sortie.
     /// </summary>
+    [RequireComponent(typeof(RootLifetimeScope))]
     public sealed class GameBootstrap : MonoBehaviour
     {
         public static GameBootstrap? Instance { get; private set; }
@@ -22,31 +22,6 @@ namespace N29.HeroesDawn.Composition
         public RootLifetimeScope Scope { get; private set; } = null!;
         public GameSession Session => Scope.Container.Resolve<GameSession>();
         public UiRoot Ui => Scope.Ui!;
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void AutoStart()
-        {
-            if (Instance != null) return;
-            var go = new GameObject("[Heroes Dawn]");
-            DontDestroyOnLoad(go);
-            go.AddComponent<GameBootstrap>();
-        }
-
-        /// <summary>Tests PlayMode : démarre le jeu (les doubles sont fournis par <c>LifetimeScope.Enqueue</c>).</summary>
-        public static void StartForTests() => AutoStart();
-
-        /// <summary>Tests PlayMode : détruit immédiatement l'instance courante et l'EventSystem.</summary>
-        public static void DestroyForTests()
-        {
-            if (Instance != null)
-            {
-                var go = Instance.gameObject;
-                Instance = null;
-                DestroyImmediate(go);
-            }
-            var es = FindAnyObjectByType<EventSystem>();
-            if (es != null) DestroyImmediate(es.gameObject);
-        }
 
         void Awake()
         {
@@ -56,6 +31,7 @@ namespace N29.HeroesDawn.Composition
                 return;
             }
             Instance = this;
+            Scope = GetComponent<RootLifetimeScope>(); // conteneur déjà construit (LifetimeScope s'exécute avant)
             UnityEngine.Application.targetFrameRate = 60;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             if (UnityEngine.Application.isMobilePlatform)
@@ -66,7 +42,6 @@ namespace N29.HeroesDawn.Composition
                 Screen.autorotateToLandscapeRight = true;
                 Screen.orientation = ScreenOrientation.AutoRotation;
             }
-            Scope = gameObject.AddComponent<RootLifetimeScope>(); // construit le conteneur dans son Awake
         }
 
         void OnApplicationPause(bool paused)

@@ -23,27 +23,14 @@ namespace N29.HeroesDawn.Tests.PlayMode
         [SetUp]
         public void SetUp()
         {
-            // L'instance démarrée automatiquement à l'entrée en Play Mode est remplacée par une instance avec doubles.
-            GameBootstrap.DestroyForTests();
             _profiles = new MemoryProfileGateway();
             _auth = new InstantAuthGateway();
         }
 
-        [TearDown]
-        public void TearDown() => GameBootstrap.DestroyForTests();
+        [UnityTearDown]
+        public IEnumerator TearDown() => PlayModeHarness.TearDown();
 
-        IEnumerator Boot()
-        {
-            using (LifetimeScope.Enqueue(b =>
-                   {
-                       b.RegisterInstance<IProfileGateway>(_profiles);
-                       b.RegisterInstance<IAuthGateway>(_auth);
-                   }))
-            {
-                GameBootstrap.StartForTests();
-            }
-            for (int i = 0; i < 300 && !LoginVisible(); i++) yield return null;
-        }
+        IEnumerator Boot() => PlayModeHarness.Boot(_profiles, _auth);
 
         static bool LoginVisible()
         {

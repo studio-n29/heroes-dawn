@@ -88,10 +88,12 @@ namespace N29.HeroesDawn.Composition
 
             // ---- Interface
             builder.Register<UiServices>(Lifetime.Singleton);
+            builder.RegisterComponentInHierarchy<UiRoot>();
 
             builder.RegisterBuildCallback(c =>
             {
-                Ui = UiRoot.Create(transform, c.Resolve<UiServices>());
+                Ui = c.Resolve<UiRoot>();
+                Ui.Build(c.Resolve<UiServices>());
                 log.Info($"Prototype M1 prêt — {content.Members.Count} recrues, {content.Zones.Count} zone(s). Données : {UnityEngine.Application.persistentDataPath}");
             });
         }

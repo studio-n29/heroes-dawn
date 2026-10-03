@@ -21,13 +21,14 @@ namespace N29.HeroesDawn.Presentation
     {
         public UiContext Context { get; private set; } = null!;
 
-        public static UiRoot Create(Transform parent, UiServices services)
+        /// <summary>Construit l'interface commune sur ce GameObject (posé dans la scène Boot). Appelé une fois par le scope racine.</summary>
+        public void Build(UiServices services)
         {
             EnsureEventSystem();
 
-            var go = new GameObject("UI", typeof(RectTransform));
+            var go = gameObject;
             go.layer = 5;
-            go.transform.SetParent(parent, false);
+            if (go.GetComponent<RectTransform>() == null) go.AddComponent<RectTransform>();
             var canvas = go.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 10;
@@ -47,7 +48,7 @@ namespace N29.HeroesDawn.Presentation
             var toastLayer = Ui.Rect(safe, "ToastLayer").Stretch();
             var toasts = Toasts.Create(toastLayer);
 
-            var ui = go.AddComponent<UiRoot>();
+            var ui = this;
             var ctx = new UiContext(services, new Navigator(), modals, toasts, screens);
             ui.Context = ctx;
             services.Toasts.Subscribe(t => ctx.Toast(t.Text, t.Kind)).AddTo(ui.destroyCancellationToken);
@@ -58,7 +59,6 @@ namespace N29.HeroesDawn.Presentation
             ctx.Combat = CreateScreen<CombatScreen>(screens, "Combat", ctx);
 
             ctx.Nav.Show(ctx.Login);
-            return ui;
         }
 
         static T CreateScreen<T>(RectTransform parent, string name, UiContext ctx) where T : UiScreen
