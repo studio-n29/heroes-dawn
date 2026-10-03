@@ -92,8 +92,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(PlayModeHarness.Visible<BoardView>(), Is.False, "le plateau est masqué");
 
             Container.Resolve<IForceCombatWinUseCase>().ExecuteAsync().Forget();
-            var combat = UnityEngine.Object.FindAnyObjectByType<CombatScreen>()!;
-            yield return PlayModeHarness.WaitFor(() => combat.ContinueForTests(), 600);
+            yield return PlayModeHarness.WaitFor(PlayModeHarness.ContinueResults, 600);
             yield return PlayModeHarness.WaitFor(() => !Loaded(SceneNames.Combat) && !Flow.IsTransitioning, 600);
 
             Assert.That(Loaded(SceneNames.Combat), Is.False);
@@ -189,8 +188,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Combat) && Flow.Current == GameState.Combat && !Flow.IsTransitioning, 600);
 
             Container.Resolve<IActiveCombatReadModel>().Simulation!.Submit(Domain.Combat.CombatCommand.Retreat());
-            var combat = UnityEngine.Object.FindAnyObjectByType<CombatScreen>()!;
-            yield return PlayModeHarness.WaitFor(() => combat.ContinueForTests(), 600);
+            yield return PlayModeHarness.WaitFor(PlayModeHarness.ContinueResults, 600);
             yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Hub) && !Flow.IsTransitioning, 600);
 
             Assert.That(Loaded(SceneNames.Hub), Is.True);

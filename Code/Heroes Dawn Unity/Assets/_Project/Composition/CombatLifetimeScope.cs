@@ -1,14 +1,20 @@
 #nullable enable
-using N29.HeroesDawn.Presentation;
 using N29.HeroesDawn.Presentation.Combat;
-using N29.HeroesDawn.Presentation.Screens;
 using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 
 namespace N29.HeroesDawn.Composition
 {
-    /// <summary>Scope de la scène Combat : crée et affiche le CombatScreen.</summary>
+    /// <summary>Scope de la scène Combat (enfant du plateau) : instancie la vue du combat (prefab du catalogue) et son présentateur.</summary>
     public sealed class CombatLifetimeScope : SceneScreenScope
     {
-        protected override UiScreen? CreateScreen(RectTransform root, UiContext ctx) => UiScreen.Create<CombatScreen>(root, "Combat", ctx);
+        protected override bool ConfigureScreen(IContainerBuilder builder, RectTransform root)
+        {
+            builder.RegisterComponentInNewPrefab(Catalog.Screen("Combat").GetComponent<CombatView>(), Lifetime.Scoped)
+                   .UnderTransform(root).As<ICombatView>();
+            builder.RegisterEntryPoint<CombatPresenter>().AsSelf();
+            return true;
+        }
     }
 }

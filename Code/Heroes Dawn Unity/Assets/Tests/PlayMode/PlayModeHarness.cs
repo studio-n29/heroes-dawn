@@ -48,6 +48,15 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Common.ConfirmPopupView>()!.OkButton.Button.onClick.Invoke();
         }
 
+        /// <summary>« Continuer » sur les résultats du combat (clic réel) ; false tant qu'ils ne sont pas affichés.</summary>
+        public static bool ContinueResults()
+        {
+            var results = Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Combat.CombatResultsPopupView>();
+            if (results == null) return false;
+            results.ContinueButton.onClick.Invoke();
+            return true;
+        }
+
         public static bool Visible<T>() where T : Component
         {
             var s = Object.FindAnyObjectByType<T>();
