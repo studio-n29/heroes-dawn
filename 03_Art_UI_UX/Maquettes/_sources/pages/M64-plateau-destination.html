@@ -1,0 +1,48 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><link rel="stylesheet" href="../kit.css"><script src="../kit.js" defer></script><script src="../board.js" defer></script></head>
+<body data-ref="M64" data-title="Zone 1.2 · Gowanus, le canal" data-group="Mission" data-mode="mission" data-back="M72">
+<main>
+  <div class="bg heavy" style="--img:url(../../Identite/HD_Illustration_Landscape_4K.png)"></div>
+  <div id="board" style="left:330px;top:110px;width:1250px;height:683px" data-pawn="n4" data-spent="n1,n2,n3" data-dest="n5:1,n6:1,n7:2,n8:2" data-path="n4,n5,n7"></div>
+
+  <div class="panel" style="left:88px;top:140px;width:330px;height:330px">
+    <span class="caption">OBJECTIFS</span>
+    <div class="abs list" style="left:16px;right:16px;top:40px;gap:10px">
+      <div class="item done small" style="align-items:flex-start">✔ Combat clé : le gang du canal</div>
+      <div class="item small" style="align-items:flex-start;border-color:var(--yellow)">☐ Événement : une famille piégée par la crue</div>
+      <div class="item small" style="align-items:flex-start">☐ Évacuer un immeuble</div>
+    </div>
+  </div>
+
+  <!-- Infobulle (appui long) -->
+  <div class="panel" style="left:1250px;top:125px;width:440px;height:140px;border-color:var(--red)">
+    <span class="caption red">COMBAT · RANG ÉLITE</span>
+    <div class="abs n small" style="left:20px;top:46px;right:20px;line-height:1.4">Pillards du canal (×3). Arrêt obligatoire : on ne traverse pas un combat non résolu.</div>
+  </div>
+
+  <!-- Dé + PM -->
+  <div class="panel" style="left:88px;top:820px;width:560px;height:140px">
+    <span class="caption">DÉ : 2</span>
+    <div class="abs t ink" style="left:24px;top:30px;font-size:72px;color:var(--yellow)">2 PM</div>
+    <div class="abs n small" style="left:200px;top:48px;width:330px;line-height:1.35">en main · choisis une case cerclée ou termine</div>
+  </div>
+  <div class="panel" style="left:1180px;top:830px;width:270px;height:130px">
+    <span class="caption white">DÉ BONUS</span>
+    <div class="abs t" style="left:20px;top:38px;font-size:40px">🎲 ×1</div>
+    <div class="abs bar gold" style="left:20px;top:94px;width:226px;--v:66%"><span>RÉSERVE 4 / 6 PM</span></div>
+  </div>
+  <div class="btn secondary" style="left:1480px;top:820px;width:352px;height:140px;font-size:48px;flex-direction:column;gap:2px">TERMINER<span class="sub" style="font-size:20px;margin:0">2 PM → réserve du dé bonus</span></div>
+
+  <i class="pin" data-n="1" style="left:935px;top:630px"></i>
+  <i class="pin" data-n="2" style="left:60px;top:890px"></i>
+  <i class="pin" data-n="3" style="left:1460px;top:890px"></i>
+  <i class="pin" data-n="4" style="left:1230px;top:200px"></i>
+  <i class="pin" data-n="5" style="left:1090px;top:440px"></i>
+</main>
+<ol class="legend">
+<li>Destinations atteignables avec les PM du lancer : anneau jaune pointillé + coût en pas dans une pastille. Toucher une destination = s'y rendre (pas de bouton à chercher).</li>
+<li>PM en main, en grand, avec la consigne en une ligne.</li>
+<li>Terminer : les PM restants vont dans la réserve du dé bonus (l'effet est écrit sur le bouton).</li>
+<li>Appui long (survol sur PC) : détail de la case (type, rang de combat, règle d'arrêt).</li>
+<li>Chemin le plus court prévisualisé en pointillés jaunes ; s'il révèle du terrain, le pion s'arrête et peut repartir avec ses PM restants.</li>
+</ol>
+</body></html>

@@ -14,5 +14,11 @@ window.HD_ROUTES = {
  "M31": "M31-confirmation-recrutement.html",
  "M40": "M40-pass.html",
  "M50": "M50-boutique.html",
+ "M60": "M60-carte.html",
+ "M61": "M61-fiche-zone.html",
+ "M62": "M62-preparation.html",
+ "M63": "M63-plateau-lancer.html",
+ "M64": "M64-plateau-destination.html",
+ "M72": "M72-pause.html",
  "DEMO": "_demo.html"
 };
