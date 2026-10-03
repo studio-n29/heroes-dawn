@@ -23,14 +23,14 @@ namespace N29.HeroesDawn.Tests.Domain.Application
 
         static T Ok<T>(Core.Result<T> r) { Assert.That(r.IsSuccess, r.Error?.Code); return r.Value; }
 
-        [Test]
+        [Test, Description("Vérifie qu'une zone inexistante est refusée — parce qu'un identifiant de contenu erroné ne doit pas créer de partie")]
         public void Start_UnknownZone_FailsWithUnknownZone()
         {
             var r = Z.Start.ExecuteAsync(new ZoneId("zone_inconnue")).GetAwaiter().GetResult();
             Assert.That(r.Error!.Code, Is.EqualTo("zone.unknown"));
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'on ne peut pas partir en mission avec une escouade épuisée — parce qu'un membre à 100 % de fatigue ne peut plus combattre (GDD §6)")]
         public void Start_SquadExhausted_Fails()
         {
             foreach (var m in _app.Session.Roster) m.Fatigue = 100;
@@ -39,14 +39,14 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Run, Is.Null);
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'on ne peut pas lancer le dé sans partie de zone — parce que l'interface doit afficher une erreur au lieu de planter")]
         public void Roll_WithoutRun_FailsWithNoRun()
         {
             var r = Z.Roll.ExecuteAsync().GetAwaiter().GetResult();
             Assert.That(r.Error!.Code, Is.EqualTo("zone.no_run"));
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'un deuxième lancer sans déplacement est refusé et ne change pas les PM — parce que le dé ne se relance qu'après le déplacement (GDD §5)")]
         public void Roll_TwiceInARow_SecondFailsWithNotAllowed()
         {
             Assert.That(Z.Start.ExecuteAsync(PrototypeContent.Zone11).GetAwaiter().GetResult().IsSuccess);
@@ -57,7 +57,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Run!.PmInHand, Is.EqualTo(pm));
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'une case Ressource crédite le portefeuille et met à jour l'affichage — parce que le gain doit apparaître dès que le pion passe sur la case")]
         public void ResourceCase_CreditsWallet_AndPublishesWalletChanged()
         {
             _app.Place("n00", pm: 1);
@@ -69,7 +69,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Received<WalletChanged>().Last().Credits, Is.EqualTo(_app.Session.Wallet.Credits));
         }
 
-        [Test]
+        [Test, Description("Vérifie les trois choix d'événement : +250 Crédits, +10 PR ou −15 % de fatigue — parce que chaque choix narratif a une conséquence chiffrée")]
         public void Narrative_Credits_Adds250_Research_Adds10Pr_Morale_RemovesFatigue15()
         {
             int credits = _app.Session.Wallet.Credits;
@@ -94,7 +94,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(ResolveNarrativeUseCase.Morale, Is.EqualTo(15));
         }
 
-        [Test]
+        [Test, Description("Vérifie que se reposer retire 30 % de fatigue à l'escouade et que passer ne change rien — parce que la case Repos réduit la fatigue en mission (GDD §5)")]
         public void Rest_Take_RemovesRestFatigueReduction_Skip_KeepsFatigue()
         {
             int reduction = _app.Session.Content.Balance.RestFatigueReduction;
@@ -110,7 +110,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Squad.All(m => m.Fatigue == 50 - reduction));
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'un mini-jeu réussi rapporte ses Crédits et PR et qu'un échec ne rapporte rien — parce que la case reste rejouable en cas d'échec (GDD §5)")]
         public void MiniGame_Success_AddsMiniGameCreditsAndPr_Failure_AddsNothing()
         {
             var b = _app.Session.Content.Balance;
@@ -127,7 +127,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Wallet.Pr, Is.EqualTo(pr + b.MiniGamePr));
         }
 
-        [Test]
+        [Test, Description("Vérifie que valider la zone rapporte 1 500 Crédits + 40 PR la première fois puis le gain de rejeu — parce que la validation rapporte 1 500 Crédits et 40 PR la première fois (GDD §5)")]
         public void ValidatingZone_FirstTime_Publishes1500Credits40Pr_SecondTime_ReplayCredits()
         {
             var b = _app.Session.Content.Balance;
@@ -149,7 +149,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(second.Pr, Is.EqualTo(0));
         }
 
-        [Test] // Review Focus 5
+        [Test, Description("Vérifie que quitter une zone, validée ou non, vide la partie sans recréditer de récompense — parce que les gains sont acquis à la validation, jamais au départ (Review Focus 5)")] // Review Focus 5
         public void Leave_AfterValidation_And_Leave_Midway_ClearRun_NoDoubleReward()
         {
             _app.DriveZone11ToLastStep();

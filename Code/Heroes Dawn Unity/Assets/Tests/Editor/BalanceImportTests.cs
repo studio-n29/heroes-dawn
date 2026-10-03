@@ -14,7 +14,7 @@ namespace N29.HeroesDawn.Tests.Editor
     {
         static string Xlsx => Path.GetFullPath(Path.Combine(Application.dataPath, "../../../01_Game_Design/05_Equilibrage.xlsx"));
 
-        [Test]
+        [Test, Description("Vérifie que l'import du vrai tableur donne les valeurs du GDD (jauge 1000, K 300, critique 15 %…) — parce que l'import est la source de l'équilibrage du jeu")]
         public void Import_RealSheet_MatchesGddValues()
         {
             using var s = new FileStream(Xlsx, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -33,7 +33,7 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(b.RankEliteLevelOffset, Is.EqualTo(3));
         }
 
-        [Test] // Review Focus 1 : tableur ouvert dans Excel
+        [Test, Description("Vérifie que l'import fonctionne pendant que le tableur est ouvert ailleurs — parce que le designer garde souvent Excel ouvert")] // Review Focus 1 : tableur ouvert dans Excel
         public void Import_WhileFileLockedForWriting_Succeeds()
         {
             using var excel = new FileStream(Xlsx, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
@@ -41,7 +41,7 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(XlsxReader.ReadSheet(s, "Paramètres").Count, Is.GreaterThan(50));
         }
 
-        [Test] // Review Focus 2 : libellé absent
+        [Test, Description("Vérifie qu'un libellé absent du tableur garde la valeur par défaut et produit un avertissement nommé — parce qu'un tableur modifié ne doit pas casser l'import en silence")] // Review Focus 2 : libellé absent
         public void Map_MissingLabel_KeepsDefaultAndWarns()
         {
             var w = new List<string>();
@@ -51,7 +51,7 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(w, Has.Some.Contains("Chance de critique de base"));
         }
 
-        [Test] // Review Focus 3 : arrondi et culture française
+        [Test, Description("Vérifie que 0,29 donne 29 % et que l'import ignore la culture française du poste — parce que l'arrondi et la virgule décimale faussaient les pourcentages")] // Review Focus 3 : arrondi et culture française
         public void Map_PercentRounding_And_FrenchCulture()
         {
             var prev = CultureInfo.CurrentCulture;
@@ -69,7 +69,7 @@ namespace N29.HeroesDawn.Tests.Editor
             finally { CultureInfo.CurrentCulture = prev; }
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'une valeur non numérique (#REF!) garde la valeur par défaut et avertit — parce qu'une formule cassée dans Excel ne doit pas injecter de zéro")]
         public void Map_NonNumericValue_WarnsAndKeepsDefault()
         {
             var w = new List<string>();
@@ -78,14 +78,14 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(w, Has.Some.Contains("Valeur illisible"));
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'un onglet inexistant donne une erreur explicite — parce qu'un onglet renommé doit être signalé clairement")]
         public void ReadSheet_UnknownSheet_Throws()
         {
             using var s = File.OpenRead(Xlsx);
             Assert.Throws<ArgumentException>(() => XlsxReader.ReadSheet(s, "Inexistant"));
         }
 
-        [Test]
+        [Test, Description("Vérifie que le fichier Remote Config contient la clé « balance » de type JSON — parce que c'est le format attendu par la fenêtre Deployment")]
         public void RemoteConfigFile_WrapsBalanceAsJsonEntry()
         {
             var rc = RemoteConfigFile.Build(BalanceJson.Serialize(new BalanceConfig()));

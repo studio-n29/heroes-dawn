@@ -39,14 +39,14 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(sim.IsOver);
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'on ne peut pas lancer de combat hors d'une case Combat — parce que le combat doit toujours venir du plateau (erreur combat.none)")]
         public void Begin_WithoutPendingCombat_Fails()
         {
             var r = C.Begin.ExecuteAsync().GetAwaiter().GetResult();
             Assert.That(r.Error!.Code, Is.EqualTo("combat.none"));
         }
 
-        [Test]
+        [Test, Description("Vérifie que les ennemis ont le niveau moyen de l'escouade plus l'écart du rang (Facile −3) — parce que la difficulté s'aligne sur l'équipe (GDD §5, mise à niveau des ennemis)")]
         public void Begin_EnemyLevel_IsSquadAverage_PlusRankOffset()
         {
             BeginEasyCombat();
@@ -57,7 +57,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(C.Active.Fighters.Count, Is.EqualTo(_app.Session.Squad.Count));
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'une victoire Facile rapporte 200 Crédits, ajoute 12 % de fatigue et libère la case — parce que les récompenses et la fatigue par combat sont fixées par le GDD §6")]
         public void Finish_Victory_CreditsByRank_FatiguePerWin_AdvancesBoard()
         {
             var b = _app.Session.Content.Balance;
@@ -73,7 +73,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Run!.IsSpent(new CaseId("n03")));
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'une défaite ne rapporte rien, ajoute 12 + 15 % de fatigue et fait reculer le pion — parce que la défaite = recul d'une case + fatigue accrue (GDD §6)")]
         public void Finish_Defeat_FatiguePerWinPlusLossExtra_PawnBack()
         {
             var b = _app.Session.Content.Balance;
@@ -88,7 +88,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(report.ReturnedToHq, Is.False);
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'une défaite qui épuise toute l'escouade ferme la zone et renvoie au QG — parce que l'équipe entière à 100 % de fatigue rentre au QG (GDD §6)")]
         public void Finish_DefeatWithSquadExhausted_LeavesZone_ReportToHq()
         {
             var b = _app.Session.Content.Balance;
@@ -101,7 +101,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Run, Is.Null);
         }
 
-        [Test]
+        [Test, Description("Vérifie que la fin de combat publie CombatFinished avec le rapport renvoyé et prévient l'effectif — parce que l'interface et les futurs écrans de résultats se mettent à jour par message")]
         public void Finish_PublishesCombatFinished_WithSameReport()
         {
             var sim = BeginEasyCombat();
@@ -112,7 +112,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Received<RosterChanged>().Count, Is.GreaterThan(0));
         }
 
-        [Test] // Review Focus 4
+        [Test, Description("Vérifie qu'un combat gagné par le bouton debug n'est pas vérifié (null) — parce qu'il n'aurait aucun sens de signaler un faux « rejeu divergent » (Review Focus 4)")] // Review Focus 4
         public void Verify_AfterForceWin_ReturnsNull()
         {
             var sim = BeginEasyCombat();
@@ -122,7 +122,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(C.Verify.ExecuteAsync().GetAwaiter().GetResult(), Is.Null);
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'un combat normal rejoué depuis sa graine et son journal donne la même empreinte — parce que la simulation est déterministe et vérifiable (doc 05)")]
         public void Verify_NormalAutoCombat_ReturnsTrue()
         {
             var sim = BeginEasyCombat();
@@ -132,7 +132,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(C.Verify.ExecuteAsync().GetAwaiter().GetResult(), Is.True);
         }
 
-        [Test]
+        [Test, Description("Vérifie que le mode auto est mémorisé dans le profil et appliqué au combat en cours — parce que le choix auto/manuel doit persister d'un combat à l'autre")]
         public void SetAuto_PersistsInSession_AndSubmitsToSimulation()
         {
             var sim = BeginEasyCombat();

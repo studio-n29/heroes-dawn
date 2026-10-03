@@ -34,7 +34,7 @@ namespace N29.HeroesDawn.Tests.Domain
             _clock = _app.Time;
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'une connexion neuve donne 4 membres, le portefeuille de départ et une sauvegarde — parce que c'est l'état d'entrée de tout nouveau joueur")]
         public void SignIn_NewProfile_StarterTeamAndSave()
         {
             var r = _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
@@ -45,7 +45,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.IsTrue(_profiles.Store.ContainsKey("p1"));
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'après 20 minutes d'absence la fatigue de tout l'effectif passe de 50 à 30 % — parce que la récupération passive suit le temps réel (GDD §7)")]
         public void SignIn_ExistingProfile_RecoversFatigueOverTime()
         {
             _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
@@ -57,7 +57,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.IsTrue(_session.Roster.All(m => m.Fatigue == 30));
         }
 
-        [Test]
+        [Test, Description("Vérifie le parcours QG complet : recruter un Agent, refuser une Élite trop chère, gérer l'escouade et entraîner — parce que ces actions s'enchaînent ainsi en jeu")]
         public void Hub_RecruitTrainSquadRules()
         {
             _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
@@ -73,7 +73,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.AreEqual(before + 1, _session.Find(new MemberId("ancre"))!.Level);
         }
 
-        [Test]
+        [Test, Description("Vérifie la boucle complète plateau → combat → plateau : récompense, fatigue, case libérée ou recul, puis vérification par rejeu — parce que c'est le cœur du prototype M1")]
         public void Zone_Combat_Flow_AppliesRewardsAndFatigue()
         {
             _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
@@ -104,7 +104,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.AreEqual(true, ok, "le rejeu doit redonner la même empreinte");
         }
 
-        [Test]
+        [Test, Description("Vérifie que quitter la zone vide la partie en cours — parce que « Retour QG » referme le brouillard (GDD §5)")]
         public void Zone_Abandon_ClearsRun()
         {
             _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();

@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.Tests.Editor
             Team = Team, TeamLevel = 5, FatiguePercent = 0, RunsPerEncounter = runs, BaseSeed = 42, MaxTicks = maxTicks,
         };
 
-        [Test]
+        [Test, Description("Vérifie que deux simulations avec la même graine donnent le même rapport — parce que les résultats d'équilibrage doivent être reproductibles")]
         public void Run_SameSeed_SameResults()
         {
             var c = PrototypeContent.Build();
@@ -26,7 +26,7 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(BalanceSimulation.ToCsv(a), Is.EqualTo(BalanceSimulation.ToCsv(b)));
         }
 
-        [Test]
+        [Test, Description("Vérifie que le simulateur produit une ligne par rencontre et que victoires + défaites + temps écoulé = nombre de combats — parce que les taux affichés doivent être justes")]
         public void Run_OneRowPerEncounter_AndCountsAddUp()
         {
             var c = PrototypeContent.Build();
@@ -35,14 +35,14 @@ namespace N29.HeroesDawn.Tests.Editor
             foreach (var e in s) Assert.That(e.Wins + e.Losses + e.Timeouts, Is.EqualTo(10));
         }
 
-        [Test] // Review Focus 5 : combat interminable
+        [Test, Description("Vérifie qu'un combat qui atteint le plafond de ticks est compté à part — parce qu'un combat interminable ne doit pas passer pour une défaite")] // Review Focus 5 : combat interminable
         public void Run_TickCapReached_CountsTimeouts()
         {
             var s = BalanceSimulation.Run(PrototypeContent.Build(), PrototypeContent.Zone11, Req(3, maxTicks: 1));
             Assert.That(s.Sum(e => e.Timeouts), Is.EqualTo(s.Count * 3));
         }
 
-        [Test] // la fenêtre recharge balance.json à chaque lancement (pas de valeurs périmées après un import)
+        [Test, Description("Vérifie que le simulateur relit balance.json à chaque lancement — parce qu'il ne doit jamais simuler avec un équilibrage périmé après un import")] // la fenêtre recharge balance.json à chaque lancement (pas de valeurs périmées après un import)
         public void LoadContent_ReadsCurrentFileContent()
         {
             var path = Path.Combine(Path.GetTempPath(), "hd_balance_test.json");
@@ -56,7 +56,7 @@ namespace N29.HeroesDawn.Tests.Editor
             finally { File.Delete(path); }
         }
 
-        [Test]
+        [Test, Description("Vérifie que l'export CSV utilise le point-virgule et le point décimal — parce que le fichier doit s'ouvrir correctement dans Excel quelle que soit la langue du poste")]
         public void ToCsv_UsesSemicolonsAndInvariantCulture()
         {
             var csv = BalanceSimulation.ToCsv(new[]

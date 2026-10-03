@@ -51,7 +51,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             return l != null && l.gameObject.activeInHierarchy;
         }
 
-        [UnityTest]
+        [UnityTest, Description("Vérifie que le jeu démarre sur l'écran de connexion avec les doubles de test injectés — parce que les tests ne doivent jamais toucher la vraie sauvegarde du joueur (Review Focus 2 des fondations)")]
         public IEnumerator Boot_ShowsLoginScreen()
         {
             yield return Boot();
@@ -74,7 +74,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             for (int i = 0; i < frames && !condition(); i++) yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Description("Vérifie que « Jouer » connecte en invité, sauvegarde et affiche le QG — parce que c'est l'entrée normale dans le jeu (W01 → W02)")]
         public IEnumerator GuestSignIn_ShowsHub()
         {
             yield return Boot();
@@ -85,7 +85,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(_profiles.Store.ContainsKey(InstantAuthGateway.PlayerId));
         }
 
-        [UnityTest] // Review Focus 1 : double clic sur « Jouer » pendant la connexion
+        [UnityTest, Description("Vérifie qu'un double clic sur « Jouer » pendant la connexion ne connecte qu'une fois — parce qu'une double connexion dupliquerait les chargements et sauvegardes")] // Review Focus 1 : double clic sur « Jouer » pendant la connexion
         public IEnumerator DoublePlay_SignsInOnce()
         {
             _auth.DelayFrames = 5;
@@ -98,7 +98,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(_auth.Calls, Is.EqualTo(1));
         }
 
-        [UnityTest] // Review Focus 3 : ré-afficher le QG déjà courant ne double pas ses abonnements
+        [UnityTest, Description("Vérifie qu'un QG ré-affiché alors qu'il est déjà à l'écran ne double pas ses abonnements — parce que chaque changement de portefeuille doit rafraîchir l'écran une seule fois")] // Review Focus 3 : ré-afficher le QG déjà courant ne double pas ses abonnements
         public IEnumerator ShowHubTwice_WalletChangedRefreshesHubOnce()
         {
             yield return Boot();
@@ -113,7 +113,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(hub.RefreshCount - before, Is.EqualTo(1));
         }
 
-        [UnityTest] // Review Focus 3 : pas d'abonnement en double après déconnexion / reconnexion
+        [UnityTest, Description("Vérifie qu'après déconnexion puis reconnexion le QG ne reçoit chaque message qu'une fois — parce que des abonnements accumulés feraient ramer et dupliqueraient les effets")] // Review Focus 3 : pas d'abonnement en double après déconnexion / reconnexion
         public IEnumerator SignOutThenSignIn_WalletChangedRefreshesHubOnce()
         {
             yield return Boot();

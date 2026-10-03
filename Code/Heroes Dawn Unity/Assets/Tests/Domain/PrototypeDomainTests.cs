@@ -13,7 +13,7 @@ namespace N29.HeroesDawn.Tests.Domain
     {
         static ContentCatalog C => PrototypeContent.Build();
 
-        [Test]
+        [Test, Description("Vérifie que le contenu du prototype est cohérent : 8 recrues, zone de 25 cases et 3 objectifs, liens valides, 3 compétences par recrue — parce qu'une donnée incohérente casserait le jeu à l'exécution")]
         public void Content_IsConsistent()
         {
             var c = C;
@@ -29,7 +29,7 @@ namespace N29.HeroesDawn.Tests.Domain
             foreach (var m in c.Members) Assert.AreEqual(3, m.Skills.Count, m.Id.Value);
         }
 
-        [Test]
+        [Test, Description("Vérifie que 6 PM non utilisés donnent un dé bonus et que la réserve plafonne à 2 dés — parce que c'est la règle du dé bonus (GDD §5)")]
         public void DiceBank_ConvertsSixPmIntoBonusDie_AndCapsAtTwo()
         {
             var bank = new DiceBank(new BalanceConfig());
@@ -43,7 +43,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.AreEqual(0, bank.StoredPm);
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'un lancer puis un déplacement font avancer le pion et sont journalisés — parce que la sauvegarde et le rejeu de zone reposent sur ce journal")]
         public void ZoneRun_RollThenMove_RevealsFogAndLogsActions()
         {
             var c = C;
@@ -59,7 +59,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.AreEqual(2, run.Log.Count);
         }
 
-        [Test]
+        [Test, Description("Vérifie que deux parties avec la même graine tirent les mêmes dés — parce que le plateau doit être déterministe (doc 05)")]
         public void ZoneRun_SameSeed_SameDice()
         {
             var c = C;
@@ -68,7 +68,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.AreEqual(((DiceRolledEvent)a.Roll()[0]).Value, ((DiceRolledEvent)b.Roll()[0]).Value);
         }
 
-        [Test]
+        [Test, Description("Vérifie que remplir un seul objectif ne valide pas la zone — parce qu'une zone n'est validée qu'avec ses 3 objectifs (GDD §5)")]
         public void ZoneRun_Validation_RequiresAllObjectives()
         {
             var c = C;
@@ -81,7 +81,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.AreNotEqual(ZoneRunPhase.Completed, run.Phase);
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'une défaite ramène le pion sur la case précédente — parce que la défaite = recul d'une case (GDD §6)")]
         public void ZoneRun_CombatDefeat_StepsBack()
         {
             var c = C;
@@ -98,7 +98,7 @@ namespace N29.HeroesDawn.Tests.Domain
             new[] { new EnemyEntry(new EnemyId("brute"), 5), new EnemyEntry(new EnemyId("thug"), 5), new EnemyEntry(new EnemyId("street_pyro"), 5) },
             auto);
 
-        [Test]
+        [Test, Description("Vérifie qu'un combat auto se termine et donne exactement le même résultat avec la même graine — parce que le combat doit être rejouable à l'identique (doc 05)")]
         public void Combat_AutoBattle_TerminatesAndIsDeterministic()
         {
             var c = C;
@@ -111,7 +111,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.AreEqual(a.Tick, b.Tick);
         }
 
-        [Test]
+        [Test, Description("Vérifie qu'un combat joué à la main se rejoue à l'identique depuis son journal d'entrées — parce que la vérification et les tests de rejeu reposent sur ce journal")]
         public void Combat_ManualInputs_ReplayToSameHash()
         {
             var c = C;
@@ -134,7 +134,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.AreEqual(sim.StateHash(), replay.StateHash);
         }
 
-        [Test]
+        [Test, Description("Vérifie que la retraite termine le combat en défaite — parce que le bouton Retraite = défaite + recul (W11a)")]
         public void Combat_Retreat_EndsInDefeat()
         {
             var sim = new CombatSimulation(C, Setup(3UL, false));
