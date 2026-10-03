@@ -104,6 +104,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             b.AddMessageBroker<SaveStateChanged>();
             b.AddMessageBroker<ZoneValidated>();
             b.AddMessageBroker<CombatFinished>();
+            b.AddMessageBroker<NavigateRequested>();
+            b.AddMessageBroker<CombatResultsClosed>();
+            b.AddMessageBroker<ReturnedToBoard>();
             _bus = b.BuildServiceProvider();
             Record<WalletChanged>();
             Record<RosterChanged>();
@@ -111,6 +114,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Record<SaveStateChanged>();
             Record<ZoneValidated>();
             Record<CombatFinished>();
+            Record<NavigateRequested>();
+            Record<CombatResultsClosed>();
+            Record<ReturnedToBoard>();
 
             Session = new GameSession(PrototypeContent.Build());
             Save = new SaveScheduler(Session, Profiles, Time, Logger, Publisher<SaveStateChanged>());

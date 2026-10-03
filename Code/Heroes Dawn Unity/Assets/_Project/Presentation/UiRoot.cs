@@ -4,7 +4,7 @@ using MessagePipe;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
-using N29.HeroesDawn.Presentation.Screens;
+using N29.HeroesDawn.Presentation.Login;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
@@ -20,7 +20,7 @@ namespace N29.HeroesDawn.Presentation
     public sealed class UiRoot : MonoBehaviour, IScreenVisibility
     {
         public UiContext Context { get; private set; } = null!;
-        public LoginScreen Login { get; private set; } = null!;
+        public LoginView Login { get; private set; } = null!;
 
         /// <summary>Zone des écrans de Boot (connexion), dans la zone sûre.</summary>
         public RectTransform ScreensRoot { get; private set; } = null!;
@@ -66,12 +66,17 @@ namespace N29.HeroesDawn.Presentation
             Modals.Init(catalog);
             Toasts = Instantiate(Required(catalog.Toasts, "Toasts"), overlaySafe).GetComponent<ToastsView>();
             ((RectTransform)Toasts.transform).Stretch();
+
+            // Écran de connexion (masqué jusqu'à ce que la machine d'états l'affiche).
+            Login = Instantiate(catalog.Screen("Login"), ScreensRoot).GetComponent<LoginView>();
+            ((RectTransform)Login.transform).Stretch();
+            Login.gameObject.SetActive(false);
         }
 
         static GameObject Required(GameObject? prefab, string name)
             => prefab != null ? prefab : throw new System.InvalidOperationException("Prefab manquant dans ScreenCatalog : " + name);
 
-        /// <summary>Construit l'interface commune (écran de connexion encore construit par code). Appelé une fois par le scope racine.</summary>
+        /// <summary>Contexte des écrans encore construits par code, messages du bus en toasts. Appelé une fois par le scope racine.</summary>
         public void Build(UiServices services, ScreenCatalog catalog)
         {
             EnsureLayers(catalog);
@@ -79,14 +84,12 @@ namespace N29.HeroesDawn.Presentation
             Context = ctx;
             // Un message peut être une clé de localisation (ex. errors.navigation, publié par la machine d'états).
             services.Toasts.Subscribe(t => ctx.Toast(Loc.Has(t.Text) ? Loc.T(t.Text) : t.Text, t.Kind)).AddTo(destroyCancellationToken);
-
-            Login = UiScreen.Create<LoginScreen>(ScreensRoot, "Login", ctx);
         }
 
         public void SetLoginVisible(bool visible)
         {
-            if (visible) Login.Show();
-            else Login.Hide();
+            if (visible) Login.transform.SetAsLastSibling();
+            Login.gameObject.SetActive(visible);
         }
 
         static void AddScaler(GameObject go)

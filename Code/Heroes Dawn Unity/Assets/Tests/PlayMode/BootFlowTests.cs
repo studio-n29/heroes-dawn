@@ -7,6 +7,7 @@ using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Composition;
 using N29.HeroesDawn.Presentation.Hub;
+using N29.HeroesDawn.Presentation.Login;
 using N29.HeroesDawn.Presentation.Screens;
 using NUnit.Framework;
 using UnityEngine;
@@ -35,7 +36,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
 
         static bool LoginVisible()
         {
-            var l = Object.FindAnyObjectByType<LoginScreen>();
+            var l = Object.FindAnyObjectByType<LoginView>();
             return l != null && l.gameObject.activeInHierarchy;
         }
 
@@ -66,7 +67,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator GuestSignIn_ShowsHub()
         {
             yield return Boot();
-            Visible<LoginScreen>()!.Play();
+            Visible<LoginView>()!.PlayButton.onClick.Invoke();
             yield return WaitFor(() => Visible<HubScreen>() != null);
             Assert.That(Visible<HubScreen>(), Is.Not.Null);
             Assert.That(_profiles.Saves, Is.GreaterThanOrEqualTo(1));
@@ -78,9 +79,9 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             _auth.DelayFrames = 5;
             yield return Boot();
-            var login = Visible<LoginScreen>()!;
-            login.Play();
-            login.Play();
+            var login = Visible<LoginView>()!;
+            login.PlayButton.onClick.Invoke();
+            login.PlayButton.onClick.Invoke();
             yield return WaitFor(() => Visible<HubScreen>() != null);
             Assert.That(Visible<HubScreen>(), Is.Not.Null);
             Assert.That(_auth.Calls, Is.EqualTo(1));
@@ -90,7 +91,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator ShowHubTwice_WalletChangedRefreshesHubOnce()
         {
             yield return Boot();
-            Visible<LoginScreen>()!.Play();
+            Visible<LoginView>()!.PlayButton.onClick.Invoke();
             yield return WaitFor(() => Visible<HubScreen>() != null);
             var hub = Visible<HubScreen>()!;
             hub.Hide();                     // OnHide : abonnements libérés
@@ -105,13 +106,13 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator SignOutThenSignIn_WalletChangedRefreshesHubOnce()
         {
             yield return Boot();
-            Visible<LoginScreen>()!.Play();
+            Visible<LoginView>()!.PlayButton.onClick.Invoke();
             yield return WaitFor(() => Visible<HubScreen>() != null);
             var container = GameBootstrap.Instance!.Scope.Container;
             container.Resolve<ISignOutUseCase>().ExecuteAsync().GetAwaiter().GetResult();
             container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Login));
-            yield return WaitFor(() => Visible<LoginScreen>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
-            Visible<LoginScreen>()!.Play();
+            yield return WaitFor(() => Visible<LoginView>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
+            Visible<LoginView>()!.PlayButton.onClick.Invoke();
             yield return WaitFor(() => Visible<HubScreen>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
             var hub = Visible<HubScreen>()!;
             int before = hub.RefreshCount;

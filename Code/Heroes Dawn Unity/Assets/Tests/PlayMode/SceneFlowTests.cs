@@ -13,6 +13,7 @@ using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Board;
 using N29.HeroesDawn.Presentation.Combat;
 using N29.HeroesDawn.Presentation.Hub;
+using N29.HeroesDawn.Presentation.Login;
 using N29.HeroesDawn.Presentation.Screens;
 using NUnit.Framework;
 using UnityEngine.SceneManagement;
@@ -43,8 +44,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
         IEnumerator SignedIn()
         {
             yield return PlayModeHarness.Boot(_profiles, _auth);
-            PlayModeHarness.Visible<LoginScreen>();
-            UnityEngine.Object.FindAnyObjectByType<LoginScreen>()!.Play();
+            PlayModeHarness.Visible<LoginView>();
+            UnityEngine.Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<HubScreen>() && !Flow.IsTransitioning);
         }
 
@@ -65,7 +66,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return SignedIn();
             Assert.That(Loaded(SceneNames.Hub), Is.True);
-            Assert.That(PlayModeHarness.Visible<LoginScreen>(), Is.False);
+            Assert.That(PlayModeHarness.Visible<LoginView>(), Is.False);
             Assert.That(Flow.Current, Is.EqualTo(GameState.Hub));
         }
 

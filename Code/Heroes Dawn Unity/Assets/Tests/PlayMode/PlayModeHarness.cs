@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections;
 using N29.HeroesDawn.Application.Ports;
+using N29.HeroesDawn.Presentation.Login;
 using N29.HeroesDawn.Presentation.Screens;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,7 +25,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 SceneManager.LoadScene("Boot", LoadSceneMode.Single);
                 yield return null; // la scène se charge (Awake des scopes) pendant que les doubles sont en file
             }
-            for (int i = 0; i < 300 && !Visible<LoginScreen>(); i++) yield return null;
+            for (int i = 0; i < 300 && !Visible<LoginView>(); i++) yield return null;
         }
 
         public static bool Visible<T>() where T : Component

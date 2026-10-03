@@ -14,6 +14,7 @@ using N29.HeroesDawn.Infrastructure.Platform;
 using N29.HeroesDawn.Infrastructure.Simulated;
 using N29.HeroesDawn.Presentation;
 using N29.HeroesDawn.Presentation.Mvp;
+using N29.HeroesDawn.Presentation.Login;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -111,6 +112,8 @@ namespace N29.HeroesDawn.Composition
             builder.Register<IFrameClock, UnityFrameClock>(Lifetime.Singleton);
             builder.Register<IBackInput, InputSystemBackInput>(Lifetime.Singleton);
             builder.RegisterEntryPoint<BackButtonRouter>().AsSelf();
+            builder.Register<ILoginView>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return ui.Login; }, Lifetime.Singleton);
+            builder.RegisterEntryPoint<LoginPresenter>().AsSelf();
 
             builder.RegisterBuildCallback(c =>
             {

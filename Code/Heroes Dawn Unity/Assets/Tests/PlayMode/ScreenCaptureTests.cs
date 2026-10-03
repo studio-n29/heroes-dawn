@@ -13,6 +13,7 @@ using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Board;
 using N29.HeroesDawn.Presentation.Combat;
 using N29.HeroesDawn.Presentation.Hub;
+using N29.HeroesDawn.Presentation.Login;
 using N29.HeroesDawn.Presentation.Screens;
 using NUnit.Framework;
 using UnityEngine;
@@ -79,7 +80,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
             yield return Capture("01-connexion");
 
-            Object.FindAnyObjectByType<LoginScreen>()!.Play();
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<HubScreen>() && !Flow.IsTransitioning);
             yield return Capture("02-qg");
 
