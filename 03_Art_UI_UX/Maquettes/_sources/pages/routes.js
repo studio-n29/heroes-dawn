@@ -27,5 +27,11 @@ window.HD_ROUTES = {
  "M70": "M70-resultats-combat.html",
  "M71": "M71-zone-securisee.html",
  "M72": "M72-pause.html",
+ "M80": "M80-parametres-audio.html",
+ "M81": "M81-parametres-graphismes.html",
+ "M82": "M82-parametres-accessibilite.html",
+ "M83": "M83-parametres-notifications.html",
+ "M84": "M84-parametres-controles.html",
+ "M85": "M85-parametres-compte-support.html",
  "DEMO": "_demo.html"
 };

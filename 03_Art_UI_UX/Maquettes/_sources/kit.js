@@ -34,7 +34,7 @@
     const titleX = d.titlex ? +d.titlex : d.back ? 290 : 88;
     const right = d.mode === "hub"
       ? resources() +
-        `<div class="icon-btn" data-go="M80" style="left:1736px;top:4px;width:92px;height:92px">${svg("gear")}</div>`
+        ("nores" in d ? "" : `<div class="icon-btn" data-go="M80" style="left:1736px;top:4px;width:92px;height:92px">${svg("gear")}</div>`)
       : `<div class="icon-btn" data-go="M72" style="left:1736px;top:4px;width:92px;height:92px">${svg("pause")}</div>`;
     add(`<div class="topbar">${back}<div class="title" style="left:${titleX}px">${d.title}</div>${right}</div>`);
   }
