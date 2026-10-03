@@ -19,6 +19,13 @@ window.HD_ROUTES = {
  "M62": "M62-preparation.html",
  "M63": "M63-plateau-lancer.html",
  "M64": "M64-plateau-destination.html",
+ "M65": "M65-combat-pret.html",
+ "M66": "M66-combat-ciblage.html",
+ "M67": "M67-mini-jeux.html",
+ "M68": "M68-evenement.html",
+ "M69": "M69-repos.html",
+ "M70": "M70-resultats-combat.html",
+ "M71": "M71-zone-securisee.html",
  "M72": "M72-pause.html",
  "DEMO": "_demo.html"
 };

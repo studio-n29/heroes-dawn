@@ -31,7 +31,7 @@
 
   if (d.mode === "hub" || d.mode === "mission") {
     const back = d.back ? `<div class="btn ghost small" data-go="${d.back}" style="left:88px;top:18px;width:170px;height:68px">${svg("back").replace("<svg", "<svg style='width:30px;height:30px;fill:#fff'")} RETOUR</div>` : "";
-    const titleX = d.back ? 290 : 88;
+    const titleX = d.titlex ? +d.titlex : d.back ? 290 : 88;
     const right = d.mode === "hub"
       ? resources() +
         `<div class="icon-btn" data-go="M80" style="left:1736px;top:4px;width:92px;height:92px">${svg("gear")}</div>`
