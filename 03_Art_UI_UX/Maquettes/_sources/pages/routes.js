@@ -33,5 +33,17 @@ window.HD_ROUTES = {
  "M83": "M83-parametres-notifications.html",
  "M84": "M84-parametres-controles.html",
  "M85": "M85-parametres-compte-support.html",
+ "T01": "T01-bienvenue.html",
+ "T02": "T02-escouade.html",
+ "T03": "T03-mission.html",
+ "T04": "T04-objectifs.html",
+ "T05": "T05-lancer.html",
+ "T06": "T06-destination.html",
+ "T07": "T07-combat-atb.html",
+ "T08": "T08-combat-competence.html",
+ "T09": "T09-resultats.html",
+ "T10": "T10-astuce-combo.html",
+ "T11": "T11-fin.html",
+ "T12": "T12-passer.html",
  "DEMO": "_demo.html"
 };
