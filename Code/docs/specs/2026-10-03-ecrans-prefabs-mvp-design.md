@@ -134,4 +134,4 @@ Chaque test porte `[Description("Vérifie que … — parce que …")]` ; `lates
 - **Taille** (~3 800 lignes de présentation à redécouper) : ordre écran par écran, chaque étape jouable ; le plan peut découper le combat en deux tâches.
 - **Rendu TMP différent** (métriques de police, retours à la ligne) : vérifié par captures en PlayMode à l'étape 1, avant toute conversion.
 - **Références de prefab cassées par une retouche** : test de structure (§9.2).
-- **Prefabs binaires en LFS** : les `.prefab` sont du YAML texte ; ils ne passent pas par LFS (vérifier `.gitattributes`).
+- **Prefabs et LFS** : les `.prefab` et `.asset` sont du YAML texte et `.gitattributes` ne les envoie pas en LFS (vérifié). Les Font Assets TMP restent légers grâce à l'atlas dynamique (« Clear Dynamic Data on Build » actif).
