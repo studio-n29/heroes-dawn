@@ -40,6 +40,10 @@ namespace N29.HeroesDawn.Content.Prototype
         static MemberDef M(string id, Family f, Role r, Rarity ra, params SkillDef[] skills)
             => new MemberDef(new MemberId(id), "members." + id + ".name", f, r, ra, Stats(r, ra), skills);
 
+        /// <summary>Recrue qui n'entre dans la boutique qu'une fois <paramref name="zone"/> validée.</summary>
+        static MemberDef Locked(MemberDef d, ZoneId zone)
+            => new MemberDef(d.Id, d.NameKey, d.Family, d.Role, d.Rarity, d.BaseStats, d.Skills, zone);
+
         static EnemyDef E(string id, Role r, Family f, StatBlock st, bool boss, params SkillDef[] skills)
             => new EnemyDef(new EnemyId(id), "enemies." + id + ".name", r, f, st, skills, boss);
 
@@ -56,10 +60,10 @@ namespace N29.HeroesDawn.Content.Prototype
                     S("ancre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), St(StatusType.Taunt, 1, 30)),
                     S("ancre_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(20)),
                     S("ancre_a3", SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15))),
-                M("verre", Family.Matter, Role.Control, Rarity.Legend,
+                Locked(M("verre", Family.Matter, Role.Control, Rarity.Legend,
                     S("verre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Vulnerable, 2, 25)),
                     S("verre_a2", SkillSlot.A2, 4, TargetRule.SingleEnemy, St(StatusType.Bind, 2), Gauge(-300)),
-                    S("verre_a3", SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15))),
+                    S("verre_a3", SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15))), Zone11),
                 M("givre", Family.Elemental, Role.Damage, Rarity.Legend,
                     S("givre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Freeze, 2, 40)),
                     S("givre_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(70), Gauge(-150)),

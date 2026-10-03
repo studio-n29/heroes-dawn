@@ -37,5 +37,14 @@ namespace N29.HeroesDawn.Definitions
         public int ZoneValidationPr { get; set; } = 40;
         public int MiniGameCredits { get; set; } = 200;
         public int MiniGamePr { get; set; } = 5;
+        // Boutique éphémère de recrutement
+        public int ShopResetHour { get; set; } = 9;
+        public int ShopWeightAgent { get; set; } = 70;
+        public int ShopWeightElite { get; set; } = 25;
+        public int ShopWeightLegend { get; set; } = 5;
+        public int ShopRerollCost1 { get; set; } = 100;
+        public int ShopRerollCost2 { get; set; } = 200;
+        public int ShopRerollCost3 { get; set; } = 400;
+        public int ShopRerollCost4 { get; set; } = 800;
     }
 }
