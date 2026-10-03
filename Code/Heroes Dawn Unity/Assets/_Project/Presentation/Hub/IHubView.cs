@@ -16,7 +16,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         event Action? DeployClicked;
         event Action<MemberId>? SquadToggleClicked;
         event Action<MemberId>? TrainClicked;
-        event Action<MemberId>? RecruitClicked;
+        /// <summary>Recruter le héros d'un emplacement de la boutique.</summary>
+        event Action<int>? RecruitClicked;
+        event Action? RerollClicked;
 
         IWalletView Wallet { get; }
         void Show(HubData data);

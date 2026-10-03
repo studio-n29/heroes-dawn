@@ -24,6 +24,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UiButton reset = null!;
         [SerializeField] UiButton heal = null!;
         [SerializeField] UiButton deploy = null!;
+        [SerializeField] GameObject shopBar = null!;
+        [SerializeField] TMP_Text shopCountdown = null!;
+        [SerializeField] UiButton reroll = null!;
         [SerializeField] RectTransform grid = null!;
         [SerializeField] ScrollRect scroll = null!;
         [SerializeField] RectTransform objectives = null!;
@@ -41,13 +44,15 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? DeployClicked;
         public event Action<MemberId>? SquadToggleClicked;
         public event Action<MemberId>? TrainClicked;
-        public event Action<MemberId>? RecruitClicked;
+        public event Action<int>? RecruitClicked;
+        public event Action? RerollClicked;
 
         public IWalletView Wallet => wallet;
 
         /// <summary>Bouton Déployer (tests PlayMode : clic réel).</summary>
         public Button DeployButton => deploy.Button;
         public Button RecruitTabButton => tabRecruit.Button;
+        public Button RerollButton => reroll.Button;
 
         void Awake()
         {
@@ -57,6 +62,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             reset.Button.onClick.AddListener(() => ResetClicked?.Invoke());
             heal.Button.onClick.AddListener(() => HealClicked?.Invoke());
             deploy.Button.onClick.AddListener(() => DeployClicked?.Invoke());
+            reroll.Button.onClick.AddListener(() => RerollClicked?.Invoke());
         }
 
         public void Show(HubData d)
@@ -84,13 +90,17 @@ namespace N29.HeroesDawn.Presentation.Hub
                 foreach (var c in d.Recruits)
                 {
                     var card = Instantiate(recruitCardPrefab, grid);
-                    var id = c.Card.Id;
-                    card.RecruitClicked += () => RecruitClicked?.Invoke(id);
+                    int slot = c.Slot;
+                    card.RecruitClicked += () => RecruitClicked?.Invoke(slot);
                     card.Show(c);
                 }
             }
             emptyRecruits.text = d.EmptyRecruitText;
             emptyRecruits.gameObject.SetActive(!team && d.Recruits.Length == 0);
+            if (shopBar.activeSelf == team) shopBar.SetActive(!team);
+            shopCountdown.text = d.ShopCountdown;
+            reroll.SetLabel(d.RerollLabel);
+            reroll.Interactable = d.RerollEnabled;
 
             objectives.Clear();
             foreach (var o in d.ZoneObjectives) Instantiate(objectiveLinePrefab, objectives).Show(o, Theme.Text);

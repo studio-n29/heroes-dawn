@@ -83,6 +83,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<HubView>() && !Flow.IsTransitioning);
             yield return Capture("02-qg");
 
+            Object.FindAnyObjectByType<HubView>()!.RecruitTabButton.onClick.Invoke();
+            for (int i = 0; i < 10; i++) yield return null;
+            yield return Capture("02b-boutique");
+
             var session = Container.Resolve<GameSession>();
             var zone = session.Content.Zone(PrototypeContent.Zone11);
             session.Run = ZoneRun.ForTests(session.Content, zone, 3UL, 1, true, "n02");

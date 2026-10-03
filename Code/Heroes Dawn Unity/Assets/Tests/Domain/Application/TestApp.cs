@@ -206,7 +206,6 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             public readonly IToggleSquadUseCase ToggleSquad;
             public readonly ITrainMemberUseCase Train;
-            public readonly IRecruitMemberUseCase Recruit;
             public readonly IHealRosterUseCase Heal;
 
             public HubUseCases(TestApp a)
@@ -215,7 +214,6 @@ namespace N29.HeroesDawn.Tests.Domain.Application
                 var r = a.Publisher<RosterChanged>();
                 ToggleSquad = new ToggleSquadUseCase(a.Session, a.Save, r);
                 Train = new TrainMemberUseCase(a.Session, a.Save, w, r);
-                Recruit = new RecruitMemberUseCase(a.Session, a.Save, w, r);
                 Heal = new HealRosterUseCase(a.Session, a.Save, w, r);
             }
         }

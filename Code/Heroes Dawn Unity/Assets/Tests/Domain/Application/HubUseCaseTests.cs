@@ -39,8 +39,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(Code(H.ToggleSquad.ExecuteAsync(squad.Last()).GetAwaiter().GetResult()), Is.EqualTo("hub.squad_empty"));
 
             for (int i = 0; i < squad.Count - 1; i++) H.ToggleSquad.ExecuteAsync(squad[i]).GetAwaiter().GetResult();
-            _app.Session.Wallet.Set(0, 1000);
-            Assert.That(H.Recruit.ExecuteAsync(new MemberId("etincelle")).GetAwaiter().GetResult().IsSuccess);
+            _app.Session.Roster.Add(new TeamMember(_app.Session.Content.Member(new MemberId("etincelle")), MetaRules.RecruitLevel));
             Assert.That(Code(H.ToggleSquad.ExecuteAsync(new MemberId("etincelle")).GetAwaiter().GetResult()), Is.EqualTo("hub.squad_full"));
             Assert.That(_app.Received<RosterChanged>().Count, Is.GreaterThan(0));
         }
@@ -62,23 +61,6 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(Code(H.Train.ExecuteAsync(ancre.Id).GetAwaiter().GetResult()), Is.EqualTo("hub.max_level"));
         }
 
-        [Test, Description("Vérifie que recruter coûte le prix de la rareté en PR, place la recrue dans l'escouade s'il y a de la place et refuse doublon, PR insuffisants ou membre inconnu — parce que le recrutement est un choix direct à coût fixe (GDD §7)")]
-        public void Recruit_CostsRecruitCostByRarity_JoinsSquadIfRoom_AlreadyOwned_Fails()
-        {
-            var def = _app.Session.Content.Member(new MemberId("etincelle"));
-            int cost = MetaRules.RecruitCost(def.Rarity);
-            _app.Session.Wallet.Set(0, cost);
-            var first = _app.Session.Squad.First().Id;
-            H.ToggleSquad.ExecuteAsync(first).GetAwaiter().GetResult();     // une place libre
-            Assert.That(H.Recruit.ExecuteAsync(def.Id).GetAwaiter().GetResult().IsSuccess);
-            Assert.That(_app.Session.Wallet.Pr, Is.EqualTo(0));
-            Assert.That(_app.Session.Find(def.Id)!.InSquad, Is.True);
-            Assert.That(_app.Session.Find(def.Id)!.Level, Is.EqualTo(MetaRules.RecruitLevel));
-            Assert.That(Code(H.Recruit.ExecuteAsync(def.Id).GetAwaiter().GetResult()), Is.EqualTo("hub.owned"));
-            Assert.That(Code(H.Recruit.ExecuteAsync(new MemberId("arc")).GetAwaiter().GetResult()), Is.EqualTo("hub.pr"));
-            Assert.That(Code(H.Recruit.ExecuteAsync(new MemberId("inconnu")).GetAwaiter().GetResult()), Is.EqualTo("hub.unknown"));
-        }
-
         [Test, Description("Vérifie que l'infirmerie refuse sans fatigue, puis coûte 150 Crédits et retire 30 % de fatigue à tout l'effectif — parce que ce sont les règles du QG du prototype")]
         public void Heal_NoFatigue_FailsNothingToHeal_Else_CostsInfirmaryCost_ReducesAll()
         {
@@ -89,15 +71,6 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Roster.All(m => m.Fatigue == 50 - MetaRules.InfirmaryReduction));
             Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(0));
             Assert.That(Code(H.Heal.ExecuteAsync().GetAwaiter().GetResult()), Is.EqualTo("hub.credits"));
-        }
-
-        [Test, Description("Vérifie que la liste de recrutement exclut les membres déjà possédés — parce qu'il n'y a pas de doublons au recrutement (GDD §7)")]
-        public void AvailableRecruits_ExcludesOwned()
-        {
-            var owned = _app.Session.Roster.Select(m => m.Id).ToList();
-            var available = ((ISessionReadModel)_app.Session).AvailableRecruits();
-            Assert.That(available.Any(d => owned.Contains(d.Id)), Is.False);
-            Assert.That(available.Count + owned.Count, Is.EqualTo(_app.Session.Content.Members.Count));
         }
     }
 }

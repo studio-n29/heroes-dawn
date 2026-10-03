@@ -16,7 +16,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action? DeployClicked;
         public event Action<MemberId>? SquadToggleClicked;
         public event Action<MemberId>? TrainClicked;
-        public event Action<MemberId>? RecruitClicked;
+        public event Action<int>? RecruitClicked;
+        public event Action? RerollClicked;
 
         public readonly FakeWalletView WalletView = new FakeWalletView();
         public IWalletView Wallet => WalletView;
@@ -34,6 +35,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void ClickDeploy() => DeployClicked?.Invoke();
         public void ClickSquad(MemberId id) => SquadToggleClicked?.Invoke(id);
         public void ClickTrain(MemberId id) => TrainClicked?.Invoke(id);
-        public void ClickRecruit(MemberId id) => RecruitClicked?.Invoke(id);
+        public void ClickRecruit(int slot) => RecruitClicked?.Invoke(slot);
+        public void ClickReroll() => RerollClicked?.Invoke();
     }
 }

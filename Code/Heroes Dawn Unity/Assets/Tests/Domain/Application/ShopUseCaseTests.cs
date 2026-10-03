@@ -141,6 +141,17 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Find(id)!.InSquad, Is.False);
         }
 
+        [Test, Description("Vérifie qu'une recrue achetée hors partie rejoint l'escouade s'il y a une place — parce que c'était la règle du recrutement et elle reste (spec §4)")]
+        public void Recruit_SquadHasRoom_JoinsSquad()
+        {
+            Assert.That(_app.Hub.ToggleSquad.ExecuteAsync(new MemberId("ancre")).GetAwaiter().GetResult().IsSuccess);
+            Open();
+            _app.Session.Wallet.Set(0, 5000);
+            var id = Shop.Offers[0].Id;
+            Assert.That(Code(Recruit(0)), Is.EqualTo("ok"));
+            Assert.That(_app.Session.Find(id)!.InSquad, Is.True);
+        }
+
         [Test, Description("Vérifie que le premier renouvellement du jour est gratuit et que le suivant coûte 100 Crédits — parce que ce sont les règles validées (spec §3)")]
         public void Reroll_FirstFree_ThenCosts100()
         {

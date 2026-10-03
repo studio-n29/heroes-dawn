@@ -57,13 +57,15 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.IsTrue(_session.Roster.All(m => m.Fatigue == 30));
         }
 
-        [Test, Description("Vérifie le parcours QG complet : recruter un Agent, refuser une Élite trop chère, gérer l'escouade et entraîner — parce que ces actions s'enchaînent ainsi en jeu")]
+        [Test, Description("Vérifie le parcours QG complet : recruter un Agent dans la boutique, refuser une Élite trop chère, gérer l'escouade et entraîner — parce que ces actions s'enchaînent ainsi en jeu")]
         public void Hub_RecruitTrainSquadRules()
         {
             _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
-            Assert.IsTrue(_app.Hub.Recruit.ExecuteAsync(new MemberId("etincelle")).GetAwaiter().GetResult().IsSuccess, "Agent à 150 PR");
+            _app.Shop.Open.ExecuteAsync().GetAwaiter().GetResult();
+            int Slot(string id) => _session.Shop.Offers.Select((o, i) => (o, i)).First(x => x.o.Id.Value == id).i;
+            Assert.IsTrue(_app.Shop.Recruit.ExecuteAsync(Slot("etincelle")).GetAwaiter().GetResult().IsSuccess, "Agent à 150 PR");
             Assert.AreEqual(MetaRules.StartPr - 150, _session.Wallet.Pr);
-            Assert.IsTrue(_app.Hub.Recruit.ExecuteAsync(new MemberId("arc")).GetAwaiter().GetResult().IsFailure, "Élite trop chère");
+            Assert.IsTrue(_app.Shop.Recruit.ExecuteAsync(Slot("arc")).GetAwaiter().GetResult().IsFailure, "Élite trop chère");
             Assert.AreEqual(4, _session.Squad.Count, "escouade pleine : la recrue reste en réserve");
             Assert.IsTrue(_app.Hub.ToggleSquad.ExecuteAsync(new MemberId("etincelle")).GetAwaiter().GetResult().IsFailure);
             Assert.IsTrue(_app.Hub.ToggleSquad.ExecuteAsync(new MemberId("seve")).GetAwaiter().GetResult().IsSuccess);

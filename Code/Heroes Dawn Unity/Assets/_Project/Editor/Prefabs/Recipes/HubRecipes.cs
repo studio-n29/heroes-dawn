@@ -125,9 +125,22 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ((RectTransform)fill.transform.Find("Skills")).sizeDelta = new Vector2(360, 80);
             var recruit = Ui.Btn(fill.transform, "", Theme.Pr, Theme.TextDark, null!, 28, FontKind.Title, "Recruit");
             recruit.Rect.At(0f, 0f, 14, 16, 356, 62);
+            // Bande de rareté (Agent / Élite / Légende) en bas de carte.
+            var rarityBand = Ui.Img(fill.transform, "RarityBand", Theme.Primary, Sprites.Rounded);
+            rarityBand.rectTransform.BottomBand(8, 0);
+            // État « Recruté » : corps de carte estompé, tampon net par-dessus (hors du groupe estompé).
+            var group = fill.gameObject.AddComponent<CanvasGroup>();
+            var stamp = Ui.Txt(frame, "", 64, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Stamp");
+            stamp.rectTransform.At(0.5f, 0.5f, 0, 20, 360, 90);
+            stamp.rectTransform.localRotation = Quaternion.Euler(0, 0, 12);
+            stamp.Inked();
+            stamp.gameObject.SetActive(false);
             var view = frame.gameObject.AddComponent<RecruitCardView>();
             wire(view);
             ctx.Wire(view, "recruit", recruit);
+            ctx.Wire(view, "group", group);
+            ctx.Wire(view, "stamp", stamp);
+            ctx.Wire(view, "rarityBand", rarityBand);
             return frame.gameObject;
         }
     }
@@ -190,6 +203,15 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             empty.rectTransform.At(0.5f, 1f, 0, -20, 1180, 200);
             empty.gameObject.SetActive(false);
 
+            // ---- Barre de la boutique éphémère (onglet Boutique) : sous la rangée de 3 cartes.
+            var shopBar = Ui.Rect(left, "ShopBar");
+            shopBar.At(0f, 1f, 0, -500, 1200, 84);
+            var countdown = Ui.Txt(shopBar, "", 30, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "Countdown");
+            countdown.rectTransform.At(0f, 0.5f, 8, 0, 720, 70);
+            var reroll = Ui.Btn(shopBar, "", Theme.Credits, Theme.TextDark, null!, 30, FontKind.Title, "Reroll");
+            reroll.Rect.At(1f, 0.5f, -4, 0, 440, 76);
+            shopBar.gameObject.SetActive(false);
+
             // ---- Colonne droite : opérations
             var ops = Ui.Panel(rt, "Ops", Theme.Surface, 5f, 10f, true);
             var opsFrame = ops.Frame();
@@ -246,6 +268,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "reset", reset);
             ctx.Wire(view, "heal", heal);
             ctx.Wire(view, "deploy", deploy);
+            ctx.Wire(view, "shopBar", shopBar.gameObject);
+            ctx.Wire(view, "shopCountdown", countdown);
+            ctx.Wire(view, "reroll", reroll);
             ctx.Wire(view, "grid", grid);
             ctx.Wire(view, "scroll", scroll);
             ctx.Wire(view, "objectives", objectives);

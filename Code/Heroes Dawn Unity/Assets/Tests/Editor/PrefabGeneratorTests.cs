@@ -91,5 +91,13 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(pills.Count, Is.EqualTo(2));
             foreach (var p in pills) Assert.That(FillColor(p.gameObject), Is.EqualTo(Color.magenta));
         }
+
+        [Test, Description("Vérifie que -overwrite liste les seuls prefabs à écraser et qu'en son absence rien n'est sélectionné — parce qu'écraser tous les prefabs renouvelle leurs identifiants internes et casse les retouches imbriquées")]
+        public void BatchArgs_Overwrite_SelectsListedPrefabsOnly()
+        {
+            var selected = PrefabGenerator.SelectedFromArgs(new[] { "Unity.exe", "-overwrite", "Screens/Hub.prefab,Widgets/RecruitCard.prefab", "-quit" });
+            Assert.That(selected, Is.EquivalentTo(new[] { "Screens/Hub.prefab", "Widgets/RecruitCard.prefab" }));
+            Assert.That(PrefabGenerator.SelectedFromArgs(new[] { "Unity.exe", "-quit" }), Is.Null);
+        }
     }
 }

@@ -90,13 +90,26 @@ namespace N29.HeroesDawn.EditorTools.Prefabs
             AssetDatabase.SaveAssets();
         }
 
-        /// <summary>Batchmode : -executeMethod … PrefabGenerator.GenerateAllBatch [-overwritePrefabs]. Code de sortie 1 si une recette échoue.</summary>
+        /// <summary>
+        /// Batchmode : -executeMethod … PrefabGenerator.GenerateAllBatch [-overwritePrefabs | -overwrite Screens/Hub.prefab,Widgets/X.prefab].
+        /// Code de sortie 1 si une recette échoue.
+        /// </summary>
         public static void GenerateAllBatch()
         {
-            bool overwrite = Environment.GetCommandLineArgs().Contains("-overwritePrefabs");
-            var report = Generate(DefaultRoot, overwrite ? OverwritePolicy.All : OverwritePolicy.Never);
+            var args = Environment.GetCommandLineArgs();
+            var selected = SelectedFromArgs(args);
+            var policy = args.Contains("-overwritePrefabs") ? OverwritePolicy.All : selected != null ? OverwritePolicy.Selected : OverwritePolicy.Never;
+            var report = Generate(DefaultRoot, policy, selected);
             Debug.Log("[Heroes Dawn] Prefabs : " + report);
             if (report.Failed.Count > 0 && Application.isBatchMode) EditorApplication.Exit(1);
+        }
+
+        /// <summary>Chemins relatifs listés après <c>-overwrite</c> (séparés par des virgules) ; null si l'option est absente.</summary>
+        public static ISet<string>? SelectedFromArgs(string[] args)
+        {
+            int i = Array.IndexOf(args, "-overwrite");
+            if (i < 0 || i + 1 >= args.Length) return null;
+            return new HashSet<string>(args[i + 1].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()));
         }
 
         [MenuItem("Heroes Dawn/Setup/Générer les prefabs d'écran")]

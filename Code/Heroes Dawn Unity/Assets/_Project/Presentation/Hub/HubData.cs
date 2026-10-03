@@ -42,6 +42,10 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         public MemberCardData Card;
         public string RecruitLabel;
+        /// <summary>Emplacement dans la boutique (0 à 2).</summary>
+        public int Slot;
+        public bool Recruited;
+        public string StampText;
         public bool RecruitEnabled;
     }
 
@@ -64,6 +68,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         public TeamCardData[] Team;
         public RecruitCardData[] Recruits;
         public string EmptyRecruitText;
+        public string ShopCountdown;
+        public string RerollLabel;
+        public bool RerollEnabled;
         public string[] ZoneObjectives;
         public string ZoneStatus;
         public bool ZoneDone;
@@ -77,7 +84,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public static HubData Empty => new HubData
         {
             PlayerLine = "", Hint = "", Team = Array.Empty<TeamCardData>(), Recruits = Array.Empty<RecruitCardData>(),
-            EmptyRecruitText = "", ZoneObjectives = Array.Empty<string>(), ZoneStatus = "", SquadTitle = "",
+            EmptyRecruitText = "", ShopCountdown = "", RerollLabel = "", ZoneObjectives = Array.Empty<string>(), ZoneStatus = "", SquadTitle = "",
             Squad = Array.Empty<SquadSlotData>(), HealLabel = "", DeployHint = ""
         };
     }

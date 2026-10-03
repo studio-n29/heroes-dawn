@@ -7,13 +7,16 @@ using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Hub;
+using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
+using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Combat;
+using N29.HeroesDawn.Domain.Shop;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 
@@ -23,13 +26,17 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// QG : construit les cartes et la salle des opérations depuis la session, exécute les actions une à une
     /// (erreur affichée, message de réussite), déploie l'escouade une seule fois puis demande le plateau.
     /// </summary>
-    public sealed class HubPresenter : PresenterBase<IHubView>
+    public sealed class HubPresenter : PresenterBase<IHubView>, VContainer.Unity.ITickable
     {
         readonly ISessionReadModel _session;
         readonly ZoneId _firstZone;
         readonly IToggleSquadUseCase _toggleSquad;
         readonly ITrainMemberUseCase _train;
-        readonly IRecruitMemberUseCase _recruit;
+        readonly IOpenShopUseCase _openShop;
+        readonly IRecruitFromShopUseCase _recruit;
+        readonly IRerollShopUseCase _reroll;
+        readonly IClock _clock;
+        readonly ISubscriber<ShopChanged> _shopChanged;
         readonly IHealRosterUseCase _heal;
         readonly IStartZoneUseCase _startZone;
         readonly ISignOutUseCase _signOut;
@@ -52,16 +59,35 @@ namespace N29.HeroesDawn.Presentation.Hub
         public int RefreshCount { get; private set; }
 
         public HubPresenter(IHubView view, ISessionReadModel session, ZoneId firstZone,
-                            IToggleSquadUseCase toggleSquad, ITrainMemberUseCase train, IRecruitMemberUseCase recruit, IHealRosterUseCase heal,
+                            IToggleSquadUseCase toggleSquad, ITrainMemberUseCase train, IHealRosterUseCase heal,
+                            IOpenShopUseCase openShop, IRecruitFromShopUseCase recruit, IRerollShopUseCase reroll, IClock clock,
                             IStartZoneUseCase startZone, ISignOutUseCase signOut, IResetProgressUseCase reset,
                             ISubscriber<RosterChanged> rosterChanged, ISubscriber<WalletChanged> walletChanged, ISubscriber<SaveStateChanged> saving,
-                            IPublisher<NavigateRequested> navigate, IModalService modals, IToastService toasts, ILocalization loc)
+                            ISubscriber<ShopChanged> shopChanged, IPublisher<NavigateRequested> navigate,
+                            IModalService modals, IToastService toasts, ILocalization loc)
             : base(view, null)
         {
-            _session = session; _firstZone = firstZone; _toggleSquad = toggleSquad; _train = train; _recruit = recruit; _heal = heal;
+            _session = session; _firstZone = firstZone; _toggleSquad = toggleSquad; _train = train; _heal = heal;
+            _openShop = openShop; _recruit = recruit; _reroll = reroll; _clock = clock; _shopChanged = shopChanged;
             _startZone = startZone; _signOut = signOut; _reset = reset; _rosterChanged = rosterChanged; _walletChanged = walletChanged;
             _saving = saving; _navigate = navigate; _modals = modals; _toasts = toasts; _loc = loc;
         }
+
+        int _lastMinute = -1;
+
+        /// <summary>Une fois par minute, tant que le QG est affiché : rouvre la boutique (nouveau tirage à 9h00) et met à jour le compte à rebours.</summary>
+        public void Tick()
+        {
+            if (Disposed || !View.IsVisible) return;
+            var now = _clock.LocalNow;
+            int minute = now.Hour * 60 + now.Minute;
+            if (minute == _lastMinute) return;
+            _lastMinute = minute;
+            OpenShop();
+            Refresh();
+        }
+
+        void OpenShop() => _openShop.ExecuteAsync(Lifetime).Forget();
 
         protected override void OnStart()
         {
@@ -74,6 +100,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.SquadToggleClicked += ToggleSquad;
             View.TrainClicked += Train;
             View.RecruitClicked += Recruit;
+            View.RerollClicked += Reroll;
         }
 
         protected override void OnDispose()
@@ -88,6 +115,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.SquadToggleClicked -= ToggleSquad;
             View.TrainClicked -= Train;
             View.RecruitClicked -= Recruit;
+            View.RerollClicked -= Reroll;
         }
 
         protected override void OnShown()
@@ -97,7 +125,11 @@ namespace N29.HeroesDawn.Presentation.Hub
             var bag = DisposableBag.CreateBuilder();
             _rosterChanged.Subscribe(_ => Refresh()).AddTo(bag);
             _walletChanged.Subscribe(_ => Refresh()).AddTo(bag);
+            _shopChanged.Subscribe(_ => Refresh()).AddTo(bag);
             _subs = bag.Build();
+            var now = _clock.LocalNow;
+            _lastMinute = now.Hour * 60 + now.Minute;
+            OpenShop();
             Refresh();
         }
 
@@ -131,10 +163,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             else
             {
-                d.Hint = _loc.T("hub.recruit.hint");
-                var list = s.AvailableRecruits();
-                d.Recruits = list.Select(RecruitCard).ToArray();
-                d.EmptyRecruitText = list.Count == 0 ? _loc.T("hub.recruit.empty") : "";
+                d.Hint = _loc.T("shop.title");
+                var offers = s.Shop.Offers;
+                d.Recruits = offers.Select(RecruitCard).ToArray();
+                d.EmptyRecruitText = offers.Count == 0 ? _loc.T("shop.empty") : "";
+                d.ShopCountdown = Countdown();
+                int cost = ShopRules.RerollCost(s.Shop.Draw, s.Content.Balance);
+                d.RerollLabel = cost == 0 ? _loc.T("shop.reroll.free") : _loc.F("shop.reroll.cost", cost);
+                d.RerollEnabled = offers.Count > 0 && s.Wallet.Credits >= cost;
             }
 
             var zone = s.Content.Zones.FirstOrDefault(z => z.Id == _firstZone);
@@ -189,15 +225,28 @@ namespace N29.HeroesDawn.Presentation.Hub
             };
         }
 
-        RecruitCardData RecruitCard(MemberDef d)
+        RecruitCardData RecruitCard(ShopOffer offer, int slot)
         {
+            var d = _session.Content.Members.First(m => m.Id == offer.Id);
             int cost = MetaRules.RecruitCost(d.Rarity);
             return new RecruitCardData
             {
                 Card = Card(d, MetaRules.RecruitLevel),
+                Slot = slot,
+                Recruited = offer.Recruited,
+                StampText = _loc.T("shop.recruited"),
                 RecruitLabel = _loc.F("hub.recruit", cost),
-                RecruitEnabled = _session.Wallet.Pr >= cost,
+                RecruitEnabled = !offer.Recruited && _session.Wallet.Pr >= cost,
             };
+        }
+
+        /// <summary>« Nouveaux héros dans 5 h 12 » ; en minutes sous une heure.</summary>
+        string Countdown()
+        {
+            var now = _clock.LocalNow;
+            var next = ShopDay.NextReset(now, _session.Content.Balance.ShopResetHour);
+            int minutes = Math.Max(1, (int)Math.Ceiling((next - now).TotalMinutes));
+            return minutes < 60 ? _loc.F("shop.countdown.m", minutes) : _loc.F("shop.countdown.h", minutes / 60, minutes % 60);
         }
 
         SquadSlotData SquadSlot(ITeamMemberReadModel m)
@@ -236,13 +285,35 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (m != null) _toasts.Show(_loc.F("hub.trained", _loc.MemberName(m.Def), m.Level), ToastKind.Reward);
         });
 
-        void Recruit(MemberId id)
+        void Recruit(int slot)
         {
-            var def = _session.Content.Members.FirstOrDefault(m => m.Id == id);
-            Act(ct => _recruit.ExecuteAsync(id, ct), () =>
+            var offers = _session.Shop.Offers;
+            var def = slot >= 0 && slot < offers.Count ? _session.Content.Members.FirstOrDefault(m => m.Id == offers[slot].Id) : null;
+            Act(ct => _recruit.ExecuteAsync(slot, ct), () =>
             {
                 if (def != null) _toasts.Show(_loc.F("hub.recruited", _loc.MemberName(def)), ToastKind.Reward);
             });
+        }
+
+        /// <summary>Renouveler : direct si gratuit, sinon après confirmation de la dépense.</summary>
+        void Reroll()
+        {
+            int cost = ShopRules.RerollCost(_session.Shop.Draw, _session.Content.Balance);
+            if (cost == 0) { Act(ct => _reroll.ExecuteAsync(ct)); return; }
+            if (_acting.IsBusy) return;
+            RerollPaidAsync(cost).Forget();
+        }
+
+        async UniTaskVoid RerollPaidAsync(int cost)
+        {
+            bool ok;
+            try
+            {
+                ok = await _modals.ConfirmAsync(new ConfirmData(_loc.T("shop.reroll.confirm.title"), _loc.F("shop.reroll.confirm.body", cost),
+                                                                _loc.T("ui.confirm"), _loc.T("ui.cancel"), Tone.Primary), Lifetime);
+            }
+            catch (OperationCanceledException) { return; }
+            if (ok && !Disposed) Act(ct => _reroll.ExecuteAsync(ct));
         }
 
         void Heal() => Act(ct => _heal.ExecuteAsync(ct), () => _toasts.Show(_loc.T("hub.healed"), ToastKind.Reward));

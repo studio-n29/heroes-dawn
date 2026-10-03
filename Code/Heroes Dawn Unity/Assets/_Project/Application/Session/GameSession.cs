@@ -108,13 +108,6 @@ namespace N29.HeroesDawn.Application.Session
         IReadOnlyCollection<string> ISessionReadModel.CompletedZones => CompletedZones;
         IShopReadModel ISessionReadModel.Shop => Shop;
 
-        public IReadOnlyList<MemberDef> AvailableRecruits()
-        {
-            var list = new List<MemberDef>();
-            foreach (var m in Content.Members) if (!Owns(m.Id)) list.Add(m);
-            return list;
-        }
-
         public TeamMember? Find(MemberId id)
         {
             foreach (var m in Roster) if (m.Id == id) return m;
