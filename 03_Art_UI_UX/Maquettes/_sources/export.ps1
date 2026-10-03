@@ -3,6 +3,7 @@
 #         pwsh export.ps1 -Only M10,M11
 param([string[]]$Only)
 $ErrorActionPreference = 'Stop'
+if ($Only) { $Only = $Only -split "," | ForEach-Object { $_.Trim() } }
 $edge = @("${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe", "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
 if (-not $edge) { throw "Microsoft Edge introuvable." }
 $src = $PSScriptRoot
@@ -19,9 +20,11 @@ foreach ($p in $pages) {
     $dir = Join-Path $root $out
     New-Item -ItemType Directory -Force $dir | Out-Null
     $png = Join-Path $dir ($p.BaseName + '.png')
+    Remove-Item $png -ErrorAction SilentlyContinue
     $url = 'file:///' + $p.FullName.Replace([char]92, [char]47) + '?export=1'
     & $edge --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --user-data-dir="$profile" `
         --window-size=1920,1080 --virtual-time-budget=4000 --screenshot="$png" $url 2>$null | Out-Null
+    for ($i = 0; $i -lt 40 -and -not (Test-Path $png); $i++) { Start-Sleep -Milliseconds 500 }
     if (-not (Test-Path $png)) { throw "Export raté : $($p.Name)" }
     Write-Host "OK $ref -> $out/$($p.BaseName).png"
 }
