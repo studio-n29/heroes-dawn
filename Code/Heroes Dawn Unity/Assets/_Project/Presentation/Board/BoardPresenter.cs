@@ -449,6 +449,9 @@ namespace N29.HeroesDawn.Presentation.Board
         void RequestBackToHq()
         {
             if (_busy.IsBusy || Disposed) return;
+            // Combat ou case engagés (pause avant la scène de combat, transition en cours) : quitter abandonnerait la partie en cours.
+            if (_run != null && (_run.Phase == ZoneRunPhase.InCombat || _run.Phase == ZoneRunPhase.InCaseInteraction)) return;
+            if (_flow.IsTransitioning || _flow.Current != GameState.Board) return;
             BackToHqAsync().Forget();
         }
 

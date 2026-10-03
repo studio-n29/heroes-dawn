@@ -171,6 +171,19 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(Navigations, Is.EqualTo(new[] { GameState.Hub }));
         }
 
+        [Test, Description("Vérifie que Retour pendant le démarrage d'un combat (plateau encore affiché) n'ouvre pas « Retour au QG ? » — parce que confirmer abandonnerait un combat engagé sans retraite ni fatigue (relecture finale, Important 1)")]
+        public void Back_WhileCombatStarting_NoHqConfirm()
+        {
+            ChoosingAtN02();
+            Make();
+            _view.MapView.Tap("n03");
+            Assume.That(_app.Session.Run!.Phase, Is.EqualTo(ZoneRunPhase.InCombat));
+            _router.Dispatch();
+            _view.ClickBack();
+            Assert.That(_host.Spawned.OfType<FakeConfirmPopup>(), Is.Empty);
+            Assert.That(_app.Session.Run, Is.Not.Null);
+        }
+
         [Test, Description("Vérifie qu'un plateau masqué (combat par-dessus) ne répond plus à Retour — parce qu'Échap en combat ne doit jamais proposer « Retour au QG » (Review Focus 2)")]
         public void Back_WhenHidden_NotHandled()
         {
