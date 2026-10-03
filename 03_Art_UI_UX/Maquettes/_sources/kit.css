@@ -35,10 +35,11 @@ main > *, .abs, .topbar > * { position: absolute; }
 
 /* Case de BD */
 .panel { background-color: var(--panel); background-image: var(--dots); background-size: 12px 12px; border: 5px solid #000; border-radius: 14px; box-shadow: 9px 9px 0 #000; }
-.panel.img { background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.85)), var(--img) center/cover; }
+.panel.img { background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.88)), var(--img) var(--pos, center)/var(--size, cover); }
 .panel.flat { box-shadow: 5px 5px 0 #000; }
 .panel.hl { border-color: var(--yellow); box-shadow: 9px 9px 0 #000, 0 0 0 4px #000; }
-.panel.lock { filter: grayscale(1) brightness(.5); }
+.panel.lock { background-color: #15171D; color: var(--muted); }
+.panel.lock .caption { background: #6B7280; }
 .panel > .abs { position: absolute; }
 .panel .pad { position: absolute; inset: 22px; }
 .caption { position: absolute; left: -10px; top: -22px; background: var(--yellow); color: var(--ink); border: 4px solid #000; box-shadow: 5px 5px 0 #000; font-family: Bangers; font-weight: 400; letter-spacing: 1.2px; font-size: 30px; padding: 2px 14px; white-space: nowrap; }
@@ -71,14 +72,14 @@ main > *, .abs, .topbar > * { position: absolute; }
 .tab { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; gap: 14px; font-family: Bangers; font-size: 34px; letter-spacing: 1.5px; color: var(--muted); border-radius: 0 0 14px 14px; }
 .tab svg { width: 40px; height: 40px; fill: currentColor; }
 .tab.on { color: var(--ink); background: var(--yellow); border: 5px solid #000; border-top: none; box-shadow: 6px 6px 0 #000; margin-top: -5px; }
-.tab .badge { position: absolute; right: 22%; top: 8px; }
+.tab .badge { position: absolute; right: 8%; top: -16px; }
 
 /* Petits éléments */
 .badge { min-width: 42px; height: 42px; border-radius: 21px; background: var(--red); color: #fff; border: 4px solid #000; font-family: Bangers; font-size: 24px; display: flex; align-items: center; justify-content: center; padding: 0 8px; z-index: 3; }
 .badge.y { background: var(--yellow); color: var(--ink); }
 .chip { display: inline-flex; align-items: center; gap: 6px; border: 3px solid #000; border-radius: 20px; padding: 2px 14px; font-size: 20px; color: var(--ink); background: var(--white); }
 .chip.dark { background: #14171F; color: #fff; }
-.tag { display: inline-block; font-family: Bangers; font-size: 22px; letter-spacing: 1px; padding: 0 10px; border: 3px solid #000; border-radius: 8px; color: var(--ink); background: var(--yellow); }
+.tag { text-shadow: none; display: inline-block; font-family: Bangers; font-size: 22px; letter-spacing: 1px; padding: 0 10px; border: 3px solid #000; border-radius: 8px; color: var(--ink); background: var(--yellow); }
 .sep { border-top: 3px solid var(--line); }
 
 /* Jauges */
@@ -137,3 +138,15 @@ main > *, .abs, .topbar > * { position: absolute; }
 /* Prototype cliquable */
 [data-go] { cursor: pointer; }
 body:not(.export) [data-go]:hover { outline: 4px dashed var(--blue); outline-offset: 4px; }
+
+/* Listes et cartes */
+.list { display: flex; flex-direction: column; gap: 12px; }
+.item { display: flex; align-items: center; gap: 16px; background: #171A22; border: 4px solid #000; border-radius: 12px; padding: 10px 14px; }
+.item .grow { flex: 1; min-width: 0; }
+.item.done { opacity: .55; }
+.mini { position: relative; width: 76px; height: 76px; flex: none; border: 4px solid #000; border-radius: 10px; background: var(--img) center 20%/cover; box-shadow: 3px 3px 0 #000; }
+.mini::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 7px; background: var(--fam, #888); }
+.slot-empty { border: 4px dashed var(--line); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-family: Bangers; font-size: 30px; letter-spacing: 1px; }
+.timer { font-family: Bangers; letter-spacing: 1px; font-size: 30px; color: var(--yellow); }
+.h { font-family: Bangers; font-weight: 400; letter-spacing: 1.2px; font-size: 34px; }
+.small { font-size: 20px; } .tiny { font-size: 17px; }

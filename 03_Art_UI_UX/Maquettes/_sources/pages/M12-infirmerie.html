@@ -1,0 +1,49 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><link rel="stylesheet" href="../kit.css"><script src="../kit.js" defer></script></head>
+<body data-ref="M12" data-title="Infirmerie · Niv. 2" data-group="Onglet QG" data-mode="hub" data-tab="qg" data-back="M10" data-badges="recruter:N,pass:2">
+<main>
+  <div class="bg heavy" style="--img:url(../../Identite/HD_Illustration_Landscape_4K.png)"></div>
+
+  <!-- Emplacements de récupération -->
+  <div class="panel" style="left:88px;top:150px;width:560px;height:330px">
+    <span class="caption">LIT 1</span>
+    <div class="abs portrait fam-physique" style="left:24px;top:46px;width:180px;height:230px;--img:url(img/p_colosse.jpg)"></div>
+    <div class="abs t ink" style="left:230px;top:50px;font-size:40px">COLOSSE</div>
+    <div class="abs n small muted" style="left:230px;top:100px">Physique/Bio · force</div>
+    <div class="abs n small" style="left:230px;top:140px">Fatigue <span class="orange">74 %</span> → 0 %</div>
+    <div class="abs bar fat warn" style="left:230px;top:176px;width:300px;--v:74%"></div>
+    <div class="abs n tiny muted" style="left:230px;top:210px">Récupération ×2 (infirmerie niv. 2)</div>
+    <div class="abs timer" style="left:230px;top:236px">01:20:05</div>
+  </div>
+  <div class="slot-empty abs" style="left:680px;top:150px;width:560px;height:330px;flex-direction:column;gap:8px"><span style="font-size:70px">+</span>LIT LIBRE</div>
+  <div class="panel" style="left:1272px;top:150px;width:560px;height:330px">
+    <span class="caption white">TROUSSE DE SOIN</span>
+    <div class="abs n small" style="left:24px;top:50px;width:510px;line-height:1.4">Retire 30 % de fatigue à un membre, sans lit ni attente.</div>
+    <div class="abs t" style="left:24px;top:150px;font-size:44px">EN STOCK : 2</div>
+    <div class="abs btn secondary" style="left:24px;top:214px;width:510px;height:90px;font-size:32px">UTILISER UNE TROUSSE</div>
+  </div>
+
+  <!-- Effectif -->
+  <div class="panel" style="left:88px;top:520px;width:1744px;height:420px">
+    <span class="caption">EFFECTIF · TRIÉ PAR FATIGUE</span>
+    <div class="abs seg" style="right:24px;top:24px;width:560px"><span class="on">FATIGUE</span><span>NIVEAU</span><span>FAMILLE</span></div>
+    <div class="abs list" style="left:24px;right:24px;top:96px;gap:10px">
+      <div class="item"><div class="mini fam-perception" style="--img:url(img/p_noir.jpg);width:64px;height:64px"></div><div class="grow"><div class="t" style="font-size:30px">ÉCHO <span class="tiny muted n">Perception · niv. 6</span></div><div class="bar fat max" style="--v:100%;margin-top:6px"><span>100 % · INDISPONIBLE</span></div></div><div class="btn primary small" style="width:200px;height:72px">PLACER</div></div>
+      <div class="item"><div class="mini fam-elementaire" style="--img:url(img/p_blanc.jpg);width:64px;height:64px"></div><div class="grow"><div class="t" style="font-size:30px">GIVRE <span class="tiny muted n">Élémentaire · niv. 8</span></div><div class="bar fat warn" style="--v:63%;margin-top:6px"><span>63 % · MALUS −10 %</span></div></div><div class="btn secondary small" style="width:200px;height:72px">PLACER</div></div>
+      <div class="item"><div class="mini fam-matiere" style="--img:url(img/p_rouge.jpg);width:64px;height:64px"></div><div class="grow"><div class="t" style="font-size:30px">VERRE <span class="tiny muted n">Matière · niv. 5</span></div><div class="bar fat" style="--v:22%;margin-top:6px"><span>22 %</span></div></div><div class="btn secondary small" style="width:200px;height:72px">PLACER</div></div>
+    </div>
+  </div>
+
+  <i class="pin" data-n="1" style="left:60px;top:315px"></i>
+  <i class="pin" data-n="2" style="left:655px;top:315px"></i>
+  <i class="pin" data-n="3" style="left:1250px;top:315px"></i>
+  <i class="pin" data-n="4" style="left:60px;top:730px"></i>
+  <i class="pin" data-n="5" style="left:1240px;top:560px"></i>
+</main>
+<ol class="legend">
+<li>Lit occupé : fatigue qui descend en temps réel, multiplicateur de l'infirmerie, minuteur restant.</li>
+<li>Lit libre : toucher = choisir un membre (le plus fatigué est proposé en premier).</li>
+<li>Trousse de soin : consommable utilisable sans lit ni attente.</li>
+<li>Effectif trié par fatigue décroissante. Jauge verte sous 60 %, orange au-delà (malus affiché en clair), rouge à 100 % (indisponible) : la couleur est toujours doublée d'un libellé.</li>
+<li>Tri par fatigue, niveau ou famille.</li>
+</ol>
+</body></html>
