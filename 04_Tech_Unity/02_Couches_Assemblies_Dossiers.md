@@ -9,17 +9,19 @@
 | `N29.HeroesDawn.Core` | Core | **Non** (`noEngineReferences`) | — | Ids typés, `Fixed`, `IRandom`/`Pcg32`, `Result<T>`, `IDomainEvent`, collections déterministes |
 | `N29.HeroesDawn.Definitions` | Core | Non | Core | Définitions immuables du contenu (`MemberDef`, `SkillDef`, `ZoneDef`…) et `BalanceConfig` |
 | `N29.HeroesDawn.Domain.*` (un par module) | Domaine | Non | Core, Definitions, autres modules **listés** (voir graphe) | État + règles + simulation |
-| `N29.HeroesDawn.Application` | Application | Non | Core, Definitions, Domain.* | Use cases, ports, `GameSession`, handlers |
-| `N29.HeroesDawn.Infrastructure` | Infrastructure | Oui | Application, Domain.*, Definitions, Core + SDK UGS, Addressables, IAP, Steamworks | Adaptateurs des ports |
+| `N29.HeroesDawn.Application` | Application | Non | Core, Definitions, Domain.*, **UniTask, MessagePipe** | Use cases (`Features/<Feature>/`), messages (`Messages/`), ports, `GameSession` + `ISessionReadModel`, `SaveScheduler` |
+| `N29.HeroesDawn.Infrastructure` | Infrastructure | Oui | Application, Domain.*, Definitions, Core, UniTask + SDK UGS, Addressables, IAP, Steamworks | Adaptateurs des ports |
 | `N29.HeroesDawn.Content` | Infrastructure | Oui | Definitions, Core | ScriptableObjects d'édition + conversion vers Definitions |
-| `N29.HeroesDawn.Presentation` | Présentation | Oui | Application (interfaces + événements), Definitions, Core, PrimeTween, MessagePipe | Vues, présentateurs, UI, audio |
-| `N29.HeroesDawn.Composition` | Composition | Oui | **Tout** | LifetimeScopes VContainer, GameFlow, point d'entrée |
+| `N29.HeroesDawn.Presentation` | Présentation | Oui | Application (interfaces de use cases, modèles de lecture, messages), Definitions, Core, UniTask, MessagePipe | Vues, présentateurs, UI, audio |
+| `N29.HeroesDawn.Composition` | Composition | Oui | **Tout** (dont VContainer, MessagePipe.VContainer) | `RootLifetimeScope`, `GameBootstrap` (point d'entrée) ; GameFlow et scopes de scène au sous-projet 2 |
 | `N29.HeroesDawn.Editor` | Outils | Éditeur | Tout | Éditeur de plateau, import d'équilibrage, simulateur |
-| `N29.HeroesDawn.Tests.Domain` | Tests | Non | Core, Definitions, Domain.*, Application | Tests unitaires (Test Runner ou batchmode) |
+| `N29.HeroesDawn.Tests.Domain` | Tests | Non | Core, Definitions, Domain.*, Application, Content, UniTask, MessagePipe | Tests unitaires (Test Runner ou batchmode) |
 | `N29.HeroesDawn.Tests.Editor` | Tests | Éditeur | Editor, Content, Domain.* | Tests des outils éditeur et de la configuration backend |
 | `N29.HeroesDawn.Tests.PlayMode` | Tests | Oui | Tout | Tests d'intégration en scène |
 
 Réglages des assemblies pures : `noEngineReferences: true`, `autoReferenced: false`, `overrideReferences: true` (aucune DLL implicite).
+
+**Packages figés (OpenUPM, 2026-10-02)** : VContainer 1.19.0, UniTask 2.5.11, MessagePipe 1.8.2, MessagePipe.VContainer 1.8.2. `Core`, `Definitions` et `Domain.*` n'en référencent aucun (test `DependencyGuardTests`).
 
 ## Graphe de dépendances
 ```mermaid

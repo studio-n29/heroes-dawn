@@ -19,5 +19,7 @@ Voir `SETUP.md`.
 
 **Tout se passe dans Unity** (décision 2026-10-02) : aucun script ni projet .NET hors du projet Unity.
 
+**Architecture** : use cases dans `Application/Features/<Feature>/` (un par intention, `UniTask<Result>`), messages dans `Application/Messages/` (MessagePipe), composition dans `Composition/RootLifetimeScope.cs` (VContainer). L'UI ne lit la session que par `ISessionReadModel`.
+
 ## Règles
 Les 12 règles d'architecture et les conventions sont dans `../04_Tech_Unity/08_Regles_Conventions.md`.
