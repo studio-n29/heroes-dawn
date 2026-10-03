@@ -1,0 +1,54 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><link rel="stylesheet" href="../kit.css"><script src="../kit.js" defer></script></head>
+<body data-ref="M20" data-title="Équipe · 12 membres" data-group="Onglet Équipe" data-mode="hub" data-tab="equipe" data-badges="recruter:N,pass:2">
+<main>
+  <div class="bg heavy" style="--img:url(../../Identite/HD_Illustration_Landscape_4K.png)"></div>
+
+  <!-- Filtres -->
+  <div class="abs rowf" style="left:88px;top:136px;gap:14px">
+    <div class="seg" style="width:640px"><span class="on">TOUS</span><span style="color:var(--matiere)">⬢ MAT.</span><span style="color:var(--elementaire)">≋ ÉLÉ.</span><span style="color:var(--physique)">✚ PHY.</span><span style="color:var(--perception)">◉ PER.</span></div>
+    <div class="seg" style="width:430px"><span class="on">NIVEAU ▾</span><span>RARETÉ</span><span>FATIGUE</span></div>
+  </div>
+
+  <!-- Escouade active -->
+  <div class="panel" style="left:1260px;top:136px;width:572px;height:804px">
+    <span class="caption">ESCOUADE DE MISSION</span>
+    <div class="abs" style="left:24px;top:50px;right:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="portrait fam-elementaire" style="position:relative;height:250px;--img:url(img/p_blanc.jpg)"><span class="abs t ink" style="left:10px;bottom:30px;font-size:28px">GIVRE</span><div class="abs bar fat warn" style="left:10px;right:10px;bottom:12px;height:14px;--v:63%"></div></div>
+      <div class="portrait fam-matiere" style="position:relative;height:250px;--img:url(img/p_rouge.jpg)"><span class="abs t ink" style="left:10px;bottom:30px;font-size:28px">VERRE</span><div class="abs bar fat" style="left:10px;right:10px;bottom:12px;height:14px;--v:22%"></div></div>
+      <div class="portrait fam-physique" style="position:relative;height:250px;--img:url(img/p_colosse.jpg)"><span class="abs t ink" style="left:10px;bottom:30px;font-size:28px">COLOSSE</span><div class="abs bar fat" style="left:10px;right:10px;bottom:12px;height:14px;--v:10%"></div></div>
+      <div class="slot-empty" style="height:250px;flex-direction:column;gap:6px"><span style="font-size:60px">+</span>AJOUTER</div>
+    </div>
+    <div class="abs n small" style="left:24px;top:600px;right:24px;line-height:1.4">Combos possibles : <span class="yellow">Projectiles chargés</span> (Givre + Verre), <span class="yellow">Armure forgée</span> (Verre + Colosse)…</div>
+    <div class="abs btn primary" data-go="M60" style="left:24px;top:690px;width:524px;height:86px">PRÉPARER UNE MISSION</div>
+  </div>
+
+  <!-- Grille de l'effectif -->
+  <div class="abs" style="left:88px;top:230px;width:1140px;display:grid;grid-template-columns:repeat(5,1fr);gap:22px">
+    <div class="portrait fam-elementaire" data-go="M21" style="position:relative;height:330px;--img:url(img/p_blanc.jpg);outline:6px solid var(--yellow)"><span class="abs tag" style="left:8px;top:8px;background:var(--silver)">ÉLITE</span><span class="abs t ink" style="left:10px;bottom:56px;font-size:30px">GIVRE</span><span class="abs n tiny" style="left:10px;bottom:30px">Niv. 8 · ≋</span><div class="abs bar fat warn" style="left:10px;right:10px;bottom:14px;height:12px;--v:63%"></div><span class="abs badge y" style="right:6px;top:6px;min-width:36px;height:36px;font-size:20px">E</span></div>
+    <div class="portrait fam-matiere" style="position:relative;height:330px;--img:url(img/p_rouge.jpg)"><span class="abs tag" style="left:8px;top:8px;background:var(--copper)">AGENT</span><span class="abs t ink" style="left:10px;bottom:56px;font-size:30px">VERRE</span><span class="abs n tiny" style="left:10px;bottom:30px">Niv. 5 · ⬢</span><div class="abs bar fat" style="left:10px;right:10px;bottom:14px;height:12px;--v:22%"></div><span class="abs badge y" style="right:6px;top:6px;min-width:36px;height:36px;font-size:20px">E</span></div>
+    <div class="portrait fam-physique" style="position:relative;height:330px;--img:url(img/p_colosse.jpg)"><span class="abs tag" style="left:8px;top:8px;background:var(--gold)">LÉGENDE</span><span class="abs t ink" style="left:10px;bottom:56px;font-size:30px">COLOSSE</span><span class="abs n tiny" style="left:10px;bottom:30px">Niv. 9 · ✚</span><div class="abs bar fat" style="left:10px;right:10px;bottom:14px;height:12px;--v:10%"></div><span class="abs badge y" style="right:6px;top:6px;min-width:36px;height:36px;font-size:20px">E</span></div>
+    <div class="portrait fam-perception" style="position:relative;height:330px;--img:url(img/p_noir.jpg)"><span class="abs tag" style="left:8px;top:8px;background:var(--silver)">ÉLITE</span><span class="abs t ink" style="left:10px;bottom:56px;font-size:30px">ÉCHO</span><span class="abs n tiny red" style="left:10px;bottom:30px">Niv. 6 · ◉ · épuisée</span><div class="abs bar fat max" style="left:10px;right:10px;bottom:14px;height:12px;--v:100%"></div></div>
+    <div class="portrait fam-elementaire" style="position:relative;height:330px;--img:url(img/p_blanc.jpg);filter:saturate(.3) brightness(.7)"><span class="abs tag" style="left:8px;top:8px;background:var(--copper)">AGENT</span><span class="abs t ink" style="left:10px;bottom:56px;font-size:30px">ÉTINCELLE</span><span class="abs n tiny" style="left:10px;bottom:30px">Niv. 3 · salon</span><div class="abs bar fat" style="left:10px;right:10px;bottom:14px;height:12px;--v:5%"></div></div>
+    <div class="portrait fam-matiere" style="position:relative;height:330px;--img:url(img/p_rouge.jpg);background-position:center 70%"><span class="abs tag" style="left:8px;top:8px;background:var(--copper)">AGENT</span><span class="abs t ink" style="left:10px;bottom:56px;font-size:30px">ROUILLE</span><span class="abs n tiny" style="left:10px;bottom:30px">Niv. 4 · ⬢</span><div class="abs bar fat" style="left:10px;right:10px;bottom:14px;height:12px;--v:30%"></div></div>
+    <div class="portrait fam-perception" style="position:relative;height:330px;--img:url(img/p_noir.jpg);background-position:center 75%"><span class="abs tag" style="left:8px;top:8px;background:var(--copper)">AGENT</span><span class="abs t ink" style="left:10px;bottom:56px;font-size:30px">INSTANT</span><span class="abs n tiny" style="left:10px;bottom:30px">Niv. 4 · ◉</span><div class="abs bar fat" style="left:10px;right:10px;bottom:14px;height:12px;--v:40%"></div></div>
+    <div class="portrait fam-physique" style="position:relative;height:330px;--img:url(img/p_colosse.jpg);background-position:center 75%"><span class="abs tag" style="left:8px;top:8px;background:var(--copper)">AGENT</span><span class="abs t ink" style="left:10px;bottom:56px;font-size:30px">MAILLON</span><span class="abs n tiny" style="left:10px;bottom:30px">Niv. 2 · ✚</span><div class="abs bar fat" style="left:10px;right:10px;bottom:14px;height:12px;--v:0%"></div></div>
+    <div class="portrait fam-elementaire" style="position:relative;height:330px;--img:url(img/p_blanc.jpg);background-position:center 80%"><span class="abs tag" style="left:8px;top:8px;background:var(--copper)">AGENT</span><span class="abs t ink" style="left:10px;bottom:56px;font-size:30px">BRASIER</span><span class="abs n tiny" style="left:10px;bottom:30px">Niv. 3 · ≋</span><div class="abs bar fat" style="left:10px;right:10px;bottom:14px;height:12px;--v:12%"></div></div>
+    <div class="slot-empty" data-go="M30" style="height:330px;flex-direction:column;gap:8px"><span style="font-size:60px">+</span>RECRUTER</div>
+  </div>
+
+  <i class="pin" data-n="1" style="left:60px;top:166px"></i>
+  <i class="pin" data-n="2" style="left:60px;top:400px"></i>
+  <i class="pin" data-n="3" style="left:470px;top:225px"></i>
+  <i class="pin" data-n="4" style="left:1240px;top:350px"></i>
+  <i class="pin" data-n="5" style="left:1240px;top:630px"></i>
+  <i class="pin" data-n="6" style="left:1240px;top:735px"></i>
+</main>
+<ol class="legend">
+<li>Filtres par famille (icône + couleur, jamais la couleur seule) et tri (niveau, rareté, fatigue).</li>
+<li>Effectif en grille de cartes : rareté, nom, niveau, famille et fatigue d'un coup d'œil ; un membre occupé (salon, infirmerie, expédition) est grisé avec son occupation, un membre épuisé est signalé en rouge.</li>
+<li>Pastille « E » : membre de l'escouade de mission. Toucher une carte = fiche complète (M21).</li>
+<li>Escouade de mission (4 places) toujours visible à droite : on la compose ici, sans passer par la préparation.</li>
+<li>Combos de l'escouade actuelle, pour aider à la composer.</li>
+<li>Action principale : préparer une mission avec cette escouade (carte de la ville).</li>
+</ol>
+</body></html>

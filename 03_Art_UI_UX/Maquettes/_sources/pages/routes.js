@@ -8,5 +8,11 @@ window.HD_ROUTES = {
  "M13": "M13-operations.html",
  "M14": "M14-labo.html",
  "M15": "M15-archives.html",
+ "M20": "M20-effectif.html",
+ "M21": "M21-fiche-membre.html",
+ "M30": "M30-recrutement.html",
+ "M31": "M31-confirmation-recrutement.html",
+ "M40": "M40-pass.html",
+ "M50": "M50-boutique.html",
  "DEMO": "_demo.html"
 };
