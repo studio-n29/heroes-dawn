@@ -32,6 +32,22 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public static N29.HeroesDawn.Presentation.Hub.HubPresenter HubPresenter()
             => Object.FindAnyObjectByType<N29.HeroesDawn.Composition.HubLifetimeScope>()!.Container.Resolve<N29.HeroesDawn.Presentation.Hub.HubPresenter>();
 
+        /// <summary>Présentateur du plateau (scope de la scène Board chargée, même masquée).</summary>
+        public static N29.HeroesDawn.Presentation.Board.BoardPresenter BoardPresenter()
+            => Object.FindAnyObjectByType<N29.HeroesDawn.Composition.BoardLifetimeScope>()!.Container.Resolve<N29.HeroesDawn.Presentation.Board.BoardPresenter>();
+
+        /// <summary>Toucher réel d'une case de la carte du plateau.</summary>
+        public static void TapNode(N29.HeroesDawn.Core.CaseId id)
+            => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Board.BoardMapView>()!.NodeButton(id).onClick.Invoke();
+
+        /// <summary>« Retour QG » sur le plateau puis « Valider » dans la confirmation.</summary>
+        public static IEnumerator BackToHqConfirmed()
+        {
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Board.BoardView>()!.BackButton.onClick.Invoke();
+            yield return WaitFor(() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Common.ConfirmPopupView>() != null);
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Common.ConfirmPopupView>()!.OkButton.Button.onClick.Invoke();
+        }
+
         public static bool Visible<T>() where T : Component
         {
             var s = Object.FindAnyObjectByType<T>();

@@ -89,10 +89,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             session.Run = ZoneRun.ForTests(session.Content, zone, 3UL, 1, true, "n02");
             session.RunZone = zone;
             Container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Board));
-            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardScreen>() && !Flow.IsTransitioning);
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning);
             yield return Capture("03-plateau");
 
-            Object.FindAnyObjectByType<BoardScreen>()!.TapNode(new N29.HeroesDawn.Core.CaseId("n03"));
+            PlayModeHarness.TapNode(new N29.HeroesDawn.Core.CaseId("n03"));
             yield return PlayModeHarness.WaitFor(() => SceneManager.GetSceneByName(SceneNames.Combat).isLoaded && !Flow.IsTransitioning, 600);
             yield return Capture("04-combat");
 

@@ -1,0 +1,35 @@
+#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Hub;
+using N29.HeroesDawn.Presentation.Mvp;
+
+namespace N29.HeroesDawn.Presentation.Board
+{
+    /// <summary>Plateau : carte, objectifs, escouade, dé, HUD. Les raccourcis (Espace, B, Entrée) sont relayés en intentions.</summary>
+    public interface IBoardView : IView
+    {
+        event Action? RollClicked;
+        event Action? BonusClicked;
+        event Action? EndMoveClicked;
+        event Action? BackClicked;
+
+        IWalletView Wallet { get; }
+        IBoardMapView Map { get; }
+
+        void SetZoneTitle(string title);
+        void ShowObjectives(IReadOnlyList<ObjectiveLineData> objectives);
+        void ShowSquad(IReadOnlyList<SquadSlotData> squad);
+        void ShowHud(BoardHudData hud);
+
+        /// <summary>Anime le dé (faces aléatoires) puis affiche <paramref name="value"/>.</summary>
+        UniTask RollDieAsync(int value, int faces, CancellationToken ct);
+        void ResetDie();
+
+        /// <summary>Temps de lecture entre deux étapes (annonce puis case, zone sécurisée).</summary>
+        UniTask PauseAsync(float seconds, CancellationToken ct);
+    }
+}
