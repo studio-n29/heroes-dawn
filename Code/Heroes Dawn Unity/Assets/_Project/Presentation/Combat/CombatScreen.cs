@@ -11,6 +11,7 @@ using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Combat;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Screens;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -33,16 +34,16 @@ namespace N29.HeroesDawn.Presentation.Combat
         RectTransform _allyRow = null!;
         RectTransform _skillPanel = null!;
         readonly UiButton[] _skillButtons = new UiButton[3];
-        readonly Text[] _skillDesc = new Text[3];
+        readonly TMP_Text[] _skillDesc = new TMP_Text[3];
         UiButton _combo = null!;
         UiButton _auto = null!;
         UiButton _speed = null!;
         UiButton _retreat = null!;
         UiButton _debug = null!;
-        Text _title = null!;
-        Text _hint = null!;
-        Text _logText = null!;
-        Text _banner = null!;
+        TMP_Text _title = null!;
+        TMP_Text _hint = null!;
+        TMP_Text _logText = null!;
+        TMP_Text _banner = null!;
 
         int _selected = -1;
         int _pendingSlot = -1;
@@ -100,9 +101,9 @@ namespace N29.HeroesDawn.Presentation.Combat
                 int slot = i;
                 var b = Ui.Btn(_skillPanel, "", Theme.Primary, Theme.TextDark, () => OnSkill(slot), 32);
                 b.Rect.Pref(440, 146);
-                b.Label.alignment = TextAnchor.UpperCenter;
+                b.Label.alignment = TextAlignmentOptions.Top;
                 b.Label.rectTransform.Stretch(12, 60, 12, 8);
-                var desc = Ui.Txt(b.Fill.transform, "", 19, Theme.TextDark, TextAnchor.UpperCenter, FontKind.Body, "Desc");
+                var desc = Ui.Txt(b.Fill.transform, "", 20, Theme.TextDark, TextAnchor.UpperCenter, FontKind.Body, "Desc");
                 desc.rectTransform.Stretch(14, 8, 14, 60);
                 _skillButtons[i] = b;
                 _skillDesc[i] = desc;
@@ -528,7 +529,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 var def = content.Member(f.Member);
                 var n = Ui.Txt(row, Loc.MemberName(def), 28, Color.white, TextAnchor.MiddleLeft, FontKind.Title);
                 n.rectTransform.At(0f, 0.5f, 0, 0, 220, 50);
-                var bar = Ui.Bar(row, "Bar", Theme.FatigueColor(f.After), Theme.SurfaceDark, true, 18);
+                var bar = Ui.Bar(row, "Bar", Theme.FatigueColor(f.After), Theme.SurfaceDark, true, 20);
                 ((RectTransform)bar.transform).At(0f, 0.5f, 230, 0, 520, 30);
                 bar.Set(f.Before / 100f, true);
                 bar.Set(f.After / 100f);
@@ -570,7 +571,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             return true;
         }
 
-        async UniTaskVoid VerifyAsync(Text label)
+        async UniTaskVoid VerifyAsync(TMP_Text label)
         {
             _cts?.Cancel();
             _cts = new CancellationTokenSource();

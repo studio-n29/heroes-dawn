@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,7 +43,7 @@ namespace N29.HeroesDawn.Presentation.Common
             strip.rectTransform.sizeDelta = new Vector2(14, -8);
             strip.rectTransform.anchoredPosition = new Vector2(6, 0);
             var label = Ui.Txt(frame, text, 30, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Body, "Label");
-            label.horizontalOverflow = HorizontalWrapMode.Overflow;
+            label.textWrappingMode = TextWrappingModes.NoWrap;
             var cg = frame.gameObject.AddComponent<CanvasGroup>();
             cg.alpha = 0f;
             cg.blocksRaycasts = false;

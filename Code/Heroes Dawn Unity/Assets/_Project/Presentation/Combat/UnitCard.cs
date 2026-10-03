@@ -4,6 +4,7 @@ using System.Text;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Combat;
 using N29.HeroesDawn.Presentation.Common;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,8 +21,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         Image _target = null!;
         UiBar _hp = null!;
         UiBar _gauge = null!;
-        Text _statuses = null!;
-        Text _ko = null!;
+        TMP_Text _statuses = null!;
+        TMP_Text _ko = null!;
         Pulse _readyPulse = null!;
         CanvasGroup _group = null!;
         Color _baseFill;
@@ -66,13 +67,13 @@ namespace N29.HeroesDawn.Presentation.Combat
             nameText.rectTransform.At(0f, 1f, x, -14, barW, 38);
             nameText.Inked(2f);
 
-            card._hp = Ui.Bar(fill.transform, "Hp", ally ? Theme.Hp : Theme.HpEnemy, Theme.SurfaceDark, true, 18);
+            card._hp = Ui.Bar(fill.transform, "Hp", ally ? Theme.Hp : Theme.HpEnemy, Theme.SurfaceDark, true, 20);
             ((RectTransform)card._hp.transform).At(0f, 1f, x, -56, barW, 28);
             card._gauge = Ui.Bar(fill.transform, "Gauge", Theme.Gauge, Theme.SurfaceDark);
             card._gauge.Smooth = false;
             ((RectTransform)card._gauge.transform).At(0f, 1f, x, -90, barW, 16);
 
-            card._statuses = Ui.Txt(fill.transform, "", 18, Theme.Shield, TextAnchor.UpperLeft, FontKind.Body, "Statuses");
+            card._statuses = Ui.Txt(fill.transform, "", 20, Theme.Shield, TextAnchor.UpperLeft, FontKind.Body, "Statuses");
             card._statuses.rectTransform.At(0f, 1f, x, -112, barW, 50);
 
             card._ko = Ui.Txt(fill.transform, "K.O.", 64, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Title, "KO");

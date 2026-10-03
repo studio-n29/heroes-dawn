@@ -7,11 +7,31 @@ namespace N29.HeroesDawn.Presentation.Common
     {
         static Sprite _rounded, _roundedSmall, _circle, _ring, _gradient;
 
-        public static Sprite Rounded => _rounded != null ? _rounded : (_rounded = MakeRounded(64, 18));
-        public static Sprite RoundedSmall => _roundedSmall != null ? _roundedSmall : (_roundedSmall = MakeRounded(32, 7));
-        public static Sprite Circle => _circle != null ? _circle : (_circle = MakeCircle(128, 0f));
-        public static Sprite Ring => _ring != null ? _ring : (_ring = MakeCircle(128, 0.8f));
-        public static Sprite VerticalGradient => _gradient != null ? _gradient : (_gradient = MakeGradient());
+        // Assets générés (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface → Resources/UI) ; repli procédural sinon.
+        public static Sprite Rounded => _rounded != null ? _rounded : (_rounded = Load("Rounded"));
+        public static Sprite RoundedSmall => _roundedSmall != null ? _roundedSmall : (_roundedSmall = Load("RoundedSmall"));
+        public static Sprite Circle => _circle != null ? _circle : (_circle = Load("Circle"));
+        public static Sprite Ring => _ring != null ? _ring : (_ring = Load("Ring"));
+        public static Sprite VerticalGradient => _gradient != null ? _gradient : (_gradient = Load("VerticalGradient"));
+
+        /// <summary>Noms des sprites d'interface générés (Resources/UI/&lt;nom&gt;.png).</summary>
+        public static readonly string[] UiSpriteNames = { "Rounded", "RoundedSmall", "Circle", "Ring", "VerticalGradient" };
+
+        static Sprite Load(string name) { var s = Resources.Load<Sprite>("UI/" + name); return s != null ? s : Procedural(name); }
+
+        /// <summary>Version fabriquée par code d'un sprite d'interface (source du baker éditeur, repli si l'asset manque).</summary>
+        public static Sprite Procedural(string name)
+        {
+            switch (name)
+            {
+                case "Rounded": return MakeRounded(64, 18);
+                case "RoundedSmall": return MakeRounded(32, 7);
+                case "Circle": return MakeCircle(128, 0f);
+                case "Ring": return MakeCircle(128, 0.8f);
+                case "VerticalGradient": return MakeGradient();
+                default: throw new System.ArgumentException("Sprite d'interface inconnu : " + name);
+            }
+        }
 
         static readonly System.Collections.Generic.Dictionary<string, Sprite> _art = new System.Collections.Generic.Dictionary<string, Sprite>();
 
@@ -22,6 +42,9 @@ namespace N29.HeroesDawn.Presentation.Common
         public static Sprite BackgroundLandscape => Art("HD_BG_Landscape_jpg");
         public static Sprite BackgroundPortrait => Art("HD_BG_Portrait_jpg");
 
+        /// <summary>Dossier des illustrations importées en textures (générées depuis Resources/Art/*.bytes).</summary>
+        public const string ArtAssetFolder = "Assets/_Project/Art/UI";
+
         /// <summary>
         /// Charge une image stockée en octets bruts (.bytes) et la décode à l'exécution : la résolution d'origine est conservée
         /// quel que soit le réglage d'import de Unity (pas de redimensionnement en puissance de 2). Renvoie null si absente.
@@ -30,6 +53,16 @@ namespace N29.HeroesDawn.Presentation.Common
         {
             if (_art.TryGetValue(name, out var cached)) return cached;
             Sprite sprite = null;
+#if UNITY_EDITOR
+            // En éditeur hors jeu (recettes de prefabs) : l'asset importé, seul référençable par un prefab.
+            if (!UnityEngine.Application.isPlaying)
+            {
+                int dot = name.LastIndexOf('_');
+                var path = ArtAssetFolder + "/" + name.Substring(0, dot) + "." + name.Substring(dot + 1);
+                sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                if (sprite != null) { _art[name] = sprite; return sprite; }
+            }
+#endif
             var asset = Resources.Load<TextAsset>("Art/" + name);
             if (asset != null)
             {

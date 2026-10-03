@@ -14,6 +14,7 @@ using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Popups;
 using N29.HeroesDawn.Presentation.Screens;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -33,13 +34,13 @@ namespace N29.HeroesDawn.Presentation.Board
             _zoneValidatedSub?.Dispose();
         }
         BoardMapView _map = null!;
-        Text _zoneTitle = null!;
+        TMP_Text _zoneTitle = null!;
         RectTransform _objectiveList = null!;
         RectTransform _squadStrip = null!;
-        Text _hint = null!;
-        Text _dieFace = null!;
+        TMP_Text _hint = null!;
+        TMP_Text _dieFace = null!;
         RectTransform _die = null!;
-        Text _pm = null!;
+        TMP_Text _pm = null!;
         UiBar _reserve = null!;
         UiButton _roll = null!;
         UiButton _bonus = null!;
@@ -99,7 +100,7 @@ namespace N29.HeroesDawn.Presentation.Board
             _pm = Ui.Txt(hudFill, "", 40, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Pm");
             _pm.rectTransform.At(0.5f, 0.5f, -120, -34, 300, 50);
             _pm.Inked(2f);
-            _reserve = Ui.Bar(hudFill, "Reserve", Theme.Primary, Theme.SurfaceDark, true, 18);
+            _reserve = Ui.Bar(hudFill, "Reserve", Theme.Primary, Theme.SurfaceDark, true, 20);
             ((RectTransform)_reserve.transform).At(0.5f, 0f, -120, 10, 420, 26);
 
             var dieFill = Ui.Panel(hudFill, "Die", Color.white, 5f, 6f, false);

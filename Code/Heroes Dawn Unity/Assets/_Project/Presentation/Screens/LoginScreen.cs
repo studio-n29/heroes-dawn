@@ -5,6 +5,7 @@ using System.Threading;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Presentation.Common;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ namespace N29.HeroesDawn.Presentation.Screens
     public sealed class LoginScreen : UiScreen
     {
         UiButton _play = null!;
-        Text _status = null!;
+        TMP_Text _status = null!;
         RectTransform _logo = null!;
         RectTransform _spinner = null!;
         bool _busy;

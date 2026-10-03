@@ -6,6 +6,7 @@ using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Common;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -102,7 +103,7 @@ namespace N29.HeroesDawn.Presentation.Popups
         RectTransform _track = null!;
         RectTransform _cursor = null!;
         RectTransform _zone = null!;
-        Text _score = null!;
+        TMP_Text _score = null!;
         UiButton _stop = null!;
         Action<bool> _finished = null!;
         float _t;

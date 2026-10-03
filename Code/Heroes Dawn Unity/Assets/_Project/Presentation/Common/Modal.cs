@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,12 +13,12 @@ namespace N29.HeroesDawn.Presentation.Common
         public RectTransform Window { get; }
         /// <summary>Zone de contenu sous le titre.</summary>
         public RectTransform Content { get; }
-        public Text Title { get; }
+        public TMP_Text Title { get; }
         readonly ModalLayer _layer;
         public bool IsOpen { get; private set; } = true;
         public event Action Closed;
 
-        internal ModalWindow(ModalLayer layer, RectTransform root, RectTransform window, RectTransform content, Text title)
+        internal ModalWindow(ModalLayer layer, RectTransform root, RectTransform window, RectTransform content, TMP_Text title)
         {
             _layer = layer; Root = root; Window = window; Content = content; Title = title;
         }

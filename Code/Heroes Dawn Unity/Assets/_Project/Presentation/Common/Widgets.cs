@@ -4,6 +4,7 @@ using MessagePipe;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Definitions;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,9 +17,9 @@ namespace N29.HeroesDawn.Presentation.Common
         ISubscriber<WalletChanged> _walletEvents = null!;
         ISubscriber<SaveStateChanged> _savingEvents = null!;
         IDisposable? _subs;
-        Text _credits = null!;
-        Text _pr = null!;
-        Text _saving = null!;
+        TMP_Text _credits = null!;
+        TMP_Text _pr = null!;
+        TMP_Text _saving = null!;
         int _lastCredits = -1;
         int _lastPr = -1;
 
@@ -37,7 +38,7 @@ namespace N29.HeroesDawn.Presentation.Common
             return v;
         }
 
-        static Text Pill(RectTransform parent, Color accent, string tag)
+        static TMP_Text Pill(RectTransform parent, Color accent, string tag)
         {
             var fill = Ui.Panel(parent, "Pill" + tag, Theme.SurfaceDark, 3f, 4f, false);
             fill.Frame().Pref(230, 62);

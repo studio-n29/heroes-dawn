@@ -5,6 +5,7 @@ using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Common;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,12 +24,12 @@ namespace N29.HeroesDawn.Presentation.Board
             public RectTransform Root = null!;
             public Image Disc = null!;
             public Image Frame = null!;
-            public Text Label = null!;
-            public Text Sub = null!;
+            public TMP_Text Label = null!;
+            public TMP_Text Sub = null!;
             public Image Highlight = null!;
-            public Text Cost = null!;
+            public TMP_Text Cost = null!;
             public Image Objective = null!;
-            public Text ObjectiveTag = null!;
+            public TMP_Text ObjectiveTag = null!;
         }
 
         sealed class LinkView

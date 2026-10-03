@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using TMPro;
 using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Common
@@ -14,21 +15,45 @@ namespace N29.HeroesDawn.Presentation.Common
     /// </summary>
     public static class Ui
     {
-        static Font _title, _body, _regular, _fallback;
+        static TMP_FontAsset _title, _body, _regular;
+        static readonly System.Collections.Generic.Dictionary<TMP_FontAsset, Material> _inked = new System.Collections.Generic.Dictionary<TMP_FontAsset, Material>();
 
-        public static Font Fallback => _fallback != null ? _fallback : (_fallback = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"));
-        public static Font TitleFont => _title != null ? _title : (_title = LoadFont("Fonts/Bangers-Regular"));
-        public static Font BodyFont => _body != null ? _body : (_body = LoadFont("Fonts/ComicNeue-Bold"));
-        public static Font RegularFont => _regular != null ? _regular : (_regular = LoadFont("Fonts/ComicNeue-Regular"));
+        // Polices TextMeshPro générées (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface → Resources/Fonts/TMP).
+        public static TMP_FontAsset TitleFont => _title != null ? _title : (_title = LoadFont("Bangers-Regular"));
+        public static TMP_FontAsset BodyFont => _body != null ? _body : (_body = LoadFont("ComicNeue-Bold"));
+        public static TMP_FontAsset RegularFont => _regular != null ? _regular : (_regular = LoadFont("ComicNeue-Regular"));
 
-        static Font LoadFont(string path)
+        static TMP_FontAsset LoadFont(string name)
         {
-            var f = Resources.Load<Font>(path);
-            if (f == null) Debug.LogWarning("[Heroes Dawn] Police introuvable : Resources/" + path + " — police par défaut utilisée.");
-            return f != null ? f : Fallback;
+            var f = Resources.Load<TMP_FontAsset>("Fonts/TMP/" + name + " SDF");
+            if (f == null) Debug.LogWarning("[Heroes Dawn] Police TMP introuvable : Resources/Fonts/TMP/" + name + " SDF — police par défaut utilisée.");
+            return f != null ? f : TMP_Settings.defaultFontAsset;
         }
 
-        public static Font FontFor(FontKind k) => k == FontKind.Title ? TitleFont : k == FontKind.Body ? BodyFont : RegularFont;
+        public static TMP_FontAsset FontFor(FontKind k) => k == FontKind.Title ? TitleFont : k == FontKind.Body ? BodyFont : RegularFont;
+
+        /// <summary>Matériau « encré » (contour noir + ombre) de la police, ou son matériau par défaut s'il manque.</summary>
+        public static Material InkedMaterial(TMP_FontAsset font)
+        {
+            if (!_inked.TryGetValue(font, out var m) || m == null) _inked[font] = m = Resources.Load<Material>("Fonts/TMP/" + font.name + " Inked");
+            return m != null ? m : font.material;
+        }
+
+        public static TextAlignmentOptions Align(TextAnchor a)
+        {
+            switch (a)
+            {
+                case TextAnchor.UpperLeft: return TextAlignmentOptions.TopLeft;
+                case TextAnchor.UpperCenter: return TextAlignmentOptions.Top;
+                case TextAnchor.UpperRight: return TextAlignmentOptions.TopRight;
+                case TextAnchor.MiddleLeft: return TextAlignmentOptions.Left;
+                case TextAnchor.MiddleRight: return TextAlignmentOptions.Right;
+                case TextAnchor.LowerLeft: return TextAlignmentOptions.BottomLeft;
+                case TextAnchor.LowerCenter: return TextAlignmentOptions.Bottom;
+                case TextAnchor.LowerRight: return TextAlignmentOptions.BottomRight;
+                default: return TextAlignmentOptions.Center;
+            }
+        }
 
         // ---------------------------------------------------------------- Rects
 
@@ -119,27 +144,40 @@ namespace N29.HeroesDawn.Presentation.Common
 
         public static RectTransform Frame(this Image panelFill) => (RectTransform)panelFill.transform.parent;
 
-        public static Text Txt(Transform parent, string text, int size, Color color, TextAnchor align = TextAnchor.MiddleCenter,
-                               FontKind font = FontKind.Body, string name = "Text")
+        public static TextMeshProUGUI Txt(Transform parent, string text, int size, Color color, TextAnchor align = TextAnchor.MiddleCenter,
+                                          FontKind font = FontKind.Body, string name = "Text")
         {
             var rt = Rect(parent, name);
-            var t = rt.gameObject.AddComponent<Text>();
+            var t = rt.gameObject.AddComponent<TextMeshProUGUI>();
             t.font = FontFor(font);
             t.fontSize = size;
             t.color = color;
-            t.alignment = align;
+            t.alignment = Align(align);
             t.text = text;
-            t.supportRichText = true;
+            t.richText = true;
             t.raycastTarget = false;
-            t.horizontalOverflow = HorizontalWrapMode.Wrap;
-            t.verticalOverflow = VerticalWrapMode.Overflow;
-            t.lineSpacing = font == FontKind.Title ? 0.9f : 1f;
+            t.textWrappingMode = TextWrappingModes.Normal;
+            t.overflowMode = TextOverflowModes.Overflow;
+            t.lineSpacing = font == FontKind.Title ? -10f : 0f;
             return t;
         }
 
-        /// <summary>Contour noir « lettrage de couverture » sur un texte.</summary>
+        /// <summary>Texte statique localisé : la clé est portée par <see cref="Mvp.LocalizedText"/> et résolue à l'activation.</summary>
+        public static TextMeshProUGUI LocTxt(Transform parent, string key, int size, Color color, TextAnchor align = TextAnchor.MiddleCenter,
+                                             FontKind font = FontKind.Body, string name = "Text")
+        {
+            var t = Txt(parent, Loc.T(key), size, color, align, font, name);
+            t.gameObject.AddComponent<Mvp.LocalizedText>().Key = key;
+            return t;
+        }
+
+        /// <summary>
+        /// Contour noir « lettrage de couverture » : matériau encré partagé pour un texte TMP (l'épaisseur est celle du matériau),
+        /// contour + ombre uGUI pour un autre graphique.
+        /// </summary>
         public static T Inked<T>(this T g, float size = 2.5f) where T : Graphic
         {
+            if (g is TMP_Text tmp) { tmp.fontSharedMaterial = InkedMaterial(tmp.font); return g; }
             var o = g.gameObject.AddComponent<Outline>();
             o.effectColor = Theme.Ink;
             o.effectDistance = new Vector2(size, -size);
@@ -170,10 +208,9 @@ namespace N29.HeroesDawn.Presentation.Common
 
             var text = Txt(fill.transform, label, fontSize, fg, TextAnchor.MiddleCenter, font, "Label");
             text.rectTransform.Stretch(10, 4, 10, 4);
-            text.horizontalOverflow = HorizontalWrapMode.Wrap;
-            text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = Mathf.Max(12, fontSize / 2);
-            text.resizeTextMaxSize = fontSize;
+            text.enableAutoSizing = true;
+            text.fontSizeMin = Mathf.Min(fontSize, Mathf.Max(20, fontSize / 2));
+            text.fontSizeMax = fontSize;
 
             var ub = frameGo.AddComponent<UiButton>();
             ub.Init(button, fill, text, bg, fg);
@@ -181,7 +218,16 @@ namespace N29.HeroesDawn.Presentation.Common
             return ub;
         }
 
-        public static UiBar Bar(Transform parent, string name, Color fill, Color back, bool withLabel = false, int labelSize = 18)
+        /// <summary>Bouton à libellé statique localisé (clé portée par <see cref="Mvp.LocalizedText"/>).</summary>
+        public static UiButton LocBtn(Transform parent, string key, Color bg, Color fg, Action onClick, int fontSize = 34,
+                                      FontKind font = FontKind.Title, string name = "Button")
+        {
+            var b = Btn(parent, Loc.T(key), bg, fg, onClick, fontSize, font, name);
+            b.Label.gameObject.AddComponent<Mvp.LocalizedText>().Key = key;
+            return b;
+        }
+
+        public static UiBar Bar(Transform parent, string name, Color fill, Color back, bool withLabel = false, int labelSize = 20)
         {
             var bg = Img(parent, name, Theme.Ink, Sprites.RoundedSmall);
             var inner = Img(bg.transform, "Back", back, Sprites.RoundedSmall);
@@ -192,7 +238,7 @@ namespace N29.HeroesDawn.Presentation.Common
             frt.anchorMax = Vector2.one;
             frt.offsetMin = Vector2.zero;
             frt.offsetMax = Vector2.zero;
-            Text label = null;
+            TMP_Text label = null;
             if (withLabel)
             {
                 label = Txt(bg.transform, "", labelSize, Color.white, TextAnchor.MiddleCenter, FontKind.Body, "Label");
@@ -302,12 +348,12 @@ namespace N29.HeroesDawn.Presentation.Common
     {
         public Button Button { get; private set; }
         public Image Fill { get; private set; }
-        public Text Label { get; private set; }
+        public TMP_Text Label { get; private set; }
         public RectTransform Rect => (RectTransform)transform;
         Color _bg;
         Color _fg;
 
-        public void Init(Button b, Image fill, Text label, Color bg, Color fg)
+        public void Init(Button b, Image fill, TMP_Text label, Color bg, Color fg)
         {
             Button = b; Fill = fill; Label = label; _bg = bg; _fg = fg;
             fill.color = bg;
@@ -343,15 +389,15 @@ namespace N29.HeroesDawn.Presentation.Common
     {
         RectTransform _fill;
         Image _fillImage;
-        Text _label;
+        TMP_Text _label;
         float _target = 1f;
         float _shown = 1f;
         public bool Smooth = true;
         public float Speed = 2.5f;
 
-        public Text Label => _label;
+        public TMP_Text Label => _label;
 
-        public void Init(RectTransform fill, Image fillImage, Text label)
+        public void Init(RectTransform fill, Image fillImage, TMP_Text label)
         {
             _fill = fill; _fillImage = fillImage; _label = label;
             Apply();

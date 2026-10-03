@@ -12,6 +12,7 @@ using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Combat;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Screens;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,14 +31,14 @@ namespace N29.HeroesDawn.Presentation.Hub
         ScrollRect _scroll = null!;
         UiButton _tabTeam = null!;
         UiButton _tabRecruit = null!;
-        Text _player = null!;
-        Text _hint = null!;
-        Text _zoneStatus = null!;
-        Text _squadTitle = null!;
+        TMP_Text _player = null!;
+        TMP_Text _hint = null!;
+        TMP_Text _zoneStatus = null!;
+        TMP_Text _squadTitle = null!;
         RectTransform _squadRow = null!;
         UiButton _deploy = null!;
         UiButton _heal = null!;
-        Text _deployHint = null!;
+        TMP_Text _deployHint = null!;
         RectTransform _objectives = null!;
 
         protected override void Build()
@@ -64,7 +65,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             ((RectTransform)wallet.transform).At(1f, 0.5f, -330, 0, 700, 70);
             var logout = Ui.Btn(top, Loc.T("hub.logout"), Theme.Surface3, Theme.Text, OnLogout, 22, FontKind.Body);
             logout.Rect.At(1f, 0.5f, -20, 22, 290, 46);
-            var reset = Ui.Btn(top, Loc.T("login.reset"), Theme.Surface2, Theme.TextMuted, OnReset, 18, FontKind.Body);
+            var reset = Ui.Btn(top, Loc.T("login.reset"), Theme.Surface2, Theme.TextMuted, OnReset, 20, FontKind.Body);
             reset.Rect.At(1f, 0.5f, -20, -28, 290, 40);
 
             // ---- Colonne gauche : onglets + grille
@@ -228,10 +229,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             var frame = CardBase(m.Def, m.Level, out var fill);
             var skills = SkillsLine(m.Def);
-            var sk = Ui.Txt(fill.transform, skills, 19, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Regular, "Skills");
+            var sk = Ui.Txt(fill.transform, skills, 20, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Regular, "Skills");
             sk.rectTransform.At(0f, 1f, 16, -160, 360, 50);
 
-            var bar = Ui.Bar(fill.transform, "Fatigue", Theme.FatigueColor(m.Fatigue), Theme.SurfaceDark, true, 18);
+            var bar = Ui.Bar(fill.transform, "Fatigue", Theme.FatigueColor(m.Fatigue), Theme.SurfaceDark, true, 20);
             ((RectTransform)bar.transform).At(0f, 1f, 16, -214, 356, 28);
             bar.Set(m.Fatigue / 100f, true);
             bar.SetLabel(Loc.F("ui.fatigue", m.Fatigue));
@@ -254,7 +255,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         void RecruitCard(MemberDef d)
         {
             CardBase(d, MetaRules.RecruitLevel, out var fill);
-            var sk = Ui.Txt(fill.transform, SkillsLine(d), 19, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Regular, "Skills");
+            var sk = Ui.Txt(fill.transform, SkillsLine(d), 20, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Regular, "Skills");
             sk.rectTransform.At(0f, 1f, 16, -160, 360, 80);
             int cost = MetaRules.RecruitCost(d.Rarity);
             var btn = Ui.Btn(fill.transform, Loc.F("hub.recruit", cost), Theme.Pr, Theme.TextDark, () => OnRecruit(d), 28);
