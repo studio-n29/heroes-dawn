@@ -1,12 +1,14 @@
 # UX — Écrans, parcours, contrôles
 
 > Orientation paysage. Tactile d'abord, souris/clavier sur PC (Steam).
+> Maquettes, wireframes annotés et screen flow : `03_Maquettes_Screen_Flow.md`.
 
-## Hub : le QG en vue en coupe
-- Écran d'accueil = coupe du QG (5 pièces visibles). Toucher une pièce = y entrer.
-- Barre haute : Crédits, PR, Gemmes, niveau du pass.
-- Boutons permanents : **Mission** (carte de New York), **Recrutement**, **Pass**, **Boutique**, **Équipe**.
-- Badges de notification : entraînement terminé, expédition revenue, nouveaux objectifs secondaires, pool renouvelée.
+## Navigation (maquettes 2026-10-04)
+- **Barre de navigation basse** permanente sur le hub : `QG · ÉQUIPE · RECRUTER · PASS · BOUTIQUE` (un menu = un onglet, badges par onglet).
+- **Barre haute** : titre de l'écran, Crédits / PR / Gemmes (toucher = origine de la ressource), ⚙ Paramètres.
+- **QG** (onglet par défaut) : les 5 pièces en cases de BD (toucher = y entrer), missions du jour, alertes, fil du QG, bouton **MISSION** rouge sous le pouce droit.
+- **Mode mission** (carte → résultats) : plein écran sans barre de navigation ; retour en haut à gauche, ⏸ = pause (Reprendre, Paramètres, Aide, Retour au QG).
+- Badges de notification : entraînement terminé, expédition revenue, labo à collecter, pool renouvelée, palier de pass.
 
 ## Liste des écrans
 | # | Écran | Accès | Contenu principal |
@@ -29,18 +31,17 @@
 | 16 | Équipe / fiche membre | Hub | Stats, compétences, paliers, famille, combos |
 | 17 | Pass saisonnier | Hub | Pistes gratuite et premium, paliers |
 | 18 | Boutique | Hub | Gemmes, packs de PR, accélérateurs, cosmétiques |
-| 19 | Paramètres | Hub | Audio, langue, accessibilité, compte, RGPD |
+| 19 | Paramètres | ⚙ (hub) ou Pause (mission) | Audio, graphismes & performance, accessibilité, langue, notifications, contrôles PC, compte & confidentialité, support & aide (dont « Revoir le tutoriel ») |
 
 ## Parcours clés
 - **Session type (5-10 min)** : QG (collecter) → Mission → reprendre la zone → 2-4 lancers → 1 combat → résultats → retour QG.
 - **Recrutement** : notification « nouvelle pool » → Recrutement → choisir → fiche du membre → l'envoyer au salon.
 - **Fin d'acte** : mini-climax → scène → Légende ajoutée à la pool → notification.
 
-## Onboarding : prologue jouable (~5 min)
-1. Scène d'intro : Rayner confie la section de New York au joueur (arrivée à Red Hook).
-2. Mini-plateau scripté (8 cases) : 1er lancer de dé, choix de chemin, brouillard.
-3. 1er combat avec 2 membres prêtés (ATB, compétence, puis combo guidé).
-4. Arrivée au QG : 1er recrutement gratuit (choix entre 3 Agents).
+## Onboarding : tutoriel guidé (décision 2026-10-04, remplace le prologue scripté)
+Première partie guidée sur la **vraie zone 1.1** (maquettes T01–T12) : Rayner explique en bulle de BD, un projecteur désigne l'élément à toucher, le reste est bloqué.
+1. Bienvenue au QG · 2. Compléter l'escouade · 3. MISSION puis Déployer · 4. Objectifs de la zone · 5. Lancer le dé · 6. Choisir une destination (brouillard) · 7. Temps actif du combat (combat figé pendant la bulle) · 8. Compétence puis cible · 9. Résultats et fatigue.
+Puis **astuces contextuelles** non bloquantes à la première rencontre de chaque mécanique. Étape enregistrée dans le profil ; « Passer » avec confirmation ; « Revoir » dans Paramètres ▸ Support & aide.
 5. Déblocage progressif pendant l'Acte 1 : salon (zone 1), infirmerie (zone 2), expéditions et labo (fin zone 3), pass (fin Acte 1).
 
 ## HUD de combat

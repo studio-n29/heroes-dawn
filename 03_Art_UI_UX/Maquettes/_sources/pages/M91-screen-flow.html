@@ -1,0 +1,71 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><link rel="stylesheet" href="../kit.css"><script src="../kit.js" defer></script>
+<style>
+  .node { position: absolute; background: var(--panel); border: 4px solid #000; border-radius: 12px; box-shadow: 5px 5px 0 #000; padding: 8px 12px; font-family: Bangers; letter-spacing: 1px; font-size: 24px; text-align: center; }
+  .node small { display: block; font-family: Neue; font-size: 15px; letter-spacing: 0; color: var(--muted); }
+  .node.y { background: var(--yellow); color: var(--ink); } .node.y small { color: #4B3E10; }
+  .node.r { background: var(--red); } .node.r small { color: #FFE0E0; }
+  .zone { position: absolute; border: 4px dashed var(--line); border-radius: 18px; }
+  .zone > .caption { font-size: 26px; }
+</style></head>
+<body data-ref="M91" data-title="Screen flow" data-group="Référence" data-out="reference" data-mode="plain">
+<main>
+  <div class="t ink" style="left:88px;top:30px;font-size:64px;color:var(--yellow)">SCREEN FLOW</div>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080" viewBox="0 0 1920 1080">
+    <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#C9CED7"/></marker></defs>
+    <g stroke="#C9CED7" stroke-width="5" fill="none" marker-end="url(#a)">
+      <path d="M250 215 L250 262"/><path d="M250 335 L250 382"/><path d="M250 455 L250 520"/>
+      <path d="M370 560 C 450 560 450 212 522 212"/>
+      <path d="M830 455 C 1120 455 1180 205 1392 205"/>
+      <path d="M1540 255 L1540 302"/><path d="M1540 375 L1540 422"/><path d="M1540 495 L1540 542"/>
+      <path d="M1450 610 L1350 684"/><path d="M1555 615 L1555 682"/><path d="M1650 610 L1745 684"/>
+      <path d="M1540 760 L1540 840"/><path d="M1540 900 L1540 948"/>
+      <path d="M1400 985 L760 985 L760 860" stroke-dasharray="14 10"/>
+    </g>
+  </svg>
+
+  <!-- Entrée -->
+  <div class="zone" style="left:88px;top:120px;width:330px;height:540px"><span class="caption">ENTRÉE</span></div>
+  <div class="node" style="left:150px;top:160px;width:200px">M01 TITRE<small>JOUER</small></div>
+  <div class="node" style="left:150px;top:270px;width:200px">M02 LANGUE · RGPD<small>1er lancement</small></div>
+  <div class="node" style="left:150px;top:390px;width:200px">M03 CHARGEMENT</div>
+  <div class="node y" style="left:130px;top:525px;width:240px">T01–T12 TUTORIEL<small>1re partie guidée</small></div>
+
+  <!-- Hub -->
+  <div class="zone" style="left:460px;top:120px;width:740px;height:780px"><span class="caption">HUB · BARRE DE NAVIGATION</span></div>
+  <div class="node y" style="left:530px;top:180px;width:300px">M10 QG<small>onglet par défaut</small></div>
+  <div class="node" style="left:530px;top:290px;width:300px">M11–M15 PIÈCES<small>salon, infirmerie, opérations, labo, archives</small></div>
+  <div class="node" style="left:870px;top:180px;width:290px">M20–M21 ÉQUIPE<small>effectif, fiche</small></div>
+  <div class="node" style="left:870px;top:290px;width:290px">M30–M31 RECRUTER</div>
+  <div class="node" style="left:870px;top:390px;width:290px">M40 PASS</div>
+  <div class="node" style="left:870px;top:490px;width:290px">M50 BOUTIQUE</div>
+  <div class="node r" style="left:530px;top:420px;width:300px">MISSION ▶<small>bouton rouge du QG</small></div>
+  <div class="node" style="left:530px;top:560px;width:630px">⚙ M80–M85 PARAMÈTRES<small>depuis la barre haute (hub) ou la pause (mission)</small></div>
+  <div class="n small" style="left:530px;top:680px;width:630px;line-height:1.5;color:var(--muted)">Retour : pièce → QG · onglet → QG · QG → « Quitter le jeu ? »<br>Badges sur les onglets ; ressources toujours en haut à droite.</div>
+
+  <!-- Mission -->
+  <div class="zone" style="left:1240px;top:120px;width:592px;height:900px"><span class="caption red">MODE MISSION · PLEIN ÉCRAN</span></div>
+  <div class="node" style="left:1400px;top:180px;width:280px">M60 CARTE DE LA VILLE</div>
+  <div class="node" style="left:1400px;top:300px;width:280px">M61 FICHE DE ZONE</div>
+  <div class="node" style="left:1400px;top:420px;width:280px">M62 PRÉPARATION</div>
+  <div class="node y" style="left:1400px;top:540px;width:280px">M63–M64 PLATEAU<small>lancer, destination · M72 pause</small></div>
+  <div class="node" style="left:1256px;top:690px;width:176px;font-size:20px">M67–M69 CASES<small>événement, mini-jeu, repos</small></div>
+  <div class="node r" style="left:1446px;top:690px;width:230px">M65–M66 COMBAT</div>
+  <div class="node" style="left:1692px;top:690px;width:128px;font-size:20px">BROUILLARD<small>arrêt, repart</small></div>
+  <div class="node" style="left:1400px;top:840px;width:280px">M70 RÉSULTATS<small>retour au plateau</small></div>
+  <div class="node y" style="left:1400px;top:950px;width:280px">M71 ZONE SÉCURISÉE</div>
+  <div class="n tiny" style="left:780px;top:940px;width:560px;color:var(--muted)">Zone sécurisée, escouade épuisée ou « Retour au QG » (pause) → QG</div>
+
+  <i class="pin" data-n="1" style="left:88px;top:300px"></i>
+  <i class="pin" data-n="2" style="left:460px;top:300px"></i>
+  <i class="pin" data-n="3" style="left:460px;top:600px"></i>
+  <i class="pin" data-n="4" style="left:1240px;top:300px"></i>
+  <i class="pin" data-n="5" style="left:1240px;top:640px"></i>
+</main>
+<ol class="legend">
+<li>Entrée : titre, premier lancement (langue + consentement), chargement, puis tutoriel guidé au tout premier lancement (QG directement les fois suivantes).</li>
+<li>Hub : un menu = un onglet de la barre de navigation basse (QG, Équipe, Recruter, Pass, Boutique) ; les pièces s'ouvrent depuis le QG.</li>
+<li>Paramètres accessibles partout : ⚙ dans la barre haute du hub, Pause en mission.</li>
+<li>Mode mission, plein écran sans barre de navigation : carte → fiche de zone → préparation → plateau.</li>
+<li>Depuis le plateau : cases (combat, événement, mini-jeu, repos) puis retour au plateau ; fin de zone ou retour volontaire → QG.</li>
+</ol>
+</body></html>
