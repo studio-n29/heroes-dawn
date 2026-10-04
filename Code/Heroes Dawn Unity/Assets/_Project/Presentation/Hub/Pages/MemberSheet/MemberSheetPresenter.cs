@@ -1,39 +1,50 @@
 #nullable enable
 using System;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Hub;
+using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
+using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Presentation.Mvp;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
     /// <summary>
-    /// Fiche d'un membre possédé (M21) : stats, compétences décrites, combos de sa famille, flèches pour parcourir l'effectif
+    /// Fiche d'un membre (M21). Membre possédé : stats, compétences, combos de sa famille, flèches pour parcourir l'effectif
     /// (sans empiler de page), raccourcis Salon / Infirmerie, Entraîner · N CR.
+    /// Héros de la boutique (<see cref="HubLocation.FromShop"/>) : même fiche, bouton Recruter · N PR par la confirmation M31 ;
+    /// si l'offre disparaît (boutique renouvelée), retour à Recruter avec un toast.
     /// </summary>
     public sealed class MemberSheetPresenter : PresenterBase<IMemberSheetView>, IPageTitle
     {
         readonly ISessionReadModel _session;
         readonly ITrainMemberUseCase _train;
+        readonly RecruitFlow _recruit;
         readonly HubNavigator _nav;
         readonly IToastService _toasts;
         readonly ILocalization _loc;
         readonly ISubscriber<WalletChanged> _wallet;
         readonly ISubscriber<RosterChanged> _roster;
+        readonly ISubscriber<ShopChanged> _shop;
         readonly PageAction _action;
+        readonly bool _fromShop;
         IDisposable? _subs;
         MemberId _member;
+        bool _left;
 
         public MemberSheetPresenter(IMemberSheetView view, HubLocation location, ISessionReadModel session, ITrainMemberUseCase train,
-                                    HubNavigator nav, IToastService toasts, ILocalization loc,
-                                    ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster)
+                                    RecruitFlow recruit, HubNavigator nav, IToastService toasts, ILocalization loc,
+                                    ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, ISubscriber<ShopChanged> shop)
             : base(view, null)
         {
-            _session = session; _train = train; _nav = nav; _toasts = toasts; _loc = loc; _wallet = wallet; _roster = roster;
+            _session = session; _train = train; _recruit = recruit; _nav = nav; _toasts = toasts; _loc = loc;
+            _wallet = wallet; _roster = roster; _shop = shop;
             _member = location.Member ?? throw new ArgumentException("Fiche sans membre", nameof(location));
+            _fromShop = location.FromShop;
             _action = new PageAction(toasts, loc);
         }
 
@@ -43,7 +54,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             View.PreviousClicked += Previous;
             View.NextClicked += Next;
-            View.PrimaryClicked += Train;
+            View.PrimaryClicked += Primary;
             View.RoomClicked += OpenRoom;
         }
 
@@ -53,6 +64,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var bag = DisposableBag.CreateBuilder();
             _wallet.Subscribe(_ => Refresh()).AddTo(bag);
             _roster.Subscribe(_ => Refresh()).AddTo(bag);
+            _shop.Subscribe(_ => Refresh()).AddTo(bag);
             _subs = bag.Build();
             Refresh();
         }
@@ -68,17 +80,16 @@ namespace N29.HeroesDawn.Presentation.Hub
             _subs?.Dispose();
             View.PreviousClicked -= Previous;
             View.NextClicked -= Next;
-            View.PrimaryClicked -= Train;
+            View.PrimaryClicked -= Primary;
             View.RoomClicked -= OpenRoom;
         }
-
-        ITeamMemberReadModel? Current => _session.Roster.FirstOrDefault(m => m.Id == _member);
 
         void Previous() => Step(-1);
         void Next() => Step(1);
 
         void Step(int delta)
         {
+            if (_fromShop) return;
             var roster = _session.Roster;
             if (roster.Count == 0) return;
             int i = 0;
@@ -88,6 +99,12 @@ namespace N29.HeroesDawn.Presentation.Hub
         }
 
         void OpenRoom(HubPage page) => _nav.Open(page);
+
+        void Primary()
+        {
+            if (_fromShop) Recruit();
+            else Train();
+        }
 
         void Train()
         {
@@ -100,32 +117,86 @@ namespace N29.HeroesDawn.Presentation.Hub
             });
         }
 
+        void Recruit()
+        {
+            int slot = Slot();
+            if (slot < 0) return;
+            RecruitAsync(slot).Forget();
+        }
+
+        async UniTaskVoid RecruitAsync(int slot)
+        {
+            var outcome = await _recruit.RunAsync(slot, Lifetime);
+            if (Disposed) return;
+            if (outcome == RecruitOutcome.Expired) Leave(false);
+            else Refresh();
+        }
+
+        int Slot()
+        {
+            var offers = _session.Shop.Offers;
+            for (int i = 0; i < offers.Count; i++) if (offers[i].Id == _member) return i;
+            return -1;
+        }
+
+        /// <summary>L'offre n'existe plus : retour à Recruter (une seule fois), avec le toast si personne ne l'a déjà affiché.</summary>
+        void Leave(bool toast)
+        {
+            if (_left) return;
+            _left = true;
+            if (toast) _toasts.Show(_loc.Error(ShopErrors.Expired), ToastKind.Error);
+            _nav.Back();
+        }
+
         void Refresh()
         {
-            if (Disposed) return;
-            var m = Current;
+            if (Disposed || _left) return;
+            if (_fromShop) RefreshShop();
+            else RefreshOwned();
+        }
+
+        void RefreshOwned()
+        {
+            var m = _session.Roster.FirstOrDefault(x => x.Id == _member);
             if (m == null) return;
-            var def = m.Def;
             bool max = m.Level >= MetaRules.MaxLevel;
             int cost = MetaRules.TrainCost(m.Level);
             int missing = cost - _session.Wallet.Credits;
-            View.Show(new MemberSheetData
-            {
-                Card = MemberCards.Card(def, m.Level, _session.Content.Balance, _loc),
-                Owned = true,
-                FatigueText = _loc.F("ui.fatigue", m.Fatigue),
-                Fatigue01 = m.Fatigue / 100f,
-                Fatigue = m.Fatigue,
-                Skills = def.Skills.Select(s => new SkillLineData { Name = _loc.SkillName(s), Description = _loc.DescribeSkill(s) }).ToArray(),
-                Combos = SquadCombos.For(def.Family, _session.Content.Combos)
-                                    .Select(c => _loc.F("sheet.combo_line", _loc.ComboName(c), _loc.FamilyName(c.A == def.Family ? c.B : c.A)))
-                                    .ToArray(),
-                PrimaryLabel = max ? _loc.T("hub.train.max") : _loc.F("hub.train", cost + " CR"),
-                PrimaryEnabled = !max && missing <= 0,
-                PrimaryReason = !max && missing > 0 ? _loc.F("hub.train.missing", missing) : "",
-                ShowArrows = _session.Roster.Count > 1,
-                ShowRooms = true,
-            });
+            var d = Sheet(m.Def, m.Level, true);
+            d.FatigueText = _loc.F("ui.fatigue", m.Fatigue);
+            d.Fatigue01 = m.Fatigue / 100f;
+            d.Fatigue = m.Fatigue;
+            d.PrimaryLabel = max ? _loc.T("hub.train.max") : _loc.F("hub.train", cost + " CR");
+            d.PrimaryEnabled = !max && missing <= 0;
+            d.PrimaryReason = !max && missing > 0 ? _loc.F("hub.train.missing", missing) : "";
+            d.ShowArrows = _session.Roster.Count > 1;
+            d.ShowRooms = true;
+            View.Show(d);
         }
+
+        void RefreshShop()
+        {
+            int slot = Slot();
+            if (slot < 0) { Leave(true); return; }
+            var offer = _session.Shop.Offers[slot];
+            var def = _session.Content.Member(offer.Id);
+            bool inTeam = offer.Recruited || _session.Roster.Any(x => x.Id == offer.Id);
+            var d = Sheet(def, MetaRules.RecruitLevel, false);
+            d.FatigueText = "";
+            d.PrimaryLabel = inTeam ? _loc.T("recruit.in_team") : _loc.F("hub.recruit", MetaRules.RecruitCost(def.Rarity));
+            d.PrimaryEnabled = !inTeam;
+            d.PrimaryReason = "";
+            View.Show(d);
+        }
+
+        MemberSheetData Sheet(MemberDef def, int level, bool owned) => new MemberSheetData
+        {
+            Card = MemberCards.Card(def, level, _session.Content.Balance, _loc),
+            Owned = owned,
+            Skills = def.Skills.Select(s => new SkillLineData { Name = _loc.SkillName(s), Description = _loc.DescribeSkill(s) }).ToArray(),
+            Combos = SquadCombos.For(def.Family, _session.Content.Combos)
+                                .Select(c => _loc.F("sheet.combo_line", _loc.ComboName(c), _loc.FamilyName(c.A == def.Family ? c.B : c.A)))
+                                .ToArray(),
+        };
     }
 }

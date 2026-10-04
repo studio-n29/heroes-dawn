@@ -31,6 +31,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         WalletBinder? _wallet;
         IDisposable? _shopSub;
         bool _askingQuit;
+        int _navVersion;
 
         public HubShellPresenter(IHubShellView view, HubNavigator nav, IHubPageFactory pages, ISessionReadModel session,
                                  ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving, ISubscriber<ShopChanged> shopChanged,
@@ -77,12 +78,23 @@ namespace N29.HeroesDawn.Presentation.Hub
             _page?.Tick();
         }
 
+        /// <summary>
+        /// Remplace la page courante. Une page peut naviguer pendant sa propre création (fiche de boutique périmée → Recruter) :
+        /// la navigation imbriquée gagne, la page dont la création se termine après elle est détruite aussitôt.
+        /// </summary>
         void OnNavigated(HubLocation location)
         {
             if (Disposed) return;
             _page?.Dispose();
             _page = null;
-            _page = _pages.Create(location);
+            int version = ++_navVersion;
+            var page = _pages.Create(location);
+            if (version != _navVersion || Disposed)
+            {
+                page.Dispose();
+                return;
+            }
+            _page = page;
             RefreshChrome();
         }
 

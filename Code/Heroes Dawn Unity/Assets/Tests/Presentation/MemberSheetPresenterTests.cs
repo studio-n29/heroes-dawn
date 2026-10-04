@@ -30,14 +30,60 @@ namespace N29.HeroesDawn.Tests.Presentation
             _nav = new HubNavigator();
         }
 
-        MemberSheetPresenter Make(string id = "givre", ITrainMemberUseCase train = null)
+        FakeModalHost _host = null!;
+
+        MemberSheetPresenter Make(string id = "givre", ITrainMemberUseCase train = null, bool fromShop = false)
         {
-            _nav.Open(HubPage.MemberSheet, new MemberId(id));
-            _p = new MemberSheetPresenter(_view, _nav.Current, _app.Session, train ?? _app.Hub.Train, _nav, _toasts, _loc,
-                                          _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>());
+            _nav.Open(HubPage.MemberSheet, new MemberId(id), fromShop);
+            _host = new FakeModalHost();
+            _host.Register<N29.HeroesDawn.Presentation.Popups.IRecruitConfirmPopupView>(() => new FakeRecruitConfirmPopup());
+            var flow = new RecruitFlow(new ModalService(_host), _app.Shop.Recruit, _app.Session, _toasts, _loc);
+            _p = new MemberSheetPresenter(_view, _nav.Current, _app.Session, train ?? _app.Hub.Train, flow, _nav, _toasts, _loc,
+                                          _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Subscriber<ShopChanged>());
             _view.Show();
             _p.Start();
             return _p;
+        }
+
+        void OpenShop()
+        {
+            _app.Time.LocalNow = new System.DateTime(2026, 10, 3, 12, 0, 0);
+            _app.Shop.Open.ExecuteAsync().GetAwaiter().GetResult();
+            _nav.SelectTab(HubPage.Recruit);
+        }
+
+        [Test, Description("Vérifie qu'un héros de la boutique s'ouvre avec « Recruter · N PR », sans flèches ni raccourcis, et que recruter passe par la confirmation — parce que la même fiche sert à la boutique (spec §4)")]
+        public void ShopMode_ShowsRecruitButtonWithPrice()
+        {
+            OpenShop();
+            _app.Session.Wallet.Set(0, 5000);
+            var offer = _app.Session.Shop.Offers[0].Id;
+            var def = _app.Session.Content.Member(offer);
+            Make(offer.Value, fromShop: true);
+            int cost = Application.Session.MetaRules.RecruitCost(def.Rarity);
+            Assert.That(_view.Last.Owned, Is.False);
+            Assert.That(_view.Last.PrimaryLabel, Is.EqualTo(_loc.F("hub.recruit", cost)));
+            Assert.That(_view.Last.PrimaryEnabled, Is.True);
+            Assert.That(_view.Last.ShowArrows || _view.Last.ShowRooms, Is.False);
+            _view.ClickPrimary();
+            ((FakeRecruitConfirmPopup)_host.Spawned.Last()).Answer(true);
+            Assert.That(_app.Session.Owns(offer), Is.True);
+            Assert.That(_view.Last.PrimaryEnabled, Is.False);
+            Assert.That(_view.Last.PrimaryLabel, Is.EqualTo(_loc.T("recruit.in_team")));
+        }
+
+        [Test, Description("Vérifie qu'une offre disparue (boutique renouvelée) renvoie à Recruter avec un toast — parce que la fiche ne peut plus acheter ce héros (Review Focus 2)")]
+        public void ShopMode_OfferGone_GoesBackToRecruitWithToast()
+        {
+            OpenShop();
+            var offer = _app.Session.Shop.Offers[0].Id;
+            Make(offer.Value, fromShop: true);
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.MemberSheet));
+            _app.Time.LocalNow = new System.DateTime(2026, 10, 4, 12, 0, 0);
+            _app.Session.Roster.Add(new Application.Session.TeamMember(_app.Session.Content.Member(offer), 5));
+            _app.Shop.Open.ExecuteAsync().GetAwaiter().GetResult();
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Recruit));
+            Assert.That(_toasts.Shown.Last(), Is.EqualTo((_loc.T("errors.shop.expired"), ToastKind.Error)));
         }
 
         [Test, Description("Vérifie que la fiche montre stats, compétences décrites et combos de la famille — parce que c'est le détail d'un membre (M21)")]

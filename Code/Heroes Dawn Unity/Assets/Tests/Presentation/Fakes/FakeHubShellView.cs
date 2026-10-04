@@ -54,10 +54,14 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public readonly List<FakePageHandle> Created = new List<FakePageHandle>();
         public FakePageHandle Last => Created[Created.Count - 1];
 
+        /// <summary>Appelé pendant la création (comme le démarrage d'un présentateur qui naviguerait aussitôt).</summary>
+        public Action<HubLocation>? OnCreate;
+
         public IHubPageHandle Create(HubLocation location)
         {
             var h = new FakePageHandle(location);
             Created.Add(h);
+            OnCreate?.Invoke(location);
             return h;
         }
     }

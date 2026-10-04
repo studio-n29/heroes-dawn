@@ -86,6 +86,14 @@ namespace N29.HeroesDawn.Presentation.Common
             ["sheet.skills"] = "COMPÉTENCES", ["sheet.combos"] = "COMBOS DE LA FAMILLE", ["sheet.combo_line"] = "{0} · avec {1}",
             ["sheet.previous"] = "PRÉC.", ["sheet.next"] = "SUIV.", ["sheet.salon"] = "SALON", ["sheet.infirmary"] = "INFIRMERIE",
             ["hub.train.missing"] = "Il manque {0} CR",
+            // --- Recruter (M30 adapté) et confirmation (M31) ---
+            ["recruit.rule"] = "3 héros chaque jour à 9h00. Les Légendes sont rares : ne les laisse pas filer.",
+            ["recruit.in_team"] = "DANS L'ÉQUIPE", ["recruit.progress"] = "Collection : {0} / {1}",
+            ["recruit.confirm.title"] = "Recruter {0} ?", ["recruit.confirm.ok"] = "RECRUTER",
+            ["recruit.confirm.before"] = "Solde actuel", ["recruit.confirm.cost"] = "Coût", ["recruit.confirm.after"] = "Après l'achat",
+            ["recruit.missing"] = "Il manque {0} PR",
+            ["recruit.how_to_earn"] = "Gagne des PR en sécurisant des zones et en remplissant leurs objectifs.",
+            ["recruit.combo"] = "Combo phare : {0} avec {1}", ["recruit.combo.family"] = "Combo phare : {0}",
             // --- Fonctions à venir (WIP) ---
             ["wip.soon"] = "BIENTÔT",
             ["wip.toast"] = "{0} arrive bientôt",

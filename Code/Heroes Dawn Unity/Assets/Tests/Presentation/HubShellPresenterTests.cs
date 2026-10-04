@@ -185,6 +185,22 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(page.Disposals, Is.EqualTo(1));
         }
 
+        [Test, Description("Vérifie qu'une page qui navigue pendant sa création est détruite et que seule la nouvelle page reste — parce qu'une fiche de boutique périmée renvoie aussitôt à Recruter (Review Focus 1)")]
+        public void NavigationDuringPageCreation_KeepsLatestPageOnly()
+        {
+            _nav.SelectTab(HubPage.Recruit);
+            _pages.OnCreate = l => { if (l.Page == HubPage.MemberSheet) _nav.Back(); };
+            _nav.Open(HubPage.MemberSheet, new Core.MemberId("arc"), true);
+            var sheet = _pages.Created.Single(h => h.Location.Page == HubPage.MemberSheet);
+            Assert.That(sheet.Disposals, Is.EqualTo(1));
+            Assert.That(_pages.Last.Location.Page, Is.EqualTo(HubPage.Recruit));
+            Assert.That(_pages.Last.Disposals, Is.Zero);
+            _p.Tick();
+            Assert.That(_pages.Last.Ticks, Is.EqualTo(1));
+            Assert.That(sheet.Ticks, Is.Zero);
+            Assert.That(_view.Last.Title, Is.EqualTo(_pages.Last.Title));
+        }
+
         [Test, Description("Vérifie que le tick de la coque est transmis à la page courante seulement — parce que les pages d'un scope enfant ne sont pas tickées par VContainer (compte à rebours du QG)")]
         public void Tick_ForwardedToCurrentPage()
         {

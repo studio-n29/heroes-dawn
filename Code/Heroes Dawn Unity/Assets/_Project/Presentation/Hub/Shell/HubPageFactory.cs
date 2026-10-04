@@ -11,7 +11,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// <summary>
     /// Crée chaque page du hub dans un scope VContainer enfant (vue instanciée depuis le catalogue + présentateur),
     /// démarre le présentateur à la main (les points d'entrée d'un scope enfant ne démarrent pas seuls) ; le handle détruit tout.
-    /// Chaque scope reçoit l'emplacement demandé (<see cref="HubLocation"/>) et son propre <see cref="MissionLauncher"/>.
+    /// Chaque scope reçoit l'emplacement demandé (<see cref="HubLocation"/>) et son propre <see cref="MissionLauncher"/> et <see cref="RecruitFlow"/>.
     /// </summary>
     public sealed class HubPageFactory : IHubPageFactory
     {
@@ -29,6 +29,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             HubPage.Qg => Make<QgPageView, IQgPageView, QgPagePresenter>(location),
             HubPage.Team => Make<TeamPageView, ITeamPageView, TeamPagePresenter>(location),
             HubPage.MemberSheet => Make<MemberSheetView, IMemberSheetView, MemberSheetPresenter>(location),
+            HubPage.Recruit => Make<RecruitPageView, IRecruitPageView, RecruitPagePresenter>(location),
             HubPage.Pass => Wip(location, WipCatalog.Pass, "page.pass"),
             HubPage.Shop => Wip(location, WipCatalog.Shop, "page.shop"),
             HubPage.Operations => Wip(location, WipCatalog.Operations, "page.operations"),
@@ -55,6 +56,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                     b.RegisterInstance<TIView>(view);
                     b.RegisterInstance(location);
                     b.Register<MissionLauncher>(Lifetime.Scoped);
+                    b.Register<RecruitFlow>(Lifetime.Scoped);
                     b.Register<TPresenter>(Lifetime.Scoped);
                     extra?.Invoke(b);
                 });
