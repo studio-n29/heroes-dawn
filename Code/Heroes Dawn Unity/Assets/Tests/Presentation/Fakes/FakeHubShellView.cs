@@ -44,6 +44,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public int Disposals { get; private set; }
         public string Title { get; }
         public FakePageHandle(HubLocation l) { Location = l; Title = "Titre " + l; }
+        public int Ticks { get; private set; }
+        public void Tick() => Ticks++;
         public void Dispose() => Disposals++;
     }
 

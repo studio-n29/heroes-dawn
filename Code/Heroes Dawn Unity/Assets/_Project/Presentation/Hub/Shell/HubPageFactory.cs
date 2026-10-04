@@ -11,6 +11,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// <summary>
     /// Crée chaque page du hub dans un scope VContainer enfant (vue instanciée depuis le catalogue + présentateur),
     /// démarre le présentateur à la main (les points d'entrée d'un scope enfant ne démarrent pas seuls) ; le handle détruit tout.
+    /// Chaque scope reçoit l'emplacement demandé (<see cref="HubLocation"/>) et son propre <see cref="MissionLauncher"/>.
     /// </summary>
     public sealed class HubPageFactory : IHubPageFactory
     {
@@ -25,19 +26,22 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public IHubPageHandle Create(HubLocation location) => location.Page switch
         {
-            HubPage.Pass => Wip(WipCatalog.Pass, "page.pass"),
-            HubPage.Shop => Wip(WipCatalog.Shop, "page.shop"),
-            HubPage.Operations => Wip(WipCatalog.Operations, "page.operations"),
-            HubPage.Lab => Wip(WipCatalog.Lab, "page.lab"),
-            HubPage.Archives => Wip(WipCatalog.Archives, "page.archives"),
+            HubPage.Qg => Make<QgPageView, IQgPageView, QgPagePresenter>(location),
+            HubPage.Team => Make<TeamPageView, ITeamPageView, TeamPagePresenter>(location),
+            HubPage.MemberSheet => Make<MemberSheetView, IMemberSheetView, MemberSheetPresenter>(location),
+            HubPage.Pass => Wip(location, WipCatalog.Pass, "page.pass"),
+            HubPage.Shop => Wip(location, WipCatalog.Shop, "page.shop"),
+            HubPage.Operations => Wip(location, WipCatalog.Operations, "page.operations"),
+            HubPage.Lab => Wip(location, WipCatalog.Lab, "page.lab"),
+            HubPage.Archives => Wip(location, WipCatalog.Archives, "page.archives"),
             _ => throw new InvalidOperationException("Page du hub pas encore disponible : " + location.Page),
         };
 
-        IHubPageHandle Wip(WipFeature feature, string titleKey)
-            => Make<WipPageView, IWipPageView, WipPagePresenter>(b => b.RegisterInstance(new WipPageArgs(feature, titleKey)));
+        IHubPageHandle Wip(HubLocation location, WipFeature feature, string titleKey)
+            => Make<WipPageView, IWipPageView, WipPagePresenter>(location, b => b.RegisterInstance(new WipPageArgs(feature, titleKey)));
 
         /// <summary>Instancie la page <typeparamref name="TView"/> et son présentateur, inscrits dans un scope enfant.</summary>
-        IHubPageHandle Make<TView, TIView, TPresenter>(Action<IContainerBuilder>? extra = null)
+        IHubPageHandle Make<TView, TIView, TPresenter>(HubLocation location, Action<IContainerBuilder>? extra = null)
             where TView : Component, TIView
             where TIView : class
             where TPresenter : class, IPageTitle, IStartable
@@ -49,12 +53,14 @@ namespace N29.HeroesDawn.Presentation.Hub
                 var scope = _resolver.CreateScope(b =>
                 {
                     b.RegisterInstance<TIView>(view);
+                    b.RegisterInstance(location);
+                    b.Register<MissionLauncher>(Lifetime.Scoped);
                     b.Register<TPresenter>(Lifetime.Scoped);
                     extra?.Invoke(b);
                 });
                 var presenter = scope.Resolve<TPresenter>();
                 presenter.Start();
-                return new PageHandle(presenter.Title, scope, go, _host);
+                return new PageHandle(presenter.Title, presenter as ITickable, scope, go, _host);
             }
             catch
             {
@@ -65,17 +71,23 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         sealed class PageHandle : IHubPageHandle
         {
+            readonly ITickable? _tickable;
             readonly IDisposable _scope;
             readonly GameObject _view;
             readonly IPageHost _host;
             bool _disposed;
 
-            public PageHandle(string title, IDisposable scope, GameObject view, IPageHost host)
+            public PageHandle(string title, ITickable? tickable, IDisposable scope, GameObject view, IPageHost host)
             {
-                Title = title; _scope = scope; _view = view; _host = host;
+                Title = title; _tickable = tickable; _scope = scope; _view = view; _host = host;
             }
 
             public string Title { get; }
+
+            public void Tick()
+            {
+                if (!_disposed) _tickable?.Tick();
+            }
 
             public void Dispose()
             {

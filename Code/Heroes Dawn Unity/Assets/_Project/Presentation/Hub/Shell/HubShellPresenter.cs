@@ -14,7 +14,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// Coque du hub : crée la page courante (une seule à la fois), tient titre, Retour, onglets et badge « N »,
     /// relaie Retour (pile, onglet → QG, QG → « Quitter le jeu ? ») et les touchers BIENTÔT / boutons grisés en toasts.
     /// </summary>
-    public sealed class HubShellPresenter : PresenterBase<IHubShellView>, IBackHandler
+    public sealed class HubShellPresenter : PresenterBase<IHubShellView>, IBackHandler, VContainer.Unity.ITickable
     {
         readonly HubNavigator _nav;
         readonly IHubPageFactory _pages;
@@ -68,6 +68,13 @@ namespace N29.HeroesDawn.Presentation.Hub
             _wallet?.Dispose();
             _page?.Dispose();
             _page = null;
+        }
+
+        /// <summary>Les pages vivent dans un scope enfant, non tické : la coque leur transmet le tick.</summary>
+        public void Tick()
+        {
+            if (Disposed) return;
+            _page?.Tick();
         }
 
         void OnNavigated(HubLocation location)

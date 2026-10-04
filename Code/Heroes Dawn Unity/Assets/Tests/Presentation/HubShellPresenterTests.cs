@@ -184,5 +184,17 @@ namespace N29.HeroesDawn.Tests.Presentation
             _p.Dispose();
             Assert.That(page.Disposals, Is.EqualTo(1));
         }
+
+        [Test, Description("Vérifie que le tick de la coque est transmis à la page courante seulement — parce que les pages d'un scope enfant ne sont pas tickées par VContainer (compte à rebours du QG)")]
+        public void Tick_ForwardedToCurrentPage()
+        {
+            var qg = _pages.Last;
+            _p.Tick();
+            Assert.That(qg.Ticks, Is.EqualTo(1));
+            _view.ClickTab(HubPage.Team);
+            _p.Tick();
+            Assert.That(qg.Ticks, Is.EqualTo(1));
+            Assert.That(_pages.Last.Ticks, Is.EqualTo(1));
+        }
     }
 }
