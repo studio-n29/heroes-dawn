@@ -87,14 +87,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             unitName.AutoSize(32);
             unitName.Inked();
             var hp = Ui.Bar(fill.transform, "Hp", Theme.Hp, Theme.SurfaceDark, true, 20);
-            ((RectTransform)hp.transform).Row(12, 12, -184, 26);
+            ((RectTransform)hp.transform).Row(12, 12, -180, 26);
             var gauge = Ui.Bar(fill.transform, "Gauge", Theme.Gauge, Theme.SurfaceDark);
             gauge.Smooth = false;
-            ((RectTransform)gauge.transform).Row(12, 12, -214, 14);
+            ((RectTransform)gauge.transform).Row(12, 12, -210, 14);
             var statuses = Ui.Txt(fill.transform, "", 20, Theme.Shield, TextAnchor.UpperLeft, FontKind.Body, "Statuses");
-            statuses.rectTransform.Row(12, 12, -234, 24);
+            statuses.rectTransform.Row(12, 12, -228, 24);
             var sub = Ui.Txt(fill.transform, "", 20, Theme.Fatigue, TextAnchor.UpperLeft, FontKind.Body, "Sub");
-            sub.rectTransform.Row(12, 12, -256, 26);
+            sub.rectTransform.Row(12, 12, -250, 26);
             var ko = Ui.Txt(fill.transform, "K.O.", 64, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Title, "KO");
             ko.rectTransform.Stretch();
             ko.Inked();
