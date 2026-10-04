@@ -34,6 +34,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             label.text = d.Label;
             hint.text = d.Hint;
             hint.gameObject.SetActive(!string.IsNullOrEmpty(d.Hint));
+            var lr = (RectTransform)label.transform;
+            lr.anchorMin = new Vector2(0f, string.IsNullOrEmpty(d.Hint) ? 0f : 0.5f); // centré quand il n y a pas d aide
             bool stepper = d.Kind == SettingKind.Stepper;
             minus.gameObject.SetActive(stepper);
             plus.gameObject.SetActive(stepper);

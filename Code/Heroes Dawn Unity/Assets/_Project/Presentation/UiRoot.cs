@@ -37,8 +37,10 @@ namespace N29.HeroesDawn.Presentation
             // Le tutoriel passe sous les modales (une confirmation reste utilisable) mais au-dessus des écrans.
             if (catalog.TutorialOverlay != null)
             {
-                Tutorial = Instantiate(catalog.TutorialOverlay, overlayRoot).GetComponent<TutorialOverlayView>();
+                // Hors de la zone sûre : le voile couvre tout l écran, encoche comprise.
+                Tutorial = Instantiate(catalog.TutorialOverlay, overlayRoot.parent).GetComponent<TutorialOverlayView>();
                 ((RectTransform)Tutorial.transform).Stretch();
+                Tutorial.transform.SetAsFirstSibling();
             }
             Modals = Instantiate(Required(catalog.ModalLayer, "ModalLayer"), overlayRoot).GetComponent<ModalLayer>();
             ((RectTransform)Modals.transform).Stretch();

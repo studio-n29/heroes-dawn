@@ -60,9 +60,9 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return Tab(HubPage.Recruit);
             Assert.That(PlayModeHarness.Visible<RecruitPageView>(), Is.True);
             yield return Tab(HubPage.Pass);
-            Assert.That(PlayModeHarness.Visible<WipPageView>(), Is.True);
+            Assert.That(PlayModeHarness.Visible<PassPageView>(), Is.True);
             yield return Tab(HubPage.Shop);
-            Assert.That(PlayModeHarness.Visible<WipPageView>(), Is.True);
+            Assert.That(PlayModeHarness.Visible<BoutiquePageView>(), Is.True);
             yield return Tab(HubPage.Qg);
             Assert.That(PlayModeHarness.Visible<QgPageView>(), Is.True);
             Assert.That(LivePages(), Is.EqualTo(1), "une seule page vivante");
@@ -105,10 +105,9 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator WipRoom_TapShowsSoonToast_NoNavigation()
         {
             yield return OnHub();
-            var mark = Object.FindObjectsByType<WipMark>(FindObjectsSortMode.None)
-                .First(m => m.gameObject.activeInHierarchy && m.FeatureId == WipCatalog.Operations.Id);
-            ExecuteEvents.Execute(mark.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerClickHandler);
-            var expected = Loc.F("wip.toast", Loc.T(WipCatalog.Operations.TitleKey));
+            // Plus aucune pièce du QG n est BIENTÔT : le mécanisme (relais de la coque) reste testé avec une fonction encore à venir.
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Wip.UiTapRelay>()!.RaiseWip(WipCatalog.MemberArt.Id);
+            var expected = Loc.F("wip.toast", Loc.T(WipCatalog.MemberArt.TitleKey));
             yield return PlayModeHarness.WaitFor(() => Object.FindObjectsByType<ToastItemView>(FindObjectsSortMode.None)
                 .Any(t => t.GetComponentInChildren<TMP_Text>().text == expected));
             Assert.That(Object.FindObjectsByType<ToastItemView>(FindObjectsSortMode.None)

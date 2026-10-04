@@ -55,9 +55,27 @@ namespace N29.HeroesDawn.Presentation.Hub
             rim.color = d.Highlight ? Theme.Primary : Theme.Ink;
             fill.color = d.Dim ? Theme.WithAlpha(Theme.Surface, 0.7f) : Theme.Surface2;
             title.color = d.Dim ? Theme.TextMuted : Theme.Text;
+            Layout(d.A, d.B, d.C);
             SetButton(0, d.A);
             SetButton(1, d.B);
             SetButton(2, d.C);
+        }
+
+        /// <summary>Les boutons visibles se rangent à droite, le texte prend la place restante.</summary>
+        void Layout(RowButtonData a, RowButtonData b, RowButtonData c)
+        {
+            var vis = new System.Collections.Generic.List<int>(3);
+            if (a.Visible) vis.Add(0);
+            if (b.Visible) vis.Add(1);
+            if (c.Visible) vis.Add(2);
+            for (int k = 0; k < vis.Count; k++)
+            {
+                var rt = buttons[vis[k]].Rect;
+                rt.anchoredPosition = new Vector2(-12f - (vis.Count - 1 - k) * 204f, rt.anchoredPosition.y);
+            }
+            float right = -(24f + vis.Count * 204f);
+            foreach (var t in new[] { (RectTransform)title.transform, (RectTransform)subtitle.transform, (RectTransform)bar.transform })
+                t.offsetMax = new Vector2(right, t.offsetMax.y);
         }
 
         void SetButton(int i, RowButtonData b)

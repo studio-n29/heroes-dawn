@@ -98,6 +98,9 @@ namespace N29.HeroesDawn.Tests.PlayMode
             session.Find(new N29.HeroesDawn.Core.MemberId("echo"))!.Fatigue = 70;
             session.Find(new N29.HeroesDawn.Core.MemberId("seve"))!.Fatigue = 30;
             yield return CaptureSettled("10-qg");
+            Container.Resolve<N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide>().Skip();
+            yield return new WaitForSecondsRealtime(0.3f);
+            yield return Capture("10b-qg-sans-tuto");
             Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
             yield return CaptureSettled("13-carte");
             Shell.BackButton.Button.onClick.Invoke();
@@ -123,12 +126,25 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return null;
 
             yield return Tab(HubPage.Pass);
-            yield return CaptureSettled("40-pass-wip");
+            yield return CaptureSettled("40-pass");
             yield return Tab(HubPage.Shop);
-            yield return CaptureSettled("50-boutique-wip");
+            yield return CaptureSettled("50-boutique");
+            yield return Tab(HubPage.Qg);
+            yield return null;
+            foreach (var room in new[] { (HubPage.Operations, "13-operations"), (HubPage.Lab, "14-labo"), (HubPage.Archives, "15-archives") })
+            {
+                Object.FindAnyObjectByType<QgPageView>()!.RoomButton(room.Item1)!.onClick.Invoke();
+                yield return CaptureSettled(room.Item2);
+                Shell.BackButton.Button.onClick.Invoke();
+                yield return null;
+            }
             Shell.SettingsButton.Button.onClick.Invoke();
-            yield return CaptureSettled("80-parametres");
-            Assert.That(File.Exists(Path.Combine(Folder, "80-parametres.png")));
+            yield return CaptureSettled("80-parametres-audio");
+            Object.FindAnyObjectByType<SettingsPageView>()!.CategoryButton(2).onClick.Invoke();
+            yield return CaptureSettled("82-parametres-accessibilite");
+            Object.FindAnyObjectByType<SettingsPageView>()!.CategoryButton(7).onClick.Invoke();
+            yield return CaptureSettled("85-parametres-support");
+            Assert.That(File.Exists(Path.Combine(Folder, "85-parametres-support.png")));
         }
 
         [UnityTest, Explicit("Captures à la demande"), Description("Produit une capture de la connexion, du QG, du plateau et du combat — parce que le passage à TextMeshPro change le rendu des polices et doit être relu à l'œil avant toute conversion (spec §11)")]
