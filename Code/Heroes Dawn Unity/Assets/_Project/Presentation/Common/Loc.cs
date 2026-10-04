@@ -86,6 +86,15 @@ namespace N29.HeroesDawn.Presentation.Common
             ["sheet.skills"] = "COMPÉTENCES", ["sheet.combos"] = "COMBOS DE LA FAMILLE", ["sheet.combo_line"] = "{0} · avec {1}",
             ["sheet.previous"] = "PRÉC.", ["sheet.next"] = "SUIV.", ["sheet.salon"] = "SALON", ["sheet.infirmary"] = "INFIRMERIE",
             ["hub.train.missing"] = "Il manque {0} CR",
+            // --- Salon, Infirmerie, Paramètres ---
+            ["salon.simple"] = "Version simple : l'entraînement est immédiat. Les séances longues arriveront avec le Salon complet.",
+            ["infirmary.simple"] = "Version simple : un soin pour toute l'équipe, -30 % de fatigue chacun.",
+            ["infirmary.band.fit"] = "EN FORME", ["infirmary.band.tired"] = "FATIGUÉ", ["infirmary.band.exhausted"] = "ÉPUISÉ",
+            ["settings.account"] = "COMPTE", ["settings.audio"] = "AUDIO", ["settings.graphics"] = "GRAPHISMES",
+            ["settings.accessibility"] = "ACCESSIBILITÉ", ["settings.notifications"] = "NOTIFICATIONS", ["settings.controls"] = "CONTRÔLES",
+            ["settings.player"] = "{0} · {1}", ["settings.logout"] = "SE DÉCONNECTER", ["settings.reset"] = "EFFACER LA SAUVEGARDE",
+            ["settings.reset.hint"] = "Efface ta progression et recommence une partie neuve. Irréversible.",
+            ["settings.reset.done"] = "Sauvegarde effacée : nouvelle partie.",
             // --- Recruter (M30 adapté) et confirmation (M31) ---
             ["recruit.rule"] = "3 héros chaque jour à 9h00. Les Légendes sont rares : ne les laisse pas filer.",
             ["recruit.in_team"] = "DANS L'ÉQUIPE", ["recruit.progress"] = "Collection : {0} / {1}",
