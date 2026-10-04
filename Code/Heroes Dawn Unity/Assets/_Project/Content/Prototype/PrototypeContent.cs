@@ -121,7 +121,10 @@ namespace N29.HeroesDawn.Content.Prototype
                 C("resonance_perception", Family.Perception, Family.Perception, TargetRule.AllAllies, St(StatusType.Haste, 2)),
             };
 
-            return new ContentCatalog(balance, members, enemies, combos, new[] { BuildZone11() });
+            enemies.AddRange(PrototypeZones.Enemies());
+            var zones = new List<ZoneDef> { BuildZone11() };
+            zones.AddRange(PrototypeZones.Zones());
+            return new ContentCatalog(balance, members, enemies, combos, zones);
         }
 
         /// <summary>Red Hook — les quais : 25 cases, 3 embranchements, 6 combats (1 Élite fixe : Brick).</summary>
@@ -170,7 +173,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 new EncounterDef(CombatRank.Elite, new[] { new EnemyId("brick"), new EnemyId("thug") }),
             };
 
-            return new ZoneDef(Zone11, "zones.ny_1_1.name", new CaseId("n00"), nodes, links, objectives, encounters);
+            return new ZoneDef(Zone11, "zones.ny_1_1.name", new CaseId("n00"), nodes, links, objectives, encounters, "1.1", 1, "brooklyn", 5);
         }
     }
 }

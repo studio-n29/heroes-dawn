@@ -19,6 +19,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] UiBar hp = null!;
         [SerializeField] UiBar gauge = null!;
         [SerializeField] TMP_Text statuses = null!;
+        [SerializeField] TMP_Text sub = null!;
+        [SerializeField] Image portraitArea = null!;
         [SerializeField] TMP_Text ko = null!;
         [SerializeField] Pulse readyPulse = null!;
         [SerializeField] CanvasGroup group = null!;
@@ -41,8 +43,10 @@ namespace N29.HeroesDawn.Presentation.Combat
             _ally = d.Ally;
             _baseFill = d.Ally ? Theme.Surface : Theme.Hex(0x2A1C22);
             fill.color = _baseFill;
-            layout.preferredWidth = layout.minWidth = d.Ally ? 430 : 440;
-            layout.preferredHeight = layout.minHeight = d.Ally ? 180 : 200;
+            layout.preferredWidth = layout.minWidth = 250;
+            layout.preferredHeight = layout.minHeight = 290;
+            sub.text = d.Sub ?? "";
+            portraitArea.color = Color.Lerp(Theme.FamilyColor(d.Family), Color.black, d.Ally ? 0.55f : 0.72f);
             strip.color = Theme.FamilyColor(d.Family);
             portrait.Show(d.Portrait);
             unitName.text = d.Name;

@@ -43,7 +43,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Carte d'unité (reprise de l'ancien UnitCard.Create) ; la taille allié / ennemi est réglée à l'exécution.</summary>
+    /// <summary>
+    /// Carte d'unité verticale (M65) : zone de portrait teintée à la famille avec le nom en bas, PV, jauge ATB, statuts et ligne fixe
+    /// (fatigue des alliés). Taille 250 × 290 réglée à l'exécution.
+    /// </summary>
     public sealed class UnitCardRecipe : IPrefabRecipe
     {
         public string RelativePath => "Widgets/UnitCard.prefab";
@@ -53,8 +56,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         {
             var fill = RecipeKit.PanelRoot("UnitCard", Theme.Surface, 4f, 7f, true);
             var frame = fill.Frame();
-            frame.sizeDelta = new Vector2(430, 180);
-            var layout = frame.Pref(430, 180);
+            frame.sizeDelta = new Vector2(250, 290);
+            var layout = frame.Pref(250, 290);
             var group = frame.gameObject.AddComponent<CanvasGroup>();
 
             var target = Ui.Img(frame, "TargetRing", Theme.Danger, Sprites.Rounded);
@@ -67,21 +70,30 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             select.transform.SetAsFirstSibling();
             select.gameObject.SetActive(false);
 
-            var strip = Ui.Img(fill.transform, "Family", Theme.Primary, Sprites.RoundedSmall);
-            strip.rectTransform.TopBand(10, 0);
-            var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", fill.transform, "Portrait");
-            ((RectTransform)portrait.transform).At(0f, 1f, 12, -20, 96, 96);
-            const float x = 122, right = 18;
-            var unitName = Ui.Txt(fill.transform, "", 32, Color.white, TextAnchor.UpperLeft, FontKind.Title, "Name");
-            unitName.rectTransform.Row(x, right, -14, 38);
+            var area = Ui.Img(fill.transform, "PortraitArea", Theme.Surface3, Sprites.Rounded);
+            area.type = Image.Type.Sliced;
+            area.rectTransform.Row(8, 8, -8, 168);
+            Ui.Img(area.transform, "Shade", new Color(0f, 0f, 0f, 0.5f), Sprites.VerticalGradient).rectTransform.Stretch();
+            var strip = Ui.Img(area.transform, "Family", Theme.Primary, Sprites.RoundedSmall);
+            strip.rectTransform.anchorMin = new Vector2(0, 0);
+            strip.rectTransform.anchorMax = new Vector2(1, 0);
+            strip.rectTransform.pivot = new Vector2(0.5f, 0);
+            strip.rectTransform.sizeDelta = new Vector2(0, 8);
+            var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", area.transform, "Portrait");
+            ((RectTransform)portrait.transform).At(0.5f, 0.5f, 0, 14, 112, 112);
+            var unitName = Ui.Txt(area.transform, "", 32, Color.white, TextAnchor.LowerLeft, FontKind.Title, "Name");
+            unitName.rectTransform.Stretch(12, 12, 8, 120);
+            unitName.AutoSize(32);
             unitName.Inked();
             var hp = Ui.Bar(fill.transform, "Hp", Theme.Hp, Theme.SurfaceDark, true, 20);
-            ((RectTransform)hp.transform).Row(x, right, -56, 28);
+            ((RectTransform)hp.transform).Row(12, 12, -184, 26);
             var gauge = Ui.Bar(fill.transform, "Gauge", Theme.Gauge, Theme.SurfaceDark);
             gauge.Smooth = false;
-            ((RectTransform)gauge.transform).Row(x, right, -90, 16);
+            ((RectTransform)gauge.transform).Row(12, 12, -214, 14);
             var statuses = Ui.Txt(fill.transform, "", 20, Theme.Shield, TextAnchor.UpperLeft, FontKind.Body, "Statuses");
-            statuses.rectTransform.Row(x, right, -112, 50);
+            statuses.rectTransform.Row(12, 12, -234, 24);
+            var sub = Ui.Txt(fill.transform, "", 20, Theme.Fatigue, TextAnchor.UpperLeft, FontKind.Body, "Sub");
+            sub.rectTransform.Row(12, 12, -256, 26);
             var ko = Ui.Txt(fill.transform, "K.O.", 64, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Title, "KO");
             ko.rectTransform.Stretch();
             ko.Inked();
@@ -107,6 +119,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "hp", hp);
             ctx.Wire(view, "gauge", gauge);
             ctx.Wire(view, "statuses", statuses);
+            ctx.Wire(view, "sub", sub);
+            ctx.Wire(view, "portraitArea", area);
             ctx.Wire(view, "ko", ko);
             ctx.Wire(view, "readyPulse", pulse);
             ctx.Wire(view, "group", group);
@@ -117,7 +131,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Bouton de compétence (reprise de l'ancien CombatScreen.Build, panneau des compétences).</summary>
+    /// <summary>Ligne de compétence du panneau de gauche (M65 ④) : nom en titre, effet dessous, 460 × 100.</summary>
     public sealed class SkillButtonRecipe : IPrefabRecipe
     {
         public string RelativePath => "Widgets/SkillButton.prefab";
@@ -125,16 +139,16 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var holder = PrefabContext.NewRoot("holder", 440, 146);
+            var holder = PrefabContext.NewRoot("holder", 460, 100);
             var b = Ui.Btn(holder, "", Theme.Primary, Theme.TextDark, null!, 32, FontKind.Title, "SkillButton");
             b.Rect.SetParent(null, false);
             Object.DestroyImmediate(holder.gameObject);
-            b.Rect.sizeDelta = new Vector2(440, 146);
-            b.Rect.Pref(440, 146);
-            b.Label.alignment = TextAlignmentOptions.Top;
-            b.Label.rectTransform.Stretch(12, 60, 12, 8);
-            var desc = Ui.Txt(b.Fill.transform, "", 20, Theme.TextDark, TextAnchor.UpperCenter, FontKind.Body, "Desc");
-            desc.rectTransform.Stretch(14, 8, 14, 60);
+            b.Rect.sizeDelta = new Vector2(460, 100);
+            b.Rect.Pref(460, 100);
+            b.Label.alignment = TextAlignmentOptions.TopLeft;
+            b.Label.rectTransform.Stretch(18, 44, 12, 6);
+            var desc = Ui.Txt(b.Fill.transform, "", 20, Theme.TextDark, TextAnchor.UpperLeft, FontKind.Body, "Desc");
+            desc.rectTransform.Stretch(18, 8, 12, 52);
             var view = b.gameObject.AddComponent<SkillButtonView>();
             ctx.Wire(view, "button", b);
             ctx.Wire(view, "description", desc);
@@ -202,8 +216,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             return root.gameObject;
         }
     }
-
-    /// <summary>Combat (reprise de l'ancien CombatScreen.Build).</summary>
+    /// <summary>
+    /// Combat (M65/M66). Adapté à un écran de ~2160 × 972 : barre haute (retraite, titre, AUTO, vitesse, pause), ennemis en haut à droite,
+    /// alliés en bas à droite, panneau de compétences et journal à gauche, combo et consigne dans la bande centrale.
+    /// </summary>
     public sealed class CombatRecipe : IPrefabRecipe
     {
         public string RelativePath => "Screens/Combat.prefab";
@@ -213,53 +229,62 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         {
             var rt = ScreenKit.Root("Combat");
             ScreenKit.Backdrop(rt, Theme.WithAlpha(Theme.Danger, 0.22f), Theme.Hex(0x120E14));
-            ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.8f);
+            ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.72f);
 
             // ---- Barre du haut
-            var top = Ui.Panel(rt, "TopBar", Theme.SurfaceDark, 0f, 0f, true).Frame().TopBand(90);
-            var retreat = Ui.LocBtn(top, "combat.retreat", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Retreat");
-            retreat.Rect.At(0f, 0.5f, 20, 0, 240, 64);
-            var title = Ui.Txt(top, "", 44, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Title");
-            title.rectTransform.At(0.5f, 0.5f, 0, 0, 900, 64);
+            var top = Ui.Panel(rt, "TopBar", Theme.WithAlpha(Theme.SurfaceDark, 0.94f), 0f, 0f, true).Frame().TopBand(90);
+            var retreat = Ui.LocBtn(top, "combat.retreat", Theme.Surface3, Theme.Danger, null!, 30, FontKind.Title, "Retreat");
+            retreat.Rect.At(0f, 0.5f, 20, 0, 230, 64);
+            var title = Ui.Txt(top, "", 44, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
+            title.rectTransform.At(0f, 0.5f, 270, 0, 800, 64);
             title.Inked();
-            var auto = Ui.LocBtn(top, "combat.auto", Theme.Surface3, Theme.Text, null!, 32, FontKind.Title, "Auto");
-            auto.Rect.At(1f, 0.5f, -170, 0, 170, 64);
-            var speed = Ui.Btn(top, "", Theme.Surface3, Theme.Text, null!, 32, FontKind.Title, "Speed");
-            speed.Rect.At(1f, 0.5f, -20, 0, 130, 64);
+            var pause = Ui.LocBtn(top, "combat.pause", Theme.Surface2, Theme.Text, null!, 34, FontKind.Title, "Pause");
+            pause.Rect.At(1f, 0.5f, -20, 0, 74, 74);
+            var speed = Ui.Btn(top, "", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Speed");
+            speed.Rect.At(1f, 0.5f, -114, 0, 150, 64);
+            var auto = Ui.LocBtn(top, "combat.auto_hint", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Auto");
+            auto.Rect.At(1f, 0.5f, -284, 0, 190, 64);
             var debug = Ui.LocBtn(top, "combat.debug_win", Theme.Hex(0x5B2A6B), Color.white, null!, 20, FontKind.Body, "DebugWin");
-            debug.Rect.At(0f, 0.5f, 280, 0, 220, 50);
+            debug.Rect.At(1f, 0.5f, -500, 0, 200, 46);
 
-            // ---- Ennemis (haut), alliés (bas)
-            var enemyRow = Ui.Rect(rt, "Enemies").At(0.5f, 1f, 0, -130, 1500, 210);
-            enemyRow.HLayout(40, 0, TextAnchor.MiddleCenter);
-            var allyRow = Ui.Rect(rt, "Allies").At(0.5f, 0f, 0, 24, 1840, 190);
-            allyRow.HLayout(24, 0, TextAnchor.MiddleCenter);
+            // ---- Ennemis (haut droite), alliés (bas droite)
+            var enemyRow = Ui.Rect(rt, "Enemies").At(1f, 1f, -30, -104, 1000, 290);
+            enemyRow.HLayout(30, 0, TextAnchor.UpperCenter);
+            var allyRow = Ui.Rect(rt, "Allies").At(1f, 0f, -30, 20, 1100, 290);
+            allyRow.HLayout(16, 0, TextAnchor.LowerCenter);
 
-            // ---- Journal (gauche)
-            var logFill = Ui.Panel(rt, "Log", Theme.WithAlpha(Theme.SurfaceDark, 0.85f), 3f, 4f, false);
-            logFill.Frame().At(0f, 0.5f, 24, 70, 560, 250);
+            // ---- Journal (haut gauche, discret)
+            var logFill = Ui.Panel(rt, "Log", Theme.WithAlpha(Theme.SurfaceDark, 0.55f), 3f, 0f, false);
+            logFill.Frame().At(0f, 1f, 24, -108, 500, 132);
             var logText = Ui.Txt(logFill.transform, "", 21, Theme.TextMuted, TextAnchor.LowerLeft, FontKind.Regular, "Lines");
             logText.rectTransform.Stretch(14, 10, 14, 10);
 
             // ---- Bandeau central, consigne
-            var banner = Ui.Txt(rt, "", 70, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Banner");
-            banner.rectTransform.At(0.5f, 0.5f, 120, 80, 1100, 110);
+            var banner = Ui.Txt(rt, "", 76, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Banner");
+            banner.rectTransform.At(1f, 0.5f, -30, 100, 1000, 120);
             banner.Inked();
             var bannerGroup = banner.gameObject.AddComponent<CanvasGroup>();
             bannerGroup.blocksRaycasts = false;
-            var hint = Ui.Txt(rt, "", 32, Color.white, TextAnchor.MiddleCenter, FontKind.Body, "Hint");
-            hint.rectTransform.At(0.5f, 0f, 0, 400, 1000, 44);
-            hint.Inked();
+            var hintBand = Ui.Img(rt, "HintBand", Theme.WithAlpha(Theme.Primary, 0.9f), Sprites.RoundedSmall);
+            hintBand.rectTransform.At(1f, 0f, -30, 322, 1000, 52);
+            var hint = Ui.Txt(hintBand.transform, "", 30, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Hint");
+            hint.rectTransform.Stretch(10, 0, 10, 0);
 
-            // ---- Compétences
-            var skillPanel = Ui.Rect(rt, "Skills").At(0.5f, 0f, 60, 236, 1380, 150);
-            skillPanel.HLayout(20, 0, TextAnchor.MiddleCenter);
+            // ---- Panneau de compétences (gauche) : onglet « X est prêt ! » + 3 lignes
+            var skillBox = Ui.Panel(rt, "Skills", Theme.WithAlpha(Theme.SurfaceDark, 0.92f), 5f, 8f, false);
+            var skillFrame = skillBox.Frame().At(0f, 0f, 24, 24, 500, 372);
+            var skillTitle = Ui.Txt(skillBox.transform, "", 30, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
+            skillTitle.rectTransform.At(0f, 1f, 18, -8, 460, 44);
+            skillTitle.AutoSize(30);
+            skillTitle.Inked();
+            var skillPanel = Ui.Rect(skillBox.transform, "Slots").At(0.5f, 0f, 0, 12, 464, 312);
+            skillPanel.VLayout(6, 0, TextAnchor.LowerCenter);
             var skills = new Object[3];
             for (int i = 0; i < 3; i++) skills[i] = ctx.Nest<SkillButtonView>("Widgets/SkillButton.prefab", skillPanel, "Skill" + (i + 1));
 
             // ---- Combo
             var combo = Ui.Btn(rt, "", Theme.Danger, Color.white, null!, 40, FontKind.Title, "Combo");
-            combo.Rect.At(1f, 0f, -24, 400, 360, 130);
+            combo.Rect.At(1f, 0f, -30, 384, 330, 116);
             combo.Label.Inked();
             combo.gameObject.AddComponent<Pulse>().Amplitude = 0.07f;
             combo.gameObject.SetActive(false);
@@ -270,6 +295,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "auto", auto);
             ctx.Wire(view, "speed", speed);
             ctx.Wire(view, "debugWin", debug);
+            ctx.Wire(view, "pause", pause);
             ctx.Wire(view, "combo", combo);
             ctx.Wire(view, "title", title);
             ctx.Wire(view, "hint", hint);
@@ -278,7 +304,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "bannerGroup", bannerGroup);
             ctx.Wire(view, "enemyRow", enemyRow);
             ctx.Wire(view, "allyRow", allyRow);
-            ctx.Wire(view, "skillPanel", skillPanel);
+            ctx.Wire(view, "skillPanel", skillFrame);
+            ctx.Wire(view, "skillTitle", skillTitle);
             ctx.WireArray(view, "skills", skills);
             ctx.Wire(view, "unitCardPrefab", ctx.Asset("Widgets/UnitCard.prefab").GetComponent<UnitCardView>());
             return rt.gameObject;

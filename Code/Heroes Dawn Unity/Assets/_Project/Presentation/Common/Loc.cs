@@ -9,9 +9,9 @@ namespace N29.HeroesDawn.Presentation.Common
     /// Textes FR du prototype (le M2 passera par Unity Localization / fr.json).
     /// Une clé absente est affichée telle quelle entre crochets pour être repérée facilement.
     /// </summary>
-    public static class Loc
+    public static partial class Loc
     {
-        static readonly Dictionary<string, string> Fr = new Dictionary<string, string>
+        static readonly Dictionary<string, string> Fr = Extended(new Dictionary<string, string>
         {
             // --- Général ---
             ["game.title"] = "HEROES DAWN",
@@ -278,7 +278,24 @@ namespace N29.HeroesDawn.Presentation.Common
             ["errors.squad_exhausted"] = "Toute l'escouade est épuisée.",
             ["errors.unknown_zone"] = "Zone inconnue.",
             ["errors.no_combat"] = "Aucun combat en attente.",
-        };
+        });
+
+        /// <summary>Les textes des fonctions ajoutées (un fichier partiel par fonction) complètent le dictionnaire de base.</summary>
+        static Dictionary<string, string> Extended(Dictionary<string, string> d)
+        {
+            ExtendMap(d);
+            ExtendCombat(d);
+            ExtendMeta(d);
+            ExtendTutorial(d);
+            ExtendSettings(d);
+            return d;
+        }
+
+        static partial void ExtendMap(Dictionary<string, string> d);
+        static partial void ExtendCombat(Dictionary<string, string> d);
+        static partial void ExtendMeta(Dictionary<string, string> d);
+        static partial void ExtendTutorial(Dictionary<string, string> d);
+        static partial void ExtendSettings(Dictionary<string, string> d);
 
         public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
         public static bool Has(string key) => Fr.ContainsKey(key);

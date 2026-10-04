@@ -13,7 +13,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// </summary>
     public sealed class ShopCardView : MonoBehaviour
     {
-        const float LegendRaise = 24f;
+        const float LegendRaise = 18f;
 
         [SerializeField] RectTransform card = null!;
         [SerializeField] Button tap = null!;
@@ -49,9 +49,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             var color = Theme.RarityColor(d.Rarity);
             rim.color = color;
-            halo.color = Theme.WithAlpha(color, 0.45f);
+            halo.color = Theme.WithAlpha(color, 0.3f);
             if (halo.gameObject.activeSelf != d.Halo) halo.gameObject.SetActive(d.Halo);
             card.anchoredPosition = new Vector2(0, d.Halo ? LegendRaise : 0);
+            ((RectTransform)halo.transform).anchoredPosition = card.anchoredPosition; // le halo suit la carte surélevée
             strip.color = Theme.FamilyColor(d.Card.Family);
             portrait.Show(d.Card.Portrait);
             memberName.text = d.Card.Name;

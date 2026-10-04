@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.Presentation.Common
             label.text = text;
             accent.color = accentColor;
             group.alpha = 0f;
-            Tween.Fade(group, 1f, 0.18f);
+            Tween.Fade(group, 0.92f, 0.18f);
             Tween.PopIn(transform, 0.25f);
             Tween.Delay(2.4f, () => Tween.Fade(group, 0f, 0.35f, () => { if (this != null) Destroy(gameObject); }), this);
         }

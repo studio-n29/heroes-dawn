@@ -9,6 +9,7 @@ namespace N29.HeroesDawn.Application.Features.Zone
         public static readonly DomainError NotAllowed = new DomainError("zone.not_allowed", "errors.board.not_allowed");
         public static readonly DomainError SquadExhausted = new DomainError("zone.exhausted", "errors.squad_exhausted");
         public static readonly DomainError UnknownZone = new DomainError("zone.unknown", "errors.unknown_zone");
+        public static readonly DomainError Locked = new DomainError("zone.locked", "errors.zone_locked");
     }
 
     public enum NarrativeChoice { Credits, Research, Morale }

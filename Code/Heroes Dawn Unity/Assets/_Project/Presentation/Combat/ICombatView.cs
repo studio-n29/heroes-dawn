@@ -14,6 +14,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         event Action? AutoClicked;
         event Action? SpeedClicked;
         event Action? DebugWinClicked;
+        event Action? PauseClicked;
         event Action? ComboClicked;
         event Action? CycleClicked;
         event Action<int>? SkillClicked;

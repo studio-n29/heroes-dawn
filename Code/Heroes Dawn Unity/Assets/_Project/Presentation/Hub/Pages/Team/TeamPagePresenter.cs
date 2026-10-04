@@ -86,7 +86,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         void Toggle(MemberId id) => _action.Run(ct => _toggle.ExecuteAsync(id, ct), Lifetime);
 
-        void Launch() => _mission.Launch(Lifetime);
+        void Launch() => _nav.Open(HubPage.CityMap);
 
         void Refresh()
         {

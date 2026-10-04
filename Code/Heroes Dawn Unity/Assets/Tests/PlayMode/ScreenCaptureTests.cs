@@ -40,7 +40,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             for (int i = 0; i < 20; i++) yield return null; // fondus et mises en page terminés
             // En batchmode, la fin d'image n'arrive jamais (WaitForEndOfFrame bloque) : rendu explicite par une caméra.
-            const int w = 1920, h = 1080;
+            const int w = 2160, h = 972; // téléphone 20:9 : le cas le plus bas (zone de page de ~710 px)
             var rt = new RenderTexture(w, h, 24);
             var camGo = new GameObject("CaptureCamera");
             var cam = camGo.AddComponent<Camera>();
@@ -98,6 +98,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             session.Find(new N29.HeroesDawn.Core.MemberId("echo"))!.Fatigue = 70;
             session.Find(new N29.HeroesDawn.Core.MemberId("seve"))!.Fatigue = 30;
             yield return CaptureSettled("10-qg");
+            Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
+            yield return CaptureSettled("13-carte");
+            Shell.BackButton.Button.onClick.Invoke();
+            yield return null;
 
             Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Salon)!.onClick.Invoke();
             yield return CaptureSettled("11-salon");
@@ -151,6 +155,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
 
             PlayModeHarness.TapNode(new N29.HeroesDawn.Core.CaseId("n03"));
             yield return PlayModeHarness.WaitFor(() => SceneManager.GetSceneByName(SceneNames.Combat).isLoaded && !Flow.IsTransitioning, 600);
+            yield return new WaitForSecondsRealtime(5f); // le temps qu un allié soit prêt (panneau de compétences)
             yield return Capture("04-combat");
 
             Container.Resolve<IForceCombatWinUseCase>().ExecuteAsync().Forget();

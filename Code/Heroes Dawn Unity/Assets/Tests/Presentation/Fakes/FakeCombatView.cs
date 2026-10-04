@@ -14,6 +14,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action? AutoClicked;
         public event Action? SpeedClicked;
         public event Action? DebugWinClicked;
+        public event Action? PauseClicked;
         public event Action? ComboClicked;
         public event Action? CycleClicked;
         public event Action<int>? SkillClicked;

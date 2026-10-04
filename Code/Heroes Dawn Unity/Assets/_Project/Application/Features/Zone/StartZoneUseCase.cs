@@ -1,6 +1,7 @@
 #nullable enable
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using N29.HeroesDawn.Application.Features.World;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
@@ -23,6 +24,7 @@ namespace N29.HeroesDawn.Application.Features.Zone
             ZoneDef? zone = null;
             foreach (var z in _s.Content.Zones) if (z.Id == zoneId) zone = z;
             if (zone == null) return UniTask.FromResult(Result.Fail(ZoneErrors.UnknownZone));
+            if (ZoneProgress.StatusOf(_s, zone) == ZoneStatus.Locked) return UniTask.FromResult(Result.Fail(ZoneErrors.Locked));
             if (_s.SquadExhausted) return UniTask.FromResult(Result.Fail(ZoneErrors.SquadExhausted));
             ulong seed = _seeds.NextSeed("zone:" + zoneId.Value);
             _s.Run = new ZoneRun(_s.Content, zone, seed);

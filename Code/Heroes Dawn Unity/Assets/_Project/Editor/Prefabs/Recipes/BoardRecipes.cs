@@ -170,7 +170,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var bonus = Ui.Btn(hudFill, "", Theme.Info, Theme.TextDark, null!, 26, FontKind.Title, "Bonus");
             bonus.Rect.At(1f, 0.5f, -20, 26, 220, 90);
             var end = Ui.LocBtn(hudFill, "board.end_move", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "EndMove");
-            end.Rect.At(1f, 0.5f, -250, -46, 590, 52);
+            end.Rect.At(1f, 0.5f, -20, -46, 590, 52); // sous Lancer et Dé bonus, jamais sous le dé
 
             var view = rt.gameObject.AddComponent<BoardView>();
             ScreenKit.WireFade(ctx, view);

@@ -9,6 +9,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     /// <summary>Aides partagées par les recettes.</summary>
     static class RecipeKit
     {
+        /// <summary>Matériau d interface généré par <c>UiMaterialBuilder</c> (Resources/UI/Materials) ; null s il n existe pas encore.</summary>
+        public static Material? Mat(string name)
+            => UnityEditor.AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Resources/UI/Materials/" + name + ".mat");
+
         /// <summary>Case de BD dont le cadre est la racine du prefab ; renvoie le fond intérieur (parent du contenu).</summary>
         public static Image PanelRoot(string name, Color fill, float border = 4f, float shadow = 6f, bool raycast = false)
         {
@@ -122,8 +126,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var fill = RecipeKit.PanelRoot("Toast", Theme.Primary, 4f, 6f);
+            var fill = RecipeKit.PanelRoot("Toast", Theme.WithAlpha(Theme.Primary, 0.78f), 4f, 0f);
             var frame = fill.Frame();
+            frame.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.55f); // translucide : le plateau reste lisible dessous
             frame.Pref(-1, 64);
             var h = frame.HLayout(0, 0);
             h.padding = new RectOffset(34, 34, 12, 12);

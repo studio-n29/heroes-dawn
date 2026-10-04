@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 {
     /// <summary>
-    /// Carte de la boutique (M30 adapté), 400 × 540 dans un emplacement de 580 de haut (place pour la Légende surélevée) :
+    /// Carte de la boutique (M30 adapté), 400 × 500 dans un emplacement de 540 de haut (place pour la Légende surélevée) :
     /// halo derrière, cadre de rareté, corps estompé une fois recruté, tampon « Dans l'équipe ».
     /// </summary>
     public sealed class ShopCardRecipe : IPrefabRecipe
@@ -19,16 +19,16 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var root = PrefabContext.NewRoot("ShopCard", 400, 580);
-            root.Pref(400, 580);
-            var halo = Ui.Img(root, "Halo", Theme.WithAlpha(Theme.Primary, 0.45f), Sprites.Rounded);
+            var root = PrefabContext.NewRoot("ShopCard", 400, 540);
+            root.Pref(400, 540);
+            var halo = Ui.Img(root, "Halo", Theme.WithAlpha(Theme.Primary, 0.3f), Sprites.Rounded);
             halo.type = Image.Type.Sliced;
-            halo.rectTransform.At(0.5f, 0.5f, 0, 0, 452, 596);
+            halo.rectTransform.At(0.5f, 0.5f, 0, 0, 428, 528);
             var haloPulse = halo.gameObject.AddComponent<Pulse>();
             haloPulse.Amplitude = 0.035f;
             haloPulse.Speed = 3f;
             halo.gameObject.SetActive(false);
-            var card = Ui.Rect(root, "Card").At(0.5f, 0.5f, 0, 0, 400, 540);
+            var card = Ui.Rect(root, "Card").At(0.5f, 0.5f, 0, 0, 400, 500);
             var rim = Ui.Img(card, "Rim", Theme.Primary, Sprites.Rounded, true);
             rim.type = Image.Type.Sliced;
             rim.rectTransform.Stretch();
@@ -97,7 +97,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var countdown = Ui.Txt(rt, "", 36, Theme.Primary, TextAnchor.MiddleRight, FontKind.Title, "Countdown");
             countdown.rectTransform.At(1f, 1f, 0, 0, 620, 48);
             countdown.Inked(1.5f);
-            var row = Ui.Rect(rt, "Cards").At(0.5f, 0.5f, 0, 18, 1300, 600);
+            var row = Ui.Rect(rt, "Cards").At(0.5f, 0.5f, 0, 20, 1300, 540);
             row.HLayout(50, 0, TextAnchor.MiddleCenter);
             var cards = new List<Object>();
             for (int i = 0; i < 3; i++) cards.Add(ctx.Nest<ShopCardView>("Widgets/ShopCard.prefab", row, "Card" + i));

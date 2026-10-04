@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using MessagePipe;
+using N29.HeroesDawn.Application.Features.World;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
@@ -71,7 +72,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         void OpenRoom(HubPage page) => _nav.Open(page);
 
-        void Launch() => _mission.Launch(Lifetime);
+        void Launch() => _nav.Open(HubPage.CityMap);
 
         void Refresh()
         {
@@ -79,8 +80,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             var s = _session;
             var now = _clock.LocalNow;
             _lastMinute = now.Hour * 60 + now.Minute;
-            var zone = s.Content.Zones.FirstOrDefault(z => z.Id == _mission.Zone);
-            bool done = s.CompletedZones.Contains(_mission.Zone.Value);
+            var zone = ZoneProgress.Recommended(s);
+            bool done = ZoneProgress.StatusOf(s, zone) == ZoneStatus.Done;
             int toTrain = s.Roster.Count(m => m.Level < MetaRules.MaxLevel);
             int tired = s.Roster.Count(m => m.Fatigue > 0);
             View.Show(new QgPageData
@@ -97,16 +98,16 @@ namespace N29.HeroesDawn.Presentation.Hub
                 SecondaryObjectivesWipId = WipCatalog.SecondaryObjectives.Id,
                 ShopAlert = ShopCountdown.Text(now, s.Content.Balance.ShopResetHour, _loc),
                 FilSpeaker = _loc.T("qg.fil.speaker"),
-                FilText = done ? _loc.T("qg.fil.done") : _loc.Or("qg.fil." + _mission.Zone.Value, "qg.fil.done"),
+                FilText = done ? _loc.T("qg.fil.done") : _loc.Or("qg.fil." + zone.Id.Value, "qg.fil.done"),
                 MissionTitle = _loc.T("qg.mission"),
-                MissionSub = zone != null ? _loc.T(zone.NameKey) : "",
+                MissionSub = _loc.T(zone.NameKey),
                 MissionEnabled = !s.SquadExhausted,
                 MissionHint = s.SquadExhausted ? _loc.T("hub.deploy.exhausted") : "",
             });
         }
 
         RoomCardData Wip(HubPage page, string titleKey, WipFeature feature)
-            => new RoomCardData { Page = page, Title = _loc.T(titleKey), Info = _loc.T("wip.soon"), WipId = feature.Id };
+            => new RoomCardData { Page = page, Title = _loc.T(titleKey), Info = "", WipId = feature.Id };
 
         /// <summary>« 1 membre … », « N membres … », ou la phrase « aucun ».</summary>
         string Count(string prefix, int n) => n == 0 ? _loc.T(prefix + ".none") : n == 1 ? _loc.T(prefix + ".one") : _loc.F(prefix + ".many", n);

@@ -18,6 +18,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] UiButton auto = null!;
         [SerializeField] UiButton speed = null!;
         [SerializeField] UiButton debugWin = null!;
+        [SerializeField] UiButton pause = null!;
+        [SerializeField] TMP_Text skillTitle = null!;
         [SerializeField] UiButton combo = null!;
         [SerializeField] TMP_Text title = null!;
         [SerializeField] TMP_Text hint = null!;
@@ -37,6 +39,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         public event Action? AutoClicked;
         public event Action? SpeedClicked;
         public event Action? DebugWinClicked;
+        public event Action? PauseClicked;
         public event Action? ComboClicked;
         public event Action? CycleClicked;
         public event Action<int>? SkillClicked;
@@ -52,6 +55,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             auto.Button.onClick.AddListener(() => AutoClicked?.Invoke());
             speed.Button.onClick.AddListener(() => SpeedClicked?.Invoke());
             debugWin.Button.onClick.AddListener(() => DebugWinClicked?.Invoke());
+            pause.Button.onClick.AddListener(() => PauseClicked?.Invoke());
             combo.Button.onClick.AddListener(() => ComboClicked?.Invoke());
             for (int i = 0; i < skills.Length; i++)
             {
@@ -67,6 +71,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (Keys.Pressed(Key.Digit3) || Keys.Pressed(Key.Numpad3)) SkillClicked?.Invoke(2);
             if (Keys.Pressed(Key.C) && combo.gameObject.activeSelf) ComboClicked?.Invoke();
             if (Keys.Pressed(Key.A)) AutoClicked?.Invoke();
+            if (Keys.Pressed(Key.S)) SpeedClicked?.Invoke();
+            if (Keys.Pressed(Key.P)) PauseClicked?.Invoke();
             if (Keys.Pressed(Key.Tab)) CycleClicked?.Invoke();
         }
 
@@ -94,6 +100,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             skillPanel.gameObject.SetActive(d.Visible);
             if (!d.Visible) return;
+            skillTitle.text = d.Title;
             for (int i = 0; i < skills.Length; i++) skills[i].Show(i < d.Slots.Length ? d.Slots[i] : default, i);
         }
 
@@ -112,7 +119,11 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (debugWin.gameObject.activeSelf != d.DebugVisible) debugWin.gameObject.SetActive(d.DebugVisible);
         }
 
-        public void SetHint(string text) => hint.text = text;
+        public void SetHint(string text)
+        {
+            hint.text = text;
+            hint.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(text));
+        }
 
         public void ShowBanner(string text, Tone tone)
         {

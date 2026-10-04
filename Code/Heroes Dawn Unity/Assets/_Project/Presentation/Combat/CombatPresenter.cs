@@ -75,6 +75,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.AutoClicked += ToggleAuto;
             View.SpeedClicked += ToggleSpeed;
             View.DebugWinClicked += DebugWin;
+            View.PauseClicked += Pause;
             View.ComboClicked += Combo;
             View.CycleClicked += CycleSelection;
             View.SkillClicked += Skill;
@@ -87,6 +88,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.AutoClicked -= ToggleAuto;
             View.SpeedClicked -= ToggleSpeed;
             View.DebugWinClicked -= DebugWin;
+            View.PauseClicked -= Pause;
             View.ComboClicked -= Combo;
             View.CycleClicked -= CycleSelection;
             View.SkillClicked -= Skill;
@@ -142,7 +144,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                     fam = def.Family;
                 }
                 _names[u.Id] = name;
-                cards.Add(new UnitCardData { Id = u.Id, Ally = u.Side == Side.Ally, Name = name.ToUpperInvariant(), Boss = u.IsBoss, Family = fam, Portrait = new PortraitData(name, fam, u.IsBoss) });
+                cards.Add(new UnitCardData { Id = u.Id, Ally = u.Side == Side.Ally, Name = name.ToUpperInvariant(), Boss = u.IsBoss, Family = fam, Portrait = new PortraitData(name, fam, u.IsBoss), Sub = u.Side == Side.Ally && u.Id < fighters.Count ? _loc.F("ui.fatigue", fighters[u.Id].Fatigue) : "" });
             }
             View.BuildUnits(cards);
         }
@@ -285,7 +287,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             _firstRefresh = false;
             View.ShowUnits(states);
 
-            var panel = new SkillPanelData { Visible = manual && _selected >= 0, Slots = new SkillSlotData[3] };
+            var panel = new SkillPanelData { Visible = manual && _selected >= 0, Slots = new SkillSlotData[3], Title = _selected >= 0 ? _loc.F("combat.ready", Name(_selected)).ToUpperInvariant() : "" };
             if (panel.Visible)
             {
                 var u = sim.Unit(_selected);
@@ -455,6 +457,24 @@ namespace N29.HeroesDawn.Presentation.Combat
                 bool ok = await _modals.ConfirmAsync(new ConfirmData(_loc.T("combat.retreat.title"), _loc.T("combat.retreat.body"),
                                                                      _loc.T("ui.confirm"), _loc.T("ui.cancel"), Tone.Danger), Lifetime);
                 if (ok) _sim?.Submit(CombatCommand.Retreat());
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        /// <summary>Pause : le combat est figé tant que la modale est ouverte ; « Abandonner » passe par la confirmation de retraite.</summary>
+        void Pause()
+        {
+            if (_sim == null || _sim.IsOver || Disposed || _modals.AnyOpen) return;
+            PauseAsync().Forget();
+        }
+
+        async UniTaskVoid PauseAsync()
+        {
+            try
+            {
+                bool resume = await _modals.ConfirmAsync(new ConfirmData(_loc.T("combat.pause.title"), _loc.T("combat.pause.body"),
+                                                                         _loc.T("combat.pause.resume"), _loc.T("combat.pause.abandon"), Tone.Primary), Lifetime);
+                if (!resume) Retreat();
             }
             catch (OperationCanceledException) { }
         }

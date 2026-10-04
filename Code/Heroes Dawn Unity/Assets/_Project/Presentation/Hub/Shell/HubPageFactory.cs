@@ -33,6 +33,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             HubPage.Salon => Make<SalonPageView, ISalonPageView, SalonPagePresenter>(location),
             HubPage.Infirmary => Make<InfirmaryPageView, IInfirmaryPageView, InfirmaryPagePresenter>(location),
             HubPage.Settings => Make<SettingsPageView, ISettingsPageView, SettingsPagePresenter>(location),
+            HubPage.CityMap => Make<CityMapPageView, ICityMapPageView, CityMapPagePresenter>(location),
             HubPage.Pass => Wip(location, WipCatalog.Pass, "page.pass"),
             HubPage.Shop => Wip(location, WipCatalog.Shop, "page.shop"),
             HubPage.Operations => Wip(location, WipCatalog.Operations, "page.operations"),

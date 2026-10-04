@@ -13,6 +13,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         public bool Boss;
         public Family Family;
         public PortraitData Portrait;
+        /// <summary>Ligne fixe sous les barres (alliés : fatigue).</summary>
+        public string Sub;
     }
 
     /// <summary>État affiché d'une unité (rafraîchi à chaque image).</summary>
@@ -46,6 +48,7 @@ namespace N29.HeroesDawn.Presentation.Combat
     public struct SkillPanelData
     {
         public bool Visible;
+        public string Title;
         public SkillSlotData[] Slots;
     }
 

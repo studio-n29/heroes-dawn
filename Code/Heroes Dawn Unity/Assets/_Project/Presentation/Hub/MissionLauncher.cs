@@ -30,16 +30,19 @@ namespace N29.HeroesDawn.Presentation.Hub
             _start = start; Zone = zone; _navigate = navigate; _toasts = toasts; _loc = loc;
         }
 
-        public void Launch(CancellationToken ct = default)
+        public void Launch(CancellationToken ct = default) => Launch(Zone, ct);
+
+        /// <summary>Démarre la zone choisie sur la carte de la ville.</summary>
+        public void Launch(ZoneId zone, CancellationToken ct = default)
         {
             if (!_gate.TryEnter()) return;
-            LaunchAsync(ct).Forget();
+            LaunchAsync(zone, ct).Forget();
         }
 
-        async UniTaskVoid LaunchAsync(CancellationToken ct)
+        async UniTaskVoid LaunchAsync(ZoneId zone, CancellationToken ct)
         {
             Result r;
-            try { r = await _start.ExecuteAsync(Zone, ct); }
+            try { r = await _start.ExecuteAsync(zone, ct); }
             catch (OperationCanceledException) { _gate.Exit(); return; }
             catch { _gate.Exit(); throw; }
             if (ct.IsCancellationRequested) { _gate.Exit(); return; }

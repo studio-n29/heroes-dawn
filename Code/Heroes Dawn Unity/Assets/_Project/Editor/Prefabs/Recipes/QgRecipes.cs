@@ -16,18 +16,21 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var root = PrefabContext.NewRoot("RoomCard", 350, 190);
+            var root = PrefabContext.NewRoot("RoomCard", 350, 168);
             var button = Ui.Btn(root, "", Theme.Surface2, Theme.Text, null!, 34, FontKind.Title, "Button");
             button.Rect.Stretch();
             button.Label.gameObject.SetActive(false);
             var title = Ui.Txt(button.Fill.transform, "", 36, Theme.Primary, TextAnchor.UpperLeft, FontKind.Title, "Title");
-            title.rectTransform.Stretch(18, 70, 18, 14);
+            title.rectTransform.Stretch(18, 64, 18, 12);
             title.AutoSize(36);
             title.Inked();
             var info = Ui.Txt(button.Fill.transform, "", 24, Theme.Text, TextAnchor.LowerLeft, FontKind.Body, "Info");
-            info.rectTransform.Stretch(18, 14, 18, 100);
+            info.rectTransform.Stretch(18, 12, 18, 96);
             var wip = ctx.Nest<WipMark>("Widgets/WipMark.prefab", root, "Wip");
             ((RectTransform)wip.transform).Stretch();
+            var band = (RectTransform)wip.transform.Find("Band");
+            band.localScale = new Vector3(0.8f, 0.8f, 1f);
+            band.anchoredPosition = new Vector2(70, -40); // sous le titre, jamais dessus
             wip.gameObject.SetActive(false);
             var view = root.gameObject.AddComponent<RoomCardView>();
             ctx.Wire(view, "button", button);
@@ -57,10 +60,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var roomsTitle = Ui.LocTxt(rt, "qg.rooms", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "RoomsTitle");
             roomsTitle.rectTransform.At(0f, 1f, 0, 0, LeftW, 46);
             roomsTitle.Inked();
-            var grid = Ui.Rect(rt, "Rooms").At(0f, 1f, 0, -56, LeftW, 404);
+            var grid = Ui.Rect(rt, "Rooms").At(0f, 1f, 0, -52, LeftW, 356);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(350, 190);
-            layout.spacing = new Vector2(25, 24);
+            layout.cellSize = new Vector2(350, 168);
+            layout.spacing = new Vector2(25, 20);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             layout.constraintCount = 3;
             var rooms = new List<Object>();
@@ -68,17 +71,17 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             // ---- Fil du QG
             var fil = Ui.Panel(rt, "Fil", Theme.Surface, 5f, 10f, true);
-            fil.Frame().At(0f, 0f, 0, 0, LeftW, 330);
+            fil.Frame().At(0f, 0f, 0, 0, LeftW, 250);
             Ui.LocTxt(fil.transform, "qg.fil", 26, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Title, "FilTitle").rectTransform.At(0f, 1f, 24, -14, 600, 34);
             var speaker = Ui.Txt(fil.transform, "", 40, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Speaker");
             speaker.rectTransform.At(0f, 1f, 24, -52, 600, 50);
             speaker.Inked();
             var filText = Ui.Txt(fil.transform, "", 28, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Text");
-            filText.rectTransform.Stretch(24, 20, 24, 112);
+            filText.rectTransform.Stretch(24, 16, 24, 104);
 
             // ---- Missions du jour (à venir)
             var daily = Ui.Panel(rt, "Daily", Theme.Surface, 5f, 10f, true);
-            daily.Frame().At(1f, 1f, 0, 0, RightW, 190);
+            daily.Frame().At(1f, 1f, 0, 0, RightW, 176);
             Ui.LocTxt(daily.transform, "qg.daily", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title").rectTransform.At(0f, 1f, 22, -14, 540, 46);
             Ui.LocTxt(daily.transform, "qg.daily.body", 24, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "Body").rectTransform.Stretch(22, 16, 22, 70);
             var dailyWip = ctx.Nest<WipMark>("Widgets/WipMark.prefab", daily.transform, "Wip");
@@ -87,13 +90,13 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             // ---- Alertes
             var alerts = Ui.Panel(rt, "Alerts", Theme.Surface, 5f, 10f, true);
-            alerts.Frame().At(1f, 1f, 0, -214, RightW, 250);
+            alerts.Frame().At(1f, 1f, 0, -192, RightW, 238);
             Ui.LocTxt(alerts.transform, "qg.alerts", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title").rectTransform.At(0f, 1f, 22, -14, 540, 46);
             var shopAlert = Ui.Txt(alerts.transform, "", 28, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "ShopAlert");
             shopAlert.rectTransform.At(0f, 1f, 22, -66, 540, 44);
             var secondary = Ui.Img(alerts.transform, "Secondary", Theme.Surface2, Sprites.RoundedSmall, true);
             secondary.type = Image.Type.Sliced;
-            secondary.rectTransform.At(0.5f, 0f, 0, 18, 546, 104);
+            secondary.rectTransform.At(0.5f, 0f, 0, 16, 546, 96);
             Ui.LocTxt(secondary.transform, "qg.secondary", 24, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Label").rectTransform.Stretch(16, 0, 16, 0);
             var secondaryWip = ctx.Nest<WipMark>("Widgets/WipMark.prefab", secondary.transform, "Wip");
             ((RectTransform)secondaryWip.transform).Stretch();
