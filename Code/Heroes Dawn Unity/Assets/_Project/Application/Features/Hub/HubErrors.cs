@@ -14,5 +14,6 @@ namespace N29.HeroesDawn.Application.Features.Hub
         public static readonly DomainError SquadEmpty = new DomainError("hub.squad_empty", "errors.squad_empty");
         public static readonly DomainError NothingToHeal = new DomainError("hub.no_fatigue", "errors.nothing_to_heal");
         public static readonly DomainError InMission = new DomainError("hub.in_mission", "errors.in_mission");
+        public static readonly DomainError OnExpedition = new DomainError("hub.expedition", "errors.on_expedition");
     }
 }

@@ -62,7 +62,7 @@ namespace N29.HeroesDawn.Application.Features.Auth
             else
             {
                 _session.ApplyProfile(data);
-                recovered = FatigueRecovery.Apply(_session.Roster, _clock.UtcNow, data.lastSeenUtcTicks);
+                recovered = FatigueRecovery.Apply(_session.Roster, _clock.UtcNow, data.lastSeenUtcTicks, Meta.LabBonuses.RecoveryPerMinute(_session.Meta));
             }
             _log.Info($"Connecté : {account.DisplayName} ({account.PlayerId}) — profil {(isNew ? "nouveau" : "chargé")}");
             _wallet.PublishWallet(_session);

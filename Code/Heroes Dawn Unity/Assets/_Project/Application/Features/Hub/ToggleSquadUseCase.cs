@@ -25,6 +25,7 @@ namespace N29.HeroesDawn.Application.Features.Hub
             if (_s.Run != null) return UniTask.FromResult(Result.Fail(HubErrors.InMission));
             var m = _s.Find(id);
             if (m == null) return UniTask.FromResult(Result.Fail(HubErrors.UnknownMember));
+            if (!m.InSquad && _s.Meta.expeditions.Exists(e => e.members.Contains(id.Value))) return UniTask.FromResult(Result.Fail(HubErrors.OnExpedition));
             int count = _s.Squad.Count;
             if (m.InSquad)
             {

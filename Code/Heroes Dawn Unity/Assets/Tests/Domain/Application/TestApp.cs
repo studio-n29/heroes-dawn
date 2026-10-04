@@ -7,6 +7,8 @@ using MessagePipe;
 using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
+using N29.HeroesDawn.Application.Features.Meta;
+using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Messages;
@@ -99,6 +101,14 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public HubUseCases Hub { get; }
         public AuthUseCases Account { get; }
         public ShopUseCases Shop { get; }
+        public MetaContext MetaCtx { get; }
+        public PassService Pass { get; }
+        public DailyMissionService Daily { get; }
+        public SecondaryObjectiveService Secondary { get; }
+        public OperationsService Operations { get; }
+        public LabService Lab { get; }
+        public ArchivesService Archives { get; }
+        public MetaTracker Tracker { get; }
 
         public TestApp()
         {
@@ -114,6 +124,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             b.AddMessageBroker<CombatResultsClosed>();
             b.AddMessageBroker<ReturnedToBoard>();
             b.AddMessageBroker<ShopChanged>();
+            b.AddMessageBroker<MetaChanged>();
+            b.AddMessageBroker<MetaRewardEarned>();
+            b.AddMessageBroker<GameStateChanged>();
             _bus = b.BuildServiceProvider();
             Record<WalletChanged>();
             Record<RosterChanged>();
@@ -125,6 +138,8 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Record<CombatResultsClosed>();
             Record<ReturnedToBoard>();
             Record<ShopChanged>();
+            Record<MetaChanged>();
+            Record<MetaRewardEarned>();
 
             Session = new GameSession(PrototypeContent.Build());
             Save = new SaveScheduler(Session, Profiles, Time, Logger, Publisher<SaveStateChanged>());
@@ -134,6 +149,15 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Hub = new HubUseCases(this);
             Account = new AuthUseCases(this);
             Shop = new ShopUseCases(this);
+            MetaCtx = new MetaContext(Session, Save, Time, Publisher<WalletChanged>(), Publisher<MetaChanged>());
+            Pass = new PassService(MetaCtx);
+            Daily = new DailyMissionService(MetaCtx, Pass);
+            Secondary = new SecondaryObjectiveService(MetaCtx, Pass);
+            Operations = new OperationsService(MetaCtx, Pass);
+            Lab = new LabService(MetaCtx);
+            Archives = new ArchivesService(MetaCtx);
+            Tracker = new MetaTracker(MetaCtx, Daily, Pass, Secondary, Subscriber<CombatFinished>(), Subscriber<ZoneValidated>(), Subscriber<RosterChanged>(),
+                                      Subscriber<WalletChanged>(), Subscriber<GameStateChanged>(), Publisher<MetaRewardEarned>());
         }
 
         public IPublisher<T> Publisher<T>() => _bus.GetRequiredService<IPublisher<T>>();

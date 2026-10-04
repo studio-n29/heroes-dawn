@@ -112,7 +112,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         SalonRowData Row(ITeamMemberReadModel m)
         {
             bool max = m.Level >= MetaRules.MaxLevel;
-            int cost = MetaRules.TrainCost(m.Level);
+            int cost = _session.TrainCostFor(m.Level);
             int missing = cost - _session.Wallet.Credits;
             return new SalonRowData
             {

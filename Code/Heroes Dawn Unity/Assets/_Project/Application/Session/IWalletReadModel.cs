@@ -6,5 +6,6 @@ namespace N29.HeroesDawn.Application.Session
     {
         int Credits { get; }
         int Pr { get; }
+        int Gems { get; }
     }
 }

@@ -56,7 +56,7 @@ namespace N29.HeroesDawn.Application.Ports
     [Serializable]
     public sealed class ProfileData
     {
-        public int schemaVersion = 3;
+        public int schemaVersion = 4;
         public int credits;
         public int pr;
         public List<string> completedZones = new List<string>();
@@ -65,6 +65,8 @@ namespace N29.HeroesDawn.Application.Ports
         public bool autoCombat;
         /// <summary>Boutique éphémère (v3). Absente en v2 : JsonUtility crée un bloc vide (jour "").</summary>
         public ShopSave shop = new ShopSave();
+        /// <summary>Méta-progression (v4) : gemmes, pass, missions, opérations, labo, archives, réglages, tutoriel. Absente avant : valeurs par défaut.</summary>
+        public MetaSave meta = new MetaSave();
     }
 
     /// <summary>Boutique du jour : offres mémorisées pour qu'un achat ou une relance ne relance pas le tirage.</summary>

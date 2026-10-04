@@ -35,7 +35,16 @@ namespace N29.HeroesDawn.Application.Session
     {
         public int Credits { get; private set; }
         public int Pr { get; private set; }
+        public int Gems { get; private set; }
         public void Add(int credits, int pr) { Credits += credits; Pr += pr; }
+        public void AddGems(int gems) { Gems = Math.Max(0, Gems + gems); }
+        public void SetGems(int gems) { Gems = Math.Max(0, gems); }
+        public bool TrySpendGems(int gems)
+        {
+            if (gems < 0 || Gems < gems) return false;
+            Gems -= gems;
+            return true;
+        }
         public void Set(int credits, int pr) { Credits = credits; Pr = pr; }
         public bool TrySpend(int credits, int pr)
         {
@@ -71,6 +80,8 @@ namespace N29.HeroesDawn.Application.Session
         public PlayerAccount? Account { get; set; }
         public bool AutoCombat { get; set; }
         public ShopState Shop { get; } = new ShopState();
+        /// <summary>Méta-progression (pass, missions, opérations…) : modifiée uniquement par les services de Features/Meta.</summary>
+        public MetaSave Meta { get; private set; } = new MetaSave();
 
         public GameSession(ContentCatalog content)
         {
@@ -116,6 +127,9 @@ namespace N29.HeroesDawn.Application.Session
 
         public bool Owns(MemberId id) => Find(id) != null;
 
+        /// <summary>Prix d entraînement avec la réduction du labo.</summary>
+        public int TrainCostFor(int level) => Math.Max(1, MetaRules.TrainCost(level) * Features.Meta.LabBonuses.TrainCostPercent(Meta) / 100);
+
         public int SquadAverageLevel()
         {
             var squad = Squad;
@@ -133,6 +147,8 @@ namespace N29.HeroesDawn.Application.Session
             RunZone = null;
             AutoCombat = false;
             Shop.Clear();
+            Meta = new MetaSave();
+            Wallet.SetGems(Meta.gems);
             Wallet.Set(MetaRules.StartCredits, MetaRules.StartPr);
             foreach (var id in MetaRules.StarterTeam)
             {
@@ -153,6 +169,8 @@ namespace N29.HeroesDawn.Application.Session
             CompletedZones.Clear();
             if (data.completedZones != null) foreach (var z in data.completedZones) CompletedZones.Add(z);
             AutoCombat = data.autoCombat;
+            Meta = data.meta ?? new MetaSave();
+            Wallet.SetGems(Meta.gems);
             Roster.Clear();
             if (data.team != null)
             {
@@ -197,6 +215,8 @@ namespace N29.HeroesDawn.Application.Session
             p.completedZones.Sort(StringComparer.Ordinal);
             foreach (var m in Roster)
                 p.team.Add(new MemberSave { id = m.Id.Value, level = m.Level, fatigue = m.Fatigue, inSquad = m.InSquad });
+            Meta.gems = Wallet.Gems;
+            p.meta = Meta;
             p.shop.day = Shop.Day;
             p.shop.draw = Shop.Draw;
             p.shop.seenDay = Shop.SeenDay;

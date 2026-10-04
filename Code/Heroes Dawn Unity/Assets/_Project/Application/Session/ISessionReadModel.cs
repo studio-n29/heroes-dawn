@@ -22,6 +22,8 @@ namespace N29.HeroesDawn.Application.Session
         bool AutoCombat { get; }
         /// <summary>Plus aucun membre de l'escouade ne peut combattre.</summary>
         bool SquadExhausted { get; }
+        /// <summary>Prix de l entraînement d un membre de ce niveau (réduction du labo comprise).</summary>
+        int TrainCostFor(int level);
         IReadOnlyCollection<string> CompletedZones { get; }
         IShopReadModel Shop { get; }
     }

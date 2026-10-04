@@ -26,7 +26,7 @@ namespace N29.HeroesDawn.Application.Features.Hub
             var m = _s.Find(id);
             if (m == null) return UniTask.FromResult(Result.Fail(HubErrors.UnknownMember));
             if (m.Level >= MetaRules.MaxLevel) return UniTask.FromResult(Result.Fail(HubErrors.MaxLevel));
-            if (!_s.Wallet.TrySpend(MetaRules.TrainCost(m.Level), 0)) return UniTask.FromResult(Result.Fail(HubErrors.NotEnoughCredits));
+            if (!_s.Wallet.TrySpend(_s.TrainCostFor(m.Level), 0)) return UniTask.FromResult(Result.Fail(HubErrors.NotEnoughCredits));
             m.Level++;
             _wallet.PublishWallet(_s);
             _roster.PublishRoster();

@@ -164,7 +164,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var m = _session.Roster.FirstOrDefault(x => x.Id == _member);
             if (m == null) { Leave(HubErrors.UnknownMember); return; }
             bool max = m.Level >= MetaRules.MaxLevel;
-            int cost = MetaRules.TrainCost(m.Level);
+            int cost = _session.TrainCostFor(m.Level);
             int missing = cost - _session.Wallet.Credits;
             var d = Sheet(m.Def, m.Level, true);
             d.FatigueText = _loc.F("ui.fatigue", m.Fatigue);

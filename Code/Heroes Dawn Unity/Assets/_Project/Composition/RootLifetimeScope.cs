@@ -5,6 +5,7 @@ using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
+using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Features.Zone;
@@ -58,6 +59,8 @@ namespace N29.HeroesDawn.Composition
             builder.RegisterMessageBroker<CombatResultsClosed>(pipe);
             builder.RegisterMessageBroker<ReturnedToBoard>(pipe);
             builder.RegisterMessageBroker<GameStateChanged>(pipe);
+            builder.RegisterMessageBroker<MetaChanged>(pipe);
+            builder.RegisterMessageBroker<MetaRewardEarned>(pipe);
 
             // ---- Ports (réseau simulé : placeholders des services UGS du M2)
             builder.Register<IClock, SystemClock>(Lifetime.Singleton);
@@ -66,6 +69,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<IProfileGateway>(_ => new LocalProfileGateway(), Lifetime.Singleton);
             builder.Register<ICombatVerifier>(_ => new LocalCombatVerifier(content), Lifetime.Singleton);
             builder.Register<ISceneLoader, UnitySceneLoader>(Lifetime.Singleton);
+            builder.Register<IPurchaseGateway>(_ => new FakePurchaseGateway(), Lifetime.Singleton);
 
             // ---- Flux de jeu (seule autorité sur les scènes)
             builder.Register<GameFlowMachine>(Lifetime.Singleton).AsSelf().As<IGameFlow>();
@@ -100,6 +104,18 @@ namespace N29.HeroesDawn.Composition
             builder.Register<RerollShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<MarkShopSeenUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<HealRosterUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+
+            // ---- Méta-progression : pass, missions, opérations, labo, archives, boutique, réglages
+            builder.Register<MetaContext>(Lifetime.Singleton);
+            builder.Register<PassService>(Lifetime.Singleton);
+            builder.Register<DailyMissionService>(Lifetime.Singleton);
+            builder.Register<SecondaryObjectiveService>(Lifetime.Singleton);
+            builder.Register<OperationsService>(Lifetime.Singleton);
+            builder.Register<LabService>(Lifetime.Singleton);
+            builder.Register<ArchivesService>(Lifetime.Singleton);
+            builder.Register<BoutiqueService>(Lifetime.Singleton);
+            builder.Register<SettingsService>(Lifetime.Singleton);
+            builder.Register<MetaTracker>(Lifetime.Singleton);
 
             // ---- Use cases : combat
             builder.Register<ActiveCombat>(Lifetime.Singleton).AsSelf().As<IActiveCombatReadModel>();
@@ -137,6 +153,7 @@ namespace N29.HeroesDawn.Composition
 
             builder.RegisterBuildCallback(c =>
             {
+                c.Resolve<MetaTracker>().Start();
                 Ui = c.Resolve<UiRoot>();
                 Ui.EnsureLayers(screens);
                 UiSoundRelay.Attach(Ui.gameObject, c.Resolve<IAudioService>()); // boutons de Boot : connexion, modales

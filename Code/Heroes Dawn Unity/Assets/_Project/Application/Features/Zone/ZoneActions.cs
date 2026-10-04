@@ -52,6 +52,8 @@ namespace N29.HeroesDawn.Application.Features.Zone
                         validated = first
                             ? new ZoneRewards(b.ZoneValidationCredits, b.ZoneValidationPr, true)
                             : new ZoneRewards(MetaRules.ZoneReplayCredits, 0, false);
+                        int pct = Meta.LabBonuses.ZoneRewardPercent(s.Meta);
+                        validated = new ZoneRewards(validated.Credits * pct / 100, validated.Pr * pct / 100, validated.FirstClear);
                         s.Wallet.Add(validated.Credits, validated.Pr);
                         wallet = true;
                         fx.Log.Info($"Zone {zoneId} validée (1re fois : {first})");

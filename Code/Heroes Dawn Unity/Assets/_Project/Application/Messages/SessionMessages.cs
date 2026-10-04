@@ -11,7 +11,8 @@ namespace N29.HeroesDawn.Application.Messages
     {
         public readonly int Credits;
         public readonly int Pr;
-        public WalletChanged(int credits, int pr) { Credits = credits; Pr = pr; }
+        public readonly int Gems;
+        public WalletChanged(int credits, int pr, int gems = 0) { Credits = credits; Pr = pr; Gems = gems; }
     }
 
     /// <summary>L'effectif a changé (niveau, fatigue, escouade, recrue).</summary>
@@ -39,7 +40,7 @@ namespace N29.HeroesDawn.Application.Messages
     {
         /// <summary>Publie l'état courant du portefeuille de la session.</summary>
         public static void PublishWallet(this IPublisher<WalletChanged> publisher, GameSession session)
-            => publisher.Publish(new WalletChanged(session.Wallet.Credits, session.Wallet.Pr));
+            => publisher.Publish(new WalletChanged(session.Wallet.Credits, session.Wallet.Pr, session.Wallet.Gems));
 
         public static void PublishRoster(this IPublisher<RosterChanged> publisher) => publisher.Publish(default);
     }
