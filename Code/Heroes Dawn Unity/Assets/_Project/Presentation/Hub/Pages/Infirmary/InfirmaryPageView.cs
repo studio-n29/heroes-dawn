@@ -30,6 +30,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             foreach (var r in d.Rows) Instantiate(rowPrefab, list).Show(r);
             heal.SetLabel(d.HealLabel);
             heal.Interactable = d.HealEnabled;
+            heal.DisabledReason = d.HealReason;
             healReason.text = d.HealReason;
         }
     }

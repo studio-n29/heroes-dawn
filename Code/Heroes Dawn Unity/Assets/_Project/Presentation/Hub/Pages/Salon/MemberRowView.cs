@@ -41,6 +41,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             SetActive(action, true);
             action.SetLabel(d.Label);
             action.Interactable = d.Enabled;
+            action.DisabledReason = d.Reason;
             reason.text = d.Reason;
         }
 

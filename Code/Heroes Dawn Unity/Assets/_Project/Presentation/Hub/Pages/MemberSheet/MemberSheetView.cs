@@ -76,6 +76,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             SetActive(infirmary, d.ShowRooms);
             primary.SetLabel(d.PrimaryLabel);
             primary.Interactable = d.PrimaryEnabled;
+            primary.DisabledReason = d.PrimaryReason;
             primaryReason.text = d.PrimaryReason;
         }
 

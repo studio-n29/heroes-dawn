@@ -30,6 +30,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text inTeam = null!;
         [SerializeField] CanvasGroup body = null!;
 
+        bool _shown;
+        bool _wasInTeam;
+
         public event Action? Tapped;
         public event Action? RecruitClicked;
 
@@ -64,6 +67,17 @@ namespace N29.HeroesDawn.Presentation.Hub
             inTeam.text = d.InTeamText;
             if (inTeam.gameObject.activeSelf != d.InTeam) inTeam.gameObject.SetActive(d.InTeam);
             body.alpha = d.InTeam ? 0.55f : 1f;
+            // Recrutement : le tampon « Dans l'équipe » s'écrase et la carte jette un éclat.
+            if (d.InTeam && _shown && !_wasInTeam)
+            {
+                Tween.PopIn(inTeam.transform, 0.26f);
+                Feedback.Fx.Burst(card);
+            }
+            _wasInTeam = d.InTeam;
+            _shown = true;
         }
+
+        /// <summary>Nouvelle offre dans cet emplacement (renouvellement) : l'état « recruté » repart de zéro.</summary>
+        public void ResetState() => _shown = false;
     }
 }

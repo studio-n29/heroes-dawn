@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Feedback;
 using N29.HeroesDawn.Presentation.Mvp;
 using TMPro;
 using UnityEngine;
@@ -28,6 +29,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] SquadSlotView squadSlotPrefab = null!;
 
         readonly List<MemberTileView> _tiles = new List<MemberTileView>();
+        readonly Dictionary<MemberId, bool> _inSquad = new Dictionary<MemberId, bool>();
+        bool _cascaded;
 
         public event Action<int>? FilterClicked;
         public event Action<MemberSort>? SortClicked;
@@ -60,6 +63,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
             grid.Clear();
             _tiles.Clear();
+            int index = 0;
             foreach (var m in d.Members)
             {
                 var tile = Instantiate(tilePrefab, grid);
@@ -68,7 +72,13 @@ namespace N29.HeroesDawn.Presentation.Hub
                 tile.SquadClicked += () => SquadToggled?.Invoke(id);
                 tile.Show(m);
                 _tiles.Add(tile);
+                // Feedbacks : cascade à la première ouverture, rebond d'une carte qui entre ou sort de l'escouade.
+                if (!_cascaded) Fx.PopInAfter(tile.transform, Stagger.DelayFor(index));
+                else if (_inSquad.TryGetValue(id, out var was) && was != m.InSquad) Fx.Burst(tile.transform);
+                _inSquad[id] = m.InSquad;
+                index++;
             }
+            _cascaded = true;
 
             squadTitle.text = d.SquadTitle;
             squadRow.Clear();
@@ -77,6 +87,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             bool none = d.Combos.Length == 0;
             if (combosNone.activeSelf != none) combosNone.SetActive(none);
             mission.Interactable = d.MissionEnabled;
+            mission.DisabledReason = d.MissionHint;
             missionHint.text = d.MissionHint;
         }
 

@@ -24,6 +24,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var halo = Ui.Img(root, "Halo", Theme.WithAlpha(Theme.Primary, 0.45f), Sprites.Rounded);
             halo.type = Image.Type.Sliced;
             halo.rectTransform.At(0.5f, 0.5f, 0, 0, 452, 596);
+            var haloPulse = halo.gameObject.AddComponent<Pulse>();
+            haloPulse.Amplitude = 0.035f;
+            haloPulse.Speed = 3f;
             halo.gameObject.SetActive(false);
             var card = Ui.Rect(root, "Card").At(0.5f, 0.5f, 0, 0, 400, 540);
             var rim = Ui.Img(card, "Rim", Theme.Primary, Sprites.Rounded, true);

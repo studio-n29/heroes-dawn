@@ -5,12 +5,18 @@ using N29.HeroesDawn.Presentation.Mvp;
 using N29.HeroesDawn.Presentation.Wip;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Coque du hub (prefab Screens/HubShell) : titre, Retour, ressources, réglages, zone de page, 5 onglets.</summary>
+    /// <summary>
+    /// Coque du hub (prefab Screens/Hub) : titre, Retour, ressources, réglages, zone de page, 5 onglets.
+    /// Feedbacks : page qui entre en glissant (le fondu vient de la vue), bloc d'onglet actif qui glisse, badges qui pulsent (prefab).
+    /// </summary>
     public sealed class HubShellView : ViewBase, IHubShellView, IPageHost
     {
+        const float PageSlide = 28f, SlideDuration = 0.22f, IndicatorDuration = 0.2f;
+
         [SerializeField] TMP_Text title = null!;
         [SerializeField] UiButton back = null!;
         [SerializeField] UiButton settings = null!;
@@ -19,6 +25,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UiTapRelay relay = null!;
         [SerializeField] UiButton[] tabs = Array.Empty<UiButton>();
         [SerializeField] TMP_Text[] badges = Array.Empty<TMP_Text>();
+        [SerializeField, OptionalRef] RectTransform? tabIndicator;
+
+        int _activeTab = -1;
 
         public event Action<HubPage>? TabClicked;
         public event Action? BackClicked;
@@ -48,9 +57,11 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             title.text = d.Title;
             if (back.gameObject.activeSelf != d.ShowBack) back.gameObject.SetActive(d.ShowBack);
+            int active = -1;
             for (int i = 0; i < tabs.Length && i < d.Tabs.Length; i++)
             {
                 var t = d.Tabs[i];
+                if (t.Active) active = i;
                 tabs[i].SetLabel(t.Label);
                 tabs[i].SetColors(t.Active ? Theme.Primary : Theme.WithAlpha(Theme.Surface, 0f), t.Active ? Theme.TextDark : Theme.TextMuted);
                 bool show = !string.IsNullOrEmpty(t.Badge);
@@ -58,13 +69,35 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (badge.activeSelf != show) badge.SetActive(show);
                 badges[i].text = t.Badge;
             }
+            MoveIndicator(active);
+        }
+
+        /// <summary>Le bloc sous l'onglet actif glisse jusqu'au nouvel onglet (placé d'un coup la première fois).</summary>
+        void MoveIndicator(int active)
+        {
+            if (tabIndicator == null || active < 0 || active == _activeTab) return;
+            bool first = _activeTab < 0;
+            _activeTab = active;
+            var row = (RectTransform)tabs[active].transform.parent;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(row);
+            var parent = (RectTransform)tabIndicator.parent;
+            float x = parent.InverseTransformPoint(tabs[active].transform.position).x;
+            var to = new Vector2(x, tabIndicator.anchoredPosition.y);
+            if (first || !UnityEngine.Application.isPlaying) tabIndicator.anchoredPosition = to;
+            else Tween.Move(tabIndicator, to, IndicatorDuration);
         }
 
         public GameObject Spawn(GameObject pagePrefab)
         {
             var go = Instantiate(pagePrefab, pageArea, false);
-            ((RectTransform)go.transform).Stretch();
+            var rt = (RectTransform)go.transform;
+            rt.Stretch();
             go.transform.SetAsLastSibling();
+            if (UnityEngine.Application.isPlaying)
+            {
+                rt.anchoredPosition = new Vector2(0, -PageSlide);
+                Tween.Move(rt, Vector2.zero, SlideDuration);
+            }
             return go;
         }
 

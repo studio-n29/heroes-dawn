@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Feedback;
 using N29.HeroesDawn.Presentation.Mvp;
 using TMPro;
 using UnityEngine;
@@ -19,6 +20,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UiButton reroll = null!;
 
         readonly int[] _slots = new int[8];
+        readonly Core.MemberId[] _ids = new Core.MemberId[8];
+        readonly bool[] _shown = new bool[8];
 
         public event Action<int>? CardTapped;
         public event Action<int>? RecruitClicked;
@@ -48,7 +51,15 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (cards[i].gameObject.activeSelf != used) cards[i].gameObject.SetActive(used);
                 if (!used) continue;
                 _slots[i] = d.Cards[i].Slot;
+                // Feedbacks : cascade à la première ouverture, retournement quand l'offre change (renouvellement, 9h00).
+                var id = d.Cards[i].Card.Id;
+                bool changed = _shown[i] && !_ids[i].Equals(id);
+                if (changed) cards[i].ResetState();
                 cards[i].Show(d.Cards[i]);
+                if (!_shown[i]) Fx.PopInAfter(cards[i].transform, Stagger.DelayFor(i));
+                else if (changed) Fx.FlipIn(cards[i].transform, Stagger.DelayFor(i, 0.08f));
+                _ids[i] = id;
+                _shown[i] = true;
             }
             empty.text = d.EmptyText;
             bool none = d.Cards.Length == 0;

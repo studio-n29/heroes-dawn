@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Feedback;
 using N29.HeroesDawn.Presentation.Mvp;
 using N29.HeroesDawn.Presentation.Wip;
 using TMPro;
@@ -23,6 +24,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text missionHint = null!;
 
         readonly HubPage[] _pages = new HubPage[8];
+        bool _cascaded;
 
         public event Action<HubPage>? RoomClicked;
         public event Action? MissionClicked;
@@ -56,6 +58,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (!used) continue;
                 _pages[i] = d.Rooms[i].Page;
                 rooms[i].Show(d.Rooms[i]);
+                if (!_cascaded) Fx.PopInAfter(rooms[i].transform, Stagger.DelayFor(i));
             }
             dailyMissionsWip.FeatureId = d.DailyMissionsWipId;
             secondaryWip.FeatureId = d.SecondaryObjectivesWipId;
@@ -64,8 +67,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             filText.text = d.FilText;
             mission.SetLabel(d.MissionTitle);
             mission.Interactable = d.MissionEnabled;
+            mission.DisabledReason = d.MissionHint;
             missionSub.text = d.MissionSub;
             missionHint.text = d.MissionHint;
+            _cascaded = true;
         }
     }
 }

@@ -33,7 +33,22 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "pr", pr);
             ctx.Wire(view, "gems", gems);
             ctx.Wire(view, "saving", saving);
+            ctx.Wire(view, "creditsDelta", Delta(credits));
+            ctx.Wire(view, "prDelta", Delta(pr));
             return root.gameObject;
+        }
+
+        /// <summary>Écart flottant (+150 / −450) sous la pastille, masqué au repos.</summary>
+        static N29.HeroesDawn.Presentation.Feedback.FloatDelta Delta(TMP_Text value)
+        {
+            var pill = value.transform.parent.parent;
+            var t = Ui.Txt(pill, "", 26, Theme.Success, TextAnchor.MiddleCenter, FontKind.Title, "Delta");
+            t.rectTransform.At(0.5f, 0f, 0, -40, 200, 34);
+            t.Inked(1.5f);
+            t.raycastTarget = false;
+            var fd = t.gameObject.AddComponent<N29.HeroesDawn.Presentation.Feedback.FloatDelta>();
+            t.gameObject.SetActive(false);
+            return fd;
         }
 
         static TMP_Text Pill(PrefabContext ctx, RectTransform parent, string name, string tag, Color accent)
@@ -96,10 +111,17 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
                 badge.rectTransform.At(1f, 1f, 6, 10, 48, 48);
                 var badgeText = Ui.Txt(badge.transform, "", 26, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Text");
                 badgeText.rectTransform.Stretch();
+                var pulse = badge.gameObject.AddComponent<Pulse>();
+                pulse.Amplitude = 0.1f;
+                pulse.Speed = 4f;
                 badge.gameObject.SetActive(false);
                 tabs.Add(tab);
                 badges.Add(badgeText);
             }
+            // Bloc sous l'onglet actif : il glisse d'un onglet à l'autre (hors de la disposition des onglets).
+            var indicator = Ui.Img(nav.transform, "TabIndicator", Theme.Primary, Sprites.RoundedSmall);
+            indicator.rectTransform.At(0.5f, 0f, 0, 2, 300, 8);
+            indicator.raycastTarget = false;
 
             var view = rt.gameObject.AddComponent<HubShellView>();
             ScreenKit.WireFade(ctx, view);
@@ -111,6 +133,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "relay", relay);
             ctx.WireArray(view, "tabs", tabs);
             ctx.WireArray(view, "badges", badges);
+            ctx.Wire(view, "tabIndicator", indicator.rectTransform);
             return rt.gameObject;
         }
     }

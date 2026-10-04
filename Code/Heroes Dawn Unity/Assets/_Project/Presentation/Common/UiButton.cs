@@ -7,8 +7,10 @@ using UnityEngine.UI;
 namespace N29.HeroesDawn.Presentation.Common
 {
     /// <summary>Bouton « comics » : léger écrasement à l'appui, son de clic (relais audio de la hiérarchie).</summary>
-    public sealed class UiButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
+    public sealed class UiButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler
     {
+        static readonly Vector3 HoverScale = new Vector3(1.04f, 1.04f, 1f);
+        bool _hover;
         // Sérialisés : le bouton fonctionne aussi dans un prefab.
         [SerializeField] Button button;
         [SerializeField] Image fill;
@@ -61,9 +63,38 @@ namespace N29.HeroesDawn.Presentation.Common
             Label.color = Button.interactable ? fg : Theme.WithAlpha(fg, 0.55f);
         }
 
+        /// <summary>Raison affichée en toast quand on touche le bouton grisé (vide : simple secousse).</summary>
+        public string DisabledReason { get; set; } = "";
+
         public void OnPointerDown(PointerEventData e) { if (Button.interactable) transform.localScale = new Vector3(0.95f, 0.95f, 1f); }
-        public void OnPointerUp(PointerEventData e) => transform.localScale = Vector3.one;
-        public void OnPointerExit(PointerEventData e) => transform.localScale = Vector3.one;
-        void OnDisable() => transform.localScale = Vector3.one;
+        public void OnPointerUp(PointerEventData e) => transform.localScale = _hover ? HoverScale : Vector3.one;
+
+        /// <summary>Survol (souris) : léger grossissement et fond éclairci.</summary>
+        public void OnPointerEnter(PointerEventData e)
+        {
+            if (!Button.interactable) return;
+            _hover = true;
+            transform.localScale = HoverScale;
+            Fill.color = Color.Lerp(_bg, Color.white, 0.15f);
+        }
+
+        public void OnPointerExit(PointerEventData e) => EndHover();
+
+        /// <summary>Toucher un bouton grisé : secousse, et sa raison en toast par le relais de la coque.</summary>
+        public void OnPointerClick(PointerEventData e)
+        {
+            if (Button.interactable) return;
+            Feedback.Fx.Shake(Rect);
+            if (!string.IsNullOrEmpty(DisabledReason)) GetComponentInParent<Wip.UiTapRelay>(true)?.RaiseReason(DisabledReason);
+        }
+
+        void EndHover()
+        {
+            _hover = false;
+            transform.localScale = Vector3.one;
+            if (Fill != null) Fill.color = _bg;
+        }
+
+        void OnDisable() => EndHover();
     }
 }
