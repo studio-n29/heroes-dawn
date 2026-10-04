@@ -61,6 +61,14 @@ namespace N29.HeroesDawn.Presentation.Common
             ["shop.reroll.confirm.body"] = "3 nouveaux héros pour {0} Crédits.",
             ["shop.recruited"] = "RECRUTÉ",
             ["shop.empty"] = "Collection de New York complète !",
+            // --- Coque du hub ---
+            ["nav.qg"] = "QG", ["nav.team"] = "ÉQUIPE", ["nav.recruit"] = "RECRUTER", ["nav.pass"] = "PASS", ["nav.shop"] = "BOUTIQUE",
+            ["nav.back"] = "RETOUR", ["nav.settings"] = "RÉGLAGES",
+            ["hub.quit.title"] = "Quitter le jeu ?", ["hub.quit.body"] = "Ta progression est sauvegardée.", ["hub.quit.ok"] = "Quitter",
+            ["page.qg"] = "QG · Section New York", ["page.team"] = "Équipe · {0} membres", ["page.recruit"] = "Recrutement · Boutique du jour",
+            ["page.pass"] = "Pass · Saison 1", ["page.shop"] = "Boutique", ["page.salon"] = "Salon d'entraînement", ["page.infirmary"] = "Infirmerie",
+            ["page.operations"] = "Salle des opérations", ["page.lab"] = "Labo de recherche", ["page.archives"] = "Archives",
+            ["page.settings"] = "Paramètres", ["page.member_sheet"] = "{0}",
             // --- Fonctions à venir (WIP) ---
             ["wip.soon"] = "BIENTÔT",
             ["wip.toast"] = "{0} arrive bientôt",
