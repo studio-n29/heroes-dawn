@@ -32,9 +32,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             name.rectTransform.At(0f, 1f, 132, -10, 460, 42);
             name.Inked(1.5f);
             var detail = Ui.Txt(fill.transform, "", 22, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Regular, "Detail");
-            detail.rectTransform.At(0f, 1f, 132, -54, 560, 30);
+            detail.rectTransform.At(0f, 1f, 132, -50, 560, 28);
             var bar = Ui.Bar(fill.transform, "Fatigue", Theme.Success, Theme.SurfaceDark, true, 20);
-            ((RectTransform)bar.transform).At(0f, 0f, 132, 14, 420, 28);
+            ((RectTransform)bar.transform).At(0f, 0f, 132, 10, 420, 26);
             var band = Ui.Txt(fill.transform, "", 28, Theme.Success, TextAnchor.MiddleLeft, FontKind.Title, "Band");
             band.rectTransform.At(0f, 0f, 572, 8, 240, 40);
             var action = Ui.Btn(fill.transform, "", Theme.Info, Theme.TextDark, null!, 30, FontKind.Title, "Action");
@@ -144,8 +144,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
                 b.Rect.Pref(LeftW, 96);
                 var wip = ctx.Nest<WipMark>("Widgets/WipMark.prefab", b.transform, "Wip");
                 ((RectTransform)wip.transform).Stretch();
-                wip.transform.Find("Band").localScale = new Vector3(0.8f, 0.8f, 1f);
-                ((RectTransform)wip.transform.Find("Band")).anchoredPosition = new Vector2(110, 0);
+                b.Label.alignment = TMPro.TextAlignmentOptions.Left;
+                wip.transform.Find("Band").localScale = new Vector3(0.6f, 0.6f, 1f);
+                ((RectTransform)wip.transform.Find("Band")).anchoredPosition = new Vector2(LeftW / 2f - 84f, 0);
                 wip.gameObject.SetActive(false);
                 categories.Add(b);
                 wips.Add(wip);

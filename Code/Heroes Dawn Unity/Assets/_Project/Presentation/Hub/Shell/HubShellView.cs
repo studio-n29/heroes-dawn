@@ -72,17 +72,21 @@ namespace N29.HeroesDawn.Presentation.Hub
             MoveIndicator(active);
         }
 
-        /// <summary>Le bloc sous l'onglet actif glisse jusqu'au nouvel onglet (placé d'un coup la première fois).</summary>
+        /// <summary>
+        /// Le bloc sous l'onglet actif glisse jusqu'au nouvel onglet (placé d'un coup la première fois). Il devient enfant de
+        /// l'onglet actif : il reste aligné quelle que soit la taille de l'écran.
+        /// </summary>
         void MoveIndicator(int active)
         {
             if (tabIndicator == null || active < 0 || active == _activeTab) return;
             bool first = _activeTab < 0;
             _activeTab = active;
-            var row = (RectTransform)tabs[active].transform.parent;
-            LayoutRebuilder.ForceRebuildLayoutImmediate(row);
-            var parent = (RectTransform)tabIndicator.parent;
-            float x = parent.InverseTransformPoint(tabs[active].transform.position).x;
-            var to = new Vector2(x, tabIndicator.anchoredPosition.y);
+            var from = tabIndicator.position;
+            tabIndicator.SetParent(tabs[active].transform, false);
+            tabIndicator.anchorMin = tabIndicator.anchorMax = new Vector2(0.5f, 0f);
+            tabIndicator.pivot = new Vector2(0.5f, 1f);
+            tabIndicator.position = from;
+            var to = new Vector2(0, -2);
             if (first || !UnityEngine.Application.isPlaying) tabIndicator.anchoredPosition = to;
             else Tween.Move(tabIndicator, to, IndicatorDuration);
         }

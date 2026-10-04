@@ -72,14 +72,18 @@ stateDiagram-v2
 - `NarrativeEvent` et `MiniGame` sont des **overlays** dans la scène Board (pas de chargement).
 
 ## Écrans internes et modales
-- `ScreenStack` (dans le hub) : pile d'écrans avec retour arrière (bouton Android géré). *Pas encore implémenté (M2).*
+- Pile du hub : `HubNavigator` (voir plus bas).
 - `ModalService` : confirmations, récompenses, résultats ; une seule modale à la fois, file d'attente (`OpenAsync<TView>()`). Les popups sont des prefabs du `ScreenCatalog`, créés dans la couche d'ordre 100 de `Boot` (`ModalLayer`).
 - **Retour** (◄, Échap, geste Android) : `BackButtonRouter` (racine) ferme d'abord la modale du dessus si elle est annulable (Retour = Annuler, ou Continuer pour les résultats), sinon le gestionnaire de l'écran visible le plus haut. Un écran masqué retire son gestionnaire : Échap en combat n'ouvre jamais « Retour au QG ? » (`BackNavigationTests`).
 - Messages du bus (`ToastRequested`) affichés en toasts par `ToastRelay` (une clé de localisation est traduite).
 
-## QG : boutique éphémère
-- Onglet **Boutique** du QG (`HubView`) : 3 cartes `RecruitCardView` (état Recruté estompé avec tampon, bande de rareté), barre sous les cartes avec compte à rebours jusqu'à 9h00 locale et bouton **Renouveler** (« Gratuit » ou prix en Crédits).
-- `HubPresenter` ouvre la boutique à l'affichage, se rafraîchit sur `ShopChanged`, et, en `ITickable`, vérifie une fois par minute le changement de jour pour retirer la boutique à 9h00 si l'onglet est affiché. Renouveler payant passe par la confirmation commune ; Recruter et Renouveler sont protégés contre le double clic (`BusyGate`).
+## Hub : coque, navigateur, pages
+- **Coque** (`Screens/Hub.prefab`, `HubShellView` + `HubShellPresenter`) : barre haute (Retour, titre de la page, Crédits / PR / Gemmes, Réglages), zone de page, barre de navigation basse à 5 onglets (QG, Équipe, Recruter, Pass, Boutique) avec badge « N » (boutique du jour pas encore vue : `Shop.Day != Shop.SeenDay`). La coque tire la boutique à l'ouverture puis chaque minute (nouveau tirage à 9h00) et transmet le tick à la page courante.
+- **Navigateur** (`HubNavigator`, C# pur) : un onglet remplace la pile ; une pièce, une fiche ou les Réglages s'empilent. Retour : dépile ; sur un onglet autre que QG → QG ; sur le QG → « Quitter le jeu ? » (confirmation, `IAppQuit`). Seule la coque s'inscrit au `BackButtonRouter`.
+- **Pages** (`Prefabs/Pages/*.prefab`, rangées dans `ScreenCatalog.pages`) : `HubPageFactory` crée chaque page dans un scope VContainer enfant (vue + présentateur + `HubLocation` + `MissionLauncher` + `RecruitFlow`) et le détruit en la quittant. Le navigateur et la fabrique sont **Singleton** dans le scope Hub : `Scoped` donnerait un navigateur neuf à chaque page. Une page qui navigue pendant sa propre création (fiche de boutique périmée) est détruite : la navigation imbriquée gagne.
+- QG (pièces, alertes, fil de Rayner, **MISSION** = `MissionLauncher`), Équipe (filtres, tri, escouade, combos), fiche membre (possédé : Entraîner ; héros de la boutique : Recruter), Recruter (3 cartes, renouvellement, confirmation M31 par `RecruitFlow` : solde avant / coût / après, achat refusé si 9h00 passe pendant la confirmation), Salon et Infirmerie en version simple, Paramètres ▸ Compte.
+- **WIP** : `WipCatalog` (une entrée par fonction à venir, clés `wip.<id>.title/planned`) ; `WipMark` (bandeau BIENTÔT) envoie le toucher au `UiTapRelay` de la coque → toast « … arrive bientôt » ; pages WIP (Pass, Boutique, pièces) avec ce qui est prévu.
+- **Feedbacks** (`Presentation/Feedback`) : `CounterRoll` (compteur de ressources qui roule), `FloatDelta` (+N / −N), `Stagger` (cascade de 40 ms), `Fx` (secousse, éclat, apparition, retournement), `MotionSettings.Reduced` (désactivé par défaut ; coupe secousses et éclats). `UiButton` : survol, appui, bouton grisé qui secoue et envoie `DisabledReason` en toast.
 
 ## Combat : le lecteur d'événements
 ```mermaid

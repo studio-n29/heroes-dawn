@@ -73,6 +73,60 @@ namespace N29.HeroesDawn.Tests.PlayMode
             rt.Release();
         }
 
+        /// <summary>Capture après la fin des animations d'entrée (cascade, glissement : temps réel).</summary>
+        static IEnumerator CaptureSettled(string name)
+        {
+            yield return new WaitForSecondsRealtime(1.2f);
+            yield return Capture(name);
+        }
+
+        static HubShellView Shell => Object.FindAnyObjectByType<HubShellView>()!;
+
+        static IEnumerator Tab(HubPage tab)
+        {
+            Shell.TabButton(tab).Button.onClick.Invoke();
+            yield return null;
+        }
+
+        [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit une capture de chaque page du hub — parce que chaque page se compare à sa maquette (M10, M11, M12, M20, M21, M30, M31, M80, M85)")]
+        public IEnumerator CaptureHubPages()
+        {
+            yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
+            var session = Container.Resolve<GameSession>();
+            session.Find(new N29.HeroesDawn.Core.MemberId("echo"))!.Fatigue = 70;
+            session.Find(new N29.HeroesDawn.Core.MemberId("seve"))!.Fatigue = 30;
+            yield return CaptureSettled("10-qg");
+
+            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Salon)!.onClick.Invoke();
+            yield return CaptureSettled("11-salon");
+            Shell.BackButton.Button.onClick.Invoke();
+            yield return null;
+            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Infirmary)!.onClick.Invoke();
+            yield return CaptureSettled("12-infirmerie");
+
+            yield return Tab(HubPage.Team);
+            yield return CaptureSettled("20-equipe");
+            Object.FindAnyObjectByType<TeamPageView>()!.Tiles[0].TapButton.onClick.Invoke();
+            yield return CaptureSettled("21-fiche");
+
+            yield return Tab(HubPage.Recruit);
+            yield return CaptureSettled("30-recruter");
+            Object.FindAnyObjectByType<RecruitPageView>()!.Card(0).RecruitButton.onClick.Invoke();
+            yield return CaptureSettled("31-confirmation");
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.RecruitConfirmPopupView>()!.CancelButton.Button.onClick.Invoke();
+            yield return null;
+
+            yield return Tab(HubPage.Pass);
+            yield return CaptureSettled("40-pass-wip");
+            yield return Tab(HubPage.Shop);
+            yield return CaptureSettled("50-boutique-wip");
+            Shell.SettingsButton.Button.onClick.Invoke();
+            yield return CaptureSettled("80-parametres");
+            Assert.That(File.Exists(Path.Combine(Folder, "80-parametres.png")));
+        }
+
         [UnityTest, Explicit("Captures à la demande"), Description("Produit une capture de la connexion, du QG, du plateau et du combat — parce que le passage à TextMeshPro change le rendu des polices et doit être relu à l'œil avant toute conversion (spec §11)")]
         public IEnumerator CaptureEveryScreen()
         {
