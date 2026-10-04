@@ -80,10 +80,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return Capture("01-connexion");
 
             Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<HubView>() && !Flow.IsTransitioning);
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
             yield return Capture("02-qg");
 
-            Object.FindAnyObjectByType<HubView>()!.RecruitTabButton.onClick.Invoke();
+            Object.FindAnyObjectByType<HubShellView>()!.TabButton(HubPage.Recruit).Button.onClick.Invoke();
             for (int i = 0; i < 10; i++) yield return null;
             yield return Capture("02b-boutique");
 

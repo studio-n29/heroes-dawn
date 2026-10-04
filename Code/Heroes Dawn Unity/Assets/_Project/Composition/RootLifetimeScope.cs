@@ -5,6 +5,7 @@ using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
+using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Ports;
@@ -114,6 +115,7 @@ namespace N29.HeroesDawn.Composition
             builder.RegisterInstance(screens);
             builder.RegisterComponentInHierarchy<UiRoot>().AsSelf().As<IScreenVisibility>();
             builder.Register<IFrameClock, UnityFrameClock>(Lifetime.Singleton);
+            builder.Register<IAppQuit, UnityAppQuit>(Lifetime.Singleton);
 
             // ---- Audio (sources créées une fois ; musique pilotée par l'état du jeu)
             var rig = AudioRig.Create(transform, audioCatalog != null ? audioCatalog.Voices : 10);

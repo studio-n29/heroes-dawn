@@ -52,14 +52,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     /// </summary>
     public sealed class HubShellRecipe : IPrefabRecipe
     {
-        public string RelativePath => "Screens/HubShell.prefab";
+        public string RelativePath => "Screens/Hub.prefab";
         public int Order => 20;
 
         const float TopH = 116, NavH = 116, Safe = 88;
 
         public GameObject Build(PrefabContext ctx)
         {
-            var rt = ScreenKit.Root("HubShell");
+            var rt = ScreenKit.Root("Hub");
             ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.8f);
             var relay = rt.gameObject.AddComponent<UiTapRelay>();
 

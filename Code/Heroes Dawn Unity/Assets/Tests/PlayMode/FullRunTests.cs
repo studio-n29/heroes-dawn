@@ -34,24 +34,22 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
             Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<HubView>() && !Flow.IsTransitioning);
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
             Assert.That(Flow.Current, Is.EqualTo(GameState.Hub), "connexion → QG");
 
-            // QG : onglet Recrutement, première recrue abordable.
+            // Onglet Recruter par la barre de navigation, première recrue abordable, confirmation d'achat.
             var session = Container.Resolve<GameSession>();
             int roster = session.Roster.Count;
-            var hub = Object.FindAnyObjectByType<HubView>()!;
-            hub.RecruitTabButton.onClick.Invoke();
-            RecruitCardView? card = null;
-            yield return PlayModeHarness.WaitFor(() => (card = Object.FindObjectsByType<RecruitCardView>(FindObjectsSortMode.None)
-                .FirstOrDefault(c => c.gameObject.activeInHierarchy && c.RecruitButton.interactable)) != null);
-            Assert.That(card, Is.Not.Null, "une recrue est abordable avec les PR de départ");
-            card!.RecruitButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => session.Roster.Count == roster + 1);
+            var shell = Object.FindAnyObjectByType<HubShellView>()!;
+            shell.TabButton(HubPage.Recruit).Button.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<RecruitPageView>() && session.Shop.Offers.Count > 0);
+            yield return PlayModeHarness.RecruitAffordable();
             Assert.That(session.Roster.Count, Is.EqualTo(roster + 1), "recrue ajoutée à l'équipe");
 
-            // Déploiement, puis dé et déplacements jusqu'au combat n03.
-            hub.DeployButton.onClick.Invoke();
+            // Retour au QG, MISSION, puis dé et déplacements jusqu'au combat n03.
+            shell.TabButton(HubPage.Qg).Button.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>());
+            Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning, 600);
             Assert.That(Flow.Current, Is.EqualTo(GameState.Board), "QG → plateau");
             var board = Object.FindAnyObjectByType<BoardView>()!;
@@ -84,7 +82,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
 
             // Retour QG confirmé.
             yield return PlayModeHarness.BackToHqConfirmed();
-            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<HubView>() && !Flow.IsTransitioning, 600);
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning, 600);
             Assert.That(Flow.Current, Is.EqualTo(GameState.Hub), "plateau → QG");
             Assert.That(session.Run, Is.Null);
             Assert.That(session.Roster.Count, Is.EqualTo(roster + 1), "la recrue est toujours dans l'équipe");

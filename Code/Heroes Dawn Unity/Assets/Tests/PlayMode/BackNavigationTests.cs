@@ -36,7 +36,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
             Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<HubView>() && !Flow.IsTransitioning);
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
             Assert.That(Flow.Current, Is.EqualTo(GameState.Hub), "connexion → QG");
             var session = Container.Resolve<GameSession>();
             var zone = session.Content.Zone(PrototypeContent.Zone11);

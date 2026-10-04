@@ -67,8 +67,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return Boot();
             Visible<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return WaitFor(() => Visible<HubView>() != null);
-            Assert.That(Visible<HubView>(), Is.Not.Null);
+            yield return WaitFor(() => Visible<HubShellView>() != null);
+            Assert.That(Visible<HubShellView>(), Is.Not.Null);
             Assert.That(_profiles.Saves, Is.GreaterThanOrEqualTo(1));
             Assert.That(_profiles.Store.ContainsKey(InstantAuthGateway.PlayerId));
         }
@@ -81,8 +81,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var login = Visible<LoginView>()!;
             login.PlayButton.onClick.Invoke();
             login.PlayButton.onClick.Invoke();
-            yield return WaitFor(() => Visible<HubView>() != null);
-            Assert.That(Visible<HubView>(), Is.Not.Null);
+            yield return WaitFor(() => Visible<HubShellView>() != null);
+            Assert.That(Visible<HubShellView>(), Is.Not.Null);
             Assert.That(_auth.Calls, Is.EqualTo(1));
         }
 
@@ -91,14 +91,14 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return Boot();
             Visible<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return WaitFor(() => Visible<HubView>() != null);
-            var hub = Visible<HubView>()!;
+            yield return WaitFor(() => Visible<HubShellView>() != null);
+            var hub = Visible<HubShellView>()!;
             hub.gameObject.SetActive(false);                     // OnHide : abonnements libérés
             hub.gameObject.SetActive(true);                      // OnShow : abonnements repris une seule fois
             yield return null;
-            int before = PlayModeHarness.HubPresenter().RefreshCount;
+            int before = PlayModeHarness.HubWallet().Shows;
             GameBootstrap.Instance!.Scope.Container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));
-            Assert.That(PlayModeHarness.HubPresenter().RefreshCount - before, Is.EqualTo(1));
+            Assert.That(PlayModeHarness.HubWallet().Shows - before, Is.EqualTo(1));
         }
 
         [UnityTest, Description("Vérifie qu'après déconnexion puis reconnexion le QG ne reçoit chaque message qu'une fois — parce que des abonnements accumulés feraient ramer et dupliqueraient les effets")] // Review Focus 3 : pas d'abonnement en double après déconnexion / reconnexion
@@ -106,17 +106,17 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return Boot();
             Visible<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return WaitFor(() => Visible<HubView>() != null);
+            yield return WaitFor(() => Visible<HubShellView>() != null);
             var container = GameBootstrap.Instance!.Scope.Container;
             container.Resolve<ISignOutUseCase>().ExecuteAsync().GetAwaiter().GetResult();
             container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Login));
             yield return WaitFor(() => Visible<LoginView>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
             Visible<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return WaitFor(() => Visible<HubView>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
-            var hub = Visible<HubView>()!;
-            int before = PlayModeHarness.HubPresenter().RefreshCount;
+            yield return WaitFor(() => Visible<HubShellView>() != null && !container.Resolve<IGameFlow>().IsTransitioning);
+            var hub = Visible<HubShellView>()!;
+            int before = PlayModeHarness.HubWallet().Shows;
             container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));
-            Assert.That(PlayModeHarness.HubPresenter().RefreshCount - before, Is.EqualTo(1));
+            Assert.That(PlayModeHarness.HubWallet().Shows - before, Is.EqualTo(1));
         }
     }
 }

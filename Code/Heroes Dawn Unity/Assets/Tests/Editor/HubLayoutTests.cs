@@ -15,7 +15,7 @@ namespace N29.HeroesDawn.Tests.Editor
 
         static IEnumerable<(string Path, Vector2 Area)> HubPrefabs()
         {
-            yield return ($"{PrefabGenerator.DefaultRoot}/Screens/HubShell.prefab", new Vector2(1920, 1080));
+            yield return ($"{PrefabGenerator.DefaultRoot}/Screens/Hub.prefab", new Vector2(1920, 1080));
             foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { PrefabGenerator.DefaultRoot + "/Pages" }))
                 yield return (AssetDatabase.GUIDToAssetPath(guid), new Vector2(1744, 860));
         }
@@ -23,7 +23,7 @@ namespace N29.HeroesDawn.Tests.Editor
         [Test, Description("Vérifie que chaque bouton de la coque du hub et de ses pages mesure au moins 96 × 96 px — parce que les cibles tactiles doivent rester faciles à toucher au doigt (maquettes §1)")]
         public void HubShell_AndPages_TouchTargetsAtLeast96()
         {
-            Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>($"{PrefabGenerator.DefaultRoot}/Screens/HubShell.prefab"), Is.Not.Null, "coque non générée");
+            Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>($"{PrefabGenerator.DefaultRoot}/Screens/Hub.prefab"), Is.Not.Null, "coque non générée");
             var small = new List<string>();
             foreach (var (path, area) in HubPrefabs())
             {

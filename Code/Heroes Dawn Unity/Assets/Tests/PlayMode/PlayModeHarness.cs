@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections;
 using N29.HeroesDawn.Application.Ports;
+using N29.HeroesDawn.Composition;
 using N29.HeroesDawn.Presentation.Login;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -27,9 +28,30 @@ namespace N29.HeroesDawn.Tests.PlayMode
             for (int i = 0; i < 300 && !Visible<LoginView>(); i++) yield return null;
         }
 
-        /// <summary>Présentateur du QG (scope de la scène Hub chargée).</summary>
-        public static N29.HeroesDawn.Presentation.Hub.HubPresenter HubPresenter()
-            => Object.FindAnyObjectByType<N29.HeroesDawn.Composition.HubLifetimeScope>()!.Container.Resolve<N29.HeroesDawn.Presentation.Hub.HubPresenter>();
+        /// <summary>Barre de ressources de la coque du hub (compte ses affichages : diagnostic des abonnements).</summary>
+        public static N29.HeroesDawn.Presentation.Common.HubWalletView HubWallet()
+            => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Common.HubWalletView>()!;
+
+        /// <summary>
+        /// Page Recruter affichée : touche « Recruter » sur la première offre payable avec les PR du joueur,
+        /// valide la confirmation (clics réels) et attend l'arrivée de la recrue.
+        /// </summary>
+        public static IEnumerator RecruitAffordable()
+        {
+            var session = GameBootstrap.Instance!.Scope.Container.Resolve<N29.HeroesDawn.Application.Session.GameSession>();
+            var offers = session.Shop.Offers;
+            int slot = -1;
+            for (int i = 0; i < offers.Count && slot < 0; i++)
+                if (!offers[i].Recruited && session.Wallet.Pr >= N29.HeroesDawn.Application.Session.MetaRules.RecruitCost(session.Content.Member(offers[i].Id).Rarity))
+                    slot = i;
+            NUnit.Framework.Assert.That(slot, NUnit.Framework.Is.GreaterThanOrEqualTo(0), "une offre est payable avec les PR de départ");
+            int roster = session.Roster.Count;
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Hub.RecruitPageView>()!.Card(slot).RecruitButton.onClick.Invoke();
+            yield return WaitFor(() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.RecruitConfirmPopupView>() != null);
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.RecruitConfirmPopupView>()!.OkButton.Button.onClick.Invoke();
+            yield return WaitFor(() => session.Roster.Count == roster + 1
+                                       && Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.RecruitConfirmPopupView>() == null);
+        }
 
         /// <summary>Présentateur du plateau (scope de la scène Board chargée, même masquée).</summary>
         public static N29.HeroesDawn.Presentation.Board.BoardPresenter BoardPresenter()

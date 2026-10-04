@@ -14,8 +14,12 @@ namespace N29.HeroesDawn.Presentation.Common
         int _lastCredits = -1;
         int _lastPr = -1;
 
+        /// <summary>Nombre d'affichages (diagnostic des abonnements, lu par les tests PlayMode).</summary>
+        public int Shows { get; private set; }
+
         public void Show(WalletData d)
         {
+            Shows++;
             credits.text = d.Credits.ToString("N0");
             pr.text = d.Pr.ToString("N0");
             gems.text = d.Gems.ToString("N0");

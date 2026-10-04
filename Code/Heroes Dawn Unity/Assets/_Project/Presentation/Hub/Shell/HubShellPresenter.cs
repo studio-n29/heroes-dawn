@@ -2,7 +2,9 @@
 using System;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
+using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Messages;
+using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
@@ -22,6 +24,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISubscriber<WalletChanged> _walletChanged;
         readonly ISubscriber<SaveStateChanged> _saving;
         readonly ISubscriber<ShopChanged> _shopChanged;
+        readonly IOpenShopUseCase _openShop;
+        readonly IClock _clock;
         readonly IModalService _modals;
         readonly IToastService _toasts;
         readonly ILocalization _loc;
@@ -32,13 +36,16 @@ namespace N29.HeroesDawn.Presentation.Hub
         IDisposable? _shopSub;
         bool _askingQuit;
         int _navVersion;
+        int _lastMinute = -1;
 
         public HubShellPresenter(IHubShellView view, HubNavigator nav, IHubPageFactory pages, ISessionReadModel session,
                                  ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving, ISubscriber<ShopChanged> shopChanged,
+                                 IOpenShopUseCase openShop, IClock clock,
                                  IModalService modals, IToastService toasts, ILocalization loc, IAppQuit quit, BackButtonRouter router)
             : base(view, router)
         {
             _nav = nav; _pages = pages; _session = session; _walletChanged = wallet; _saving = saving; _shopChanged = shopChanged;
+            _openShop = openShop; _clock = clock;
             _modals = modals; _toasts = toasts; _loc = loc; _quit = quit;
         }
 
@@ -55,6 +62,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.Relay.WipTapped += OnWipTapped;
             View.Relay.ReasonTapped += OnReasonTapped;
             OnNavigated(_nav.Current);
+            OpenShop();
         }
 
         protected override void OnDispose()
@@ -75,7 +83,17 @@ namespace N29.HeroesDawn.Presentation.Hub
         public void Tick()
         {
             if (Disposed) return;
+            var now = _clock.LocalNow;
+            if (now.Hour * 60 + now.Minute != _lastMinute) OpenShop();
             _page?.Tick();
+        }
+
+        /// <summary>Tire la boutique du jour si besoin (à l'ouverture, puis une fois par minute : nouveau tirage à 9h00) ; le badge « N » suit.</summary>
+        void OpenShop()
+        {
+            var now = _clock.LocalNow;
+            _lastMinute = now.Hour * 60 + now.Minute;
+            _openShop.ExecuteAsync(Lifetime).Forget();
         }
 
         /// <summary>

@@ -45,7 +45,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.Boot(_profiles, _auth);
             PlayModeHarness.Visible<LoginView>();
             UnityEngine.Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<HubView>() && !Flow.IsTransitioning);
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
         }
 
         /// <summary>Depuis le QG : pion en n02 avec 1 PM (n03 = combat Facile), puis plateau affiché.</summary>
@@ -73,7 +73,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator Deploy_UnloadsHub_LoadsBoard()
         {
             yield return SignedIn();
-            UnityEngine.Object.FindAnyObjectByType<HubView>()!.DeployButton.onClick.Invoke();
+            UnityEngine.Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Board) && !Flow.IsTransitioning);
             Assert.That(Loaded(SceneNames.Board), Is.True);
             Assert.That(Loaded(SceneNames.Hub), Is.False);
@@ -137,11 +137,11 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator DoubleDeployClick_StartsZoneOnce()
         {
             yield return SignedIn();
-            var hub = UnityEngine.Object.FindAnyObjectByType<HubView>()!;
+            var hub = UnityEngine.Object.FindAnyObjectByType<QgPageView>()!;
             var session = Container.Resolve<GameSession>();
-            hub.DeployButton.onClick.Invoke();
+            hub.MissionButton.onClick.Invoke();
             var firstRun = session.Run;
-            hub.DeployButton.onClick.Invoke();
+            hub.MissionButton.onClick.Invoke();
             Assert.That(firstRun, Is.Not.Null);
             Assert.That(session.Run, Is.SameAs(firstRun), "la partie n'est pas remplacée");
             yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Board) && !Flow.IsTransitioning);
@@ -162,8 +162,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator HubUnloaded_WalletChanged_NoErrorNoDestroyedRefresh()
         {
             yield return SignedIn();
-            var hub = UnityEngine.Object.FindAnyObjectByType<HubView>()!;
-            hub.DeployButton.onClick.Invoke();
+            var hub = UnityEngine.Object.FindAnyObjectByType<QgPageView>()!;
+            hub.MissionButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Board) && !Flow.IsTransitioning);
             Assert.That(hub == null, Is.True, "l'écran du QG est détruit avec sa scène");
             Container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));
