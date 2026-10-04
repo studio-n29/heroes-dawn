@@ -4,7 +4,7 @@
 const fs = require("fs"), path = require("path");
 const out = (f) => path.join(__dirname, "pages", f);
 
-const under = (file) => `<iframe class="under" src="${file}?export=1&embed=1"></iframe>`;
+const under = (file, extra = "") => `<iframe class="under" src="${file}?export=1&embed=1${extra}"></iframe>`;
 let NEXT = "";
 const spot = ([x, y, w, h], round = false) => `<div class="spotlight${round ? " round" : ""}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div><div class="abs" data-go="${NEXT}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;z-index:41"></div>`;
 const hand = (x, y, rot = 0) => `<div class="hand center" style="left:${x}px;top:${y}px;font-size:96px;transform:rotate(${rot}deg)">👆</div>`;
@@ -106,7 +106,7 @@ page("T07-combat-atb.html", "T07", "Tutoriel 7/9 · Temps actif", [
 
 NEXT = "T09";
 page("T08-combat-competence.html", "T08", "Tutoriel 8/9 · Compétence et cible", [
-  under("M66-combat-ciblage.html"), spot([922, 112, 316, 366]), hand(1060, 380, -10),
+  under("M66-combat-ciblage.html", "&calm=1"), spot([922, 112, 316, 366]), hand(1060, 380, -10),
   ...say(240, 560, 640, "8 / 9", "VISE !",
     "Tu as choisi Éclat de givre. Maintenant, touche le <b>chef du gang</b> pour l'attaquer."),
 ], [[1, 900, 130], [2, 220, 560]], [

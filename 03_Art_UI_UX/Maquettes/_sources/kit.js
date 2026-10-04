@@ -18,6 +18,7 @@
   const b = document.body, d = b.dataset;
   const params = new URLSearchParams(location.search);
   if (params.has("export")) b.classList.add("export");
+  if (params.has("calm")) b.classList.add("calm"); // retours de combat masqués (étape du tutoriel avant le coup)
   if (params.has("embed")) b.classList.add("embed"); // écran affiché sous un calque de tutoriel : sans pastilles
   const main = document.querySelector("main") || b;
   const add = (html) => main.insertAdjacentHTML("beforeend", html);
