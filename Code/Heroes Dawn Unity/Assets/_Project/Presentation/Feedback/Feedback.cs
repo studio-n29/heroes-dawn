@@ -83,6 +83,48 @@ namespace N29.HeroesDawn.Presentation.Feedback
             return true;
         }
 
+        /// <summary>
+        /// Gerbe d étincelles (impact, recrutement, récompense) : petits disques qui partent du centre de <paramref name="target"/>, ralentissent et s éteignent.
+        /// Coupée par les mouvements réduits ; rien hors du mode jeu.
+        /// </summary>
+        public static bool Sparks(RectTransform? target, Color color, int count = 9, float radius = 110f, float size = 16f)
+        {
+            if (target == null || !Allowed) return false;
+            for (int i = 0; i < count; i++)
+            {
+                var go = new GameObject("Spark", typeof(RectTransform), typeof(UnityEngine.UI.Image)) { layer = 5 };
+                var rt = (RectTransform)go.transform;
+                rt.SetParent(target, false);
+                rt.sizeDelta = new Vector2(size, size);
+                var img = go.GetComponent<UnityEngine.UI.Image>();
+                img.sprite = Sprites.Circle;
+                img.color = color;
+                img.raycastTarget = false;
+                float angle = (i + UnityEngine.Random.value * 0.6f) / count * Mathf.PI * 2f;
+                var dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+                float reach = radius * (0.6f + UnityEngine.Random.value * 0.6f);
+                var spark = rt;
+                Tween.Run(0.45f, k =>
+                {
+                    if (spark == null) return;
+                    spark.anchoredPosition = dir * reach * k;
+                    spark.localScale = Vector3.one * (1f - k * 0.8f);
+                    img.color = new Color(color.r, color.g, color.b, color.a * (1f - k * k));
+                }, () => { if (spark != null) UnityEngine.Object.Destroy(spark.gameObject); }, spark, Tween.EaseOutCubic);
+            }
+            return true;
+        }
+
+        /// <summary>Éclair blanc bref sur une image (coup reçu) puis retour à sa couleur ; false si coupé.</summary>
+        public static bool Flash(UnityEngine.UI.Graphic? g, float seconds = 0.14f)
+        {
+            if (g == null || !Allowed) return false;
+            var baseColor = g.color;
+            g.color = Color.white;
+            Tween.Delay(seconds, () => { if (g != null) g.color = baseColor; }, g);
+            return true;
+        }
+
         /// <summary>Entrée en cascade : apparition avec rebond après <paramref name="delay"/> (toujours jouée, non bloquante).</summary>
         public static void PopInAfter(Transform t, float delay)
         {

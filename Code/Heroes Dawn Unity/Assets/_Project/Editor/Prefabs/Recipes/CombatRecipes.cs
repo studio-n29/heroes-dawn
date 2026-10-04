@@ -291,6 +291,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             combo.Rect.At(1f, 0f, -30, 384, 330, 116);
             combo.Label.Inked();
             combo.gameObject.AddComponent<Pulse>().Amplitude = 0.07f;
+            RecipeKit.Shine(combo);
             combo.gameObject.SetActive(false);
 
             var view = rt.gameObject.AddComponent<CombatView>();

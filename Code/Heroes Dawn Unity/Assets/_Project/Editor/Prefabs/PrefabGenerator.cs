@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using N29.HeroesDawn.Presentation.Mvp;
+using N29.HeroesDawn.EditorTools;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,6 +30,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs
 
         public static GenerationReport Generate(string root, OverwritePolicy policy, ISet<string>? selected = null)
         {
+            if (root == DefaultRoot) Assets.UiMaterialBuilder.EnsureAll(); // matériaux des recettes (hachures, reflets, fond comics)
             var report = new GenerationReport();
             var ctx = new PrefabContext(root);
             foreach (var recipe in Recipes)

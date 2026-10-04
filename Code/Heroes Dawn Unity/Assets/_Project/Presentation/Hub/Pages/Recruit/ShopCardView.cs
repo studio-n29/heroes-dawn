@@ -73,6 +73,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 Tween.PopIn(inTeam.transform, 0.26f);
                 Feedback.Fx.Burst(card);
+                Feedback.Fx.Sparks(card, color, 14, 170f, 20f);
             }
             _wasInTeam = d.InTeam;
             _shown = true;

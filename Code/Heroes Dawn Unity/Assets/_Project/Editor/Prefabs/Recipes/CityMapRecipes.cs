@@ -153,6 +153,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             deploy.Rect.At(0.5f, 0f, 0, 0, RightW, 96);
             deploy.Label.Inked();
             RecipeKit.Mark(deploy, TutorialTarget.MapDeploy);
+            RecipeKit.Shine(deploy);
 
             var tagTemplate = Ui.Txt(mapArea, "", 28, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Title, "TagTemplate");
             tagTemplate.raycastTarget = false;

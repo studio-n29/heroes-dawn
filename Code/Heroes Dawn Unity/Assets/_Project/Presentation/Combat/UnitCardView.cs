@@ -72,7 +72,12 @@ namespace N29.HeroesDawn.Presentation.Combat
         }
 
         public void Float(string text, Color color, int size) => Instantiate(floatPrefab, transform).Play(text, color, size);
-        public void Hit() => Tween.Shake((RectTransform)transform, 12f, 0.25f);
+        public void Hit()
+        {
+            Tween.Shake((RectTransform)transform, 12f, 0.25f);
+            Feedback.Fx.Flash(portraitArea);
+            Feedback.Fx.Sparks((RectTransform)transform, _ally ? Theme.Danger : Theme.Primary, 7, 90f, 14f);
+        }
         public void Act() => Tween.Punch(transform, 0.08f, 0.25f);
     }
 }

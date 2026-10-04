@@ -37,6 +37,13 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
             fitter.aspectRatio = art.rect.width / art.rect.height;
             if (veil > 0f) Ui.Img(holder, "Veil", new Color(0, 0, 0, veil)).rectTransform.Stretch();
+            var comicMat = RecipeKit.Mat("UiBackdrop");
+            if (comicMat != null)
+            {
+                var comic = Ui.Img(rt, "Comic", Color.black);
+                comic.material = comicMat;
+                comic.rectTransform.Stretch();
+            }
             return img;
         }
     }

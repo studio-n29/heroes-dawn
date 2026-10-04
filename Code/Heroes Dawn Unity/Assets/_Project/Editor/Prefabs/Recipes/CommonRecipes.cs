@@ -22,6 +22,13 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
 
         /// <summary>Matériau d interface généré par <c>UiMaterialBuilder</c> (Resources/UI/Materials) ; null s il n existe pas encore.</summary>
+        /// <summary>Reflet animé sur un bouton d action (shader HD/UI/Shine).</summary>
+        public static void Shine(UiButton b)
+        {
+            var m = Mat("UiShine");
+            if (m != null) b.Fill.material = m;
+        }
+
         public static Material? Mat(string name)
             => UnityEditor.AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Resources/UI/Materials/" + name + ".mat");
 

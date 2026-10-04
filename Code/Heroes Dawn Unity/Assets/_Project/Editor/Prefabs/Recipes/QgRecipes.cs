@@ -128,6 +128,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var mission = Ui.LocBtn(rt, "qg.mission", Theme.Danger, Color.white, null!, 72, FontKind.Title, "Mission");
             mission.Rect.At(1f, 0f, 0, 0, RightW, 160);
             mission.Label.Inked();
+            RecipeKit.Shine(mission);
 
             var view = rt.gameObject.AddComponent<QgPageView>();
             ScreenKit.WireFade(ctx, view);

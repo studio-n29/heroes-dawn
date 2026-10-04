@@ -129,6 +129,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             banner.text = text;
             banner.color = ToneColors.Of(tone);
+            if (tone == Tone.Danger || tone == Tone.Primary) Tween.Punch(transform, 0.018f, 0.3f); // coup de caméra sur COMBO / VICTOIRE
             Tween.PopIn(banner.rectTransform, 0.3f);
             bannerGroup.alpha = 1f;
             if (_bannerFade != null) Tween.Stop(_bannerFade);

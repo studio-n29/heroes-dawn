@@ -69,6 +69,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             skip.Rect.At(0f, 0f, 22, 14, 330, 52);
             var ok = Ui.Btn(bubblePanel.transform, "", Theme.Primary, Theme.TextDark, null!, 36, FontKind.Title, "Ok");
             ok.Rect.At(1f, 0f, -20, 14, 300, 74);
+            RecipeKit.Shine(ok);
 
             // ---- Carte « Astuce » (non bloquante, en bas)
             var hintPanel = Ui.Panel(root, "Hint", Theme.Surface, 5f, 10f, true);

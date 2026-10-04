@@ -171,6 +171,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var roll = Ui.LocBtn(hudFill, "board.roll", Theme.Primary, Theme.TextDark, null!, 54, FontKind.Title, "Roll");
             roll.Rect.At(1f, 0.5f, -250, 26, 360, 90);
             RecipeKit.Mark(roll, TutorialTarget.BoardRoll);
+            RecipeKit.Shine(roll);
             var bonus = Ui.Btn(hudFill, "", Theme.Info, Theme.TextDark, null!, 26, FontKind.Title, "Bonus");
             bonus.Rect.At(1f, 0.5f, -20, 26, 220, 90);
             var end = Ui.LocBtn(hudFill, "board.end_move", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "EndMove");
