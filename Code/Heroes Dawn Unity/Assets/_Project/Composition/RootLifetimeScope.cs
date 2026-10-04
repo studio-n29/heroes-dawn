@@ -97,6 +97,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<OpenShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<RecruitFromShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<RerollShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<MarkShopSeenUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<HealRosterUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
 
             // ---- Use cases : combat

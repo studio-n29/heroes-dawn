@@ -199,6 +199,7 @@ namespace N29.HeroesDawn.Application.Session
                 p.team.Add(new MemberSave { id = m.Id.Value, level = m.Level, fatigue = m.Fatigue, inSquad = m.InSquad });
             p.shop.day = Shop.Day;
             p.shop.draw = Shop.Draw;
+            p.shop.seenDay = Shop.SeenDay;
             foreach (var o in Shop.Offers)
             {
                 p.shop.offers.Add(o.Id.Value);
@@ -220,6 +221,7 @@ namespace N29.HeroesDawn.Application.Session
                 offers.Add(new ShopOffer(def.Id, recruited));
             }
             Shop.Replace(save.day, Math.Max(0, save.draw), offers);
+            Shop.SetSeenDay(save.seenDay ?? "");
         }
     }
 }

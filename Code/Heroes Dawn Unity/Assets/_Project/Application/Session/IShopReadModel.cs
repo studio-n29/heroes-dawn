@@ -10,6 +10,8 @@ namespace N29.HeroesDawn.Application.Session
         string Day { get; }
         /// <summary>Numéro du tirage du jour = nombre de renouvellements faits aujourd'hui.</summary>
         int Draw { get; }
+        /// <summary>Dernier jour de boutique vu sur l'onglet Recruter ; différent de <see cref="Day"/> = badge « N ».</summary>
+        string SeenDay { get; }
         IReadOnlyList<ShopOffer> Offers { get; }
     }
 }

@@ -251,5 +251,53 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(other.Session.Shop.Offers.Count, Is.EqualTo(2));
             Assert.That(other.Session.Shop.Offers.Any(o => o.Id.Value == "inconnu"), Is.False);
         }
+
+        Result MarkSeen() => Sh.MarkSeen.ExecuteAsync().GetAwaiter().GetResult();
+
+        [Test, Description("Vérifie que marquer la boutique comme vue retient le jour courant et sauvegarde — parce que le badge « N » de l'onglet Recruter disparaît une fois la boutique vue (spec §5)")]
+        public void MarkSeen_SetsSeenDayAndSaves()
+        {
+            Open();
+            int saves = _app.Profiles.Saves;
+            Assert.That(Code(MarkSeen()), Is.EqualTo("ok"));
+            Assert.That(Shop.SeenDay, Is.EqualTo(Shop.Day));
+            Assert.That(_app.Profiles.Saves, Is.GreaterThan(saves));
+        }
+
+        [Test, Description("Vérifie que marquer deux fois n'annonce le changement qu'une fois — parce que la coque ne doit pas se rafraîchir pour rien")]
+        public void MarkSeen_Twice_PublishesOnce()
+        {
+            Open();
+            int before = _app.Received<ShopChanged>().Count;
+            MarkSeen();
+            MarkSeen();
+            Assert.That(_app.Received<ShopChanged>().Count, Is.EqualTo(before + 1));
+        }
+
+        [Test, Description("Vérifie que le jour vu est sauvegardé puis restauré — parce que le badge ne doit pas réapparaître au relancement")]
+        public void Save_ThenApply_RestoresSeenDay()
+        {
+            Open();
+            MarkSeen();
+            var p = _app.Session.ToProfile(DateTime.UtcNow);
+            Assert.That(p.shop.seenDay, Is.EqualTo(Shop.Day));
+            var other = new TestApp();
+            other.SignInDirect("p1");
+            other.Session.ApplyProfile(p);
+            Assert.That(other.Session.Shop.SeenDay, Is.EqualTo(Shop.Day));
+        }
+
+        [Test, Description("Vérifie qu'un profil sans jour vu se charge comme « pas vu » — parce que les sauvegardes actuelles n'ont pas ce champ (spec §5)")]
+        public void ApplyProfile_WithoutSeenDay_IsNotSeen()
+        {
+            Open();
+            var p = _app.Session.ToProfile(DateTime.UtcNow);
+            p.shop.seenDay = "";
+            var other = new TestApp();
+            other.SignInDirect("p1");
+            other.Session.ApplyProfile(p);
+            Assert.That(other.Session.Shop.SeenDay, Is.EqualTo(""));
+            Assert.That(other.Session.Shop.SeenDay, Is.Not.EqualTo(other.Session.Shop.Day));
+        }
     }
 }

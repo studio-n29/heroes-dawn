@@ -19,6 +19,7 @@ namespace N29.HeroesDawn.Presentation.Mvp
         [SerializeField, OptionalRef] GameObject? modalLayer;
         [SerializeField, OptionalRef] GameObject? toasts;
         [SerializeField] GameObject[] popups = Array.Empty<GameObject>();
+        [SerializeField] GameObject[] pages = Array.Empty<GameObject>();
 
         public GameObject? ModalLayer => modalLayer;
         public GameObject? Toasts => toasts;
@@ -41,13 +42,21 @@ namespace N29.HeroesDawn.Presentation.Mvp
             throw new InvalidOperationException($"Popup manquante dans ScreenCatalog : {typeof(TView).Name}");
         }
 
+        /// <summary>Prefab de page du hub dont la racine porte un composant <typeparamref name="TView"/>.</summary>
+        public GameObject PageFor<TView>() where TView : class
+        {
+            foreach (var p in pages)
+                if (p != null && p.GetComponent<TView>() != null) return p;
+            throw new InvalidOperationException($"Page manquante dans ScreenCatalog : {typeof(TView).Name}");
+        }
+
 #if UNITY_EDITOR
         /// <summary>Remplissage par le générateur de prefabs (éditeur).</summary>
         public void Fill(GameObject? login, GameObject? hub, GameObject? board, GameObject? combat,
-                         GameObject? modalLayer, GameObject? toasts, GameObject[] popups)
+                         GameObject? modalLayer, GameObject? toasts, GameObject[] popups, GameObject[] pages)
         {
             this.login = login; this.hub = hub; this.board = board; this.combat = combat;
-            this.modalLayer = modalLayer; this.toasts = toasts; this.popups = popups;
+            this.modalLayer = modalLayer; this.toasts = toasts; this.popups = popups; this.pages = pages;
         }
 #endif
     }

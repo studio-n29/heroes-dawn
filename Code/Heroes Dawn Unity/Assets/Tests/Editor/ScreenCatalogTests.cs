@@ -39,6 +39,26 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(ex.Message, Does.Contain("ScreenCatalog"));
         }
 
+        [Test, Description("Vérifie qu'une page du hub se retrouve par le type de sa vue — parce que la fabrique de pages instancie chaque page depuis le catalogue (spec §3.3)")]
+        public void PageFor_ReturnsPrefabHoldingTheView()
+        {
+            var c = ScriptableObject.CreateInstance<ScreenCatalog>();
+            var page = new GameObject("Page", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+            try
+            {
+                c.Fill(null, null, null, null, null, null, Array.Empty<GameObject>(), new[] { page });
+                Assert.That(c.PageFor<UnityEngine.UI.Image>(), Is.SameAs(page));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(page); UnityEngine.Object.DestroyImmediate(c); }
+        }
+
+        [Test, Description("Vérifie qu'une page absente du catalogue lève une erreur explicite — parce qu'un prefab manquant doit être signalé clairement")]
+        public void PageFor_Missing_ThrowsExplicitMessage()
+        {
+            var ex = Assert.Throws<InvalidOperationException>(() => Catalog.PageFor<IUnknownPopup>());
+            Assert.That(ex.Message, Does.Contain("ScreenCatalog"));
+        }
+
         [Test, Description("Vérifie que le scope racine et les scopes des scènes d'écran référencent le catalogue — parce que sans lui aucun écran ne peut être instancié (spec §4)")]
         public void GeneratedScenes_ScopesReferenceCatalog()
         {

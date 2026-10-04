@@ -239,6 +239,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             public readonly IOpenShopUseCase Open;
             public readonly IRecruitFromShopUseCase Recruit;
             public readonly IRerollShopUseCase Reroll;
+            public readonly IMarkShopSeenUseCase MarkSeen;
 
             public ShopUseCases(TestApp a)
             {
@@ -246,6 +247,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
                 Open = new OpenShopUseCase(a.Session, a.Time, a.Save, shop);
                 Recruit = new RecruitFromShopUseCase(a.Session, a.Time, a.Save, Open, a.Publisher<WalletChanged>(), a.Publisher<RosterChanged>(), shop);
                 Reroll = new RerollShopUseCase(a.Session, a.Time, a.Save, Open, a.Publisher<WalletChanged>(), shop);
+                MarkSeen = new MarkShopSeenUseCase(a.Session, a.Save, shop);
             }
         }
 

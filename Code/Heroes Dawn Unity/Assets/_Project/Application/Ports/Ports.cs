@@ -73,6 +73,7 @@ namespace N29.HeroesDawn.Application.Ports
     {
         public string day = "";
         public int draw;
+        public string seenDay = "";
         public List<string> offers = new List<string>();
         public List<bool> recruited = new List<bool>();
     }

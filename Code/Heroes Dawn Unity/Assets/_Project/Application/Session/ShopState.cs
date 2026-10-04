@@ -10,6 +10,8 @@ namespace N29.HeroesDawn.Application.Session
 
         public string Day { get; private set; } = "";
         public int Draw { get; private set; }
+        /// <summary>Dernier jour de boutique affiché sur l'onglet Recruter (vide = jamais vu).</summary>
+        public string SeenDay { get; private set; } = "";
         public IReadOnlyList<ShopOffer> Offers => _offers;
 
         internal void Replace(string day, int draw, IEnumerable<ShopOffer> offers)
@@ -20,6 +22,12 @@ namespace N29.HeroesDawn.Application.Session
             _offers.AddRange(offers);
         }
 
-        internal void Clear() => Replace("", 0, System.Array.Empty<ShopOffer>());
+        internal void Clear()
+        {
+            Replace("", 0, System.Array.Empty<ShopOffer>());
+            SeenDay = "";
+        }
+
+        internal void SetSeenDay(string day) => SeenDay = day ?? "";
     }
 }

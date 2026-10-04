@@ -80,12 +80,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs
         static void FillCatalog()
         {
             GameObject? Load(string rel) => AssetDatabase.LoadAssetAtPath<GameObject>(DefaultRoot + "/" + rel);
-            var popups = AssetDatabase.FindAssets("t:Prefab", new[] { DefaultRoot + "/Popups" })
-                                      .Select(AssetDatabase.GUIDToAssetPath).OrderBy(p => p, StringComparer.Ordinal)
-                                      .Select(AssetDatabase.LoadAssetAtPath<GameObject>).ToArray();
+            GameObject[] InFolder(string folder)
+                => !AssetDatabase.IsValidFolder(DefaultRoot + "/" + folder) ? Array.Empty<GameObject>()
+                   : AssetDatabase.FindAssets("t:Prefab", new[] { DefaultRoot + "/" + folder })
+                                  .Select(AssetDatabase.GUIDToAssetPath).OrderBy(p => p, StringComparer.Ordinal)
+                                  .Select(AssetDatabase.LoadAssetAtPath<GameObject>).ToArray();
             var c = EnsureCatalog();
             c.Fill(Load("Screens/Login.prefab"), Load("Screens/Hub.prefab"), Load("Screens/Board.prefab"), Load("Screens/Combat.prefab"),
-                   Load("Common/ModalLayer.prefab"), Load("Common/Toasts.prefab"), popups);
+                   Load("Common/ModalLayer.prefab"), Load("Common/Toasts.prefab"), InFolder("Popups"), InFolder("Pages"));
             EditorUtility.SetDirty(c);
             AssetDatabase.SaveAssets();
         }
