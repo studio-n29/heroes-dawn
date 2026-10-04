@@ -95,6 +95,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             int i = 0;
             for (int k = 0; k < roster.Count; k++) if (roster[k].Id == _member) { i = k; break; }
             _member = roster[((i + delta) % roster.Count + roster.Count) % roster.Count].Id;
+            _nav.ReplaceCurrent(new HubLocation(HubPage.MemberSheet, _member));
             Refresh();
         }
 
@@ -128,7 +129,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             var outcome = await _recruit.RunAsync(slot, Lifetime);
             if (Disposed) return;
-            if (outcome == RecruitOutcome.Expired) Leave(false);
+            if (outcome == RecruitOutcome.Expired) Leave(null);
             else Refresh();
         }
 
@@ -139,12 +140,15 @@ namespace N29.HeroesDawn.Presentation.Hub
             return -1;
         }
 
-        /// <summary>L'offre n'existe plus : retour à Recruter (une seule fois), avec le toast si personne ne l'a déjà affiché.</summary>
-        void Leave(bool toast)
+        /// <summary>
+        /// Le héros de la fiche n'existe plus (offre renouvelée, membre effacé) : retour à la page précédente, une seule fois,
+        /// avec le toast <paramref name="error"/> si personne ne l'a déjà affiché.
+        /// </summary>
+        void Leave(DomainError? error)
         {
             if (_left) return;
             _left = true;
-            if (toast) _toasts.Show(_loc.Error(ShopErrors.Expired), ToastKind.Error);
+            if (error != null) _toasts.Show(_loc.Error(error), ToastKind.Error);
             _nav.Back();
         }
 
@@ -158,7 +162,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         void RefreshOwned()
         {
             var m = _session.Roster.FirstOrDefault(x => x.Id == _member);
-            if (m == null) return;
+            if (m == null) { Leave(HubErrors.UnknownMember); return; }
             bool max = m.Level >= MetaRules.MaxLevel;
             int cost = MetaRules.TrainCost(m.Level);
             int missing = cost - _session.Wallet.Credits;
@@ -177,7 +181,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         void RefreshShop()
         {
             int slot = Slot();
-            if (slot < 0) { Leave(true); return; }
+            if (slot < 0) { Leave(ShopErrors.Expired); return; }
             var offer = _session.Shop.Offers[slot];
             var def = _session.Content.Member(offer.Id);
             bool inTeam = offer.Recruited || _session.Roster.Any(x => x.Id == offer.Id);

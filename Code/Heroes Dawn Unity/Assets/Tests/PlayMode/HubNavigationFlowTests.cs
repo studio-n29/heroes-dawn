@@ -116,6 +116,39 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(PlayModeHarness.Visible<QgPageView>(), Is.True, "aucune navigation");
         }
 
+        [UnityTest, Description("Vérifie qu'un MISSION sur le QG puis un MISSION sur l'Équipe avant le départ du hub ne démarrent la zone qu'une fois — parce qu'un second départ remplacerait la partie (relecture, M5)")]
+        public IEnumerator Mission_ThenTeamMissionBeforeUnload_StartsZoneOnce()
+        {
+            yield return OnHub();
+            var session = Container.Resolve<GameSession>();
+            Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
+            var firstRun = session.Run;
+            Shell.TabButton(HubPage.Team).Button.onClick.Invoke();
+            Object.FindAnyObjectByType<TeamPageView>()!.MissionButton.onClick.Invoke();
+            Assert.That(firstRun, Is.Not.Null);
+            Assert.That(session.Run, Is.SameAs(firstRun), "la partie n'est pas remplacée");
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning, 600);
+        }
+
+        [UnityTest, Description("Vérifie que des touchers répétés sur un bouton grisé le laissent à sa place — parce qu'une secousse qui part d'une position déjà décalée ferait dériver le bouton (relecture, M2)")]
+        public IEnumerator DisabledButton_RepeatedTaps_NoDrift()
+        {
+            yield return OnHub();
+            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Infirmary)!.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<InfirmaryPageView>());
+            var heal = Object.FindAnyObjectByType<InfirmaryPageView>()!.HealButton.GetComponent<UiButton>();
+            Assert.That(heal.Interactable, Is.False, "aucune fatigue : soin grisé");
+            var origin = heal.Rect.anchoredPosition;
+            for (int i = 0; i < 4; i++)
+            {
+                heal.OnPointerClick(new PointerEventData(EventSystem.current));
+                yield return null;
+                yield return null;
+            }
+            yield return new WaitForSecondsRealtime(0.6f);
+            Assert.That(Vector2.Distance(heal.Rect.anchoredPosition, origin), Is.LessThan(0.01f));
+        }
+
         [UnityTest, Timeout(120000), Description("Vérifie que MISSION lance la zone depuis le QG puis depuis l'Équipe — parce que les deux boutons mènent au plateau (spec §4)")]
         public IEnumerator Mission_FromQgAndFromTeam_LaunchesZone()
         {

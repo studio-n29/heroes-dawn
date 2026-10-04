@@ -54,9 +54,23 @@ namespace N29.HeroesDawn.Presentation.Feedback
         public static bool Shake(RectTransform? rt, float strength = 8f)
         {
             if (rt == null || !Allowed) return false;
-            Tween.Shake(rt, strength, 0.22f);
+            // Une secousse par élément : la précédente est arrêtée et sa position d'origine rétablie (sinon, touchers répétés = dérive).
+            if (Shaking.Count > 16)
+                foreach (var dead in System.Linq.Enumerable.ToList(System.Linq.Enumerable.Where(Shaking.Keys, k => k == null))) Shaking.Remove(dead);
+            if (Shaking.TryGetValue(rt, out var running))
+            {
+                Tween.Stop(running.Run);
+                rt.anchoredPosition = running.Origin;
+            }
+            var origin = rt.anchoredPosition;
+            var run = Tween.Run(0.22f, k => { if (rt != null) rt.anchoredPosition = origin + new Vector2(Mathf.Sin(k * 40f) * strength * (1f - k), 0f); },
+                                () => { if (rt != null) rt.anchoredPosition = origin; Shaking.Remove(rt!); }, rt, Tween.Linear);
+            Shaking[rt] = (run, origin);
             return true;
         }
+
+        static readonly System.Collections.Generic.Dictionary<RectTransform, (Coroutine Run, Vector2 Origin)> Shaking =
+            new System.Collections.Generic.Dictionary<RectTransform, (Coroutine Run, Vector2 Origin)>();
 
         /// <summary>Éclat : grossissement bref (recrutement, entrée dans l'escouade) ; false si coupé.</summary>
         public static bool Burst(Transform? t, float amount = 0.14f)

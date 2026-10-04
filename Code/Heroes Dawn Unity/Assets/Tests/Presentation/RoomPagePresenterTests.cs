@@ -68,6 +68,22 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_toasts.Shown.Last().Kind, Is.EqualTo(ToastKind.Reward));
         }
 
+        [Test, Description("Vérifie que l'ordre des lignes reste celui de l'ouverture après un entraînement — parce qu'une ligne qui glisse sous le doigt ferait payer l'entraînement d'un autre membre (relecture, I3)")]
+        public void Train_DoesNotReorderRows()
+        {
+            _app.Session.Wallet.Set(5000, 0);
+            _app.Session.Find(new MemberId("ancre"))!.Level = 9;
+            _app.Session.Find(new MemberId("echo"))!.Level = 6;
+            _app.Session.Find(new MemberId("seve"))!.Level = 7;
+            Make();
+            var before = _view.Last.Rows.Select(r => r.Id.Value).ToArray();
+            Assert.That(before.First(), Is.EqualTo("givre"));
+            _view.ClickTrain(new MemberId("givre"));
+            _view.ClickTrain(new MemberId("givre"));
+            Assert.That(_app.Session.Find(new MemberId("givre"))!.Level, Is.EqualTo(7));
+            Assert.That(_view.Last.Rows.Select(r => r.Id.Value), Is.EqualTo(before));
+        }
+
         [Test, Description("Vérifie que sans assez de Crédits la ligne est grisée et dit ce qui manque — parce qu'un bouton désactivé doit dire pourquoi (contraintes)")]
         public void Train_NotEnoughCredits_DisabledWithReason()
         {

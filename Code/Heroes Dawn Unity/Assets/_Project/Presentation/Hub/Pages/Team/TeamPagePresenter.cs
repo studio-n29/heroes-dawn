@@ -23,16 +23,16 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly HubNavigator _nav;
         readonly ILocalization _loc;
         readonly ISubscriber<RosterChanged> _roster;
+        readonly TeamViewState _state;
         readonly PageAction _action;
         IDisposable? _subs;
-        int _filter;
-        MemberSort _sort = MemberSort.Level;
 
         public TeamPagePresenter(ITeamPageView view, ISessionReadModel session, IToggleSquadUseCase toggle, MissionLauncher mission,
-                                 HubNavigator nav, IToastService toasts, ILocalization loc, ISubscriber<RosterChanged> roster)
+                                 HubNavigator nav, TeamViewState state, IToastService toasts, ILocalization loc, ISubscriber<RosterChanged> roster)
             : base(view, null)
         {
             _session = session; _toggle = toggle; _mission = mission; _nav = nav; _loc = loc; _roster = roster;
+            _state = state;
             _action = new PageAction(toasts, loc);
         }
 
@@ -72,13 +72,13 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         void SetFilter(int index)
         {
-            _filter = index;
+            _state.FilterIndex = index;
             Refresh();
         }
 
         void SetSort(MemberSort sort)
         {
-            _sort = sort;
+            _state.Sort = sort;
             Refresh();
         }
 
@@ -92,14 +92,14 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             if (Disposed) return;
             var s = _session;
-            Family? family = _filter <= 0 ? (Family?)null : (Family)(_filter - 1);
+            Family? family = _state.FilterIndex <= 0 ? (Family?)null : (Family)(_state.FilterIndex - 1);
             var squad = s.Squad;
             var combos = SquadCombos.Of(squad.Select(m => m.Def).ToList(), s.Content.Combos);
             View.Show(new TeamPageData
             {
-                Members = MemberQuery.Apply(s.Roster, family, _sort).Select(Tile).ToArray(),
-                FilterIndex = _filter,
-                Sort = _sort,
+                Members = MemberQuery.Apply(s.Roster, family, _state.Sort).Select(Tile).ToArray(),
+                FilterIndex = _state.FilterIndex,
+                Sort = _state.Sort,
                 SquadTitle = _loc.F("hub.squad", squad.Count),
                 Squad = squad.Select(m => MemberCards.Slot(m, _loc)).ToArray(),
                 Combos = combos.Select(c => _loc.F("team.combo_line", _loc.ComboName(c.Combo), _loc.MemberName(c.A), _loc.MemberName(c.B))).ToArray(),

@@ -45,6 +45,32 @@ namespace N29.HeroesDawn.Tests.Presentation
             return _p;
         }
 
+        [Test, Description("Vérifie que le membre choisi aux flèches devient l'emplacement courant, sans nouvelle page — parce qu'un raccourci puis Retour doit ramener à ce membre (relecture, I2)")]
+        public void NextPrevious_UpdatesNavigatorLocation_WithoutNavigation()
+        {
+            Make("givre");
+            int changes = 0;
+            _nav.Changed += _ => changes++;
+            _view.ClickNext();
+            Assert.That(_nav.Current.Member, Is.EqualTo(new MemberId("echo")));
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.MemberSheet));
+            Assert.That(changes, Is.Zero, "aucune page recréée");
+            _view.ClickRoom(HubPage.Salon);
+            _nav.Back();
+            Assert.That(_nav.Current.Member, Is.EqualTo(new MemberId("echo")));
+        }
+
+        [Test, Description("Vérifie que la fiche d'un membre qui n'existe plus revient en arrière avec un toast au lieu d'une fiche vide — parce qu'un effacement de sauvegarde peut retirer le membre (spec §7 ; relecture, M1)")]
+        public void OwnedMemberGone_GoesBackWithToast()
+        {
+            _nav.SelectTab(HubPage.Team);
+            Make("givre");
+            _app.Session.Roster.RemoveAll(m => m.Id.Value == "givre");
+            _app.Publisher<RosterChanged>().Publish(default);
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Team));
+            Assert.That(_toasts.Shown.Last(), Is.EqualTo((_loc.Error(HubErrors.UnknownMember), ToastKind.Error)));
+        }
+
         void OpenShop()
         {
             _app.Time.LocalNow = new System.DateTime(2026, 10, 3, 12, 0, 0);

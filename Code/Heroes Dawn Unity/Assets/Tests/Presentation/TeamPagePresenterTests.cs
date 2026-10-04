@@ -21,6 +21,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         FakeToasts _toasts = null!;
         HubNavigator _nav = null!;
         TeamPagePresenter _p = null!;
+        TeamViewState _state = null!;
         readonly LocLocalization _loc = new LocLocalization();
 
         [SetUp]
@@ -29,6 +30,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _app = new TestApp();
             _app.Account.SignIn.ExecuteAsync().GetAwaiter().GetResult();
             _view = new FakeTeamPageView();
+            _state = new TeamViewState();
             _toasts = new FakeToasts();
             _nav = new HubNavigator();
         }
@@ -36,7 +38,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         TeamPagePresenter Make(IToggleSquadUseCase toggle = null)
         {
             var mission = new MissionLauncher(_app.Zone.Start, PrototypeContent.Zone11, _app.Publisher<NavigateRequested>(), _toasts, _loc);
-            _p = new TeamPagePresenter(_view, _app.Session, toggle ?? _app.Hub.ToggleSquad, mission, _nav, _toasts, _loc, _app.Subscriber<RosterChanged>());
+            _p = new TeamPagePresenter(_view, _app.Session, toggle ?? _app.Hub.ToggleSquad, mission, _nav, _state, _toasts, _loc, _app.Subscriber<RosterChanged>());
             _view.Show();
             _p.Start();
             return _p;
@@ -66,6 +68,20 @@ namespace N29.HeroesDawn.Tests.Presentation
             _view.ClickSort(MemberSort.Fatigue);
             Assert.That(_view.Last.Members.First().Id.Value, Is.EqualTo("seve"));
             Assert.That(_view.Last.Sort, Is.EqualTo(MemberSort.Fatigue));
+        }
+
+        [Test, Description("Vérifie que le filtre et le tri sont retrouvés après un passage par la fiche — parce que l'état utile vit hors de la vue (spec §3) ; la page est recréée à chaque retour (relecture, I1)")]
+        public void Filter_And_Sort_KeptAfterLeavingPage()
+        {
+            Make();
+            _view.ClickFilter(1 + (int)Family.Elemental);
+            _view.ClickSort(MemberSort.Fatigue);
+            _p.Dispose();
+            _view = new FakeTeamPageView();
+            Make();
+            Assert.That(_view.Last.FilterIndex, Is.EqualTo(1 + (int)Family.Elemental));
+            Assert.That(_view.Last.Sort, Is.EqualTo(MemberSort.Fatigue));
+            Assert.That(_view.Last.Members.Select(m => m.Id.Value), Is.EqualTo(new[] { "givre" }));
         }
 
         [Test, Description("Vérifie que toucher le bouton d'escouade retire puis remet un membre — parce que l'escouade se compose ici (M20 ④)")]

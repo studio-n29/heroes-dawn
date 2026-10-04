@@ -43,6 +43,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISubscriber<RosterChanged> _roster;
         readonly PageAction _action;
         IDisposable? _subs;
+        System.Collections.Generic.List<MemberId>? _order;
 
         public SalonPagePresenter(ISalonPageView view, ISessionReadModel session, ITrainMemberUseCase train, IToastService toasts,
                                   ILocalization loc, ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster)
@@ -91,8 +92,21 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.Show(new SalonPageData
             {
                 Banner = _loc.T("salon.simple"),
-                Rows = _session.Roster.OrderBy(m => m.Level).Select(Row).ToArray(),
+                Rows = Ordered().Select(Row).ToArray(),
             });
+        }
+
+        /// <summary>
+        /// Du plus bas niveau au plus haut, ordre figé à l'ouverture : une ligne ne glisse jamais sous le doigt après un entraînement
+        /// (un second toucher paierait pour un autre membre). Nouveaux membres à la fin, membres disparus retirés.
+        /// </summary>
+        System.Collections.Generic.IEnumerable<ITeamMemberReadModel> Ordered()
+        {
+            var roster = _session.Roster;
+            _order ??= roster.OrderBy(m => m.Level).Select(m => m.Id).ToList();
+            foreach (var m in roster) if (!_order.Contains(m.Id)) _order.Add(m.Id);
+            _order.RemoveAll(id => roster.All(m => m.Id != id));
+            return _order.Select(id => roster.First(m => m.Id == id));
         }
 
         SalonRowData Row(ITeamMemberReadModel m)

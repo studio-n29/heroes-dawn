@@ -19,6 +19,9 @@ namespace N29.HeroesDawn.Composition
             // Singleton dans ce scope : les scopes enfants des pages partagent le navigateur de la coque (Scoped en créerait un par page).
             builder.Register<HubNavigator>(Lifetime.Singleton);
             builder.Register<IHubPageFactory, HubPageFactory>(Lifetime.Singleton);
+            // Partagés par toutes les pages : un seul départ en mission à la fois (même en changeant de page), filtre et tri de l'Équipe conservés.
+            builder.Register<MissionLauncher>(Lifetime.Singleton);
+            builder.Register<TeamViewState>(Lifetime.Singleton);
             builder.RegisterEntryPoint<HubShellPresenter>().AsSelf();
         }
     }

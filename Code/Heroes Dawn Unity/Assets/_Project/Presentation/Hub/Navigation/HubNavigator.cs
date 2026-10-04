@@ -41,6 +41,16 @@ namespace N29.HeroesDawn.Presentation.Hub
             Changed?.Invoke(Current);
         }
 
+        /// <summary>
+        /// Remplace l'emplacement courant sans recréer de page (pas d'événement <see cref="Changed"/>) : la fiche y note le membre
+        /// atteint par ses flèches, pour qu'un raccourci puis Retour y ramène.
+        /// </summary>
+        public void ReplaceCurrent(HubLocation location)
+        {
+            if (IsTab(location.Page) != IsTab(Current.Page)) throw new ArgumentException("Un onglet ne remplace qu'un onglet", nameof(location));
+            _stack[_stack.Count - 1] = location;
+        }
+
         public BackOutcome Back()
         {
             if (_stack.Count > 1)
