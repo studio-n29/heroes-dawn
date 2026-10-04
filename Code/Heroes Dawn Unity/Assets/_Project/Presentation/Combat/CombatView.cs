@@ -19,6 +19,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] UiButton speed = null!;
         [SerializeField] UiButton debugWin = null!;
         [SerializeField] UiButton pause = null!;
+        [SerializeField] UiButton timeSkip = null!;
+        [SerializeField] TimelineView timeline = null!;
         [SerializeField] TMP_Text skillTitle = null!;
         [SerializeField] UiButton combo = null!;
         [SerializeField] TMP_Text title = null!;
@@ -40,6 +42,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         public event Action? SpeedClicked;
         public event Action? DebugWinClicked;
         public event Action? PauseClicked;
+        public event Action? TimeSkipClicked;
         public event Action? ComboClicked;
         public event Action? CycleClicked;
         public event Action<int>? SkillClicked;
@@ -48,6 +51,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         /// <summary>Boutons Auto et vitesse (tests PlayMode : clics réels).</summary>
         public UnityEngine.UI.Button AutoButton => auto.Button;
         public UnityEngine.UI.Button SpeedButton => speed.Button;
+        public UnityEngine.UI.Button TimeSkipButton => timeSkip.Button;
+        public TimelineView Timeline => timeline;
 
         /// <summary>Bouton de la compétence <paramref name="i"/> (tests PlayMode : clics réels).</summary>
         public UnityEngine.UI.Button SkillButton(int i) => skills[i].ClickButton;
@@ -67,6 +72,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             speed.Button.onClick.AddListener(() => SpeedClicked?.Invoke());
             debugWin.Button.onClick.AddListener(() => DebugWinClicked?.Invoke());
             pause.Button.onClick.AddListener(() => PauseClicked?.Invoke());
+            timeSkip.Button.onClick.AddListener(() => TimeSkipClicked?.Invoke());
             combo.Button.onClick.AddListener(() => ComboClicked?.Invoke());
             for (int i = 0; i < skills.Length; i++)
             {
@@ -91,6 +97,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             enemyRow.Clear();
             allyRow.Clear();
+            timeline.Clear();
             _cards.Clear();
             foreach (var u in units)
             {
@@ -113,6 +120,17 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (!d.Visible) return;
             skillTitle.text = d.Title;
             for (int i = 0; i < skills.Length; i++) skills[i].Show(i < d.Slots.Length ? d.Slots[i] : default, i);
+        }
+
+        public void ShowTimeline(TimelineData d)
+        {
+            timeline.Show(d);
+            if (timeSkip.gameObject.activeSelf != d.SkipVisible) timeSkip.gameObject.SetActive(d.SkipVisible);
+            if (!d.SkipVisible) return;
+            timeSkip.SetLabel(d.SkipLabel);
+            timeSkip.SetColors(d.SkipTargeting ? Color.white : Theme.Info, Theme.TextDark);
+            timeSkip.Interactable = d.SkipEnabled;
+            timeSkip.DisabledReason = d.SkipReason;
         }
 
         public void ShowCombo(bool visible, string label)

@@ -35,6 +35,7 @@ namespace N29.HeroesDawn.Domain.Combat
             foreach (var a in setup.Allies) _units.Add(UnitFactory.Ally(id++, c.Member(a.Member), a, _b));
             foreach (var e in setup.Enemies) _units.Add(UnitFactory.Enemy(id++, c.Enemy(e.Enemy), e, setup.Rank, _b));
             foreach (var u in _units) u.Gauge = u.GaugeMax * _rng.Range(0, 21) / 100; // départ entre 0 et 20 %
+            InitTimeline();
         }
 
         public CombatUnit Unit(int id) => _units[id];
@@ -58,11 +59,16 @@ namespace N29.HeroesDawn.Domain.Combat
         void StepOne(List<CombatEvent> output)
         {
             Tick++;
+            RegenTimeBank();
             for (int i = 0; i < _units.Count; i++)
             {
                 var u = _units[i];
                 if (!u.IsAlive || u.IsReady) continue;
-                u.Gauge += FillPerTick(u);
+                long fill = FillPerTick(u);
+                u.Gauge += fill;
+                BurnStep(u, fill, output); // la brûlure mord à chaque pas sur la frise
+                if (!u.IsAlive) continue;
+                if (u.Gauge < u.GaugeMax) PlanIfNeeded(u, output);
                 if (u.Gauge >= u.GaugeMax)
                 {
                     u.Gauge = u.GaugeMax;

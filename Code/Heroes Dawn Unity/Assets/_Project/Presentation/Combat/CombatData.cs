@@ -61,6 +61,38 @@ namespace N29.HeroesDawn.Presentation.Combat
         public bool DebugVisible;
     }
 
+    /// <summary>Une unité sur la frise chronologique : position 0..1, annonce de l action, état.</summary>
+    public struct TimelineMarkerData
+    {
+        public int Id;
+        public bool Ally;
+        public bool Alive;
+        public string Initial;
+        public Family Family;
+        public float Position01;
+        /// <summary>En canalisation (position négative après un combo).</summary>
+        public bool Channelling;
+        public bool Ready;
+        public bool InPrep;
+        /// <summary>Compétence annoncée (0 à 2) ; -1 : aucune.</summary>
+        public int PlannedSlot;
+        public bool Boss;
+    }
+
+    public struct TimelineData
+    {
+        public TimelineMarkerData[] Markers;
+        public float PrepStart01;
+        public int Bank;
+        public int BankMax;
+        public string BankText;
+        public bool SkipVisible;
+        public bool SkipEnabled;
+        public bool SkipTargeting;
+        public string SkipLabel;
+        public string SkipReason;
+    }
+
     /// <summary>Ligne de fatigue des résultats (avant → après).</summary>
     public struct FatigueRowData
     {

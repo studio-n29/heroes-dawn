@@ -32,7 +32,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["tutorial.step.Move.title"] = "AVANCER";
             d["tutorial.step.Move.body"] = "Les cases cerclées sont à ta portée. Touche celle que je t'indique.";
             d["tutorial.step.CombatAtb.title"] = "LE COMBAT";
-            d["tutorial.step.CombatAtb.body"] = "Les jauges jaunes se remplissent : quand elle est pleine, ton héros agit.";
+            d["tutorial.step.CombatAtb.body"] = "Chaque héros avance sur la frise : à 100 %, il agit. Le rouge, c'est la zone de préparation.";
             d["tutorial.step.CombatSkill.title"] = "À TOI DE JOUER";
             d["tutorial.step.CombatSkill.body"] = "Choisis une compétence, puis touche un ennemi pour la lancer.";
             d["tutorial.step.Results.title"] = "LA FATIGUE";
@@ -52,6 +52,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["tutorial.hint.zone_done"] = "Zone sécurisée ! Tu peux la rejouer pour des Crédits, ou ouvrir la suivante sur la carte.";
             d["tutorial.hint.recruit"] = "Trois héros sont proposés chaque jour, les Légendes sont rares. Ils coûtent des PR.";
             d["tutorial.hint.infirmary"] = "Un de tes héros est fatigué : l'Infirmerie le remet sur pied pour quelques Crédits.";
+            d["tutorial.hint.timeline"] = "La frise montre qui agit quand. Un ennemi qui entre en zone rouge annonce son attaque : un contrôle (Entrave, Choc, Gel) ou un critique l'interrompt.";
+            d["tutorial.hint.timebank"] = "Le Temps d'équipe se dépense : DÉPASSER fait agir un allié tout de suite et coupe l'action d'un ennemi ; COMBO SYNC rattrape un partenaire en retard.";
         }
     }
 }

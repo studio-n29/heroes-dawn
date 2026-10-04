@@ -69,7 +69,9 @@ namespace N29.HeroesDawn.Domain.Combat
                     PerformSkill(_units[cmd.Actor], _units[cmd.Actor].Skills[cmd.SlotIndex], cmd.SlotIndex, cmd.Target, output);
                     return true;
                 case CommandType.Combo:
-                    return TryPerformCombo(cmd.Actor, cmd.Partner, cmd.Target, output);
+                    return cmd.Flag ? TrySyncCombo(cmd.Actor, cmd.Partner, cmd.Target, output) : TryPerformCombo(cmd.Actor, cmd.Partner, cmd.Target, output);
+                case CommandType.TimeSkip:
+                    return TryTimeSkip(cmd.Actor, cmd.Target, output);
             }
             return false;
         }
@@ -79,8 +81,6 @@ namespace N29.HeroesDawn.Domain.Combat
         {
             for (int i = 0; i < 3; i++) if (u.Cooldowns[i] > 0) u.Cooldowns[i]--;
 
-            if (u.Has(StatusType.Burn)) DealDamage(u, Math.Max(1, u.MaxHp * 5 / 100), false, output);
-            if (!u.IsAlive) return;
             if (u.Has(StatusType.Regen))
             {
                 int h = Math.Min(u.MaxHp * 8 / 100, u.MaxHp - u.Hp);
@@ -109,9 +109,12 @@ namespace N29.HeroesDawn.Domain.Combat
             }
         }
 
-        void EndOfTurn(CombatUnit u)
+        /// <summary>Fin d action : l unité est replacée sur la frise selon le poids de sa compétence (voir <see cref="GaugeAfter"/>).</summary>
+        void EndOfTurn(CombatUnit u, int slotIndex)
         {
-            u.Gauge = 0;
+            u.Gauge = GaugeAfter(u, slotIndex);
+            u.PlannedSlot = -1;
+            u.PlannedTarget = -1;
             u.ActionsSinceCombo++;
         }
 
@@ -121,7 +124,7 @@ namespace N29.HeroesDawn.Domain.Combat
             output.Add(new SkillUsedEvent(Tick, actor.Id, skill.Id, targets.ToArray()));
             ApplyEffects(actor, skill, targets, output);
             if (slotIndex >= 0 && slotIndex < 3) actor.Cooldowns[slotIndex] = skill.Cooldown + 1;
-            EndOfTurn(actor);
+            EndOfTurn(actor, slotIndex);
         }
 
         void ApplyEffects(CombatUnit actor, SkillDef skill, List<int> targets, List<CombatEvent> output)
@@ -168,6 +171,7 @@ namespace N29.HeroesDawn.Domain.Combat
                             if (t.IsReady && fx.Value > 0) break; // déjà prête : rien à ajouter
                             long g = t.Gauge + (long)fx.Value * 1000;
                             t.Gauge = Math.Max(0, Math.Min(t.GaugeMax - 1, g)); // ne déclenche pas de tour hors du remplissage
+                            if (t.PlannedSlot >= 0 && t.TimelinePercent < PlanStartPercent(t)) CancelPlan(t, InterruptReason.PushBack, output);
                             break;
                     }
                 }
@@ -194,6 +198,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 t.Statuses.Clear();
                 output.Add(new UnitDefeatedEvent(Tick, t.Id));
             }
+            else if (crit) InterruptOnCrit(t, output);
         }
 
         void ApplyStatus(CombatUnit t, StatusType s, int turns, int value, List<CombatEvent> output)
@@ -207,6 +212,7 @@ namespace N29.HeroesDawn.Domain.Combat
             }
             else t.Statuses.Add(new StatusInstance(s, turns, value));
             output.Add(new StatusAppliedEvent(Tick, t.Id, s, turns));
+            PushBack(t, PushBackFor(_b, s), InterruptReason.PushBack, output); // un contrôle repousse sur la frise
         }
 
         void RemoveStatus(CombatUnit t, StatusType s, List<CombatEvent> output)
@@ -273,7 +279,12 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         /// <summary>Aides de test et de debug.</summary>
-        public void ApplyDamageForTests(CombatUnit t, int dmg) => DealDamage(t, dmg, false, new List<CombatEvent>());
+        public IReadOnlyList<CombatEvent> ApplyDamageForTests(CombatUnit t, int dmg, bool crit = false)
+        {
+            var output = new List<CombatEvent>();
+            DealDamage(t, dmg, crit, output);
+            return output;
+        }
         public void ForceEnemiesDefeatedForDebug()
         {
             foreach (var u in _units) if (u.Side == Side.Enemy) { u.Hp = 0; u.Gauge = 0; u.Statuses.Clear(); }

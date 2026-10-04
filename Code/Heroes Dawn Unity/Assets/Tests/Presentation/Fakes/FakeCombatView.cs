@@ -15,6 +15,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action? SpeedClicked;
         public event Action? DebugWinClicked;
         public event Action? PauseClicked;
+        public event Action? TimeSkipClicked;
         public event Action? ComboClicked;
         public event Action? CycleClicked;
         public event Action<int>? SkillClicked;
@@ -24,6 +25,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public IReadOnlyList<UnitStateData> States = Array.Empty<UnitStateData>();
         public SkillPanelData Skills;
         public bool ComboVisible;
+        public TimelineData Timeline;
+        public string ComboLabel = "";
         public CombatTopBarData TopBar;
         public string Hint = "";
         public IReadOnlyList<string> Log = Array.Empty<string>();
@@ -32,13 +35,15 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void ClickAuto() => AutoClicked?.Invoke();
         public void ClickSpeed() => SpeedClicked?.Invoke();
         public void ClickCombo() => ComboClicked?.Invoke();
+        public void ClickTimeSkip() => TimeSkipClicked?.Invoke();
         public void ClickSkill(int slot) => SkillClicked?.Invoke(slot);
         public void TapUnit(int id) => UnitTapped?.Invoke(id);
 
         public void BuildUnits(IReadOnlyList<UnitCardData> units) => Built = units;
         public void ShowUnits(IReadOnlyList<UnitStateData> states) => States = states;
         public void ShowSkills(SkillPanelData data) => Skills = data;
-        public void ShowCombo(bool visible, string comboName) => ComboVisible = visible;
+        public void ShowCombo(bool visible, string comboName) { ComboVisible = visible; ComboLabel = comboName; }
+        public void ShowTimeline(TimelineData data) => Timeline = data;
         public void ShowTopBar(CombatTopBarData data) => TopBar = data;
         public void SetHint(string hint) => Hint = hint;
         public void ShowBanner(string text, Tone tone) { }

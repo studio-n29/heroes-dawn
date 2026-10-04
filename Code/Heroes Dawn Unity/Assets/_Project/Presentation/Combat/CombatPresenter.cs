@@ -56,6 +56,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         bool _ended;
         bool _firstRefresh;
         bool _autoShown;
+        bool _skipTargeting;
+        bool _pendingSync;
 
         public CombatPresenter(ICombatView view, IActiveCombatReadModel combat, ISessionReadModel session, ISetAutoCombatUseCase setAuto,
                                IFinishCombatUseCase finish, IVerifyCombatUseCase verify, IForceCombatWinUseCase forceWin,
@@ -78,6 +80,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.AutoClicked += ToggleAuto;
             View.SpeedClicked += ToggleSpeed;
             View.DebugWinClicked += DebugWin;
+            View.TimeSkipClicked += TimeSkip;
             View.PauseClicked += Pause;
             View.ComboClicked += Combo;
             View.CycleClicked += CycleSelection;
@@ -91,6 +94,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.AutoClicked -= ToggleAuto;
             View.SpeedClicked -= ToggleSpeed;
             View.DebugWinClicked -= DebugWin;
+            View.TimeSkipClicked -= TimeSkip;
             View.PauseClicked -= Pause;
             View.ComboClicked -= Combo;
             View.CycleClicked -= CycleSelection;
@@ -113,6 +117,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             _selected = -1;
             _pendingSlot = -1;
             _pendingCombo = null;
+            _skipTargeting = false;
+            _pendingSync = false;
             _readyOrder.Clear();
             _log.Clear();
             View.ShowLog(_log);
@@ -236,6 +242,27 @@ namespace N29.HeroesDawn.Presentation.Combat
                         _audio.Play(SfxId.Combo);
                         AddLog(Name(cu.A) + " + " + Name(cu.B) + " : " + comboName);
                         break;
+                    case ActionPlannedEvent ap:
+                        if (_sim!.Unit(ap.Unit).Side == Side.Enemy)
+                        {
+                            View.Float(ap.Unit, ap.Slot == 2 ? _loc.T("combat.planned_heavy") : _loc.T("combat.planned"), ap.Slot == 2 ? Tone.Danger : Tone.Primary, 34);
+                            AddLog(Name(ap.Unit) + " : " + _loc.F("combat.prepares", SkillLabel(ap.Unit, _sim.Unit(ap.Unit).Skills[ap.Slot].Id)));
+                            _tutorial?.Hint("timeline");
+                        }
+                        break;
+                    case ActionInterruptedEvent ai:
+                        View.Float(ai.Unit, _loc.T("combat.interrupted"), _sim!.Unit(ai.Unit).Side == Side.Enemy ? Tone.Success : Tone.Danger, 40);
+                        View.Hit(ai.Unit);
+                        AddLog(Name(ai.Unit) + " : " + _loc.T("combat.interrupted"));
+                        break;
+                    case PushedBackEvent pb:
+                        View.Float(pb.Unit, _loc.F("combat.pushed", pb.Percent), Tone.Perception, 30);
+                        break;
+                    case TimeSkipEvent ts:
+                        View.ShowBanner(_loc.T("combat.timeskip"), Tone.Info);
+                        AddLog(Name(ts.Ally) + " : " + _loc.T("combat.timeskip"));
+                        _tutorial?.Hint("timebank");
+                        break;
                     case CombatEndedEvent ce:
                         View.ShowBanner(ce.Victory ? _loc.T("combat.victory") : _loc.T("combat.defeat"), ce.Victory ? Tone.Primary : Tone.Danger);
                         _audio.Play(ce.Victory ? SfxId.Victory : SfxId.Defeat); // atténue la musique (catalogue)
@@ -261,7 +288,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (_pendingCombo.HasValue && !ComboStillAvailable(_pendingCombo.Value)) _pendingCombo = null;
 
             bool targetEnemies = false, targetAllies = false;
-            if (_pendingCombo.HasValue) targetEnemies = true;
+            if (_pendingCombo.HasValue || _skipTargeting) targetEnemies = true;
             else if (_selected >= 0 && _pendingSlot >= 0)
             {
                 var rule = sim.Unit(_selected).Skills[_pendingSlot].Target;
@@ -309,10 +336,16 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.ShowSkills(panel);
 
             var combos = manual ? sim.AvailableCombos() : Array.Empty<CombatSimulation.ComboOption>();
+            var syncs = manual && combos.Count == 0 ? sim.AvailableSyncCombos() : Array.Empty<CombatSimulation.ComboOption>();
             if (combos.Count > 0) _tutorial?.Hint("combo");
-            View.ShowCombo(combos.Count > 0, combos.Count > 0 ? _loc.T("combat.combo") + "\n<size=24>" + _loc.ComboName(combos[0].Combo) + "</size>" : "");
+            string comboLabel = combos.Count > 0 ? _loc.T("combat.combo") + "\n<size=24>" + _loc.ComboName(combos[0].Combo) + "</size>"
+                              : syncs.Count > 0 ? _loc.F("combat.combo_sync", _session.Content.Balance.ComboSyncCost) + "\n<size=24>" + _loc.ComboName(syncs[0].Combo) + "</size>"
+                              : "";
+            View.ShowCombo(combos.Count > 0 || syncs.Count > 0, comboLabel);
+            View.ShowTimeline(BuildTimeline(sim, manual));
 
-            View.SetHint(targetEnemies ? _loc.T("combat.choose_target")
+            View.SetHint(_skipTargeting ? _loc.T("combat.skip_pick")
+                       : targetEnemies ? _loc.T("combat.choose_target")
                        : targetAllies ? _loc.T("combat.choose_ally")
                        : manual && _selected < 0 ? _loc.T("combat.waiting") : "");
             RefreshTopBar();
@@ -365,15 +398,60 @@ namespace N29.HeroesDawn.Presentation.Combat
             var sim = _sim;
             if (!CanCommand) return;
             var list = sim!.AvailableCombos();
+            bool sync = false;
+            if (list.Count == 0)
+            {
+                list = sim.AvailableSyncCombos(); // partenaire en retard : le Temps d'équipe le rattrape
+                sync = true;
+            }
             if (list.Count == 0) return;
             var c = list[0];
+            _skipTargeting = false;
             if (c.Combo.Effect.Target == TargetRule.SingleEnemy && AliveCount(Side.Enemy) > 1)
             {
                 _pendingCombo = c;
+                _pendingSync = sync;
                 _pendingSlot = -1;
             }
-            else Submit(CombatCommand.UseCombo(c.A, c.B, FirstAlive(Side.Enemy)));
+            else Submit(ComboCommand(c, sync, FirstAlive(Side.Enemy)));
             RefreshAll();
+        }
+
+        static CombatCommand ComboCommand(CombatSimulation.ComboOption c, bool sync, int target)
+            => sync ? CombatCommand.SyncCombo(c.A, c.B, target) : CombatCommand.UseCombo(c.A, c.B, target);
+
+        /// <summary>
+        /// Dépassement (Time Bank) : on touche DÉPASSER puis l'ennemi à couper ; l'allié le plus avancé sur la frise saute à 100 %.
+        /// Un seul ennemi vivant : pas de ciblage.
+        /// </summary>
+        void TimeSkip()
+        {
+            var sim = _sim;
+            if (!CanCommand) return;
+            if (_skipTargeting) { _skipTargeting = false; RefreshAll(); return; }
+            if (SkipAlly(sim!) < 0) return;
+            _pendingSlot = -1;
+            _pendingCombo = null;
+            if (AliveCount(Side.Enemy) == 1) SubmitTimeSkip(FirstAlive(Side.Enemy));
+            else _skipTargeting = true;
+            RefreshAll();
+        }
+
+        /// <summary>L'allié qui profite du dépassement : celui qui n'est pas prêt et qui est le plus avancé sur la frise.</summary>
+        int SkipAlly(CombatSimulation sim)
+        {
+            if (sim.TimeBank < _session.Content.Balance.TimeSkipCost) return -1;
+            CombatUnit? best = null;
+            foreach (var u in sim.Units)
+                if (u.Side == Side.Ally && u.IsAlive && !u.IsReady && (best == null || u.Gauge > best.Gauge)) best = u;
+            return best?.Id ?? -1;
+        }
+
+        void SubmitTimeSkip(int enemy)
+        {
+            int ally = SkipAlly(_sim!);
+            if (ally >= 0) Submit(CombatCommand.TimeSkip(ally, enemy));
+            _skipTargeting = false;
         }
 
         void UnitTapped(int unitId)
@@ -381,10 +459,11 @@ namespace N29.HeroesDawn.Presentation.Combat
             var sim = _sim;
             if (!CanCommand) return;
             var u = sim!.Unit(unitId);
-            if (_pendingCombo.HasValue && u.Side == Side.Enemy && u.IsAlive)
+            if (_skipTargeting && u.Side == Side.Enemy && u.IsAlive) SubmitTimeSkip(unitId);
+            else if (_pendingCombo.HasValue && u.Side == Side.Enemy && u.IsAlive)
             {
                 var c = _pendingCombo.Value;
-                Submit(CombatCommand.UseCombo(c.A, c.B, unitId));
+                Submit(ComboCommand(c, _pendingSync, unitId));
             }
             else if (_selected >= 0 && _pendingSlot >= 0 && IsValidTarget(sim.Unit(_selected).Skills[_pendingSlot].Target, u))
                 Submit(CombatCommand.UseSkill(_selected, _pendingSlot, unitId));
@@ -405,6 +484,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             _sim?.Submit(cmd);
             _pendingSlot = -1;
             _pendingCombo = null;
+            _pendingSync = false;
+            _skipTargeting = false;
             if (cmd.Type == CommandType.Skill || cmd.Type == CommandType.Combo)
             {
                 _readyOrder.Remove(cmd.Actor);
@@ -415,9 +496,10 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         public bool HandleBack()
         {
-            if (_pendingSlot < 0 && !_pendingCombo.HasValue) return false;
+            if (_pendingSlot < 0 && !_pendingCombo.HasValue && !_skipTargeting) return false;
             _pendingSlot = -1;
             _pendingCombo = null;
+            _skipTargeting = false;
             RefreshAll();
             return true;
         }
@@ -441,6 +523,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             _autoShown = on;
             _pendingSlot = -1;
             _pendingCombo = null;
+            _skipTargeting = false;
             RefreshTopBar();
         }
 
@@ -572,7 +655,48 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         ComboDef? FindCombo(string id) => _session.Content.Combos.FirstOrDefault(c => c.Id == id);
 
-        bool ComboStillAvailable(CombatSimulation.ComboOption o) => _sim!.AvailableCombos().Any(c => c.A == o.A && c.B == o.B);
+        bool ComboStillAvailable(CombatSimulation.ComboOption o)
+            => (_pendingSync ? _sim!.AvailableSyncCombos() : _sim!.AvailableCombos()).Any(c => c.A == o.A && c.B == o.B);
+
+        /// <summary>Frise chronologique : position de chaque unité, actions annoncées, Time Bank et bouton DÉPASSER.</summary>
+        TimelineData BuildTimeline(CombatSimulation sim, bool manual)
+        {
+            var b = _session.Content.Balance;
+            var markers = new List<TimelineMarkerData>(sim.Units.Count);
+            foreach (var u in sim.Units)
+            {
+                string name = _names.TryGetValue(u.Id, out var n) ? n : "?";
+                markers.Add(new TimelineMarkerData
+                {
+                    Id = u.Id,
+                    Ally = u.Side == Side.Ally,
+                    Alive = u.IsAlive,
+                    Initial = name.Length > 0 ? name.Substring(0, 1).ToUpperInvariant() : "?",
+                    Family = u.Family,
+                    Position01 = u.GaugeMax == 0 ? 0f : Math.Max(0f, Math.Min(1f, (float)((double)u.Gauge / u.GaugeMax))),
+                    Channelling = u.Gauge < 0,
+                    Ready = u.IsReady,
+                    InPrep = sim.InPrepZone(u),
+                    PlannedSlot = u.PlannedSlot,
+                    Boss = u.IsBoss,
+                });
+            }
+            bool enoughTime = sim.TimeBank >= b.TimeSkipCost;
+            bool hasAlly = SkipAlly(sim) >= 0 || sim.Units.Any(x => x.Side == Side.Ally && x.IsAlive && !x.IsReady);
+            return new TimelineData
+            {
+                Markers = markers.ToArray(),
+                PrepStart01 = b.TimelinePrepZonePercent / 100f,
+                Bank = sim.TimeBank,
+                BankMax = sim.TimeBankMax,
+                BankText = _loc.F("combat.bank", sim.TimeBank, sim.TimeBankMax),
+                SkipVisible = manual,
+                SkipEnabled = enoughTime && hasAlly && AliveCount(Side.Enemy) > 0,
+                SkipTargeting = _skipTargeting,
+                SkipLabel = _loc.F("combat.skip", b.TimeSkipCost),
+                SkipReason = !enoughTime ? _loc.F("combat.skip_missing", b.TimeSkipCost - sim.TimeBank) : _loc.T("combat.skip_nobody"),
+            };
+        }
 
         int AliveCount(Side side) => _sim!.Units.Count(u => u.Side == side && u.IsAlive);
 
@@ -581,7 +705,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         void AddLog(string line)
         {
             _log.Add(line);
-            if (_log.Count > 8) _log.RemoveAt(0);
+            if (_log.Count > 5) _log.RemoveAt(0);
             View.ShowLog(_log.ToArray());
         }
     }

@@ -15,6 +15,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         event Action? SpeedClicked;
         event Action? DebugWinClicked;
         event Action? PauseClicked;
+        event Action? TimeSkipClicked;
         event Action? ComboClicked;
         event Action? CycleClicked;
         event Action<int>? SkillClicked;
@@ -24,6 +25,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         void ShowUnits(IReadOnlyList<UnitStateData> states);
         void ShowSkills(SkillPanelData data);
         void ShowCombo(bool visible, string label);
+        void ShowTimeline(TimelineData data);
         void ShowTopBar(CombatTopBarData data);
         void SetHint(string hint);
         void ShowBanner(string text, Tone tone);

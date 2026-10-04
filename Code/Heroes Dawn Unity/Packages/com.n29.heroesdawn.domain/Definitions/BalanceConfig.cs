@@ -25,6 +25,39 @@ namespace N29.HeroesDawn.Definitions
         public int RankEasyStatPercent { get; set; } = 80;
         public int RankEliteStatPercent { get; set; } = 130;
         public int ComboCooldownActions { get; set; } = 3;
+
+        // ---- Frise chronologique (Timeline) : positions en % de la jauge, 100 = point d action
+        /// <summary>Position après une compétence légère (A1).</summary>
+        public int TimelineLightResetPercent { get; set; } = 30;
+        /// <summary>Position après une compétence intermédiaire (A2).</summary>
+        public int TimelineMediumResetPercent { get; set; } = 15;
+        /// <summary>Position après une compétence lourde ou ultime (A3).</summary>
+        public int TimelineHeavyResetPercent { get; set; } = 0;
+        /// <summary>Position après un combo : négative = temps de canalisation à rattraper.</summary>
+        public int TimelineComboResetPercent { get; set; } = -15;
+        /// <summary>Début de la zone de préparation (80-100 %) : l action est annoncée, un critique l annule.</summary>
+        public int TimelinePrepZonePercent { get; set; } = 80;
+        /// <summary>Début de la zone de préparation vue grâce à la Perception (précognition) : une unité Perception vivante révèle l action ennemie plus tôt.</summary>
+        public int TimelinePrecognitionPercent { get; set; } = 50;
+        /// <summary>Position où une unité interrompue (critique en zone de préparation) est renvoyée.</summary>
+        public int TimelineInterruptResetPercent { get; set; } = 40;
+        public int PushBackBindPercent { get; set; } = 25;
+        public int PushBackShockPercent { get; set; } = 15;
+        public int PushBackFreezePercent { get; set; } = 20;
+        /// <summary>Brûlure : % des PV max perdus pour une frise complète parcourue (dégâts à chaque pas).</summary>
+        public int BurnPercentPerTimeline { get; set; } = 8;
+
+        // ---- Réserve temporelle d équipe (Time Bank)
+        public int TimeBankMax { get; set; } = 100;
+        public int TimeBankStart { get; set; } = 40;
+        /// <summary>Un point de Temps est gagné tous les N ticks.</summary>
+        public int TimeBankRegenTicks { get; set; } = 10;
+        public int TimeSkipCost { get; set; } = 40;
+        /// <summary>Recul infligé à l ennemi coupé par un dépassement.</summary>
+        public int TimeSkipPushBackPercent { get; set; } = 40;
+        public int ComboSyncCost { get; set; } = 25;
+        /// <summary>Le partenaire d un combo synchronisé doit avoir au moins cette position.</summary>
+        public int ComboSyncWindowPercent { get; set; } = 60;
         public int ResourceCreditsMin { get; set; } = 150;
         public int ResourceCreditsMax { get; set; } = 400;
         public int ResourcePrMin { get; set; } = 5;

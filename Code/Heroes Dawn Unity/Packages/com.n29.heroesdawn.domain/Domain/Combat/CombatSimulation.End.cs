@@ -25,11 +25,15 @@ namespace N29.HeroesDawn.Domain.Combat
         {
             var h = new Fnv1a64();
             h.Add(Tick);
+            h.Add(TimeBank);
+            h.Add(_bankTicks);
             foreach (var u in _units)
             {
                 h.Add(u.Id);
                 h.Add(u.Hp);
                 h.Add(u.Gauge);
+                h.Add(u.PlannedSlot);
+                h.Add(u.BurnRemainder);
                 foreach (var s in u.Statuses) { h.Add((int)s.Type); h.Add(s.TurnsLeft); h.Add(s.Value); }
             }
             h.Add(Victory == true ? 1 : Victory == false ? 2 : 0);

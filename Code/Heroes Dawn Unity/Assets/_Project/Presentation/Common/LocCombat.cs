@@ -8,6 +8,19 @@ namespace N29.HeroesDawn.Presentation.Common
     {
         static partial void ExtendCombat(Dictionary<string, string> d)
         {
+            d["status.Anchor"] = "Ancrage";
+            d["combat.combo_sync"] = "COMBO SYNC · {0}";
+            d["combat.skip"] = "DÉPASSER · {0}";
+            d["combat.skip_pick"] = "TOUCHE L'ENNEMI À COUPER · ÉCHAP = ANNULER";
+            d["combat.skip_missing"] = "Il manque {0} de Temps d'équipe.";
+            d["combat.skip_nobody"] = "Aucun allié à faire avancer.";
+            d["combat.bank"] = "TEMPS {0}/{1}";
+            d["combat.planned"] = "PRÉPARE…";
+            d["combat.planned_heavy"] = "GROSSE ATTAQUE !";
+            d["combat.prepares"] = "prépare {0}";
+            d["combat.interrupted"] = "INTERROMPU !";
+            d["combat.pushed"] = "RECUL -{0} %";
+            d["combat.timeskip"] = "DÉPASSEMENT !";
             d["combat.pause"] = "II";
             d["combat.pause.title"] = "Pause";
             d["combat.pause.body"] = "Le combat est figé. Reprends quand tu es prêt.";

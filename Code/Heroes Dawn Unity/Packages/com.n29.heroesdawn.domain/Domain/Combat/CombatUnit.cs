@@ -25,6 +25,14 @@ namespace N29.HeroesDawn.Domain.Combat
         public List<StatusInstance> Statuses { get; } = new List<StatusInstance>();
         public IReadOnlyList<SkillDef> Skills { get; }
         public int ActionsSinceCombo { get; set; } = 99;
+        /// <summary>Compétence annoncée sur la frise (ennemis, zone de préparation) ; -1 = aucune.</summary>
+        public int PlannedSlot { get; set; } = -1;
+        public int PlannedTarget { get; set; } = -1;
+        /// <summary>Reste de la brûlure (dégâts au pas de frise) en unités de jauge × %.</summary>
+        public long BurnRemainder { get; set; }
+
+        /// <summary>Position sur la frise en % (0 = départ, 100 = point d action) ; négative pendant une canalisation.</summary>
+        public int TimelinePercent => (int)(Gauge * 100 / GaugeMax);
 
         public bool IsAlive => Hp > 0;
         public bool IsReady => IsAlive && Gauge >= GaugeMax;

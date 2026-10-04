@@ -1,6 +1,6 @@
 namespace N29.HeroesDawn.Domain.Combat
 {
-    public enum CommandType { Skill, Combo, SetAuto, Retreat }
+    public enum CommandType { Skill, Combo, SetAuto, Retreat, TimeSkip }
 
     public sealed class CombatCommand
     {
@@ -18,6 +18,10 @@ namespace N29.HeroesDawn.Domain.Combat
 
         public static CombatCommand UseSkill(int actor, int slotIndex, int target) => new CombatCommand(CommandType.Skill, actor, -1, slotIndex, target, false);
         public static CombatCommand UseCombo(int a, int b, int target) => new CombatCommand(CommandType.Combo, a, b, -1, target, false);
+        /// <summary>Combo synchronisé : le partenaire n est pas encore prêt, l équipe dépense du Temps pour le rattraper.</summary>
+        public static CombatCommand SyncCombo(int a, int b, int target) => new CombatCommand(CommandType.Combo, a, b, -1, target, true);
+        /// <summary>Dépassement : l allié <paramref name="ally"/> passe à 100 % de la frise, l ennemi <paramref name="enemy"/> est repoussé et son action coupée.</summary>
+        public static CombatCommand TimeSkip(int ally, int enemy) => new CombatCommand(CommandType.TimeSkip, ally, -1, -1, enemy, false);
         public static CombatCommand SetAuto(bool on) => new CombatCommand(CommandType.SetAuto, -1, -1, -1, -1, on);
         public static CombatCommand Retreat() => new CombatCommand(CommandType.Retreat, -1, -1, -1, -1, false);
     }

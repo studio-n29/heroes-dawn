@@ -13,8 +13,6 @@ namespace N29.HeroesDawn.Domain.Combat
     {
         void AiAct(CombatUnit u, List<CombatEvent> output)
         {
-            bool smart = u.Side == Side.Ally || Setup.Rank == CombatRank.Elite || Setup.Rank == CombatRank.Boss;
-
             if (u.Side == Side.Ally)
             {
                 foreach (var combo in AvailableCombos())
@@ -26,6 +24,19 @@ namespace N29.HeroesDawn.Domain.Combat
                 }
             }
 
+            // Une action annoncée sur la frise (zone de préparation) est celle qui s exécute, si elle est toujours possible.
+            int slot, target;
+            if (u.PlannedSlot >= 0 && CanUseSlot(u, u.PlannedSlot)) { slot = u.PlannedSlot; target = u.PlannedTarget; }
+            else (slot, target) = ChooseAction(u);
+            u.PlannedSlot = -1;
+            u.PlannedTarget = -1;
+            PerformSkill(u, u.Skills[slot], slot, target, output);
+        }
+
+        /// <summary>Choix de la compétence et de la cible selon le rang (même logique qu avant, déplacée pour pouvoir annoncer l action à l avance).</summary>
+        (int Slot, int Target) ChooseAction(CombatUnit u)
+        {
+            bool smart = u.Side == Side.Ally || Setup.Rank == CombatRank.Elite || Setup.Rank == CombatRank.Boss;
             int slot;
             if (smart)
             {
@@ -34,22 +45,21 @@ namespace N29.HeroesDawn.Domain.Combat
                 else if (CanUseSlot(u, 2)) slot = 2;
                 else if (CanUseSlot(u, 1)) slot = 1;
                 else slot = 0;
-                PerformSkill(u, u.Skills[slot], slot, WeakestFoe(u.Side), output);
-                return;
+                return (slot, WeakestFoe(u.Side));
             }
 
             if (Setup.Rank == CombatRank.Normal)
             {
                 slot = CanUseSlot(u, 2) ? 2 : CanUseSlot(u, 1) ? 1 : 0;
                 int target = _rng.Chance(50) ? WeakestFoe(u.Side) : RandomFoe(u.Side);
-                PerformSkill(u, u.Skills[slot], slot, target, output);
-                return;
+                return (slot, target);
             }
+
 
             var usable = new List<int>();
             for (int i = 0; i < ActiveSkillCount(u) && i < 3; i++) if (CanUseSlot(u, i)) usable.Add(i);
             slot = usable.Count == 0 ? 0 : usable[_rng.Range(0, usable.Count)];
-            PerformSkill(u, u.Skills[slot], slot, RandomFoe(u.Side), output);
+            return (slot, RandomFoe(u.Side));
         }
 
         bool CanUseSlot(CombatUnit u, int slot)

@@ -60,7 +60,7 @@ namespace N29.HeroesDawn.Domain.Combat
             var other = caster == ua ? ub : ua;
             output.Add(new ComboUsedEvent(Tick, a, b, combo.Id));
             PerformSkill(caster, combo.Effect, -1, target, output);
-            EndOfTurn(other);
+            EndOfTurn(other, -1);
             ua.ActionsSinceCombo = 0;
             ub.ActionsSinceCombo = 0;
             return true;

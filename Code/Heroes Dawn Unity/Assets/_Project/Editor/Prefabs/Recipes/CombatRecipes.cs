@@ -132,6 +132,44 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
+    /// <summary>Pastille d une unité sur la frise chronologique (56 px) : disque de famille, initiale, anneau, annonce de l action.</summary>
+    public sealed class TimelineMarkerRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Widgets/TimelineMarker.prefab";
+        public int Order => 0;
+
+        public GameObject Build(PrefabContext ctx)
+        {
+            var root = PrefabContext.NewRoot("TimelineMarker", 56, 56);
+            root.anchorMin = root.anchorMax = root.pivot = new Vector2(0.5f, 0.5f);
+            var group = root.gameObject.AddComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+            var ring = Ui.Img(root, "Ring", Color.white, Sprites.Ring);
+            ring.rectTransform.At(0.5f, 0.5f, 0, 0, 74, 74);
+            ring.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
+            ring.gameObject.SetActive(false);
+            var frame = Ui.Img(root, "Frame", Theme.Ink, Sprites.Circle);
+            frame.rectTransform.At(0.5f, 0.5f, 0, 0, 56, 56);
+            var disc = Ui.Img(frame.transform, "Disc", Theme.Info, Sprites.Circle);
+            disc.rectTransform.Stretch(4, 4, 4, 4);
+            var initial = Ui.Txt(disc.transform, "", 28, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Initial");
+            initial.rectTransform.Stretch();
+            initial.Inked();
+            var plan = Ui.Txt(root, "", 24, Theme.Primary, TextAnchor.LowerCenter, FontKind.Title, "Plan");
+            plan.rectTransform.At(0.5f, 1f, 0, 30, 140, 30);
+            plan.textWrappingMode = TextWrappingModes.NoWrap;
+            plan.Inked();
+            plan.gameObject.SetActive(false);
+            var view = root.gameObject.AddComponent<TimelineMarkerView>();
+            ctx.Wire(view, "disc", disc);
+            ctx.Wire(view, "ring", ring);
+            ctx.Wire(view, "initial", initial);
+            ctx.Wire(view, "plan", plan);
+            ctx.Wire(view, "group", group);
+            return root.gameObject;
+        }
+    }
+
     /// <summary>Ligne de compétence du panneau de gauche (M65 ④) : nom en titre, effet dessous, 460 × 100.</summary>
     public sealed class SkillButtonRecipe : IPrefabRecipe
     {
@@ -259,6 +297,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             // ---- Journal (haut gauche, discret)
             var logFill = Ui.Panel(rt, "Log", Theme.WithAlpha(Theme.SurfaceDark, 0.55f), 3f, 0f, false);
             logFill.Frame().At(0f, 1f, 24, -108, 500, 132);
+            logFill.gameObject.AddComponent<RectMask2D>();
             var logText = Ui.Txt(logFill.transform, "", 21, Theme.TextMuted, TextAnchor.LowerLeft, FontKind.Regular, "Lines");
             logText.rectTransform.Stretch(14, 10, 14, 10);
 
@@ -286,9 +325,30 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var skills = new Object[3];
             for (int i = 0; i < 3; i++) skills[i] = ctx.Nest<SkillButtonView>("Widgets/SkillButton.prefab", skillPanel, "Skill" + (i + 1));
 
+            // ---- Frise chronologique (0-100 %) et réserve de Temps d équipe
+            var stripFill = Ui.Panel(rt, "Timeline", Theme.WithAlpha(Theme.SurfaceDark, 0.88f), 4f, 6f, false);
+            var strip = stripFill.Frame().At(1f, 0f, -30, 404, 1100, 100);
+            var bank = Ui.Bar(stripFill.transform, "Bank", Theme.Info, Theme.SurfaceDark, true, 22);
+            ((RectTransform)bank.transform).At(0f, 0.5f, 18, 0, 250, 36);
+            var track = Ui.Rect(stripFill.transform, "Track").At(0f, 0.5f, 300, 0, 760, 10);
+            Ui.Img(track, "Line", Theme.Surface3, Sprites.RoundedSmall).rectTransform.Stretch();
+            var prep = Ui.Img(track, "Prep", Theme.WithAlpha(Theme.Danger, 0.6f), Sprites.RoundedSmall);
+            prep.rectTransform.anchorMin = new Vector2(0.8f, 0f);
+            prep.rectTransform.anchorMax = new Vector2(1f, 1f);
+            prep.rectTransform.offsetMin = new Vector2(0, -14);
+            prep.rectTransform.offsetMax = new Vector2(0, 14);
+            var timeline = strip.gameObject.AddComponent<TimelineView>();
+            ctx.Wire(timeline, "track", track);
+            ctx.Wire(timeline, "prepZone", prep.rectTransform);
+            ctx.Wire(timeline, "markerPrefab", ctx.Asset("Widgets/TimelineMarker.prefab").GetComponent<TimelineMarkerView>());
+            ctx.Wire(timeline, "bank", bank);
+            var timeSkip = Ui.Btn(rt, "", Theme.Info, Theme.TextDark, null!, 30, FontKind.Title, "TimeSkip");
+            timeSkip.Rect.At(0f, 0f, 24, 508, 500, 96);
+            timeSkip.gameObject.SetActive(false);
+
             // ---- Combo
             var combo = Ui.Btn(rt, "", Theme.Danger, Color.white, null!, 40, FontKind.Title, "Combo");
-            combo.Rect.At(1f, 0f, -30, 384, 330, 116);
+            combo.Rect.At(0f, 0f, 24, 404, 500, 96);
             combo.Label.Inked();
             combo.gameObject.AddComponent<Pulse>().Amplitude = 0.07f;
             RecipeKit.Shine(combo);
@@ -301,6 +361,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "speed", speed);
             ctx.Wire(view, "debugWin", debug);
             ctx.Wire(view, "pause", pause);
+            ctx.Wire(view, "timeSkip", timeSkip);
+            ctx.Wire(view, "timeline", timeline);
             ctx.Wire(view, "combo", combo);
             ctx.Wire(view, "title", title);
             ctx.Wire(view, "hint", hint);

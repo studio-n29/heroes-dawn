@@ -65,5 +65,38 @@ namespace N29.HeroesDawn.Domain.Combat
         public ComboUsedEvent(int t, int a, int b, string comboId) : base(t) { A = a; B = b; ComboId = comboId; }
     }
 
+    /// <summary>Une unité entre en zone de préparation : son action est annoncée sur la frise.</summary>
+    public sealed class ActionPlannedEvent : CombatEvent
+    {
+        public int Unit { get; }
+        public int Slot { get; }
+        public ActionPlannedEvent(int t, int unit, int slot) : base(t) { Unit = unit; Slot = slot; }
+    }
+
+    public enum InterruptReason { Critical, PushBack, TimeSkip }
+
+    /// <summary>Action annoncée annulée (critique en zone de préparation, recul, dépassement).</summary>
+    public sealed class ActionInterruptedEvent : CombatEvent
+    {
+        public int Unit { get; }
+        public InterruptReason Reason { get; }
+        public ActionInterruptedEvent(int t, int unit, InterruptReason reason) : base(t) { Unit = unit; Reason = reason; }
+    }
+
+    /// <summary>Une unité est repoussée en arrière sur la frise (contrôle : Entrave, Choc, Gel).</summary>
+    public sealed class PushedBackEvent : CombatEvent
+    {
+        public int Unit { get; }
+        public int Percent { get; }
+        public PushedBackEvent(int t, int unit, int percent) : base(t) { Unit = unit; Percent = percent; }
+    }
+
+    public sealed class TimeSkipEvent : CombatEvent
+    {
+        public int Ally { get; }
+        public int Enemy { get; }
+        public TimeSkipEvent(int t, int ally, int enemy) : base(t) { Ally = ally; Enemy = enemy; }
+    }
+
     public sealed class CombatEndedEvent : CombatEvent { public bool Victory { get; } public CombatEndedEvent(int t, bool victory) : base(t) { Victory = victory; } }
 }
