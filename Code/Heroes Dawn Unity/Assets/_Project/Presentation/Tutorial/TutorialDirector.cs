@@ -86,7 +86,10 @@ namespace N29.HeroesDawn.Presentation.Tutorial
         {
             var view = _view;
             if (view == null) return;
-            if (!_tutorial.Active || _modals.AnyOpen)
+            var current = TutorialStepInfo.Of(_tutorial.Current);
+            // Une modale ouverte (confirmation, achat…) prend la main, sauf l étape qui désigne le bouton d une popup (Résultats).
+            bool blockedByModal = _modals.AnyOpen && current.Target != TutorialTarget.ResultsContinue;
+            if (!_tutorial.Active || blockedByModal)
             {
                 if (view.StepVisible) view.Hide();
                 _tutorial.Presenting = false;

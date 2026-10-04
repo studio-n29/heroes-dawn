@@ -14,6 +14,8 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         public event Action? Clicked;
 
+        public UnityEngine.UI.Button ClickButton => button.Button;
+
         void Awake() => button.Button.onClick.AddListener(() => Clicked?.Invoke());
 
         public void Show(SkillSlotData d, int slot)

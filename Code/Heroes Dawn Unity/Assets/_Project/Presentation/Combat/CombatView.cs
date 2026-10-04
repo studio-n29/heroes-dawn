@@ -49,6 +49,17 @@ namespace N29.HeroesDawn.Presentation.Combat
         public UnityEngine.UI.Button AutoButton => auto.Button;
         public UnityEngine.UI.Button SpeedButton => speed.Button;
 
+        /// <summary>Bouton de la compétence <paramref name="i"/> (tests PlayMode : clics réels).</summary>
+        public UnityEngine.UI.Button SkillButton(int i) => skills[i].ClickButton;
+
+        /// <summary>Cartes ennemies (tests PlayMode : cibler au toucher).</summary>
+        public IReadOnlyList<UnitCardView> EnemyCards()
+        {
+            var list = new List<UnitCardView>();
+            foreach (Transform t in enemyRow) { var c = t.GetComponent<UnitCardView>(); if (c != null) list.Add(c); }
+            return list;
+        }
+
         void Awake()
         {
             retreat.Button.onClick.AddListener(() => RetreatClicked?.Invoke());
