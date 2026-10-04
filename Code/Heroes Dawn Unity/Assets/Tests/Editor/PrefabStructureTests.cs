@@ -32,6 +32,7 @@ namespace N29.HeroesDawn.Tests.Editor
                 for (var t = type; t != null && t != typeof(MonoBehaviour); t = t.BaseType)
                 foreach (var f in t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly))
                 {
+                    if (f.DeclaringType?.Namespace == null || !f.DeclaringType.Namespace.StartsWith("N29.HeroesDawn")) continue; // champs hérités d Unity (Graphic.m_Material) : hors périmètre
                     if (f.GetCustomAttribute<SerializeField>() == null && !f.IsPublic) continue;
                     if (f.GetCustomAttribute<OptionalRefAttribute>() != null) continue;
                     var value = f.GetValue(mb);

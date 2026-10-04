@@ -34,11 +34,11 @@ namespace N29.HeroesDawn.Presentation.Hub
             HubPage.Infirmary => Make<InfirmaryPageView, IInfirmaryPageView, InfirmaryPagePresenter>(location),
             HubPage.Settings => Make<SettingsPageView, ISettingsPageView, SettingsPagePresenter>(location),
             HubPage.CityMap => Make<CityMapPageView, ICityMapPageView, CityMapPagePresenter>(location),
-            HubPage.Pass => Wip(location, WipCatalog.Pass, "page.pass"),
-            HubPage.Shop => Wip(location, WipCatalog.Shop, "page.shop"),
-            HubPage.Operations => Wip(location, WipCatalog.Operations, "page.operations"),
-            HubPage.Lab => Wip(location, WipCatalog.Lab, "page.lab"),
-            HubPage.Archives => Wip(location, WipCatalog.Archives, "page.archives"),
+            HubPage.Pass => Make<PassPageView, IPassPageView, PassPagePresenter>(location),
+            HubPage.Shop => Make<BoutiquePageView, IBoutiquePageView, BoutiquePagePresenter>(location),
+            HubPage.Operations => Make<OperationsPageView, IOperationsPageView, OperationsPagePresenter>(location),
+            HubPage.Lab => Make<LabPageView, ILabPageView, LabPagePresenter>(location),
+            HubPage.Archives => Make<ArchivesPageView, IArchivesPageView, ArchivesPagePresenter>(location),
             _ => throw new InvalidOperationException("Page du hub pas encore disponible : " + location.Page),
         };
 

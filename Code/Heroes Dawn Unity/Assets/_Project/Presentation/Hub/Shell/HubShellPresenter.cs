@@ -2,7 +2,9 @@
 using System;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
+using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Features.Shop;
+using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
@@ -30,6 +32,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly IToastService _toasts;
         readonly ILocalization _loc;
         readonly IAppQuit _quit;
+        readonly MetaOverview? _meta;
+        readonly ISubscriber<MetaChanged>? _metaChanged;
+        readonly TutorialGuide? _tutorial;
+        IDisposable? _metaSub;
 
         IHubPageHandle? _page;
         WalletBinder? _wallet;
@@ -41,12 +47,14 @@ namespace N29.HeroesDawn.Presentation.Hub
         public HubShellPresenter(IHubShellView view, HubNavigator nav, IHubPageFactory pages, ISessionReadModel session,
                                  ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving, ISubscriber<ShopChanged> shopChanged,
                                  IOpenShopUseCase openShop, IClock clock,
-                                 IModalService modals, IToastService toasts, ILocalization loc, IAppQuit quit, BackButtonRouter router)
+                                 IModalService modals, IToastService toasts, ILocalization loc, IAppQuit quit, BackButtonRouter router,
+                                 MetaOverview? meta = null, ISubscriber<MetaChanged>? metaChanged = null, TutorialGuide? tutorial = null)
             : base(view, router)
         {
             _nav = nav; _pages = pages; _session = session; _walletChanged = wallet; _saving = saving; _shopChanged = shopChanged;
             _openShop = openShop; _clock = clock;
             _modals = modals; _toasts = toasts; _loc = loc; _quit = quit;
+            _meta = meta; _metaChanged = metaChanged; _tutorial = tutorial;
         }
 
         protected override IBackHandler BackHandler => this;
@@ -55,6 +63,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             _wallet = new WalletBinder(View.Wallet, _session, _walletChanged, _saving);
             _shopSub = _shopChanged.Subscribe(_ => RefreshChrome());
+            _metaSub = _metaChanged?.Subscribe(_ => RefreshChrome());
             _nav.Changed += OnNavigated;
             View.TabClicked += _nav.SelectTab;
             View.BackClicked += OnBackClicked;
@@ -74,6 +83,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.Relay.WipTapped -= OnWipTapped;
             View.Relay.ReasonTapped -= OnReasonTapped;
             _shopSub?.Dispose();
+            _metaSub?.Dispose();
             _wallet?.Dispose();
             _page?.Dispose();
             _page = null;
@@ -113,7 +123,21 @@ namespace N29.HeroesDawn.Presentation.Hub
                 return;
             }
             _page = page;
+            if (location.Page == HubPage.Team) _tutorial?.Signal(TutorialSignal.TeamOpened);
+            if (location.Page == HubPage.CityMap) _tutorial?.Signal(TutorialSignal.MapOpened);
+            OfferHints(location);
             RefreshChrome();
+        }
+
+        /// <summary>Astuces à la première rencontre : boutique, infirmerie avec un membre fatigué, fatigue élevée au QG.</summary>
+        void OfferHints(HubLocation location)
+        {
+            if (_tutorial == null) return;
+            if (location.Page == HubPage.Recruit) _tutorial.Hint("recruit");
+            bool tired = false, exhausting = false;
+            foreach (var m in _session.Roster) { if (m.Fatigue > 0) tired = true; if (m.Fatigue >= 60) exhausting = true; }
+            if (location.Page == HubPage.Infirmary && tired) _tutorial.Hint("infirmary");
+            if (location.Page == HubPage.Qg && exhausting) _tutorial.Hint("fatigue");
         }
 
         void RefreshChrome()
@@ -130,10 +154,19 @@ namespace N29.HeroesDawn.Presentation.Hub
                     Page = page,
                     Label = _loc.T(NavKey(page)),
                     Active = page == root,
-                    Badge = page == HubPage.Recruit && shop.Day.Length > 0 && shop.SeenDay != shop.Day ? "N" : "",
+                    Badge = BadgeOf(page, shop),
                 };
             }
             View.ShowChrome(new HubShellData { Title = _page?.Title ?? "", ShowBack = !_nav.IsOnTab, Tabs = tabs });
+        }
+
+        string BadgeOf(HubPage page, IShopReadModel shop)
+        {
+            if (page == HubPage.Recruit) return shop.Day.Length > 0 && shop.SeenDay != shop.Day ? "N" : "";
+            if (_meta == null) return "";
+            if (page == HubPage.Pass) { int n = _meta.PassBadge; return n > 0 ? n.ToString() : ""; }
+            if (page == HubPage.Shop) return _meta.ShopBadge > 0 ? "!" : "";
+            return "";
         }
 
         static string NavKey(HubPage tab) => tab switch

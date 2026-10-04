@@ -1,6 +1,7 @@
 #nullable enable
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,7 +22,11 @@ namespace N29.HeroesDawn.Presentation.Board
         [SerializeField] TMP_Text cost = null!;
         [SerializeField] Button button = null!;
 
+        TutorialTargetMarker? _marker;
+
         public Button Button => button;
+
+        void Awake() => _marker = frame.GetComponent<TutorialTargetMarker>();
 
         public void Init(BoardMapNode n)
         {
@@ -60,6 +65,7 @@ namespace N29.HeroesDawn.Presentation.Board
             }
             bool dest = s.DestinationCost >= 0;
             highlight.gameObject.SetActive(dest);
+            if (_marker != null) _marker.enabled = dest; // le tutoriel désigne les cases à portée
             costBadge.SetActive(dest);
             if (dest) cost.text = s.DestinationCost.ToString();
         }

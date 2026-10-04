@@ -14,6 +14,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text title = null!;
         [SerializeField] TMP_Text info = null!;
         [SerializeField] WipMark wip = null!;
+        [SerializeField] GameObject badge = null!;
+        [SerializeField] TMP_Text badgeText = null!;
 
         public event Action? Clicked;
 
@@ -28,6 +30,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             bool soon = d.WipId != null;
             if (wip.gameObject.activeSelf != soon) wip.gameObject.SetActive(soon);
             if (soon) wip.FeatureId = d.WipId!;
+            if (badge.activeSelf != d.Badge > 0) badge.SetActive(d.Badge > 0);
+            badgeText.text = d.Badge.ToString();
         }
     }
 }

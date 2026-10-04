@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Wip;
 using UnityEngine;
@@ -32,11 +33,19 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             band.localScale = new Vector3(0.8f, 0.8f, 1f);
             band.anchoredPosition = new Vector2(70, -40); // sous le titre, jamais dessus
             wip.gameObject.SetActive(false);
+            var badgeImg = Ui.Img(root, "Badge", Theme.Danger, Sprites.Circle);
+            badgeImg.rectTransform.At(1f, 1f, 10, 10, 44, 44);
+            var badgeText = Ui.Txt(badgeImg.transform, "", 26, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Text");
+            badgeText.rectTransform.Stretch();
+            badgeImg.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
+            badgeImg.gameObject.SetActive(false);
             var view = root.gameObject.AddComponent<RoomCardView>();
             ctx.Wire(view, "button", button);
             ctx.Wire(view, "title", title);
             ctx.Wire(view, "info", info);
             ctx.Wire(view, "wip", wip);
+            ctx.Wire(view, "badge", badgeImg.gameObject);
+            ctx.Wire(view, "badgeText", badgeText);
             return root.gameObject;
         }
     }
@@ -55,6 +64,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx)
         {
             var rt = ScreenKit.Root("QgPage");
+            RecipeKit.Mark(rt, TutorialTarget.QgPage);
 
             // ---- Pièces
             var roomsTitle = Ui.LocTxt(rt, "qg.rooms", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "RoomsTitle");
@@ -83,10 +93,16 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var daily = Ui.Panel(rt, "Daily", Theme.Surface, 5f, 10f, true);
             daily.Frame().At(1f, 1f, 0, 0, RightW, 176);
             Ui.LocTxt(daily.transform, "qg.daily", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title").rectTransform.At(0f, 1f, 22, -14, 540, 46);
-            Ui.LocTxt(daily.transform, "qg.daily.body", 24, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "Body").rectTransform.Stretch(22, 16, 22, 70);
-            var dailyWip = ctx.Nest<WipMark>("Widgets/WipMark.prefab", daily.transform, "Wip");
-            ((RectTransform)dailyWip.transform).Stretch();
-            dailyWip.FeatureId = WipCatalog.DailyMissions.Id;
+            var dailyBody = Ui.Txt(daily.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Body");
+            dailyBody.rectTransform.Stretch(22, 12, 22, 62);
+            var dailyButton = daily.Frame().gameObject.AddComponent<Button>();
+            dailyButton.targetGraphic = daily;
+            dailyButton.transition = Selectable.Transition.None;
+            var dailyBadge = Ui.Img(daily.Frame(), "Badge", Theme.Danger, Sprites.Circle);
+            dailyBadge.rectTransform.At(1f, 1f, -10, -10, 44, 44);
+            var dailyBadgeText = Ui.Txt(dailyBadge.transform, "", 26, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Text");
+            dailyBadgeText.rectTransform.Stretch();
+            dailyBadge.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
 
             // ---- Alertes
             var alerts = Ui.Panel(rt, "Alerts", Theme.Surface, 5f, 10f, true);
@@ -97,10 +113,11 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var secondary = Ui.Img(alerts.transform, "Secondary", Theme.Surface2, Sprites.RoundedSmall, true);
             secondary.type = Image.Type.Sliced;
             secondary.rectTransform.At(0.5f, 0f, 0, 16, 546, 96);
-            Ui.LocTxt(secondary.transform, "qg.secondary", 24, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Label").rectTransform.Stretch(16, 0, 16, 0);
-            var secondaryWip = ctx.Nest<WipMark>("Widgets/WipMark.prefab", secondary.transform, "Wip");
-            ((RectTransform)secondaryWip.transform).Stretch();
-            secondaryWip.FeatureId = WipCatalog.SecondaryObjectives.Id;
+            var secondaryBody = Ui.Txt(secondary.transform, "", 22, Theme.Fatigue, TextAnchor.MiddleLeft, FontKind.Body, "Label");
+            secondaryBody.rectTransform.Stretch(16, 0, 16, 0);
+            var secondaryButton = secondary.gameObject.AddComponent<Button>();
+            secondaryButton.targetGraphic = secondary;
+            secondaryButton.transition = Selectable.Transition.None;
 
             // ---- MISSION
             var hint = Ui.Txt(rt, "", 22, Theme.Fatigue, TextAnchor.MiddleRight, FontKind.Body, "MissionHint");
@@ -115,8 +132,11 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var view = rt.gameObject.AddComponent<QgPageView>();
             ScreenKit.WireFade(ctx, view);
             ctx.WireArray(view, "rooms", rooms);
-            ctx.Wire(view, "dailyMissionsWip", dailyWip);
-            ctx.Wire(view, "secondaryWip", secondaryWip);
+            ctx.Wire(view, "dailyCard", dailyButton);
+            ctx.Wire(view, "dailyBody", dailyBody);
+            ctx.Wire(view, "dailyBadge", dailyBadgeText);
+            ctx.Wire(view, "secondaryCard", secondaryButton);
+            ctx.Wire(view, "secondaryBody", secondaryBody);
             ctx.Wire(view, "shopAlert", shopAlert);
             ctx.Wire(view, "filSpeaker", speaker);
             ctx.Wire(view, "filText", filText);

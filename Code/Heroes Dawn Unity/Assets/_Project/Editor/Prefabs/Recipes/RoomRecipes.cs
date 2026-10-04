@@ -123,60 +123,114 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Paramètres (M80-M85) : 6 catégories à gauche (BIENTÔT sauf Compte), le compte à droite.</summary>
+
+    /// <summary>Ligne de réglage : libellé + aide à gauche, « − valeur + » / interrupteur / bouton / valeur à droite (92 px).</summary>
+    public sealed class SettingRowRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Widgets/SettingRow.prefab";
+        public int Order => 5;
+
+        public GameObject Build(PrefabContext ctx)
+        {
+            var root = PrefabContext.NewRoot("SettingRow", 1000, 116);
+            root.Pref(-1, 116, 1);
+            var rim = Ui.Img(root, "Rim", Theme.Ink, Sprites.Rounded);
+            rim.type = Image.Type.Sliced;
+            rim.rectTransform.Stretch();
+            var fill = Ui.Img(rim.transform, "Fill", Theme.Surface2, Sprites.Rounded);
+            fill.type = Image.Type.Sliced;
+            fill.rectTransform.Stretch(4, 4, 4, 4);
+
+            var label = Ui.Txt(fill.transform, "", 30, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Label");
+            label.rectTransform.anchorMin = new Vector2(0, 0.5f);
+            label.rectTransform.anchorMax = new Vector2(1, 1);
+            label.rectTransform.offsetMin = new Vector2(22, 0);
+            label.rectTransform.offsetMax = new Vector2(-480, -4);
+            label.AutoSize(30);
+            label.Inked(1.5f);
+            var hint = Ui.Txt(fill.transform, "", 20, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "Hint");
+            hint.rectTransform.anchorMin = new Vector2(0, 0);
+            hint.rectTransform.anchorMax = new Vector2(1, 0.5f);
+            hint.rectTransform.offsetMin = new Vector2(22, 4);
+            hint.rectTransform.offsetMax = new Vector2(-480, 0);
+
+            var minus = Ui.Btn(fill.transform, "-", Theme.Surface3, Theme.Text, null!, 40, FontKind.Title, "Minus");
+            minus.Rect.At(1f, 0.5f, -366, 0, 96, 96);
+            var value = Ui.Txt(fill.transform, "", 28, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Value");
+            value.rectTransform.At(1f, 0.5f, -116, 0, 240, 96);
+                        value.AutoSize(28);
+            var plus = Ui.Btn(fill.transform, "+", Theme.Surface3, Theme.Text, null!, 40, FontKind.Title, "Plus");
+            plus.Rect.At(1f, 0.5f, -14, 0, 96, 96);
+            var action = Ui.Btn(fill.transform, "", Theme.Primary, Theme.TextDark, null!, 26, FontKind.Title, "Action");
+            action.Rect.At(1f, 0.5f, -14, 0, 440, 96);
+
+            var view = root.gameObject.AddComponent<SettingRowView>();
+            ctx.Wire(view, "label", label);
+            ctx.Wire(view, "hint", hint);
+            ctx.Wire(view, "value", value);
+            ctx.Wire(view, "minus", minus);
+            ctx.Wire(view, "plus", plus);
+            ctx.Wire(view, "action", action);
+            return root.gameObject;
+        }
+    }
+
+    /// <summary>Paramètres (M80-M85) : 8 catégories à gauche, réglages de la catégorie à droite (défilants), « Réinitialiser » en tête.</summary>
     public sealed class SettingsPageRecipe : IPrefabRecipe
     {
         public string RelativePath => "Pages/Settings.prefab";
         public int Order => 10;
 
-        const float LeftW = 440;
+        const float LeftW = 400;
 
         public GameObject Build(PrefabContext ctx)
         {
             var rt = ScreenKit.Root("SettingsPage");
-            var column = Ui.Rect(rt, "Categories").At(0f, 1f, 0, 0, LeftW, 6 * 96 + 5 * 16);
-            column.VLayout(16, 0, TextAnchor.UpperLeft);
+            var column = Ui.Rect(rt, "Categories");
+            column.anchorMin = new Vector2(0, 1);
+            column.anchorMax = new Vector2(1, 1);
+            column.pivot = new Vector2(0.5f, 1);
+            column.sizeDelta = new Vector2(0, 96);
+            column.anchoredPosition = Vector2.zero;
+            var h = column.HLayout(8, 0, TextAnchor.UpperLeft);
+            h.childControlWidth = true;
+            h.childForceExpandWidth = true;
             var categories = new List<Object>();
-            var wips = new List<Object>();
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 8; i++)
             {
-                var b = Ui.Btn(column, "", Theme.Surface3, Theme.Text, null!, 32, FontKind.Title, "Category" + i);
-                b.Rect.Pref(LeftW, 96);
-                var wip = ctx.Nest<WipMark>("Widgets/WipMark.prefab", b.transform, "Wip");
-                ((RectTransform)wip.transform).Stretch();
-                b.Label.alignment = TMPro.TextAlignmentOptions.Left;
-                wip.transform.Find("Band").localScale = new Vector3(0.6f, 0.6f, 1f);
-                ((RectTransform)wip.transform.Find("Band")).anchoredPosition = new Vector2(LeftW / 2f - 84f, 0);
-                wip.gameObject.SetActive(false);
+                var b = Ui.Btn(column, "", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Category" + i);
+                b.Rect.Pref(100, 96, 1);
                 categories.Add(b);
-                wips.Add(wip);
             }
 
-            var panel = Ui.Panel(rt, "Account", Theme.Surface, 5f, 10f, true);
+            var panel = Ui.Panel(rt, "Panel", Theme.WithAlpha(Theme.SurfaceDark, 0.92f), 5f, 10f, true);
             var frame = panel.Frame();
             frame.anchorMin = Vector2.zero;
             frame.anchorMax = Vector2.one;
-            frame.offsetMin = new Vector2(LeftW + 30, 0);
-            frame.offsetMax = Vector2.zero;
-            var title = Ui.LocTxt(panel.transform, "settings.account", 48, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
-            title.rectTransform.At(0f, 1f, 30, -20, 800, 60);
+            frame.offsetMin = Vector2.zero;
+            frame.offsetMax = new Vector2(0, -108);
+            var title = Ui.Txt(panel.transform, "", 42, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
+            title.rectTransform.At(0f, 1f, 24, -10, 700, 56);
             title.Inked();
-            var player = Ui.Txt(panel.transform, "", 28, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "Player");
-            player.rectTransform.At(0f, 1f, 30, -90, 1100, 40);
-            var logout = Ui.LocBtn(panel.transform, "settings.logout", Theme.Surface3, Theme.Text, null!, 32, FontKind.Title, "Logout");
-            logout.Rect.At(0f, 1f, 30, -170, 560, 96);
-            var reset = Ui.LocBtn(panel.transform, "settings.reset", Theme.Danger, Color.white, null!, 32, FontKind.Title, "Reset");
-            reset.Rect.At(0f, 1f, 30, -300, 560, 96);
-            Ui.LocTxt(panel.transform, "settings.reset.hint", 22, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "ResetHint")
-              .rectTransform.At(0f, 1f, 30, -406, 1000, 60);
+            var reset = Ui.Btn(panel.transform, "", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "ResetCategory");
+            reset.Rect.At(1f, 1f, -20, -8, 330, 96);
+            var listArea = Ui.Rect(panel.transform, "Rows");
+            listArea.anchorMin = Vector2.zero;
+            listArea.anchorMax = Vector2.one;
+            listArea.offsetMin = new Vector2(16, 12);
+            listArea.offsetMax = new Vector2(-16, -112);
+            var content = Ui.VScroll(listArea, out _);
+            var vl = content.VLayout(8, 0, TextAnchor.UpperCenter);
+            vl.childControlHeight = true;
+            vl.childForceExpandHeight = false;
 
             var view = rt.gameObject.AddComponent<SettingsPageView>();
             ScreenKit.WireFade(ctx, view);
             ctx.WireArray(view, "categories", categories);
-            ctx.WireArray(view, "categoryWips", wips);
-            ctx.Wire(view, "playerLine", player);
-            ctx.Wire(view, "logout", logout);
-            ctx.Wire(view, "reset", reset);
+            ctx.Wire(view, "title", title);
+            ctx.Wire(view, "resetCategory", reset);
+            ctx.Wire(view, "rows", content);
+            ctx.Wire(view, "rowPrefab", ctx.Asset("Widgets/SettingRow.prefab").GetComponent<SettingRowView>());
             return rt.gameObject;
         }
     }

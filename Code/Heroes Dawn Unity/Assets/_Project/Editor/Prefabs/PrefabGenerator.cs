@@ -87,7 +87,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs
                                   .Select(AssetDatabase.LoadAssetAtPath<GameObject>).ToArray();
             var c = EnsureCatalog();
             c.Fill(Load("Screens/Login.prefab"), Load("Screens/Hub.prefab"), Load("Screens/Board.prefab"), Load("Screens/Combat.prefab"),
-                   Load("Common/ModalLayer.prefab"), Load("Common/Toasts.prefab"), InFolder("Popups"), InFolder("Pages"));
+                   Load("Common/ModalLayer.prefab"), Load("Common/Toasts.prefab"), InFolder("Popups"), InFolder("Pages"), Load("Common/TutorialOverlay.prefab"));
             EditorUtility.SetDirty(c);
             AssetDatabase.SaveAssets();
         }

@@ -14,8 +14,11 @@ namespace N29.HeroesDawn.Presentation.Hub
     public sealed class QgPageView : ViewBase, IQgPageView
     {
         [SerializeField] RoomCardView[] rooms = Array.Empty<RoomCardView>();
-        [SerializeField] WipMark dailyMissionsWip = null!;
-        [SerializeField] WipMark secondaryWip = null!;
+        [SerializeField] Button dailyCard = null!;
+        [SerializeField] TMP_Text dailyBody = null!;
+        [SerializeField] TMP_Text dailyBadge = null!;
+        [SerializeField] Button secondaryCard = null!;
+        [SerializeField] TMP_Text secondaryBody = null!;
         [SerializeField] TMP_Text shopAlert = null!;
         [SerializeField] TMP_Text filSpeaker = null!;
         [SerializeField] TMP_Text filText = null!;
@@ -28,6 +31,8 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public event Action<HubPage>? RoomClicked;
         public event Action? MissionClicked;
+        public event Action? DailyClicked;
+        public event Action? SecondaryClicked;
 
         /// <summary>Bouton MISSION (tests PlayMode : clic réel).</summary>
         public Button MissionButton => mission.Button;
@@ -47,6 +52,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 rooms[i].Clicked += () => RoomClicked?.Invoke(_pages[index]);
             }
             mission.Button.onClick.AddListener(() => MissionClicked?.Invoke());
+            dailyCard.onClick.AddListener(() => DailyClicked?.Invoke());
+            secondaryCard.onClick.AddListener(() => SecondaryClicked?.Invoke());
         }
 
         public void Show(QgPageData d)
@@ -60,8 +67,11 @@ namespace N29.HeroesDawn.Presentation.Hub
                 rooms[i].Show(d.Rooms[i]);
                 if (!_cascaded) Fx.PopInAfter(rooms[i].transform, Stagger.DelayFor(i));
             }
-            dailyMissionsWip.FeatureId = d.DailyMissionsWipId;
-            secondaryWip.FeatureId = d.SecondaryObjectivesWipId;
+            dailyBody.text = string.Join("\n", d.DailyLines);
+            dailyBadge.text = d.DailyBadge;
+            dailyBadge.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(d.DailyBadge));
+            secondaryBody.text = d.SecondaryText;
+            secondaryBody.color = d.SecondaryActive ? Theme.Fatigue : Theme.TextMuted;
             shopAlert.text = d.ShopAlert;
             filSpeaker.text = d.FilSpeaker;
             filText.text = d.FilText;

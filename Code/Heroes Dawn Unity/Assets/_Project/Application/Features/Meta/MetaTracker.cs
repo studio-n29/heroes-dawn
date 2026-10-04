@@ -24,9 +24,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public const int XpPerWin = 10, XpPerFirstClear = 50, XpPerReplay = 20, GemsPerFirstClear = 10;
 
         readonly MetaContext _c;
-        readonly DailyMissionService _daily;
-        readonly PassService _pass;
-        readonly SecondaryObjectiveService _secondary;
+        readonly DailyMissions _daily;
+        readonly PassProgress _pass;
+        readonly SecondaryObjectives _secondary;
         readonly ISubscriber<CombatFinished> _combat;
         readonly ISubscriber<ZoneValidated> _zone;
         readonly ISubscriber<RosterChanged> _roster;
@@ -37,7 +37,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         int _levelSum, _count, _credits;
         bool _armed;
 
-        public MetaTracker(MetaContext context, DailyMissionService daily, PassService pass, SecondaryObjectiveService secondary,
+        public MetaTracker(MetaContext context, DailyMissions daily, PassProgress pass, SecondaryObjectives secondary,
                            ISubscriber<CombatFinished> combat, ISubscriber<ZoneValidated> zone, ISubscriber<RosterChanged> roster,
                            ISubscriber<WalletChanged> wallet, ISubscriber<GameStateChanged> state, IPublisher<MetaRewardEarned> earned)
         {

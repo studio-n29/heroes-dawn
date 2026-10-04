@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Wip;
 using TMPro;
@@ -24,10 +25,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var credits = Pill(ctx, root, "PillCR", "CR", Theme.Credits);
             var pr = Pill(ctx, root, "PillPR", "PR", Theme.Pr);
             var gems = Pill(ctx, root, "PillGM", "GM", Theme.Perception);
-            var mark = ctx.Nest<WipMark>("Widgets/WipMark.prefab", gems.transform.parent.parent, "Wip");
-            ((RectTransform)mark.transform).Stretch();
-            mark.transform.Find("Band").localScale = new Vector3(0.75f, 0.75f, 1f);
-            mark.FeatureId = WipCatalog.Gems.Id;
             var view = root.gameObject.AddComponent<HubWalletView>();
             ctx.Wire(view, "credits", credits);
             ctx.Wire(view, "pr", pr);
@@ -115,6 +112,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
                 pulse.Amplitude = 0.1f;
                 pulse.Speed = 4f;
                 badge.gameObject.SetActive(false);
+                if (page == HubPage.Team) RecipeKit.Mark(tab, TutorialTarget.TabTeam);
                 tabs.Add(tab);
                 badges.Add(badgeText);
             }

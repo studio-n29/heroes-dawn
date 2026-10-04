@@ -42,7 +42,10 @@ namespace N29.HeroesDawn.Presentation.Feedback
     {
         public static bool Reduced { get; set; }
 
-        public static void ResetForTests() => Reduced = false;
+        /// <summary>Accessibilité : mini-jeux plus lents et zones de réussite plus larges.</summary>
+        public static bool ExtendedMiniGame { get; set; }
+
+        public static void ResetForTests() { Reduced = false; ExtendedMiniGame = false; }
     }
 
     /// <summary>Effets ponctuels qui respectent <see cref="MotionSettings"/> ; rien hors du mode jeu (tests EditMode).</summary>

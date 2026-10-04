@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Wip;
 using UnityEngine;
@@ -123,7 +124,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             none.gameObject.SetActive(false);
             var hint = Ui.Txt(side.transform, "", 22, Theme.Fatigue, TextAnchor.MiddleCenter, FontKind.Body, "MissionHint");
             hint.rectTransform.At(0.5f, 0f, 0, 140, 520, 30);
+            RecipeKit.Mark(side.Frame(), TutorialTarget.TeamSquad);
             var mission = Ui.LocBtn(side.transform, "team.mission", Theme.Danger, Color.white, null!, 40, FontKind.Title, "Mission");
+            RecipeKit.Mark(mission, TutorialTarget.TeamMission);
             mission.Rect.At(0.5f, 0f, 0, 18, 520, 112);
             mission.Label.Inked();
 

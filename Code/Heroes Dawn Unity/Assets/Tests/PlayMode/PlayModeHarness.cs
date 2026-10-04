@@ -78,6 +78,16 @@ namespace N29.HeroesDawn.Tests.PlayMode
             return true;
         }
 
+        /// <summary>MISSION puis DÉPLOYER : la carte de la ville s ouvre entre les deux (zone proposée par défaut).</summary>
+        public static IEnumerator Deploy(UnityEngine.UI.Button mission)
+        {
+            mission.onClick.Invoke();
+            yield return WaitFor(() => Visible<N29.HeroesDawn.Presentation.Hub.CityMapPageView>());
+            DeployNow();
+        }
+
+        public static void DeployNow() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Hub.CityMapPageView>()!.DeployButton.onClick.Invoke();
+
         public static bool Visible<T>() where T : Component
         {
             var s = Object.FindAnyObjectByType<T>();

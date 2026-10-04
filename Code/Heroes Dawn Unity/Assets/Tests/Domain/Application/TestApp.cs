@@ -8,6 +8,7 @@ using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
 using N29.HeroesDawn.Application.Features.Meta;
+using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Features.Zone;
@@ -102,13 +103,25 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public AuthUseCases Account { get; }
         public ShopUseCases Shop { get; }
         public MetaContext MetaCtx { get; }
-        public PassService Pass { get; }
-        public DailyMissionService Daily { get; }
-        public SecondaryObjectiveService Secondary { get; }
-        public OperationsService Operations { get; }
-        public LabService Lab { get; }
-        public ArchivesService Archives { get; }
+        public PassProgress Pass { get; }
+        public DailyMissions Daily { get; }
+        public SecondaryObjectives Secondary { get; }
+        public Expeditions Operations { get; }
+        public ResearchLab Lab { get; }
+        public ArchiveBook Archives { get; }
         public MetaTracker Tracker { get; }
+        public Boutique Boutique { get; }
+        public MetaOverview Overview { get; }
+        public PlayerSettings Settings { get; }
+        public TutorialGuide Tutorial { get; }
+        public InstantPurchase Purchases { get; } = new InstantPurchase();
+
+        public sealed class InstantPurchase : IPurchaseGateway
+        {
+            public bool Fail;
+            public UniTask<Result> PurchaseAsync(string productId, CancellationToken ct)
+                => UniTask.FromResult(Fail ? Result.Fail(MetaErrors.PaymentFailed) : Result.Ok());
+        }
 
         public TestApp()
         {
@@ -150,12 +163,16 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Account = new AuthUseCases(this);
             Shop = new ShopUseCases(this);
             MetaCtx = new MetaContext(Session, Save, Time, Publisher<WalletChanged>(), Publisher<MetaChanged>());
-            Pass = new PassService(MetaCtx);
-            Daily = new DailyMissionService(MetaCtx, Pass);
-            Secondary = new SecondaryObjectiveService(MetaCtx, Pass);
-            Operations = new OperationsService(MetaCtx, Pass);
-            Lab = new LabService(MetaCtx);
-            Archives = new ArchivesService(MetaCtx);
+            Pass = new PassProgress(MetaCtx);
+            Daily = new DailyMissions(MetaCtx, Pass);
+            Secondary = new SecondaryObjectives(MetaCtx, Pass);
+            Operations = new Expeditions(MetaCtx, Pass);
+            Lab = new ResearchLab(MetaCtx);
+            Archives = new ArchiveBook(MetaCtx);
+            Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
+            Overview = new MetaOverview(Pass, Daily, Secondary, Operations, Lab, Archives, Boutique);
+            Settings = new PlayerSettings(MetaCtx);
+            Tutorial = new TutorialGuide(MetaCtx);
             Tracker = new MetaTracker(MetaCtx, Daily, Pass, Secondary, Subscriber<CombatFinished>(), Subscriber<ZoneValidated>(), Subscriber<RosterChanged>(),
                                       Subscriber<WalletChanged>(), Subscriber<GameStateChanged>(), Publisher<MetaRewardEarned>());
         }

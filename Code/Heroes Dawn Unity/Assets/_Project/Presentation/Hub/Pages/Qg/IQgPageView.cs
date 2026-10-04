@@ -8,6 +8,8 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         event Action<HubPage> RoomClicked;
         event Action MissionClicked;
+        event Action DailyClicked;
+        event Action SecondaryClicked;
         void Show(QgPageData data);
     }
 }

@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using N29.HeroesDawn.Presentation.Hub;
 using UnityEngine;
 using UnityEngine.UI;
@@ -126,20 +127,15 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             actTitle.rectTransform.Stretch(18, 0, 18, 0);
             actTitle.AutoSize(34);
 
+            // Les zones se choisissent sur la carte (points de 96 px) : pas de liste dupliquée.
             var rows = new List<Object>();
-            for (int i = 0; i < 3; i++)
-            {
-                var row = ctx.Nest<ZoneRowView>("Widgets/ZoneRow.prefab", column, "Row" + i);
-                ((RectTransform)row.transform).At(0f, 1f, 0, -(62 + i * 74), RightW, 66);
-                rows.Add(row);
-            }
 
             var detail = Ui.Panel(column, "Detail", Theme.Surface, 5f, 8f, true);
             var detailFrame = detail.Frame();
             detailFrame.anchorMin = new Vector2(0, 0);
             detailFrame.anchorMax = new Vector2(1, 1);
-            detailFrame.offsetMin = new Vector2(0, 104);
-            detailFrame.offsetMax = new Vector2(0, -290);
+            detailFrame.offsetMin = new Vector2(0, 108);
+            detailFrame.offsetMax = new Vector2(0, -62);
             var title = Ui.Txt(detail.transform, "", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
             title.rectTransform.At(0f, 1f, 18, -8, RightW - 36, 44);
             title.AutoSize(34);
@@ -154,12 +150,18 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             rewards.rectTransform.At(0f, 0f, 18, 10, RightW - 36, 34);
 
             var deploy = Ui.Btn(column, "", Theme.Danger, Color.white, null!, 54, FontKind.Title, "Deploy");
-            deploy.Rect.At(0.5f, 0f, 0, 0, RightW, 92);
+            deploy.Rect.At(0.5f, 0f, 0, 0, RightW, 96);
             deploy.Label.Inked();
+            RecipeKit.Mark(deploy, TutorialTarget.MapDeploy);
 
+            var tagTemplate = Ui.Txt(mapArea, "", 28, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Title, "TagTemplate");
+            tagTemplate.raycastTarget = false;
+            tagTemplate.Inked();
+            tagTemplate.gameObject.SetActive(false);
             var view = rt.gameObject.AddComponent<CityMapPageView>();
             ScreenKit.WireFade(ctx, view);
             ctx.Wire(view, "mapArea", mapArea);
+            ctx.Wire(view, "tagTemplate", tagTemplate);
             ctx.Wire(view, "pointPrefab", ctx.Asset("Widgets/ZonePoint.prefab").GetComponent<ZonePointView>());
             ctx.Wire(view, "lockedMaterial", RecipeKit.Mat("UiHatch"));
             ctx.Wire(view, "actTitle", actTitle);

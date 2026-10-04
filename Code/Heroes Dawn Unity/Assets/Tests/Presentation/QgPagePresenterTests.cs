@@ -34,7 +34,8 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             var loc = new LocLocalization();
             var mission = new MissionLauncher(_app.Zone.Start, PrototypeContent.Zone11, _app.Publisher<NavigateRequested>(), new FakeToasts(), loc);
-            _p = new QgPagePresenter(_view, _app.Session, _nav, mission, _app.Time, loc, _app.Subscriber<RosterChanged>());
+            _p = new QgPagePresenter(_view, _app.Session, _nav, mission, _app.Time, loc, _app.Overview, _app.Subscriber<RosterChanged>(),
+                                     _app.Subscriber<N29.HeroesDawn.Application.Features.Meta.MetaChanged>());
             _view.Show();
             _p.Start();
             return _p;
@@ -55,22 +56,40 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(Room(HubPage.Infirmary).WipId, Is.Null);
         }
 
-        [Test, Description("Vérifie qu'Opérations, Labo et Archives sont marqués BIENTÔT — parce que ces pièces ne sont pas développées (spec §4)")]
-        public void WipRooms_MarkedSoon()
+        [Test, Description("Vérifie qu'Opérations, Labo et Archives affichent leur état réel et plus de bandeau BIENTÔT — parce que ces trois pièces fonctionnent maintenant")]
+        public void OperationsLabArchives_AreRealRooms()
         {
             Make();
-            Assert.That(Room(HubPage.Operations).WipId, Is.EqualTo(WipCatalog.Operations.Id));
-            Assert.That(Room(HubPage.Lab).WipId, Is.EqualTo(WipCatalog.Lab.Id));
-            Assert.That(Room(HubPage.Archives).WipId, Is.EqualTo(WipCatalog.Archives.Id));
+            Assert.That(Room(HubPage.Operations).WipId, Is.Null);
+            Assert.That(Room(HubPage.Lab).WipId, Is.Null);
+            Assert.That(Room(HubPage.Archives).WipId, Is.Null);
+            Assert.That(Room(HubPage.Operations).Info, Is.EqualTo(new LocLocalization().T("qg.ops.idle")));
+            Assert.That(Room(HubPage.Lab).Info, Is.EqualTo(new LocLocalization().T("qg.lab.idle")));
+            Assert.That(Room(HubPage.Archives).Badge, Is.GreaterThan(0), "des fiches de départ sont à lire");
             Assert.That(_view.Last.Rooms.Length, Is.EqualTo(5));
         }
 
-        [Test, Description("Vérifie que les missions du jour et les objectifs secondaires sont marqués BIENTÔT — parce qu'ils viennent avec le pass et le mode mission (spec §4)")]
-        public void DailyMissions_And_SecondaryObjectives_MarkedSoon()
+        [Test, Description("Vérifie que le QG montre les trois missions du jour avec leur avancement et l'objectif secondaire quand il existe — parce que ces cartes ne sont plus BIENTÔT")]
+        public void DailyMissions_And_SecondaryObjective_AreReal()
         {
             Make();
-            Assert.That(_view.Last.DailyMissionsWipId, Is.EqualTo(WipCatalog.DailyMissions.Id));
-            Assert.That(_view.Last.SecondaryObjectivesWipId, Is.EqualTo(WipCatalog.SecondaryObjectives.Id));
+            Assert.That(_view.Last.DailyLines.Length, Is.EqualTo(3));
+            Assert.That(_view.Last.DailyLines[0], Does.Contain("0 /"));
+            Assert.That(_view.Last.SecondaryActive, Is.False);
+            _p.Dispose();
+            _app.Session.CompletedZones.Add(PrototypeContent.Zone11.Value);
+            _view = new FakeQgPageView();
+            Make();
+            Assert.That(_view.Last.SecondaryActive, Is.True);
+            Assert.That(_view.Last.SecondaryText, Does.Contain("Red Hook"));
+        }
+
+        [Test, Description("Vérifie que toucher les missions du jour ouvre le pass — parce que les missions nourrissent le pass (M40)")]
+        public void DailyCard_OpensPass()
+        {
+            Make();
+            _view.ClickDaily();
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Pass));
         }
 
         [Test, Description("Vérifie que les alertes montrent le vrai compte à rebours de la boutique — parce que le joueur doit savoir quand arrivent les nouveaux héros (M10 ⑤)")]
@@ -94,6 +113,12 @@ namespace N29.HeroesDawn.Tests.Presentation
             _app.Session.CompletedZones.Add(PrototypeContent.Zone11.Value);
             _view = new FakeQgPageView();
             Make();
+            Assert.That(_view.Last.FilText, Is.EqualTo(new LocLocalization().T("qg.fil.zone_ny_1_2")), "la zone suivante prend le relais");
+            _p.Dispose();
+            _app.Session.CompletedZones.Add(PrototypeZones.Zone12.Value);
+            _app.Session.CompletedZones.Add(PrototypeZones.Zone13.Value);
+            _view = new FakeQgPageView();
+            Make();
             Assert.That(_view.Last.FilText, Is.EqualTo(new LocLocalization().T("qg.fil.done")));
         }
 
@@ -105,14 +130,15 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Infirmary));
         }
 
-        [Test, Description("Vérifie que MISSION démarre la zone et demande le plateau — parce que c'est l'action principale du QG (spec §4)")]
-        public void MissionClick_LaunchesMission()
+        [Test, Description("Vérifie que MISSION ouvre la carte de New York au lieu de lancer la zone directement — parce que le joueur choisit sa zone sur la carte (M60)")]
+        public void MissionClick_OpensCityMap()
         {
             Make();
             Assert.That(_view.Last.MissionEnabled, Is.True);
             _view.ClickMission();
-            Assert.That(_app.Session.Run, Is.Not.Null);
-            Assert.That(_app.Received<NavigateRequested>().Count(n => n.Target == GameState.Board), Is.EqualTo(1));
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.CityMap));
+            Assert.That(_app.Session.Run, Is.Null, "rien n'est lancé tant que le joueur n'a pas déployé");
+            Assert.That(_app.Received<NavigateRequested>().Count(n => n.Target == GameState.Board), Is.Zero);
         }
 
         [Test, Description("Vérifie que MISSION est désactivé avec la raison quand l'escouade est épuisée — parce qu'un bouton grisé doit dire pourquoi (contraintes)")]

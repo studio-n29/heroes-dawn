@@ -7,6 +7,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Combat;
+using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
@@ -40,6 +41,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         readonly ILocalization _loc;
         readonly IFrameClock _clock;
         readonly IAudioService _audio;
+        readonly TutorialGuide? _tutorial;
 
         CombatSimulation? _sim;
         readonly Dictionary<int, string> _names = new Dictionary<int, string>();
@@ -59,12 +61,13 @@ namespace N29.HeroesDawn.Presentation.Combat
                                IFinishCombatUseCase finish, IVerifyCombatUseCase verify, IForceCombatWinUseCase forceWin,
                                IPublisher<CombatResultsClosed> closed, IPublisher<NavigateRequested> navigate, IModalService modals,
                                IToastService toasts, ILocalization loc, IFrameClock clock, BackButtonRouter router,
-                               IAudioService? audio = null)
+                               IAudioService? audio = null, TutorialGuide? tutorial = null)
             : base(view, router)
         {
             _combat = combat; _session = session; _setAuto = setAuto; _finish = finish; _verify = verify; _forceWin = forceWin;
             _closed = closed; _navigate = navigate; _modals = modals; _toasts = toasts; _loc = loc; _clock = clock;
             _audio = audio ?? NullAudioService.Instance;
+            _tutorial = tutorial;
         }
 
         protected override IBackHandler BackHandler => this;
@@ -119,6 +122,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             RefreshTopBar();
             RefreshAll();
             View.ShowBanner(_loc.T("combat.rank").Replace("{0}", "").Trim().ToUpperInvariant() + " !", Tone.Primary);
+            _tutorial?.Hint("auto");
         }
 
         void BuildUnits(CombatSimulation sim)
@@ -154,7 +158,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         public void Tick()
         {
             var sim = _sim;
-            if (sim == null || _ended || Disposed || !View.IsVisible || _modals.AnyOpen) return;
+            if (sim == null || _ended || Disposed || !View.IsVisible || _modals.AnyOpen || (_tutorial?.PausesCombat ?? false)) return;
             int tickMs = _session.Content.Balance.TickMs;
             _accumulator += _clock.UnscaledDeltaTime * 1000f * _speedFactor;
             int steps = 0;
@@ -189,6 +193,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                         break;
                     case SkillUsedEvent su:
                         View.Act(su.Actor);
+                        if (_sim!.Unit(su.Actor).Side == Side.Ally) _tutorial?.Signal(TutorialSignal.SkillUsed);
                         _audio.Play(SfxId.SkillCast);
                         AddLog(Name(su.Actor) + " : " + SkillLabel(su.Actor, su.Skill));
                         break;
@@ -304,6 +309,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.ShowSkills(panel);
 
             var combos = manual ? sim.AvailableCombos() : Array.Empty<CombatSimulation.ComboOption>();
+            if (combos.Count > 0) _tutorial?.Hint("combo");
             View.ShowCombo(combos.Count > 0, combos.Count > 0 ? _loc.T("combat.combo") + "\n<size=24>" + _loc.ComboName(combos[0].Combo) + "</size>" : "");
 
             View.SetHint(targetEnemies ? _loc.T("combat.choose_target")

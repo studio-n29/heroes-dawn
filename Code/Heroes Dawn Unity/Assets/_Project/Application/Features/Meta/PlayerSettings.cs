@@ -7,11 +7,11 @@ namespace N29.HeroesDawn.Application.Features.Meta
     public enum SettingsCategory { Audio, Graphics, Accessibility, Language, Notifications, Controls, Account, Support }
 
     /// <summary>Réglages du joueur (stockés dans le profil) ; chaque changement est annoncé pour être appliqué tout de suite.</summary>
-    public sealed class SettingsService
+    public sealed class PlayerSettings
     {
         readonly MetaContext _c;
 
-        public SettingsService(MetaContext context) { _c = context; }
+        public PlayerSettings(MetaContext context) { _c = context; }
 
         public SettingsSave Current => _c.Meta.settings;
 

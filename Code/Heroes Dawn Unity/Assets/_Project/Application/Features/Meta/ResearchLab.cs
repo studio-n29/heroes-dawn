@@ -29,16 +29,16 @@ namespace N29.HeroesDawn.Application.Features.Meta
     public static class LabBonuses
     {
         /// <summary>Réduction du prix d'entraînement : 4 % par niveau.</summary>
-        public static int TrainCostPercent(MetaSave m) => 100 - 4 * Level(m, LabService.Training);
+        public static int TrainCostPercent(MetaSave m) => 100 - 4 * Level(m, ResearchLab.Training);
 
         /// <summary>Bonus de Crédits de combat : 5 % par niveau.</summary>
-        public static int CombatCreditsPercent(MetaSave m) => 100 + 5 * Level(m, LabService.Loot);
+        public static int CombatCreditsPercent(MetaSave m) => 100 + 5 * Level(m, ResearchLab.Loot);
 
         /// <summary>Points de fatigue récupérés par minute hors mission : 1 + 1 par niveau.</summary>
-        public static int RecoveryPerMinute(MetaSave m) => MetaRulesRecovery + Level(m, LabService.Recovery);
+        public static int RecoveryPerMinute(MetaSave m) => MetaRulesRecovery + Level(m, ResearchLab.Recovery);
 
         /// <summary>Bonus de récompense de validation de zone : 5 % par niveau.</summary>
-        public static int ZoneRewardPercent(MetaSave m) => 100 + 5 * Level(m, LabService.Logistics);
+        public static int ZoneRewardPercent(MetaSave m) => 100 + 5 * Level(m, ResearchLab.Logistics);
 
         const int MetaRulesRecovery = 1;
 
@@ -46,7 +46,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
     }
 
     /// <summary>Labo de recherche (simulé en local) : une recherche à la fois, payée en Crédits, qui dure quelques minutes.</summary>
-    public sealed class LabService
+    public sealed class ResearchLab
     {
         public const string Training = "training", Loot = "loot", Recovery = "recovery", Logistics = "logistics";
 
@@ -57,7 +57,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
 
         readonly MetaContext _c;
 
-        public LabService(MetaContext context) { _c = context; }
+        public ResearchLab(MetaContext context) { _c = context; }
 
         public static LabTech? Find(string id)
         {

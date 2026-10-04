@@ -121,10 +121,9 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return OnHub();
             var session = Container.Resolve<GameSession>();
-            Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
+            yield return PlayModeHarness.Deploy(Object.FindAnyObjectByType<QgPageView>()!.MissionButton);
             var firstRun = session.Run;
-            Shell.TabButton(HubPage.Team).Button.onClick.Invoke();
-            Object.FindAnyObjectByType<TeamPageView>()!.MissionButton.onClick.Invoke();
+            PlayModeHarness.DeployNow(); // second départ avant le déchargement du hub
             Assert.That(firstRun, Is.Not.Null);
             Assert.That(session.Run, Is.SameAs(firstRun), "la partie n'est pas remplacée");
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning, 600);
@@ -153,14 +152,14 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator Mission_FromQgAndFromTeam_LaunchesZone()
         {
             yield return OnHub();
-            Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
+            yield return PlayModeHarness.Deploy(Object.FindAnyObjectByType<QgPageView>()!.MissionButton);
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning, 600);
             Assert.That(Flow.Current, Is.EqualTo(GameState.Board), "QG → plateau");
 
             yield return PlayModeHarness.BackToHqConfirmed();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning, 600);
             yield return Tab(HubPage.Team);
-            Object.FindAnyObjectByType<TeamPageView>()!.MissionButton.onClick.Invoke();
+            yield return PlayModeHarness.Deploy(Object.FindAnyObjectByType<TeamPageView>()!.MissionButton);
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning, 600);
             Assert.That(Flow.Current, Is.EqualTo(GameState.Board), "Équipe → plateau");
         }
@@ -200,7 +199,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return OnHub();
             Shell.SettingsButton.Button.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<SettingsPageView>());
-            Object.FindAnyObjectByType<SettingsPageView>()!.LogoutButton.onClick.Invoke();
+            var settings = Object.FindAnyObjectByType<SettingsPageView>()!;
+            settings.CategoryButton(6).onClick.Invoke(); // Compte
+            yield return null;
+            settings.ActionButton(N29.HeroesDawn.Presentation.Common.Loc.T("settings.logout"))!.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<LoginView>() && !Flow.IsTransitioning, 600);
             Assert.That(Flow.Current, Is.EqualTo(GameState.Login));
         }

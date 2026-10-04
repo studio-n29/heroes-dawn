@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
     }
 
     /// <summary>Trois missions par jour (tirées d'un catalogue, identiques pour une date donnée), qui font avancer le pass.</summary>
-    public sealed class DailyMissionService
+    public sealed class DailyMissions
     {
         public const int PerDay = 3;
 
@@ -45,9 +45,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
         };
 
         readonly MetaContext _c;
-        readonly PassService _pass;
+        readonly PassProgress _pass;
 
-        public DailyMissionService(MetaContext context, PassService pass) { _c = context; _pass = pass; }
+        public DailyMissions(MetaContext context, PassProgress pass) { _c = context; _pass = pass; }
 
         public static DailyTemplate? Find(string id)
         {

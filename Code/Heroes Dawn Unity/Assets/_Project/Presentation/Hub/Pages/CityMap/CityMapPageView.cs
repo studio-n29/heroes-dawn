@@ -18,6 +18,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     public sealed class CityMapPageView : ViewBase, ICityMapPageView
     {
         [SerializeField] RectTransform mapArea = null!;
+        [SerializeField] TMP_Text tagTemplate = null!;
         [SerializeField] ZonePointView pointPrefab = null!;
         [SerializeField, OptionalRef] Material? lockedMaterial;
         [SerializeField] TMP_Text actTitle = null!;
@@ -120,9 +121,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 click.onClick.AddListener(() => { if (_polygons.TryGetValue(id, out var p) && p.color.a > 0 && IsLocked(id)) LockedTapped?.Invoke(TagOf(id)); });
                 _polygons[b.Id] = poly;
 
-                var tag = Ui.Txt(mapArea, "", 28, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Title, "Tag_" + b.Id);
-                tag.raycastTarget = false;
-                tag.Inked();
+                var tag = Instantiate(tagTemplate, mapArea);
+                tag.gameObject.SetActive(true);
+                tag.name = "Tag_" + b.Id;
                 var trt = tag.rectTransform;
                 trt.anchorMin = trt.anchorMax = new Vector2(b.LabelAt.x, 1f - b.LabelAt.y);
                 trt.pivot = new Vector2(0.5f, 0.5f);

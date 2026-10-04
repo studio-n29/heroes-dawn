@@ -18,11 +18,13 @@ namespace N29.HeroesDawn.Presentation.Mvp
         [SerializeField, OptionalRef] GameObject? combat;
         [SerializeField, OptionalRef] GameObject? modalLayer;
         [SerializeField, OptionalRef] GameObject? toasts;
+        [SerializeField, OptionalRef] GameObject? tutorialOverlay;
         [SerializeField] GameObject[] popups = Array.Empty<GameObject>();
         [SerializeField] GameObject[] pages = Array.Empty<GameObject>();
 
         public GameObject? ModalLayer => modalLayer;
         public GameObject? Toasts => toasts;
+        public GameObject? TutorialOverlay => tutorialOverlay;
 
         /// <summary>Prefab de l'écran d'une scène : "Login", "Hub", "Board" ou "Combat".</summary>
         public GameObject Screen(string scene)
@@ -53,10 +55,11 @@ namespace N29.HeroesDawn.Presentation.Mvp
 #if UNITY_EDITOR
         /// <summary>Remplissage par le générateur de prefabs (éditeur).</summary>
         public void Fill(GameObject? login, GameObject? hub, GameObject? board, GameObject? combat,
-                         GameObject? modalLayer, GameObject? toasts, GameObject[] popups, GameObject[] pages)
+                         GameObject? modalLayer, GameObject? toasts, GameObject[] popups, GameObject[] pages, GameObject? tutorialOverlay = null)
         {
             this.login = login; this.hub = hub; this.board = board; this.combat = combat;
             this.modalLayer = modalLayer; this.toasts = toasts; this.popups = popups; this.pages = pages;
+            this.tutorialOverlay = tutorialOverlay;
         }
 #endif
     }

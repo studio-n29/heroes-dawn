@@ -185,12 +185,12 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_nav.IsOnTab, Is.False);
         }
 
-        [Test, Description("Vérifie que la barre de ressources affiche les Crédits et les PR de la session, Gemmes à 0 — parce que la monnaie premium n'existe pas encore (spec §3.4)")]
-        public void Wallet_ShowsSessionValues_GemsZero()
+        [Test, Description("Vérifie que la barre de ressources affiche les Crédits et les PR de la session, et les Gemmes — parce que la monnaie premium existe maintenant (50 Gemmes de départ)")]
+        public void Wallet_ShowsSessionValues_WithGems()
         {
             Assert.That(_view.WalletView.Last.Credits, Is.EqualTo(_app.Session.Wallet.Credits));
             Assert.That(_view.WalletView.Last.Pr, Is.EqualTo(_app.Session.Wallet.Pr));
-            Assert.That(_view.WalletView.Last.Gems, Is.Zero);
+            Assert.That(_view.WalletView.Last.Gems, Is.EqualTo(_app.Session.Wallet.Gems));
         }
 
         [Test, Description("Vérifie que détruire la coque détruit la page courante une seule fois — parce que la scène du hub est déchargée en partant en mission")]

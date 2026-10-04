@@ -13,9 +13,9 @@ namespace N29.HeroesDawn.Presentation.Common
 
         public WalletBinder(IWalletView view, ISessionReadModel session, ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving)
         {
-            view.Show(new WalletData(session.Wallet.Credits, session.Wallet.Pr));
+            view.Show(new WalletData(session.Wallet.Credits, session.Wallet.Pr, session.Wallet.Gems));
             var bag = DisposableBag.CreateBuilder();
-            wallet.Subscribe(w => view.Show(new WalletData(w.Credits, w.Pr))).AddTo(bag);
+            wallet.Subscribe(w => view.Show(new WalletData(w.Credits, w.Pr, w.Gems))).AddTo(bag);
             saving.Subscribe(s => view.SetSaving(s.Saving)).AddTo(bag);
             _subs = bag.Build();
         }

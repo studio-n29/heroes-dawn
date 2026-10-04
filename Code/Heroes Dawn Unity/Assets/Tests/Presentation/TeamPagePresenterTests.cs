@@ -160,12 +160,13 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_toasts.Shown, Is.Empty);
         }
 
-        [Test, Description("Vérifie que « Préparer une mission » lance la zone comme MISSION — parce que c'est la même action (spec §4)")]
+        [Test, Description("Vérifie que « Préparer une mission » ouvre la carte de la ville comme MISSION — parce que c est la même action (spec §4)")]
         public void Mission_LaunchesZone()
         {
             Make();
             _view.ClickMission();
-            Assert.That(_app.Session.Run, Is.Not.Null);
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.CityMap));
+            Assert.That(_app.Session.Run, Is.Null);
         }
     }
 }

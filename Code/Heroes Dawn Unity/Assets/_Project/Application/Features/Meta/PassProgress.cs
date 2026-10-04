@@ -47,11 +47,11 @@ namespace N29.HeroesDawn.Application.Features.Meta
     }
 
     /// <summary>Pass saisonnier (local : la saison dure 30 jours à partir du premier lancement, la boutique « premium » est simulée).</summary>
-    public sealed class PassService
+    public sealed class PassProgress
     {
         readonly MetaContext _c;
 
-        public PassService(MetaContext context) { _c = context; }
+        public PassProgress(MetaContext context) { _c = context; }
 
         public int Xp => _c.Meta.passXp;
         public bool PremiumOwned => _c.Meta.passPremium;

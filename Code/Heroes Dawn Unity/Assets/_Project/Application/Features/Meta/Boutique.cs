@@ -34,7 +34,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
     }
 
     /// <summary>Boutique : paquets de Gemmes (achat simulé), échanges Gemmes → ressources, cadeau quotidien gratuit.</summary>
-    public sealed class BoutiqueService
+    public sealed class Boutique
     {
         public static readonly Reward DailyGift = new Reward(credits: 100, gems: 1);
 
@@ -56,7 +56,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         readonly IPurchaseGateway _payments;
         readonly IPublisher<RosterChanged> _roster;
 
-        public BoutiqueService(MetaContext context, IPurchaseGateway payments, IPublisher<RosterChanged> roster)
+        public Boutique(MetaContext context, IPurchaseGateway payments, IPublisher<RosterChanged> roster)
         {
             _c = context; _payments = payments; _roster = roster;
         }

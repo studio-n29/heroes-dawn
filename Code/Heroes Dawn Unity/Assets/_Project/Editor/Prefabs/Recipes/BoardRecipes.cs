@@ -1,6 +1,7 @@
 #nullable enable
 using N29.HeroesDawn.Presentation.Board;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using N29.HeroesDawn.Presentation.Hub;
 using UnityEngine;
 using UnityEngine.UI;
@@ -48,6 +49,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             cost.rectTransform.Stretch();
             badge.gameObject.SetActive(false);
 
+            RecipeKit.Mark(frame, TutorialTarget.BoardDestination, enabled: false);
             var view = root.gameObject.AddComponent<BoardNodeView>();
             ctx.Wire(view, "highlight", highlight);
             ctx.Wire(view, "objective", objective);
@@ -130,6 +132,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             // ---- Objectifs (récitatif en haut à gauche)
             var obj = Ui.Panel(rt, "Objectives", Theme.Primary, 4f, 6f, false);
             obj.Frame().At(0f, 1f, 24, -112, 520, 156);
+            RecipeKit.Mark(obj.Frame(), TutorialTarget.BoardObjectives);
             Ui.LocTxt(obj.transform, "board.objectives", 30, Theme.TextDark, TextAnchor.UpperLeft, FontKind.Title, "Title").rectTransform.At(0f, 1f, 16, -8, 480, 36);
             var objectiveList = Ui.Rect(obj.transform, "List").At(0f, 1f, 16, -46, 490, 120);
             objectiveList.VLayout(2, 0, TextAnchor.UpperLeft);
@@ -167,6 +170,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             dieFace.rectTransform.Stretch();
             var roll = Ui.LocBtn(hudFill, "board.roll", Theme.Primary, Theme.TextDark, null!, 54, FontKind.Title, "Roll");
             roll.Rect.At(1f, 0.5f, -250, 26, 360, 90);
+            RecipeKit.Mark(roll, TutorialTarget.BoardRoll);
             var bonus = Ui.Btn(hudFill, "", Theme.Info, Theme.TextDark, null!, 26, FontKind.Title, "Bonus");
             bonus.Rect.At(1f, 0.5f, -20, 26, 220, 90);
             var end = Ui.LocBtn(hudFill, "board.end_move", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "EndMove");

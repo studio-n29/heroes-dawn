@@ -1,6 +1,7 @@
 #nullable enable
 using N29.HeroesDawn.Presentation.Combat;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -202,6 +203,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var toHq = Ui.Txt(content, "", 26, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Body, "ToHq");
             toHq.rectTransform.At(0.5f, 0f, 0, 150, 900, 34);
             var cont = Ui.Btn(content, "", Theme.Primary, Theme.TextDark, null!, 42, FontKind.Title, "Continue");
+            RecipeKit.Mark(cont, TutorialTarget.ResultsContinue);
             cont.Rect.At(0.5f, 0f, 0, 0, 420, 100);
             var view = root.gameObject.AddComponent<CombatResultsPopupView>();
             CasePopupKit.WireBase(ctx, view, title, window);
@@ -250,6 +252,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             // ---- Ennemis (haut droite), alliés (bas droite)
             var enemyRow = Ui.Rect(rt, "Enemies").At(1f, 1f, -30, -104, 1000, 290);
             enemyRow.HLayout(30, 0, TextAnchor.UpperCenter);
+            RecipeKit.Mark(enemyRow, TutorialTarget.CombatEnemies);
             var allyRow = Ui.Rect(rt, "Allies").At(1f, 0f, -30, 20, 1100, 290);
             allyRow.HLayout(16, 0, TextAnchor.LowerCenter);
 
@@ -273,6 +276,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             // ---- Panneau de compétences (gauche) : onglet « X est prêt ! » + 3 lignes
             var skillBox = Ui.Panel(rt, "Skills", Theme.WithAlpha(Theme.SurfaceDark, 0.92f), 5f, 8f, false);
             var skillFrame = skillBox.Frame().At(0f, 0f, 24, 24, 500, 372);
+            RecipeKit.Mark(skillFrame, TutorialTarget.CombatSkills);
             var skillTitle = Ui.Txt(skillBox.transform, "", 30, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
             skillTitle.rectTransform.At(0f, 1f, 18, -8, 460, 44);
             skillTitle.AutoSize(30);

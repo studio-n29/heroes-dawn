@@ -6,6 +6,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Combat;
+using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
@@ -30,6 +31,7 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly ISessionReadModel _session;
         readonly IRollDiceUseCase _roll;
         readonly IUseBonusDieUseCase _bonus;
+        readonly TutorialGuide? _tutorial;
         readonly IMoveToUseCase _moveTo;
         readonly IEndMoveUseCase _endMove;
         readonly IBeginCombatUseCase _beginCombat;
@@ -63,13 +65,14 @@ namespace N29.HeroesDawn.Presentation.Board
                               ISubscriber<ZoneValidated> zoneValidated, ISubscriber<ReturnedToBoard> returned, ISubscriber<RosterChanged> roster,
                               ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving, IPublisher<NavigateRequested> navigate,
                               IModalService modals, IToastService toasts, ILocalization loc, BackButtonRouter router,
-                              IAudioService? audio = null)
+                              IAudioService? audio = null, TutorialGuide? tutorial = null)
             : base(view, router)
         {
             _session = session; _roll = roll; _bonus = bonus; _moveTo = moveTo; _endMove = endMove; _beginCombat = beginCombat;
             _leave = leave; _flow = flow; _cases = cases; _zoneValidated = zoneValidated; _returned = returned; _roster = roster;
             _wallet = wallet; _saving = saving; _navigate = navigate; _modals = modals; _toasts = toasts; _loc = loc;
             _audio = audio ?? NullAudioService.Instance;
+            _tutorial = tutorial;
         }
 
         protected override IBackHandler BackHandler => this;
@@ -314,6 +317,9 @@ namespace N29.HeroesDawn.Presentation.Board
             try { await View.RollDieAsync(value, _session.Content.Balance.DieFaces, Lifetime); }
             finally { _busy.Exit(); }
             RefreshAll();
+            _tutorial?.Signal(TutorialSignal.Rolled);
+            if (_run != null && _run.Dice.BonusDice > 0) _tutorial?.Hint("bonus_die");
+            if (_run != null && _run.Phase == ZoneRunPhase.ChoosingDestination && _run.PmInHand > 0) _tutorial?.Hint("end_move");
         }
 
         /// <summary>Joue les événements du domaine dans l'ordre : déplacement animé, puis messages, puis case déclenchée.</summary>
@@ -334,6 +340,7 @@ namespace N29.HeroesDawn.Presentation.Board
                 try { await View.Map.MovePawnAsync(path, Lifetime); }
                 finally { _busy.Exit(); }
             }
+            if (path != null && !events.Any(x => x is SteppedBackEvent)) _tutorial?.Signal(TutorialSignal.Moved);
             if (Disposed) return;
             await AnnounceAndTriggerAsync(events);
         }
@@ -350,7 +357,7 @@ namespace N29.HeroesDawn.Presentation.Board
                     case FogRevealedEvent _: _toasts.Show(_loc.T("board.fog"), ToastKind.Info); break;
                     case ObjectiveCompletedEvent oc: _toasts.Show(_loc.F("board.objective_done", ObjectiveName(oc.ObjectiveId)), ToastKind.Reward); break;
                     case PmBankedEvent pb: _toasts.Show(_loc.F("board.banked", pb.Pm), ToastKind.Info); break;
-                    case SteppedBackEvent _: _toasts.Show(_loc.T("board.stepped_back"), ToastKind.Warning); break;
+                    case SteppedBackEvent _: _toasts.Show(_loc.T("board.stepped_back"), ToastKind.Warning); _tutorial?.Hint("defeat"); break;
                     case CaseTriggeredEvent ct: triggered = ct.Outcome; break;
                     case ZoneValidatedEvent _: validated = true; break;
                 }
@@ -365,6 +372,9 @@ namespace N29.HeroesDawn.Presentation.Board
             }
             if (triggered != null)
             {
+                if (triggered.Type == CaseType.Narrative) _tutorial?.Hint("event");
+                else if (triggered.Type == CaseType.MiniGame) _tutorial?.Hint("minigame");
+                else if (triggered.Type == CaseType.Rest) _tutorial?.Hint("rest");
                 await View.PauseAsync(0.35f, Lifetime);
                 await OpenCaseAsync(triggered);
             }
@@ -434,6 +444,7 @@ namespace N29.HeroesDawn.Presentation.Board
         async UniTask ShowZoneCompleteAsync()
         {
             await _cases.ShowZoneCompleteAsync(LastZoneRewards, Lifetime);
+            _tutorial?.Hint("zone_done");
             await LeaveToHqAsync();
         }
 

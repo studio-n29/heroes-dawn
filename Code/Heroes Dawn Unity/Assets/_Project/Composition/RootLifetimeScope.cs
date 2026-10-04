@@ -6,6 +6,7 @@ using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Hub;
 using N29.HeroesDawn.Application.Features.Meta;
+using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Features.Zone;
@@ -17,6 +18,8 @@ using N29.HeroesDawn.Infrastructure.Platform;
 using N29.HeroesDawn.Infrastructure.Simulated;
 using N29.HeroesDawn.Presentation;
 using N29.HeroesDawn.Presentation.Audio;
+using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using N29.HeroesDawn.Presentation.Mvp;
 using N29.HeroesDawn.Presentation.Login;
 using UnityEngine;
@@ -107,14 +110,16 @@ namespace N29.HeroesDawn.Composition
 
             // ---- Méta-progression : pass, missions, opérations, labo, archives, boutique, réglages
             builder.Register<MetaContext>(Lifetime.Singleton);
-            builder.Register<PassService>(Lifetime.Singleton);
-            builder.Register<DailyMissionService>(Lifetime.Singleton);
-            builder.Register<SecondaryObjectiveService>(Lifetime.Singleton);
-            builder.Register<OperationsService>(Lifetime.Singleton);
-            builder.Register<LabService>(Lifetime.Singleton);
-            builder.Register<ArchivesService>(Lifetime.Singleton);
-            builder.Register<BoutiqueService>(Lifetime.Singleton);
-            builder.Register<SettingsService>(Lifetime.Singleton);
+            builder.Register<PassProgress>(Lifetime.Singleton);
+            builder.Register<DailyMissions>(Lifetime.Singleton);
+            builder.Register<SecondaryObjectives>(Lifetime.Singleton);
+            builder.Register<Expeditions>(Lifetime.Singleton);
+            builder.Register<ResearchLab>(Lifetime.Singleton);
+            builder.Register<ArchiveBook>(Lifetime.Singleton);
+            builder.Register<Boutique>(Lifetime.Singleton);
+            builder.Register<PlayerSettings>(Lifetime.Singleton);
+            builder.Register<MetaOverview>(Lifetime.Singleton);
+            builder.Register<TutorialGuide>(Lifetime.Singleton);
             builder.Register<MetaTracker>(Lifetime.Singleton);
 
             // ---- Use cases : combat
@@ -138,6 +143,8 @@ namespace N29.HeroesDawn.Composition
             builder.RegisterInstance(rig);
             builder.RegisterEntryPoint(c => new AudioService(rig, audioCatalog, c.Resolve<IFrameClock>(), log), Lifetime.Singleton);
             builder.RegisterEntryPoint<MusicDirector>();
+            builder.RegisterEntryPoint<SettingsApplier>();
+            builder.RegisterEntryPoint<TutorialDirector>();
 
             // Modales et toasts habillés de sons (et la musique s'atténue sous une modale).
             builder.Register<IPopupHost>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return new AudiblePopupHost(ui.Modals, c.Resolve<IAudioService>()); }, Lifetime.Singleton);

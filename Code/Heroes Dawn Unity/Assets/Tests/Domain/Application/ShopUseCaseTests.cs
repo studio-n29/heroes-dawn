@@ -211,7 +211,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             _app.Session.Wallet.Set(0, 5000);
             Recruit(1);
             var p = _app.Session.ToProfile(DateTime.UtcNow);
-            Assert.That(p.schemaVersion, Is.EqualTo(3));
+            Assert.That(p.schemaVersion, Is.EqualTo(4));
 
             var other = new TestApp();
             other.SignInDirect("p1");

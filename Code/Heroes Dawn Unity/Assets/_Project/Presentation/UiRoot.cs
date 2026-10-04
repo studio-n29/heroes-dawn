@@ -3,6 +3,7 @@ using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Login;
 using N29.HeroesDawn.Presentation.Mvp;
+using N29.HeroesDawn.Presentation.Tutorial;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
@@ -21,6 +22,7 @@ namespace N29.HeroesDawn.Presentation
         public LoginView Login { get; private set; } = null!;
         public ModalLayer Modals { get; private set; } = null!;
         public ToastsView Toasts { get; private set; } = null!;
+        public TutorialOverlayView? Tutorial { get; private set; }
         bool _layersBuilt;
 
         /// <summary>Instancie une fois la couche des modales, les toasts et la connexion depuis le catalogue (au premier besoin).</summary>
@@ -32,6 +34,12 @@ namespace N29.HeroesDawn.Presentation
             _layersBuilt = true;
             EnsureEventSystem();
 
+            // Le tutoriel passe sous les modales (une confirmation reste utilisable) mais au-dessus des écrans.
+            if (catalog.TutorialOverlay != null)
+            {
+                Tutorial = Instantiate(catalog.TutorialOverlay, overlayRoot).GetComponent<TutorialOverlayView>();
+                ((RectTransform)Tutorial.transform).Stretch();
+            }
             Modals = Instantiate(Required(catalog.ModalLayer, "ModalLayer"), overlayRoot).GetComponent<ModalLayer>();
             ((RectTransform)Modals.transform).Stretch();
             Modals.Init(catalog);

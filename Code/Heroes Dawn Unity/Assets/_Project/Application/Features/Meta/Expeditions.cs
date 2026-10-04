@@ -35,7 +35,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
     /// Salle des opérations (simulée en local) : envoie des membres hors escouade en expédition de quelques minutes à quelques heures ;
     /// à leur retour, Crédits, PR et Gemmes (un peu plus si l'équipe est de haut niveau) et un peu de fatigue.
     /// </summary>
-    public sealed class OperationsService
+    public sealed class Expeditions
     {
         public const int Slots = 3;
         public const int FatiguePerTrip = 10;
@@ -48,9 +48,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
         };
 
         readonly MetaContext _c;
-        readonly PassService _pass;
+        readonly PassProgress _pass;
 
-        public OperationsService(MetaContext context, PassService pass) { _c = context; _pass = pass; }
+        public Expeditions(MetaContext context, PassProgress pass) { _c = context; _pass = pass; }
 
         public static ExpeditionTemplate? Find(string id)
         {

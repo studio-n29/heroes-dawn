@@ -25,11 +25,11 @@ namespace N29.HeroesDawn.Application.Features.Meta
     /// Archives : fiches de lore débloquées par la progression (héros recrutés, zones validées, ennemis vaincus, histoire).
     /// Une fiche non lue porte une pastille « N ».
     /// </summary>
-    public sealed class ArchivesService
+    public sealed class ArchiveBook
     {
         readonly MetaContext _c;
 
-        public ArchivesService(MetaContext context) { _c = context; }
+        public ArchiveBook(MetaContext context) { _c = context; }
 
         public IReadOnlyList<ArchiveEntry> Entries()
         {

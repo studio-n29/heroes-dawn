@@ -81,7 +81,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             var a = _app.Daily.Today().Select(v => v.Template.Id).ToList();
             Assert.That(a.Count, Is.EqualTo(3));
             Assert.That(_app.Daily.Today().Select(v => v.Template.Kind).Distinct().Count(), Is.EqualTo(3));
-            var again = new DailyMissionService(_app.MetaCtx, _app.Pass).Today().Select(v => v.Template.Id).ToList();
+            var again = new DailyMissions(_app.MetaCtx, _app.Pass).Today().Select(v => v.Template.Id).ToList();
             Assert.That(again, Is.EqualTo(a));
         }
 
@@ -114,8 +114,8 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             _app.Tracker.Start();
             _app.Publisher<GameStateChanged>().Publish(new GameStateChanged(GameState.Login, GameState.Hub));
-            var train = DailyMissionService.Catalog.First(t => t.Kind == DailyKind.TrainMember);
-            var recruit = DailyMissionService.Catalog.First(t => t.Kind == DailyKind.RecruitHero);
+            var train = DailyMissions.Catalog.First(t => t.Kind == DailyKind.TrainMember);
+            var recruit = DailyMissions.Catalog.First(t => t.Kind == DailyKind.RecruitHero);
             _app.Session.Meta.daily.Clear();
             _app.Session.Meta.dailyDay = _app.MetaCtx.Today;
             _app.Session.Meta.daily.Add(new DailySave { id = train.Id });
@@ -136,7 +136,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             _app.Tracker.Start();
             _app.Publisher<GameStateChanged>().Publish(new GameStateChanged(GameState.Login, GameState.Hub));
-            var earn = DailyMissionService.Catalog.First(t => t.Kind == DailyKind.EarnCredits);
+            var earn = DailyMissions.Catalog.First(t => t.Kind == DailyKind.EarnCredits);
             _app.Session.Meta.daily.Clear();
             _app.Session.Meta.dailyDay = _app.MetaCtx.Today;
             _app.Session.Meta.daily.Add(new DailySave { id = earn.Id });
@@ -151,7 +151,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public void Tracker_DoesNothing_BeforeEnteringTheHub()
         {
             _app.Tracker.Start();
-            var earn = DailyMissionService.Catalog.First(t => t.Kind == DailyKind.EarnCredits);
+            var earn = DailyMissions.Catalog.First(t => t.Kind == DailyKind.EarnCredits);
             _app.Session.Meta.dailyDay = _app.MetaCtx.Today;
             _app.Session.Meta.daily.Clear();
             _app.Session.Meta.daily.Add(new DailySave { id = earn.Id });
@@ -182,7 +182,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             int gems = _app.Session.Wallet.Gems;
             var prize = _app.Secondary.OnZoneValidated("zone_ny_1_1");
             Assert.That(prize, Is.Not.Null);
-            Assert.That(_app.Session.Wallet.Gems, Is.EqualTo(gems + SecondaryObjectiveService.Prize.Gems));
+            Assert.That(_app.Session.Wallet.Gems, Is.EqualTo(gems + SecondaryObjectives.Prize.Gems));
             Assert.That(_app.Secondary.Active, Is.Null, "délai de repos après un objectif rempli");
         }
 
@@ -191,9 +191,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             _app.Session.CompletedZones.Add("zone_ny_1_1");
             _ = _app.Secondary.Active;
-            _app.Time.UtcNow = _app.Time.UtcNow.Add(SecondaryObjectiveService.Duration + TimeSpan.FromMinutes(1));
+            _app.Time.UtcNow = _app.Time.UtcNow.Add(SecondaryObjectives.Duration + TimeSpan.FromMinutes(1));
             Assert.That(_app.Secondary.Active, Is.Null);
-            _app.Time.UtcNow = _app.Time.UtcNow.Add(SecondaryObjectiveService.Cooldown + TimeSpan.FromMinutes(1));
+            _app.Time.UtcNow = _app.Time.UtcNow.Add(SecondaryObjectives.Cooldown + TimeSpan.FromMinutes(1));
             Assert.That(_app.Secondary.Active, Is.Not.Null);
         }
 
@@ -230,7 +230,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(r.IsSuccess);
             Assert.That(r.Value.Credits, Is.EqualTo(250 * 110 / 100), "niveau 10 : +10 %");
             Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(credits + r.Value.Credits));
-            Assert.That(_app.Session.Find(new MemberId("etincelle"))!.Fatigue, Is.EqualTo(OperationsService.FatiguePerTrip));
+            Assert.That(_app.Session.Find(new MemberId("etincelle"))!.Fatigue, Is.EqualTo(Expeditions.FatiguePerTrip));
             Assert.That(_app.Operations.SlotViews()[0].Empty);
         }
 
@@ -262,15 +262,15 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public void Lab_ResearchCostsTimeAndCredits_OneAtATime()
         {
             _app.Session.Wallet.Set(0, 0);
-            Assert.That(Code(_app.Lab.Start(LabService.Training)), Is.EqualTo("meta.credits"));
+            Assert.That(Code(_app.Lab.Start(ResearchLab.Training)), Is.EqualTo("meta.credits"));
             _app.Session.Wallet.Set(10_000, 0);
-            Assert.That(_app.Lab.Start(LabService.Training).IsSuccess);
+            Assert.That(_app.Lab.Start(ResearchLab.Training).IsSuccess);
             Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(10_000 - 500));
-            Assert.That(Code(_app.Lab.Start(LabService.Loot)), Is.EqualTo("meta.busy"));
+            Assert.That(Code(_app.Lab.Start(ResearchLab.Loot)), Is.EqualTo("meta.busy"));
             Assert.That(_app.Lab.Refresh(), Is.Null);
             _app.Time.UtcNow = _app.Time.UtcNow.AddMinutes(11);
-            Assert.That(_app.Lab.Refresh()?.Id, Is.EqualTo(LabService.Training));
-            Assert.That(LabBonuses.Level(_app.Session.Meta, LabService.Training), Is.EqualTo(1));
+            Assert.That(_app.Lab.Refresh()?.Id, Is.EqualTo(ResearchLab.Training));
+            Assert.That(LabBonuses.Level(_app.Session.Meta, ResearchLab.Training), Is.EqualTo(1));
         }
 
         [Test, Description("Vérifie que la recherche d'entraînement réduit le prix de 4 % par niveau dans le cas d'usage réel — parce qu'un bonus affiché doit s'appliquer")]
@@ -278,16 +278,16 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             int level = 10;
             Assert.That(_app.Session.TrainCostFor(level), Is.EqualTo(MetaRules.TrainCost(level)));
-            _app.Session.Meta.SetCounter(_app.Session.Meta.labLevels, LabService.Training, 2);
+            _app.Session.Meta.SetCounter(_app.Session.Meta.labLevels, ResearchLab.Training, 2);
             Assert.That(_app.Session.TrainCostFor(level), Is.EqualTo(MetaRules.TrainCost(level) * 92 / 100));
         }
 
         [Test, Description("Vérifie qu'on ne dépasse pas le niveau maximum d'une recherche — parce que chaque recherche a 5 niveaux")]
         public void Lab_MaxLevel_Refused()
         {
-            _app.Session.Meta.SetCounter(_app.Session.Meta.labLevels, LabService.Loot, 5);
+            _app.Session.Meta.SetCounter(_app.Session.Meta.labLevels, ResearchLab.Loot, 5);
             _app.Session.Wallet.Set(1_000_000, 0);
-            Assert.That(Code(_app.Lab.Start(LabService.Loot)), Is.EqualTo("meta.max_level"));
+            Assert.That(Code(_app.Lab.Start(ResearchLab.Loot)), Is.EqualTo("meta.max_level"));
         }
 
         // ------------------------------------------------------------------ Archives

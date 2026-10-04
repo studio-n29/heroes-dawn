@@ -66,7 +66,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public DateTime LocalNow => _clock.LocalNow;
         public string Today => _clock.LocalNow.ToString("yyyy-MM-dd");
 
-        /// <summary>Verse Crédits, PR et Gemmes (les points du pass sont ajoutés par <see cref="PassService"/>).</summary>
+        /// <summary>Verse Crédits, PR et Gemmes (les points du pass sont ajoutés par <see cref="PassProgress"/>).</summary>
         public void Grant(Reward r)
         {
             Granting = true;

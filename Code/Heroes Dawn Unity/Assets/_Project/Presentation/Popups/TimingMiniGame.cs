@@ -44,11 +44,11 @@ namespace N29.HeroesDawn.Presentation.Popups
 
         void NewRound()
         {
-            float width = Mathf.Lerp(0.2f, 0.14f, _tries / (float)Attempts);
+            float width = Mathf.Lerp(0.2f, 0.14f, _tries / (float)Attempts) * (Feedback.MotionSettings.ExtendedMiniGame ? 1.4f : 1f);
             float center = UnityEngine.Random.Range(0.2f, 0.8f);
             zone.sizeDelta = new Vector2(width * TrackWidth, 56);
             zone.anchoredPosition = new Vector2(center * TrackWidth, 0);
-            _speed = 0.8f + 0.25f * _tries;
+            _speed = (0.8f + 0.25f * _tries) * (Feedback.MotionSettings.ExtendedMiniGame ? 0.7f : 1f);
             _t = UnityEngine.Random.value;
             _running = true;
             stop.Interactable = true;

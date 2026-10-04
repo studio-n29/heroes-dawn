@@ -49,7 +49,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             // Retour au QG, MISSION, puis dé et déplacements jusqu'au combat n03.
             shell.TabButton(HubPage.Qg).Button.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>());
-            Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
+            yield return PlayModeHarness.Deploy(Object.FindAnyObjectByType<QgPageView>()!.MissionButton);
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning, 600);
             Assert.That(Flow.Current, Is.EqualTo(GameState.Board), "QG → plateau");
             var board = Object.FindAnyObjectByType<BoardView>()!;

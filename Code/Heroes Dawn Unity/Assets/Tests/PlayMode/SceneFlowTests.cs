@@ -73,7 +73,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator Deploy_UnloadsHub_LoadsBoard()
         {
             yield return SignedIn();
-            UnityEngine.Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
+            yield return PlayModeHarness.Deploy(UnityEngine.Object.FindAnyObjectByType<QgPageView>()!.MissionButton);
             yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Board) && !Flow.IsTransitioning);
             Assert.That(Loaded(SceneNames.Board), Is.True);
             Assert.That(Loaded(SceneNames.Hub), Is.False);
@@ -139,9 +139,9 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return SignedIn();
             var hub = UnityEngine.Object.FindAnyObjectByType<QgPageView>()!;
             var session = Container.Resolve<GameSession>();
-            hub.MissionButton.onClick.Invoke();
+            yield return PlayModeHarness.Deploy(hub.MissionButton);
             var firstRun = session.Run;
-            hub.MissionButton.onClick.Invoke();
+            PlayModeHarness.DeployNow(); // second clic avant le chargement du plateau
             Assert.That(firstRun, Is.Not.Null);
             Assert.That(session.Run, Is.SameAs(firstRun), "la partie n'est pas remplacée");
             yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Board) && !Flow.IsTransitioning);
@@ -163,7 +163,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return SignedIn();
             var hub = UnityEngine.Object.FindAnyObjectByType<QgPageView>()!;
-            hub.MissionButton.onClick.Invoke();
+            yield return PlayModeHarness.Deploy(hub.MissionButton);
             yield return PlayModeHarness.WaitFor(() => Loaded(SceneNames.Board) && !Flow.IsTransitioning);
             Assert.That(hub == null, Is.True, "l'écran du QG est détruit avec sa scène");
             Container.Resolve<IPublisher<WalletChanged>>().Publish(new WalletChanged(1, 2));

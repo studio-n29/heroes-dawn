@@ -17,16 +17,16 @@ namespace N29.HeroesDawn.Application.Features.Meta
     /// Objectifs secondaires « en temps réel » (simulés en local) : une zone déjà validée est reprise par les pillards,
     /// la rejouer et la valider avant l'échéance rapporte une récompense.
     /// </summary>
-    public sealed class SecondaryObjectiveService
+    public sealed class SecondaryObjectives
     {
         public static readonly TimeSpan Duration = TimeSpan.FromHours(3);
         public static readonly TimeSpan Cooldown = TimeSpan.FromMinutes(10);
         public static readonly Reward Prize = new Reward(credits: 400, gems: 5, passXp: 25);
 
         readonly MetaContext _c;
-        readonly PassService _pass;
+        readonly PassProgress _pass;
 
-        public SecondaryObjectiveService(MetaContext context, PassService pass) { _c = context; _pass = pass; }
+        public SecondaryObjectives(MetaContext context, PassProgress pass) { _c = context; _pass = pass; }
 
         public SecondaryView? Active
         {

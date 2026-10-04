@@ -1,5 +1,6 @@
 #nullable enable
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,17 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     /// <summary>Aides partagées par les recettes.</summary>
     static class RecipeKit
     {
+        /// <summary>Désigne un élément au tutoriel (marqueur nommé ; <paramref name="enabled"/> faux : activé à l exécution).</summary>
+        public static TutorialTargetMarker Mark(Component c, TutorialTarget id, bool enabled = true)
+        {
+            var m = c.gameObject.AddComponent<TutorialTargetMarker>();
+            var so = new UnityEditor.SerializedObject(m);
+            so.FindProperty("id").enumValueIndex = (int)id;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            m.enabled = enabled;
+            return m;
+        }
+
         /// <summary>Matériau d interface généré par <c>UiMaterialBuilder</c> (Resources/UI/Materials) ; null s il n existe pas encore.</summary>
         public static Material? Mat(string name)
             => UnityEditor.AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Resources/UI/Materials/" + name + ".mat");
