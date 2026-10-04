@@ -59,7 +59,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             spin.type = Image.Type.Filled;
             spin.fillMethod = Image.FillMethod.Radial360;
             spin.fillAmount = 0.75f;
-            var spinner = spin.rectTransform.At(0.5f, 0f, 0, 150, 70, 70);
+            // Pivot au centre : la vue le fait tourner sur lui-même (position décalée de la demi-hauteur pour rester au même endroit).
+            var spinner = spin.rectTransform.At(0.5f, 0f, 0, 150 + 35, 70, 70);
+            spinner.pivot = new Vector2(0.5f, 0.5f);
             spinner.gameObject.SetActive(false);
 
             Ui.LocTxt(rt, "game.studio", 30, Theme.Primary, TextAnchor.LowerLeft, FontKind.Title, "Studio").rectTransform.At(0f, 0f, 40, 24, 400, 50);

@@ -64,6 +64,15 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(small, Is.Empty, string.Join("\n", small));
         }
 
+        [Test, Description("Vérifie que le cercle de chargement de la connexion tourne autour de son centre (pivot 0,5 / 0,5) — parce qu'un pivot en bas le faisait tourner autour d'un point du bas au lieu de sur lui-même (retour du test sur téléphone)")]
+        public void LoginSpinner_PivotIsCentered()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabGenerator.DefaultRoot + "/Screens/Login.prefab");
+            var view = prefab.GetComponent<N29.HeroesDawn.Presentation.Login.LoginView>();
+            var spinner = (RectTransform)new SerializedObject(view).FindProperty("spinner").objectReferenceValue;
+            Assert.That(spinner.pivot, Is.EqualTo(new Vector2(0.5f, 0.5f)));
+        }
+
         [Test, Description("Vérifie que chaque clé de texte statique des prefabs existe dans la localisation — parce qu'une clé inconnue s'afficherait « [clé] » à l'écran")]
         public void EveryLocalizedTextKeyExists()
         {
