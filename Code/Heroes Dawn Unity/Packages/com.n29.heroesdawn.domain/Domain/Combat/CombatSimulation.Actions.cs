@@ -72,8 +72,6 @@ namespace N29.HeroesDawn.Domain.Combat
                     return cmd.Flag ? TrySyncCombo(cmd.Actor, cmd.Partner, cmd.Target, output) : TryPerformCombo(cmd.Actor, cmd.Partner, cmd.Target, output);
                 case CommandType.Avatar:
                     return TryAvatar(cmd.SlotIndex, cmd.Target, output);
-                case CommandType.TimeSkip:
-                    return TryTimeSkip(cmd.Actor, cmd.Target, output);
             }
             return false;
         }

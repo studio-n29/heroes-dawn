@@ -73,7 +73,7 @@ namespace N29.HeroesDawn.Domain.Combat
         public ActionPlannedEvent(int t, int unit, int slot) : base(t) { Unit = unit; Slot = slot; }
     }
 
-    public enum InterruptReason { Critical, PushBack, TimeSkip }
+    public enum InterruptReason { Critical, PushBack }
 
     /// <summary>Action annoncée annulée (critique en zone de préparation, recul, dépassement).</summary>
     public sealed class ActionInterruptedEvent : CombatEvent
@@ -89,13 +89,6 @@ namespace N29.HeroesDawn.Domain.Combat
         public int Unit { get; }
         public int Percent { get; }
         public PushedBackEvent(int t, int unit, int percent) : base(t) { Unit = unit; Percent = percent; }
-    }
-
-    public sealed class TimeSkipEvent : CombatEvent
-    {
-        public int Ally { get; }
-        public int Enemy { get; }
-        public TimeSkipEvent(int t, int ally, int enemy) : base(t) { Ally = ally; Enemy = enemy; }
     }
 
     public sealed class WaveStartedEvent : CombatEvent

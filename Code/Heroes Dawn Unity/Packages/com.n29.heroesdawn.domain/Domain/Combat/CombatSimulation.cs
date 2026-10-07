@@ -37,7 +37,6 @@ namespace N29.HeroesDawn.Domain.Combat
             foreach (var a in setup.Allies) _units.Add(UnitFactory.Ally(id++, c.Member(a.Member), a, _b));
             SpawnWave(0);
             foreach (var u in _units) u.Gauge = u.GaugeMax * _rng.Range(0, 21) / 100; // départ entre 0 et 20 %
-            InitTimeline();
         }
 
         public CombatUnit Unit(int id) => _units[id];
@@ -74,7 +73,7 @@ namespace N29.HeroesDawn.Domain.Combat
             Tick++;
             if (IsAwaitingAction)
             {
-                // Pause d'action : ni frise, ni recharges, ni Temps d'équipe ; seules les commandes sont traitées.
+                // Pause d'action : ni frise, ni recharges ; seules les commandes sont traitées.
                 ProcessCommands(output);
                 ActReadyUnits(output);
                 CheckEnd(output);
@@ -82,7 +81,6 @@ namespace N29.HeroesDawn.Domain.Combat
             }
             ActiveTick++;
             AdvanceAvatar();
-            RegenTimeBank();
             for (int i = 0; i < _units.Count; i++)
             {
                 var u = _units[i];

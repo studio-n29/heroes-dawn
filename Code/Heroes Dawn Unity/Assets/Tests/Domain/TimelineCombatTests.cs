@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace N29.HeroesDawn.Tests.Domain
 {
-    /// <summary>Frise chronologique, zone de préparation, contrôles, Time Bank (spec 2026-10-05).</summary>
+    /// <summary>Frise chronologique, zone de préparation, contrôles, combos à proximité (specs 2026-10-05 et 2026-10-07).</summary>
     public sealed class TimelineCombatTests
     {
         static readonly ContentCatalog C = PrototypeContent.Build();
@@ -181,59 +181,8 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(u.Hp, Is.EqualTo(hp));
         }
 
-        [Test, Description("Vérifie que le Temps d'équipe démarre à 40, se régénère d'un point toutes les 10 ticks et ne dépasse jamais 100 — parce que c'est la ressource partagée de la Time Bank (spec §B)")]
-        public void TimeBank_StartsAt40_Regenerates_IsCapped()
-        {
-            var s = Sim(new[] { "ancre" }, new[] { "brute" });
-            Assert.That(s.TimeBank, Is.EqualTo(40));
-            Calm(s);
-            s.Unit(0).Spd = 0; // l allié n arrive jamais à 0 : la pause d action ne fige pas la réserve
-            s.Step(100);
-            Assert.That(s.TimeBank, Is.EqualTo(50));
-            s.Step(2000);
-            Assert.That(s.TimeBank, Is.LessThanOrEqualTo(s.TimeBankMax));
-        }
-
-        [Test, Description("Vérifie que le dépassement coûte 40 de Temps, met l'allié à 100 %, repousse l'ennemi de 40 % et coupe son action annoncée — parce que c'est l'usage « saut de tour » de la Time Bank (spec §B)")]
-        public void TimeSkip_AdvancesAlly_CutsEnemyAction()
-        {
-            var s = Sim(new[] { "givre" }, new[] { "brute" }, CombatRank.Elite);
-            var givre = s.Unit(0); var brute = s.Unit(1);
-            At(givre, 50);
-            At(brute, 90);
-            s.Step(1);
-            Assert.That(brute.PlannedSlot, Is.GreaterThanOrEqualTo(0));
-            int bank = s.TimeBank;
-            s.Submit(CombatCommand.TimeSkip(0, 1));
-            var ev = s.Step(1);
-            Assert.That(ev.OfType<TimeSkipEvent>().Any(), Is.True);
-            Assert.That(givre.IsReady, Is.True);
-            Assert.That(Pct(brute), Is.LessThanOrEqualTo(55));
-            Assert.That(brute.PlannedSlot, Is.EqualTo(-1));
-            Assert.That(s.TimeBank, Is.EqualTo(bank - 40 + (s.Tick % 10 == 0 ? 1 : 0)));
-        }
-
-        [Test, Description("Vérifie que le dépassement est refusé (et non journalisé) sans assez de Temps ou si l'allié est déjà prêt — parce qu'une commande invalide ne doit rien coûter ni se rejouer")]
-        public void TimeSkip_RefusedWhenTooPoorOrAlreadyReady()
-        {
-            var s = Sim(new[] { "givre" }, new[] { "brute" });
-            Calm(s);
-            At(s.Unit(0), 30);
-            s.Submit(CombatCommand.TimeSkip(0, 1));
-            s.Step(1);
-            Assert.That(s.Unit(0).IsReady, Is.True, "le premier dépassement passe (40 de Temps au départ)");
-            At(s.Unit(0), 30);
-            s.Submit(CombatCommand.TimeSkip(0, 1));
-            s.Step(1);
-            Assert.That(s.InputLog.Count(i => i.Command.Type == CommandType.TimeSkip), Is.EqualTo(1), "le second est refusé : plus assez de Temps");
-            Assert.That(s.CanTimeSkip(0, 1), Is.False);
-            var ready = Sim(new[] { "givre" }, new[] { "brute" });
-            At(ready.Unit(0), 100);
-            Assert.That(ready.CanTimeSkip(0, 1), Is.False, "un allié déjà prêt n a rien à sauter");
-        }
-
-        [Test, Description("Vérifie qu'un combo synchronisé rattrape un partenaire à 60 % ou plus pour 25 de Temps et déclenche le combo — parce que le joueur n'a plus à viser le même instant exact (spec §B)")]
-        public void SyncCombo_PullsPartner_SpendsTime()
+        [Test, Description("Vérifie qu'un combo synchronisé rattrape gratuitement un partenaire à 60 % ou plus et déclenche le combo — parce que le joueur n a plus à viser le même instant exact (spec 2026-10-07)")]
+        public void SyncCombo_PullsPartner_ForFree()
         {
             var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
             Calm(s);
@@ -241,11 +190,9 @@ namespace N29.HeroesDawn.Tests.Domain
             At(s.Unit(1), 70);
             Assert.That(s.AvailableCombos().Count, Is.Zero, "partenaire pas prêt : combo normal impossible");
             Assert.That(s.AvailableSyncCombos().Count, Is.EqualTo(1));
-            int bank = s.TimeBank;
             s.Submit(CombatCommand.SyncCombo(0, 1, 2));
             var ev = s.Step(1);
             Assert.That(ev.OfType<ComboUsedEvent>().Any(), Is.True);
-            Assert.That(s.TimeBank, Is.EqualTo(bank - 25 + (s.Tick % 10 == 0 ? 1 : 0)));
             Assert.That(Pct(s.Unit(1)), Is.EqualTo(-15));
         }
 
@@ -262,7 +209,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(s.InputLog.Any(), Is.False);
         }
 
-        [Test, Description("Vérifie qu'un combat manuel utilisant dépassement et combo synchronisé se rejoue à l'identique depuis son journal — parce que la vérification serveur repose sur le rejeu des commandes (doc 05)")]
+        [Test, Description("Vérifie qu un combat manuel utilisant des combos synchronisés se rejoue à l'identique depuis son journal — parce que la vérification serveur repose sur le rejeu des commandes (doc 05)")]
         public void NewCommands_ReplayToSameHash()
         {
             var setup = new CombatSetup(21UL, CombatRank.Normal,
@@ -279,13 +226,9 @@ namespace N29.HeroesDawn.Tests.Domain
                     int slot = sim.CanUse(u.Id, 2) ? 2 : sim.CanUse(u.Id, 1) ? 1 : 0;
                     sim.Submit(CombatCommand.UseSkill(u.Id, slot, -1));
                 }
-                var foe = sim.Units.FirstOrDefault(x => x.Side == Side.Enemy && x.IsAlive && x.PlannedSlot >= 0);
-                var slow = sim.Units.FirstOrDefault(x => x.Side == Side.Ally && x.IsAlive && !x.IsReady);
-                if (foe != null && slow != null && sim.CanTimeSkip(slow.Id, foe.Id)) sim.Submit(CombatCommand.TimeSkip(slow.Id, foe.Id));
                 sim.Step(1);
             }
             Assert.That(sim.IsOver);
-            Assert.That(sim.InputLog.Any(i => i.Command.Type == CommandType.TimeSkip), Is.True, "le test exerce bien le dépassement");
             var replay = CombatReplay.Run(C, setup, sim.InputLog);
             Assert.That(replay.StateHash, Is.EqualTo(sim.StateHash()));
         }

@@ -325,12 +325,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var skills = new Object[3];
             for (int i = 0; i < 3; i++) skills[i] = ctx.Nest<SkillButtonView>("Widgets/SkillButton.prefab", skillPanel, "Skill" + (i + 1));
 
-            // ---- Frise chronologique (0-100 %) et réserve de Temps d équipe
+            // ---- Frise chronologique (100 à gauche → 0 à droite : à 0, c est le tour)
             var stripFill = Ui.Panel(rt, "Timeline", Theme.WithAlpha(Theme.SurfaceDark, 0.88f), 4f, 6f, false);
             var strip = stripFill.Frame().At(1f, 0f, -30, 404, 1100, 100);
-            var bank = Ui.Bar(stripFill.transform, "Bank", Theme.Info, Theme.SurfaceDark, true, 22);
-            ((RectTransform)bank.transform).At(0f, 0.5f, 18, 0, 250, 36);
-            var track = Ui.Rect(stripFill.transform, "Track").At(0f, 0.5f, 300, 0, 760, 10);
+            var track = Ui.Rect(stripFill.transform, "Track").At(0f, 0.5f, 70, 0, 960, 10);
+            var axisStart = Ui.Txt(stripFill.transform, "100", 26, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Title, "AxisStart");
+            axisStart.rectTransform.At(0f, 0.5f, 10, 0, 56, 40);
+            var axisEnd = Ui.Txt(stripFill.transform, "0", 26, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "AxisEnd");
+            axisEnd.rectTransform.At(1f, 0.5f, -18, 0, 56, 40);
             Ui.Img(track, "Line", Theme.Surface3, Sprites.RoundedSmall).rectTransform.Stretch();
             var prep = Ui.Img(track, "Prep", Theme.WithAlpha(Theme.Danger, 0.6f), Sprites.RoundedSmall);
             prep.rectTransform.anchorMin = new Vector2(0.8f, 0f);
@@ -341,10 +343,19 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(timeline, "track", track);
             ctx.Wire(timeline, "prepZone", prep.rectTransform);
             ctx.Wire(timeline, "markerPrefab", ctx.Asset("Widgets/TimelineMarker.prefab").GetComponent<TimelineMarkerView>());
-            ctx.Wire(timeline, "bank", bank);
-            var timeSkip = Ui.Btn(rt, "", Theme.Info, Theme.TextDark, null!, 30, FontKind.Title, "TimeSkip");
-            timeSkip.Rect.At(0f, 0f, 24, 508, 500, 96);
-            timeSkip.gameObject.SetActive(false);
+
+            // ---- Compétences d avatar (lançables à tout moment) : 5 boutons sous le combo
+            var avatarPanel = Ui.Rect(rt, "Avatar").At(0f, 0f, 24, 508, 500, 104);
+            avatarPanel.HLayout(6, 0, TextAnchor.MiddleCenter);
+            var avatarButtons = new Object[5];
+            for (int i = 0; i < 5; i++)
+            {
+                var ab = Ui.Btn(avatarPanel, "", Theme.Danger, Theme.TextDark, null!, 22, FontKind.Title, "Avatar" + (i + 1));
+                ab.Rect.sizeDelta = new Vector2(96, 104);
+                var le = ab.gameObject.AddComponent<LayoutElement>();
+                le.preferredWidth = 96; le.preferredHeight = 104; le.flexibleWidth = 1;
+                avatarButtons[i] = ab;
+            }
 
             // ---- Combo
             var combo = Ui.Btn(rt, "", Theme.Danger, Color.white, null!, 40, FontKind.Title, "Combo");
@@ -361,7 +372,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "speed", speed);
             ctx.Wire(view, "debugWin", debug);
             ctx.Wire(view, "pause", pause);
-            ctx.Wire(view, "timeSkip", timeSkip);
+            ctx.Wire(view, "avatarPanel", avatarPanel);
+            ctx.WireArray(view, "avatarButtons", avatarButtons);
             ctx.Wire(view, "timeline", timeline);
             ctx.Wire(view, "combo", combo);
             ctx.Wire(view, "title", title);

@@ -8,8 +8,8 @@ using UnityEngine.UI;
 namespace N29.HeroesDawn.Presentation.Combat
 {
     /// <summary>
-    /// Frise chronologique du combat (widget du prefab Combat) : de 0 % (départ) à 100 % (point d'action), zone de préparation
-    /// 80-100 % en rouge, alliés sous la ligne et ennemis au-dessus, avec l'action annoncée ; à gauche la réserve de Temps d'équipe.
+    /// Frise chronologique du combat (widget du prefab Combat) : de 100 (départ) à 0 (point d action : c est son tour), zone de préparation
+    /// (les 20 derniers points avant 0) en rouge, alliés sous la ligne et ennemis au-dessus, avec l action annoncée.
     /// </summary>
     public sealed class TimelineView : MonoBehaviour
     {
@@ -18,7 +18,6 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] RectTransform track = null!;
         [SerializeField] RectTransform prepZone = null!;
         [SerializeField] TimelineMarkerView markerPrefab = null!;
-        [SerializeField] UiBar bank = null!;
 
         readonly List<TimelineMarkerView> _markers = new List<TimelineMarkerView>();
         readonly Dictionary<int, TimelineMarkerView> _byId = new Dictionary<int, TimelineMarkerView>();
@@ -29,8 +28,6 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             var rect = track.rect;
             prepZone.anchorMin = new Vector2(d.PrepStart01, 0f);
-            bank.Set(d.BankMax <= 0 ? 0f : d.Bank / (float)d.BankMax);
-            bank.SetLabel(d.BankText);
             int readyAllies = 0, readyEnemies = 0; // les unités prêtes s empilent à 100 % : on les étale vers la gauche
             for (int i = 0; i < d.Markers.Length; i++)
             {

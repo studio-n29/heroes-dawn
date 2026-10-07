@@ -52,8 +52,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["tutorial.hint.zone_done"] = "Zone sécurisée ! Tu peux la rejouer pour des Crédits, ou ouvrir la suivante sur la carte.";
             d["tutorial.hint.recruit"] = "Trois héros sont proposés chaque jour, les Légendes sont rares. Ils coûtent des PR.";
             d["tutorial.hint.infirmary"] = "Un de tes héros est fatigué : l'Infirmerie le remet sur pied pour quelques Crédits.";
-            d["tutorial.hint.timeline"] = "La frise montre qui agit quand. Un ennemi qui entre en zone rouge annonce son attaque : un contrôle (Entrave, Choc, Gel) ou un critique l'interrompt.";
-            d["tutorial.hint.timebank"] = "Le Temps d'équipe se dépense : DÉPASSER fait agir un allié tout de suite et coupe l'action d'un ennemi ; COMBO SYNC rattrape un partenaire en retard.";
+            d["tutorial.hint.avatar"] = "Tes compétences d avatar (Q W E R T) se lancent à tout moment, même quand le combat attend ton action. Leur recharge ne tourne que pendant que la frise avance.";
+            d["tutorial.hint.timeline"] = "La frise va de 100 à 0 : à 0, c est le tour de l unité et tout le monde attend. Un allié proche de 0 peut se joindre à un combo. Un ennemi qui entre en zone rouge annonce son attaque : un contrôle (Entrave, Choc, Gel) ou un critique l'interrompt.";
         }
     }
 }

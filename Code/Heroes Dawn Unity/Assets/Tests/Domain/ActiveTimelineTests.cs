@@ -30,13 +30,12 @@ namespace N29.HeroesDawn.Tests.Domain
             At(ancre, 50); At(brute, 50);
             At(givre, 100);
             long ancreBefore = ancre.Gauge, bruteBefore = brute.Gauge;
-            int active = s.ActiveTick, bank = s.TimeBank;
+            int active = s.ActiveTick;
             s.Step(60);
             Assert.That(s.IsAwaitingAction, Is.True);
             Assert.That(ancre.Gauge, Is.EqualTo(ancreBefore));
             Assert.That(brute.Gauge, Is.EqualTo(bruteBefore));
             Assert.That(s.ActiveTick, Is.EqualTo(active));
-            Assert.That(s.TimeBank, Is.EqualTo(bank));
         }
 
         [Test, Description("Vérifie que la frise repart dès que l'action du joueur est jouée — parce que la pause ne dure que le temps de la décision")]

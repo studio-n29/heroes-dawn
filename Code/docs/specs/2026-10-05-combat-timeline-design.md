@@ -1,4 +1,5 @@
 # Combat : frise chronologique, zone de risque et Time Bank — design
+n> **Mise à jour 2026-10-07** : la Time Bank (§3) et le Dépassement ont été retirés ; voir `2026-10-07-combat-active-timeline-design.md`.
 
 > Statut : demandé par l'utilisateur (2026-10-05), implémenté sur `feature/combat-timeline`. Le GDD (`00_GDD/*`) et le tableur d'équilibrage ne sont pas modifiés : tous les nouveaux paramètres vivent dans `BalanceConfig` (valeurs par défaut ci-dessous), à reporter dans le tableur par le game design.
 

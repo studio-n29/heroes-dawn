@@ -26,8 +26,6 @@ namespace N29.HeroesDawn.Domain.Combat
         {
             var h = new Fnv1a64();
             h.Add(Tick);
-            h.Add(TimeBank);
-            h.Add(_bankTicks);
             h.Add(ActiveTick);
             foreach (var u in _units)
             {
