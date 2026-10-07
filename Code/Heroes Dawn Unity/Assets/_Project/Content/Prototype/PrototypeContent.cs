@@ -50,6 +50,19 @@ namespace N29.HeroesDawn.Content.Prototype
         static ComboDef C(string id, Family a, Family b, TargetRule t, params EffectDef[] fx)
             => new ComboDef(id, "combos." + id + ".name", a, b, S("combo_" + id, SkillSlot.A3, 0, t, fx));
 
+        static AvatarSkillDef A(string id, int cooldownTicks, TargetRule t, params EffectDef[] fx)
+            => new AvatarSkillDef(new SkillId(id), cooldownTicks, t, fx);
+
+        /// <summary>Compétences de l avatar du joueur (une par catégorie) ; recharge en ticks de temps actif (20 ticks = 1 s).</summary>
+        static List<AvatarSkillDef> AvatarSkills() => new List<AvatarSkillDef>
+        {
+            A("avatar_strike", 300, TargetRule.SingleEnemy, Dmg(150), St(StatusType.Vulnerable, 2)),
+            A("avatar_mend", 400, TargetRule.AllAllies, Heal(25)),
+            A("avatar_barrier", 500, TargetRule.AllAllies, Shield(20), St(StatusType.Anchor, 2)),
+            A("avatar_rally", 400, TargetRule.AllAllies, St(StatusType.Haste, 3), St(StatusType.Regen, 2)),
+            A("avatar_rewind", 600, TargetRule.AllEnemies, Gauge(-300), St(StatusType.Vulnerable, 2)),
+        };
+
         public static ContentCatalog Build() => Build(new BalanceConfig());
 
         public static ContentCatalog Build(BalanceConfig balance)
@@ -124,7 +137,7 @@ namespace N29.HeroesDawn.Content.Prototype
             enemies.AddRange(PrototypeZones.Enemies());
             var zones = new List<ZoneDef> { BuildZone11() };
             zones.AddRange(PrototypeZones.Zones());
-            return new ContentCatalog(balance, members, enemies, combos, zones);
+            return new ContentCatalog(balance, members, enemies, combos, zones, AvatarSkills());
         }
 
         /// <summary>Red Hook — les quais : 25 cases, 3 embranchements, 6 combats (1 Élite fixe : Brick).</summary>

@@ -19,7 +19,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] UiButton speed = null!;
         [SerializeField] UiButton debugWin = null!;
         [SerializeField] UiButton pause = null!;
-        [SerializeField] UiButton timeSkip = null!;
+        [SerializeField] RectTransform avatarPanel = null!;
+        [SerializeField] UiButton[] avatarButtons = Array.Empty<UiButton>();
         [SerializeField] TimelineView timeline = null!;
         [SerializeField] TMP_Text skillTitle = null!;
         [SerializeField] UiButton combo = null!;
@@ -42,7 +43,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         public event Action? SpeedClicked;
         public event Action? DebugWinClicked;
         public event Action? PauseClicked;
-        public event Action? TimeSkipClicked;
+        public event Action<int>? AvatarClicked;
         public event Action? ComboClicked;
         public event Action? CycleClicked;
         public event Action<int>? SkillClicked;
@@ -51,7 +52,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         /// <summary>Boutons Auto et vitesse (tests PlayMode : clics réels).</summary>
         public UnityEngine.UI.Button AutoButton => auto.Button;
         public UnityEngine.UI.Button SpeedButton => speed.Button;
-        public UnityEngine.UI.Button TimeSkipButton => timeSkip.Button;
+        /// <summary>Bouton de la compétence d avatar <paramref name="i"/> (tests PlayMode : clics réels).</summary>
+        public UnityEngine.UI.Button AvatarButton(int i) => avatarButtons[i].Button;
         public TimelineView Timeline => timeline;
 
         /// <summary>Bouton de la compétence <paramref name="i"/> (tests PlayMode : clics réels).</summary>
@@ -72,7 +74,11 @@ namespace N29.HeroesDawn.Presentation.Combat
             speed.Button.onClick.AddListener(() => SpeedClicked?.Invoke());
             debugWin.Button.onClick.AddListener(() => DebugWinClicked?.Invoke());
             pause.Button.onClick.AddListener(() => PauseClicked?.Invoke());
-            timeSkip.Button.onClick.AddListener(() => TimeSkipClicked?.Invoke());
+            for (int i = 0; i < avatarButtons.Length; i++)
+            {
+                int index = i;
+                avatarButtons[i].Button.onClick.AddListener(() => AvatarClicked?.Invoke(index));
+            }
             combo.Button.onClick.AddListener(() => ComboClicked?.Invoke());
             for (int i = 0; i < skills.Length; i++)
             {
@@ -86,6 +92,11 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (Keys.Pressed(Key.Digit1) || Keys.Pressed(Key.Numpad1)) SkillClicked?.Invoke(0);
             if (Keys.Pressed(Key.Digit2) || Keys.Pressed(Key.Numpad2)) SkillClicked?.Invoke(1);
             if (Keys.Pressed(Key.Digit3) || Keys.Pressed(Key.Numpad3)) SkillClicked?.Invoke(2);
+            if (Keys.Pressed(Key.Q)) AvatarClicked?.Invoke(0);
+            if (Keys.Pressed(Key.W)) AvatarClicked?.Invoke(1);
+            if (Keys.Pressed(Key.E)) AvatarClicked?.Invoke(2);
+            if (Keys.Pressed(Key.R)) AvatarClicked?.Invoke(3);
+            if (Keys.Pressed(Key.T)) AvatarClicked?.Invoke(4);
             if (Keys.Pressed(Key.C) && combo.gameObject.activeSelf) ComboClicked?.Invoke();
             if (Keys.Pressed(Key.A)) AutoClicked?.Invoke();
             if (Keys.Pressed(Key.S)) SpeedClicked?.Invoke();
@@ -125,12 +136,36 @@ namespace N29.HeroesDawn.Presentation.Combat
         public void ShowTimeline(TimelineData d)
         {
             timeline.Show(d);
-            if (timeSkip.gameObject.activeSelf != d.SkipVisible) timeSkip.gameObject.SetActive(d.SkipVisible);
-            if (!d.SkipVisible) return;
-            timeSkip.SetLabel(d.SkipLabel);
-            timeSkip.SetColors(d.SkipTargeting ? Color.white : Theme.Info, Theme.TextDark);
-            timeSkip.Interactable = d.SkipEnabled;
-            timeSkip.DisabledReason = d.SkipReason;
+        }
+
+        public void ShowAvatar(AvatarBarData d)
+        {
+            avatarPanel.gameObject.SetActive(d.Visible);
+            if (!d.Visible) return;
+            for (int i = 0; i < avatarButtons.Length; i++)
+            {
+                var b = avatarButtons[i];
+                bool has = d.Slots != null && i < d.Slots.Length && d.Slots[i].Visible;
+                if (b.gameObject.activeSelf != has) b.gameObject.SetActive(has);
+                if (!has) continue;
+                var s = d.Slots![i];
+                b.SetLabel(s.Label);
+                var bg = s.Pending ? Color.white : AvatarColor(s.Category);
+                b.SetColors(bg, Theme.TextDark);
+                b.Interactable = s.Enabled;
+            }
+        }
+
+        static Color AvatarColor(N29.HeroesDawn.Definitions.SkillCategory c)
+        {
+            switch (c)
+            {
+                case N29.HeroesDawn.Definitions.SkillCategory.Heal: return Theme.Success;
+                case N29.HeroesDawn.Definitions.SkillCategory.Protection: return Theme.Info;
+                case N29.HeroesDawn.Definitions.SkillCategory.Boost: return Theme.Primary;
+                case N29.HeroesDawn.Definitions.SkillCategory.TimeManagement: return Theme.Perception;
+                default: return Theme.Danger;
+            }
         }
 
         public void ShowCombo(bool visible, string label)

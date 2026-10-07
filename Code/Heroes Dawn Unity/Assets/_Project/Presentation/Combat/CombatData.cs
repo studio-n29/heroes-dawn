@@ -52,6 +52,25 @@ namespace N29.HeroesDawn.Presentation.Combat
         public SkillSlotData[] Slots;
     }
 
+    /// <summary>Bouton de compétence d avatar (lançable à tout moment, recharge en temps actif).</summary>
+    public struct AvatarSlotData
+    {
+        public bool Visible;
+        public string Label;
+        public SkillCategory Category;
+        public bool Enabled;
+        public bool Pending;
+        /// <summary>Part de recharge restante (1 = juste lancée, 0 = prête).</summary>
+        public float Cooldown01;
+    }
+
+    public struct AvatarBarData
+    {
+        public bool Visible;
+        public string Title;
+        public AvatarSlotData[] Slots;
+    }
+
     public struct CombatTopBarData
     {
         public string Title;
@@ -83,14 +102,6 @@ namespace N29.HeroesDawn.Presentation.Combat
     {
         public TimelineMarkerData[] Markers;
         public float PrepStart01;
-        public int Bank;
-        public int BankMax;
-        public string BankText;
-        public bool SkipVisible;
-        public bool SkipEnabled;
-        public bool SkipTargeting;
-        public string SkipLabel;
-        public string SkipReason;
     }
 
     /// <summary>Ligne de fatigue des résultats (avant → après).</summary>

@@ -16,11 +16,13 @@ namespace N29.HeroesDawn.Definitions
         public IReadOnlyList<EnemyDef> Enemies { get; }
         public IReadOnlyList<ComboDef> Combos { get; }
         public IReadOnlyList<ZoneDef> Zones { get; }
+        public IReadOnlyList<AvatarSkillDef> AvatarSkills { get; }
 
         public ContentCatalog(BalanceConfig balance, IReadOnlyList<MemberDef> members, IReadOnlyList<EnemyDef> enemies,
-                              IReadOnlyList<ComboDef> combos, IReadOnlyList<ZoneDef> zones)
+                              IReadOnlyList<ComboDef> combos, IReadOnlyList<ZoneDef> zones, IReadOnlyList<AvatarSkillDef>? avatarSkills = null)
         {
             Balance = balance; Members = members; Enemies = enemies; Combos = combos; Zones = zones;
+            AvatarSkills = avatarSkills ?? new List<AvatarSkillDef>();
             foreach (var m in members) _members.Add(m.Id, m);
             foreach (var e in enemies) _enemies.Add(e.Id, e);
             foreach (var z in zones) _zones.Add(z.Id, z);

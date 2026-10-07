@@ -1,0 +1,141 @@
+using System.Collections.Generic;
+using System.Linq;
+using N29.HeroesDawn.Content.Prototype;
+using N29.HeroesDawn.Core;
+using N29.HeroesDawn.Definitions;
+using N29.HeroesDawn.Domain.Combat;
+using NUnit.Framework;
+
+namespace N29.HeroesDawn.Tests.Domain
+{
+    /// <summary>Active Timeline : pause globale au point d'action, temps actif, catégories, vagues, compétences d'avatar (spec 2026-10-07).</summary>
+    public sealed class ActiveTimelineTests
+    {
+        static readonly ContentCatalog C = PrototypeContent.Build();
+
+        static CombatSimulation Sim(string[] allies, string[] enemies, CombatRank rank = CombatRank.Normal, ulong seed = 11)
+            => new CombatSimulation(C, new CombatSetup(seed, rank,
+                allies.Select(a => new AllyEntry(new MemberId(a), 5, 0)).ToArray(),
+                enemies.Select(e => new EnemyEntry(new EnemyId(e), 5)).ToArray(), false));
+
+        static void At(CombatUnit u, int percent) => u.Gauge = u.GaugeMax * percent / 100;
+        static void Calm(CombatSimulation s) { foreach (var u in s.Units.Where(x => x.Side == Side.Enemy)) At(u, 0); }
+
+        [Test, Description("Vérifie que lorsqu'un allié arrive au point d'action, plus aucune unité n'avance ni ne perd de recharge, et que le temps actif s'arrête — parce que le monde attend que l'action soit jouée")]
+        public void WhenAllyIsReady_EverythingIsFrozen()
+        {
+            var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
+            Calm(s);
+            var givre = s.Unit(0); var ancre = s.Unit(1); var brute = s.Unit(2);
+            At(ancre, 50); At(brute, 50);
+            At(givre, 100);
+            long ancreBefore = ancre.Gauge, bruteBefore = brute.Gauge;
+            int active = s.ActiveTick;
+            s.Step(60);
+            Assert.That(s.IsAwaitingAction, Is.True);
+            Assert.That(ancre.Gauge, Is.EqualTo(ancreBefore));
+            Assert.That(brute.Gauge, Is.EqualTo(bruteBefore));
+            Assert.That(s.ActiveTick, Is.EqualTo(active));
+        }
+
+        [Test, Description("Vérifie que la frise repart dès que l'action du joueur est jouée — parce que la pause ne dure que le temps de la décision")]
+        public void AfterTheAction_TimeFlowsAgain()
+        {
+            var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
+            Calm(s);
+            var givre = s.Unit(0); var ancre = s.Unit(1);
+            At(ancre, 10);
+            At(givre, 100);
+            s.Submit(CombatCommand.UseSkill(givre.Id, 0, 2));
+            s.Step(1);
+            Assert.That(s.IsAwaitingAction, Is.False);
+            long before = ancre.Gauge;
+            s.Step(10);
+            Assert.That(ancre.Gauge, Is.GreaterThan(before));
+            Assert.That(s.ActiveTick, Is.GreaterThan(0));
+        }
+
+        [Test, Description("Vérifie qu'en mode auto la frise ne se fige jamais — parce que l'IA agit tout de suite")]
+        public void InAutoMode_NoPause()
+        {
+            var s = new CombatSimulation(C, new CombatSetup(5UL, CombatRank.Normal,
+                new[] { new AllyEntry(new MemberId("givre"), 5, 0) }, new[] { new EnemyEntry(new EnemyId("brute"), 5) }, true));
+            s.Step(200);
+            Assert.That(s.IsAwaitingAction, Is.False);
+            Assert.That(s.ActiveTick, Is.EqualTo(s.Tick));
+        }
+
+        [Test, Description("Vérifie que chaque catégorie (Dégâts, Soins, Protection, Boost, Gestion du temps) est couverte par une compétence d'avatar et que l'effet de base précède les sous-effets — parce que le joueur dispose d'un outil par famille")]
+        public void AvatarSkills_CoverTheFiveCategories_BaseEffectFirst()
+        {
+            var cats = C.AvatarSkills.Select(a => a.Category).Distinct().OrderBy(x => x).ToArray();
+            Assert.That(cats, Is.EqualTo(new[] { SkillCategory.Damage, SkillCategory.Heal, SkillCategory.Protection, SkillCategory.Boost, SkillCategory.TimeManagement }));
+            var strike = C.AvatarSkills.First(a => a.Id.Value == "avatar_strike");
+            Assert.That(strike.Effects[0].Type, Is.EqualTo(EffectType.Damage));
+            Assert.That(strike.Effects.Count, Is.GreaterThan(1), "sous-effet : faiblesse");
+        }
+
+        [Test, Description("Vérifie qu'une compétence d'avatar se lance pendant la pause d'action, sans consommer le tour de l'agent prêt — parce que l'avatar agit à n'importe quel moment")]
+        public void Avatar_CanBeUsed_WhileAwaitingAction_WithoutSpendingTheTurn()
+        {
+            var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
+            Calm(s);
+            var givre = s.Unit(0); var brute = s.Unit(2);
+            At(givre, 100);
+            int idx = C.AvatarSkills.ToList().FindIndex(a => a.Id.Value == "avatar_strike");
+            int hp = brute.Hp;
+            s.Submit(CombatCommand.UseAvatar(idx, brute.Id));
+            var ev = s.Step(1);
+            Assert.That(ev.OfType<AvatarSkillUsedEvent>().Single().Category, Is.EqualTo(SkillCategory.Damage));
+            Assert.That(brute.Hp, Is.LessThan(hp));
+            Assert.That(givre.IsReady, Is.True, "le tour de l'agent n'est pas consommé");
+            Assert.That(s.IsAwaitingAction, Is.True);
+        }
+
+        [Test, Description("Vérifie que la recharge d'une compétence d'avatar ne baisse que pendant le temps actif, pas pendant la pause d'action — parce que le joueur ne doit pas récupérer ses compétences en réfléchissant")]
+        public void AvatarCooldown_OnlyRegenerates_InActiveTime()
+        {
+            var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
+            Calm(s);
+            At(s.Unit(1), 0);
+            int idx = C.AvatarSkills.ToList().FindIndex(a => a.Id.Value == "avatar_mend");
+            s.Submit(CombatCommand.UseAvatar(idx, -1));
+            s.Step(1);
+            int full = s.AvatarCooldownLeft(idx);
+            Assert.That(full, Is.GreaterThan(0));
+            Assert.That(s.CanUseAvatar(idx), Is.False);
+
+            At(s.Unit(0), 100); // pause d'action
+            s.Step(100);
+            Assert.That(s.AvatarCooldownLeft(idx), Is.EqualTo(full), "figée pendant la pause");
+
+            s.Submit(CombatCommand.UseSkill(0, 0, 2));
+            s.Step(1);
+            s.Step(50);
+            Assert.That(s.AvatarCooldownLeft(idx), Is.LessThan(full), $"elle baisse en temps actif (attente={s.IsAwaitingAction}, actif={s.ActiveTick}, over={s.IsOver}, givre={s.Unit(0).Gauge}, hp={s.Unit(0).Hp})");
+        }
+
+        [Test, Description("Vérifie qu'un combat en deux vagues fait apparaître la seconde quand la première est vaincue, et ne se termine qu'à la fin de la dernière — parce que les combats peuvent être découpés en vagues")]
+        public void Waves_SpawnNextWave_VictoryOnlyAfterLast()
+        {
+            var setup = new CombatSetup(3UL, CombatRank.Normal,
+                new[] { new AllyEntry(new MemberId("ancre"), 5, 0) },
+                new IReadOnlyList<EnemyEntry>[]
+                {
+                    new[] { new EnemyEntry(new EnemyId("brute"), 5), new EnemyEntry(new EnemyId("brute"), 5) },
+                    new[] { new EnemyEntry(new EnemyId("brute"), 5) },
+                }, false);
+            var s = new CombatSimulation(C, setup);
+            Assert.That(s.WaveCount, Is.EqualTo(2));
+            Assert.That(s.Units.Count(u => u.Side == Side.Enemy), Is.EqualTo(2));
+            foreach (var e in s.Units.Where(u => u.Side == Side.Enemy).ToList()) s.ApplyDamageForTests(e, 1_000_000);
+            var ev = s.Step(1);
+            Assert.That(ev.OfType<WaveStartedEvent>().Single().Wave, Is.EqualTo(1));
+            Assert.That(s.IsOver, Is.False);
+            Assert.That(s.Units.Count(u => u.Side == Side.Enemy && u.IsAlive), Is.EqualTo(1));
+            foreach (var e in s.Units.Where(u => u.Side == Side.Enemy && u.IsAlive).ToList()) s.ApplyDamageForTests(e, 1_000_000);
+            s.Step(1);
+            Assert.That(s.Victory, Is.EqualTo(true));
+        }
+    }
+}

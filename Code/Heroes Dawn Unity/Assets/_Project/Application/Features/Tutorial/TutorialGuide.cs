@@ -46,7 +46,7 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
 
         public static readonly string[] HintIds =
         {
-            "combo", "auto", "timeline", "timebank", "bonus_die", "end_move", "event", "minigame", "rest", "defeat", "fatigue", "zone_done", "recruit", "infirmary",
+            "combo", "auto", "timeline", "avatar", "bonus_die", "end_move", "event", "minigame", "rest", "defeat", "fatigue", "zone_done", "recruit", "infirmary",
         };
 
         readonly MetaContext _c;

@@ -303,7 +303,8 @@ namespace N29.HeroesDawn.Presentation.Common
         public static string Or(string key, string fallbackKey) => Has(key) ? T(key) : T(fallbackKey);
 
         public static string Error(DomainError? e) => e == null ? "" : T(e.LocKey);
-        public static string MemberName(MemberDef d) => T(d.NameKey);
+        /// <summary>Nom de code du héros : toujours en anglais, quelle que soit la langue (voir <see cref="CodeNames"/>).</summary>
+        public static string MemberName(MemberDef d) => CodeNames.TryGetValue(d.Id.Value, out var n) ? n : T(d.NameKey);
         public static string EnemyName(EnemyDef d) => T(d.NameKey);
         public static string SkillName(SkillDef s) => Or("skills." + s.Id.Value, "skills." + s.Id.Value);
         public static string ComboName(ComboDef c) => T(c.NameKey);

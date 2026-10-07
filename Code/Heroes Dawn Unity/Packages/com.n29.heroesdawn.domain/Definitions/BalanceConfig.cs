@@ -47,16 +47,8 @@ namespace N29.HeroesDawn.Definitions
         /// <summary>Brûlure : % des PV max perdus pour une frise complète parcourue (dégâts à chaque pas).</summary>
         public int BurnPercentPerTimeline { get; set; } = 8;
 
-        // ---- Réserve temporelle d équipe (Time Bank)
-        public int TimeBankMax { get; set; } = 100;
-        public int TimeBankStart { get; set; } = 40;
-        /// <summary>Un point de Temps est gagné tous les N ticks.</summary>
-        public int TimeBankRegenTicks { get; set; } = 10;
-        public int TimeSkipCost { get; set; } = 40;
-        /// <summary>Recul infligé à l ennemi coupé par un dépassement.</summary>
-        public int TimeSkipPushBackPercent { get; set; } = 40;
-        public int ComboSyncCost { get; set; } = 25;
-        /// <summary>Le partenaire d un combo synchronisé doit avoir au moins cette position.</summary>
+        // ---- Combo à proximité (gratuit)
+        /// <summary>Quand un allié est à 0, un partenaire de combo valide doit avoir au moins cette position (%) pour lancer le combo.</summary>
         public int ComboSyncWindowPercent { get; set; } = 60;
         public int ResourceCreditsMin { get; set; } = 150;
         public int ResourceCreditsMax { get; set; } = 400;

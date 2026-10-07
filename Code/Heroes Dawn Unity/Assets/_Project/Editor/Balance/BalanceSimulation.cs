@@ -50,15 +50,20 @@ namespace N29.HeroesDawn.EditorTools.Balance
                 int offset = enc.Rank == CombatRank.Easy ? b.RankEasyLevelOffset
                            : enc.Rank == CombatRank.Elite || enc.Rank == CombatRank.Boss ? b.RankEliteLevelOffset : 0;
                 int enemyLevel = Math.Max(1, req.TeamLevel + offset);
-                var enemies = new List<EnemyEntry>();
-                foreach (var id in enc.Enemies) enemies.Add(new EnemyEntry(id, enemyLevel));
+                var waves = new List<IReadOnlyList<EnemyEntry>>();
+                foreach (var wave in enc.Waves)
+                {
+                    var enemies = new List<EnemyEntry>();
+                    foreach (var id in wave) enemies.Add(new EnemyEntry(id, enemyLevel));
+                    waves.Add(enemies);
+                }
 
                 var stats = new EncounterStats { EncounterIndex = e, Rank = enc.Rank, Runs = req.RunsPerEncounter };
                 long winTicks = 0;
                 for (int i = 0; i < req.RunsPerEncounter; i++)
                 {
                     var seed = req.BaseSeed + (ulong)(e * 100000 + i);
-                    var sim = new CombatSimulation(content, new CombatSetup(seed, enc.Rank, allies, enemies, true));
+                    var sim = new CombatSimulation(content, new CombatSetup(seed, enc.Rank, allies, waves, true));
                     while (!sim.IsOver && sim.Tick < req.MaxTicks) sim.Step(1);
                     if (!sim.IsOver) stats.Timeouts++;
                     else if (sim.Victory == true) { stats.Wins++; winTicks += sim.Tick; }

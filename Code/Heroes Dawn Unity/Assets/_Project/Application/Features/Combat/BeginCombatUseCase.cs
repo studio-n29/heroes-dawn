@@ -51,11 +51,16 @@ namespace N29.HeroesDawn.Application.Features.Combat
                 allies.Add(new AllyEntry(m.Id, m.Level, m.Fatigue));
                 engaged.Add(m);
             }
-            var enemies = new List<EnemyEntry>();
-            foreach (var e in encounter.Enemies) enemies.Add(new EnemyEntry(e, enemyLevel));
+            var waves = new List<IReadOnlyList<EnemyEntry>>();
+            foreach (var wave in encounter.Waves)
+            {
+                var enemies = new List<EnemyEntry>();
+                foreach (var e in wave) enemies.Add(new EnemyEntry(e, enemyLevel));
+                waves.Add(enemies);
+            }
 
             ulong seed = _seeds.NextSeed("combat:" + pending.Case.Value);
-            var setup = new CombatSetup(seed, pending.Rank, allies, enemies, _s.AutoCombat);
+            var setup = new CombatSetup(seed, pending.Rank, allies, waves, _s.AutoCombat);
             var sim = new CombatSimulation(_s.Content, setup);
             _active.Start(sim, setup, pending, engaged);
             _log.Info($"Combat {pending.Rank} sur {pending.Case} — ennemis niv. {enemyLevel} (graine {seed})");

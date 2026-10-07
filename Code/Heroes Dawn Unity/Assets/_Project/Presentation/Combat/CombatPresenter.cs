@@ -56,7 +56,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         bool _ended;
         bool _firstRefresh;
         bool _autoShown;
-        bool _skipTargeting;
+        int _pendingAvatar = -1;
+        readonly HashSet<int> _shown = new HashSet<int>();
         bool _pendingSync;
 
         public CombatPresenter(ICombatView view, IActiveCombatReadModel combat, ISessionReadModel session, ISetAutoCombatUseCase setAuto,
@@ -80,7 +81,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.AutoClicked += ToggleAuto;
             View.SpeedClicked += ToggleSpeed;
             View.DebugWinClicked += DebugWin;
-            View.TimeSkipClicked += TimeSkip;
+            View.AvatarClicked += Avatar;
             View.PauseClicked += Pause;
             View.ComboClicked += Combo;
             View.CycleClicked += CycleSelection;
@@ -94,7 +95,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.AutoClicked -= ToggleAuto;
             View.SpeedClicked -= ToggleSpeed;
             View.DebugWinClicked -= DebugWin;
-            View.TimeSkipClicked -= TimeSkip;
+            View.AvatarClicked -= Avatar;
             View.PauseClicked -= Pause;
             View.ComboClicked -= Combo;
             View.CycleClicked -= CycleSelection;
@@ -117,7 +118,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             _selected = -1;
             _pendingSlot = -1;
             _pendingCombo = null;
-            _skipTargeting = false;
+            _pendingAvatar = -1;
             _pendingSync = false;
             _readyOrder.Clear();
             _log.Clear();
@@ -134,6 +135,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         void BuildUnits(CombatSimulation sim)
         {
             _names.Clear();
+            _shown.Clear();
             var fighters = _combat.Fighters;
             var content = _session.Content;
             var cards = new List<UnitCardData>();
@@ -154,6 +156,8 @@ namespace N29.HeroesDawn.Presentation.Combat
                     fam = def.Family;
                 }
                 _names[u.Id] = name;
+                if (u.Side == Side.Enemy && !u.IsAlive) continue; // ennemis des vagues précédentes
+                _shown.Add(u.Id);
                 cards.Add(new UnitCardData { Id = u.Id, Ally = u.Side == Side.Ally, Name = name.ToUpperInvariant(), Boss = u.IsBoss, Family = fam, Portrait = new PortraitData(name, fam, u.IsBoss), Sub = u.Side == Side.Ally && u.Id < fighters.Count ? _loc.F("ui.fatigue", fighters[u.Id].Fatigue) : "" });
             }
             View.BuildUnits(cards);
@@ -258,10 +262,17 @@ namespace N29.HeroesDawn.Presentation.Combat
                     case PushedBackEvent pb:
                         View.Float(pb.Unit, _loc.F("combat.pushed", pb.Percent), Tone.Perception, 30);
                         break;
-                    case TimeSkipEvent ts:
-                        View.ShowBanner(_loc.T("combat.timeskip"), Tone.Info);
-                        AddLog(Name(ts.Ally) + " : " + _loc.T("combat.timeskip"));
-                        _tutorial?.Hint("timebank");
+                    case WaveStartedEvent ws:
+                        BuildUnits(_sim!);
+                        _firstRefresh = true;
+                        View.ShowBanner(_loc.F("combat.wave_banner", ws.Wave + 1), Tone.Primary);
+                        AddLog(_loc.F("combat.wave", ws.Wave + 1, _sim!.WaveCount));
+                        break;
+                    case AvatarSkillUsedEvent av:
+                        _audio.Play(SfxId.SkillCast);
+                        View.ShowBanner(AvatarName(_session.Content.AvatarSkills.First(a => a.Id == av.Skill)), Tone.Info);
+                        AddLog(_loc.T("combat.avatar") + " : " + AvatarName(_session.Content.AvatarSkills.First(a => a.Id == av.Skill)));
+                        foreach (var t in av.Targets) if (av.Category == SkillCategory.Damage) View.Hit(t);
                         break;
                     case CombatEndedEvent ce:
                         View.ShowBanner(ce.Victory ? _loc.T("combat.victory") : _loc.T("combat.defeat"), ce.Victory ? Tone.Primary : Tone.Danger);
@@ -288,7 +299,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (_pendingCombo.HasValue && !ComboStillAvailable(_pendingCombo.Value)) _pendingCombo = null;
 
             bool targetEnemies = false, targetAllies = false;
-            if (_pendingCombo.HasValue || _skipTargeting) targetEnemies = true;
+            if (_pendingCombo.HasValue) targetEnemies = true;
+            else if (_pendingAvatar >= 0) targetEnemies = true;
             else if (_selected >= 0 && _pendingSlot >= 0)
             {
                 var rule = sim.Unit(_selected).Skills[_pendingSlot].Target;
@@ -299,6 +311,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             var states = new List<UnitStateData>(sim.Units.Count);
             foreach (var u in sim.Units)
             {
+                if (!_shown.Contains(u.Id)) continue;
                 bool ally = u.Side == Side.Ally;
                 states.Add(new UnitStateData
                 {
@@ -334,17 +347,18 @@ namespace N29.HeroesDawn.Presentation.Combat
                 }
             }
             View.ShowSkills(panel);
+            View.ShowAvatar(BuildAvatarBar(sim));
 
             var combos = manual ? sim.AvailableCombos() : Array.Empty<CombatSimulation.ComboOption>();
             var syncs = manual && combos.Count == 0 ? sim.AvailableSyncCombos() : Array.Empty<CombatSimulation.ComboOption>();
             if (combos.Count > 0) _tutorial?.Hint("combo");
             string comboLabel = combos.Count > 0 ? _loc.T("combat.combo") + "\n<size=24>" + _loc.ComboName(combos[0].Combo) + "</size>"
-                              : syncs.Count > 0 ? _loc.F("combat.combo_sync", _session.Content.Balance.ComboSyncCost) + "\n<size=24>" + _loc.ComboName(syncs[0].Combo) + "</size>"
+                              : syncs.Count > 0 ? _loc.T("combat.combo_sync") + "\n<size=24>" + _loc.ComboName(syncs[0].Combo) + "</size>"
                               : "";
             View.ShowCombo(combos.Count > 0 || syncs.Count > 0, comboLabel);
             View.ShowTimeline(BuildTimeline(sim, manual));
 
-            View.SetHint(_skipTargeting ? _loc.T("combat.skip_pick")
+            View.SetHint(_pendingAvatar >= 0 ? _loc.F("combat.avatar_pick", AvatarName(sim.AvatarSkills[_pendingAvatar]))
                        : targetEnemies ? _loc.T("combat.choose_target")
                        : targetAllies ? _loc.T("combat.choose_ally")
                        : manual && _selected < 0 ? _loc.T("combat.waiting") : "");
@@ -369,7 +383,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             var pending = _combat.Case;
             View.ShowTopBar(new CombatTopBarData
             {
-                Title = pending != null ? _loc.F("combat.rank", _loc.RankName(pending.Rank)).ToUpperInvariant() : "",
+                Title = (pending != null ? _loc.F("combat.rank", _loc.RankName(pending.Rank)).ToUpperInvariant() : "")
+                        + (_sim != null && _sim.WaveCount > 1 ? "  ·  " + _loc.F("combat.wave", _sim.WaveIndex + 1, _sim.WaveCount) : ""),
                 AutoOn = _autoShown,
                 SpeedText = _loc.F("combat.speed", _speedFactor),
                 RetreatEnabled = _sim != null && !_sim.IsOver,
@@ -401,12 +416,12 @@ namespace N29.HeroesDawn.Presentation.Combat
             bool sync = false;
             if (list.Count == 0)
             {
-                list = sim.AvailableSyncCombos(); // partenaire en retard : le Temps d'équipe le rattrape
+                list = sim.AvailableSyncCombos(); // partenaire proche de 0 : le combo part quand même
                 sync = true;
             }
             if (list.Count == 0) return;
             var c = list[0];
-            _skipTargeting = false;
+            _pendingAvatar = -1;
             if (c.Combo.Effect.Target == TargetRule.SingleEnemy && AliveCount(Side.Enemy) > 1)
             {
                 _pendingCombo = c;
@@ -421,46 +436,39 @@ namespace N29.HeroesDawn.Presentation.Combat
             => sync ? CombatCommand.SyncCombo(c.A, c.B, target) : CombatCommand.UseCombo(c.A, c.B, target);
 
         /// <summary>
-        /// Dépassement (Time Bank) : on touche DÉPASSER puis l'ennemi à couper ; l'allié le plus avancé sur la frise saute à 100 %.
-        /// Un seul ennemi vivant : pas de ciblage.
+        /// Compétence d'avatar : utilisable à tout moment (même pendant la pause d'action). Une cible unique ennemie demande un ciblage
+        /// quand plusieurs ennemis sont vivants ; un second appui sur le même bouton annule.
         /// </summary>
-        void TimeSkip()
+        void Avatar(int index)
         {
             var sim = _sim;
-            if (!CanCommand) return;
-            if (_skipTargeting) { _skipTargeting = false; RefreshAll(); return; }
-            if (SkipAlly(sim!) < 0) return;
+            if (sim == null || sim.IsOver || _modals.AnyOpen || Disposed || !sim.CanUseAvatar(index)) return;
+            var def = sim.AvatarSkills[index];
             _pendingSlot = -1;
             _pendingCombo = null;
-            if (AliveCount(Side.Enemy) == 1) SubmitTimeSkip(FirstAlive(Side.Enemy));
-            else _skipTargeting = true;
+            if (_pendingAvatar == index) _pendingAvatar = -1;
+            else if (def.Target == TargetRule.SingleEnemy && AliveCount(Side.Enemy) > 1) _pendingAvatar = index;
+            else
+            {
+                Submit(CombatCommand.UseAvatar(index, def.Target == TargetRule.SingleEnemy ? FirstAlive(Side.Enemy) : -1));
+                _tutorial?.Hint("avatar");
+            }
             RefreshAll();
-        }
-
-        /// <summary>L'allié qui profite du dépassement : celui qui n'est pas prêt et qui est le plus avancé sur la frise.</summary>
-        int SkipAlly(CombatSimulation sim)
-        {
-            if (sim.TimeBank < _session.Content.Balance.TimeSkipCost) return -1;
-            CombatUnit? best = null;
-            foreach (var u in sim.Units)
-                if (u.Side == Side.Ally && u.IsAlive && !u.IsReady && (best == null || u.Gauge > best.Gauge)) best = u;
-            return best?.Id ?? -1;
-        }
-
-        void SubmitTimeSkip(int enemy)
-        {
-            int ally = SkipAlly(_sim!);
-            if (ally >= 0) Submit(CombatCommand.TimeSkip(ally, enemy));
-            _skipTargeting = false;
         }
 
         void UnitTapped(int unitId)
         {
             var sim = _sim;
+            if (sim == null || sim.IsOver || _modals.AnyOpen || Disposed) return;
+            var u = sim.Unit(unitId);
+            if (_pendingAvatar >= 0 && u.Side == Side.Enemy && u.IsAlive)
+            {
+                Submit(CombatCommand.UseAvatar(_pendingAvatar, unitId));
+                RefreshAll();
+                return;
+            }
             if (!CanCommand) return;
-            var u = sim!.Unit(unitId);
-            if (_skipTargeting && u.Side == Side.Enemy && u.IsAlive) SubmitTimeSkip(unitId);
-            else if (_pendingCombo.HasValue && u.Side == Side.Enemy && u.IsAlive)
+            if (_pendingCombo.HasValue && u.Side == Side.Enemy && u.IsAlive)
             {
                 var c = _pendingCombo.Value;
                 Submit(ComboCommand(c, _pendingSync, unitId));
@@ -485,7 +493,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             _pendingSlot = -1;
             _pendingCombo = null;
             _pendingSync = false;
-            _skipTargeting = false;
+            _pendingAvatar = -1;
             if (cmd.Type == CommandType.Skill || cmd.Type == CommandType.Combo)
             {
                 _readyOrder.Remove(cmd.Actor);
@@ -496,10 +504,10 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         public bool HandleBack()
         {
-            if (_pendingSlot < 0 && !_pendingCombo.HasValue && !_skipTargeting) return false;
+            if (_pendingSlot < 0 && !_pendingCombo.HasValue && _pendingAvatar < 0) return false;
             _pendingSlot = -1;
             _pendingCombo = null;
-            _skipTargeting = false;
+            _pendingAvatar = -1;
             RefreshAll();
             return true;
         }
@@ -523,7 +531,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             _autoShown = on;
             _pendingSlot = -1;
             _pendingCombo = null;
-            _skipTargeting = false;
+            _pendingAvatar = -1;
             RefreshTopBar();
         }
 
@@ -665,6 +673,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             var markers = new List<TimelineMarkerData>(sim.Units.Count);
             foreach (var u in sim.Units)
             {
+                if (!_shown.Contains(u.Id)) continue;
                 string name = _names.TryGetValue(u.Id, out var n) ? n : "?";
                 markers.Add(new TimelineMarkerData
                 {
@@ -681,22 +690,39 @@ namespace N29.HeroesDawn.Presentation.Combat
                     Boss = u.IsBoss,
                 });
             }
-            bool enoughTime = sim.TimeBank >= b.TimeSkipCost;
-            bool hasAlly = SkipAlly(sim) >= 0 || sim.Units.Any(x => x.Side == Side.Ally && x.IsAlive && !x.IsReady);
             return new TimelineData
             {
                 Markers = markers.ToArray(),
                 PrepStart01 = b.TimelinePrepZonePercent / 100f,
-                Bank = sim.TimeBank,
-                BankMax = sim.TimeBankMax,
-                BankText = _loc.F("combat.bank", sim.TimeBank, sim.TimeBankMax),
-                SkipVisible = manual,
-                SkipEnabled = enoughTime && hasAlly && AliveCount(Side.Enemy) > 0,
-                SkipTargeting = _skipTargeting,
-                SkipLabel = _loc.F("combat.skip", b.TimeSkipCost),
-                SkipReason = !enoughTime ? _loc.F("combat.skip_missing", b.TimeSkipCost - sim.TimeBank) : _loc.T("combat.skip_nobody"),
             };
         }
+
+        /// <summary>Barre des compétences d'avatar : nom court, recharge restante en secondes de temps actif, ciblage en cours.</summary>
+        AvatarBarData BuildAvatarBar(CombatSimulation sim)
+        {
+            int tickMs = _session.Content.Balance.TickMs;
+            var slots = new AvatarSlotData[sim.AvatarSkills.Count];
+            for (int i = 0; i < slots.Length; i++)
+            {
+                var def = sim.AvatarSkills[i];
+                int left = sim.AvatarCooldownLeft(i);
+                slots[i] = new AvatarSlotData
+                {
+                    Visible = true,
+                    Label = "[" + AvatarKeys[Math.Min(i, AvatarKeys.Length - 1)] + "] " + AvatarName(def)
+                          + "\n<size=22>" + (left > 0 ? Math.Ceiling(left * tickMs / 1000.0) + " s" : _loc.T("combat.avatar_ready")) + "</size>",
+                    Category = def.Category,
+                    Enabled = sim.CanUseAvatar(i),
+                    Pending = _pendingAvatar == i,
+                    Cooldown01 = def.CooldownTicks <= 0 ? 0f : left / (float)def.CooldownTicks,
+                };
+            }
+            return new AvatarBarData { Visible = !sim.IsOver, Title = _loc.T("combat.avatar"), Slots = slots };
+        }
+
+        static readonly string[] AvatarKeys = { "Q", "W", "E", "R", "T" };
+
+        string AvatarName(AvatarSkillDef def) => _loc.Or("avatar." + def.Id.Value + ".name", "combat.avatar");
 
         int AliveCount(Side side) => _sim!.Units.Count(u => u.Side == side && u.IsAlive);
 

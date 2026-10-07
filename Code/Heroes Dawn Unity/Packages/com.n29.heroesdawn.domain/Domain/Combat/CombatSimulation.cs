@@ -19,6 +19,8 @@ namespace N29.HeroesDawn.Domain.Combat
 
         public CombatSetup Setup { get; }
         public int Tick { get; private set; }
+        /// <summary>Ticks de temps actif : n'avance pas pendant l'attente d'une action (pause globale).</summary>
+        public int ActiveTick { get; private set; }
         public IReadOnlyList<CombatUnit> Units => _units;
         public bool IsOver => Victory.HasValue;
         public bool? Victory { get; private set; }
@@ -33,9 +35,8 @@ namespace N29.HeroesDawn.Domain.Combat
             _rng = new Pcg32(setup.Seed).Fork(3);
             int id = 0;
             foreach (var a in setup.Allies) _units.Add(UnitFactory.Ally(id++, c.Member(a.Member), a, _b));
-            foreach (var e in setup.Enemies) _units.Add(UnitFactory.Enemy(id++, c.Enemy(e.Enemy), e, setup.Rank, _b));
+            SpawnWave(0);
             foreach (var u in _units) u.Gauge = u.GaugeMax * _rng.Range(0, 21) / 100; // départ entre 0 et 20 %
-            InitTimeline();
         }
 
         public CombatUnit Unit(int id) => _units[id];
@@ -56,10 +57,30 @@ namespace N29.HeroesDawn.Domain.Combat
             return output;
         }
 
+        /// <summary>Vrai tant qu'un allié a atteint 0 et attend l'ordre du joueur : toute la frise est figée.</summary>
+        public bool IsAwaitingAction
+        {
+            get
+            {
+                if (Auto) return false;
+                foreach (var u in _units) if (u.Side == Side.Ally && u.IsReady) return true;
+                return false;
+            }
+        }
+
         void StepOne(List<CombatEvent> output)
         {
             Tick++;
-            RegenTimeBank();
+            if (IsAwaitingAction)
+            {
+                // Pause d'action : ni frise, ni recharges ; seules les commandes sont traitées.
+                ProcessCommands(output);
+                ActReadyUnits(output);
+                CheckEnd(output);
+                return;
+            }
+            ActiveTick++;
+            AdvanceAvatar();
             for (int i = 0; i < _units.Count; i++)
             {
                 var u = _units[i];
