@@ -24,12 +24,18 @@ namespace N29.HeroesDawn.Domain.Combat
         public ulong Seed { get; }
         public CombatRank Rank { get; }
         public IReadOnlyList<AllyEntry> Allies { get; }
+        /// <summary>Ennemis de la première vague.</summary>
         public IReadOnlyList<EnemyEntry> Enemies { get; }
+        /// <summary>Vagues successives d'ennemis (au moins une) ; la vague 1 est <see cref="Enemies"/>.</summary>
+        public IReadOnlyList<IReadOnlyList<EnemyEntry>> Waves { get; }
         public bool Auto { get; }
 
         public CombatSetup(ulong seed, CombatRank rank, IReadOnlyList<AllyEntry> allies, IReadOnlyList<EnemyEntry> enemies, bool auto)
+            : this(seed, rank, allies, new[] { enemies }, auto) { }
+
+        public CombatSetup(ulong seed, CombatRank rank, IReadOnlyList<AllyEntry> allies, IReadOnlyList<IReadOnlyList<EnemyEntry>> waves, bool auto)
         {
-            Seed = seed; Rank = rank; Allies = allies; Enemies = enemies; Auto = auto;
+            Seed = seed; Rank = rank; Allies = allies; Waves = waves; Enemies = waves[0]; Auto = auto;
         }
     }
 }

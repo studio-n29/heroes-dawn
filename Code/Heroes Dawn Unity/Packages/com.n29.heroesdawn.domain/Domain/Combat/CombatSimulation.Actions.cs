@@ -70,6 +70,8 @@ namespace N29.HeroesDawn.Domain.Combat
                     return true;
                 case CommandType.Combo:
                     return cmd.Flag ? TrySyncCombo(cmd.Actor, cmd.Partner, cmd.Target, output) : TryPerformCombo(cmd.Actor, cmd.Partner, cmd.Target, output);
+                case CommandType.Avatar:
+                    return TryAvatar(cmd.SlotIndex, cmd.Target, output);
                 case CommandType.TimeSkip:
                     return TryTimeSkip(cmd.Actor, cmd.Target, output);
             }
@@ -122,18 +124,18 @@ namespace N29.HeroesDawn.Domain.Combat
         {
             var targets = ResolveTargets(actor, skill.Target, preferredTarget);
             output.Add(new SkillUsedEvent(Tick, actor.Id, skill.Id, targets.ToArray()));
-            ApplyEffects(actor, skill, targets, output);
+            ApplyEffects(actor, skill.Effects, targets, output);
             if (slotIndex >= 0 && slotIndex < 3) actor.Cooldowns[slotIndex] = skill.Cooldown + 1;
             EndOfTurn(actor, slotIndex);
         }
 
-        void ApplyEffects(CombatUnit actor, SkillDef skill, List<int> targets, List<CombatEvent> output)
+        void ApplyEffects(CombatUnit actor, IReadOnlyList<EffectDef> effects, List<int> targets, List<CombatEvent> output)
         {
             foreach (var tid in targets)
             {
                 var t = _units[tid];
                 bool missed = false;
-                foreach (var fx in skill.Effects)
+                foreach (var fx in effects)
                 {
                     if (!t.IsAlive || missed) break;
                     if (!_rng.Chance(fx.ChancePercent)) continue;
@@ -287,6 +289,7 @@ namespace N29.HeroesDawn.Domain.Combat
         }
         public void ForceEnemiesDefeatedForDebug()
         {
+            _wave = WaveCount - 1; // saute les vagues restantes
             foreach (var u in _units) if (u.Side == Side.Enemy) { u.Hp = 0; u.Gauge = 0; u.Statuses.Clear(); }
         }
     }

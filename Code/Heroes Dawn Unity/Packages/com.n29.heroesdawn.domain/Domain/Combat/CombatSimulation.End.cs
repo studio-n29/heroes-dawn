@@ -15,6 +15,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 if (!u.IsAlive) continue;
                 if (u.Side == Side.Ally) alliesAlive = true; else enemiesAlive = true;
             }
+            if (!enemiesAlive && TryStartNextWave(output)) { AnnounceCombos(output); return; }
             if (!enemiesAlive) { Victory = true; output.Add(new CombatEndedEvent(Tick, true)); return; }
             if (!alliesAlive) { Victory = false; output.Add(new CombatEndedEvent(Tick, false)); return; }
             AnnounceCombos(output);
@@ -27,6 +28,7 @@ namespace N29.HeroesDawn.Domain.Combat
             h.Add(Tick);
             h.Add(TimeBank);
             h.Add(_bankTicks);
+            h.Add(ActiveTick);
             foreach (var u in _units)
             {
                 h.Add(u.Id);

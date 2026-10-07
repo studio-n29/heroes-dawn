@@ -187,6 +187,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var s = Sim(new[] { "ancre" }, new[] { "brute" });
             Assert.That(s.TimeBank, Is.EqualTo(40));
             Calm(s);
+            s.Unit(0).Spd = 0; // l allié n arrive jamais à 0 : la pause d action ne fige pas la réserve
             s.Step(100);
             Assert.That(s.TimeBank, Is.EqualTo(50));
             s.Step(2000);

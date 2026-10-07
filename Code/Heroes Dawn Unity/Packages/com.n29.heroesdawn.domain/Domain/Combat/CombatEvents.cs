@@ -98,5 +98,20 @@ namespace N29.HeroesDawn.Domain.Combat
         public TimeSkipEvent(int t, int ally, int enemy) : base(t) { Ally = ally; Enemy = enemy; }
     }
 
+    public sealed class WaveStartedEvent : CombatEvent
+    {
+        public int Wave { get; }
+        public int[] Enemies { get; }
+        public WaveStartedEvent(int t, int wave, int[] enemies) : base(t) { Wave = wave; Enemies = enemies; }
+    }
+
+    public sealed class AvatarSkillUsedEvent : CombatEvent
+    {
+        public SkillId Skill { get; }
+        public SkillCategory Category { get; }
+        public int[] Targets { get; }
+        public AvatarSkillUsedEvent(int t, SkillId skill, SkillCategory category, int[] targets) : base(t) { Skill = skill; Category = category; Targets = targets; }
+    }
+
     public sealed class CombatEndedEvent : CombatEvent { public bool Victory { get; } public CombatEndedEvent(int t, bool victory) : base(t) { Victory = victory; } }
 }
