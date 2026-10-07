@@ -4,7 +4,7 @@
 > Statut : **v2.0 — prêt pour démarrer la production (M1 Prototype)**. Tous les domaines sont cadrés ; le contenu restant (recrues, kits de compétences, cosmétiques) est listé en §11.
 
 ## 1. Pitch
-Jeu mobile de gestion-RPG dans l'univers Apex Unit. Le joueur dirige une section de **La Guilde** dans une grande ville, recrute et entraîne des méta-humains, et les engage sur des plateaux de jeu où il affronte combats et mini-jeux.
+Jeu mobile de gestion-RPG dans l'**Apex Universe**, l'univers partagé de tous les projets de Studio N29 (né de l'œuvre d'origine *Apex Unit*). Le joueur dirige une section de **La Guilde** dans une grande ville, recrute et entraîne des méta-humains — que tout le monde surnomme **« les Apex »**, en référence à l'Apex Unit d'origine — et les engage sur des plateaux de jeu où il affronte combats et mini-jeux.
 
 ## 1bis. Vision
 ### Public cible
@@ -19,7 +19,7 @@ Jeu mobile de gestion-RPG dans l'univers Apex Unit. Le joueur dirige une section
 Chaque fonctionnalité doit servir au moins un pilier.
 1. **Chaque lancer compte** — le plateau offre toujours un choix intéressant (chemin, dé bonus, brouillard).
 2. **Mon équipe, mes choix** — le joueur construit son équipe et ses synergies, il ne subit pas le hasard.
-3. **Vivre l'univers Apex** — chaque ville raconte une histoire ; personnages canon et lore post-Supernova.
+3. **Vivre l'Apex Universe** — chaque ville raconte une histoire ; personnages canon et lore post-Supernova.
 ### Références
 | Jeu | Ce qu'on retient |
 |---|---|
@@ -37,7 +37,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 | Rendu | Majoritairement 2D |
 | Orientation | Paysage |
 | Mode | PvE ; PvP futur envisagé en arène asynchrone |
-| Relation à Apex Unit | Spin-off autonome, pas de cross-progression |
+| Relation à Apex Unit | Spin-off autonome de l'Apex Universe, pas de cross-progression |
 | Genre | Gestion d'équipe + RPG + jeu de plateau + combat temps actif (ATB) |
 
 ## 2bis. Périmètre de contenu (lancement — New York)
@@ -63,7 +63,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 ## 3. Univers & contexte
 - Se déroule **après la Supernova de Paris**.
 - Pendant l'**Œuvre 1 — La Guilde** du canon : après le blackout mondial, des milliers de méta-humains naturels apparaissent ; la Guilde, dirigée par **Brie Rayner**, ouvre des sections locales.
-- Les Apex (Rayner, Adam West, John Guerin, Erik Bronson) sont des **PNJ** : directrice et mentors. Eda est absent (en Enfer).
+- Les membres de l'**Apex Unit** d'origine (Rayner, Adam West, John Guerin, Erik Bronson) sont des **PNJ** : directrice et mentors. Eda est absent (en Enfer).
 - Lore détaillé : `02_Lore_Narration/` (sources originales dans `Sources/`).
 - Le joueur est chef d'une section de La Guilde dans une ville : **New York, Los Angeles, Paris, Londres, Moscou**.
 - **Campagne New York** : un plateau par arrondissement — 1. Brooklyn, 2. Queens, 3. Bronx, 4. Staten Island, 5. Manhattan.
@@ -156,7 +156,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 - Renouvellement : 1 gratuit/jour, puis Crédits, puis premium.
 - Pas de doublons ; pool épuisée = collection de la ville terminée.
 - **Légendes liées à l'histoire** : une par acte, elle entre dans la pool après le mini-climax.
-- **3 rangs de rareté** : Agent / Élite / Légende — coût en PR et puissance croissants. Les Légendes sont les méta-humains naturels les plus puissants ; les Apex ne sont pas recrutables (PNJ).
+- **3 rangs de rareté** : Agent / Élite / Légende — coût en PR et puissance croissants. Les Légendes sont les méta-humains naturels les plus puissants ; les membres de l'Apex Unit ne sont pas recrutables (PNJ).
 ### Entraînement & progression
 - Entraînement **automatique au salon** grâce aux objets placés.
 - Niveaux → **paliers de compétences** (effets additionnels), validés en Crédits.
@@ -200,7 +200,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 - **Onboarding** : prologue jouable (~5 min), systèmes débloqués pendant l'Acte 1.
 - **Combat** : 4 portraits en bas, compétences au toucher, boutons Combo et Auto. PC : souris + raccourcis clavier.
 - **Audio** : thème par arrondissement, doublage partiel des répliques de combat, banques sous licence.
-- Détail : `03_Art_UI_UX/01_UX_Ecrans.md`, `03_Art_UI_UX/02_Direction_Artistique_Audio.md`.
+- Détail : `03_Art_UI_UX/01_UX_Ecrans.md`, `03_Art_UI_UX/03_Maquettes_Screen_Flow.md` (wireframes, maquettes, screen flow), `03_Art_UI_UX/02_Direction_Artistique_Audio.md`.
 
 ## 10bis. Technique
 - Unity 6.6, Unity Gaming Services (Authentication, Cloud Save, Economy, Cloud Code, Remote Config, Analytics).
@@ -226,7 +226,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 - [x] Cosmétiques : types, sources, volumes, prix indicatifs
 - [x] 10 Élites + 20 Agents de New York (fiches v1)
 - [x] Kits de compétences des 35 recrues (v1, à équilibrer)
-- [x] Lieutenants des Actes 2 à 4 ; mentors Apex par acte
+- [x] Lieutenants des Actes 2 à 4 ; mentors de l'Apex Unit par acte
 - [ ] **Calage en playtest** des valeurs de départ (`01_Game_Design/05_Equilibrage.xlsx`) — à faire pendant le prototype et l'alpha
 - [ ] **Recommandations ⚑ à confirmer en prototype** : dé 1d6 et 6 PM par dé bonus ; jauges qui continuent pendant le choix en manuel ; plafond de niveau par acte
 
@@ -243,6 +243,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 | Équilibrage (tableur) | `01_Game_Design/05_Equilibrage.xlsx` |
 | Lore & New York | `02_Lore_Narration/` |
 | UX & écrans | `03_Art_UI_UX/01_UX_Ecrans.md` |
+| Maquettes & screen flow | `03_Art_UI_UX/03_Maquettes_Screen_Flow.md` |
 | DA & audio | `03_Art_UI_UX/02_Direction_Artistique_Audio.md` |
 | Kits de compétences | `01_Game_Design/06_Kits_Competences.md` |
 | Architecture logicielle | `04_Tech_Unity/` (00 à 09) |

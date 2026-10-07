@@ -5,7 +5,7 @@
 > Kits : `06_Kits_Competences.md` · Roster NY : `02_Lore_Narration/04_Recrues_New_York.md` · Stats : tableur, onglet Stats
 
 ## Objectif du système
-Donner au joueur une collection qu'il **choisit** (pas de hasard) et des équipes dont la force vient des **synergies** entre familles, pour porter les piliers « Mon équipe, mes choix » et « Vivre l'univers Apex ».
+Donner au joueur une collection qu'il **choisit** (pas de hasard) et des équipes dont la force vient des **synergies** entre familles, pour porter les piliers « Mon équipe, mes choix » et « Vivre l'Apex Universe ».
 
 ## Anatomie d'une recrue
 | Élément | Détail |

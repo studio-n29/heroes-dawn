@@ -53,18 +53,18 @@ Catalogue : `05_Evenements_New_York.md`.
 | Lena Voss, « Mère Voile » | 4 | Perception | Officiante du rituel ; camouflage optique, prêche les Enfants de la Brèche |
 | Silas Moreau, « le Héraut » | 5 | Élémentaire | Boss final ; flammes rouge cendre |
 
-### Mentors Apex par acte
+### Mentors de l'Apex Unit par acte
 | Acte | Mentor | Rôle dans l'histoire |
 |---|---|---|
 | Prologue / 1 | Brie Rayner, Adam West | Rayner confie la section ; Adam West entraîne la première équipe à Red Hook |
 | 2 | John Guerin | Infiltre le Syndicat par polymorphie et localise le centre de recrutement |
 | 3 | Brie Rayner, Erik Bronson | Rayner négocie à l'ONU ; Bronson surveille les mouvements de l'AMIF |
 | 4 | Erik Bronson | Repère le rituel à Staten Island grâce à son ouïe |
-| 5 | Tous les Apex | Défense de l'ONU aux côtés de la section et de la Commandante Hayes |
+| 5 | Toute l'Apex Unit | Défense de l'ONU aux côtés de la section et de la Commandante Hayes |
 
 ### Alliés et PNJ
 - **Brie Rayner** : directrice de la Guilde, négocie à l'ONU.
-- **Mentors Apex** : Adam West, John Guerin, Erik Bronson (apparitions à placer par acte).
+- **Mentors de l'Apex Unit** : Adam West, John Guerin, Erik Bronson (apparitions à placer par acte).
 - **Général Stroke** : chef de l'AMIF, hostile jusqu'au bout.
 - **Commandante Hayes** : adjointe locale de Stroke, pragmatique ; alliée de l'Acte 5.
 

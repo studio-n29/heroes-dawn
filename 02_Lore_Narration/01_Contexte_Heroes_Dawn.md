@@ -10,7 +10,8 @@
 - **Adam West, John Guerin, Erik Bronson** : **PNJ mentors**, apparaissent dans les actes. **Non recrutables.**
 - **Eda** : absent (en Enfer). Peut être évoqué (hommages, signature énergétique captée par Rayner).
 - **AMIF / Général Stroke**, tensions politiques, manifestations anti-méta-humains.
-- Les recrues sont des **méta-humains naturels** nés de la Supernova. Les **Légendes** sont les plus puissants d'entre eux (pas les Apex).
+- Les recrues sont des **méta-humains naturels** nés de la Supernova. Les **Légendes** sont les plus puissants d'entre eux (pas les membres de l'Apex Unit).
+- Dans le monde, on appelle couramment les méta-humains **« les Apex »**, en référence à l'Apex Unit d'origine ; le terme officiel reste « méta-humain » (voir la terminologie du canon).
 
 ## Règles de cohérence
 - Les pouvoirs des recrues s'appuient sur les profils génétiques du lore (voir `02_Profils_Pouvoirs.md`), étendus par l'énergie cosmique de la Supernova si besoin.
