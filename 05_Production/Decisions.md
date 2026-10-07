@@ -45,14 +45,14 @@
 | 2026-09-29 | Cible : fans de super-héros, casual+ ; sessions 5-10 min | |
 | 2026-09-29 | Zones reprenables (sauvegarde à chaque case) | Compatibilité sessions courtes |
 | 2026-09-29 | USP : plateau + combat ; juste, sans pay-to-win | |
-| 2026-09-29 | Piliers : Chaque lancer compte / Mon équipe, mes choix / Vivre l'univers Apex | |
+| 2026-09-29 | Piliers : Chaque lancer compte / Mon équipe, mes choix / Vivre l'Apex Universe | |
 | 2026-09-29 | Lancement : New York seule, 4 villes en live-ops | |
 | 2026-09-29 | 35 recrues/ville, sorties en 2 vagues | |
 | 2026-09-29 | Assets : portraits + quelques modèles 3D low poly, génération IA, rig 2D partagé | |
 | 2026-09-29 | Lancement : ~15 ennemis, 4 mini-jeux, ~35 événements, zones de ~25 cases / 3 objectifs | |
 | 2026-09-29 | Heroes Dawn se situe dans l'Œuvre 1 « La Guilde » du canon | Sources dans 02_Lore_Narration/Sources |
 | 2026-09-29 | Familles alignées sur le lore : Matière, Élémentaire, Physique/Bio, Perception | Remplace TK/Mat. et Psychique/Énergie |
-| 2026-09-29 | Apex = PNJ (Rayner directrice, autres mentors), non recrutables | |
+| 2026-09-29 | Membres de l'Apex Unit = PNJ (Rayner directrice, autres mentors), non recrutables | |
 | 2026-09-29 | Menaces NY : méta-criminels, AMIF/Stroke, restes démoniaques | |
 | 2026-09-29 | Combos v2 validés : Piège, Point faible, Triage | Suite au réalignement des familles |
 | 2026-09-29 | Arc NY : 1 plateau = 1 borough (Brooklyn, Queens, Bronx, Staten Island, Manhattan) | |
@@ -91,6 +91,7 @@
 | 2026-10-02 | Sous-projet 1 (fondations) : un use case par intention, messages MessagePipe, `RootLifetimeScope` ; UI encore construite par code | Scènes et flux : sous-projet 2 ; vues en prefabs générés : sous-projet 3 |
 | 2026-10-03 | Rapport HTML à chaque exécution des tests (ce que chaque test vérifie et pourquoi) + synthèse en chat ; `[Description]` obligatoire sur chaque test | Demande de l'utilisateur ; garde-fou `EveryTestHasADescription` |
 | 2026-10-03 | Sous-projet 2 : scènes `Boot`/`Hub`/`Board`/`Combat` générées par menu, un scope par scène, `GameFlowMachine` (Application, testable sans Unity) seule autorité de navigation | Écrans encore construits par code ; prefabs MVP au sous-projet 3 |
+| 2026-10-03 | L'univers commun de tous les projets s'appelle l'**Apex Universe** ; dans le monde, les méta-humains sont surnommés « les Apex » en référence à l'Apex Unit d'origine | Équipe d'origine = « l'Apex Unit » |
 | 2026-10-03 | Sous-projet 3 : prefabs générés puis éditables (recettes éditeur, `ScreenCatalog`), présentateurs C# purs, TextMeshPro, Retour par `BackButtonRouter` | Mise en page des maquettes : retouche des prefabs |
 | 2026-10-03 | Audio : `AudioService` (deux platines en fondu enchaîné à puissance constante, voix d'effets bornées, musique en streaming), musique pilotée par l'état du jeu (`MusicDirector`), catalogue `Settings/AudioCatalog.asset` reconstruit depuis les dossiers `Audio/Music/<thème>` et `Audio/Sfx/<effet>` | Musiques générées (Google Flow Music) ; effets Kenney CC0 |
 | 2026-10-04 | Maquettes haute fidélité du jeu complet (navigation par barre d'onglets basse, mode mission plein écran, paramètres en 8 catégories) et tutoriel = première partie guidée sur la zone 1.1 (projecteur, bulles de Rayner, astuces contextuelles), à la place du prologue scripté | Spec `Code/docs/specs/2026-10-04-maquettes-ui-tutoriel-design.md` ; intégration au M1 : spec à venir |

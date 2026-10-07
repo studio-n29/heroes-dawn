@@ -1,6 +1,6 @@
 # Heroes Dawn — Documentation projet
 
-Jeu mobile-first de gestion-RPG dans l'univers **Apex Unit**. Moteur : Unity 6.6. Studio N29.
+Jeu mobile-first de gestion-RPG dans l'**Apex Universe** (univers partagé des projets de Studio N29, né d'*Apex Unit*). Moteur : Unity 6.6. Studio N29.
 
 ## Arborescence
 | Dossier | Contenu |
