@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections;
 using System.IO;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Combat;
@@ -145,6 +146,25 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<SettingsPageView>()!.CategoryButton(7).onClick.Invoke();
             yield return CaptureSettled("85-parametres-support");
             Assert.That(File.Exists(Path.Combine(Folder, "85-parametres-support.png")));
+        }
+
+        [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit la capture de la fenêtre d'activité (pêche du port de nuit) — parce que la mise en page du framework d'activités se relit à l'œil")]
+        public IEnumerator CaptureActivityWindow()
+        {
+            yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
+            var session = Container.Resolve<GameSession>();
+            var zone = session.Content.Zone(PrototypeContent.Zone11);
+            var from = new BoardGraph(zone).Neighbors(new N29.HeroesDawn.Core.CaseId("n15")).First();
+            session.Run = ZoneRun.ForTests(session.Content, zone, 3UL, 1, true, from.Value);
+            session.RunZone = zone;
+            Container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Board));
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning);
+            PlayModeHarness.TapNode(new N29.HeroesDawn.Core.CaseId("n15"));
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.ActivityPopupView>() != null);
+            yield return CaptureSettled("06-activite-peche");
+            Assert.That(File.Exists(Path.Combine(Folder, "06-activite-peche.png")));
         }
 
         [UnityTest, Explicit("Captures à la demande"), Description("Produit une capture de la connexion, du QG, du plateau et du combat — parce que le passage à TextMeshPro change le rendu des polices et doit être relu à l'œil avant toute conversion (spec §11)")]

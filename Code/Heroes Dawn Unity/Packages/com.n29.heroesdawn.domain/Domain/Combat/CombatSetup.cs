@@ -9,7 +9,9 @@ namespace N29.HeroesDawn.Domain.Combat
         public MemberId Member { get; }
         public int Level { get; }
         public int FatiguePercent { get; }
-        public AllyEntry(MemberId member, int level, int fatiguePercent) { Member = member; Level = level; FatiguePercent = fatiguePercent; }
+        /// <summary>Bonus / malus de statistiques en % (ex. -15 après une potion ratée) ; 0 = aucun.</summary>
+        public int StatPercent { get; }
+        public AllyEntry(MemberId member, int level, int fatiguePercent, int statPercent = 0) { Member = member; Level = level; FatiguePercent = fatiguePercent; StatPercent = statPercent; }
     }
 
     public sealed class EnemyEntry

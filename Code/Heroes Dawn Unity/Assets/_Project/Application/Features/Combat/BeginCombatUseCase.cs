@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
             foreach (var m in fighters)
             {
                 if (allies.Count >= MetaRules.SquadSize) break;
-                allies.Add(new AllyEntry(m.Id, m.Level, m.Fatigue));
+                allies.Add(new AllyEntry(m.Id, m.Level, m.Fatigue, run.MalusPercent(m.Id)));
                 engaged.Add(m);
             }
             var enemies = new List<EnemyEntry>();

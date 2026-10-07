@@ -24,7 +24,7 @@ namespace N29.HeroesDawn.Domain.Combat
         public static CombatUnit Ally(int id, MemberDef d, AllyEntry e, BalanceConfig b)
         {
             int f = FatigueMultiplierPermille(e.FatiguePercent, b);
-            int S(int v) => ScaleStat(v, e.Level, b) * f / 1000;
+            int S(int v) => ScaleStat(v, e.Level, b) * f / 1000 * (100 + e.StatPercent) / 100;
             return new CombatUnit(id, Side.Ally, d.Id.Value, d.Family, d.Role, false,
                                   S(d.BaseStats.Hp), S(d.BaseStats.Atk), S(d.BaseStats.Def), d.BaseStats.Spd,
                                   (long)b.AtbGaugePoints * 1000, d.Skills);

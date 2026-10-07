@@ -52,8 +52,8 @@ namespace N29.HeroesDawn.Content.Prototype
             return System.Array.Empty<ZoneId>();
         }
 
-        static NodeDef N(string id, CaseType t, int x, int y, bool fixedNode = false, CombatRank r = CombatRank.Normal)
-            => new NodeDef(new CaseId(id), t, fixedNode, r, x, y);
+        static NodeDef N(string id, CaseType t, int x, int y, bool fixedNode = false, CombatRank r = CombatRank.Normal, string activity = null)
+            => new NodeDef(new CaseId(id), t, fixedNode, r, x, y, activity == null ? (ActivityId?)null : new ActivityId(activity));
 
         static List<LinkDef> Links(params (string, string)[] pairs)
         {
@@ -95,7 +95,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 new EncounterDef(CombatRank.Normal, new[] { new EnemyId("street_pyro"), new EnemyId("sniper"), new EnemyId("brute") }),
                 new EncounterDef(CombatRank.Elite, new[] { new EnemyId("canal_chief"), new EnemyId("thug"), new EnemyId("sniper") }),
             };
-            return new ZoneDef(Zone12, "zones.ny_1_2.name", new CaseId("n00"), nodes, links, objectives, encounters, "1.2", 1, "brooklyn", 6);
+            return new ZoneDef(Zone12, "zones.ny_1_2.name", new CaseId("n00"), nodes, links, objectives, encounters, "1.2", 1, "brooklyn", 6, null, new ZoneEnvironment(Biome.Industrial, Weather.Rain));
         }
 
         /// <summary>Dumbo — le pont : 19 cases, boss fixe au bout : le Titan du pont.</summary>
@@ -106,7 +106,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 N("n00", CaseType.Entry, 0, 2, true),
                 N("n01", CaseType.Resource, 1, 2), N("n02", CaseType.Combat, 2, 2),
                 N("n03", CaseType.Resource, 3, 3), N("n04", CaseType.Narrative, 4, 3), N("n05", CaseType.Combat, 5, 3),
-                N("n06", CaseType.MiniGame, 3, 1), N("n07", CaseType.Combat, 4, 1, r: CombatRank.Easy), N("n08", CaseType.Resource, 5, 1),
+                N("n06", CaseType.MiniGame, 3, 1, activity: "potion_field"), N("n07", CaseType.Combat, 4, 1, r: CombatRank.Easy), N("n08", CaseType.Resource, 5, 1),
                 N("n09", CaseType.Rest, 6, 2), N("n10", CaseType.Combat, 7, 2),
                 N("n11", CaseType.MiniGame, 8, 3, true), N("n12", CaseType.Resource, 9, 3),
                 N("n13", CaseType.Narrative, 8, 1), N("n14", CaseType.Combat, 9, 1, true, CombatRank.Elite),
@@ -131,7 +131,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 new EncounterDef(CombatRank.Elite, new[] { new EnemyId("canal_chief"), new EnemyId("brute"), new EnemyId("sniper") }),
                 new EncounterDef(CombatRank.Boss, new[] { new EnemyId("bridge_titan"), new EnemyId("sniper"), new EnemyId("thug") }),
             };
-            return new ZoneDef(Zone13, "zones.ny_1_3.name", new CaseId("n00"), nodes, links, objectives, encounters, "1.3", 1, "brooklyn", 8, Requires(Zone13));
+            return new ZoneDef(Zone13, "zones.ny_1_3.name", new CaseId("n00"), nodes, links, objectives, encounters, "1.3", 1, "brooklyn", 8, Requires(Zone13), new ZoneEnvironment(Biome.City, Weather.Fog));
         }
     }
 }

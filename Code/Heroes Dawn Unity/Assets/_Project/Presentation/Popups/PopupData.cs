@@ -45,4 +45,18 @@ namespace N29.HeroesDawn.Presentation.Popups
         public string Rewards;
         public string ToHq;
     }
+
+    /// <summary>Activité (hors réflexe) : description, lignes de détail (décor, réglages, niveau), mention « en développement », résultats à simuler.</summary>
+    public struct ActivityPopupData
+    {
+        public string Title;
+        public string Body;
+        public string[] Lines;
+        public string Wip;
+        public string WinLabel;
+        public string FailLabel;
+        /// <summary>Score simulé à la réussite / à l'échec (ex. poissons pêchés).</summary>
+        public int WinScore;
+        public int FailScore;
+    }
 }

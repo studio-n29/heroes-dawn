@@ -24,11 +24,15 @@ namespace N29.HeroesDawn.Definitions
         public int RecommendedLevel { get; }
         /// <summary>Zones à valider avant d'ouvrir celle-ci (vide : disponible d'emblée).</summary>
         public IReadOnlyList<ZoneId> Requires { get; }
+        /// <summary>Décor et météo du plateau : les activités lancées depuis ses cases s'y adaptent.</summary>
+        public ZoneEnvironment Environment { get; }
 
         public ZoneDef(ZoneId id, string nameKey, CaseId entry, IReadOnlyList<NodeDef> nodes, IReadOnlyList<LinkDef> links,
                        IReadOnlyList<ObjectiveDef> objectives, IReadOnlyList<EncounterDef> encounters,
-                       string code = "", int act = 1, string borough = "brooklyn", int recommendedLevel = 1, IReadOnlyList<ZoneId>? requires = null)
+                       string code = "", int act = 1, string borough = "brooklyn", int recommendedLevel = 1, IReadOnlyList<ZoneId>? requires = null,
+                       ZoneEnvironment? environment = null)
         {
+            Environment = environment ?? ZoneEnvironment.Default;
             Id = id; NameKey = nameKey; Entry = entry; Nodes = nodes; Links = links; Objectives = objectives; Encounters = encounters;
             Code = code; Act = act; Borough = borough; RecommendedLevel = recommendedLevel;
             Requires = requires ?? System.Array.Empty<ZoneId>();

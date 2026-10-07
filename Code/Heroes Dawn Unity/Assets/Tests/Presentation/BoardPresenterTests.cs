@@ -62,7 +62,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         void Make(IRollDiceUseCase roll = null)
         {
             var loc = new LocLocalization();
-            var cases = new CasePopupPresenter(_modals, _app.Zone.Rest, _app.Zone.Narrative, _app.Zone.MiniGame, _app.Session, _toasts, loc);
+            var cases = new CasePopupPresenter(_modals, _app.Zone.Rest, _app.Zone.Narrative, _app.Zone.PlanActivity, _app.Zone.Activity, _app.Session, _toasts, loc);
             _p = new BoardPresenter(_view, _app.Session, roll ?? _app.Zone.Roll, _app.Zone.Bonus, _app.Zone.Move, _app.Zone.End,
                                     _app.Combat.Begin, _app.Zone.Leave, new FakeGameFlow(), cases,
                                     _app.Subscriber<ZoneValidated>(), _app.Subscriber<ReturnedToBoard>(), _app.Subscriber<RosterChanged>(),
