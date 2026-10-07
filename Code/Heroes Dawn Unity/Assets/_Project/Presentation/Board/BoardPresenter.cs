@@ -52,6 +52,10 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly BusyGate _busy = new BusyGate();
         ZoneRun? _run;
         ZoneRun? _built;
+        /// <summary>Case visée par la prévisualisation (tapée), sa destination réelle et le chemin illuminé ; <c>null</c> : pas de fiche ouverte.</summary>
+        CaseId? _previewTapped;
+        MovePlan? _previewPlan;
+        FogReachPlan? _previewFog;
         IDisposable? _lifetimeSubs;
         IDisposable? _rosterSub;
         WalletBinder? _walletBinder;
@@ -91,6 +95,8 @@ namespace N29.HeroesDawn.Presentation.Board
             View.BonusClicked += Bonus;
             View.EndMoveClicked += EndMove;
             View.BackClicked += RequestBackToHq;
+            View.MoveConfirmClicked += ConfirmMove;
+            View.MoveCancelClicked += CancelPreview;
             View.Map.NodeTapped += TapNode;
         }
 
@@ -103,6 +109,8 @@ namespace N29.HeroesDawn.Presentation.Board
             View.BonusClicked -= Bonus;
             View.EndMoveClicked -= EndMove;
             View.BackClicked -= RequestBackToHq;
+            View.MoveConfirmClicked -= ConfirmMove;
+            View.MoveCancelClicked -= CancelPreview;
             View.Map.NodeTapped -= TapNode;
         }
 
@@ -118,6 +126,7 @@ namespace N29.HeroesDawn.Presentation.Board
             {
                 _run = run;
                 _busy.Exit();
+                ClosePreview();
                 View.ResetDie();
             }
             if (_built != run)
@@ -173,13 +182,30 @@ namespace N29.HeroesDawn.Presentation.Board
 
         void RefreshMap(ZoneRun run, bool movePawn)
         {
+            ValidatePreview(run);
             var doneIds = new HashSet<string>(run.CompletedObjectives);
             var doneTargets = new HashSet<CaseId>(run.Graph.Zone.Objectives.Where(o => doneIds.Contains(o.Id)).Select(o => o.Target));
+            bool choosing = run.Phase == ZoneRunPhase.ChoosingDestination;
+            var pathNodes = _previewPlan != null ? new HashSet<CaseId>(_previewPlan.Path) : new HashSet<CaseId>();
+            var stopPairs = _previewPlan != null ? Pairs(run.Position, _previewPlan.Path) : new HashSet<(CaseId, CaseId)>();
+            var beyondPairs = _previewFog != null ? Pairs(run.Position, _previewFog.FullPath) : new HashSet<(CaseId, CaseId)>();
             var nodes = run.Graph.AllIds.Select(id =>
             {
                 var def = run.Graph.Node(id);
                 bool spent = run.IsSpent(id);
-                bool dest = run.Phase == ZoneRunPhase.ChoosingDestination && run.Destinations.ContainsKey(id);
+                var mark = NodeMark.None;
+                int cost = -1;
+                if (choosing)
+                {
+                    if (_previewTapped == id)
+                    {
+                        mark = NodeMark.Target;
+                        cost = _previewFog != null ? _previewFog.Distance : _previewPlan!.Cost;
+                    }
+                    else if (pathNodes.Contains(id)) mark = NodeMark.Path;
+                    else if (run.Destinations.TryGetValue(id, out var d)) { mark = NodeMark.Destination; cost = d.Cost; }
+                    else if (run.FogReach.TryGetValue(id, out var f)) { mark = NodeMark.FogDestination; cost = f.Distance; }
+                }
                 return new BoardNodeState
                 {
                     Id = id,
@@ -191,15 +217,116 @@ namespace N29.HeroesDawn.Presentation.Board
                     Rank = def.Rank,
                     Spent = spent,
                     ObjectiveDone = doneTargets.Contains(id),
-                    DestinationCost = dest ? run.Destinations[id].Cost : -1,
+                    Mark = mark,
+                    DestinationCost = cost,
                 };
             }).ToArray();
             var links = run.Graph.Zone.Links.Select(l =>
             {
                 bool a = run.Fog.IsRevealed(l.A), b = run.Fog.IsRevealed(l.B);
-                return new BoardLinkState { Visible = a || b, Dim = !(a && b) };
+                var lm = stopPairs.Contains((l.A, l.B)) ? LinkMark.Path : beyondPairs.Contains((l.A, l.B)) ? LinkMark.Beyond : LinkMark.None;
+                return new BoardLinkState { Visible = a || b || lm != LinkMark.None, Dim = !(a && b), Mark = lm };
             }).ToArray();
             View.Map.Refresh(nodes, links, run.Position, movePawn);
+        }
+
+        /// <summary>Paires de cases consécutives (dans les deux sens) du chemin parti de <paramref name="start"/>.</summary>
+        static HashSet<(CaseId, CaseId)> Pairs(CaseId start, IReadOnlyList<CaseId> path)
+        {
+            var set = new HashSet<(CaseId, CaseId)>();
+            var prev = start;
+            foreach (var id in path)
+            {
+                set.Add((prev, id));
+                set.Add((id, prev));
+                prev = id;
+            }
+            return set;
+        }
+
+        // ------------------------------------------------------------------ Fiche de case (« S'y rendre »)
+
+        /// <summary>Ouvre la fiche de la case tapée : décrit la case, illumine le chemin et dézoome dessus.</summary>
+        void OpenPreview(CaseId tapped, MovePlan plan, FogReachPlan? fog)
+        {
+            var run = _run!;
+            _previewTapped = tapped;
+            _previewPlan = plan;
+            _previewFog = fog;
+            View.ShowMovePreview(BuildPreview(run, tapped, plan, fog));
+            RefreshMap(run, false);
+            var ids = new List<CaseId> { run.Position };
+            ids.AddRange(fog != null ? fog.FullPath : plan.Path);
+            View.Map.FitTo(ids, true);
+        }
+
+        MovePreviewData BuildPreview(ZoneRun run, CaseId tapped, MovePlan plan, FogReachPlan? fog)
+        {
+            if (fog != null)
+            {
+                var stop = run.Graph.Node(fog.StopAt);
+                string stopName = CaseTitle(stop);
+                return new MovePreviewData
+                {
+                    Title = _loc.T("board.preview.fog_title"),
+                    Body = _loc.F("board.preview.fog_body", fog.Distance, stopName),
+                    Detail = _loc.F("board.preview.fog_detail", stopName, plan.Cost),
+                    Tone = Tone.Info,
+                    ConfirmLabel = _loc.T("board.preview.go"),
+                    CancelLabel = _loc.T("board.preview.cancel"),
+                };
+            }
+            var def = run.Graph.Node(tapped);
+            var body = _loc.T("board.case." + def.Type + ".body");
+            if (run.Graph.Zone.Objectives.Any(o => o.Target == tapped)) body += "\n" + _loc.T("board.case.objective");
+            var detail = plan.Cost >= run.PmInHand ? _loc.F("board.preview.cost_all", plan.Cost) : _loc.F("board.preview.cost", plan.Cost, run.PmInHand - plan.Cost);
+            if (run.IsBlocking(tapped)) detail += "\n" + _loc.T("board.preview.stop_combat");
+            else if (run.Fog.WouldReveal(tapped)) detail += "\n" + _loc.T("board.preview.stop_fog");
+            if (run.IsSpent(tapped) && def.Type != CaseType.Entry) detail += "\n" + _loc.T("board.preview.spent");
+            return new MovePreviewData
+            {
+                Title = CaseTitle(def),
+                Body = body,
+                Detail = detail,
+                Tone = def.Type == CaseType.Combat ? Tone.Danger : Tone.Primary,
+                ConfirmLabel = _loc.T("board.preview.go"),
+                CancelLabel = _loc.T("board.preview.cancel"),
+            };
+        }
+
+        string CaseTitle(NodeDef def)
+            => def.Type == CaseType.Combat ? _loc.F("board.case.Combat.title", _loc.RankName(def.Rank)) : _loc.T("board.case." + def.Type + ".title");
+
+        void ClosePreview()
+        {
+            if (_previewTapped == null && _previewPlan == null) return;
+            _previewTapped = null;
+            _previewPlan = null;
+            _previewFog = null;
+            View.ShowMovePreview(null);
+        }
+
+        /// <summary>La fiche n'a de sens que pendant le choix de destination, tant que la destination existe encore.</summary>
+        void ValidatePreview(ZoneRun run)
+        {
+            if (_previewPlan == null) return;
+            if (run.Phase != ZoneRunPhase.ChoosingDestination || !run.Destinations.ContainsKey(_previewPlan.Target)) ClosePreview();
+        }
+
+        void CancelPreview()
+        {
+            if (_run == null || Disposed || _previewPlan == null) return;
+            ClosePreview();
+            RefreshAll(false);
+            View.Map.CenterOn(_run.Position, true);
+        }
+
+        void ConfirmMove()
+        {
+            if (!CanAct || _run!.Phase != ZoneRunPhase.ChoosingDestination || _previewPlan == null) return;
+            var target = _previewPlan.Target;
+            ClosePreview();
+            RunBoardAsync(ct => _moveTo.ExecuteAsync(target, ct), ProcessEventsAsync).Forget();
         }
 
         static string Glyph(CaseType t, bool spent)
@@ -272,19 +399,26 @@ namespace N29.HeroesDawn.Presentation.Board
         void Bonus()
         {
             if (!CanAct || _run!.Dice.BonusDice == 0) return;
+            ClosePreview(); // les PM changent : la fiche serait périmée
             RunBoardAsync(ct => _bonus.ExecuteAsync(ct), AnimateDieAsync).Forget();
         }
 
         void EndMove()
         {
             if (!CanAct || _run!.Phase != ZoneRunPhase.ChoosingDestination) return;
+            ClosePreview();
             RunBoardAsync(ct => _endMove.ExecuteAsync(ct), ProcessEventsAsync).Forget();
         }
 
+        /// <summary>
+        /// Toucher une case en surbrillance n'engage plus le déplacement : sa fiche s'ouvre, le chemin s'illumine et la caméra dézoome ;
+        /// « S'y rendre » valide. Une case cachée à portée mène à son arrêt forcé (premier arrêt du chemin).
+        /// </summary>
         void TapNode(CaseId id)
         {
-            if (!CanAct || _run!.Phase != ZoneRunPhase.ChoosingDestination || !_run.Destinations.ContainsKey(id)) return;
-            RunBoardAsync(ct => _moveTo.ExecuteAsync(id, ct), ProcessEventsAsync).Forget();
+            if (!CanAct || _run!.Phase != ZoneRunPhase.ChoosingDestination) return;
+            if (_run.Destinations.TryGetValue(id, out var plan)) OpenPreview(id, plan, null);
+            else if (_run.FogReach.TryGetValue(id, out var fog) && _run.Destinations.TryGetValue(fog.StopAt, out var stop)) OpenPreview(id, stop, fog);
         }
 
         /// <summary>Action de plateau : entrées bloquées pendant l'appel, erreur affichée, puis suite.</summary>
@@ -339,6 +473,7 @@ namespace N29.HeroesDawn.Presentation.Board
                 _audio.Play(SfxId.PawnMove);
                 try { await View.Map.MovePawnAsync(path, Lifetime); }
                 finally { _busy.Exit(); }
+                if (_run != null) View.Map.CenterOn(_run.Position, true); // la caméra suit le pion
             }
             if (path != null && !events.Any(x => x is SteppedBackEvent)) _tutorial?.Signal(TutorialSignal.Moved);
             if (Disposed) return;
@@ -461,6 +596,11 @@ namespace N29.HeroesDawn.Presentation.Board
 
         public bool HandleBack()
         {
+            if (_previewPlan != null) // Échap referme d'abord la fiche de case
+            {
+                CancelPreview();
+                return true;
+            }
             RequestBackToHq();
             return true;
         }

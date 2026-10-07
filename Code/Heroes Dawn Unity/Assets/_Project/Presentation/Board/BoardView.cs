@@ -30,6 +30,12 @@ namespace N29.HeroesDawn.Presentation.Board
         [SerializeField] UiButton back = null!;
         [SerializeField] WalletView wallet = null!;
         [SerializeField] BoardMapView map = null!;
+        [SerializeField] RectTransform previewRoot = null!;
+        [SerializeField] TMP_Text previewTitle = null!;
+        [SerializeField] TMP_Text previewBody = null!;
+        [SerializeField] TMP_Text previewDetail = null!;
+        [SerializeField] UiButton previewConfirm = null!;
+        [SerializeField] UiButton previewCancel = null!;
         [SerializeField] TextLineView objectiveLinePrefab = null!;
         [SerializeField] SquadSlotView squadSlotPrefab = null!;
 
@@ -37,6 +43,8 @@ namespace N29.HeroesDawn.Presentation.Board
         public event Action? BonusClicked;
         public event Action? EndMoveClicked;
         public event Action? BackClicked;
+        public event Action? MoveConfirmClicked;
+        public event Action? MoveCancelClicked;
 
         public IWalletView Wallet => wallet;
         public IBoardMapView Map => map;
@@ -46,9 +54,15 @@ namespace N29.HeroesDawn.Presentation.Board
         public Button BackButton => back.Button;
         public Button RollButton => roll.Button;
         public Button EndMoveButton => end.Button;
+        /// <summary>Carte d'information de la case visée (tests PlayMode : « S'y rendre »).</summary>
+        public Button MoveConfirmButton => previewConfirm.Button;
+        public Button PreviewCancelButton => previewCancel.Button;
+        public bool PreviewVisible => previewRoot.gameObject.activeSelf;
 
         void Awake()
         {
+            previewConfirm.Button.onClick.AddListener(() => MoveConfirmClicked?.Invoke());
+            previewCancel.Button.onClick.AddListener(() => MoveCancelClicked?.Invoke());
             roll.Button.onClick.AddListener(() => RollClicked?.Invoke());
             bonus.Button.onClick.AddListener(() => BonusClicked?.Invoke());
             end.Button.onClick.AddListener(() => EndMoveClicked?.Invoke());
@@ -58,8 +72,28 @@ namespace N29.HeroesDawn.Presentation.Board
         void Update()
         {
             if (Keys.Pressed(Key.Space)) RollClicked?.Invoke();
-            else if (Keys.Pressed(Key.Enter) || Keys.Pressed(Key.NumpadEnter)) EndMoveClicked?.Invoke();
+            else if (Keys.Pressed(Key.Enter) || Keys.Pressed(Key.NumpadEnter))
+            {
+                // Entrée : « S'y rendre » si la carte d'information est ouverte, sinon valide la case sélectionnée au clavier.
+                if (PreviewVisible) MoveConfirmClicked?.Invoke();
+                else map.ConfirmFocus();
+            }
+            else if (Keys.Pressed(Key.T)) EndMoveClicked?.Invoke();
             else if (Keys.Pressed(Key.B)) BonusClicked?.Invoke();
+        }
+
+        public void ShowMovePreview(MovePreviewData? data)
+        {
+            bool show = data.HasValue;
+            if (previewRoot.gameObject.activeSelf != show) previewRoot.gameObject.SetActive(show);
+            if (!show) return;
+            var d = data!.Value;
+            previewTitle.text = d.Title;
+            previewTitle.color = ToneColors.Of(d.Tone);
+            previewBody.text = d.Body;
+            previewDetail.text = d.Detail;
+            previewConfirm.SetLabel(d.ConfirmLabel);
+            previewCancel.SetLabel(d.CancelLabel);
         }
 
         public void SetZoneTitle(string title) => zoneTitle.text = title;

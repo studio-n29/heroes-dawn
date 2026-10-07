@@ -16,6 +16,9 @@ namespace N29.HeroesDawn.Presentation.Board
         event Action? BonusClicked;
         event Action? EndMoveClicked;
         event Action? BackClicked;
+        /// <summary>« S'y rendre » sur la carte d'information de la case visée.</summary>
+        event Action? MoveConfirmClicked;
+        event Action? MoveCancelClicked;
 
         IWalletView Wallet { get; }
         IBoardMapView Map { get; }
@@ -24,6 +27,9 @@ namespace N29.HeroesDawn.Presentation.Board
         void ShowObjectives(IReadOnlyList<ObjectiveLineData> objectives);
         void ShowSquad(IReadOnlyList<SquadSlotData> squad);
         void ShowHud(BoardHudData hud);
+
+        /// <summary>Affiche la carte d'information de la case visée ; <c>null</c> la ferme.</summary>
+        void ShowMovePreview(MovePreviewData? data);
 
         /// <summary>Anime le dé (faces aléatoires) puis affiche <paramref name="value"/>.</summary>
         UniTask RollDieAsync(int value, int faces, CancellationToken ct);

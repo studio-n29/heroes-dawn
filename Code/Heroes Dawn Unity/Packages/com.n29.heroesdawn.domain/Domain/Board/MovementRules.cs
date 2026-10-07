@@ -45,5 +45,44 @@ namespace N29.HeroesDawn.Domain.Board
             }
             return result;
         }
+
+        /// <summary>
+        /// Cases encore sous le brouillard et à portée (1..PM pas, sans retour immédiat), arrêts forcés ignorés :
+        /// elles sont surlignées pour montrer la portée complète. Chacune renvoie vers son premier arrêt forcé
+        /// (une destination de <paramref name="destinations"/>) : c'est là que le déplacement s'arrête réellement.
+        /// </summary>
+        public static IReadOnlyDictionary<CaseId, FogReachPlan> FindFogReach(
+            BoardGraph g, FogOfWar fog, CaseId from, int pm, Func<CaseId, bool> isBlocking,
+            IReadOnlyDictionary<CaseId, MovePlan> destinations)
+        {
+            var result = new Dictionary<CaseId, FogReachPlan>();
+            var frontier = new List<Walk> { new Walk { At = from, HasPrev = false, Path = new List<CaseId>() } };
+
+            for (int step = 1; step <= pm; step++)
+            {
+                var next = new List<Walk>();
+                foreach (var w in frontier)
+                {
+                    foreach (var n in g.Neighbors(w.At))
+                    {
+                        if (w.HasPrev && n == w.Prev) continue;
+                        if (n == from) continue;
+                        var path = new List<CaseId>(w.Path) { n };
+                        if (!fog.IsRevealed(n) && !result.ContainsKey(n))
+                        {
+                            foreach (var p in path)
+                            {
+                                if (fog.IsRevealed(p) && !isBlocking(p) && !fog.WouldReveal(p)) continue;
+                                if (destinations.TryGetValue(p, out var stop)) result.Add(n, new FogReachPlan(n, path, p, stop.Path));
+                                break;
+                            }
+                        }
+                        next.Add(new Walk { At = n, Prev = w.At, HasPrev = true, Path = path });
+                    }
+                }
+                frontier = next;
+            }
+            return result;
+        }
     }
 }

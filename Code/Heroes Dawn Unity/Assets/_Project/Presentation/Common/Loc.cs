@@ -288,9 +288,11 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendMeta(d);
             ExtendTutorial(d);
             ExtendSettings(d);
+            ExtendBoard(d);
             return d;
         }
 
+        static partial void ExtendBoard(Dictionary<string, string> d);
         static partial void ExtendMap(Dictionary<string, string> d);
         static partial void ExtendCombat(Dictionary<string, string> d);
         static partial void ExtendMeta(Dictionary<string, string> d);

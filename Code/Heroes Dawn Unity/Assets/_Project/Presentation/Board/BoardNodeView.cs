@@ -8,10 +8,14 @@ using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Board
 {
-    /// <summary>Case du plateau (widget prefab) : disque coloré par type, glyphe, rang, objectif, destination et coût.</summary>
+    /// <summary>
+    /// Case du plateau (widget prefab) : disque coloré par type, glyphe, rang, objectif, surbrillance de déplacement
+    /// (destination, case cachée à portée, chemin, cible), coût et anneau de navigation (case sélectionnée au clavier).
+    /// </summary>
     public sealed class BoardNodeView : MonoBehaviour
     {
         [SerializeField] Image highlight = null!;
+        [SerializeField] Image focus = null!;
         [SerializeField] Image objective = null!;
         [SerializeField] Image frame = null!;
         [SerializeField] Image disc = null!;
@@ -33,17 +37,25 @@ namespace N29.HeroesDawn.Presentation.Board
             objective.gameObject.SetActive(n.IsObjective);
             objectiveTag.gameObject.SetActive(n.IsObjective);
             highlight.gameObject.SetActive(false);
+            focus.gameObject.SetActive(false);
             costBadge.SetActive(false);
+        }
+
+        /// <summary>Anneau de navigation case à case (clavier / manette).</summary>
+        public void SetFocused(bool on)
+        {
+            if (focus.gameObject.activeSelf != on) focus.gameObject.SetActive(on);
         }
 
         public void Apply(BoardNodeState s)
         {
+            bool fogReach = s.Mark == NodeMark.FogDestination;
             if (!s.Revealed)
             {
-                disc.color = Theme.WithAlpha(Theme.Surface2, 0.55f);
-                frame.color = Theme.WithAlpha(Theme.Ink, 0.5f);
+                disc.color = Theme.WithAlpha(Theme.Surface2, fogReach ? 0.85f : 0.55f);
+                frame.color = fogReach ? Theme.Info : Theme.WithAlpha(Theme.Ink, 0.5f);
                 label.text = "?";
-                label.color = Theme.WithAlpha(Theme.TextMuted, 0.6f);
+                label.color = fogReach ? Theme.Info : Theme.WithAlpha(Theme.TextMuted, 0.6f);
                 sub.text = "";
             }
             else
@@ -63,11 +75,25 @@ namespace N29.HeroesDawn.Presentation.Board
                 objectiveTag.color = s.ObjectiveDone ? Theme.Success : Theme.Primary;
                 objectiveTag.text = s.ObjectiveDone ? "OK" : "OBJ";
             }
-            bool dest = s.DestinationCost >= 0;
-            highlight.gameObject.SetActive(dest);
-            if (_marker != null) _marker.enabled = dest; // le tutoriel désigne les cases à portée
-            costBadge.SetActive(dest);
-            if (dest) cost.text = s.DestinationCost.ToString();
+            bool marked = s.Mark != NodeMark.None;
+            highlight.gameObject.SetActive(marked);
+            if (marked) highlight.color = HighlightColor(s.Mark);
+            bool real = s.Mark == NodeMark.Destination || s.Mark == NodeMark.Target;
+            if (_marker != null) _marker.enabled = s.Mark == NodeMark.Destination; // le tutoriel désigne les cases à portée
+            bool badge = s.DestinationCost >= 0 && (real || fogReach);
+            costBadge.SetActive(badge);
+            if (badge) cost.text = s.DestinationCost.ToString();
+        }
+
+        static Color HighlightColor(NodeMark m)
+        {
+            switch (m)
+            {
+                case NodeMark.FogDestination: return Theme.WithAlpha(Theme.Info, 0.8f);
+                case NodeMark.Path: return Theme.WithAlpha(Theme.Info, 0.9f);
+                case NodeMark.Target: return Color.white;
+                default: return Theme.Primary;
+            }
         }
     }
 }

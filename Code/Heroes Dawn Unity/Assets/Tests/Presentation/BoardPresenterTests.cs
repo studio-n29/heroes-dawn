@@ -128,15 +128,94 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_app.Session.Run!.Position, Is.EqualTo(new CaseId("n02")));
         }
 
-        [Test, Description("Vérifie qu'un toucher sur une destination déplace le pion le long du chemin et rafraîchit la carte — parce que la vue ne calcule jamais un chemin (doc 07)")]
+        [Test, Description("Vérifie qu'un toucher sur une destination déplace le pion le long du chemin après « S'y rendre » et rafraîchit la carte — parce que la vue ne calcule jamais un chemin (doc 07)")]
         public void TapNode_Destination_MovesAndRefreshes()
         {
             ChoosingAtN02();
             Make();
             int refreshes = _view.MapView.Refreshes;
             _view.MapView.Tap("n06");
+            _view.ClickGo();
             Assert.That(_view.MapView.Moves.Single().Last(), Is.EqualTo(new CaseId("n06")));
             Assert.That(_view.MapView.Refreshes, Is.GreaterThan(refreshes));
+            Assert.That(_view.Preview, Is.Null, "la fiche se ferme une fois le déplacement engagé");
+            Assert.That(_view.MapView.LastCenter, Is.EqualTo(new CaseId("n06")), "la caméra suit le pion");
+        }
+
+        [Test, Description("Vérifie qu'un toucher sur une destination n'engage pas le déplacement mais ouvre la fiche de la case, illumine le chemin et dézoome dessus — parce qu'on veut voir où l'on va avant de valider")]
+        public void TapNode_Destination_OpensPreview_WithoutMoving()
+        {
+            ChoosingAtN02();
+            Make();
+            _view.MapView.Tap("n06");
+            Assert.That(_view.MapView.Moves, Is.Empty);
+            Assert.That(_app.Session.Run!.Position, Is.EqualTo(new CaseId("n02")));
+            Assert.That(_view.Preview, Is.Not.Null);
+            Assert.That(_view.Preview!.Value.ConfirmLabel, Is.EqualTo("S'Y RENDRE"));
+            Assert.That(_view.MapView.Fits, Is.EqualTo(1));
+            Assert.That(_view.MapView.LastFit, Has.Member(new CaseId("n02")).And.Member(new CaseId("n06")), "la caméra montre le départ et l'arrivée");
+            Assert.That(_view.MapView.LastNodes.Single(n => n.Id == new CaseId("n06")).Mark, Is.EqualTo(NodeMark.Target));
+            Assert.That(_view.MapView.LastLinks.Any(l => l.Mark == LinkMark.Path), Is.True, "le chemin est illuminé d'une autre couleur");
+        }
+
+        [Test, Description("Vérifie qu'« Annuler » ferme la fiche sans déplacer le pion et recentre la caméra sur lui — parce que la prévisualisation ne coûte rien")]
+        public void Preview_Cancel_ClosesWithoutMoving()
+        {
+            ChoosingAtN02();
+            Make();
+            _view.MapView.Tap("n06");
+            _view.ClickCancelMove();
+            Assert.That(_view.Preview, Is.Null);
+            Assert.That(_view.MapView.Moves, Is.Empty);
+            Assert.That(_app.Session.Run!.Position, Is.EqualTo(new CaseId("n02")));
+            Assert.That(_view.MapView.LastCenter, Is.EqualTo(new CaseId("n02")));
+            Assert.That(_view.MapView.LastNodes.All(n => n.Mark != NodeMark.Target && n.Mark != NodeMark.Path));
+        }
+
+        [Test, Description("Vérifie que Retour (Échap) referme d'abord la fiche de case sans proposer « Retour au QG » — parce qu'on annule un geste avant de quitter la zone")]
+        public void Preview_Back_ClosesPreviewFirst()
+        {
+            ChoosingAtN02();
+            Make();
+            _view.MapView.Tap("n06");
+            Assert.That(_router.Dispatch(), Is.True);
+            Assert.That(_view.Preview, Is.Null);
+            Assert.That(_host.Spawned.OfType<FakeConfirmPopup>(), Is.Empty);
+        }
+
+        [Test, Description("Vérifie que toucher une autre destination remplace la fiche par celle de la nouvelle case — parce qu'on peut comparer plusieurs cases avant de choisir")]
+        public void Preview_TappingAnotherNode_ReplacesThePreview()
+        {
+            ChoosingAtN02();
+            Make();
+            _view.MapView.Tap("n06");
+            var first = _view.Preview!.Value.Title;
+            _view.MapView.Tap("n01");
+            Assert.That(_view.Preview, Is.Not.Null);
+            Assert.That(_view.MapView.LastNodes.Single(n => n.Id == new CaseId("n01")).Mark, Is.EqualTo(NodeMark.Target));
+            Assert.That(_view.MapView.LastNodes.Single(n => n.Id == new CaseId("n06")).Mark, Is.Not.EqualTo(NodeMark.Target));
+            Assert.That(first, Is.Not.Empty);
+        }
+
+        [Test, Description("Vérifie que les cases encore cachées mais à portée sont surlignées, que leur fiche annonce la zone inconnue et que « S'y rendre » mène à l'arrêt forcé — parce que la portée complète doit se voir sans enfreindre l'arrêt obligatoire du brouillard")]
+        public void FogReach_IsHighlighted_AndLeadsToItsForcedStop()
+        {
+            var zone = _app.Session.Content.Zone(PrototypeContent.Zone11);
+            _app.Session.Run = ZoneRun.ForTests(_app.Session.Content, zone, 3UL, 6, false);
+            _app.Session.RunZone = zone;
+            var run = _app.Session.Run!;
+            Assume.That(run.FogReach, Is.Not.Empty);
+            Make();
+            var hidden = _view.MapView.LastNodes.Where(n => n.Mark == NodeMark.FogDestination).ToArray();
+            Assert.That(hidden.Length, Is.EqualTo(run.FogReach.Count));
+            Assert.That(hidden.All(n => !n.Revealed && n.DestinationCost > 0));
+            var fog = run.FogReach.Values.First();
+            _view.MapView.Tap(fog.Target.Value);
+            Assert.That(_view.Preview!.Value.Title, Is.EqualTo("ZONE INCONNUE"));
+            Assert.That(_view.MapView.LastFit, Has.Member(fog.Target), "le dézoom montre aussi la suite du chemin sous le brouillard");
+            Assert.That(_view.MapView.LastLinks.Any(l => l.Mark == LinkMark.Beyond), Is.True);
+            _view.ClickGo();
+            Assert.That(_view.MapView.Moves.Single().Last(), Is.EqualTo(fog.StopAt), "le pion s'arrête au premier arrêt forcé");
         }
 
         [Test, Description("Vérifie qu'arriver sur une case Combat engage le combat puis demande la scène de combat — parce que le combat se joue dans sa scène, par-dessus le plateau (doc 07)")]
@@ -145,6 +224,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             ChoosingAtN02();
             Make();
             _view.MapView.Tap("n03");
+            _view.ClickGo();
             Assert.That(_app.Combat.Active.Simulation, Is.Not.Null);
             Assert.That(Navigations, Is.EqualTo(new[] { GameState.Combat }));
         }
@@ -177,6 +257,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             ChoosingAtN02();
             Make();
             _view.MapView.Tap("n03");
+            _view.ClickGo();
             Assume.That(_app.Session.Run!.Phase, Is.EqualTo(ZoneRunPhase.InCombat));
             _router.Dispatch();
             _view.ClickBack();
