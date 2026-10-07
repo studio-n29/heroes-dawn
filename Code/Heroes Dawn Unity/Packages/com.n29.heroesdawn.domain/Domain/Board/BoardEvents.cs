@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using N29.HeroesDawn.Core;
+using N29.HeroesDawn.Domain.Activities;
 
 namespace N29.HeroesDawn.Domain.Board
 {
@@ -56,5 +57,12 @@ namespace N29.HeroesDawn.Domain.Board
     {
         public CaseId To { get; }
         public SteppedBackEvent(CaseId to) { To = to; }
+    }
+
+    /// <summary>Une activité jouée est résolue : gains, malus éventuel, suite éventuelle (combat ou autre activité).</summary>
+    public sealed class ActivityResolvedEvent : BoardEvent
+    {
+        public ActivityOutcome Outcome { get; }
+        public ActivityResolvedEvent(ActivityOutcome outcome) { Outcome = outcome; }
     }
 }

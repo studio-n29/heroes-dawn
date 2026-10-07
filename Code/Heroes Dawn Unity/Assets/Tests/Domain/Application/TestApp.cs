@@ -205,6 +205,8 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             public readonly IMoveToUseCase Move;
             public readonly IEndMoveUseCase End;
             public readonly IResolveMiniGameUseCase MiniGame;
+            public readonly IPlanActivityUseCase PlanActivity;
+            public readonly IResolveActivityUseCase Activity;
             public readonly IResolveNarrativeUseCase Narrative;
             public readonly IResolveRestUseCase Rest;
             public readonly ILeaveZoneUseCase Leave;
@@ -217,7 +219,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
                 Bonus = new UseBonusDieUseCase(a.Effects);
                 Move = new MoveToUseCase(a.Effects);
                 End = new EndMoveUseCase(a.Effects);
-                MiniGame = new ResolveMiniGameUseCase(a.Effects);
+                Activity = new ResolveActivityUseCase(a.Effects);
+                PlanActivity = new PlanActivityUseCase(a.Effects);
+                MiniGame = new ResolveMiniGameUseCase(Activity);
                 Narrative = new ResolveNarrativeUseCase(a.Effects, roster);
                 Rest = new ResolveRestUseCase(a.Effects, roster);
                 Leave = new LeaveZoneUseCase(a.Session, a.Save, a.Logger);

@@ -4,6 +4,7 @@ using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
+using N29.HeroesDawn.Domain.Activities;
 using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Board;
 using N29.HeroesDawn.Presentation.Common;
@@ -24,6 +25,8 @@ namespace N29.HeroesDawn.Tests.Presentation
         FakeRestPopup _rest = null!;
         FakeNarrativePopup _narrative = null!;
         FakeMiniGamePopup _miniGame = null!;
+        FakeActivityPopup _activityPopup = null!;
+        FakePlanActivity _plan = null!;
         FakeZoneCompletePopup _zone = null!;
         CasePopupPresenter _p = null!;
 
@@ -35,14 +38,17 @@ namespace N29.HeroesDawn.Tests.Presentation
             _rest = new FakeRestPopup();
             _narrative = new FakeNarrativePopup();
             _miniGame = new FakeMiniGamePopup();
+            _activityPopup = new FakeActivityPopup();
             _zone = new FakeZoneCompletePopup();
             _host.Register<IRestPopupView>(() => _rest);
             _host.Register<INarrativePopupView>(() => _narrative);
             _host.Register<IMiniGamePopupView>(() => _miniGame);
+            _host.Register<IActivityPopupView>(() => _activityPopup);
             _host.Register<IZoneCompletePopupView>(() => _zone);
             _toasts = new FakeToasts();
             _resolve = new FakeCaseResolutions();
-            _p = new CasePopupPresenter(new ModalService(_host), _resolve, _resolve, _resolve, _app.Session, _toasts, new LocLocalization());
+            _plan = new FakePlanActivity(_app.Session.Content);
+            _p = new CasePopupPresenter(new ModalService(_host), _resolve, _resolve, _plan, _resolve, _app.Session, _toasts, new LocLocalization());
         }
 
         static CaseOutcome Case(CaseType t) => new CaseOutcome(new CaseId("n07"), t, CombatRank.Easy, null);
@@ -69,7 +75,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             _p.RunAsync(Case(CaseType.MiniGame), CancellationToken.None).GetAwaiter().GetResult();
             var b = _app.Session.Content.Balance;
-            Assert.That(_resolve.Calls, Is.EqualTo(new object[] { true }));
+            Assert.That(((ActivityResult)_resolve.Calls.Single()).Success, Is.True);
             Assert.That(_toasts.Shown, Has.Some.Matches<(string Text, ToastKind Kind)>(t => t.Kind == ToastKind.Reward && t.Text == Loc.F("mg.success", b.MiniGameCredits, b.MiniGamePr)));
         }
 
@@ -78,7 +84,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             _miniGame.Answer = false;
             _p.RunAsync(Case(CaseType.MiniGame), CancellationToken.None).GetAwaiter().GetResult();
-            Assert.That(_resolve.Calls, Is.EqualTo(new object[] { false }));
+            Assert.That(((ActivityResult)_resolve.Calls.Single()).Success, Is.False);
             Assert.That(_toasts.Shown, Has.Some.Matches<(string Text, ToastKind Kind)>(t => t.Kind == ToastKind.Warning && t.Text == Loc.T("mg.fail")));
         }
 
@@ -104,11 +110,80 @@ namespace N29.HeroesDawn.Tests.Presentation
             var modals = new ModalService(_host);
             foreach (var t in new[] { CaseType.Rest, CaseType.Narrative, CaseType.MiniGame })
             {
-                var p = new CasePopupPresenter(modals, _resolve, _resolve, _resolve, _app.Session, _toasts, new LocLocalization());
+                var p = new CasePopupPresenter(modals, _resolve, _resolve, _plan, _resolve, _app.Session, _toasts, new LocLocalization());
                 p.RunAsync(Case(t), CancellationToken.None).GetAwaiter().GetResult();
             }
             Assert.That(_host.Spawned.Cast<IPopupView>().All(v => !v.Cancelable), Is.True);
         }
+        CasePopupPresenter Presenter(IPlanActivityUseCase plan)
+            => new CasePopupPresenter(new ModalService(_host), _resolve, _resolve, plan, _resolve, _app.Session, _toasts, new LocLocalization());
+
+        bool Toasted(ToastKind kind, string text) => _toasts.Shown.Any(t => t.Kind == kind && t.Text == text);
+
+        [Test, Description("Vérifie qu'une activité hors réflexe ouvre la fenêtre d'activité (titre, description, décor, réglages, niveau généré) et résout la case avec le score simulé — parce que le framework décrit chaque activité de la même façon")]
+        public void Activity_OpensTheActivityPopup_WithEnvironmentAndParameters()
+        {
+            var plan = new FakePlanActivity(_app.Session.Content, "fishing_docks");
+            Presenter(plan).RunAsync(Case(CaseType.MiniGame), CancellationToken.None).GetAwaiter().GetResult();
+            var data = _activityPopup.Data!.Value;
+            Assert.That(data.Title, Is.EqualTo("PÊCHE"));
+            Assert.That(data.Lines, Has.Some.EqualTo("Décor : Port · nuit"));
+            Assert.That(data.Lines, Has.Some.Contains("Durée (s) : 60"));
+            Assert.That(data.Lines, Has.Some.Contains("Niveau généré"));
+            Assert.That(data.WinScore, Is.EqualTo(4), "poissons demandés pour réussir");
+            var call = (ActivityResult)_resolve.Calls.Single();
+            Assert.That(call.Success, Is.True);
+            Assert.That(call.Score, Is.EqualTo(4));
+            Assert.That(Toasted(ToastKind.Reward, Loc.F("mg.success", 100 + 40 * 4, 5)), Is.True, "base + 40 Crédits par poisson");
+            Assert.That(_host.Spawned.OfType<FakeMiniGamePopup>(), Is.Empty);
+        }
+
+        [Test, Description("Vérifie qu'une pêche ratée paie quand même au prorata des poissons — parce que la quantité pêchée donne des pièces même sous le quota")]
+        public void Activity_FishingFailure_StillPaysProRata()
+        {
+            _activityPopup.Win = false;
+            Presenter(new FakePlanActivity(_app.Session.Content, "fishing_docks")).RunAsync(Case(CaseType.MiniGame), CancellationToken.None).GetAwaiter().GetResult();
+            Assert.That(((ActivityResult)_resolve.Calls.Single()).Score, Is.EqualTo(2));
+            Assert.That(Toasted(ToastKind.Warning, Loc.T("mg.fail")), Is.True);
+            Assert.That(Toasted(ToastKind.Reward, Loc.F("mg.success", 80, 0)), Is.True);
+        }
+
+        [Test, Description("Vérifie qu'une potion ratée annonce le malus du patient (nom de code et pourcentage) — parce que le joueur doit savoir quel agent est affaibli jusqu'à la fin du plateau")]
+        public void Activity_PotionFailure_AnnouncesTheMalus()
+        {
+            _activityPopup.Win = false;
+            var plan = new FakePlanActivity(_app.Session.Content, "potion_field");
+            Presenter(plan).RunAsync(Case(CaseType.MiniGame), CancellationToken.None).GetAwaiter().GetResult();
+            var loc = new LocLocalization();
+            var patient = loc.MemberName(_app.Session.Content.Member(plan.Plans[0].Patient!.Value));
+            Assert.That(_activityPopup.Data!.Value.Lines, Has.Some.Contains("Patient : " + patient));
+            Assert.That(_toasts.Shown, Has.Some.Matches<(string Text, ToastKind Kind)>(t => t.Kind == ToastKind.Warning && t.Text.Contains(patient) && t.Text.Contains("-15 %")));
+        }
+
+        [Test, Description("Vérifie qu'un dialogue raté prévient que ça tourne mal (combat enchaîné) — parce que l'échec lance une activité liée")]
+        public void Activity_DialogueFailure_AnnouncesTheCombat()
+        {
+            _activityPopup.Win = false;
+            Presenter(new FakePlanActivity(_app.Session.Content, "dialogue_dockers")).RunAsync(Case(CaseType.MiniGame), CancellationToken.None).GetAwaiter().GetResult();
+            Assert.That(Toasted(ToastKind.Warning, Loc.T("activity.followup_combat")), Is.True);
+        }
+
+        [Test, Description("Vérifie qu'un échec qui enchaîne une autre activité la fait jouer ensuite sur la même case — parce que les activités peuvent s'enchaîner (dialogue raté puis épreuve liée)")]
+        public void Activity_FailureChainsTheNextActivity()
+        {
+            var c = _app.Session.Content;
+            var chain = new ActivityDef(new ActivityId("chain_a"), ActivityKinds.Fishing, "activities.fishing.name", "activities.fishing.desc",
+                                        failureFollowUp: FollowUpDef.ThenActivity(new ActivityId("fishing_docks")));
+            var content = new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Combos, c.Zones, c.AvatarSkills, new[] { chain }.Concat(c.Activities).ToList());
+            var plan = new FakePlanActivity(content, "chain_a", "fishing_docks");
+            _resolve.ActivityEvents = r => new BoardEvent[] { new ActivityResolvedEvent(ActivityRules.Resolve(plan.Plans.Last(), r)) };
+            _activityPopup.Win = false;
+            Presenter(plan).RunAsync(Case(CaseType.MiniGame), CancellationToken.None).GetAwaiter().GetResult();
+            Assert.That(plan.Plans.Select(p => p.Def.Id.Value), Is.EqualTo(new[] { "chain_a", "fishing_docks" }));
+            Assert.That(_resolve.Calls.Count, Is.EqualTo(2));
+            Assert.That(Toasted(ToastKind.Info, Loc.T("activity.followup_activity")), Is.True);
+        }
+
 
         [Test, Description("Vérifie qu'une première validation de zone annonce Crédits et PR — parce que la première validation rapporte aussi des PR (GDD §5)")]
         public void ZoneComplete_FirstClear_ShowsCreditsAndPr()

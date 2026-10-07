@@ -65,6 +65,13 @@ namespace N29.HeroesDawn.Content.Prototype
 
         public static ContentCatalog Build() => Build(new BalanceConfig());
 
+        /// <summary>Contenu avec l'équilibrage et les réglages d'activités (Resources/Balance/activities.json) donnés.</summary>
+        public static ContentCatalog Build(BalanceConfig balance, IReadOnlyDictionary<string, int> activityOverrides)
+            => WithActivities(Build(balance), ActivityParamsJson.Apply(PrototypeActivities.Build(balance), activityOverrides));
+
+        static ContentCatalog WithActivities(ContentCatalog c, IReadOnlyList<ActivityDef> activities)
+            => new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Combos, c.Zones, c.AvatarSkills, activities);
+
         public static ContentCatalog Build(BalanceConfig balance)
         {
             var members = new List<MemberDef>
@@ -137,14 +144,14 @@ namespace N29.HeroesDawn.Content.Prototype
             enemies.AddRange(PrototypeZones.Enemies());
             var zones = new List<ZoneDef> { BuildZone11() };
             zones.AddRange(PrototypeZones.Zones());
-            return new ContentCatalog(balance, members, enemies, combos, zones, AvatarSkills());
+            return new ContentCatalog(balance, members, enemies, combos, zones, AvatarSkills(), PrototypeActivities.Build(balance));
         }
 
         /// <summary>Red Hook — les quais : 25 cases, 3 embranchements, 6 combats (1 Élite fixe : Brick).</summary>
         static ZoneDef BuildZone11()
         {
-            NodeDef N(string id, CaseType t, int x, int y, bool fixedNode = false, CombatRank r = CombatRank.Normal)
-                => new NodeDef(new CaseId(id), t, fixedNode, r, x, y);
+            NodeDef N(string id, CaseType t, int x, int y, bool fixedNode = false, CombatRank r = CombatRank.Normal, string activity = null)
+                => new NodeDef(new CaseId(id), t, fixedNode, r, x, y, activity == null ? (ActivityId?)null : new ActivityId(activity));
 
             var nodes = new List<NodeDef>
             {
@@ -154,9 +161,9 @@ namespace N29.HeroesDawn.Content.Prototype
                 N("n06", CaseType.Resource, 3, 1), N("n07", CaseType.Combat, 4, 1, r: CombatRank.Easy), N("n08", CaseType.MiniGame, 5, 1, true),
                 N("n09", CaseType.Empty, 6, 2), N("n10", CaseType.Rest, 7, 2),
                 N("n11", CaseType.Combat, 8, 3), N("n12", CaseType.Resource, 9, 3), N("n13", CaseType.Narrative, 10, 3),
-                N("n14", CaseType.Resource, 8, 1), N("n15", CaseType.MiniGame, 9, 1), N("n16", CaseType.Combat, 10, 1),
+                N("n14", CaseType.Resource, 8, 1), N("n15", CaseType.MiniGame, 9, 1, activity: "fishing_docks"), N("n16", CaseType.Combat, 10, 1),
                 N("n17", CaseType.Empty, 11, 2), N("n18", CaseType.Resource, 12, 2),
-                N("n19", CaseType.Combat, 13, 3), N("n20", CaseType.Narrative, 14, 3), N("n21", CaseType.MiniGame, 13, 1),
+                N("n19", CaseType.Combat, 13, 3), N("n20", CaseType.Narrative, 14, 3), N("n21", CaseType.MiniGame, 13, 1, activity: "dialogue_dockers"),
                 N("n22", CaseType.Rest, 14, 1), N("n23", CaseType.Combat, 15, 2, true, CombatRank.Elite),
                 N("n24", CaseType.Empty, 16, 2, true),
             };
@@ -186,7 +193,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 new EncounterDef(CombatRank.Elite, new[] { new EnemyId("brick"), new EnemyId("thug") }),
             };
 
-            return new ZoneDef(Zone11, "zones.ny_1_1.name", new CaseId("n00"), nodes, links, objectives, encounters, "1.1", 1, "brooklyn", 5);
+            return new ZoneDef(Zone11, "zones.ny_1_1.name", new CaseId("n00"), nodes, links, objectives, encounters, "1.1", 1, "brooklyn", 5, null, new ZoneEnvironment(Biome.Harbor, Weather.Night));
         }
     }
 }

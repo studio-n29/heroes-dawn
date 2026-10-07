@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Application.Features.Zone;
@@ -8,6 +9,7 @@ using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
+using N29.HeroesDawn.Domain.Activities;
 using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Mvp;
@@ -24,16 +26,17 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly IModalService _modals;
         readonly IResolveRestUseCase _rest;
         readonly IResolveNarrativeUseCase _narrative;
-        readonly IResolveMiniGameUseCase _miniGame;
+        readonly IPlanActivityUseCase _plan;
+        readonly IResolveActivityUseCase _activity;
         readonly ISessionReadModel _session;
         readonly IToastService _toasts;
         readonly ILocalization _loc;
         readonly IAudioService _audio;
 
-        public CasePopupPresenter(IModalService modals, IResolveRestUseCase rest, IResolveNarrativeUseCase narrative, IResolveMiniGameUseCase miniGame,
+        public CasePopupPresenter(IModalService modals, IResolveRestUseCase rest, IResolveNarrativeUseCase narrative, IPlanActivityUseCase plan, IResolveActivityUseCase activity,
                                   ISessionReadModel session, IToastService toasts, ILocalization loc, IAudioService? audio = null)
         {
-            _modals = modals; _rest = rest; _narrative = narrative; _miniGame = miniGame; _session = session; _toasts = toasts; _loc = loc;
+            _modals = modals; _rest = rest; _narrative = narrative; _plan = plan; _activity = activity; _session = session; _toasts = toasts; _loc = loc;
             _audio = audio ?? NullAudioService.Instance;
         }
 
@@ -85,7 +88,37 @@ namespace N29.HeroesDawn.Presentation.Board
             finally { _modals.Close(view); }
         }
 
+        /// <summary>Nombre maximal d'activités enchaînées sur une même case (un échec peut lancer une activité liée).</summary>
+        const int MaxChain = 4;
+
+        /// <summary>
+        /// Case Mini-jeu : prépare l'activité de la case (framework d'activités), la fait jouer (réflexe historique ou fenêtre d'activité),
+        /// la résout (gains, malus, suite) et enchaîne tant qu'un échec lance une autre activité.
+        /// </summary>
         async UniTask<IReadOnlyList<BoardEvent>> MiniGameAsync(CaseId at, CancellationToken ct)
+        {
+            var all = new List<BoardEvent>();
+            for (int step = 0; step < MaxChain; step++)
+            {
+                var planned = _plan.Execute();
+                if (planned.IsFailure)
+                {
+                    _toasts.Show(_loc.Error(planned.Error!), ToastKind.Error);
+                    break;
+                }
+                var plan = planned.Value;
+                var result = plan.Def.Kind == ActivityKinds.Reflex ? await PlayReflexAsync(at, ct) : await PlayActivityAsync(plan, ct);
+                _audio.Play(result.Success ? SfxId.MiniGameHit : SfxId.MiniGameMiss);
+                ToastOutcome(ActivityRules.Resolve(plan, result));
+                var events = Events(await _activity.ExecuteAsync(result, ct));
+                all.AddRange(events);
+                var resolved = events.OfType<ActivityResolvedEvent>().FirstOrDefault();
+                if (resolved == null || resolved.Outcome.FollowUp == null || resolved.Outcome.FollowUp.Type != FollowUpType.Activity) break;
+            }
+            return all;
+        }
+
+        async UniTask<ActivityResult> PlayReflexAsync(CaseId at, CancellationToken ct)
         {
             string key = "mg." + at.Value;
             var view = await _modals.OpenAsync<IMiniGamePopupView>(ct);
@@ -99,13 +132,59 @@ namespace N29.HeroesDawn.Presentation.Board
                     Stop = _loc.T("mg.stop"),
                     ScoreFormat = _loc.T("mg.score"),
                 }, ct);
-                var b = _session.Content.Balance;
-                _audio.Play(success ? SfxId.MiniGameHit : SfxId.MiniGameMiss);
-                if (success) _toasts.Show(_loc.F("mg.success", b.MiniGameCredits, b.MiniGamePr), ToastKind.Reward);
-                else _toasts.Show(_loc.T("mg.fail"), ToastKind.Warning);
-                return Events(await _miniGame.ExecuteAsync(success, ct));
+                return new ActivityResult(success);
             }
             finally { _modals.Close(view); }
+        }
+
+        async UniTask<ActivityResult> PlayActivityAsync(ActivityPlan plan, CancellationToken ct)
+        {
+            var view = await _modals.OpenAsync<IActivityPopupView>(ct);
+            try { return await view.PlayAsync(ActivityData(plan), ct); }
+            finally { _modals.Close(view); }
+        }
+
+        /// <summary>Contenu de la fenêtre d'activité : description, décor, patient, réglages et résumé du niveau généré.</summary>
+        ActivityPopupData ActivityData(ActivityPlan plan)
+        {
+            var def = plan.Def;
+            var lines = new List<string>
+            {
+                _loc.F("activity.env", _loc.T("env.biome." + plan.Environment.Biome), _loc.T("env.weather." + plan.Environment.Weather)),
+            };
+            if (plan.Patient.HasValue && plan.Level.PayloadAs<PotionRecipe>() is PotionRecipe recipe)
+                lines.Add(_loc.F("activity.patient", _loc.MemberName(_session.Content.Member(plan.Patient.Value)), _loc.T("potion.ailment." + recipe.Ailment)));
+            lines.Add(_loc.F("activity.level", plan.Level.Primitives.Count, (plan.Seed % 100000).ToString()));
+            lines.Add(_loc.T("activity.params"));
+            foreach (var kv in plan.Parameters.Values.OrderBy(k => k.Key, StringComparer.Ordinal))
+                lines.Add("  " + _loc.Or("activity.param." + kv.Key, "activity.params").TrimEnd(':') + " : " + kv.Value);
+            int need = plan.Parameters.Get("success_fish");
+            return new ActivityPopupData
+            {
+                Title = _loc.T(def.NameKey).ToUpperInvariant(),
+                Body = _loc.T(def.DescriptionKey),
+                Lines = lines.ToArray(),
+                Wip = _loc.T("activity.wip"),
+                WinLabel = _loc.T("activity.simulate_win"),
+                FailLabel = _loc.T("activity.simulate_fail"),
+                WinScore = need,
+                FailScore = need / 2,
+            };
+        }
+
+        void ToastOutcome(ActivityOutcome o)
+        {
+            if (o.Result.Success) _toasts.Show(_loc.F("mg.success", o.Credits, o.Pr), ToastKind.Reward);
+            else
+            {
+                _toasts.Show(_loc.T("mg.fail"), ToastKind.Warning);
+                if (o.Credits > 0) _toasts.Show(_loc.F("mg.success", o.Credits, o.Pr), ToastKind.Reward); // pièces au prorata (pêche)
+            }
+            if (o.Malus != null)
+                _toasts.Show(_loc.F("activity.malus_applied", _loc.MemberName(_session.Content.Member(o.Malus.Member)), -o.Malus.StatPercent,
+                                    _loc.Or(o.Malus.ReasonKey, "activity.params")), ToastKind.Warning);
+            if (o.FollowUp != null && o.FollowUp.Type == FollowUpType.Combat) _toasts.Show(_loc.T("activity.followup_combat"), ToastKind.Warning);
+            else if (o.FollowUp != null && o.FollowUp.Type == FollowUpType.Activity) _toasts.Show(_loc.T("activity.followup_activity"), ToastKind.Info);
         }
 
         /// <summary>Écran « zone sécurisée » : récompenses, puis attend « Vers le QG ».</summary>

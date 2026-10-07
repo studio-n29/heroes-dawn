@@ -289,6 +289,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendTutorial(d);
             ExtendSettings(d);
             ExtendBoard(d);
+            ExtendActivities(d);
             return d;
         }
 
@@ -298,6 +299,7 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendMeta(Dictionary<string, string> d);
         static partial void ExtendTutorial(Dictionary<string, string> d);
         static partial void ExtendSettings(Dictionary<string, string> d);
+        static partial void ExtendActivities(Dictionary<string, string> d);
 
         public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
         public static bool Has(string key) => Fr.ContainsKey(key);

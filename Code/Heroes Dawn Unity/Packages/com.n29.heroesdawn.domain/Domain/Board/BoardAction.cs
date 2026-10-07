@@ -1,6 +1,6 @@
 namespace N29.HeroesDawn.Domain.Board
 {
-    public enum BoardActionType { Roll, BonusDie, Move, EndMove, CombatResult, CaseResolved }
+    public enum BoardActionType { Roll, BonusDie, Move, EndMove, CombatResult, CaseResolved, ActivityResolved }
 
     /// <summary>Entrée du journal de zone (rejoué par le serveur au M2).</summary>
     public readonly struct BoardAction

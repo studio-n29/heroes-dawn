@@ -43,7 +43,8 @@ namespace N29.HeroesDawn.Composition
         protected override void Configure(IContainerBuilder builder)
         {
             var log = new UnityLogger();
-            var content = PrototypeContent.Build(LoadBalance(log));
+            var balance = LoadBalance(log);
+            var content = PrototypeContent.Build(balance, LoadActivityOverrides(log));
 
             // ---- Contenu & état
             builder.RegisterInstance(content);
@@ -92,6 +93,8 @@ namespace N29.HeroesDawn.Composition
             builder.Register<UseBonusDieUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<MoveToUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<EndMoveUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<PlanActivityUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<ResolveActivityUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<ResolveMiniGameUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<ResolveNarrativeUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<ResolveRestUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
@@ -166,6 +169,17 @@ namespace N29.HeroesDawn.Composition
                 UiSoundRelay.Attach(Ui.gameObject, c.Resolve<IAudioService>()); // boutons de Boot : connexion, modales
                 log.Info($"Prototype M1 prêt — {content.Members.Count} recrues, {content.Zones.Count} zone(s). Données : {UnityEngine.Application.persistentDataPath}");
             });
+        }
+
+        /// <summary>Réglages d'activités (Resources/Balance/activities.json) : « activité.paramètre » → valeur ; aucun si absent ou illisible.</summary>
+        static System.Collections.Generic.IReadOnlyDictionary<string, int> LoadActivityOverrides(ILogger log)
+        {
+            var asset = Resources.Load<TextAsset>("Balance/activities");
+            if (asset == null) return new System.Collections.Generic.Dictionary<string, int>();
+            var parsed = ActivityParamsJson.Parse(asset.text);
+            if (parsed.IsSuccess) return parsed.Value;
+            log.Warn("Réglages d'activités illisibles (activities.json) : valeurs par défaut");
+            return new System.Collections.Generic.Dictionary<string, int>();
         }
 
         /// <summary>Équilibrage importé du tableur (Resources/Balance/balance.json) ; valeurs par défaut sinon.</summary>

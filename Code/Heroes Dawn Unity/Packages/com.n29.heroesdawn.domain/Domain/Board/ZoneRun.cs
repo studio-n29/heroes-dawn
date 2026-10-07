@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
+using N29.HeroesDawn.Domain.Activities;
 
 namespace N29.HeroesDawn.Domain.Board
 {
@@ -21,6 +22,11 @@ namespace N29.HeroesDawn.Domain.Board
         readonly HashSet<CaseId> _resolvedCases = new HashSet<CaseId>();
         readonly HashSet<string> _objectives = new HashSet<string>();
         readonly List<BoardAction> _log = new List<BoardAction>();
+        readonly List<AgentMalus> _maluses = new List<AgentMalus>();
+        ActivityPlan? _activity;
+        int _activityAttempts;
+        ActivityId? _followUpActivity;
+        bool _combatIsFollowUp;
         CaseId _previous;
         IReadOnlyDictionary<CaseId, MovePlan> _destinations = new Dictionary<CaseId, MovePlan>();
         IReadOnlyDictionary<CaseId, FogReachPlan> _fogReach = new Dictionary<CaseId, FogReachPlan>();
@@ -36,6 +42,10 @@ namespace N29.HeroesDawn.Domain.Board
         /// <summary>Cases encore cachées mais à portée : surlignées, elles renvoient vers leur arrêt forcé (une destination).</summary>
         public IReadOnlyDictionary<CaseId, FogReachPlan> FogReach => _fogReach;
         public IReadOnlyCollection<string> CompletedObjectives => _objectives;
+        /// <summary>Malus d'agents (ex. potion ratée), valables jusqu'à la fin du plateau.</summary>
+        public IReadOnlyList<AgentMalus> Maluses => _maluses;
+        /// <summary>Activité en cours sur la case Mini-jeu (null hors activité).</summary>
+        public ActivityPlan? CurrentActivity => _activity;
         public IReadOnlyCollection<CaseId> CollectedResources => _collected;
         public IReadOnlyCollection<CaseId> DefeatedCombats => _defeated;
         public IReadOnlyList<BoardAction> Log => _log;
@@ -129,6 +139,8 @@ namespace N29.HeroesDawn.Domain.Board
             {
                 BankRemaining(events);
                 PendingCase = new CaseOutcome(Position, type, node0.Rank, null);
+                _activity = null;
+                _followUpActivity = null;
                 Phase = ZoneRunPhase.InCaseInteraction;
                 events.Add(new CaseTriggeredEvent(PendingCase));
             }
@@ -165,14 +177,19 @@ namespace N29.HeroesDawn.Domain.Board
             var events = new List<BoardEvent>();
             if (victory)
             {
-                _defeated.Add(Position);
-                CompleteObjectives(ObjectiveType.DefeatCombat, Position, events);
+                // Combat lancé par l'échec d'une activité : la case d'activité reste à rejouer (ni « vaincue » ni objectif de combat).
+                if (!_combatIsFollowUp)
+                {
+                    _defeated.Add(Position);
+                    CompleteObjectives(ObjectiveType.DefeatCombat, Position, events);
+                }
             }
             else
             {
                 Position = _previous;
                 events.Add(new SteppedBackEvent(Position));
             }
+            _combatIsFollowUp = false;
             PendingCase = null;
             Phase = ZoneRunPhase.AwaitingRoll;
             CheckValidated(events);
@@ -190,6 +207,71 @@ namespace N29.HeroesDawn.Domain.Board
                 _resolvedCases.Add(Position);
                 if (type == CaseType.MiniGame) CompleteObjectives(ObjectiveType.CompleteMiniGame, Position, events);
                 if (type == CaseType.Narrative) CompleteObjectives(ObjectiveType.ResolveNarrative, Position, events);
+            }
+            PendingCase = null;
+            Phase = ZoneRunPhase.AwaitingRoll;
+            CheckValidated(events);
+            return events;
+        }
+
+        // ------------------------------------------------------------------ Activités
+
+        /// <summary>Malus cumulé d'un agent (négatif, borné) : appliqué à ses statistiques en combat jusqu'à la fin du plateau.</summary>
+        public void AddMalusForTests(AgentMalus malus) => _maluses.Add(malus);
+
+        public int MalusPercent(MemberId member)
+        {
+            int sum = 0;
+            foreach (var m in _maluses) if (m.Member == member) sum += m.StatPercent;
+            return sum < -ActivityRules.MaxMalusPercent ? -ActivityRules.MaxMalusPercent : sum > 0 ? 0 : sum;
+        }
+
+        /// <summary>
+        /// Prépare l'activité de la case Mini-jeu où l'on se trouve : activité de la case (ou celle qu'un échec vient d'enchaîner), environnement
+        /// de la zone, graine dérivée de la partie. Idempotent tant que l'activité n'est pas résolue (reprise d'une partie).
+        /// </summary>
+        public ActivityPlan PlanActivity(IReadOnlyList<MemberId> squad)
+        {
+            Require(ZoneRunPhase.InCaseInteraction);
+            if (Graph.Node(Position).Type != CaseType.MiniGame) throw new InvalidOperationException("Pas d'activité sur la case " + Position);
+            if (_activity != null) return _activity;
+            var id = _followUpActivity ?? Graph.Node(Position).Activity ?? ActivityIds.Reflex;
+            _followUpActivity = null;
+            _activity = ActivityPlanner.Plan(ActivityRegistry.Default, _c.Activity(id), Graph.Zone.Environment, Seed, Position, ++_activityAttempts, squad);
+            return _activity;
+        }
+
+        /// <summary>
+        /// Résout l'activité en cours : réussite = case résolue (objectif validé) ; échec = case à rejouer, malus d'agent éventuel,
+        /// puis suite éventuelle (combat de rang donné, ou autre activité enchaînée sur la même case).
+        /// </summary>
+        public IReadOnlyList<BoardEvent> ResolveActivity(ActivityResult result)
+        {
+            Require(ZoneRunPhase.InCaseInteraction);
+            var plan = _activity ?? PlanActivity(Array.Empty<MemberId>());
+            var outcome = ActivityRules.Resolve(plan, result);
+            _log.Add(new BoardAction(BoardActionType.ActivityResolved, plan.Def.Id.Value, (result.Score << 1) | (result.Success ? 1 : 0)));
+            _activity = null;
+            if (outcome.Malus != null) _maluses.Add(outcome.Malus);
+            var events = new List<BoardEvent> { new ActivityResolvedEvent(outcome) };
+
+            if (result.Success)
+            {
+                _resolvedCases.Add(Position);
+                CompleteObjectives(ObjectiveType.CompleteMiniGame, Position, events);
+            }
+            else if (outcome.FollowUp != null && outcome.FollowUp.Type == FollowUpType.Combat)
+            {
+                _combatIsFollowUp = true;
+                PendingCase = new CaseOutcome(Position, CaseType.Combat, outcome.FollowUp.Rank, PickEncounter(outcome.FollowUp.Rank));
+                Phase = ZoneRunPhase.InCombat;
+                events.Add(new CaseTriggeredEvent(PendingCase));
+                return events;
+            }
+            else if (outcome.FollowUp != null && outcome.FollowUp.Type == FollowUpType.Activity)
+            {
+                _followUpActivity = outcome.FollowUp.Activity; // la case reste interactive : l'activité liée est la suivante
+                return events;
             }
             PendingCase = null;
             Phase = ZoneRunPhase.AwaitingRoll;

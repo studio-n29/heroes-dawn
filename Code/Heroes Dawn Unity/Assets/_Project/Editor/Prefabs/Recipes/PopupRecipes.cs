@@ -142,6 +142,37 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
+    /// <summary>Activité hors réflexe (potion, survie, pêche, arène, dialogue) : fenêtre de test du framework d'activités.</summary>
+    public sealed class ActivityPopupRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Popups/ActivityPopup.prefab";
+        public int Order => 10;
+
+        public GameObject Build(PrefabContext ctx)
+        {
+            var (root, content, title) = CasePopupKit.Build("ActivityPopup", 1300, 800, Theme.Info, out var window);
+            var body = Ui.Txt(content, "", 28, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Body");
+            body.rectTransform.Stretch(24, 560, 24, 10);
+            var details = Ui.Txt(content, "", 24, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "Details");
+            details.rectTransform.Stretch(24, 235, 24, 140);
+            var wip = Ui.Txt(content, "", 24, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Body, "Wip");
+            wip.rectTransform.At(0.5f, 0f, 0, 130, 1240, 90);
+            var win = Ui.Btn(content, "", Theme.Success, Theme.TextDark, null!, 34, FontKind.Title, "Win");
+            win.Rect.At(0f, 0f, 24, 20, 580, 90);
+            var fail = Ui.Btn(content, "", Theme.Danger, Color.white, null!, 34, FontKind.Title, "Fail");
+            fail.Rect.At(1f, 0f, -24, 20, 580, 90);
+
+            var view = root.gameObject.AddComponent<ActivityPopupView>();
+            CasePopupKit.WireBase(ctx, view, title, window);
+            ctx.Wire(view, "body", body);
+            ctx.Wire(view, "details", details);
+            ctx.Wire(view, "wip", wip);
+            ctx.Wire(view, "win", win);
+            ctx.Wire(view, "fail", fail);
+            return root.gameObject;
+        }
+    }
+
     /// <summary>Zone sécurisée (reprise de BoardScreen.ShowZoneComplete).</summary>
     public sealed class ZoneCompletePopupRecipe : IPrefabRecipe
     {
