@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections;
 using System.IO;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Combat;
@@ -145,6 +146,37 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<SettingsPageView>()!.CategoryButton(7).onClick.Invoke();
             yield return CaptureSettled("85-parametres-support");
             Assert.That(File.Exists(Path.Combine(Folder, "85-parametres-support.png")));
+        }
+
+        [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit les captures du plateau agrandi : portée avec cases cachées, fiche d'une destination (chemin illuminé, dézoom), fiche d'une case sous le brouillard — parce que la prévisualisation du déplacement se relit à l'œil")]
+        public IEnumerator CaptureBoardMove()
+        {
+            yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
+
+            var session = Container.Resolve<GameSession>();
+            var zone = session.Content.Zone(PrototypeContent.Zone11);
+            session.Run = ZoneRun.ForTests(session.Content, zone, 3UL, 6, false);
+            session.RunZone = zone;
+            var run = session.Run!;
+            Container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Board));
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning);
+            yield return CaptureSettled("03-plateau-portee");
+
+            var map = Object.FindAnyObjectByType<BoardMapView>()!;
+            var far = run.Destinations.OrderByDescending(d => d.Value.Cost).First().Key;
+            map.NodeButton(far).onClick.Invoke();
+            yield return new WaitForSecondsRealtime(0.8f);
+            yield return Capture("03b-plateau-fiche");
+            Assert.That(Object.FindAnyObjectByType<BoardView>()!.PreviewVisible, Is.True);
+
+            Object.FindAnyObjectByType<BoardView>()!.PreviewCancelButton.onClick.Invoke();
+            Assume.That(run.FogReach, Is.Not.Empty);
+            map.NodeButton(run.FogReach.Keys.First()).onClick.Invoke();
+            yield return new WaitForSecondsRealtime(0.8f);
+            yield return Capture("03c-plateau-brouillard");
+            Assert.That(File.Exists(Path.Combine(Folder, "03c-plateau-brouillard.png")));
         }
 
         [UnityTest, Explicit("Captures à la demande"), Description("Produit une capture de la connexion, du QG, du plateau et du combat — parce que le passage à TextMeshPro change le rendu des polices et doit être relu à l'œil avant toute conversion (spec §11)")]

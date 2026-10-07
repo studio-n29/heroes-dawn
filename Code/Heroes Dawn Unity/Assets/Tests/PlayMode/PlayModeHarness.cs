@@ -57,9 +57,12 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public static N29.HeroesDawn.Presentation.Board.BoardPresenter BoardPresenter()
             => Object.FindAnyObjectByType<N29.HeroesDawn.Composition.BoardLifetimeScope>()!.Container.Resolve<N29.HeroesDawn.Presentation.Board.BoardPresenter>();
 
-        /// <summary>Toucher réel d'une case de la carte du plateau.</summary>
+        /// <summary>Toucher réel d'une case de la carte du plateau, puis « S'y rendre » sur sa fiche (le déplacement se valide en deux temps).</summary>
         public static void TapNode(N29.HeroesDawn.Core.CaseId id)
-            => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Board.BoardMapView>()!.NodeButton(id).onClick.Invoke();
+        {
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Board.BoardMapView>()!.NodeButton(id).onClick.Invoke();
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Board.BoardView>()!.MoveConfirmButton.onClick.Invoke();
+        }
 
         /// <summary>« Retour QG » sur le plateau puis « Valider » dans la confirmation.</summary>
         public static IEnumerator BackToHqConfirmed()

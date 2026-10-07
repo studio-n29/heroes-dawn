@@ -19,9 +19,17 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public IReadOnlyList<BoardNodeState> LastNodes = Array.Empty<BoardNodeState>();
         public readonly List<IReadOnlyList<CaseId>> Moves = new List<IReadOnlyList<CaseId>>();
 
+        public IReadOnlyList<BoardLinkState> LastLinks = Array.Empty<BoardLinkState>();
+        public IReadOnlyList<CaseId> LastFit = Array.Empty<CaseId>();
+        public int Fits;
+        public CaseId? LastCenter;
+        public CaseId? Focused { get; set; }
+
         public void Tap(string id) => NodeTapped?.Invoke(new CaseId(id));
         public void Build(BoardMapData d) => Builds++;
-        public void Refresh(IReadOnlyList<BoardNodeState> nodes, IReadOnlyList<BoardLinkState> links, CaseId pawnAt, bool movePawn) { Refreshes++; LastNodes = nodes; }
+        public void CenterOn(CaseId id, bool animate) => LastCenter = id;
+        public void FitTo(IReadOnlyList<CaseId> ids, bool animate) { Fits++; LastFit = ids; }
+        public void Refresh(IReadOnlyList<BoardNodeState> nodes, IReadOnlyList<BoardLinkState> links, CaseId pawnAt, bool movePawn) { Refreshes++; LastNodes = nodes; LastLinks = links; }
         public UniTask MovePawnAsync(IReadOnlyList<CaseId> path, CancellationToken ct) { Moves.Add(path); return UniTask.CompletedTask; }
     }
 
@@ -31,6 +39,11 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action? BonusClicked;
         public event Action? EndMoveClicked;
         public event Action? BackClicked;
+        public event Action? MoveConfirmClicked;
+        public event Action? MoveCancelClicked;
+
+        /// <summary>Fiche de case ouverte (null = fermée).</summary>
+        public MovePreviewData? Preview;
 
         public readonly FakeWalletView WalletView = new FakeWalletView();
         public readonly FakeBoardMap MapView = new FakeBoardMap();
@@ -46,6 +59,9 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void ClickBonus() => BonusClicked?.Invoke();
         public void ClickEnd() => EndMoveClicked?.Invoke();
         public void ClickBack() => BackClicked?.Invoke();
+        public void ClickGo() => MoveConfirmClicked?.Invoke();
+        public void ClickCancelMove() => MoveCancelClicked?.Invoke();
+        public void ShowMovePreview(MovePreviewData? data) => Preview = data;
 
         public void SetZoneTitle(string title) => Title = title;
         public void ShowObjectives(IReadOnlyList<ObjectiveLineData> o) => Objectives = o;

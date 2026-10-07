@@ -23,6 +23,7 @@ namespace N29.HeroesDawn.Domain.Board
         readonly List<BoardAction> _log = new List<BoardAction>();
         CaseId _previous;
         IReadOnlyDictionary<CaseId, MovePlan> _destinations = new Dictionary<CaseId, MovePlan>();
+        IReadOnlyDictionary<CaseId, FogReachPlan> _fogReach = new Dictionary<CaseId, FogReachPlan>();
 
         public BoardGraph Graph { get; }
         public FogOfWar Fog { get; }
@@ -32,6 +33,8 @@ namespace N29.HeroesDawn.Domain.Board
         public ZoneRunPhase Phase { get; private set; }
         public CaseOutcome? PendingCase { get; private set; }
         public IReadOnlyDictionary<CaseId, MovePlan> Destinations => _destinations;
+        /// <summary>Cases encore cachées mais à portée : surlignées, elles renvoient vers leur arrêt forcé (une destination).</summary>
+        public IReadOnlyDictionary<CaseId, FogReachPlan> FogReach => _fogReach;
         public IReadOnlyCollection<string> CompletedObjectives => _objectives;
         public IReadOnlyCollection<CaseId> CollectedResources => _collected;
         public IReadOnlyCollection<CaseId> DefeatedCombats => _defeated;
@@ -197,13 +200,18 @@ namespace N29.HeroesDawn.Domain.Board
         void BankRemaining(List<BoardEvent> events)
         {
             _destinations = new Dictionary<CaseId, MovePlan>();
+            _fogReach = new Dictionary<CaseId, FogReachPlan>();
             if (PmInHand <= 0) { PmInHand = 0; return; }
             Dice.AddUnusedPm(PmInHand);
             events.Add(new PmBankedEvent(PmInHand));
             PmInHand = 0;
         }
 
-        void RefreshDestinations() => _destinations = MovementRules.FindDestinations(Graph, Fog, Position, PmInHand, IsBlocking);
+        void RefreshDestinations()
+        {
+            _destinations = MovementRules.FindDestinations(Graph, Fog, Position, PmInHand, IsBlocking);
+            _fogReach = MovementRules.FindFogReach(Graph, Fog, Position, PmInHand, IsBlocking, _destinations);
+        }
 
         EncounterDef PickEncounter(CombatRank rank)
         {
