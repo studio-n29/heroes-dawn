@@ -187,7 +187,13 @@ namespace N29.HeroesDawn.Domain.Activities
                 while (scores.Count < perLine) scores.Add(1);
                 Gen.Shuffle(rng, scores);
                 var choices = new List<DialogueChoice>();
-                for (int k = 0; k < perLine; k++) choices.Add(new DialogueChoice(k, scores[k], "dialogue." + id + "." + i + ".c" + k));
+                int ok = 0;
+                for (int k = 0; k < perLine; k++)
+                {
+                    // Le texte suit la qualité de la réponse (.good / .ok1 / .ok2 / .bad), pas sa position : les répliques se rédigent par palier.
+                    string tier = scores[k] == 2 ? "good" : scores[k] == 0 ? "bad" : "ok" + (++ok);
+                    choices.Add(new DialogueChoice(k, scores[k], "dialogue." + id + "." + i + "." + tier));
+                }
                 result.Add(new DialogueLine(i, "dialogue." + id + "." + i, choices));
             }
             return new DialogueScript(result, c.Param("required_percent"));

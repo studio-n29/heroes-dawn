@@ -37,7 +37,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
 
         static string Folder => Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "../../docs/test-reports/captures"));
 
-        static IEnumerator Capture(string name)
+        internal static IEnumerator Capture(string name)
         {
             for (int i = 0; i < 20; i++) yield return null; // fondus et mises en page terminés
             // En batchmode, la fin d'image n'arrive jamais (WaitForEndOfFrame bloque) : rendu explicite par une caméra.
