@@ -29,7 +29,7 @@ namespace N29.HeroesDawn.Domain.Combat
         {
             int pct = slotIndex == 0 ? _b.TimelineLightResetPercent
                     : slotIndex == 1 ? _b.TimelineMediumResetPercent
-                    : slotIndex == 2 ? _b.TimelineHeavyResetPercent
+                    : slotIndex == 2 || slotIndex == 3 ? _b.TimelineHeavyResetPercent
                     : _b.TimelineComboResetPercent;
             return u.GaugeMax * pct / 100;
         }

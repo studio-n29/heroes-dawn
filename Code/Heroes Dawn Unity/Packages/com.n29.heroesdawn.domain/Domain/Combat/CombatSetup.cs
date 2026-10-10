@@ -11,7 +11,16 @@ namespace N29.HeroesDawn.Domain.Combat
         public int FatiguePercent { get; }
         /// <summary>Bonus / malus de statistiques en % (ex. -15 après une potion ratée) ; 0 = aucun.</summary>
         public int StatPercent { get; }
-        public AllyEntry(MemberId member, int level, int fatiguePercent, int statPercent = 0) { Member = member; Level = level; FatiguePercent = fatiguePercent; StatPercent = statPercent; }
+        /// <summary>Objets equipes (au plus 2).</summary>
+        public IReadOnlyList<ItemId> Items { get; }
+        /// <summary>Cartes equipees : emplacement 3 puis 4 (une entree vide = pas de carte).</summary>
+        public IReadOnlyList<CardId?> Cards { get; }
+        public AllyEntry(MemberId member, int level, int fatiguePercent, int statPercent = 0, IReadOnlyList<ItemId>? items = null, IReadOnlyList<CardId?>? cards = null)
+        {
+            Member = member; Level = level; FatiguePercent = fatiguePercent; StatPercent = statPercent;
+            Items = items ?? System.Array.Empty<ItemId>();
+            Cards = cards ?? System.Array.Empty<CardId?>();
+        }
     }
 
     public sealed class EnemyEntry

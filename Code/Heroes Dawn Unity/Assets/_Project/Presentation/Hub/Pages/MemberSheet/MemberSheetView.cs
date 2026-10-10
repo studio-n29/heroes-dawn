@@ -26,6 +26,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UiButton next = null!;
         [SerializeField] UiButton salon = null!;
         [SerializeField] UiButton infirmary = null!;
+        [SerializeField] UiButton loadout = null!;
         [SerializeField] UiButton primary = null!;
         [SerializeField] TMP_Text primaryReason = null!;
 
@@ -33,6 +34,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? NextClicked;
         public event Action? PrimaryClicked;
         public event Action<HubPage>? RoomClicked;
+        public event Action? LoadoutClicked;
 
         public Button PrimaryButton => primary.Button;
         public Button NextButton => next.Button;
@@ -44,6 +46,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             primary.Button.onClick.AddListener(() => PrimaryClicked?.Invoke());
             salon.Button.onClick.AddListener(() => RoomClicked?.Invoke(HubPage.Salon));
             infirmary.Button.onClick.AddListener(() => RoomClicked?.Invoke(HubPage.Infirmary));
+            loadout.Button.onClick.AddListener(() => LoadoutClicked?.Invoke());
         }
 
         public void Show(MemberSheetData d)
@@ -74,6 +77,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             SetActive(next, d.ShowArrows);
             SetActive(salon, d.ShowRooms);
             SetActive(infirmary, d.ShowRooms);
+            SetActive(loadout, d.ShowLoadout);
+            if (d.ShowLoadout) loadout.SetLabel(d.LoadoutLabel);
             primary.SetLabel(d.PrimaryLabel);
             primary.Interactable = d.PrimaryEnabled;
             primary.DisabledReason = d.PrimaryReason;

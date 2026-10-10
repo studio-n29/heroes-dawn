@@ -35,6 +35,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ok.SetLabel(d.Ok);
             ok.SetColors(ToneColors.Of(d.OkTone), Theme.TextDark);
             cancel.SetLabel(d.Cancel);
+            cancel.gameObject.SetActive(!string.IsNullOrEmpty(d.Cancel)); // un message simple n a qu un bouton
             group.alpha = 0f;
             Tween.Fade(group, 1f, 0.15f);
             Tween.PopIn(window, 0.26f);

@@ -45,6 +45,26 @@ namespace N29.HeroesDawn.Tests.Presentation
             return _p;
         }
 
+        [Test, Description("Vérifie que la fiche d'un agent possédé propose Équipement avec ses emplacements remplis et que le bouton ouvre la page Équipement de cet agent — parce que l'équipement se règle depuis la fiche")]
+        public void Loadout_ButtonOpensTheLoadoutPage_WithCounts()
+        {
+            Make("givre");
+            Assert.That(_view.Last.ShowLoadout, Is.True);
+            Assert.That(_view.Last.LoadoutLabel, Does.Contain("objets 0/2").And.Contain("cartes 0/2"));
+            _view.ClickLoadout();
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Loadout));
+            Assert.That(_nav.Current.Member, Is.EqualTo(new MemberId("givre")));
+        }
+
+        [Test, Description("Vérifie que la fiche d'un héros de la boutique ne propose pas d'équipement — parce qu'on n'équipe que son effectif")]
+        public void Loadout_HiddenOnAShopHeroSheet()
+        {
+            var offer = _app.Session.Shop.Offers.Count > 0 ? _app.Session.Shop.Offers[0].Id.Value : null;
+            if (offer == null) { Assert.Ignore("pas d'offre de boutique dans ce test"); }
+            Make(offer!, fromShop: true);
+            Assert.That(_view.Last.ShowLoadout, Is.False);
+        }
+
         [Test, Description("Vérifie que le membre choisi aux flèches devient l'emplacement courant, sans nouvelle page — parce qu'un raccourci puis Retour doit ramener à ce membre (relecture, I2)")]
         public void NextPrevious_UpdatesNavigatorLocation_WithoutNavigation()
         {

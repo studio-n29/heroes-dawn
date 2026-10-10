@@ -62,7 +62,13 @@ namespace N29.HeroesDawn.Application.Session
         public int Level { get; set; }
         public int Fatigue { get; set; }
         public bool InSquad { get; set; }
+        /// <summary>Objets equipes (au plus 2).</summary>
+        public List<ItemId> Items { get; } = new List<ItemId>();
+        /// <summary>Cartes equipees : emplacement 3 puis 4 (null = pas de carte).</summary>
+        public CardId?[] Cards { get; } = new CardId?[2];
         public bool Exhausted => Fatigue >= 100;
+        IReadOnlyList<ItemId> ITeamMemberReadModel.Items => Items;
+        IReadOnlyList<CardId?> ITeamMemberReadModel.Cards => Cards;
         public TeamMember(MemberDef def, int level) { Def = def; Id = def.Id; Level = level; }
 
         public void AddFatigue(int amount) => Fatigue = Math.Max(0, Math.Min(100, Fatigue + amount));
@@ -178,11 +184,13 @@ namespace N29.HeroesDawn.Application.Session
                 {
                     var def = FindDef(new MemberId(s.id ?? ""));
                     if (def == null || Owns(def.Id)) continue;
-                    Roster.Add(new TeamMember(def, Math.Max(1, Math.Min(MetaRules.MaxLevel, s.level)))
+                    var member = new TeamMember(def, Math.Max(1, Math.Min(MetaRules.MaxLevel, s.level)))
                     {
                         Fatigue = Math.Max(0, Math.Min(100, s.fatigue)),
                         InSquad = s.inSquad,
-                    });
+                    };
+                    LoadEquipment(member, s);
+                    Roster.Add(member);
                 }
             }
             if (Roster.Count == 0)
@@ -214,7 +222,12 @@ namespace N29.HeroesDawn.Application.Session
             foreach (var z in CompletedZones) p.completedZones.Add(z);
             p.completedZones.Sort(StringComparer.Ordinal);
             foreach (var m in Roster)
-                p.team.Add(new MemberSave { id = m.Id.Value, level = m.Level, fatigue = m.Fatigue, inSquad = m.InSquad });
+            {
+                var save = new MemberSave { id = m.Id.Value, level = m.Level, fatigue = m.Fatigue, inSquad = m.InSquad };
+                foreach (var item in m.Items) save.items.Add(item.Value);
+                foreach (var card in m.Cards) save.cards.Add(card.HasValue ? card.Value.Value : "");
+                p.team.Add(save);
+            }
             Meta.gems = Wallet.Gems;
             p.meta = Meta;
             p.shop.day = Shop.Day;
@@ -226,6 +239,27 @@ namespace N29.HeroesDawn.Application.Session
                 p.shop.recruited.Add(o.Recruited);
             }
             return p;
+        }
+
+        /// <summary>Objets et cartes equipes sauvegardes ; un objet ou une carte inconnu du jeu, en trop ou d'une autre categorie est ignore.</summary>
+        void LoadEquipment(TeamMember member, MemberSave save)
+        {
+            var collection = Content.Collection;
+            if (save.items != null)
+                foreach (var id in save.items)
+                {
+                    if (member.Items.Count >= CollectionRules.MaxItems) break;
+                    if (!string.IsNullOrEmpty(id) && collection.HasItem(new ItemId(id))) member.Items.Add(new ItemId(id));
+                }
+            if (save.cards != null)
+                for (int i = 0; i < save.cards.Count && i < member.Cards.Length; i++)
+                {
+                    var id = save.cards[i];
+                    if (string.IsNullOrEmpty(id) || !collection.HasCard(new CardId(id))) continue;
+                    if (!CollectionRules.CanEquip(collection.Card(new CardId(id)), member.Def)) continue;
+                    member.Cards[i] = new CardId(id);
+                }
+            if (member.Cards[0] == null && member.Cards[1] != null) { member.Cards[0] = member.Cards[1]; member.Cards[1] = null; }
         }
 
         /// <summary>Restaure la boutique sauvegardée ; une offre dont la recrue n'existe plus est ignorée.</summary>

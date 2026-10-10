@@ -310,6 +310,7 @@ namespace N29.HeroesDawn.Presentation.Board
                 string text = rewards == null ? ""
                             : rewards.FirstClear ? _loc.F("board.zone_rewards", rewards.Credits, rewards.Pr)
                             : _loc.F("board.zone_rewards.replay", rewards.Credits);
+                if (rewards != null && rewards.Boosters > 0) text += _loc.F("board.zone_booster", rewards.Boosters);
                 await view.ShowAsync(new ZoneCompleteData { Title = _loc.T("board.zone_complete"), Rewards = text, ToHq = _loc.T("board.to_hq") }, ct);
             }
             finally { _modals.Close(view); }

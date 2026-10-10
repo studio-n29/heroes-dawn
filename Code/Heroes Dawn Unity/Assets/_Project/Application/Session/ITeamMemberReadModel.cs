@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 
@@ -13,5 +14,7 @@ namespace N29.HeroesDawn.Application.Session
         int Fatigue { get; }
         bool InSquad { get; }
         bool Exhausted { get; }
+        IReadOnlyList<ItemId> Items { get; }
+        IReadOnlyList<CardId?> Cards { get; }
     }
 }

@@ -123,6 +123,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<ResearchLab>(Lifetime.Singleton);
             builder.Register<ArchiveBook>(Lifetime.Singleton);
             builder.Register<Boutique>(Lifetime.Singleton);
+            builder.Register<Application.Features.Collection.CollectionBook>(Lifetime.Singleton);
             builder.Register<PlayerSettings>(Lifetime.Singleton);
             builder.Register<MetaOverview>(Lifetime.Singleton);
             builder.Register<TutorialGuide>(Lifetime.Singleton);

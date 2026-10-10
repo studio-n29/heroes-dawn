@@ -27,6 +27,10 @@ namespace N29.HeroesDawn.Definitions
         public int RankEasyStatPercent { get; set; } = 80;
         public int RankEliteStatPercent { get; set; } = 130;
         public int ComboCooldownActions { get; set; } = 3;
+        /// <summary>Chance en % qu un evenement narratif resolu fasse trouver un objet.</summary>
+        public int EventItemChancePercent { get; set; } = 60;
+        /// <summary>Chance en % qu un mini-jeu reussi donne un booster.</summary>
+        public int ActivityBoosterChancePercent { get; set; } = 50;
 
         // ---- Frise chronologique (Timeline) : positions en % de la jauge, 100 = point d action
         /// <summary>Position après une compétence légère (A1).</summary>

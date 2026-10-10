@@ -26,5 +26,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string PrimaryReason;
         public bool ShowArrows;
         public bool ShowRooms;
+        /// <summary>Bouton Equipement : libelle avec les emplacements remplis ; cache sur la fiche d un heros de la boutique.</summary>
+        public string LoadoutLabel;
+        public bool ShowLoadout;
     }
 }

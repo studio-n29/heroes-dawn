@@ -111,6 +111,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public ArchiveBook Archives { get; }
         public MetaTracker Tracker { get; }
         public Boutique Boutique { get; }
+        public N29.HeroesDawn.Application.Features.Collection.CollectionBook Collection { get; }
         public MetaOverview Overview { get; }
         public PlayerSettings Settings { get; }
         public TutorialGuide Tutorial { get; }
@@ -170,6 +171,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Lab = new ResearchLab(MetaCtx);
             Archives = new ArchiveBook(MetaCtx);
             Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
+            Collection = new N29.HeroesDawn.Application.Features.Collection.CollectionBook(MetaCtx, Publisher<RosterChanged>());
             Overview = new MetaOverview(Pass, Daily, Secondary, Operations, Lab, Archives, Boutique);
             Settings = new PlayerSettings(MetaCtx);
             Tutorial = new TutorialGuide(MetaCtx);

@@ -37,9 +37,9 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (!d.Visible) return;
             slot.text = (index + 1).ToString();
             glyph.text = d.Locked ? "+" : d.Glyph;
-            var baseColor = d.Locked ? Theme.Surface3 : index == 2 ? Theme.Danger : index == 1 ? Theme.Info : Theme.Primary;
+            var baseColor = d.Locked ? Theme.Surface3 : index == 3 ? Theme.Perception : index == 2 ? Theme.Danger : index == 1 ? Theme.Info : Theme.Primary;
             disc.color = d.Pending ? Color.white : baseColor;
-            glyph.color = d.Pending || index != 2 || d.Locked ? Theme.TextDark : Color.white;
+            glyph.color = d.Pending || index < 2 || d.Locked ? Theme.TextDark : Color.white;
             if (d.Locked) glyph.color = Theme.TextMuted;
             bool cooling = d.Cooldown > 0;
             cooldown.gameObject.SetActive(cooling);
