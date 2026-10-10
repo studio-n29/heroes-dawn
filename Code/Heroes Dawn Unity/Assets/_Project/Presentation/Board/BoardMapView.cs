@@ -49,6 +49,7 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly List<bool> _linkVisible = new List<bool>();
         readonly List<CaseId> _cycle = new List<CaseId>();
         RectTransform? _pawn;
+        Image? _background;
         Coroutine? _move;
         Coroutine? _camera;
         bool _animating;
@@ -81,6 +82,7 @@ namespace N29.HeroesDawn.Presentation.Board
 
         public void Build(BoardMapData d)
         {
+            BuildBackground(d);
             linkLayer.Clear();
             nodeLayer.Clear();
             _nodes.Clear();
@@ -123,6 +125,26 @@ namespace N29.HeroesDawn.Presentation.Board
             _pawn.anchoredPosition = PawnPos(d.PawnAt);
             _zoom = DefaultZoom;
             CenterOn(d.PawnAt, false);
+        }
+
+        /// <summary>Fond de carte généré par l'outil de level design : une image derrière les liens, cadrée sur la grille qu'elle couvre.</summary>
+        void BuildBackground(BoardMapData d)
+        {
+            if (_background != null) Destroy(_background.gameObject);
+            _background = null;
+            if (string.IsNullOrEmpty(d.BackgroundKey)) return;
+            var sprite = Resources.Load<Sprite>("Zones/" + d.BackgroundKey);
+            if (sprite == null) return;
+            var go = new GameObject("Background", typeof(RectTransform), typeof(Image));
+            var rt = (RectTransform)go.transform;
+            rt.SetParent(content, false);
+            rt.SetAsFirstSibling();
+            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = new Vector2(((d.BgMinX + d.BgMaxX) / 2f - 8f) * StepX, ((d.BgMinY + d.BgMaxY) / 2f - 2f) * StepY);
+            rt.sizeDelta = new Vector2((d.BgMaxX - d.BgMinX) * StepX, (d.BgMaxY - d.BgMinY) * StepY);
+            _background = go.GetComponent<Image>();
+            _background.sprite = sprite;
+            _background.raycastTarget = false;
         }
 
         void AddNeighbor(CaseId from, CaseId to, int link)

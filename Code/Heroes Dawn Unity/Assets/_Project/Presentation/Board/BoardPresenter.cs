@@ -167,6 +167,9 @@ namespace N29.HeroesDawn.Presentation.Board
                 Links = run.Graph.Zone.Links.Select(l => new BoardMapLink { A = l.A, B = l.B }).ToArray(),
                 Pawn = new PortraitData(_loc.MemberName(leader), leader.Family),
                 PawnAt = run.Position,
+                BackgroundKey = run.Graph.Zone.Background?.Key ?? "",
+                BgMinX = run.Graph.Zone.Background?.MinX ?? 0, BgMinY = run.Graph.Zone.Background?.MinY ?? 0,
+                BgMaxX = run.Graph.Zone.Background?.MaxX ?? 0, BgMaxY = run.Graph.Zone.Background?.MaxY ?? 0,
             };
         }
 

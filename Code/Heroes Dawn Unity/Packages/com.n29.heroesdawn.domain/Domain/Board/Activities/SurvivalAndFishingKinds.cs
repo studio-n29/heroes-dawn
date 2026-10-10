@@ -204,9 +204,10 @@ namespace N29.HeroesDawn.Domain.Activities
             }
 
             var facts = new Dictionary<string, int> { ["waves"] = waves, ["enemies_per_wave"] = perWave, ["enemies_total"] = waves * perWave, ["arena_radius_cm"] = radius };
+            int patternBase = rng.Range(0, 3); // les vagues parcourent poursuite, charge, tir à partir d'un point de départ tiré
             for (int w = 0; w < waves; w++)
             {
-                facts["wave" + w + "_pattern"] = (w + rng.Range(0, 3)) % 3;
+                facts["wave" + w + "_pattern"] = (w + patternBase) % 3;
                 for (int i = 0; i < perWave; i++)
                 {
                     var d = Gen.Dir16[(i * 16 / perWave + w) % 16];

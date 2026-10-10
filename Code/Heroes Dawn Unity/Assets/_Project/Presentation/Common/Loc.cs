@@ -290,6 +290,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendSettings(d);
             ExtendBoard(d);
             ExtendActivities(d);
+            ExtendStages(d);
             return d;
         }
 
@@ -300,9 +301,16 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendTutorial(Dictionary<string, string> d);
         static partial void ExtendSettings(Dictionary<string, string> d);
         static partial void ExtendActivities(Dictionary<string, string> d);
+        static partial void ExtendStages(Dictionary<string, string> d);
 
         public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
         public static bool Has(string key) => Fr.ContainsKey(key);
+
+        /// <summary>Ajoute ou remplace des textes (zones et objectifs créés dans l'outil de level design).</summary>
+        public static void Override(IEnumerable<KeyValuePair<string, string>> texts)
+        {
+            foreach (var kv in texts) Fr[kv.Key] = kv.Value;
+        }
         public static string F(string key, params object[] args) => string.Format(T(key), args);
         public static string Or(string key, string fallbackKey) => Has(key) ? T(key) : T(fallbackKey);
 

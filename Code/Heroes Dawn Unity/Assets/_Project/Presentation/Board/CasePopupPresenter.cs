@@ -10,6 +10,9 @@ using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Activities;
+using N29.HeroesDawn.Domain.Activities.Games;
+using N29.HeroesDawn.Presentation.Activities;
+using UnityEngine;
 using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Mvp;
@@ -137,11 +140,111 @@ namespace N29.HeroesDawn.Presentation.Board
             finally { _modals.Close(view); }
         }
 
+        /// <summary>Joue l'activité avec sa fenêtre : potion, dialogue, survie, pêche ou arène ; un type sans jeu dédié garde la fenêtre générique.</summary>
         async UniTask<ActivityResult> PlayActivityAsync(ActivityPlan plan, CancellationToken ct)
         {
+            switch (plan.Def.Kind)
+            {
+                case ActivityKinds.Potion when plan.Level.PayloadAs<PotionRecipe>() != null: return await PlayPotionAsync(plan, ct);
+                case ActivityKinds.Dialogue when plan.Level.PayloadAs<DialogueScript>() != null: return await PlayDialogueAsync(plan, ct);
+                case ActivityKinds.SnowSurvival:
+                case ActivityKinds.Fishing:
+                case ActivityKinds.CombatArena:
+                    return await PlayStageAsync(plan, ct);
+            }
             var view = await _modals.OpenAsync<IActivityPopupView>(ct);
             try { return await view.PlayAsync(ActivityData(plan), ct); }
             finally { _modals.Close(view); }
+        }
+
+        static readonly Dictionary<PotionTag, Color> TagColors = new Dictionary<PotionTag, Color>
+        {
+            [PotionTag.Heat] = new Color(1f, 0.55f, 0.3f), [PotionTag.Cold] = new Color(0.55f, 0.85f, 1f), [PotionTag.Calm] = new Color(0.78f, 0.7f, 1f),
+            [PotionTag.Vigor] = new Color(0.55f, 0.9f, 0.5f), [PotionTag.Antidote] = new Color(0.4f, 0.85f, 0.8f), [PotionTag.Binding] = new Color(0.95f, 0.75f, 0.35f),
+            [PotionTag.Light] = new Color(1f, 0.95f, 0.5f), [PotionTag.Earth] = new Color(0.75f, 0.6f, 0.45f),
+        };
+
+        async UniTask<ActivityResult> PlayPotionAsync(ActivityPlan plan, CancellationToken ct)
+        {
+            var request = PotionRequestFor(plan);
+            var view = await _modals.OpenAsync<IPotionPopupView>(ct);
+            try { return await view.PlayAsync(request, ct); }
+            finally { _modals.Close(view); }
+        }
+
+        /// <summary>Potion : la partie, les ingrédients (nom + propriété), le livre d'indices et la présentation du patient.</summary>
+        public PotionRequest PotionRequestFor(ActivityPlan plan)
+        {
+            var recipe = plan.Level.PayloadAs<PotionRecipe>()!;
+            string Name(int i) => _loc.T("potion.name." + recipe.Ingredients[i].Tag);
+            var sb = new System.Text.StringBuilder();
+            sb.Append("<color=#FFD24D>").Append(_loc.T("potion.book.effects")).Append("</color>\n");
+            foreach (var h in recipe.Hints.Where(h => h.Kind == "effect")) sb.Append(_loc.F("potion.hint.effect", Name(h.A), _loc.T("potion.tag." + (PotionTag)h.B))).Append('\n');
+            sb.Append("\n<color=#FFD24D>").Append(_loc.T("potion.book.recipe")).Append("</color>\n");
+            foreach (var h in recipe.Hints.Where(h => h.Kind == "order").OrderBy(h => h.B)) sb.Append(_loc.F("potion.hint.order", Name(h.A), h.B)).Append('\n');
+            foreach (var h in recipe.Hints.Where(h => h.Kind == "quantity")) sb.Append(_loc.F("potion.hint.quantity", Name(h.A), h.B)).Append('\n');
+            string ailment = _loc.T("potion.ailment." + recipe.Ailment);
+            return new PotionRequest
+            {
+                Title = _loc.T(plan.Def.NameKey).ToUpperInvariant(),
+                Intro = plan.Patient.HasValue ? _loc.F("potion.intro", _loc.MemberName(_session.Content.Member(plan.Patient.Value)), ailment) : _loc.F("potion.intro_nobody", ailment),
+                Book = sb.ToString(),
+                Game = new PotionGame(recipe),
+                IngredientNames = recipe.Ingredients.Select(i => _loc.T("potion.ingredient." + i.Tag)).ToList(),
+                IngredientColors = recipe.Ingredients.Select(i => TagColors[i.Tag]).ToList(),
+                Loc = _loc,
+            };
+        }
+
+        async UniTask<ActivityResult> PlayDialogueAsync(ActivityPlan plan, CancellationToken ct)
+        {
+            var request = DialogueRequestFor(plan);
+            var view = await _modals.OpenAsync<IDialoguePopupView>(ct);
+            try { return await view.PlayAsync(request, ct); }
+            finally { _modals.Close(view); }
+        }
+
+        public DialogueRequest DialogueRequestFor(ActivityPlan plan)
+            => new DialogueRequest
+            {
+                Title = _loc.T(plan.Def.NameKey).ToUpperInvariant(),
+                Game = new DialogueGame(plan.Level.PayloadAs<DialogueScript>()!),
+                Text = k => _loc.Has(k) ? _loc.T(k) : k.Substring(k.LastIndexOf('.') + 1),
+                Loc = _loc,
+            };
+
+        async UniTask<ActivityResult> PlayStageAsync(ActivityPlan plan, CancellationToken ct)
+        {
+            var request = StageRequestFor(plan);
+            var view = await _modals.OpenAsync<IStageGameView>(ct);
+            try { return await view.PlayAsync(request, ct); }
+            finally { _modals.Close(view); }
+        }
+
+        /// <summary>Activité 3D : la partie (ou, pour l'arène, la fabrique selon l'agent choisi dans l'escouade), les textes et les consignes.</summary>
+        public StageRequest StageRequestFor(ActivityPlan plan)
+        {
+            var r = new StageRequest { Title = _loc.T(plan.Def.NameKey).ToUpperInvariant(), Level = plan.Level, Loc = _loc };
+            switch (plan.Def.Kind)
+            {
+                case ActivityKinds.SnowSurvival:
+                    r.Kind = StageKind.Survival; r.Instructions = _loc.T("stage.instr.survival");
+                    r.Survival = new SnowSurvivalGame(plan.Level, plan.Parameters);
+                    break;
+                case ActivityKinds.Fishing:
+                    r.Kind = StageKind.Fishing; r.Instructions = _loc.T("stage.instr.fishing");
+                    r.Fishing = new FishingGame(plan.Level, plan.Parameters);
+                    break;
+                default:
+                    r.Kind = StageKind.Arena; r.Instructions = _loc.T("stage.instr.arena") + "\n\n" + _loc.T("stage.choose_agent");
+                    var members = _session.Squad.Where(m => !m.Exhausted).ToList();
+                    if (members.Count == 0) members = _session.Squad.ToList();
+                    var agents = members.Select(m => ArenaAgent.From(m.Def, m.Level, _session.Content.Balance)).ToList();
+                    r.Agents = members.Select((m, i) => new AgentChoice { Name = _loc.MemberName(m.Def).ToUpperInvariant(), Detail = _loc.T("stage.skill." + agents[i].Primary.Id + ".detail") }).ToList();
+                    r.ArenaFactory = i => new ArenaGame(plan.Level, plan.Parameters, agents[Math.Max(0, Math.Min(i, agents.Count - 1))]);
+                    break;
+            }
+            return r;
         }
 
         /// <summary>Contenu de la fenêtre d'activité : description, décor, patient, réglages et résumé du niveau généré.</summary>

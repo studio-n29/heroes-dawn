@@ -131,7 +131,7 @@ namespace N29.HeroesDawn.Domain.Board
             if (type == CaseType.Combat && IsBlocking(Position))
             {
                 BankRemaining(events);
-                PendingCase = new CaseOutcome(Position, type, node0.Rank, PickEncounter(node0.Rank));
+                PendingCase = new CaseOutcome(Position, type, node0.Rank, PickEncounter(node0.Rank, node0));
                 Phase = ZoneRunPhase.InCombat;
                 events.Add(new CaseTriggeredEvent(PendingCase));
             }
@@ -295,8 +295,9 @@ namespace N29.HeroesDawn.Domain.Board
             _fogReach = MovementRules.FindFogReach(Graph, Fog, Position, PmInHand, IsBlocking, _destinations);
         }
 
-        EncounterDef PickEncounter(CombatRank rank)
+        EncounterDef PickEncounter(CombatRank rank, NodeDef? node = null)
         {
+            if (node != null && node.Combat != null && node.Combat.EnemyTable.Count > 0) return EncounterGenerator.Generate(node.Combat, rank, _caseRng);
             var list = new List<EncounterDef>();
             foreach (var e in Graph.Zone.Encounters) if (e.Rank == rank) list.Add(e);
             if (list.Count == 0) foreach (var e in Graph.Zone.Encounters) list.Add(e);

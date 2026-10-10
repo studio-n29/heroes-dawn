@@ -39,6 +39,18 @@ namespace N29.HeroesDawn.Definitions
         public ActivityDef Activity(ActivityId id) => _activities[id];
         public bool HasActivity(ActivityId id) => _activities.ContainsKey(id);
 
+        /// <summary>Même contenu avec ces zones : une zone de même identifiant remplace celle du catalogue (ordre conservé), les autres sont ajoutées.</summary>
+        public ContentCatalog WithZones(IReadOnlyList<ZoneDef> zones)
+        {
+            if (zones.Count == 0) return this;
+            var merged = new List<ZoneDef>();
+            var byId = new Dictionary<ZoneId, ZoneDef>();
+            foreach (var z in zones) byId[z.Id] = z;
+            foreach (var z in Zones) merged.Add(byId.TryGetValue(z.Id, out var over) ? over : z);
+            foreach (var z in zones) if (!_zones.ContainsKey(z.Id)) merged.Add(z);
+            return new ContentCatalog(Balance, Members, Enemies, Combos, merged, AvatarSkills, Activities);
+        }
+
         /// <summary>Premier combo correspondant, dans l'ordre de la liste (ordre stable).</summary>
         public ComboDef? FindCombo(Family a, Family b)
         {
