@@ -13,7 +13,7 @@ namespace N29.HeroesDawn.Presentation.Combat
     /// </summary>
     public sealed class TimelineView : MonoBehaviour
     {
-        const float RowOffset = 26f;
+        const float RowOffset = 44f;
 
         [SerializeField] RectTransform track = null!;
         [SerializeField] RectTransform prepZone = null!;

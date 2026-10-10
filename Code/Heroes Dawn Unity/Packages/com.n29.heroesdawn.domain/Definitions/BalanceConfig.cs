@@ -6,6 +6,8 @@ namespace N29.HeroesDawn.Definitions
         public int TickMs { get; set; } = 50;
         public int AtbGaugePoints { get; set; } = 1000;
         public int AtbFactorPerSecond { get; set; } = 4;
+        /// <summary>Vitesse de la frise en % (100 = vitesse d'origine) : plus bas, plus de temps de réflexion.</summary>
+        public int TimelineSpeedPercent { get; set; } = 70;
         public int DefK { get; set; } = 300;
         public int CritBasePercent { get; set; } = 15;
         public int CritMultiplierPercent { get; set; } = 150;

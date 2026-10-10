@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Presentation.Common;
@@ -22,7 +23,6 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] RectTransform avatarPanel = null!;
         [SerializeField] UiButton[] avatarButtons = Array.Empty<UiButton>();
         [SerializeField] TimelineView timeline = null!;
-        [SerializeField] TMP_Text skillTitle = null!;
         [SerializeField] UiButton combo = null!;
         [SerializeField] TMP_Text title = null!;
         [SerializeField] TMP_Text hint = null!;
@@ -31,12 +31,11 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] CanvasGroup bannerGroup = null!;
         [SerializeField] RectTransform enemyRow = null!;
         [SerializeField] RectTransform allyRow = null!;
-        [SerializeField] RectTransform skillPanel = null!;
-        [SerializeField] SkillButtonView[] skills = Array.Empty<SkillButtonView>();
         [SerializeField] UnitCardView unitCardPrefab = null!;
 
         readonly Dictionary<int, UnitCardView> _cards = new Dictionary<int, UnitCardView>();
         Coroutine? _bannerFade;
+        int _skillUnit = -1;
 
         public event Action? RetreatClicked;
         public event Action? AutoClicked;
@@ -56,8 +55,16 @@ namespace N29.HeroesDawn.Presentation.Combat
         public UnityEngine.UI.Button AvatarButton(int i) => avatarButtons[i].Button;
         public TimelineView Timeline => timeline;
 
-        /// <summary>Bouton de la compétence <paramref name="i"/> (tests PlayMode : clics réels).</summary>
-        public UnityEngine.UI.Button SkillButton(int i) => skills[i].ClickButton;
+        /// <summary>Icône de la compétence <paramref name="i"/> de l'agent prêt (tests PlayMode : clics réels).</summary>
+        public UnityEngine.UI.Button SkillButton(int i)
+        {
+            if (_skillUnit >= 0 && _cards.TryGetValue(_skillUnit, out var active)) return active.Icon(i).Button;
+            foreach (var card in _cards.Values) if (card.Icon(i).Data.Visible) return card.Icon(i).Button; // aucun agent prêt : la première icône affichée
+            return _cards.Values.First().Icon(i).Button;
+        }
+
+        /// <summary>Icône d'un agent donné (tests PlayMode).</summary>
+        public SkillIconView SkillIcon(int unitId, int i) => _cards[unitId].Icon(i);
 
         /// <summary>Cartes ennemies (tests PlayMode : cibler au toucher).</summary>
         public IReadOnlyList<UnitCardView> EnemyCards()
@@ -80,11 +87,6 @@ namespace N29.HeroesDawn.Presentation.Combat
                 avatarButtons[i].Button.onClick.AddListener(() => AvatarClicked?.Invoke(index));
             }
             combo.Button.onClick.AddListener(() => ComboClicked?.Invoke());
-            for (int i = 0; i < skills.Length; i++)
-            {
-                int slot = i;
-                skills[i].Clicked += () => SkillClicked?.Invoke(slot);
-            }
         }
 
         void Update()
@@ -115,6 +117,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 var card = Instantiate(unitCardPrefab, u.Ally ? allyRow : enemyRow);
                 card.Setup(u);
                 card.Tapped += id => UnitTapped?.Invoke(id);
+                card.SkillClicked += slot => { if (u.Id == _skillUnit || _skillUnit < 0) SkillClicked?.Invoke(slot); };
                 _cards[u.Id] = card;
             }
         }
@@ -127,10 +130,8 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         public void ShowSkills(SkillPanelData d)
         {
-            skillPanel.gameObject.SetActive(d.Visible);
-            if (!d.Visible) return;
-            skillTitle.text = d.Title;
-            for (int i = 0; i < skills.Length; i++) skills[i].Show(i < d.Slots.Length ? d.Slots[i] : default, i);
+            // Les icônes vivent sous chaque agent (UnitStateData.Skills) ; ici on retient quel agent est lançable.
+            _skillUnit = d.Visible ? d.UnitId : -1;
         }
 
         public void ShowTimeline(TimelineData d)

@@ -100,6 +100,21 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ko.Inked();
             ko.gameObject.SetActive(false);
 
+            // Éventail des 4 compétences sous la carte : arc léger, les icônes du milieu un peu plus bas.
+            var icons = new Object[4];
+            float[] iconX = { -93f, -31f, 31f, 93f };
+            float[] iconY = { -68f, -78f, -78f, -68f };
+            for (int i = 0; i < 4; i++)
+            {
+                var icon = ctx.Nest<SkillIconView>("Widgets/SkillIcon.prefab", frame, "Skill" + (i + 1));
+                ((RectTransform)icon.transform).At(0.5f, 0f, iconX[i], iconY[i], SkillIconRecipe.Size, SkillIconRecipe.Size);
+                icons[i] = icon;
+            }
+
+            // Cible du tutoriel : les icônes de l'agent prêt (marqueur vivant seulement quand une compétence est lançable).
+            var fan = Ui.Rect(frame, "SkillFan").At(0.5f, 0f, 0, -80, 260, 92);
+            var readyMarker = RecipeKit.Mark(fan, TutorialTarget.CombatSkills, enabled: false);
+
             var pulse = frame.gameObject.AddComponent<Pulse>();
             pulse.Amplitude = 0.035f;
             pulse.Speed = 7f;
@@ -128,6 +143,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "button", button);
             ctx.Wire(view, "layout", layout);
             ctx.Wire(view, "floatPrefab", ctx.Asset("Widgets/FloatingText.prefab").GetComponent<FloatingTextView>());
+            ctx.WireArray(view, "icons", icons);
+            ctx.Wire(view, "readyMarker", readyMarker);
             return frame.gameObject;
         }
     }
@@ -140,23 +157,23 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var root = PrefabContext.NewRoot("TimelineMarker", 56, 56);
+            var root = PrefabContext.NewRoot("TimelineMarker", 80, 80);
             root.anchorMin = root.anchorMax = root.pivot = new Vector2(0.5f, 0.5f);
             var group = root.gameObject.AddComponent<CanvasGroup>();
             group.blocksRaycasts = false;
             var ring = Ui.Img(root, "Ring", Color.white, Sprites.Ring);
-            ring.rectTransform.At(0.5f, 0.5f, 0, 0, 74, 74);
+            ring.rectTransform.At(0.5f, 0.5f, 0, 0, 104, 104);
             ring.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
             ring.gameObject.SetActive(false);
             var frame = Ui.Img(root, "Frame", Theme.Ink, Sprites.Circle);
-            frame.rectTransform.At(0.5f, 0.5f, 0, 0, 56, 56);
+            frame.rectTransform.At(0.5f, 0.5f, 0, 0, 80, 80);
             var disc = Ui.Img(frame.transform, "Disc", Theme.Info, Sprites.Circle);
-            disc.rectTransform.Stretch(4, 4, 4, 4);
-            var initial = Ui.Txt(disc.transform, "", 28, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Initial");
+            disc.rectTransform.Stretch(5, 5, 5, 5);
+            var initial = Ui.Txt(disc.transform, "", 40, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Initial");
             initial.rectTransform.Stretch();
             initial.Inked();
-            var plan = Ui.Txt(root, "", 24, Theme.Primary, TextAnchor.LowerCenter, FontKind.Title, "Plan");
-            plan.rectTransform.At(0.5f, 1f, 0, 30, 140, 30);
+            var plan = Ui.Txt(root, "", 30, Theme.Primary, TextAnchor.LowerCenter, FontKind.Title, "Plan");
+            plan.rectTransform.At(0.5f, 1f, 0, 42, 160, 36);
             plan.textWrappingMode = TextWrappingModes.NoWrap;
             plan.Inked();
             plan.gameObject.SetActive(false);
@@ -170,28 +187,62 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Ligne de compétence du panneau de gauche (M65 ④) : nom en titre, effet dessous, 460 × 100.</summary>
-    public sealed class SkillButtonRecipe : IPrefabRecipe
+    /// <summary>Icône de compétence sous la carte d'un agent (72 px) : disque coloré, numéro, initiale, recharge, anneau.</summary>
+    public sealed class SkillIconRecipe : IPrefabRecipe
     {
-        public string RelativePath => "Widgets/SkillButton.prefab";
+        public const float Size = 60f;
+        public string RelativePath => "Widgets/SkillIcon.prefab";
         public int Order => 0;
 
         public GameObject Build(PrefabContext ctx)
         {
-            var holder = PrefabContext.NewRoot("holder", 460, 100);
-            var b = Ui.Btn(holder, "", Theme.Primary, Theme.TextDark, null!, 32, FontKind.Title, "SkillButton");
-            b.Rect.SetParent(null, false);
-            Object.DestroyImmediate(holder.gameObject);
-            b.Rect.sizeDelta = new Vector2(460, 100);
-            b.Rect.Pref(460, 100);
-            b.Label.alignment = TextAlignmentOptions.TopLeft;
-            b.Label.rectTransform.Stretch(18, 44, 12, 6);
-            var desc = Ui.Txt(b.Fill.transform, "", 20, Theme.TextDark, TextAnchor.UpperLeft, FontKind.Body, "Desc");
-            desc.rectTransform.Stretch(18, 8, 12, 52);
-            var view = b.gameObject.AddComponent<SkillButtonView>();
-            ctx.Wire(view, "button", b);
-            ctx.Wire(view, "description", desc);
-            return b.gameObject;
+            var root = PrefabContext.NewRoot("SkillIcon", Size, Size);
+            root.anchorMin = root.anchorMax = root.pivot = new Vector2(0.5f, 0.5f);
+            var group = root.gameObject.AddComponent<CanvasGroup>();
+            var ring = Ui.Img(root, "Ring", Color.white, Sprites.Ring);
+            ring.rectTransform.At(0.5f, 0.5f, 0, 0, Size + 14, Size + 14);
+            ring.raycastTarget = false;
+            ring.gameObject.AddComponent<Pulse>().Amplitude = 0.07f;
+            ring.gameObject.SetActive(false);
+            var frame = Ui.Img(root, "Frame", Theme.Ink, Sprites.Circle, true);
+            frame.rectTransform.At(0.5f, 0.5f, 0, 0, Size, Size);
+            var button = frame.gameObject.AddComponent<Button>();
+            button.transition = Selectable.Transition.None;
+            var nav = button.navigation;
+            nav.mode = Navigation.Mode.None;
+            button.navigation = nav;
+            var disc = Ui.Img(frame.transform, "Disc", Theme.Primary, Sprites.Circle);
+            disc.rectTransform.Stretch(4, 4, 4, 4);
+            var glyph = Ui.Txt(disc.transform, "A", 38, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Glyph");
+            glyph.rectTransform.Stretch();
+            var cooldownFill = Ui.Img(disc.transform, "CooldownFill", new Color(0f, 0f, 0f, 0.55f), Sprites.Circle);
+            cooldownFill.rectTransform.Stretch();
+            cooldownFill.type = Image.Type.Filled;
+            cooldownFill.fillMethod = Image.FillMethod.Radial360;
+            cooldownFill.fillOrigin = (int)Image.Origin360.Top;
+            cooldownFill.fillClockwise = false;
+            cooldownFill.raycastTarget = false;
+            cooldownFill.gameObject.SetActive(false);
+            var cooldown = Ui.Txt(disc.transform, "", 34, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Cooldown");
+            cooldown.rectTransform.Stretch();
+            cooldown.Inked();
+            cooldown.gameObject.SetActive(false);
+            var slotBadge = Ui.Img(root, "SlotBadge", Theme.Ink, Sprites.Circle);
+            slotBadge.rectTransform.At(0f, 1f, 4, -4, 28, 28);
+            slotBadge.raycastTarget = false;
+            var slot = Ui.Txt(slotBadge.transform, "1", 20, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Slot");
+            slot.rectTransform.Stretch();
+
+            var view = root.gameObject.AddComponent<SkillIconView>();
+            ctx.Wire(view, "button", button);
+            ctx.Wire(view, "disc", disc);
+            ctx.Wire(view, "cooldownFill", cooldownFill);
+            ctx.Wire(view, "ring", ring);
+            ctx.Wire(view, "glyph", glyph);
+            ctx.Wire(view, "slot", slot);
+            ctx.Wire(view, "cooldown", cooldown);
+            ctx.Wire(view, "group", group);
+            return root.gameObject;
         }
     }
 
@@ -291,7 +342,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var enemyRow = Ui.Rect(rt, "Enemies").At(1f, 1f, -30, -104, 1000, 290);
             enemyRow.HLayout(30, 0, TextAnchor.UpperCenter);
             RecipeKit.Mark(enemyRow, TutorialTarget.CombatEnemies);
-            var allyRow = Ui.Rect(rt, "Allies").At(1f, 0f, -30, 20, 1100, 290);
+            var allyRow = Ui.Rect(rt, "Allies").At(1f, 0f, -30, 104, 1100, 290);
             allyRow.HLayout(16, 0, TextAnchor.LowerCenter);
 
             // ---- Journal (haut gauche, discret)
@@ -308,44 +359,42 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var bannerGroup = banner.gameObject.AddComponent<CanvasGroup>();
             bannerGroup.blocksRaycasts = false;
             var hintBand = Ui.Img(rt, "HintBand", Theme.WithAlpha(Theme.Primary, 0.9f), Sprites.RoundedSmall);
-            hintBand.rectTransform.At(1f, 0f, -30, 322, 1000, 52);
+            hintBand.rectTransform.At(1f, 0f, -30, 624, 1000, 52);
             var hint = Ui.Txt(hintBand.transform, "", 30, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Hint");
             hint.rectTransform.Stretch(10, 0, 10, 0);
 
-            // ---- Panneau de compétences (gauche) : onglet « X est prêt ! » + 3 lignes
-            var skillBox = Ui.Panel(rt, "Skills", Theme.WithAlpha(Theme.SurfaceDark, 0.92f), 5f, 8f, false);
-            var skillFrame = skillBox.Frame().At(0f, 0f, 24, 24, 500, 372);
-            RecipeKit.Mark(skillFrame, TutorialTarget.CombatSkills);
-            var skillTitle = Ui.Txt(skillBox.transform, "", 30, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
-            skillTitle.rectTransform.At(0f, 1f, 18, -8, 460, 44);
-            skillTitle.AutoSize(30);
-            skillTitle.Inked();
-            var skillPanel = Ui.Rect(skillBox.transform, "Slots").At(0.5f, 0f, 0, 12, 464, 312);
-            skillPanel.VLayout(6, 0, TextAnchor.LowerCenter);
-            var skills = new Object[3];
-            for (int i = 0; i < 3; i++) skills[i] = ctx.Nest<SkillButtonView>("Widgets/SkillButton.prefab", skillPanel, "Skill" + (i + 1));
-
-            // ---- Frise chronologique (100 à gauche → 0 à droite : à 0, c est le tour)
-            var stripFill = Ui.Panel(rt, "Timeline", Theme.WithAlpha(Theme.SurfaceDark, 0.88f), 4f, 6f, false);
-            var strip = stripFill.Frame().At(1f, 0f, -30, 404, 1100, 100);
-            var track = Ui.Rect(stripFill.transform, "Track").At(0f, 0.5f, 70, 0, 960, 10);
-            var axisStart = Ui.Txt(stripFill.transform, "100", 26, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Title, "AxisStart");
-            axisStart.rectTransform.At(0f, 0.5f, 10, 0, 56, 40);
-            var axisEnd = Ui.Txt(stripFill.transform, "0", 26, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "AxisEnd");
-            axisEnd.rectTransform.At(1f, 0.5f, -18, 0, 56, 40);
+            // ---- Frise chronologique : grande bande mise en valeur au centre (100 à gauche → 0 à droite : à 0, c'est le tour)
+            var glow = Ui.Img(rt, "TimelineGlow", Theme.WithAlpha(Theme.Primary, 0.35f), Sprites.Rounded);
+            glow.rectTransform.At(1f, 0f, -22, 390, 1516, 186);
+            var stripFill = Ui.Panel(rt, "Timeline", Theme.WithAlpha(Theme.SurfaceDark, 0.94f), 5f, 8f, false);
+            var strip = stripFill.Frame().At(1f, 0f, -30, 398, 1500, 170);
+            var track = Ui.Rect(stripFill.transform, "Track").At(0f, 0.5f, 110, 0, 1250, 18);
+            var axisStart = Ui.Txt(stripFill.transform, "100", 40, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Title, "AxisStart");
+            axisStart.rectTransform.At(0f, 0.5f, 14, 0, 90, 56);
+            var axisEnd = Ui.Txt(stripFill.transform, "0", 56, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "AxisEnd");
+            axisEnd.rectTransform.At(1f, 0.5f, -20, 8, 90, 70);
+            axisEnd.Inked();
+            var axisLabel = Ui.LocTxt(stripFill.transform, "combat.timeline_action", 22, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "AxisLabel");
+            axisLabel.rectTransform.At(1f, 0.5f, -20, -34, 110, 30);
             Ui.Img(track, "Line", Theme.Surface3, Sprites.RoundedSmall).rectTransform.Stretch();
-            var prep = Ui.Img(track, "Prep", Theme.WithAlpha(Theme.Danger, 0.6f), Sprites.RoundedSmall);
+            var prep = Ui.Img(track, "Prep", Theme.WithAlpha(Theme.Danger, 0.65f), Sprites.RoundedSmall);
             prep.rectTransform.anchorMin = new Vector2(0.8f, 0f);
             prep.rectTransform.anchorMax = new Vector2(1f, 1f);
-            prep.rectTransform.offsetMin = new Vector2(0, -14);
-            prep.rectTransform.offsetMax = new Vector2(0, 14);
+            prep.rectTransform.offsetMin = new Vector2(0, -26);
+            prep.rectTransform.offsetMax = new Vector2(0, 26);
+            var gate = Ui.Img(track, "Gate", Theme.Primary, Sprites.RoundedSmall);
+            gate.rectTransform.anchorMin = new Vector2(1f, 0f);
+            gate.rectTransform.anchorMax = new Vector2(1f, 1f);
+            gate.rectTransform.sizeDelta = new Vector2(10, 90);
+            gate.rectTransform.anchoredPosition = Vector2.zero;
+            gate.gameObject.AddComponent<Pulse>().Amplitude = 0.12f;
             var timeline = strip.gameObject.AddComponent<TimelineView>();
             ctx.Wire(timeline, "track", track);
             ctx.Wire(timeline, "prepZone", prep.rectTransform);
             ctx.Wire(timeline, "markerPrefab", ctx.Asset("Widgets/TimelineMarker.prefab").GetComponent<TimelineMarkerView>());
 
             // ---- Compétences d avatar (lançables à tout moment) : 5 boutons sous le combo
-            var avatarPanel = Ui.Rect(rt, "Avatar").At(0f, 0f, 24, 508, 500, 104);
+            var avatarPanel = Ui.Rect(rt, "Avatar").At(0f, 0f, 24, 24, 500, 104);
             avatarPanel.HLayout(6, 0, TextAnchor.MiddleCenter);
             var avatarButtons = new Object[5];
             for (int i = 0; i < 5; i++)
@@ -359,7 +408,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             // ---- Combo
             var combo = Ui.Btn(rt, "", Theme.Danger, Color.white, null!, 40, FontKind.Title, "Combo");
-            combo.Rect.At(0f, 0f, 24, 404, 500, 96);
+            combo.Rect.At(0f, 0f, 24, 140, 500, 96);
             combo.Label.Inked();
             combo.gameObject.AddComponent<Pulse>().Amplitude = 0.07f;
             RecipeKit.Shine(combo);
@@ -383,9 +432,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "bannerGroup", bannerGroup);
             ctx.Wire(view, "enemyRow", enemyRow);
             ctx.Wire(view, "allyRow", allyRow);
-            ctx.Wire(view, "skillPanel", skillFrame);
-            ctx.Wire(view, "skillTitle", skillTitle);
-            ctx.WireArray(view, "skills", skills);
             ctx.Wire(view, "unitCardPrefab", ctx.Asset("Widgets/UnitCard.prefab").GetComponent<UnitCardView>());
             return rt.gameObject;
         }
