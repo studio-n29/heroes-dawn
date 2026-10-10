@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Core;
+using N29.HeroesDawn.Domain.Maps;
 using N29.HeroesDawn.Presentation.Common;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -35,6 +36,7 @@ namespace N29.HeroesDawn.Presentation.Board
         [SerializeField] RectTransform nodeLayer = null!;
         [SerializeField] BoardNodeView nodePrefab = null!;
         [SerializeField] Image linkPrefab = null!;
+        [SerializeField] BoardLinkCostView linkCostPrefab = null!;
         [SerializeField] PortraitView pawnPrefab = null!;
         [SerializeField] Button zoomIn = null!;
         [SerializeField] Button zoomOut = null!;
@@ -45,7 +47,10 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly Dictionary<CaseId, BoardNodeView> _nodes = new Dictionary<CaseId, BoardNodeView>();
         readonly Dictionary<CaseId, Vector2> _positions = new Dictionary<CaseId, Vector2>();
         readonly Dictionary<CaseId, List<(CaseId To, int Link)>> _neighbors = new Dictionary<CaseId, List<(CaseId To, int Link)>>();
-        readonly List<Image> _links = new List<Image>();
+        readonly List<Image[]> _links = new List<Image[]>();
+        readonly List<BoardLinkCostView> _costs = new List<BoardLinkCostView>();
+        /// <summary>Tracé de chaque chemin en pixels, dans le sens A vers B puis B vers A.</summary>
+        readonly Dictionary<(CaseId, CaseId), Vector2[]> _curves = new Dictionary<(CaseId, CaseId), Vector2[]>();
         readonly List<bool> _linkVisible = new List<bool>();
         readonly List<CaseId> _cycle = new List<CaseId>();
         RectTransform? _pawn;
@@ -69,7 +74,9 @@ namespace N29.HeroesDawn.Presentation.Board
         /// <summary>Bouton d'une case (tests PlayMode : toucher réel).</summary>
         public Button NodeButton(CaseId id) => _nodes[id].Button;
 
-        static Vector2 PosOf(BoardMapNode n) => new Vector2((n.X - 8) * StepX, (n.Y - 2) * StepY);
+        static Vector2 PosOf(BoardMapNode n) => GridToPixels(n.X, n.Y);
+
+        static Vector2 GridToPixels(float x, float y) => new Vector2((x - 8f) * StepX, (y - 2f) * StepY);
 
         void Awake()
         {
@@ -97,17 +104,33 @@ namespace N29.HeroesDawn.Presentation.Board
             for (int i = 0; i < d.Links.Length; i++)
             {
                 var l = d.Links[i];
-                Vector2 a = _positions[l.A], b = _positions[l.B];
-                var line = Instantiate(linkPrefab, linkLayer);
-                var rt = line.rectTransform;
-                rt.anchoredPosition = (a + b) * 0.5f;
-                rt.sizeDelta = new Vector2(Vector2.Distance(a, b), 12f);
-                rt.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(b.y - a.y, b.x - a.x) * Mathf.Rad2Deg);
-                _links.Add(line);
+                var points = CurvePixels(l.Curve);
+                _curves[(l.A, l.B)] = points;
+                var reversed = (Vector2[])points.Clone();
+                Array.Reverse(reversed);
+                _curves[(l.B, l.A)] = reversed;
+                var segments = new Image[points.Length - 1];
+                for (int s = 0; s < segments.Length; s++)
+                {
+                    Vector2 p = points[s], q = points[s + 1];
+                    var seg = Instantiate(linkPrefab, linkLayer);
+                    var rt = seg.rectTransform;
+                    rt.anchoredPosition = (p + q) * 0.5f;
+                    rt.sizeDelta = new Vector2(Vector2.Distance(p, q) + 3f, 12f);
+                    rt.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(q.y - p.y, q.x - p.x) * Mathf.Rad2Deg);
+                    segments[s] = seg;
+                }
+                var badge = Instantiate(linkCostPrefab, linkLayer);
+                ((RectTransform)badge.transform).anchoredPosition = CurvePoint(points, 0.5f);
+                badge.Show(l.Cost);
+                badge.name = "LinkCost_" + l.A.Value + "_" + l.B.Value;
+                _costs.Add(badge);
+                _links.Add(segments);
                 _linkVisible.Add(true);
                 AddNeighbor(l.A, l.B, i);
                 AddNeighbor(l.B, l.A, i);
             }
+            foreach (var c in _costs) c.transform.SetAsLastSibling();
             foreach (var n in d.Nodes)
             {
                 var node = Instantiate(nodePrefab, nodeLayer);
@@ -166,7 +189,7 @@ namespace N29.HeroesDawn.Presentation.Board
             _bounds = Rect.MinMaxRect(min.x, min.y, max.x, max.y);
         }
 
-        Vector2 PawnPos(CaseId id) => _positions[id] + new Vector2(0, 22);
+        Vector2 PawnPos(CaseId id) => _positions[id] + PawnOffset;
 
         public void Refresh(IReadOnlyList<BoardNodeState> nodes, IReadOnlyList<BoardLinkState> links, CaseId pawnAt, bool movePawn)
         {
@@ -181,13 +204,19 @@ namespace N29.HeroesDawn.Presentation.Board
             {
                 var l = links[i];
                 _linkVisible[i] = l.Visible;
-                _links[i].gameObject.SetActive(l.Visible);
-                var rt = _links[i].rectTransform;
                 float thickness = l.Mark == LinkMark.Path ? 22f : l.Mark == LinkMark.Beyond ? 16f : 12f;
-                rt.sizeDelta = new Vector2(rt.sizeDelta.x, thickness);
-                _links[i].color = l.Mark == LinkMark.Path ? Theme.Info
-                                : l.Mark == LinkMark.Beyond ? Theme.WithAlpha(Theme.Info, 0.5f)
-                                : l.Dim ? Theme.WithAlpha(Theme.Surface3, 0.3f) : Theme.Surface3;
+                var color = l.Mark == LinkMark.Path ? Theme.Info
+                          : l.Mark == LinkMark.Beyond ? Theme.WithAlpha(Theme.Info, 0.5f)
+                          : l.Dim ? Theme.WithAlpha(Theme.Surface3, 0.3f) : Theme.Surface3;
+                foreach (var seg in _links[i])
+                {
+                    seg.gameObject.SetActive(l.Visible);
+                    var rt = seg.rectTransform;
+                    rt.sizeDelta = new Vector2(rt.sizeDelta.x, thickness);
+                    seg.color = color;
+                }
+                _costs[i].gameObject.SetActive(l.Visible);
+                _costs[i].SetHighlighted(l.Mark == LinkMark.Path);
             }
             _pawnAt = pawnAt;
             if (_focused.HasValue && !_nodes.ContainsKey(_focused.Value)) _focused = null;
@@ -196,30 +225,94 @@ namespace N29.HeroesDawn.Presentation.Board
             _pawn.SetAsLastSibling();
         }
 
+        /// <summary>Tracé d'un chemin en pixels : segments d'au plus ~40 px, extrémités comprises.</summary>
+        static Vector2[] CurvePixels(BezierCurve curve)
+        {
+            int segments = Mathf.Clamp(Mathf.CeilToInt(curve.Length() * StepX / 40f), 6, 28);
+            var grid = curve.Sample(segments);
+            var px = new Vector2[grid.Length];
+            for (int i = 0; i < grid.Length; i++) px[i] = GridToPixels(grid[i].X, grid[i].Y);
+            return px;
+        }
+
+        /// <summary>Point d'une polyligne à la fraction <paramref name="t"/> de sa longueur.</summary>
+        static Vector2 CurvePoint(IReadOnlyList<Vector2> pts, float t)
+        {
+            float total = 0f;
+            for (int i = 1; i < pts.Count; i++) total += Vector2.Distance(pts[i - 1], pts[i]);
+            float target = total * Mathf.Clamp01(t);
+            for (int i = 1; i < pts.Count; i++)
+            {
+                float seg = Vector2.Distance(pts[i - 1], pts[i]);
+                if (target <= seg || i == pts.Count - 1) return Vector2.Lerp(pts[i - 1], pts[i], seg < 1e-3f ? 0f : Mathf.Clamp01(target / seg));
+                target -= seg;
+            }
+            return pts[0];
+        }
+
+        /// <summary>Trajet complet du pion : les tracés des chemins mis bout à bout, sans arrêt aux cases traversées.</summary>
+        List<Vector2> TravelPoints(IReadOnlyList<CaseId> path)
+        {
+            var pts = new List<Vector2>();
+            var at = StartOf(path[0]);
+            foreach (var step in path)
+            {
+                if (_curves.TryGetValue((at, step), out var curve))
+                    foreach (var p in curve) pts.Add(p + PawnOffset);
+                else if (_positions.TryGetValue(step, out var to)) pts.Add(to + PawnOffset);
+                at = step;
+            }
+            return pts;
+        }
+
+        /// <summary>Case d'où part le pion pour atteindre <paramref name="first"/> : la voisine la plus proche de sa position actuelle.</summary>
+        CaseId StartOf(CaseId first)
+        {
+            var best = _pawnAt;
+            float bestDist = float.MaxValue;
+            if (_pawn != null && _neighbors.TryGetValue(first, out var list))
+                foreach (var (to, _) in list)
+                {
+                    float d = Vector2.Distance(_pawn.anchoredPosition, PawnPos(to));
+                    if (d < bestDist) { bestDist = d; best = to; }
+                }
+            return best;
+        }
+
+        static readonly Vector2 PawnOffset = new Vector2(0, 22);
+
+        /// <summary>Vitesse du pion le long des chemins (pixels par seconde).</summary>
+        const float PawnSpeed = 900f;
+
         public async UniTask MovePawnAsync(IReadOnlyList<CaseId> path, CancellationToken ct)
         {
             if (_move != null) Tween.Stop(_move);
             if (path.Count == 0 || _pawn == null) return;
+            var pts = TravelPoints(path);
+            if (pts.Count < 2) return;
+            var cumulative = new float[pts.Count];
+            for (int i = 1; i < pts.Count; i++) cumulative[i] = cumulative[i - 1] + Vector2.Distance(pts[i - 1], pts[i]);
+            float total = cumulative[pts.Count - 1];
             _animating = true;
             try
             {
-                foreach (var step in path)
+                var done = new UniTaskCompletionSource();
+                float duration = Mathf.Clamp(total / PawnSpeed, 0.25f, 3f);
+                _pawn.anchoredPosition = pts[0];
+                _move = Tween.Run(duration, k =>
                 {
-                    var done = new UniTaskCompletionSource();
-                    Vector2 from = _pawn.anchoredPosition, to = PawnPos(step);
-                    _move = Tween.Run(0.2f, k =>
-                    {
-                        if (_pawn == null) return;
-                        var p = Vector2.Lerp(from, to, k);
-                        p.y += Mathf.Sin(k * Mathf.PI) * 34f;
-                        _pawn.anchoredPosition = p;
-                    }, () =>
-                    {
-                        if (_pawn != null) Tween.Punch(_pawn, 0.1f, 0.12f);
-                        done.TrySetResult();
-                    }, this, Tween.Linear);
-                    await done.Task.AttachExternalCancellation(ct);
-                }
+                    if (_pawn == null) return;
+                    float d = total * k;
+                    int i = 1;
+                    while (i < pts.Count - 1 && cumulative[i] < d) i++;
+                    float seg = cumulative[i] - cumulative[i - 1];
+                    _pawn.anchoredPosition = Vector2.Lerp(pts[i - 1], pts[i], seg < 1e-3f ? 1f : Mathf.Clamp01((d - cumulative[i - 1]) / seg));
+                }, () =>
+                {
+                    if (_pawn != null) { _pawn.anchoredPosition = pts[pts.Count - 1]; Tween.Punch(_pawn, 0.1f, 0.12f); }
+                    done.TrySetResult();
+                }, this, Tween.Linear);
+                await done.Task.AttachExternalCancellation(ct);
             }
             finally { _animating = false; }
         }

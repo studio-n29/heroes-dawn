@@ -23,7 +23,7 @@ namespace N29.HeroesDawn.Presentation.Board
         /// <summary>Navigation case à case : la case sélectionnée au clavier / à la manette (déplacée le long des liens).</summary>
         CaseId? Focused { get; }
 
-        /// <summary>Déplace le pion case par case (petits bonds).</summary>
+        /// <summary>Déplace le pion d'un trait le long des tracés des chemins, sans s'arrêter aux cases traversées.</summary>
         UniTask MovePawnAsync(IReadOnlyList<CaseId> path, CancellationToken ct);
     }
 }

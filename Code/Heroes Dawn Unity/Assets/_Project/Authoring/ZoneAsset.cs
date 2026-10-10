@@ -31,6 +31,12 @@ namespace N29.HeroesDawn.Authoring
     {
         public string a = "";
         public string b = "";
+        /// <summary>PM dépensés pour emprunter ce chemin (au moins 1).</summary>
+        public int cost = 1;
+        /// <summary>Courbe saisie (points de contrôle en unités de grille, de a vers b) ; sinon courbe générée.</summary>
+        public bool hasCurve;
+        public Vector2 control1;
+        public Vector2 control2;
     }
 
     [Serializable]

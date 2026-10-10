@@ -14,6 +14,7 @@ using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Board;
+using N29.HeroesDawn.Domain.Maps;
 using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Hub;
@@ -164,7 +165,11 @@ namespace N29.HeroesDawn.Presentation.Board
                     var def = run.Graph.Node(id);
                     return new BoardMapNode { Id = id, X = def.X, Y = def.Y, IsObjective = objectiveTargets.Contains(id) };
                 }).ToArray(),
-                Links = run.Graph.Zone.Links.Select(l => new BoardMapLink { A = l.A, B = l.B }).ToArray(),
+                Links = run.Graph.Zone.Links.Select(l => new BoardMapLink
+                {
+                    A = l.A, B = l.B, Cost = l.Cost,
+                    Curve = LinkCurves.Resolve(run.Graph.Node(l.A), run.Graph.Node(l.B), l),
+                }).ToArray(),
                 Pawn = new PortraitData(_loc.MemberName(leader), leader.Family),
                 PawnAt = run.Position,
                 BackgroundKey = run.Graph.Zone.Background?.Key ?? "",
@@ -203,11 +208,11 @@ namespace N29.HeroesDawn.Presentation.Board
                     if (_previewTapped == id)
                     {
                         mark = NodeMark.Target;
-                        cost = _previewFog != null ? _previewFog.Distance : _previewPlan!.Cost;
+                        cost = _previewFog != null ? _previewFog.Cost : _previewPlan!.Cost;
                     }
                     else if (pathNodes.Contains(id)) mark = NodeMark.Path;
                     else if (run.Destinations.TryGetValue(id, out var d)) { mark = NodeMark.Destination; cost = d.Cost; }
-                    else if (run.FogReach.TryGetValue(id, out var f)) { mark = NodeMark.FogDestination; cost = f.Distance; }
+                    else if (run.FogReach.TryGetValue(id, out var f)) { mark = NodeMark.FogDestination; cost = f.Cost; }
                 }
                 return new BoardNodeState
                 {
@@ -272,7 +277,7 @@ namespace N29.HeroesDawn.Presentation.Board
                 return new MovePreviewData
                 {
                     Title = _loc.T("board.preview.fog_title"),
-                    Body = _loc.F("board.preview.fog_body", fog.Distance, stopName),
+                    Body = _loc.F("board.preview.fog_body", fog.Cost, stopName),
                     Detail = _loc.F("board.preview.fog_detail", stopName, plan.Cost),
                     Tone = Tone.Info,
                     ConfirmLabel = _loc.T("board.preview.go"),

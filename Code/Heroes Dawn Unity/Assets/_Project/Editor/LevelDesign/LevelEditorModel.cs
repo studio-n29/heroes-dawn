@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using N29.HeroesDawn.Authoring;
 using N29.HeroesDawn.Definitions;
-using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Domain.Maps;
+using N29.HeroesDawn.Domain.Board;
 
 namespace N29.HeroesDawn.EditorTools.LevelDesign
 {
@@ -64,7 +64,15 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
             if (n == null) return false;
             var at = NodeAt(z, x, y);
             if (at != null && at != n) return false;
+            int dx = x - n.x, dy = y - n.y;
             n.x = x; n.y = y;
+            // Une courbe saisie suit l'extrémité déplacée.
+            foreach (var l in z.links)
+            {
+                if (!l.hasCurve) continue;
+                if (l.a == id) l.control1 += new UnityEngine.Vector2(dx, dy);
+                if (l.b == id) l.control2 += new UnityEngine.Vector2(dx, dy);
+            }
             return true;
         }
 
@@ -84,6 +92,29 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
             if (a == b || z.Node(a) == null || z.Node(b) == null || HasLink(z, a, b)) return false;
             z.links.Add(string.CompareOrdinal(a, b) < 0 ? new LinkData { a = a, b = b } : new LinkData { a = b, b = a });
             return true;
+        }
+
+        /// <summary>Chemin entre deux cases, quel que soit le sens.</summary>
+        public static LinkData? FindLink(ZoneAsset z, string a, string b)
+            => z.links.FirstOrDefault(l => (l.a == a && l.b == b) || (l.a == b && l.b == a));
+
+        /// <summary>Courbe du chemin en unités de grille : celle saisie, sinon la courbe générée (la même qu'en jeu).</summary>
+        public static BezierCurve CurveOf(ZoneAsset z, LinkData l)
+        {
+            var a = z.Node(l.a)!; var b = z.Node(l.b)!;
+            var p0 = new PointF(a.x, a.y); var p3 = new PointF(b.x, b.y);
+            if (!l.hasCurve) return LinkCurves.Auto(p0, p3, l.a, l.b);
+            return new BezierCurve(p0, new PointF(l.control1.x, l.control1.y), new PointF(l.control2.x, l.control2.y), p3);
+        }
+
+        /// <summary>Fige la courbe générée en points de contrôle modifiables.</summary>
+        public static void CustomizeCurve(ZoneAsset z, LinkData l)
+        {
+            if (l.hasCurve) return;
+            var c = CurveOf(z, l);
+            l.control1 = new UnityEngine.Vector2(c.C1.X, c.C1.Y);
+            l.control2 = new UnityEngine.Vector2(c.C2.X, c.C2.Y);
+            l.hasCurve = true;
         }
 
         public static bool Disconnect(ZoneAsset z, string a, string b)

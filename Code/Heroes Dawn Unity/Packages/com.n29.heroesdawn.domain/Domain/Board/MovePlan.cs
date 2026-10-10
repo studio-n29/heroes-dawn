@@ -8,7 +8,8 @@ namespace N29.HeroesDawn.Domain.Board
         public CaseId Target { get; }
         /// <summary>Chemin sans la case de départ ; se termine par Target.</summary>
         public IReadOnlyList<CaseId> Path { get; }
-        public int Cost => Path.Count;
-        public MovePlan(CaseId target, IReadOnlyList<CaseId> path) { Target = target; Path = path; }
+        /// <summary>PM dépensés : somme des coûts des chemins empruntés.</summary>
+        public int Cost { get; }
+        public MovePlan(CaseId target, IReadOnlyList<CaseId> path, int cost) { Target = target; Path = path; Cost = cost; }
     }
 }

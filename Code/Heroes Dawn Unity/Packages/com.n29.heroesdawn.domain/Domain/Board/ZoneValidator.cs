@@ -62,6 +62,17 @@ namespace N29.HeroesDawn.Domain.Board
                 if (l.A == l.B) { Error("link.self", "Lien d'une case vers elle-même : " + l.A.Value, l.A); continue; }
                 var key = l.A.CompareTo(l.B) < 0 ? (l.A, l.B) : (l.B, l.A);
                 if (!seen.Add(key)) { Error("link.duplicate", "Lien en double : " + l.A.Value + " — " + l.B.Value, l.A); continue; }
+                if (l.Curve.HasValue)
+                {
+                    var na = zone.Nodes.First(n => n.Id == l.A); var nb = zone.Nodes.First(n => n.Id == l.B);
+                    var c = l.Curve.Value;
+                    float minX = System.Math.Min(na.X, nb.X) - 3f, maxX = System.Math.Max(na.X, nb.X) + 3f;
+                    float minY = System.Math.Min(na.Y, nb.Y) - 3f, maxY = System.Math.Max(na.Y, nb.Y) + 3f;
+                    bool outside(float x, float y) => x < minX || x > maxX || y < minY || y > maxY;
+                    if (outside(c.C1X, c.C1Y) || outside(c.C2X, c.C2Y))
+                        Warn("link.curve", "Courbe très éloignée de ses cases : " + l.A.Value + " — " + l.B.Value, l.A);
+                }
+                if (l.Cost > 6) Warn("link.cost", "Chemin très coûteux (" + l.Cost + " PM) : " + l.A.Value + " — " + l.B.Value, l.A);
                 degree[l.A]++; degree[l.B]++;
                 adj[l.A].Add(l.B); adj[l.B].Add(l.A);
             }

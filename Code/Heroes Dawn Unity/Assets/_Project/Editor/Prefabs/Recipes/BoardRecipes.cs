@@ -91,6 +91,29 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
+    /// <summary>Pastille du coût en PM d'un chemin (au milieu de son tracé).</summary>
+    public sealed class BoardLinkCostRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Widgets/BoardLinkCost.prefab";
+        public int Order => 0;
+
+        public GameObject Build(PrefabContext ctx)
+        {
+            var root = PrefabContext.NewRoot("BoardLinkCost", 44, 44);
+            root.anchorMin = root.anchorMax = root.pivot = new Vector2(0.5f, 0.5f);
+            var bg = Ui.Img(root, "Background", Theme.Surface3, Sprites.Circle, true);
+            bg.rectTransform.Stretch();
+            bg.raycastTarget = false;
+            var label = Ui.Txt(bg.transform, "1", 26, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Cost");
+            label.rectTransform.Stretch();
+            label.raycastTarget = false;
+            var view = root.gameObject.AddComponent<BoardLinkCostView>();
+            ctx.Wire(view, "background", bg);
+            ctx.Wire(view, "label", label);
+            return root.gameObject;
+        }
+    }
+
     /// <summary>Pion : portrait du chef d'escouade (imbriqué) avec ombre portée, ancré par le bas.</summary>
     public sealed class PawnRecipe : IPrefabRecipe
     {
@@ -175,6 +198,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(map, "nodeLayer", nodeLayer);
             ctx.Wire(map, "nodePrefab", ctx.Asset("Widgets/BoardNode.prefab").GetComponent<BoardNodeView>());
             ctx.Wire(map, "linkPrefab", ctx.Asset("Widgets/BoardLink.prefab").GetComponent<Image>());
+            ctx.Wire(map, "linkCostPrefab", ctx.Asset("Widgets/BoardLinkCost.prefab").GetComponent<BoardLinkCostView>());
             ctx.Wire(map, "pawnPrefab", ctx.Asset("Widgets/Pawn.prefab").GetComponent<PortraitView>());
 
             // ---- Pop-up d'information de la case visée (déplacement) : se dézoome sur le chemin, « S'y rendre » valide

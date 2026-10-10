@@ -29,7 +29,7 @@ namespace N29.HeroesDawn.Tests.Domain
                 Assert.That(run.Fog.IsRevealed(kv.Key), Is.False, "la case est bien cachée");
                 Assert.That(run.Destinations.ContainsKey(kv.Key), Is.False, "une case cachée n'est jamais une destination directe");
                 Assert.That(run.Destinations.ContainsKey(plan.StopAt), Is.True, "l'arrêt forcé est une vraie destination");
-                Assert.That(plan.Distance, Is.LessThanOrEqualTo(6));
+                Assert.That(plan.Cost, Is.LessThanOrEqualTo(6));
                 Assert.That(plan.StopPath.Count, Is.LessThan(plan.FullPath.Count), "on s'arrête avant d'atteindre la case cachée");
                 Assert.That(plan.FullPath.Last(), Is.EqualTo(kv.Key));
             }
@@ -41,7 +41,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var run = NewRun(1);
             Assert.That(run.FogReach, Is.Empty);
             var far = NewRun(6);
-            Assert.That(far.FogReach.Values.All(p => p.Distance <= 6));
+            Assert.That(far.FogReach.Values.All(p => p.Cost <= 6));
         }
 
         [Test, Description("Vérifie que sans brouillard (tout révélé) il n'y a aucune case cachée à surligner — parce que la portée cachée n'existe que sous le brouillard")]

@@ -64,6 +64,13 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
             if (_foldZone) DrawZoneFields(z);
             _foldNode = EditorGUILayout.Foldout(_foldNode, "Case sélectionnée", true);
             if (_foldNode) DrawNodeFields(z);
+            if (_selectedLink != null && !z.links.Contains(_selectedLink)) _selectedLink = null;
+            if (_selectedLink != null)
+            {
+                EditorGUILayout.Space(4);
+                EditorGUILayout.LabelField("Chemin sélectionné", EditorStyles.boldLabel);
+                DrawLinkFields(z, _selectedLink);
+            }
             _foldObjectives = EditorGUILayout.Foldout(_foldObjectives, "Objectifs (" + z.objectives.Count + ")", true);
             if (_foldObjectives) DrawObjectives(z);
             _foldEncounters = EditorGUILayout.Foldout(_foldEncounters, "Rencontres de la zone (repli des combats sans table)", true);
@@ -101,6 +108,24 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
                 EditorGUI.BeginChangeCheck();
                 var p = new Vector2Int(EditorGUILayout.IntSlider("  X (‰)", z.mapPointPermille.x, 0, 1000), EditorGUILayout.IntSlider("  Y (‰)", z.mapPointPermille.y, 0, 1000));
                 if (EditorGUI.EndChangeCheck()) { Touch("Position carte"); z.mapPointPermille = p; Changed(); }
+            }
+            EditorGUI.indentLevel--;
+        }
+
+        void DrawLinkFields(ZoneAsset z, LinkData l)
+        {
+            EditorGUI.indentLevel++;
+            EditorGUILayout.LabelField("Entre", l.a + " ↔ " + l.b);
+            int cost = Int("Coût en PM", Mathf.Max(1, l.cost), 1, 9);
+            if (cost != l.cost) { Touch("Coût du chemin"); l.cost = cost; Changed(); }
+            if (!l.hasCurve)
+            {
+                if (GUILayout.Button("Personnaliser la courbe")) { Touch("Courbe du chemin"); LevelEditorModel.CustomizeCurve(z, l); Changed(); }
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("Glisse les deux points jaunes sur la carte.", MessageType.None);
+                if (GUILayout.Button("Revenir à la courbe générée")) { Touch("Courbe du chemin"); l.hasCurve = false; Changed(); }
             }
             EditorGUI.indentLevel--;
         }
