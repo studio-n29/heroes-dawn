@@ -293,6 +293,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendStages(d);
             ExtendNarration(d);
             ExtendCollection(d);
+            ExtendAgents(d);
             return d;
         }
 
@@ -306,6 +307,7 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendStages(Dictionary<string, string> d);
         static partial void ExtendNarration(Dictionary<string, string> d);
         static partial void ExtendCollection(Dictionary<string, string> d);
+        static partial void ExtendAgents(Dictionary<string, string> d);
 
         public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
         public static bool Has(string key) => Fr.ContainsKey(key);

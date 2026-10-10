@@ -14,11 +14,13 @@ namespace N29.HeroesDawn.Application.Features.Zone
         public IPublisher<ZoneValidated> Validated { get; }
         public SaveScheduler Save { get; }
         public ILogger Log { get; }
+        /// <summary>Horloge du telephone (jours d evenement) ; nulle : l heure du systeme.</summary>
+        public IClock? Clock { get; }
 
         public ZoneEffects(GameSession session, IPublisher<WalletChanged> wallet, IPublisher<ZoneValidated> validated,
-                           SaveScheduler save, ILogger log)
+                           SaveScheduler save, ILogger log, IClock? clock = null)
         {
-            Session = session; Wallet = wallet; Validated = validated; Save = save; Log = log;
+            Session = session; Wallet = wallet; Validated = validated; Save = save; Log = log; Clock = clock;
         }
     }
 }

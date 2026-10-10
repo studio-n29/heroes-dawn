@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
@@ -38,6 +39,7 @@ namespace N29.HeroesDawn.Application.Features.Zone
             var b = s.Content.Balance;
             bool wallet = false;
             bool collection = false;
+            bool rosterChanged = false;
             ZoneRewards? validated = null;
             foreach (var e in events)
             {
@@ -62,7 +64,9 @@ namespace N29.HeroesDawn.Application.Features.Zone
                             ? new ZoneRewards(b.ZoneValidationCredits, b.ZoneValidationPr, true)
                             : new ZoneRewards(MetaRules.ZoneReplayCredits, 0, false);
                         int pct = Meta.LabBonuses.ZoneRewardPercent(s.Meta);
-                        validated = new ZoneRewards(validated.Credits * pct / 100, validated.Pr * pct / 100, validated.FirstClear, first ? 1 : 0);
+                        var joined = s.RunZone != null ? AgentUnlocks.OnZoneValidated(s, s.Run, s.RunZone.Id, (fx.Clock?.LocalNow ?? System.DateTime.Now)) : (System.Collections.Generic.IReadOnlyList<Definitions.MemberDef>)System.Array.Empty<Definitions.MemberDef>();
+                        validated = new ZoneRewards(validated.Credits * pct / 100, validated.Pr * pct / 100, validated.FirstClear, first ? 1 : 0, joined.Select(m => m.Id).ToList());
+                        if (joined.Count > 0) rosterChanged = true;
                         if (first) { Collection.CollectionOps.AddBooster(s, Definitions.BoosterDef.StandardId); collection = true; }
                         s.Wallet.Add(validated.Credits, validated.Pr);
                         wallet = true;
@@ -72,7 +76,7 @@ namespace N29.HeroesDawn.Application.Features.Zone
             }
             if (wallet) fx.Wallet.PublishWallet(s);
             if (validated != null) fx.Validated.Publish(new ZoneValidated(validated));
-            if (wallet || collection) fx.Save.RequestSave();
+            if (wallet || collection || rosterChanged) fx.Save.RequestSave();
         }
     }
 }

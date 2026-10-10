@@ -13,11 +13,11 @@ namespace N29.HeroesDawn.Tests.Domain
     {
         static ContentCatalog C => PrototypeContent.Build();
 
-        [Test, Description("Vérifie que le contenu du prototype est cohérent : 8 recrues, zone de 25 cases et 3 objectifs, liens valides, 3 compétences par recrue — parce qu'une donnée incohérente casserait le jeu à l'exécution")]
+        [Test, Description("Vérifie que le contenu du prototype est cohérent : 30 agents, zone de 25 cases et 3 objectifs, liens valides, 3 compétences par recrue — parce qu'une donnée incohérente casserait le jeu à l'exécution")]
         public void Content_IsConsistent()
         {
             var c = C;
-            Assert.AreEqual(8, c.Members.Count);
+            Assert.AreEqual(30, c.Members.Count);
             var zone = c.Zone(PrototypeContent.Zone11);
             Assert.AreEqual(25, zone.Nodes.Count);
             Assert.AreEqual(3, zone.Objectives.Count);

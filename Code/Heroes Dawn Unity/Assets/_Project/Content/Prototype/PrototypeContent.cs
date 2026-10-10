@@ -74,7 +74,12 @@ namespace N29.HeroesDawn.Content.Prototype
         static ContentCatalog WithActivities(ContentCatalog c, IReadOnlyList<ActivityDef> activities)
             => new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Combos, c.Zones, c.AvatarSkills, activities, c.Collection);
 
-        public static ContentCatalog Build(BalanceConfig balance)
+        public static ContentCatalog Build(BalanceConfig balance) => Build(balance, true);
+
+        /// <summary>Les huit premiers agents seulement (tests des regles de boutique, independants du reste de la roster).</summary>
+        public static ContentCatalog BuildCore() => Build(new BalanceConfig(), false);
+
+        public static ContentCatalog Build(BalanceConfig balance, bool extraAgents)
         {
             var members = new List<MemberDef>
             {
@@ -111,6 +116,7 @@ namespace N29.HeroesDawn.Content.Prototype
                     S("etincelle_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, Adv(60)),
                     S("etincelle_a3", SkillSlot.A3, 5, TargetRule.SingleEnemy, Dmg(150))),
             };
+            if (extraAgents) members.AddRange(PrototypeAgents.Members(Stats));
 
             var enemies = new List<EnemyDef>
             {

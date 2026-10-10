@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Messages;
+using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Activities;
@@ -126,6 +127,15 @@ namespace N29.HeroesDawn.Tests.Presentation
             _p.ShowZoneCompleteAsync(new ZoneRewards(1500, 40, true), CancellationToken.None).GetAwaiter().GetResult();
             Assert.That(_zone.Data!.Value.Rewards, Is.EqualTo(Loc.F("board.zone_rewards", 1500, 40)));
             Assert.That(_host.Despawned, Does.Contain(_zone));
+        }
+
+        [Test, Description("Vérifie que la validation d'une zone annonce le booster gagné et le nom de l'agent qui rejoint l'équipe — parce que les déblocages doivent se voir à l'écran")]
+        public void ZoneComplete_AnnouncesBoosterAndNewAgents()
+        {
+            var rewards = new ZoneRewards(1500, 40, true, 1, new[] { new MemberId("vanguard") });
+            var p = new CasePopupPresenter(new ModalService(_host), _resolve, _resolve, _app.Zone.PlanActivity, _resolve, new GameSession(N29.HeroesDawn.Content.Prototype.PrototypeContent.Build()), _toasts, new LocLocalization());
+            p.ShowZoneCompleteAsync(rewards, CancellationToken.None).GetAwaiter().GetResult();
+            Assert.That(_zone.Data!.Value.Rewards, Does.Contain("+1 booster").And.Contain("Vanguard"));
         }
     }
 }
