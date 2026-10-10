@@ -22,6 +22,12 @@ namespace N29.HeroesDawn.Application.Features.Zone
         public bool FirstClear { get; }
         /// <summary>Boosters de cartes offerts a la premiere validation.</summary>
         public int Boosters { get; }
-        public ZoneRewards(int credits, int pr, bool firstClear, int boosters = 0) { Credits = credits; Pr = pr; FirstClear = firstClear; Boosters = boosters; }
+        /// <summary>Agents qui rejoignent l equipe a cette validation (arc, evenement, prouesse).</summary>
+        public System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Core.MemberId> NewAgents { get; }
+        public ZoneRewards(int credits, int pr, bool firstClear, int boosters = 0, System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Core.MemberId>? newAgents = null)
+        {
+            Credits = credits; Pr = pr; FirstClear = firstClear; Boosters = boosters;
+            NewAgents = newAgents ?? System.Array.Empty<N29.HeroesDawn.Core.MemberId>();
+        }
     }
 }

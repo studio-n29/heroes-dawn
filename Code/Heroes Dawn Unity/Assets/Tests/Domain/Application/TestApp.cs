@@ -155,7 +155,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Record<MetaChanged>();
             Record<MetaRewardEarned>();
 
-            Session = new GameSession(PrototypeContent.Build());
+            Session = new GameSession(PrototypeContent.BuildCore());
             Save = new SaveScheduler(Session, Profiles, Time, Logger, Publisher<SaveStateChanged>());
             Effects = new ZoneEffects(Session, Publisher<WalletChanged>(), Publisher<ZoneValidated>(), Save, Logger);
             Zone = new ZoneUseCases(this);

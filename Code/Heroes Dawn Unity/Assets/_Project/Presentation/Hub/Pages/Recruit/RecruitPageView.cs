@@ -18,6 +18,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text empty = null!;
         [SerializeField] TMP_Text progress = null!;
         [SerializeField] UiButton reroll = null!;
+        [SerializeField] UiButton registry = null!;
 
         readonly int[] _slots = new int[8];
         readonly Core.MemberId[] _ids = new Core.MemberId[8];
@@ -26,6 +27,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action<int>? CardTapped;
         public event Action<int>? RecruitClicked;
         public event Action? RerollClicked;
+        public event Action? RegistryClicked;
 
         public Button RerollButton => reroll.Button;
         public ShopCardView Card(int index) => cards[index];
@@ -39,6 +41,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 cards[i].RecruitClicked += () => RecruitClicked?.Invoke(_slots[index]);
             }
             reroll.Button.onClick.AddListener(() => RerollClicked?.Invoke());
+            registry.Button.onClick.AddListener(() => RegistryClicked?.Invoke());
         }
 
         public void Show(RecruitPageData d)

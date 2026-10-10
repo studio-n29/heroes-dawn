@@ -81,7 +81,15 @@ namespace N29.HeroesDawn.Application.Session
         public Wallet Wallet { get; } = new Wallet();
         public List<TeamMember> Roster { get; } = new List<TeamMember>();
         public HashSet<string> CompletedZones { get; } = new HashSet<string>();
-        public ZoneRun? Run { get; set; }
+        ZoneRun? _run;
+        /// <summary>Plateau en cours ; en changer remet a zero les agents engages au combat (prouesse de compagnon).</summary>
+        public ZoneRun? Run
+        {
+            get => _run;
+            set { if (!ReferenceEquals(_run, value)) RunEngaged.Clear(); _run = value; }
+        }
+        /// <summary>Agents engages dans au moins un combat du plateau en cours.</summary>
+        public HashSet<string> RunEngaged { get; } = new HashSet<string>();
         public ZoneDef? RunZone { get; set; }
         public PlayerAccount? Account { get; set; }
         public bool AutoCombat { get; set; }
@@ -208,6 +216,7 @@ namespace N29.HeroesDawn.Application.Session
             }
             if (inSquad == 0)
                 for (int i = 0; i < Roster.Count && i < MetaRules.SquadSize; i++) Roster[i].InSquad = true;
+            Features.Zone.AgentUnlocks.CatchUpArcs(this);
         }
 
         public ProfileData ToProfile(DateTime utcNow)

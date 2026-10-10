@@ -54,6 +54,14 @@ namespace N29.HeroesDawn.Tests.Presentation
 
         void Own(string id) => _app.Session.Roster.Add(new TeamMember(_app.Session.Content.Member(new MemberId(id)), MetaRules.RecruitLevel));
 
+        [Test, Description("Vérifie que le bouton Registre de la page Recruter ouvre le registre des agents — parce que le joueur doit pouvoir voir comment obtenir chaque agent")]
+        public void RegistryButton_OpensTheAgentsRegistry()
+        {
+            Make();
+            _view.ClickRegistry();
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Agents));
+        }
+
         [Test, Description("Vérifie que la page montre 3 cartes avec leur rareté et que seule la Légende a le halo — parce que la Légende est mise en avant (M30)")]
         public void ShowsThreeCardsWithRarityAndHalo_LegendOnly()
         {

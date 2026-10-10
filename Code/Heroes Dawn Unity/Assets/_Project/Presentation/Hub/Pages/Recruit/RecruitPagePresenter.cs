@@ -57,7 +57,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.CardTapped += OpenSheet;
             View.RecruitClicked += Recruit;
             View.RerollClicked += Reroll;
+            View.RegistryClicked += OpenRegistry;
         }
+
+        void OpenRegistry() => _nav.Open(HubPage.Agents);
 
         protected override void OnShown()
         {
@@ -83,6 +86,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.CardTapped -= OpenSheet;
             View.RecruitClicked -= Recruit;
             View.RerollClicked -= Reroll;
+            View.RegistryClicked -= OpenRegistry;
         }
 
         public void Tick()

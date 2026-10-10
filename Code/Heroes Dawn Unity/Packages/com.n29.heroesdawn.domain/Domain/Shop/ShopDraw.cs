@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.Domain.Shop
             var list = new List<MemberDef>();
             foreach (var m in members)
             {
-                if (owned(m.Id)) continue;
+                if (owned(m.Id) || !m.InShop) continue;
                 if (m.UnlockZone is ZoneId z && !zoneCompleted(z)) continue;
                 list.Add(m);
             }

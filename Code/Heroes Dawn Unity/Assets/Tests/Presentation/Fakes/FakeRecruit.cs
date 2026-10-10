@@ -15,12 +15,14 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action<int>? CardTapped;
         public event Action<int>? RecruitClicked;
         public event Action? RerollClicked;
+        public event Action? RegistryClicked;
         public readonly List<RecruitPageData> Shown = new List<RecruitPageData>();
         public RecruitPageData Last => Shown[Shown.Count - 1];
         public void Show(RecruitPageData d) => Shown.Add(d);
         public void TapCard(int slot) => CardTapped?.Invoke(slot);
         public void ClickRecruit(int slot) => RecruitClicked?.Invoke(slot);
         public void ClickReroll() => RerollClicked?.Invoke();
+        public void ClickRegistry() => RegistryClicked?.Invoke();
     }
 
     /// <summary>Confirmation d'achat de test : garde les données demandées, répond par <see cref="Answer"/> ; Retour = non.</summary>

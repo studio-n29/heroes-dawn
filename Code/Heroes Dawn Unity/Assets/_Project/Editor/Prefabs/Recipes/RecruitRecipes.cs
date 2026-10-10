@@ -109,6 +109,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             progress.rectTransform.At(0f, 0f, 0, 0, 700, 96);
             var reroll = Ui.Btn(rt, "", Theme.Credits, Theme.TextDark, null!, 32, FontKind.Title, "Reroll");
             reroll.Rect.At(1f, 0f, 0, 0, 480, 96);
+            var registry = Ui.LocBtn(rt, "agents.open", Theme.Surface3, Theme.Text, null!, 32, FontKind.Title, "Registry");
+            registry.Rect.At(0.5f, 0f, 60, 0, 360, 96);
 
             var view = rt.gameObject.AddComponent<RecruitPageView>();
             ScreenKit.WireFade(ctx, view);
@@ -118,6 +120,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "empty", empty);
             ctx.Wire(view, "progress", progress);
             ctx.Wire(view, "reroll", reroll);
+            ctx.Wire(view, "registry", registry);
             return rt.gameObject;
         }
     }

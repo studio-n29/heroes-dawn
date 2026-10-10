@@ -10,6 +10,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         event Action<int> CardTapped;
         event Action<int> RecruitClicked;
         event Action RerollClicked;
+        /// <summary>Registre des agents : comment obtenir chacun des 30 agents.</summary>
+        event Action RegistryClicked;
         void Show(RecruitPageData data);
     }
 }

@@ -54,6 +54,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
             int fatigue = b.FatiguePerWin + (victory ? 0 : b.FatiguePerLossExtra);
             foreach (var m in _active.FighterMembers)
             {
+                s.RunEngaged.Add(m.Id.Value);
                 int before = m.Fatigue;
                 m.AddFatigue(fatigue);
                 changes.Add(new FatigueChange(m.Id, before, m.Fatigue));
