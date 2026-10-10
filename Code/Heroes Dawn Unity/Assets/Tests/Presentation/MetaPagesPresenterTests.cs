@@ -16,7 +16,7 @@ using NUnit.Framework;
 namespace N29.HeroesDawn.Tests.Presentation
 {
     /// <summary>Vue de liste factice : un seul double pour Pass, Boutique, Opérations, Labo et Archives.</summary>
-    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView
+    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView
     {
         public event Action<int>? HeaderClicked;
         public event Action<int, int>? RowButtonClicked;
@@ -105,7 +105,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             _app.Session.Wallet.SetGems(0);
             var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
-                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
+                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator()));
             int row = BoutiqueRow("ex_credits");
             Assert.That(_view.Rows[row].A.Enabled, Is.False);
             Assert.That(_view.Rows[row].A.Reason, Does.Contain("20"));
@@ -124,7 +124,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void Boutique_PackPurchase_ConfirmsThenGrantsGems()
         {
             var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
-                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
+                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator()));
             int gems = _app.Session.Wallet.Gems;
             _view.ClickRow(0);
             var popup = (FakeConfirmPopup)_host.Spawned.Single();
@@ -138,7 +138,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void Boutique_DailyGift_OncePerDay()
         {
             var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
-                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
+                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator()));
             Assert.That(_view.Header.A.Enabled, Is.True);
             _view.ClickHeader(0);
             Assert.That(_view.Header.A.Enabled, Is.False);

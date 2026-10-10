@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Domain.Combat
         public long Gauge { get; set; }
         public long GaugeMax { get; }
         /// <summary>Recharges des compétences A1, A2, A3 (0 = disponible).</summary>
-        public int[] Cooldowns { get; } = new int[3];
+        public int[] Cooldowns { get; } = new int[4];
         public List<StatusInstance> Statuses { get; } = new List<StatusInstance>();
         public IReadOnlyList<SkillDef> Skills { get; }
         public int ActionsSinceCombo { get; set; } = 99;
@@ -32,6 +32,10 @@ namespace N29.HeroesDawn.Domain.Combat
         public long BurnRemainder { get; set; }
         /// <summary>Déjà repoussée par une compétence depuis sa dernière action : une autre attaque ne la repousse pas (anti-blocage).</summary>
         public bool KnockbackGuard { get; set; }
+        /// <summary>Chances de critique ajoutees par les objets (en %).</summary>
+        public int CritBonusPercent { get; set; }
+        /// <summary>Avance de depart sur la frise donnee par les objets (en %).</summary>
+        public int StartGaugeBonusPercent { get; set; }
 
         /// <summary>Position sur la frise en % (0 = départ, 100 = point d action) ; négative pendant une canalisation.</summary>
         public int TimelinePercent => (int)(Gauge * 100 / GaugeMax);

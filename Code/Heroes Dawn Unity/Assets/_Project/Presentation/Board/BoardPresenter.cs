@@ -505,6 +505,8 @@ namespace N29.HeroesDawn.Presentation.Board
                     case PmBankedEvent pb: _toasts.Show(_loc.F("board.banked", pb.Pm), ToastKind.Info); break;
                     case SteppedBackEvent _: steppedBack = true; _toasts.Show(_loc.T("board.stepped_back"), ToastKind.Warning); _tutorial?.Hint("defeat"); break;
                     case NarrationEvent ne: narrations.Add(ne); break;
+                    case ItemFoundEvent itf: _toasts.Show(_loc.F("board.item_found", _loc.T(_session.Content.Collection.Item(itf.Item).NameKey)), ToastKind.Reward); break;
+                    case BoosterEarnedEvent _: _toasts.Show(_loc.T("board.booster_earned"), ToastKind.Reward); break;
                     case CaseTriggeredEvent ct: triggered = ct.Outcome; break;
                     case ZoneValidatedEvent _: validated = true; break;
                 }

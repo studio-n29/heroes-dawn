@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Application.Ports;
@@ -48,7 +49,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
             foreach (var m in fighters)
             {
                 if (allies.Count >= MetaRules.SquadSize) break;
-                allies.Add(new AllyEntry(m.Id, m.Level, m.Fatigue, run.MalusPercent(m.Id)));
+                allies.Add(new AllyEntry(m.Id, m.Level, m.Fatigue, run.MalusPercent(m.Id), m.Items.ToArray(), m.Cards.ToArray()));
                 engaged.Add(m);
             }
             var waves = new List<IReadOnlyList<EnemyEntry>>();

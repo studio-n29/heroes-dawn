@@ -34,9 +34,13 @@ namespace N29.HeroesDawn.Domain.Combat
             Auto = setup.Auto;
             _rng = new Pcg32(setup.Seed).Fork(3);
             int id = 0;
-            foreach (var a in setup.Allies) _units.Add(UnitFactory.Ally(id++, c.Member(a.Member), a, _b));
+            foreach (var a in setup.Allies) _units.Add(UnitFactory.Ally(id++, c.Member(a.Member), a, _b, c.Collection));
             SpawnWave(0);
-            foreach (var u in _units) u.Gauge = u.GaugeMax * _rng.Range(0, 21) / 100; // départ entre 0 et 20 %
+            foreach (var u in _units)
+            {
+                u.Gauge = u.GaugeMax * _rng.Range(0, 21) / 100; // départ entre 0 et 20 %
+                if (u.StartGaugeBonusPercent > 0) u.Gauge = System.Math.Min(u.GaugeMax - 1, u.Gauge + u.GaugeMax * u.StartGaugeBonusPercent / 100);
+            }
         }
 
         public CombatUnit Unit(int id) => _units[id];

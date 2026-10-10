@@ -50,6 +50,10 @@ namespace N29.HeroesDawn.Application.Ports
         public int level = 1;
         public int fatigue;
         public bool inSquad;
+        /// <summary>Objets equipes (au plus 2).</summary>
+        public List<string> items = new List<string>();
+        /// <summary>Cartes equipees : emplacement 3 puis 4 (chaine vide = pas de carte).</summary>
+        public List<string> cards = new List<string>();
     }
 
     /// <summary>Profil sauvegardé (M1 : fichier local ; M2 : Cloud Save + Economy).</summary>

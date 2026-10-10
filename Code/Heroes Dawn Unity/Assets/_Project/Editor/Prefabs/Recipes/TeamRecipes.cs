@@ -215,11 +215,13 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var side = Column(rt, "Side", LeftW + Gap + MidW + Gap, RightW);
             Ui.LocTxt(side.transform, "sheet.combos", 32, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "CombosTitle").rectTransform.At(0f, 1f, 22, -20, 492, 42);
             var combos = Ui.Txt(side.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Combos");
-            combos.rectTransform.Stretch(22, 384, 22, 72);
+            combos.rectTransform.Stretch(22, 468, 22, 72);
             var salon = Ui.LocBtn(side.transform, "sheet.salon", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Salon");
             salon.Rect.At(0f, 0f, 20, 252, 236, 96);
             var infirmary = Ui.LocBtn(side.transform, "sheet.infirmary", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Infirmary");
             infirmary.Rect.At(1f, 0f, -20, 252, 236, 96);
+            var loadout = Ui.LocBtn(side.transform, "sheet.loadout", Theme.Info, Theme.TextDark, null!, 30, FontKind.Title, "Loadout");
+            loadout.Rect.At(0.5f, 0f, 0, 356, 492, 96);
             var reason = Ui.Txt(side.transform, "", 24, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Body, "PrimaryReason");
             reason.rectTransform.At(0.5f, 0f, 0, 140, 492, 34);
             var primary = Ui.Btn(side.transform, "", Theme.Primary, Theme.TextDark, null!, 40, FontKind.Title, "Primary");
@@ -241,6 +243,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "next", next);
             ctx.Wire(view, "salon", salon);
             ctx.Wire(view, "infirmary", infirmary);
+            ctx.Wire(view, "loadout", loadout);
             ctx.Wire(view, "primary", primary);
             ctx.Wire(view, "primaryReason", reason);
             return rt.gameObject;

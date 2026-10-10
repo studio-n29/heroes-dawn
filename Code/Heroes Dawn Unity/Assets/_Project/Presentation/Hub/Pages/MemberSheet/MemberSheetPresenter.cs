@@ -56,6 +56,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.NextClicked += Next;
             View.PrimaryClicked += Primary;
             View.RoomClicked += OpenRoom;
+            View.LoadoutClicked += OpenLoadout;
         }
 
         protected override void OnShown()
@@ -82,6 +83,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.NextClicked -= Next;
             View.PrimaryClicked -= Primary;
             View.RoomClicked -= OpenRoom;
+            View.LoadoutClicked -= OpenLoadout;
         }
 
         void Previous() => Step(-1);
@@ -100,6 +102,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         }
 
         void OpenRoom(HubPage page) => _nav.Open(page);
+
+        void OpenLoadout() => _nav.Open(HubPage.Loadout, _member);
 
         void Primary()
         {
@@ -175,6 +179,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             d.PrimaryReason = !max && missing > 0 ? _loc.F("hub.train.missing", missing) : "";
             d.ShowArrows = _session.Roster.Count > 1;
             d.ShowRooms = true;
+            d.ShowLoadout = true;
+            d.LoadoutLabel = _loc.F("sheet.loadout_counts", m.Items.Count, 2, m.Cards.Count(c => c.HasValue), 2);
             View.Show(d);
         }
 

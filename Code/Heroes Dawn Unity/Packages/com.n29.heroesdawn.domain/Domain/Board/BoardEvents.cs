@@ -57,6 +57,22 @@ namespace N29.HeroesDawn.Domain.Board
         public NarrationEvent(CaseId at, NarrationPhase phase, System.Collections.Generic.IReadOnlyList<NarrationLineDef> lines) { Case = at; Phase = phase; Lines = lines; }
     }
 
+    /// <summary>Un objet est trouve (evenement) : le service d application l ajoute a l inventaire.</summary>
+    public sealed class ItemFoundEvent : BoardEvent
+    {
+        public CaseId Case { get; }
+        public ItemId Item { get; }
+        public ItemFoundEvent(CaseId at, ItemId item) { Case = at; Item = item; }
+    }
+
+    /// <summary>Un booster de cartes est gagne (exploit, mini-jeu).</summary>
+    public sealed class BoosterEarnedEvent : BoardEvent
+    {
+        public string Booster { get; }
+        public BoosterSource Source { get; }
+        public BoosterEarnedEvent(string booster, BoosterSource source) { Booster = booster; Source = source; }
+    }
+
     public sealed class PmBankedEvent : BoardEvent
     {
         public int Pm { get; }

@@ -94,6 +94,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (Keys.Pressed(Key.Digit1) || Keys.Pressed(Key.Numpad1)) SkillClicked?.Invoke(0);
             if (Keys.Pressed(Key.Digit2) || Keys.Pressed(Key.Numpad2)) SkillClicked?.Invoke(1);
             if (Keys.Pressed(Key.Digit3) || Keys.Pressed(Key.Numpad3)) SkillClicked?.Invoke(2);
+            if (Keys.Pressed(Key.Digit4) || Keys.Pressed(Key.Numpad4)) SkillClicked?.Invoke(3);
             if (Keys.Pressed(Key.Q)) AvatarClicked?.Invoke(0);
             if (Keys.Pressed(Key.W)) AvatarClicked?.Invoke(1);
             if (Keys.Pressed(Key.E)) AvatarClicked?.Invoke(2);

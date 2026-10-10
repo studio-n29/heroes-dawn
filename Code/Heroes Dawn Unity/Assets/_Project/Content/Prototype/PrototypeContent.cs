@@ -72,7 +72,7 @@ namespace N29.HeroesDawn.Content.Prototype
             => WithActivities(Build(balance), ActivityParamsJson.Apply(PrototypeActivities.Build(balance), activityOverrides));
 
         static ContentCatalog WithActivities(ContentCatalog c, IReadOnlyList<ActivityDef> activities)
-            => new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Combos, c.Zones, c.AvatarSkills, activities);
+            => new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Combos, c.Zones, c.AvatarSkills, activities, c.Collection);
 
         public static ContentCatalog Build(BalanceConfig balance)
         {
@@ -146,7 +146,7 @@ namespace N29.HeroesDawn.Content.Prototype
             enemies.AddRange(PrototypeZones.Enemies());
             var zones = new List<ZoneDef> { BuildZone11() };
             zones.AddRange(PrototypeZones.Zones());
-            return new ContentCatalog(balance, members, enemies, combos, zones, AvatarSkills(), PrototypeActivities.Build(balance));
+            return new ContentCatalog(balance, members, enemies, combos, zones, AvatarSkills(), PrototypeActivities.Build(balance), PrototypeCollection.Build());
         }
 
         /// <summary>Red Hook — les quais : 25 cases, 3 embranchements, 6 combats (1 Élite fixe : Brick).</summary>

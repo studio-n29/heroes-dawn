@@ -47,6 +47,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action? NextClicked;
         public event Action? PrimaryClicked;
         public event Action<HubPage>? RoomClicked;
+        public event Action? LoadoutClicked;
         public readonly List<MemberSheetData> Shown = new List<MemberSheetData>();
         public MemberSheetData Last => Shown[Shown.Count - 1];
         public void Show(MemberSheetData d) => Shown.Add(d);
@@ -54,6 +55,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void ClickNext() => NextClicked?.Invoke();
         public void ClickPrimary() => PrimaryClicked?.Invoke();
         public void ClickRoom(HubPage p) => RoomClicked?.Invoke(p);
+        public void ClickLoadout() => LoadoutClicked?.Invoke();
     }
 
     /// <summary>Cas d'usage qui ne répond qu'à la demande (tests de Dispose pendant un appel).</summary>

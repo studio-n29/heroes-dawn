@@ -37,6 +37,7 @@ namespace N29.HeroesDawn.Application.Features.Zone
             var s = fx.Session;
             var b = s.Content.Balance;
             bool wallet = false;
+            bool collection = false;
             ZoneRewards? validated = null;
             foreach (var e in events)
             {
@@ -46,6 +47,14 @@ namespace N29.HeroesDawn.Application.Features.Zone
                         s.Wallet.Add(rc.Credits, rc.Pr);
                         wallet = true;
                         break;
+                    case ItemFoundEvent found:
+                        Collection.CollectionOps.AddItem(s, found.Item);
+                        collection = true;
+                        break;
+                    case BoosterEarnedEvent earned:
+                        Collection.CollectionOps.AddBooster(s, earned.Booster);
+                        collection = true;
+                        break;
                     case ZoneValidatedEvent _:
                         var zoneId = s.RunZone != null ? s.RunZone.Id.Value : "";
                         bool first = s.CompletedZones.Add(zoneId);
@@ -53,7 +62,8 @@ namespace N29.HeroesDawn.Application.Features.Zone
                             ? new ZoneRewards(b.ZoneValidationCredits, b.ZoneValidationPr, true)
                             : new ZoneRewards(MetaRules.ZoneReplayCredits, 0, false);
                         int pct = Meta.LabBonuses.ZoneRewardPercent(s.Meta);
-                        validated = new ZoneRewards(validated.Credits * pct / 100, validated.Pr * pct / 100, validated.FirstClear);
+                        validated = new ZoneRewards(validated.Credits * pct / 100, validated.Pr * pct / 100, validated.FirstClear, first ? 1 : 0);
+                        if (first) { Collection.CollectionOps.AddBooster(s, Definitions.BoosterDef.StandardId); collection = true; }
                         s.Wallet.Add(validated.Credits, validated.Pr);
                         wallet = true;
                         fx.Log.Info($"Zone {zoneId} validée (1re fois : {first})");
@@ -62,7 +72,7 @@ namespace N29.HeroesDawn.Application.Features.Zone
             }
             if (wallet) fx.Wallet.PublishWallet(s);
             if (validated != null) fx.Validated.Publish(new ZoneValidated(validated));
-            if (wallet) fx.Save.RequestSave();
+            if (wallet || collection) fx.Save.RequestSave();
         }
     }
 }

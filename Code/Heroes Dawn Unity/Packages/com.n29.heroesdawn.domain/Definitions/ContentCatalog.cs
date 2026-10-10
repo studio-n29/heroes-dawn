@@ -19,11 +19,14 @@ namespace N29.HeroesDawn.Definitions
         public IReadOnlyList<ZoneDef> Zones { get; }
         public IReadOnlyList<AvatarSkillDef> AvatarSkills { get; }
         public IReadOnlyList<ActivityDef> Activities { get; }
+        /// <summary>Objets, cartes de competences et boosters.</summary>
+        public CollectionDef Collection { get; }
 
         public ContentCatalog(BalanceConfig balance, IReadOnlyList<MemberDef> members, IReadOnlyList<EnemyDef> enemies,
                               IReadOnlyList<ComboDef> combos, IReadOnlyList<ZoneDef> zones, IReadOnlyList<AvatarSkillDef>? avatarSkills = null,
-                              IReadOnlyList<ActivityDef>? activities = null)
+                              IReadOnlyList<ActivityDef>? activities = null, CollectionDef? collection = null)
         {
+            Collection = collection ?? CollectionDef.Empty;
             Balance = balance; Members = members; Enemies = enemies; Combos = combos; Zones = zones;
             AvatarSkills = avatarSkills ?? new List<AvatarSkillDef>();
             Activities = activities ?? new List<ActivityDef>();
@@ -48,8 +51,12 @@ namespace N29.HeroesDawn.Definitions
             foreach (var z in zones) byId[z.Id] = z;
             foreach (var z in Zones) merged.Add(byId.TryGetValue(z.Id, out var over) ? over : z);
             foreach (var z in zones) if (!_zones.ContainsKey(z.Id)) merged.Add(z);
-            return new ContentCatalog(Balance, Members, Enemies, Combos, merged, AvatarSkills, Activities);
+            return new ContentCatalog(Balance, Members, Enemies, Combos, merged, AvatarSkills, Activities, Collection);
         }
+
+        /// <summary>Meme contenu avec ces objets, cartes et boosters.</summary>
+        public ContentCatalog WithCollection(CollectionDef collection)
+            => new ContentCatalog(Balance, Members, Enemies, Combos, Zones, AvatarSkills, Activities, collection);
 
         /// <summary>Premier combo correspondant, dans l'ordre de la liste (ordre stable).</summary>
         public ComboDef? FindCombo(Family a, Family b)

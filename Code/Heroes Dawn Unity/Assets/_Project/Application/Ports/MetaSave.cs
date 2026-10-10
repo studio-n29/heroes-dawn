@@ -100,6 +100,9 @@ namespace N29.HeroesDawn.Application.Ports
         public SettingsSave settings = new SettingsSave();
         public TutorialSave tutorial = new TutorialSave();
 
+        // Objets, grimoire, boosters
+        public CollectionSave collection = new CollectionSave();
+
         public int GetCounter(List<CounterSave> list, string id)
         {
             foreach (var c in list) if (c.id == id) return c.value;

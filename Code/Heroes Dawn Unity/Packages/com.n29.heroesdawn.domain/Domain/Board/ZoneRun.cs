@@ -163,6 +163,25 @@ namespace N29.HeroesDawn.Domain.Board
             return events;
         }
 
+        /// <summary>Aleatoire propre a une case (graine du plateau + case) : ne touche pas au flux des autres tirages.</summary>
+        Pcg32 EventRng(CaseId at, string salt)
+        {
+            var h = new Fnv1a64();
+            h.Add((long)Seed);
+            h.Add(at.Value);
+            h.Add(salt);
+            return new Pcg32(h.Value);
+        }
+
+        /// <summary>Evenement resolu : avec une chance, un objet est trouve (tire parmi les objets du jeu).</summary>
+        void RollItemFind(CaseId at, List<BoardEvent> events)
+        {
+            var rng = EventRng(at, "item");
+            if (!rng.Chance(_c.Balance.EventItemChancePercent)) return;
+            var item = CollectionRules.RollItem(_c.Collection, rng);
+            if (item != null) events.Add(new ItemFoundEvent(at, item.Id));
+        }
+
         /// <summary>Dialogue de la case joué une seule fois par plateau : l'événement porte les répliques.</summary>
         void EmitNarration(CaseId at, NarrationPhase phase, List<BoardEvent> events)
         {
@@ -194,6 +213,7 @@ namespace N29.HeroesDawn.Domain.Board
                     _defeated.Add(Position);
                     CompleteObjectives(ObjectiveType.DefeatCombat, Position, events);
                     EmitNarration(Position, NarrationPhase.After, events);
+                    if (Graph.Node(Position).Rank == CombatRank.Elite) events.Add(new BoosterEarnedEvent(CollectionRules.StandardBooster, BoosterSource.Exploit));
                 }
             }
             else
@@ -219,6 +239,7 @@ namespace N29.HeroesDawn.Domain.Board
                 _resolvedCases.Add(Position);
                 if (type == CaseType.MiniGame) CompleteObjectives(ObjectiveType.CompleteMiniGame, Position, events);
                 if (type == CaseType.Narrative) CompleteObjectives(ObjectiveType.ResolveNarrative, Position, events);
+                if (type == CaseType.Narrative) RollItemFind(Position, events);
                 EmitNarration(Position, NarrationPhase.After, events);
             }
             PendingCase = null;
@@ -272,6 +293,7 @@ namespace N29.HeroesDawn.Domain.Board
             {
                 _resolvedCases.Add(Position);
                 CompleteObjectives(ObjectiveType.CompleteMiniGame, Position, events);
+                if (EventRng(Position, "booster").Chance(_c.Balance.ActivityBoosterChancePercent)) events.Add(new BoosterEarnedEvent(CollectionRules.StandardBooster, BoosterSource.MiniGame));
             }
             else if (outcome.FollowUp != null && outcome.FollowUp.Type == FollowUpType.Combat)
             {

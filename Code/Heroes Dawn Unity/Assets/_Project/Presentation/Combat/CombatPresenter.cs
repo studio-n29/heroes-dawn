@@ -337,12 +337,12 @@ namespace N29.HeroesDawn.Presentation.Combat
             _firstRefresh = false;
             View.ShowUnits(states);
 
-            var panel = new SkillPanelData { Visible = manual && _selected >= 0, UnitId = _selected, Slots = new SkillSlotData[3], Title = _selected >= 0 ? _loc.F("combat.ready", Name(_selected)).ToUpperInvariant() : "" };
+            var panel = new SkillPanelData { Visible = manual && _selected >= 0, UnitId = _selected, Slots = new SkillSlotData[4], Title = _selected >= 0 ? _loc.F("combat.ready", Name(_selected)).ToUpperInvariant() : "" };
             if (panel.Visible)
             {
                 var u = sim.Unit(_selected);
                 int count = CombatSimulation.ActiveSkillCount(u);
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     if (i >= count) continue;
                     var s = u.Skills[i];
@@ -375,7 +375,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             var slots = new SkillSlotData[4];
             int count = CombatSimulation.ActiveSkillCount(u);
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
             {
                 if (i >= count) { slots[i] = new SkillSlotData { Visible = true, Locked = true, Label = "", Description = "", Glyph = "" }; continue; }
                 var s = u.Skills[i];
@@ -391,7 +391,6 @@ namespace N29.HeroesDawn.Presentation.Combat
                     Enabled = active && sim.CanUse(u.Id, i),
                 };
             }
-            slots[3] = new SkillSlotData { Visible = true, Locked = true, Label = "", Description = "", Glyph = "" };
             return slots;
         }
 

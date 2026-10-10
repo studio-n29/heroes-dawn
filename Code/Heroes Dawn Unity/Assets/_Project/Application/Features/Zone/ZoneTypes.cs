@@ -20,6 +20,8 @@ namespace N29.HeroesDawn.Application.Features.Zone
         public int Credits { get; }
         public int Pr { get; }
         public bool FirstClear { get; }
-        public ZoneRewards(int credits, int pr, bool firstClear) { Credits = credits; Pr = pr; FirstClear = firstClear; }
+        /// <summary>Boosters de cartes offerts a la premiere validation.</summary>
+        public int Boosters { get; }
+        public ZoneRewards(int credits, int pr, bool firstClear, int boosters = 0) { Credits = credits; Pr = pr; FirstClear = firstClear; Boosters = boosters; }
     }
 }
