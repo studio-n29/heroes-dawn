@@ -27,6 +27,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] Button button = null!;
         [SerializeField] LayoutElement layout = null!;
         [SerializeField] FloatingTextView floatPrefab = null!;
+        [SerializeField] SkillIconView[] icons = Array.Empty<SkillIconView>();
+        [SerializeField] Tutorial.TutorialTargetMarker readyMarker = null!;
 
         Color _baseFill;
         bool _ally;
@@ -34,8 +36,20 @@ namespace N29.HeroesDawn.Presentation.Combat
         public int UnitId { get; private set; }
         public Button Button => button;
         public event Action<int>? Tapped;
+        /// <summary>Un des quatre icônes de compétence de l'agent a été touchée (emplacement 0 à 3).</summary>
+        public event Action<int>? SkillClicked;
 
-        void Awake() => button.onClick.AddListener(() => Tapped?.Invoke(UnitId));
+        public SkillIconView Icon(int i) => icons[i];
+
+        void Awake()
+        {
+            button.onClick.AddListener(() => Tapped?.Invoke(UnitId));
+            for (int i = 0; i < icons.Length; i++)
+            {
+                int slot = i;
+                icons[i].Clicked += () => SkillClicked?.Invoke(slot);
+            }
+        }
 
         public void Setup(UnitCardData d)
         {
@@ -69,6 +83,11 @@ namespace N29.HeroesDawn.Presentation.Combat
             select.gameObject.SetActive(s.Selected && s.Alive);
             target.gameObject.SetActive(s.Targetable && s.Alive);
             target.color = _ally ? Theme.Success : Theme.Danger;
+            for (int i = 0; i < icons.Length; i++)
+                icons[i].Show(s.Skills != null && i < s.Skills.Length ? s.Skills[i] : default, i);
+            bool usable = false;
+            if (s.Skills != null) foreach (var sk in s.Skills) usable |= sk.Enabled || sk.Pending;
+            readyMarker.enabled = usable && s.Alive;
         }
 
         public void Float(string text, Color color, int size) => Instantiate(floatPrefab, transform).Play(text, color, size);

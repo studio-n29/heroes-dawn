@@ -23,6 +23,7 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         void BuildUnits(IReadOnlyList<UnitCardData> units);
         void ShowUnits(IReadOnlyList<UnitStateData> states);
+        /// <summary>Agent dont les icônes sont lançables (mêmes données que dans <see cref="UnitStateData.Skills"/>) ; sert aux raccourcis et aux tests.</summary>
         void ShowSkills(SkillPanelData data);
         void ShowAvatar(AvatarBarData data);
         void ShowCombo(bool visible, string label);

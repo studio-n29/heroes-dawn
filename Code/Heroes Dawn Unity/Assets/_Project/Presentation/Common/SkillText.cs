@@ -28,6 +28,8 @@ namespace N29.HeroesDawn.Presentation.Common
                     case EffectType.Damage: yield return Loc.F("fx.damage", fx.Value); break;
                     case EffectType.Heal: yield return Loc.F("fx.heal", fx.Value); break;
                     case EffectType.Shield: yield return Loc.F("fx.shield", fx.Value); break;
+                    case EffectType.PushBack: yield return Loc.F("fx.pushback", fx.Value); break;
+                    case EffectType.Advance: yield return Loc.F("fx.advance", fx.Value); break;
                     case EffectType.GaugeDelta:
                         yield return fx.Value >= 0 ? Loc.F("fx.gauge_up", fx.Value / 10) : Loc.F("fx.gauge_down", -fx.Value / 10);
                         break;

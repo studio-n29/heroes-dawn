@@ -262,6 +262,10 @@ namespace N29.HeroesDawn.Presentation.Combat
                     case PushedBackEvent pb:
                         View.Float(pb.Unit, _loc.F("combat.pushed", pb.Percent), Tone.Perception, 30);
                         break;
+                    case AdvancedEvent ad:
+                        View.Float(ad.Unit, _loc.F("combat.advanced", ad.Percent), Tone.Success, 34);
+                        if (ad.Ready) { View.Act(ad.Unit); AddLog(Name(ad.Unit) + " : " + _loc.T("combat.propelled")); }
+                        break;
                     case WaveStartedEvent ws:
                         BuildUnits(_sim!);
                         _firstRefresh = true;
@@ -327,12 +331,13 @@ namespace N29.HeroesDawn.Presentation.Combat
                     Selected = u.Id == _selected && u.IsAlive,
                     Targetable = u.IsAlive && ((!ally && targetEnemies) || (ally && targetAllies)),
                     Instant = _firstRefresh,
+                    Skills = ally ? SkillIcons(sim, u, manual && u.Id == _selected && u.IsAlive) : null,
                 });
             }
             _firstRefresh = false;
             View.ShowUnits(states);
 
-            var panel = new SkillPanelData { Visible = manual && _selected >= 0, Slots = new SkillSlotData[3], Title = _selected >= 0 ? _loc.F("combat.ready", Name(_selected)).ToUpperInvariant() : "" };
+            var panel = new SkillPanelData { Visible = manual && _selected >= 0, UnitId = _selected, Slots = new SkillSlotData[3], Title = _selected >= 0 ? _loc.F("combat.ready", Name(_selected)).ToUpperInvariant() : "" };
             if (panel.Visible)
             {
                 var u = sim.Unit(_selected);
@@ -363,6 +368,31 @@ namespace N29.HeroesDawn.Presentation.Combat
                        : targetAllies ? _loc.T("combat.choose_ally")
                        : manual && _selected < 0 ? _loc.T("combat.waiting") : "");
             RefreshTopBar();
+        }
+
+        /// <summary>Les quatre icônes de compétence d'un agent : 1 et 2 propres à l'agent, 3 lourde, 4 réservée aux cartes du grimoire.</summary>
+        SkillSlotData[] SkillIcons(CombatSimulation sim, CombatUnit u, bool active)
+        {
+            var slots = new SkillSlotData[4];
+            int count = CombatSimulation.ActiveSkillCount(u);
+            for (int i = 0; i < 3; i++)
+            {
+                if (i >= count) { slots[i] = new SkillSlotData { Visible = true, Locked = true, Label = "", Description = "", Glyph = "" }; continue; }
+                var s = u.Skills[i];
+                string name = _loc.SkillName(s);
+                slots[i] = new SkillSlotData
+                {
+                    Visible = true,
+                    Label = "[" + (i + 1) + "] " + name,
+                    Description = _loc.DescribeSkill(s),
+                    Glyph = string.IsNullOrEmpty(name) ? "?" : name.Substring(0, 1).ToUpperInvariant(),
+                    Cooldown = u.Cooldowns[i],
+                    Pending = active && _pendingSlot == i,
+                    Enabled = active && sim.CanUse(u.Id, i),
+                };
+            }
+            slots[3] = new SkillSlotData { Visible = true, Locked = true, Label = "", Description = "", Glyph = "" };
+            return slots;
         }
 
         string Statuses(CombatUnit u)

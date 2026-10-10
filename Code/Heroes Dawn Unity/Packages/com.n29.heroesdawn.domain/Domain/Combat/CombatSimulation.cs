@@ -45,6 +45,7 @@ namespace N29.HeroesDawn.Domain.Combat
         public long FillPerTick(CombatUnit u)
         {
             long fill = (long)u.Spd * _b.AtbFactorPerSecond * _b.TickMs;
+            fill = fill * _b.TimelineSpeedPercent / 100;
             if (u.Has(StatusType.Haste)) fill = fill * 130 / 100;
             if (u.Has(StatusType.Freeze)) fill = fill * 50 / 100;
             return fill;

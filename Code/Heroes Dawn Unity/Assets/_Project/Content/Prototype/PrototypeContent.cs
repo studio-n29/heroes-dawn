@@ -17,6 +17,8 @@ namespace N29.HeroesDawn.Content.Prototype
         static EffectDef Heal(int pct) => new EffectDef(EffectType.Heal, pct);
         static EffectDef Shield(int pct, int turns = 2) => new EffectDef(EffectType.Shield, pct, StatusType.Shield, turns);
         static EffectDef Gauge(int points) => new EffectDef(EffectType.GaugeDelta, points);
+        static EffectDef Push(int pct) => new EffectDef(EffectType.PushBack, pct);
+        static EffectDef Adv(int pct) => new EffectDef(EffectType.Advance, pct);
 
         static SkillDef S(string id, SkillSlot slot, int cd, TargetRule t, params EffectDef[] fx)
             => new SkillDef(new SkillId(id), slot, cd, t, fx);
@@ -77,12 +79,12 @@ namespace N29.HeroesDawn.Content.Prototype
             var members = new List<MemberDef>
             {
                 M("ancre", Family.PhysicalBio, Role.Tank, Rarity.Legend,
-                    S("ancre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), St(StatusType.Taunt, 1, 30)),
+                    S("ancre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), St(StatusType.Taunt, 1, 30), Push(15)),
                     S("ancre_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(20)),
                     S("ancre_a3", SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15), St(StatusType.Anchor, 2))),
                 Locked(M("verre", Family.Matter, Role.Control, Rarity.Legend,
                     S("verre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Vulnerable, 2, 25)),
-                    S("verre_a2", SkillSlot.A2, 4, TargetRule.SingleEnemy, St(StatusType.Bind, 2), Gauge(-300)),
+                    S("verre_a2", SkillSlot.A2, 4, TargetRule.SingleEnemy, St(StatusType.Bind, 2), Push(30)),
                     S("verre_a3", SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15), St(StatusType.Anchor, 2))), Zone11),
                 M("givre", Family.Elemental, Role.Damage, Rarity.Legend,
                     S("givre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Freeze, 2, 40)),
@@ -94,10 +96,10 @@ namespace N29.HeroesDawn.Content.Prototype
                     S("echo_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(70))),
                 M("arc", Family.Elemental, Role.Damage, Rarity.Elite,
                     S("arc_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Shock, 1, 20)),
-                    S("arc_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, St(StatusType.Haste, 2), Gauge(150)),
+                    S("arc_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, St(StatusType.Haste, 2), Adv(35)),
                     S("arc_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(90))),
                 M("rempart", Family.PhysicalBio, Role.Tank, Rarity.Elite,
-                    S("rempart_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110)),
+                    S("rempart_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), Push(15)),
                     S("rempart_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, Shield(25)),
                     S("rempart_a3", SkillSlot.A3, 5, TargetRule.Self, St(StatusType.Taunt, 2), Shield(30))),
                 M("seve", Family.PhysicalBio, Role.Support, Rarity.Elite,
@@ -106,7 +108,7 @@ namespace N29.HeroesDawn.Content.Prototype
                     S("seve_a3", SkillSlot.A3, 5, TargetRule.AllAllies, St(StatusType.Regen, 2))),
                 M("etincelle", Family.Elemental, Role.Control, Rarity.Agent,
                     S("etincelle_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Shock, 1, 15)),
-                    S("etincelle_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, Gauge(150)),
+                    S("etincelle_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, Adv(60)),
                     S("etincelle_a3", SkillSlot.A3, 5, TargetRule.SingleEnemy, Dmg(150))),
             };
 

@@ -27,6 +27,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["combat.prepares"] = "prépare {0}";
             d["combat.interrupted"] = "INTERROMPU !";
             d["combat.pushed"] = "RECUL -{0} %";
+            d["combat.timeline_action"] = "ACTION";
+            d["combat.advanced"] = "ÉLAN +{0} %";
+            d["combat.propelled"] = "propulsé au point d'action !";
+            d["fx.pushback"] = "Recule la cible de {0} % sur la frise";
+            d["fx.advance"] = "Propulse la cible de {0} % vers l'action";
             d["combat.pause"] = "II";
             d["combat.pause.title"] = "Pause";
             d["combat.pause.body"] = "Le combat est figé. Reprends quand tu es prêt.";

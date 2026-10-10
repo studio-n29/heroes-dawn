@@ -113,6 +113,7 @@ namespace N29.HeroesDawn.Domain.Combat
         void EndOfTurn(CombatUnit u, int slotIndex)
         {
             u.Gauge = GaugeAfter(u, slotIndex);
+            u.KnockbackGuard = false;
             u.PlannedSlot = -1;
             u.PlannedTarget = -1;
             u.ActionsSinceCombo++;
@@ -166,6 +167,22 @@ namespace N29.HeroesDawn.Domain.Combat
                             break;
                         case EffectType.ApplyStatus:
                             ApplyStatus(t, fx.Status, fx.Duration, 0, output);
+                            break;
+                        case EffectType.PushBack:
+                            if (t.KnockbackGuard || t.Side == actor.Side) break;
+                            if (PushBack(t, fx.Value, InterruptReason.PushBack, output)) t.KnockbackGuard = true;
+                            break;
+                        case EffectType.Advance:
+                            if (t == actor || t.IsReady) break;
+                            long reach = t.Gauge + t.GaugeMax * fx.Value / 100;
+                            bool arrives = reach >= t.GaugeMax;
+                            t.Gauge = arrives ? t.GaugeMax : reach;
+                            output.Add(new AdvancedEvent(Tick, t.Id, fx.Value, arrives));
+                            if (arrives)
+                            {
+                                output.Add(new GaugeFullEvent(Tick, t.Id));
+                                BeginTurn(t, output);
+                            }
                             break;
                         case EffectType.GaugeDelta:
                             if (t.IsReady && fx.Value > 0) break; // déjà prête : rien à ajouter

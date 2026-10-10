@@ -84,6 +84,15 @@ namespace N29.HeroesDawn.Domain.Combat
     }
 
     /// <summary>Une unité est repoussée en arrière sur la frise (contrôle : Entrave, Choc, Gel).</summary>
+    /// <summary>Une unité est propulsée vers le point d'action ; <c>Ready</c> : elle l'atteint et agit aussitôt.</summary>
+    public sealed class AdvancedEvent : CombatEvent
+    {
+        public int Unit { get; }
+        public int Percent { get; }
+        public bool Ready { get; }
+        public AdvancedEvent(int t, int unit, int percent, bool ready) : base(t) { Unit = unit; Percent = percent; Ready = ready; }
+    }
+
     public sealed class PushedBackEvent : CombatEvent
     {
         public int Unit { get; }

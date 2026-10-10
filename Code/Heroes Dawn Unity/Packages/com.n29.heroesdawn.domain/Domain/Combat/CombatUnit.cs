@@ -30,6 +30,8 @@ namespace N29.HeroesDawn.Domain.Combat
         public int PlannedTarget { get; set; } = -1;
         /// <summary>Reste de la brûlure (dégâts au pas de frise) en unités de jauge × %.</summary>
         public long BurnRemainder { get; set; }
+        /// <summary>Déjà repoussée par une compétence depuis sa dernière action : une autre attaque ne la repousse pas (anti-blocage).</summary>
+        public bool KnockbackGuard { get; set; }
 
         /// <summary>Position sur la frise en % (0 = départ, 100 = point d action) ; négative pendant une canalisation.</summary>
         public int TimelinePercent => (int)(Gauge * 100 / GaugeMax);

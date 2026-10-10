@@ -54,14 +54,15 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         /// <summary>Repousse une unité en arrière sur la frise (sauf Ancrage ou unité déjà prête) ; annule son action annoncée si elle sort de la zone.</summary>
-        void PushBack(CombatUnit u, int percent, InterruptReason reason, List<CombatEvent> output)
+        bool PushBack(CombatUnit u, int percent, InterruptReason reason, List<CombatEvent> output)
         {
-            if (percent <= 0 || !u.IsAlive || u.IsReady || u.Has(StatusType.Anchor) || u.Gauge <= 0) return;
+            if (percent <= 0 || !u.IsAlive || u.IsReady || u.Has(StatusType.Anchor) || u.Gauge <= 0) return false;
             long before = u.Gauge;
             u.Gauge = Math.Max(0, before - u.GaugeMax * percent / 100);
-            if (u.Gauge == before) return;
+            if (u.Gauge == before) return false;
             output.Add(new PushedBackEvent(Tick, u.Id, percent));
             if (u.PlannedSlot >= 0 && u.TimelinePercent < PlanStartPercent(u)) CancelPlan(u, reason, output);
+            return true;
         }
 
         static int PushBackFor(BalanceConfig b, StatusType s)

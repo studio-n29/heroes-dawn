@@ -33,6 +33,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         public bool Targetable;
         /// <summary>Premier affichage : barres sans interpolation.</summary>
         public bool Instant;
+        /// <summary>Icônes des 4 compétences (alliés seulement) ; null pour les ennemis.</summary>
+        public SkillSlotData[]? Skills;
     }
 
     /// <summary>Bouton de compétence (emplacement 0 à 2).</summary>
@@ -43,11 +45,19 @@ namespace N29.HeroesDawn.Presentation.Combat
         public string Description;
         public bool Pending;
         public bool Enabled;
+        /// <summary>Emplacement réservé à une carte du grimoire (4e compétence), pas encore équipé.</summary>
+        public bool Locked;
+        /// <summary>Tours de recharge restants (0 : disponible).</summary>
+        public int Cooldown;
+        /// <summary>Initiale affichée sur l'icône.</summary>
+        public string Glyph;
     }
 
     public struct SkillPanelData
     {
         public bool Visible;
+        /// <summary>Agent dont les icônes sont lançables ; -1 : aucun.</summary>
+        public int UnitId;
         public string Title;
         public SkillSlotData[] Slots;
     }
