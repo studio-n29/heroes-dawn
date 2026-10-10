@@ -22,6 +22,13 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public UniTask<ActivityResult> PlayAsync(PotionRequest request, CancellationToken ct) { Request = request; return UniTask.FromResult(Result); }
     }
 
+    /// <summary>Boîte de dialogue de narration de test : enregistre les répliques reçues.</summary>
+    public sealed class FakeDialogueBox : FakePopup, N29.HeroesDawn.Presentation.Narration.IDialogueBoxView
+    {
+        public readonly System.Collections.Generic.List<N29.HeroesDawn.Presentation.Narration.DialogueBoxLine> Played = new System.Collections.Generic.List<N29.HeroesDawn.Presentation.Narration.DialogueBoxLine>();
+        public UniTask PlayAsync(System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Presentation.Narration.DialogueBoxLine> lines, CancellationToken ct) { Played.AddRange(lines); return UniTask.CompletedTask; }
+    }
+
     public sealed class FakeDialoguePopup : FakePopup, IDialoguePopupView
     {
         public ActivityResult Result = ActivityResult.Won();

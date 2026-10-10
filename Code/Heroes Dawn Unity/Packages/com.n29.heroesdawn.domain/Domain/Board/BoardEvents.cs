@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using N29.HeroesDawn.Core;
+using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Activities;
 
 namespace N29.HeroesDawn.Domain.Board
@@ -46,6 +47,15 @@ namespace N29.HeroesDawn.Domain.Board
     }
 
     public sealed class ZoneValidatedEvent : BoardEvent { }
+
+    /// <summary>Dialogue de narration à jouer (avant l'action de la case ou après sa résolution).</summary>
+    public sealed class NarrationEvent : BoardEvent
+    {
+        public CaseId Case { get; }
+        public NarrationPhase Phase { get; }
+        public System.Collections.Generic.IReadOnlyList<NarrationLineDef> Lines { get; }
+        public NarrationEvent(CaseId at, NarrationPhase phase, System.Collections.Generic.IReadOnlyList<NarrationLineDef> lines) { Case = at; Phase = phase; Lines = lines; }
+    }
 
     public sealed class PmBankedEvent : BoardEvent
     {

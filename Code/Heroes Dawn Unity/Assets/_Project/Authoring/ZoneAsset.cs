@@ -6,6 +6,14 @@ using UnityEngine;
 
 namespace N29.HeroesDawn.Authoring
 {
+    /// <summary>Réplique d'un dialogue de narration : qui parle (identifiant d'agent ou nom d'un personnage) et ce qu'il dit.</summary>
+    [Serializable]
+    public sealed class NarrationLineData
+    {
+        public string speaker = "";
+        [TextArea] public string text = "";
+    }
+
     [Serializable]
     public sealed class NodeData
     {
@@ -24,6 +32,9 @@ namespace N29.HeroesDawn.Authoring
         public int rounds = 1;
         public int enemiesMin = 2;
         public int enemiesMax = 3;
+        /// <summary>Dialogues joués en arrivant sur la case (avant son action) et après sa résolution.</summary>
+        public List<NarrationLineData> narrationBefore = new List<NarrationLineData>();
+        public List<NarrationLineData> narrationAfter = new List<NarrationLineData>();
     }
 
     [Serializable]

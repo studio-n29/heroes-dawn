@@ -17,10 +17,12 @@ namespace N29.HeroesDawn.Definitions
         public ActivityId? Activity { get; }
         /// <summary>Combat d'une case Combat : table d'ennemis et manches ; vide : rencontres de la zone par rang.</summary>
         public CombatSpec? Combat { get; }
+        /// <summary>Dialogues joués avant et/ou après l'action de la case ; vide : aucun.</summary>
+        public NarrationDef? Narration { get; }
 
-        public NodeDef(CaseId id, CaseType type, bool isFixed, CombatRank rank, int x, int y, ActivityId? activity = null, CombatSpec? combat = null)
+        public NodeDef(CaseId id, CaseType type, bool isFixed, CombatRank rank, int x, int y, ActivityId? activity = null, CombatSpec? combat = null, NarrationDef? narration = null)
         {
-            Id = id; Type = type; IsFixed = isFixed; Rank = rank; X = x; Y = y; Activity = activity; Combat = combat;
+            Id = id; Type = type; IsFixed = isFixed; Rank = rank; X = x; Y = y; Activity = activity; Combat = combat; Narration = narration;
         }
     }
 }

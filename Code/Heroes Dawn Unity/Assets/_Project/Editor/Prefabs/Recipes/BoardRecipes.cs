@@ -91,6 +91,26 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
+    /// <summary>Nuage de brouillard de guerre (posé par la carte sur chaque case cachée).</summary>
+    public sealed class FogCloudRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Widgets/FogCloud.prefab";
+        public int Order => 0;
+
+        public GameObject Build(PrefabContext ctx)
+        {
+            var root = PrefabContext.NewRoot("FogCloud", 470, 340);
+            root.anchorMin = root.anchorMax = root.pivot = new Vector2(0.5f, 0.5f);
+            var img = root.gameObject.AddComponent<Image>();
+            img.sprite = Sprites.Cloud;
+            img.color = new Color(0.78f, 0.84f, 0.93f, 0.78f);
+            img.raycastTarget = false;
+            var view = root.gameObject.AddComponent<FogCloudView>();
+            ctx.Wire(view, "image", img);
+            return root.gameObject;
+        }
+    }
+
     /// <summary>Pastille du coût en PM d'un chemin (au milieu de son tracé).</summary>
     public sealed class BoardLinkCostRecipe : IPrefabRecipe
     {
@@ -199,6 +219,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(map, "nodePrefab", ctx.Asset("Widgets/BoardNode.prefab").GetComponent<BoardNodeView>());
             ctx.Wire(map, "linkPrefab", ctx.Asset("Widgets/BoardLink.prefab").GetComponent<Image>());
             ctx.Wire(map, "linkCostPrefab", ctx.Asset("Widgets/BoardLinkCost.prefab").GetComponent<BoardLinkCostView>());
+            ctx.Wire(map, "fogPrefab", ctx.Asset("Widgets/FogCloud.prefab").GetComponent<FogCloudView>());
             ctx.Wire(map, "pawnPrefab", ctx.Asset("Widgets/Pawn.prefab").GetComponent<PortraitView>());
 
             // ---- Pop-up d'information de la case visée (déplacement) : se dézoome sur le chemin, « S'y rendre » valide
@@ -252,6 +273,31 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             hud.SetAsLastSibling();
             previewFrame.SetAsLastSibling();
 
+            // Onomatopée de bande dessinée au centre, par-dessus tout (jouée avant un combat ou un événement).
+            var burstHolder = new GameObject("ComicBurst", typeof(RectTransform)).GetComponent<RectTransform>();
+            burstHolder.SetParent(rt, false);
+            burstHolder.Stretch();
+            var burstRoot = new GameObject("Root", typeof(RectTransform)).GetComponent<RectTransform>();
+            burstRoot.SetParent(burstHolder, false);
+            burstRoot.anchorMin = burstRoot.anchorMax = burstRoot.pivot = new Vector2(0.5f, 0.5f);
+            burstRoot.anchoredPosition = Vector2.zero;
+            burstRoot.sizeDelta = new Vector2(760, 520);
+            var burstShadow = Ui.Img(burstRoot, "Shadow", Theme.Ink, Sprites.Burst);
+            burstShadow.rectTransform.At(0.5f, 0.5f, 10, -10, 760, 520);
+            burstShadow.raycastTarget = false;
+            var burstImg = Ui.Img(burstRoot, "Burst", Theme.Primary, Sprites.Burst);
+            burstImg.rectTransform.At(0.5f, 0.5f, 0, 0, 740, 500);
+            burstImg.raycastTarget = false;
+            var burstLabel = Ui.Txt(burstRoot, "COMBAT !", 120, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Label");
+            burstLabel.rectTransform.Stretch(120, 120, 120, 120);
+            burstLabel.raycastTarget = false;
+            var burstView = burstHolder.gameObject.AddComponent<ComicBurstView>();
+            ctx.Wire(burstView, "root", burstRoot);
+            ctx.Wire(burstView, "shadow", burstShadow);
+            ctx.Wire(burstView, "burst", burstImg);
+            ctx.Wire(burstView, "label", burstLabel);
+            burstHolder.SetAsLastSibling();
+
             var view = rt.gameObject.AddComponent<BoardView>();
             ScreenKit.WireFade(ctx, view);
             ctx.Wire(view, "zoneTitle", zoneTitle);
@@ -268,6 +314,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "back", back);
             ctx.Wire(view, "wallet", wallet);
             ctx.Wire(view, "map", map);
+            ctx.Wire(view, "comicBurst", burstView);
             ctx.Wire(view, "previewRoot", previewFrame);
             ctx.Wire(view, "previewTitle", previewTitle);
             ctx.Wire(view, "previewBody", previewBody);

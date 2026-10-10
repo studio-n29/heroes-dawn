@@ -19,6 +19,7 @@ namespace N29.HeroesDawn.Domain.Board
         readonly IRandom _caseRng;
         readonly HashSet<CaseId> _collected = new HashSet<CaseId>();
         readonly HashSet<CaseId> _defeated = new HashSet<CaseId>();
+        readonly HashSet<(CaseId, NarrationPhase)> _narrated = new HashSet<(CaseId, NarrationPhase)>();
         readonly HashSet<CaseId> _resolvedCases = new HashSet<CaseId>();
         readonly HashSet<string> _objectives = new HashSet<string>();
         readonly List<BoardAction> _log = new List<BoardAction>();
@@ -127,6 +128,8 @@ namespace N29.HeroesDawn.Domain.Board
             var node0 = Graph.Node(Position);
             var type = node0.Type;
             bool interactive = (type == CaseType.MiniGame || type == CaseType.Narrative || type == CaseType.Rest) && !_resolvedCases.Contains(Position);
+            EmitNarration(Position, NarrationPhase.Before, events);
+            if (!(type == CaseType.Combat && IsBlocking(Position)) && !interactive) EmitNarration(Position, NarrationPhase.After, events);
 
             if (type == CaseType.Combat && IsBlocking(Position))
             {
@@ -160,6 +163,14 @@ namespace N29.HeroesDawn.Domain.Board
             return events;
         }
 
+        /// <summary>Dialogue de la case joué une seule fois par plateau : l'événement porte les répliques.</summary>
+        void EmitNarration(CaseId at, NarrationPhase phase, List<BoardEvent> events)
+        {
+            var lines = Graph.Node(at).Narration?.Of(phase);
+            if (lines == null || lines.Count == 0 || !_narrated.Add((at, phase))) return;
+            events.Add(new NarrationEvent(at, phase, lines));
+        }
+
         public IReadOnlyList<BoardEvent> EndMove()
         {
             Require(ZoneRunPhase.ChoosingDestination);
@@ -182,6 +193,7 @@ namespace N29.HeroesDawn.Domain.Board
                 {
                     _defeated.Add(Position);
                     CompleteObjectives(ObjectiveType.DefeatCombat, Position, events);
+                    EmitNarration(Position, NarrationPhase.After, events);
                 }
             }
             else
@@ -207,6 +219,7 @@ namespace N29.HeroesDawn.Domain.Board
                 _resolvedCases.Add(Position);
                 if (type == CaseType.MiniGame) CompleteObjectives(ObjectiveType.CompleteMiniGame, Position, events);
                 if (type == CaseType.Narrative) CompleteObjectives(ObjectiveType.ResolveNarrative, Position, events);
+                EmitNarration(Position, NarrationPhase.After, events);
             }
             PendingCase = null;
             Phase = ZoneRunPhase.AwaitingRoll;

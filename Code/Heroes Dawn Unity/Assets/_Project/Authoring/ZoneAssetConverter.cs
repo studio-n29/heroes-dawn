@@ -29,7 +29,8 @@ namespace N29.HeroesDawn.Authoring
                                                         string.IsNullOrEmpty(n.activity) ? (ActivityId?)null : new ActivityId(n.activity),
                                                         n.type == CaseType.Combat && n.hasCombat
                                                             ? new CombatSpec(n.enemyTable.Select(e => new EnemyId(e)).ToList(), n.rounds, n.enemiesMin, n.enemiesMax)
-                                                            : null)).ToList();
+                                                            : null,
+                                                        NarrationOf(a, n))).ToList();
             var links = a.links.Select(l => new LinkDef(new CaseId(l.a), new CaseId(l.b), l.cost, l.hasCurve ? new LinkCurve(l.control1.x, l.control1.y, l.control2.x, l.control2.y) : (LinkCurve?)null)).ToList();
             var objectives = a.objectives.Select(o => new ObjectiveDef(o.id, o.type, new CaseId(o.target), ObjectiveKeyOf(a, o))).ToList();
             var encounters = a.encounters.Select(e => new EncounterDef(e.rank, e.waves.Select(w => (IReadOnlyList<EnemyId>)w.enemies.Select(x => new EnemyId(x)).ToList()).ToList())).ToList();
@@ -41,6 +42,18 @@ namespace N29.HeroesDawn.Authoring
                                code ?? a.code, act ?? a.act, a.borough, a.recommendedLevel, req, new ZoneEnvironment(a.biome, a.weather), bg, mp);
         }
 
+        /// <summary>Clé de texte d'une réplique de narration saisie dans l'outil.</summary>
+        public static string NarrationKeyOf(ZoneAsset a, NodeData n, NarrationPhase phase, int index)
+            => "narration." + a.zoneId.Replace("zone_", "") + "." + n.id + "." + (phase == NarrationPhase.Before ? "before" : "after") + "." + index;
+
+        static NarrationDef? NarrationOf(ZoneAsset a, NodeData n)
+        {
+            if (n.narrationBefore.Count == 0 && n.narrationAfter.Count == 0) return null;
+            IReadOnlyList<NarrationLineDef> Lines(List<NarrationLineData> src, NarrationPhase phase)
+                => src.Select((l, i) => new NarrationLineDef(l.speaker, NarrationKeyOf(a, n, phase, i))).ToList();
+            return new NarrationDef(Lines(n.narrationBefore, NarrationPhase.Before), Lines(n.narrationAfter, NarrationPhase.After));
+        }
+
         /// <summary>Textes saisis dans l'outil (nom, nom court, description, objectifs) ; vides = on garde les textes existants du jeu.</summary>
         public static ZoneTexts TextsOf(ZoneAsset a)
         {
@@ -50,6 +63,11 @@ namespace N29.HeroesDawn.Authoring
             if (!string.IsNullOrEmpty(a.shortName)) t.Values[key.Replace(".name", ".short")] = a.shortName;
             if (!string.IsNullOrEmpty(a.description)) t.Values[key.Replace(".name", ".desc")] = a.description;
             foreach (var o in a.objectives) if (!string.IsNullOrEmpty(o.text)) t.Values[ObjectiveKeyOf(a, o)] = o.text;
+            foreach (var n in a.nodes)
+            {
+                for (int i = 0; i < n.narrationBefore.Count; i++) t.Values[NarrationKeyOf(a, n, NarrationPhase.Before, i)] = n.narrationBefore[i].text;
+                for (int i = 0; i < n.narrationAfter.Count; i++) t.Values[NarrationKeyOf(a, n, NarrationPhase.After, i)] = n.narrationAfter[i].text;
+            }
             return t;
         }
 

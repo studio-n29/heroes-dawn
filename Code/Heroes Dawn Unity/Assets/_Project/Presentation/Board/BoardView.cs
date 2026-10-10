@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Feedback;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Mvp;
 using TMPro;
@@ -30,6 +31,7 @@ namespace N29.HeroesDawn.Presentation.Board
         [SerializeField] UiButton back = null!;
         [SerializeField] WalletView wallet = null!;
         [SerializeField] BoardMapView map = null!;
+        [SerializeField] ComicBurstView comicBurst = null!;
         [SerializeField] RectTransform previewRoot = null!;
         [SerializeField] TMP_Text previewTitle = null!;
         [SerializeField] TMP_Text previewBody = null!;
@@ -135,6 +137,8 @@ namespace N29.HeroesDawn.Presentation.Board
         }
 
         public void ResetDie() => dieFace.text = "-";
+
+        public UniTask PlayCueAsync(ComicCueData cue, CancellationToken ct) => comicBurst.PlayAsync(cue, ct);
 
         public UniTask PauseAsync(float seconds, CancellationToken ct)
             => UniTask.Delay(TimeSpan.FromSeconds(seconds), ignoreTimeScale: true, cancellationToken: ct);

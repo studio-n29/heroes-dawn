@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Feedback;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Mvp;
 
@@ -34,6 +35,9 @@ namespace N29.HeroesDawn.Presentation.Board
         /// <summary>Anime le dé (faces aléatoires) puis affiche <paramref name="value"/>.</summary>
         UniTask RollDieAsync(int value, int faces, CancellationToken ct);
         void ResetDie();
+
+        /// <summary>Onomatopée de bande dessinée plein écran (« COMBAT ! ») jouée avant l'action ; rend la main quand elle est finie.</summary>
+        UniTask PlayCueAsync(ComicCueData cue, CancellationToken ct);
 
         /// <summary>Temps de lecture entre deux étapes (annonce puis case, zone sécurisée).</summary>
         UniTask PauseAsync(float seconds, CancellationToken ct);

@@ -7,6 +7,7 @@ using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Presentation.Board;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Feedback;
 using N29.HeroesDawn.Presentation.Hub;
 
 namespace N29.HeroesDawn.Tests.Presentation.Fakes
@@ -69,6 +70,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void ShowHud(BoardHudData hud) => Huds.Add(hud);
         public UniTask RollDieAsync(int value, int faces, CancellationToken ct) { DieRolls.Add(value); return UniTask.CompletedTask; }
         public void ResetDie() { }
+        public readonly List<string> Cues = new List<string>();
+        public UniTask PlayCueAsync(ComicCueData cue, CancellationToken ct) { Cues.Add(cue.Text); return UniTask.CompletedTask; }
         public UniTask PauseAsync(float seconds, CancellationToken ct) => UniTask.CompletedTask;
     }
 
