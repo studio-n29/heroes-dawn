@@ -30,7 +30,7 @@ namespace N29.HeroesDawn.Authoring
                                                         n.type == CaseType.Combat && n.hasCombat
                                                             ? new CombatSpec(n.enemyTable.Select(e => new EnemyId(e)).ToList(), n.rounds, n.enemiesMin, n.enemiesMax)
                                                             : null)).ToList();
-            var links = a.links.Select(l => new LinkDef(new CaseId(l.a), new CaseId(l.b))).ToList();
+            var links = a.links.Select(l => new LinkDef(new CaseId(l.a), new CaseId(l.b), l.cost, l.hasCurve ? new LinkCurve(l.control1.x, l.control1.y, l.control2.x, l.control2.y) : (LinkCurve?)null)).ToList();
             var objectives = a.objectives.Select(o => new ObjectiveDef(o.id, o.type, new CaseId(o.target), ObjectiveKeyOf(a, o))).ToList();
             var encounters = a.encounters.Select(e => new EncounterDef(e.rank, e.waves.Select(w => (IReadOnlyList<EnemyId>)w.enemies.Select(x => new EnemyId(x)).ToList()).ToList())).ToList();
             var req = (requires ?? a.requires).Select(r => new ZoneId(r)).ToList();
@@ -70,7 +70,13 @@ namespace N29.HeroesDawn.Authoring
                 enemyTable = n.Combat != null ? n.Combat.EnemyTable.Select(e => e.Value).ToList() : new List<string>(),
                 rounds = n.Combat?.Rounds ?? 1, enemiesMin = n.Combat?.EnemiesMin ?? 2, enemiesMax = n.Combat?.EnemiesMax ?? 3,
             }).ToList();
-            a.links = d.Links.Select(l => new LinkData { a = l.A.Value, b = l.B.Value }).ToList();
+            a.links = d.Links.Select(l => new LinkData
+            {
+                a = l.A.Value, b = l.B.Value, cost = l.Cost,
+                hasCurve = l.Curve.HasValue,
+                control1 = l.Curve.HasValue ? new UnityEngine.Vector2(l.Curve.Value.C1X, l.Curve.Value.C1Y) : UnityEngine.Vector2.zero,
+                control2 = l.Curve.HasValue ? new UnityEngine.Vector2(l.Curve.Value.C2X, l.Curve.Value.C2Y) : UnityEngine.Vector2.zero,
+            }).ToList();
             a.objectives = d.Objectives.Select(o => new ObjectiveData { id = o.Id, type = o.Type, target = o.Target.Value, nameKey = o.NameKey }).ToList();
             a.encounters = d.Encounters.Select(e => new EncounterData
             {

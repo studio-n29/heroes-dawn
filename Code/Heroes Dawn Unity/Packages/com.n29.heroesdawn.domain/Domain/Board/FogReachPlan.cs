@@ -17,12 +17,12 @@ namespace N29.HeroesDawn.Domain.Board
         public CaseId StopAt { get; }
         /// <summary>Chemin réellement parcouru jusqu'à <see cref="StopAt"/>.</summary>
         public IReadOnlyList<CaseId> StopPath { get; }
-        /// <summary>Distance totale jusqu'à la case cachée, en pas.</summary>
-        public int Distance => FullPath.Count;
+        /// <summary>Coût total en PM jusqu'à la case cachée (somme des chemins).</summary>
+        public int Cost { get; }
 
-        public FogReachPlan(CaseId target, IReadOnlyList<CaseId> fullPath, CaseId stopAt, IReadOnlyList<CaseId> stopPath)
+        public FogReachPlan(CaseId target, IReadOnlyList<CaseId> fullPath, int cost, CaseId stopAt, IReadOnlyList<CaseId> stopPath)
         {
-            Target = target; FullPath = fullPath; StopAt = stopAt; StopPath = stopPath;
+            Target = target; FullPath = fullPath; Cost = cost; StopAt = stopAt; StopPath = stopPath;
         }
     }
 }

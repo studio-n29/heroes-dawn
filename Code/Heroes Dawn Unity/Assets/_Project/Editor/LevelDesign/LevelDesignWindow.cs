@@ -31,6 +31,7 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
         float _zoom = 0.8f;
         string? _selected;
         string? _linkFrom;
+        LinkData? _selectedLink;
         bool _dragging;
         bool _panning;
         Vector2 _regionStart;
@@ -96,7 +97,7 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
             if (_tab == Tab.Plateau)
             {
                 var z = (ZoneAsset?)EditorGUILayout.ObjectField(_zone, typeof(ZoneAsset), false, GUILayout.Width(220));
-                if (z != _zone) { _zone = z; _selected = null; _linkFrom = null; _issuesDirty = true; }
+                if (z != _zone) { _zone = z; _selected = null; _selectedLink = null; _linkFrom = null; _issuesDirty = true; }
                 if (GUILayout.Button("Nouveau plateau", EditorStyles.toolbarButton, GUILayout.Width(110))) NewZoneDialog();
                 GUILayout.Space(8);
                 _tool = (Tool)GUILayout.Toolbar((int)_tool, new[] { "Sélection", "Placer", "Relier", "Supprimer", "Zone" }, EditorStyles.toolbarButton, GUILayout.Width(330));
@@ -209,6 +210,7 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
                     Handles.DrawAAPolyLine(3f, a, e.mousePosition);
                 }
             }
+            DrawCurveHandles(z);
             HandleInput(canvas, e);
             GUI.EndClip();
             GUI.Label(new Rect(canvas.x + 8, canvas.yMax - 22, canvas.width - 16, 18), Hint(), EditorStyles.miniLabel);
@@ -249,15 +251,56 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
             }
         }
 
+        /// <summary>Tracé d'un chemin à l'écran (courbe de Bézier échantillonnée).</summary>
+        Vector3[] LinkScreenPoints(ZoneAsset z, LinkData l)
+        {
+            var pts = LevelEditorModel.CurveOf(z, l).Sample(24);
+            var screen = new Vector3[pts.Length];
+            for (int i = 0; i < pts.Length; i++) screen[i] = ToScreen(pts[i].X, pts[i].Y);
+            return screen;
+        }
+
         void DrawLinks(ZoneAsset z)
         {
+            var small = new GUIStyle(EditorStyles.miniBoldLabel) { alignment = TextAnchor.MiddleCenter, normal = { textColor = Color.black } };
             foreach (var l in z.links)
             {
                 var a = z.Node(l.a); var b = z.Node(l.b);
                 if (a == null || b == null) { continue; }
-                bool sel = _selected == l.a || _selected == l.b;
-                Handles.color = sel ? Color.white : new Color(0.8f, 0.8f, 0.85f, 0.85f);
-                Handles.DrawAAPolyLine(sel ? 5f : 3f, ToScreen(a.x, a.y), ToScreen(b.x, b.y));
+                bool chosen = l == _selectedLink;
+                bool sel = chosen || _selected == l.a || _selected == l.b;
+                Handles.color = chosen ? new Color(1f, 0.85f, 0.2f) : sel ? Color.white : new Color(0.8f, 0.8f, 0.85f, 0.85f);
+                var pts = LinkScreenPoints(z, l);
+                Handles.DrawAAPolyLine(sel ? 5f : 3f, pts);
+                var mid = (Vector2)pts[pts.Length / 2];
+                EditorGUI.DrawRect(new Rect(mid.x - 11, mid.y - 9, 22, 18), chosen ? new Color(1f, 0.85f, 0.2f) : new Color(0.85f, 0.88f, 0.95f));
+                GUI.Label(new Rect(mid.x - 11, mid.y - 9, 22, 18), Mathf.Max(1, l.cost).ToString(), small);
+            }
+        }
+
+        /// <summary>Poignées des deux points de contrôle du chemin sélectionné (courbe saisie) : à déplacer à la souris.</summary>
+        void DrawCurveHandles(ZoneAsset z)
+        {
+            var l = _selectedLink;
+            if (l == null || !l.hasCurve || z.Node(l.a) == null || z.Node(l.b) == null) return;
+            var a = z.Node(l.a)!; var b = z.Node(l.b)!;
+            Handles.color = new Color(1f, 0.85f, 0.2f, 0.6f);
+            Handles.DrawLine(ToScreen(a.x, a.y), ToScreen(l.control1.x, l.control1.y));
+            Handles.DrawLine(ToScreen(b.x, b.y), ToScreen(l.control2.x, l.control2.y));
+            for (int i = 0; i < 2; i++)
+            {
+                var g = i == 0 ? l.control1 : l.control2;
+                Handles.color = new Color(1f, 0.85f, 0.2f);
+                EditorGUI.BeginChangeCheck();
+                var moved = Handles.FreeMoveHandle(ToScreen(g.x, g.y), 8f, Vector3.zero, Handles.CircleHandleCap);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Touch("Courbe du chemin");
+                    var ng = ToGrid(moved);
+                    ng = new Vector2(Mathf.Round(ng.x * 4f) / 4f, Mathf.Round(ng.y * 4f) / 4f);
+                    if (i == 0) l.control1 = ng; else l.control2 = ng;
+                    Changed();
+                }
             }
         }
 
@@ -300,9 +343,10 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
             var z = _zone!;
             foreach (var l in z.links)
             {
-                var a = z.Node(l.a); var b = z.Node(l.b);
-                if (a == null || b == null) continue;
-                if (HandleUtility.DistancePointToLineSegment(mouse, ToScreen(a.x, a.y), ToScreen(b.x, b.y)) < 8f) return l;
+                if (z.Node(l.a) == null || z.Node(l.b) == null) continue;
+                var pts = LinkScreenPoints(z, l);
+                for (int i = 1; i < pts.Length; i++)
+                    if (HandleUtility.DistancePointToLineSegment(mouse, pts[i - 1], pts[i]) < 8f) return l;
             }
             return null;
         }
@@ -335,6 +379,7 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
                 {
                     case Tool.Selection:
                         _selected = hit?.id;
+                        _selectedLink = hit == null ? HitLink(e.mousePosition) : null;
                         _dragging = hit != null;
                         if (hit != null) Touch("Déplacer une case");
                         break;
@@ -374,7 +419,7 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
                         else
                         {
                             var link = HitLink(e.mousePosition);
-                            if (link != null) { Touch("Supprimer un chemin"); LevelEditorModel.Disconnect(z, link.a, link.b); Changed(); }
+                            if (link != null) { Touch("Supprimer un chemin"); LevelEditorModel.Disconnect(z, link.a, link.b); if (_selectedLink == link) _selectedLink = null; Changed(); }
                         }
                         break;
                     case Tool.Zone:

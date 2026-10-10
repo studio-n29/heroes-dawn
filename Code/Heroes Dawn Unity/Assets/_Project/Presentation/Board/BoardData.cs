@@ -1,6 +1,7 @@
 #nullable enable
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
+using N29.HeroesDawn.Domain.Maps;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 
@@ -19,6 +20,10 @@ namespace N29.HeroesDawn.Presentation.Board
     {
         public CaseId A;
         public CaseId B;
+        /// <summary>PM dépensés pour emprunter ce chemin.</summary>
+        public int Cost;
+        /// <summary>Tracé de A vers B (courbe de Bézier, en unités de grille).</summary>
+        public BezierCurve Curve;
     }
 
     /// <summary>Ce qu'il faut pour construire la carte d'une partie (une fois par partie).</summary>
