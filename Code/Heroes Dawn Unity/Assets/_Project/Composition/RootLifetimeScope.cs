@@ -45,6 +45,9 @@ namespace N29.HeroesDawn.Composition
             var log = new UnityLogger();
             var balance = LoadBalance(log);
             var content = PrototypeContent.Build(balance, LoadActivityOverrides(log));
+            var zoneLibrary = N29.HeroesDawn.Authoring.ZoneLibrary.Load(); // plateaux créés dans l'outil de level design (Resources/Zones)
+            content = content.WithZones(zoneLibrary.Zones);
+            Loc.Override(zoneLibrary.Texts);
 
             // ---- Contenu & état
             builder.RegisterInstance(content);

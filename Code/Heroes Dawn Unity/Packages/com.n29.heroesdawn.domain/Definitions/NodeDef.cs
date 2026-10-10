@@ -15,10 +15,12 @@ namespace N29.HeroesDawn.Definitions
         public int Y { get; }
         /// <summary>Activité lancée par une case Mini-jeu ; vide : l'activité par défaut (<see cref="ActivityIds.Reflex"/>).</summary>
         public ActivityId? Activity { get; }
+        /// <summary>Combat d'une case Combat : table d'ennemis et manches ; vide : rencontres de la zone par rang.</summary>
+        public CombatSpec? Combat { get; }
 
-        public NodeDef(CaseId id, CaseType type, bool isFixed, CombatRank rank, int x, int y, ActivityId? activity = null)
+        public NodeDef(CaseId id, CaseType type, bool isFixed, CombatRank rank, int x, int y, ActivityId? activity = null, CombatSpec? combat = null)
         {
-            Id = id; Type = type; IsFixed = isFixed; Rank = rank; X = x; Y = y; Activity = activity;
+            Id = id; Type = type; IsFixed = isFixed; Rank = rank; X = x; Y = y; Activity = activity; Combat = combat;
         }
     }
 }

@@ -110,10 +110,31 @@ namespace N29.HeroesDawn.Presentation.Hub
                     Tag = b.Act > 1 ? _loc.F("map.act_soon", b.Act) : _loc.F("map.act", b.Act),
                     LabelAt = b.LabelAt,
                 }).ToArray(),
-                Points = CityMapLayout.Spots.Select(p => PointOf(p, sel)).ToArray(),
+                Points = SpotsFor().Select(p => PointOf(p, sel)).ToArray(),
                 Rows = zones.Select(z => RowOf(z, sel)).ToArray(),
                 Detail = DetailOf(sel),
             });
+        }
+
+        /// <summary>
+        /// Points de mission : ceux de la mise en page de la ville, repositionnés quand la zone a sa propre position (outil de level design),
+        /// plus les zones créées dans l'outil qui ont une position et pas de point prédéfini.
+        /// </summary>
+        System.Collections.Generic.IEnumerable<MapSpot> SpotsFor()
+        {
+            var zones = _session.Content.Zones;
+            foreach (var spot in CityMapLayout.Spots)
+            {
+                var zone = spot.ZoneId == null ? null : zones.FirstOrDefault(z => z.Id.Value == spot.ZoneId);
+                if (zone != null && zone.MapPoint.HasValue)
+                    yield return new MapSpot(spot.Borough, spot.Label, spot.ZoneId, new UnityEngine.Vector2(zone.MapPoint.Value.XPermille / 1000f, zone.MapPoint.Value.YPermille / 1000f));
+                else yield return spot;
+            }
+            foreach (var z in zones)
+            {
+                if (!z.MapPoint.HasValue || CityMapLayout.SpotOf(z.Id.Value).HasValue) continue;
+                yield return new MapSpot(z.Borough, z.Code, z.Id.Value, new UnityEngine.Vector2(z.MapPoint.Value.XPermille / 1000f, z.MapPoint.Value.YPermille / 1000f));
+            }
         }
 
         ZonePointData PointOf(MapSpot spot, ZoneDef sel)

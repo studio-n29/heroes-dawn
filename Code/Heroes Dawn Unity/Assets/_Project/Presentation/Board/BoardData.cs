@@ -27,6 +27,12 @@ namespace N29.HeroesDawn.Presentation.Board
         public BoardMapNode[] Nodes;
         public BoardMapLink[] Links;
         public PortraitData Pawn;
+        /// <summary>Fond de carte généré (ressource Resources/Zones/clé) et rectangle de grille qu'il couvre ; clé vide : pas de fond.</summary>
+        public string BackgroundKey;
+        public int BgMinX;
+        public int BgMinY;
+        public int BgMaxX;
+        public int BgMaxY;
         public CaseId PawnAt;
     }
 

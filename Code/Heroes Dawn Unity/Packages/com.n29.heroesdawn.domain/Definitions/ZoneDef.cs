@@ -26,13 +26,18 @@ namespace N29.HeroesDawn.Definitions
         public IReadOnlyList<ZoneId> Requires { get; }
         /// <summary>Décor et météo du plateau : les activités lancées depuis ses cases s'y adaptent.</summary>
         public ZoneEnvironment Environment { get; }
+        /// <summary>Fond de carte généré (vide : fond uni).</summary>
+        public ZoneBackground? Background { get; }
+        /// <summary>Position sur la carte de la ville (vide : point défini par la mise en page de la ville).</summary>
+        public ZoneMapPoint? MapPoint { get; }
 
         public ZoneDef(ZoneId id, string nameKey, CaseId entry, IReadOnlyList<NodeDef> nodes, IReadOnlyList<LinkDef> links,
                        IReadOnlyList<ObjectiveDef> objectives, IReadOnlyList<EncounterDef> encounters,
                        string code = "", int act = 1, string borough = "brooklyn", int recommendedLevel = 1, IReadOnlyList<ZoneId>? requires = null,
-                       ZoneEnvironment? environment = null)
+                       ZoneEnvironment? environment = null, ZoneBackground? background = null, ZoneMapPoint? mapPoint = null)
         {
             Environment = environment ?? ZoneEnvironment.Default;
+            Background = background; MapPoint = mapPoint;
             Id = id; NameKey = nameKey; Entry = entry; Nodes = nodes; Links = links; Objectives = objectives; Encounters = encounters;
             Code = code; Act = act; Borough = borough; RecommendedLevel = recommendedLevel;
             Requires = requires ?? System.Array.Empty<ZoneId>();
