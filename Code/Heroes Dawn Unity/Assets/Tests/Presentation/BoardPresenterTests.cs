@@ -36,6 +36,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         BackButtonRouter _router = null!;
         FakeToasts _toasts = null!;
         BoardPresenter _p = null!;
+        FakeDialogueBox _box = null!;
 
         [SetUp]
         public void SetUp()
@@ -46,6 +47,8 @@ namespace N29.HeroesDawn.Tests.Presentation
             _host = new FakeModalHost();
             _host.Register<IRestPopupView>(() => new FakeRestPopup());
             _host.Register<IZoneCompletePopupView>(() => new FakeZoneCompletePopup());
+            _box = new FakeDialogueBox();
+            _host.Register<N29.HeroesDawn.Presentation.Narration.IDialogueBoxView>(() => _box);
             _modals = new ModalService(_host);
             _router = new BackButtonRouter(new FakeBackInput(), _modals);
             _toasts = new FakeToasts();
@@ -227,6 +230,43 @@ namespace N29.HeroesDawn.Tests.Presentation
             _view.ClickGo();
             Assert.That(_app.Combat.Active.Simulation, Is.Not.Null);
             Assert.That(Navigations, Is.EqualTo(new[] { GameState.Combat }));
+        }
+
+        [Test, Description("Vérifie qu'arriver sur une case Combat joue l'onomatopée « COMBAT ! » avant de lancer le combat — parce que l'entrée en combat se joue en bande dessinée avant l'action")]
+        public void CombatCase_PlaysTheComicCueFirst()
+        {
+            ChoosingAtN02();
+            Make();
+            _view.MapView.Tap("n03");
+            _view.ClickGo();
+            Assert.That(_view.Cues, Is.EqualTo(new[] { "COMBAT !" }));
+            Assert.That(Navigations, Is.EqualTo(new[] { GameState.Combat }));
+        }
+
+        [Test, Description("Vérifie qu'une case Repos joue l'onomatopée « REPOS ! » puis ouvre sa popup, et qu'une case sans action n'en joue aucune — parce que seules les cases d'action ont une entrée en scène")]
+        public void RestCase_PlaysItsCue_AndPlainCasesNone()
+        {
+            ChoosingAtN02();
+            Make();
+            var rest = new CaseOutcome(new CaseId("n10"), CaseType.Rest, CombatRank.Easy, null);
+            _app.Publisher<ReturnedToBoard>().Publish(new ReturnedToBoard(Report(new CaseTriggeredEvent(rest))));
+            Assert.That(_view.Cues, Is.EqualTo(new[] { "REPOS !" }));
+            _view.Cues.Clear();
+            _view.MapView.Tap("n01");
+            _view.ClickGo();
+            Assert.That(_view.Cues, Is.Empty);
+        }
+
+        [Test, Description("Vérifie que les événements de narration d'un rapport ouvrent la boîte de dialogue avec leurs répliques avant le reste — parce que la narration se joue avant l'action de la case")]
+        public void NarrationEvent_OpensTheDialogueBoxWithItsLines()
+        {
+            ChoosingAtN02();
+            Make();
+            var lines = new[] { new NarrationLineDef("brick", "narration.ny_1_1.n23.before.0"), new NarrationLineDef("ancre", "narration.ny_1_1.n23.before.1") };
+            _app.Publisher<ReturnedToBoard>().Publish(new ReturnedToBoard(Report(new NarrationEvent(new CaseId("n23"), NarrationPhase.Before, lines))));
+            Assert.That(_box.Played.Count, Is.EqualTo(2));
+            Assert.That(_box.Played[0].Speaker, Is.EqualTo("Brick"));
+            Assert.That(_box.Played[1].Left, Is.True);
         }
 
         [Test, Description("Vérifie qu'une case Repos déclenchée ouvre la popup de repos via le présentateur des cases — parce que les popups de case sont des prefabs pilotés par CasePopupPresenter (spec §3)")]

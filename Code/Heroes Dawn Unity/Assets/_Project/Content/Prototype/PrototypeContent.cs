@@ -150,8 +150,13 @@ namespace N29.HeroesDawn.Content.Prototype
         /// <summary>Red Hook — les quais : 25 cases, 3 embranchements, 6 combats (1 Élite fixe : Brick).</summary>
         static ZoneDef BuildZone11()
         {
-            NodeDef N(string id, CaseType t, int x, int y, bool fixedNode = false, CombatRank r = CombatRank.Normal, string activity = null)
-                => new NodeDef(new CaseId(id), t, fixedNode, r, x, y, activity == null ? (ActivityId?)null : new ActivityId(activity));
+            NodeDef N(string id, CaseType t, int x, int y, bool fixedNode = false, CombatRank r = CombatRank.Normal, string activity = null, NarrationDef narration = null)
+                => new NodeDef(new CaseId(id), t, fixedNode, r, x, y, activity == null ? (ActivityId?)null : new ActivityId(activity), null, narration);
+
+            NarrationLineDef L(string speaker, string key) => new NarrationLineDef(speaker, "narration.ny_1_1.n23." + key);
+            var brickTalk = new NarrationDef(
+                new[] { L("brick", "before.0"), L("ancre", "before.1") },
+                new[] { L("ancre", "after.0"), L("ancre", "after.1") });
 
             var nodes = new List<NodeDef>
             {
@@ -164,7 +169,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 N("n14", CaseType.Resource, 8, 1), N("n15", CaseType.MiniGame, 9, 1, activity: "fishing_docks"), N("n16", CaseType.Combat, 10, 1),
                 N("n17", CaseType.Empty, 11, 2), N("n18", CaseType.Resource, 12, 2),
                 N("n19", CaseType.Combat, 13, 3), N("n20", CaseType.Narrative, 14, 3), N("n21", CaseType.MiniGame, 13, 1, activity: "dialogue_dockers"),
-                N("n22", CaseType.Rest, 14, 1), N("n23", CaseType.Combat, 15, 2, true, CombatRank.Elite),
+                N("n22", CaseType.Rest, 14, 1), N("n23", CaseType.Combat, 15, 2, true, CombatRank.Elite, narration: brickTalk),
                 N("n24", CaseType.Empty, 16, 2, true),
             };
 

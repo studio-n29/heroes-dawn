@@ -9,6 +9,12 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendBoard(Dictionary<string, string> d)
         {
             d["board.hint.choose"] = "Touche une case en surbrillance : sa fiche s'ouvre et « S'y rendre » valide. Flèches ou boutons CASE pour naviguer, T pour terminer.";
+            d["cue.combat"] = "COMBAT !";
+            d["cue.event"] = "ÉVÉNEMENT !";
+            d["cue.minigame"] = "DÉFI !";
+            d["cue.rest"] = "REPOS !";
+            d["cue.bang"] = "BANG !";
+            d["cue.ouch"] = "OUTCH !";
             d["board.preview.go"] = "S'Y RENDRE";
             d["board.preview.cancel"] = "ANNULER";
             d["board.preview.cost"] = "Coût : {0} PM · il t'en restera {1}.";

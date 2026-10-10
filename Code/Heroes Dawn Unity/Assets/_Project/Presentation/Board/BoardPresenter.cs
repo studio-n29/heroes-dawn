@@ -16,6 +16,7 @@ using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Domain.Maps;
 using N29.HeroesDawn.Presentation.Audio;
+using N29.HeroesDawn.Presentation.Feedback;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Mvp;
@@ -492,6 +493,8 @@ namespace N29.HeroesDawn.Presentation.Board
         {
             CaseOutcome? triggered = null;
             bool validated = false;
+            bool steppedBack = false;
+            var narrations = new List<NarrationEvent>();
             foreach (var e in events)
             {
                 switch (e)
@@ -500,12 +503,19 @@ namespace N29.HeroesDawn.Presentation.Board
                     case FogRevealedEvent _: _toasts.Show(_loc.T("board.fog"), ToastKind.Info); break;
                     case ObjectiveCompletedEvent oc: _toasts.Show(_loc.F("board.objective_done", ObjectiveName(oc.ObjectiveId)), ToastKind.Reward); break;
                     case PmBankedEvent pb: _toasts.Show(_loc.F("board.banked", pb.Pm), ToastKind.Info); break;
-                    case SteppedBackEvent _: _toasts.Show(_loc.T("board.stepped_back"), ToastKind.Warning); _tutorial?.Hint("defeat"); break;
+                    case SteppedBackEvent _: steppedBack = true; _toasts.Show(_loc.T("board.stepped_back"), ToastKind.Warning); _tutorial?.Hint("defeat"); break;
+                    case NarrationEvent ne: narrations.Add(ne); break;
                     case CaseTriggeredEvent ct: triggered = ct.Outcome; break;
                     case ZoneValidatedEvent _: validated = true; break;
                 }
             }
             RefreshAll();
+            if (steppedBack) await PlayCueAsync(ComicCue.Ouch);
+            foreach (var n in narrations)
+            {
+                if (Disposed) return;
+                await _cases.PlayNarrationAsync(n, Lifetime);
+            }
             if (validated)
             {
                 await View.PauseAsync(0.5f, Lifetime);
@@ -529,10 +539,25 @@ namespace N29.HeroesDawn.Presentation.Board
             return o != null ? _loc.T(o.NameKey) : id;
         }
 
+        /// <summary>Onomatopée de bande dessinée avant l'action de la case (aucune pour les cases sans action).</summary>
+        async UniTask PlayCueForAsync(CaseType type)
+        {
+            var cue = ComicCues.ForCase(type);
+            if (cue == null) return;
+            await PlayCueAsync(cue.Value);
+        }
+
+        async UniTask PlayCueAsync(ComicCue cue)
+        {
+            if (Disposed) return;
+            await View.PlayCueAsync(new ComicCueData(_loc.T(ComicCues.TextKey(cue)), ComicCues.ColorOf(cue), ComicCues.TiltOf(cue)), Lifetime);
+        }
+
         async UniTask OpenCaseAsync(CaseOutcome outcome)
         {
             if (_run == null || Disposed || _flow.Current != GameState.Board) return;
             _audio.Play(outcome.Type == CaseType.Combat ? SfxId.CombatAlert : SfxId.CaseEvent);
+            await PlayCueForAsync(outcome.Type);
             if (outcome.Type == CaseType.Combat)
             {
                 await StartCombatAsync();

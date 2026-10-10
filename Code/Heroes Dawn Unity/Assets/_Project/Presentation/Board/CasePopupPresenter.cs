@@ -16,6 +16,7 @@ using UnityEngine;
 using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Mvp;
+using N29.HeroesDawn.Presentation.Narration;
 using N29.HeroesDawn.Presentation.Popups;
 
 namespace N29.HeroesDawn.Presentation.Board
@@ -288,6 +289,16 @@ namespace N29.HeroesDawn.Presentation.Board
                                     _loc.Or(o.Malus.ReasonKey, "activity.params")), ToastKind.Warning);
             if (o.FollowUp != null && o.FollowUp.Type == FollowUpType.Combat) _toasts.Show(_loc.T("activity.followup_combat"), ToastKind.Warning);
             else if (o.FollowUp != null && o.FollowUp.Type == FollowUpType.Activity) _toasts.Show(_loc.T("activity.followup_activity"), ToastKind.Info);
+        }
+
+        /// <summary>Dialogue de narration d'une case (avant son action ou après sa résolution) dans la boîte de dialogue ; rend la main à la fin ou si le joueur le passe.</summary>
+        public async UniTask PlayNarrationAsync(NarrationEvent e, CancellationToken ct)
+        {
+            var lines = NarrationLines.Build(e, _session.Content, _loc);
+            if (lines.Count == 0) return;
+            var view = await _modals.OpenAsync<IDialogueBoxView>(ct);
+            try { await view.PlayAsync(lines, ct); }
+            finally { _modals.Close(view); }
         }
 
         /// <summary>Écran « zone sécurisée » : récompenses, puis attend « Vers le QG ».</summary>

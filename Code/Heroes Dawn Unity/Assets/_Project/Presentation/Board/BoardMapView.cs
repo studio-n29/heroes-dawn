@@ -37,6 +37,7 @@ namespace N29.HeroesDawn.Presentation.Board
         [SerializeField] BoardNodeView nodePrefab = null!;
         [SerializeField] Image linkPrefab = null!;
         [SerializeField] BoardLinkCostView linkCostPrefab = null!;
+        [SerializeField] FogCloudView fogPrefab = null!;
         [SerializeField] PortraitView pawnPrefab = null!;
         [SerializeField] Button zoomIn = null!;
         [SerializeField] Button zoomOut = null!;
@@ -47,6 +48,8 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly Dictionary<CaseId, BoardNodeView> _nodes = new Dictionary<CaseId, BoardNodeView>();
         readonly Dictionary<CaseId, Vector2> _positions = new Dictionary<CaseId, Vector2>();
         readonly Dictionary<CaseId, List<(CaseId To, int Link)>> _neighbors = new Dictionary<CaseId, List<(CaseId To, int Link)>>();
+        readonly Dictionary<CaseId, List<FogCloudView>> _fog = new Dictionary<CaseId, List<FogCloudView>>();
+        RectTransform? _fogLayer;
         readonly List<Image[]> _links = new List<Image[]>();
         readonly List<BoardLinkCostView> _costs = new List<BoardLinkCostView>();
         /// <summary>Tracé de chaque chemin en pixels, dans le sens A vers B puis B vers A.</summary>
@@ -131,6 +134,7 @@ namespace N29.HeroesDawn.Presentation.Board
                 AddNeighbor(l.B, l.A, i);
             }
             foreach (var c in _costs) c.transform.SetAsLastSibling();
+            BuildFog(d);
             foreach (var n in d.Nodes)
             {
                 var node = Instantiate(nodePrefab, nodeLayer);
@@ -148,6 +152,31 @@ namespace N29.HeroesDawn.Presentation.Board
             _pawn.anchoredPosition = PawnPos(d.PawnAt);
             _zoom = DefaultZoom;
             CenterOn(d.PawnAt, false);
+        }
+
+        /// <summary>Brouillard de guerre : deux nuages par case, entre les chemins et les cases ; ils se dissipent quand la case est révélée.</summary>
+        void BuildFog(BoardMapData d)
+        {
+            var go = new GameObject("FogLayer", typeof(RectTransform));
+            _fogLayer = (RectTransform)go.transform;
+            _fogLayer.SetParent(content, false);
+            _fogLayer.anchorMin = linkLayer.anchorMin; _fogLayer.anchorMax = linkLayer.anchorMax; _fogLayer.pivot = linkLayer.pivot;
+            _fogLayer.anchoredPosition = linkLayer.anchoredPosition; _fogLayer.sizeDelta = linkLayer.sizeDelta;
+            _fogLayer.SetSiblingIndex(nodeLayer.GetSiblingIndex());
+            var tint = new Color(0.78f, 0.84f, 0.93f, 1f);
+            int k = 0;
+            foreach (var n in d.Nodes)
+            {
+                var list = new List<FogCloudView>();
+                for (int i = 0; i < 2; i++, k++)
+                {
+                    var cloud = Instantiate(fogPrefab, _fogLayer);
+                    var off = new Vector2(i == 0 ? -46f : 52f, i == 0 ? 30f : -38f);
+                    cloud.Init(_positions[n.Id] + off, i == 0 ? 470f : 400f, k * 1.7f, tint, true);
+                    list.Add(cloud);
+                }
+                _fog[n.Id] = list;
+            }
         }
 
         /// <summary>Fond de carte généré par l'outil de level design : une image derrière les liens, cadrée sur la grille qu'elle couvre.</summary>
@@ -198,6 +227,7 @@ namespace N29.HeroesDawn.Presentation.Board
             {
                 if (!_nodes.TryGetValue(s.Id, out var n)) continue;
                 n.Apply(s);
+                if (_fog.TryGetValue(s.Id, out var clouds)) foreach (var cloud in clouds) cloud.SetFogged(!s.Revealed);
                 if (s.Mark == NodeMark.Destination || s.Mark == NodeMark.FogDestination || s.Mark == NodeMark.Target) _cycle.Add(s.Id);
             }
             for (int i = 0; i < links.Count && i < _links.Count; i++)
