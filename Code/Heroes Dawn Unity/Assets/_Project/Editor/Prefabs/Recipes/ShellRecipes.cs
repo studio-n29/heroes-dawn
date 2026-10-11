@@ -72,6 +72,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx)
         {
             var rt = ScreenKit.Root("Hub");
+            ScreenKit.Backdrop(rt, Theme.SkyTop, Theme.SkyBottom);
             ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.8f);
             var relay = rt.gameObject.AddComponent<UiTapRelay>();
 
@@ -79,12 +80,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var pageArea = Ui.Rect(rt, "PageArea").Stretch(Safe, NavH + 12, Safe, TopH + 12);
 
             // ---- Barre haute
-            var top = Ui.Img(rt, "TopBar", Theme.WithAlpha(Theme.SurfaceDark, 0.92f), null, true);
+            var top = Ui.Img(rt, "TopBar", Theme.WithAlpha(Theme.Frost, 0.92f), null, true);
             top.rectTransform.TopBand(TopH);
             var back = Ui.LocBtn(top.transform, "nav.back", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Back");
             back.Rect.At(0f, 0.5f, Safe - 70, 0, 160, 96);
             back.gameObject.SetActive(false);
-            var title = Ui.Txt(top.transform, "", 56, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
+            var title = Ui.Txt(top.transform, "", 56, Theme.Navy, TextAnchor.MiddleLeft, FontKind.Title, "Title");
             title.rectTransform.At(0f, 0.5f, Safe + 110, 0, 820, 96);
             title.AutoSize(56);
             title.Inked();
@@ -94,7 +95,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ((RectTransform)wallet.transform).At(1f, 0.5f, -(Safe - 70) - 190, 0, 920, 70);
 
             // ---- Barre de navigation basse
-            var nav = Ui.Img(rt, "NavBar", Theme.WithAlpha(Theme.SurfaceDark, 0.95f), null, true);
+            var nav = Ui.Img(rt, "NavBar", Theme.WithAlpha(Theme.Frost, 0.95f), null, true);
             nav.rectTransform.BottomBand(NavH);
             var row = Ui.Rect(nav.transform, "Tabs").Stretch(Safe - 40, 10, Safe - 40, 10);
             row.HLayout(16, 0, TextAnchor.MiddleCenter);

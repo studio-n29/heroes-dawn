@@ -87,7 +87,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
         public void ShowStep(Rect? hole, TutorialStepView text, bool bubbleAtTop, bool blockHole, bool dim = true)
         {
             veilRoot.gameObject.SetActive(true);
-            var veilTint = new Color(0f, 0f, 0f, dim ? 0.7f : 0f);
+            var veilTint = Theme.WithAlpha(Theme.Navy, dim ? 0.5f : 0f);
             foreach (var v in new[] { veilTop, veilBottom, veilLeft, veilRight }) { v.color = veilTint; v.raycastTarget = dim; }
             var area = ((RectTransform)transform).rect;
             _hasHole = hole.HasValue;

@@ -104,7 +104,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var rt = ScreenKit.Root("CityMapPage");
 
             // ---- Carte (gauche)
-            var mapPanel = Ui.Panel(rt, "Map", Theme.WithAlpha(Theme.SurfaceDark, 0.88f), 5f, 8f, false);
+            var mapPanel = Ui.Panel(rt, "Map", Theme.WithAlpha(Theme.Frost, 0.88f), 5f, 8f, false);
             var mapFrame = mapPanel.Frame();
             mapFrame.anchorMin = new Vector2(0, 0);
             mapFrame.anchorMax = new Vector2(0, 1);

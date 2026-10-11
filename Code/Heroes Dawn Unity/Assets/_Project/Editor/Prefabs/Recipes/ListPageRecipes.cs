@@ -95,7 +95,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var rt = ScreenKit.Root(name);
 
             // ---- En-tête
-            var header = Ui.Panel(rt, "Header", Theme.WithAlpha(Theme.SurfaceDark, 0.9f), 4f, 6f, false);
+            var header = Ui.Panel(rt, "Header", Theme.WithAlpha(Theme.Frost, 0.9f), 4f, 6f, false);
             header.Frame().TopBand(HeaderH);
             var title = Ui.Txt(header.transform, "", 40, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
             title.rectTransform.At(0f, 1f, 22, -10, 900, 54);
@@ -135,7 +135,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             // ---- Colonne de droite
             if (sideWidth > 0)
             {
-                var side = Ui.Panel(rt, "Side", Theme.WithAlpha(Theme.SurfaceDark, 0.9f), 4f, 6f, false);
+                var side = Ui.Panel(rt, "Side", Theme.WithAlpha(Theme.Frost, 0.9f), 4f, 6f, false);
                 var frame = side.Frame();
                 frame.anchorMin = new Vector2(1, 0);
                 frame.anchorMax = new Vector2(1, 1);

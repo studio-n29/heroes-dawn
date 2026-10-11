@@ -19,7 +19,7 @@ namespace N29.HeroesDawn.Presentation.Common
         public static readonly Color Glow = Hex(0xFFD9A8);
 
         // ---- Noms historiques (valeurs pastel) -------------------------------------------------------------
-        public static readonly Color Primary = Accent;
+        public static readonly Color Primary = AccentDark;
         public static readonly Color Danger = Accent;
         public static readonly Color Success = Hex(0x4CCB8A);
         public static readonly Color Info = Hex(0x3AA6F5);

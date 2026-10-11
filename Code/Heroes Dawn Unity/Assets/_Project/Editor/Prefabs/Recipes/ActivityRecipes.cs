@@ -190,7 +190,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var holdB = b.gameObject.AddComponent<HoldButton>();
 
             // Introduction (consignes, choix de l'agent, Commencer) : par-dessus la scène.
-            var introFill = Ui.Panel(content, "Intro", Theme.WithAlpha(Theme.SurfaceDark, 0.96f), 4f, 6f, true);
+            var introFill = Ui.Panel(content, "Intro", Theme.WithAlpha(Theme.Frost, 0.96f), 4f, 6f, true);
             var intro = introFill.Frame();
             intro.Stretch(200, 120, 200, 120);
             var introTitle = Ui.Txt(introFill.transform, "", 56, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "IntroTitle");

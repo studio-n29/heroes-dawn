@@ -203,7 +203,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
                 categories.Add(b);
             }
 
-            var panel = Ui.Panel(rt, "Panel", Theme.WithAlpha(Theme.SurfaceDark, 0.92f), 5f, 10f, true);
+            var panel = Ui.Panel(rt, "Panel", Theme.WithAlpha(Theme.Frost, 0.92f), 5f, 10f, true);
             var frame = panel.Frame();
             frame.anchorMin = Vector2.zero;
             frame.anchorMax = Vector2.one;

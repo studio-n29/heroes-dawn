@@ -15,7 +15,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx)
         {
             var rt = ScreenKit.Root("Login");
-            ScreenKit.Backdrop(rt, Theme.WithAlpha(Theme.Perception, 0.35f), Theme.SurfaceDark);
+            ScreenKit.Backdrop(rt, Theme.SkyTop, Theme.SkyBottom);
             ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0f);
             // Dégradé sombre en bas pour la lisibilité des boutons.
             var shade = Ui.Img(rt, "BottomShade", new Color(0, 0, 0, 0.85f), Sprites.VerticalGradient);

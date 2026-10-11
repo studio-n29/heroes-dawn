@@ -55,12 +55,12 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             UnitId = d.Id;
             _ally = d.Ally;
-            _baseFill = d.Ally ? Theme.Surface : Theme.Hex(0x2A1C22);
+            _baseFill = d.Ally ? Theme.Surface : Color.Lerp(Theme.Surface, Theme.AccentSoft, 0.35f);
             fill.color = _baseFill;
             layout.preferredWidth = layout.minWidth = 250;
             layout.preferredHeight = layout.minHeight = 290;
             sub.text = d.Sub ?? "";
-            portraitArea.color = Color.Lerp(Theme.FamilyColor(d.Family), Color.black, d.Ally ? 0.55f : 0.72f);
+            portraitArea.color = Color.Lerp(Theme.FamilyColor(d.Family), Theme.Navy, d.Ally ? 0.25f : 0.4f);
             strip.color = Theme.FamilyColor(d.Family);
             portrait.Show(d.Portrait);
             unitName.text = d.Name;

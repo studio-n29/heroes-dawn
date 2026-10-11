@@ -74,7 +74,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var area = Ui.Img(fill.transform, "PortraitArea", Theme.Surface3, Sprites.Rounded);
             area.type = Image.Type.Sliced;
             area.rectTransform.Row(8, 8, -8, 168);
-            Ui.Img(area.transform, "Shade", new Color(0f, 0f, 0f, 0.5f), Sprites.VerticalGradient).rectTransform.Stretch();
+            Ui.Img(area.transform, "Shade", Theme.WithAlpha(Theme.Navy, 0.45f), Sprites.VerticalGradient).rectTransform.Stretch();
             var strip = Ui.Img(area.transform, "Family", Theme.Primary, Sprites.RoundedSmall);
             strip.rectTransform.anchorMin = new Vector2(0, 0);
             strip.rectTransform.anchorMax = new Vector2(1, 0);
@@ -91,9 +91,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var gauge = Ui.Bar(fill.transform, "Gauge", Theme.Gauge, Theme.SurfaceDark);
             gauge.Smooth = false;
             ((RectTransform)gauge.transform).Row(12, 12, -210, 14);
-            var statuses = Ui.Txt(fill.transform, "", 20, Theme.Shield, TextAnchor.UpperLeft, FontKind.Body, "Statuses");
+            var statuses = Ui.Txt(fill.transform, "", 20, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "Statuses");
             statuses.rectTransform.Row(12, 12, -228, 24);
-            var sub = Ui.Txt(fill.transform, "", 20, Theme.Fatigue, TextAnchor.UpperLeft, FontKind.Body, "Sub");
+            var sub = Ui.Txt(fill.transform, "", 20, Theme.AccentDark, TextAnchor.UpperLeft, FontKind.Body, "Sub");
             sub.rectTransform.Row(12, 12, -250, 26);
             var ko = Ui.Txt(fill.transform, "K.O.", 64, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Title, "KO");
             ko.rectTransform.Stretch();
@@ -319,11 +319,11 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx)
         {
             var rt = ScreenKit.Root("Combat");
-            ScreenKit.Backdrop(rt, Theme.WithAlpha(Theme.Danger, 0.22f), Theme.Hex(0x120E14));
+            ScreenKit.Backdrop(rt, Theme.SkyTop, Theme.SkyBottom);
             ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.72f);
 
             // ---- Barre du haut
-            var top = Ui.Panel(rt, "TopBar", Theme.WithAlpha(Theme.SurfaceDark, 0.94f), 0f, 0f, true).Frame().TopBand(90);
+            var top = Ui.Panel(rt, "TopBar", Theme.WithAlpha(Theme.Frost, 0.94f), 0f, 0f, true).Frame().TopBand(90);
             var retreat = Ui.LocBtn(top, "combat.retreat", Theme.Surface3, Theme.Danger, null!, 30, FontKind.Title, "Retreat");
             retreat.Rect.At(0f, 0.5f, 20, 0, 230, 64);
             var title = Ui.Txt(top, "", 44, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
@@ -346,7 +346,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             allyRow.HLayout(16, 0, TextAnchor.LowerCenter);
 
             // ---- Journal (haut gauche, discret)
-            var logFill = Ui.Panel(rt, "Log", Theme.WithAlpha(Theme.SurfaceDark, 0.55f), 3f, 0f, false);
+            var logFill = Ui.Panel(rt, "Log", Theme.WithAlpha(Theme.Frost, 0.55f), 3f, 0f, false);
             logFill.Frame().At(0f, 1f, 24, -108, 500, 132);
             logFill.gameObject.AddComponent<RectMask2D>();
             var logText = Ui.Txt(logFill.transform, "", 21, Theme.TextMuted, TextAnchor.LowerLeft, FontKind.Regular, "Lines");
@@ -366,7 +366,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             // ---- Frise chronologique : grande bande mise en valeur au centre (100 à gauche → 0 à droite : à 0, c'est le tour)
             var glow = Ui.Img(rt, "TimelineGlow", Theme.WithAlpha(Theme.Primary, 0.35f), Sprites.Rounded);
             glow.rectTransform.At(1f, 0f, -22, 390, 1516, 186);
-            var stripFill = Ui.Panel(rt, "Timeline", Theme.WithAlpha(Theme.SurfaceDark, 0.94f), 5f, 8f, false);
+            var stripFill = Ui.Panel(rt, "Timeline", Theme.WithAlpha(Theme.Frost, 0.94f), 5f, 8f, false);
             var strip = stripFill.Frame().At(1f, 0f, -30, 398, 1500, 170);
             var track = Ui.Rect(stripFill.transform, "Track").At(0f, 0.5f, 110, 0, 1250, 18);
             var axisStart = Ui.Txt(stripFill.transform, "100", 40, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Title, "AxisStart");
