@@ -17,8 +17,8 @@ namespace N29.HeroesDawn.Tests.Domain
                 allies.Select(a => new AllyEntry(new MemberId(a), 5, 0)).ToArray(),
                 enemies.Select(e => new EnemyEntry(new EnemyId(e), 5)).ToArray(), false));
 
-        static int Pct(CombatUnit u) => (int)(u.Gauge * 100 / u.GaugeMax);
-        static void At(CombatUnit u, int percent) => u.Gauge = u.GaugeMax * percent / 100;
+        static int Pct(CombatUnit u) => (int)System.Math.Round(u.Point * 100.0 / u.ActionPoint);
+        static void At(CombatUnit u, int percent) => u.Point = (int)System.Math.Round(percent * u.ActionPoint / 100.0);
         static void Calm(CombatSimulation s) { foreach (var u in s.Units.Where(x => x.Side == Side.Enemy)) At(u, 0); }
 
         static System.Collections.Generic.IReadOnlyList<CombatEvent> Act(CombatSimulation s, CombatUnit ally, int slot, int target)
@@ -37,7 +37,7 @@ namespace N29.HeroesDawn.Tests.Domain
             At(brute, 50);
             var events = Act(s, s.Unit(0), 0, brute.Id);
             Assert.That(events.OfType<PushedBackEvent>().Single().Percent, Is.EqualTo(15));
-            Assert.That(Pct(brute), Is.EqualTo(35));
+            Assert.That(Pct(brute), Is.EqualTo(30));
         }
 
         [Test, Description("Vérifie qu'un recul annule l'action annoncée par l'ennemi quand il le renvoie sous la zone de préparation — parce que repousser un ennemi doit pouvoir lui faire perdre son grand coup")]
@@ -62,10 +62,10 @@ namespace N29.HeroesDawn.Tests.Domain
             var brute = s.Unit(2);
             At(brute, 60);
             Act(s, s.Unit(0), 0, brute.Id);
-            Assert.That(Pct(brute), Is.EqualTo(45));
+            Assert.That(Pct(brute), Is.EqualTo(40));
             var again = Act(s, s.Unit(1), 0, brute.Id);
             Assert.That(again.OfType<PushedBackEvent>(), Is.Empty, "pas de second recul");
-            Assert.That(Pct(brute), Is.EqualTo(45));
+            Assert.That(Pct(brute), Is.EqualTo(40));
             brute.KnockbackGuard = false; // la cible a agi entre-temps
             s.Unit(0).Cooldowns[0] = 0;
             At(brute, 60);
@@ -107,7 +107,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var ancre = s.Unit(1);
             var brute = s.Unit(2);
             At(ancre, 50);
-            At(brute, 95);
+            brute.Point = 9;
             brute.PlannedSlot = 0;
             brute.PlannedTarget = 0;
             var events = Act(s, s.Unit(0), 1, ancre.Id);
@@ -117,7 +117,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(s.IsAwaitingAction, Is.True);
             var later = s.Step(60);
             Assert.That(later.OfType<SkillUsedEvent>().Any(e => e.Actor == brute.Id), Is.False, "l'ennemi n'agit pas avant l'allié propulsé");
-            Assert.That(Pct(brute), Is.EqualTo(95), "la frise est figée");
+            Assert.That(Pct(brute), Is.EqualTo(90), "la frise est figée");
         }
 
         [Test, Description("Vérifie qu'un Élan sur un allié déjà prêt ou sur le lanceur lui-même ne fait rien — parce qu'on ne propulse pas qui est déjà à l'action")]
@@ -131,17 +131,6 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(events.OfType<AdvancedEvent>(), Is.Empty);
         }
 
-        [Test, Description("Vérifie que la vitesse de la frise réglable ralentit le remplissage des jauges (70 % par défaut) — parce que le joueur doit avoir plus de temps de réflexion")]
-        public void TimelineSpeed_ScalesTheGaugeFill()
-        {
-            var normal = Sim(new[] { "ancre" }, new[] { "brute" }, PrototypeContent.Build(new BalanceConfig { TimelineSpeedPercent = 100 }));
-            var slow = Sim(new[] { "ancre" }, new[] { "brute" });
-            long full = normal.FillPerTick(normal.Unit(0));
-            long reduced = slow.FillPerTick(slow.Unit(0));
-            Assert.That(new BalanceConfig().TimelineSpeedPercent, Is.EqualTo(70));
-            Assert.That(reduced, Is.EqualTo(full * 70 / 100));
-        }
-
         [Test, Description("Vérifie que la même graine donne le même combat avec reculs et propulsions — parce que la simulation doit rester déterministe")]
         public void OrderEffects_AreDeterministic()
         {
@@ -153,7 +142,7 @@ namespace N29.HeroesDawn.Tests.Domain
                 At(s.Unit(1), 40);
                 foreach (var e in Act(s, s.Unit(0), 1, 1)) log.Append(e.GetType().Name).Append(e.Tick).Append(';');
                 foreach (var e in Act(s, s.Unit(1), 0, 2)) log.Append(e.GetType().Name).Append(e.Tick).Append(';');
-                return log.ToString() + s.Unit(2).Gauge;
+                return log.ToString() + s.Unit(2).Point;
             }
             Assert.That(Run(), Is.EqualTo(Run()));
         }

@@ -38,21 +38,22 @@ namespace N29.HeroesDawn.Domain.Combat
             SpawnWave(0);
             foreach (var u in _units)
             {
-                u.Gauge = u.GaugeMax * _rng.Range(0, 21) / 100; // départ entre 0 et 20 %
-                if (u.StartGaugeBonusPercent > 0) u.Gauge = System.Math.Min(u.GaugeMax - 1, u.Gauge + u.GaugeMax * u.StartGaugeBonusPercent / 100);
+                u.Point = _rng.Range(0, _b.TimelineStartPointMax + 1); // depart entre le point 0 et le point 2
+                if (u.StartPointBonus > 0) u.Point = System.Math.Min(u.ActionPoint - 1, u.Point + u.StartPointBonus);
             }
         }
 
         public CombatUnit Unit(int id) => _units[id];
 
-        /// <summary>Milli-points ajoutés à la jauge à chaque tick.</summary>
-        public long FillPerTick(CombatUnit u)
+        /// <summary>Vrai pendant la fenetre d interruption : le dernier pas de frise est tombe sur un point d action vide.</summary>
+        public bool InterruptWindowOpen { get; private set; }
+
+        /// <summary>Points franchis par une unite a ce pas : 1 pour tous ; Hate : 2 un pas sur trois ; Gel : un pas sur deux seulement.</summary>
+        int PointsThisStep(CombatUnit u)
         {
-            long fill = (long)u.Spd * _b.AtbFactorPerSecond * _b.TickMs;
-            fill = fill * _b.TimelineSpeedPercent / 100;
-            if (u.Has(StatusType.Haste)) fill = fill * 130 / 100;
-            if (u.Has(StatusType.Freeze)) fill = fill * 50 / 100;
-            return fill;
+            if (u.Has(StatusType.Freeze) && Tick % 2 == 1) return 0;
+            if (u.Has(StatusType.Haste) && Tick % 3 == 0) return 2;
+            return 1;
         }
 
         public IReadOnlyList<CombatEvent> Step(int ticks)
@@ -78,7 +79,7 @@ namespace N29.HeroesDawn.Domain.Combat
             Tick++;
             if (IsAwaitingAction)
             {
-                // Pause d'action : ni frise, ni recharges ; seules les commandes sont traitées.
+                // Pause d'action : ni frise, ni recharges ; seules les commandes sont traitees.
                 ProcessCommands(output);
                 ActReadyUnits(output);
                 CheckEnd(output);
@@ -86,35 +87,55 @@ namespace N29.HeroesDawn.Domain.Combat
             }
             ActiveTick++;
             AdvanceAvatar();
+            InterruptWindowOpen = false;
             for (int i = 0; i < _units.Count; i++)
             {
                 var u = _units[i];
                 if (!u.IsAlive || u.IsReady) continue;
-                long fill = FillPerTick(u);
-                u.Gauge += fill;
-                BurnStep(u, fill, output); // la brûlure mord à chaque pas sur la frise
-                if (!u.IsAlive) continue;
-                if (u.Gauge < u.GaugeMax) PlanIfNeeded(u, output);
-                if (u.Gauge >= u.GaugeMax)
+                int moves = PointsThisStep(u);
+                for (int m = 0; m < moves && u.IsAlive && !u.IsReady; m++)
                 {
-                    u.Gauge = u.GaugeMax;
+                    u.Point++;
+                    BurnStep(u, output); // la brulure mord a chaque point franchi
+                }
+                if (!u.IsAlive) continue;
+                if (!u.IsReady) PlanIfNeeded(u, output);
+                else
+                {
                     output.Add(new GaugeFullEvent(Tick, u.Id));
                     BeginTurn(u, output);
                 }
+            }
+            output.Add(new TimelineAdvancedEvent(Tick));
+            ResolveEncounters(output);
+            bool someoneActs = false;
+            foreach (var u in _units) if (u.IsReady) someoneActs = true;
+            if (!someoneActs && !Auto && !IsOver)
+            {
+                // Point d action vide : la frise marque une pause pendant laquelle le joueur peut interrompre.
+                InterruptWindowOpen = true;
+                output.Add(new EmptyPointPauseEvent(Tick, _b.TimelinePausePerEmptyPointMs));
             }
             ProcessCommands(output);
             ActReadyUnits(output);
             CheckEnd(output);
         }
 
-        /// <summary>Aide de test : remplit la jauge d'une seule unité sans déclencher de tour.</summary>
-        public void StepSingleUnitForTests(CombatUnit u, int ticks)
+        /// <summary>Traite les ordres en attente sans avancer la frise (fenetre d interruption, pause d action).</summary>
+        public IReadOnlyList<CombatEvent> ApplyCommands()
         {
-            for (int i = 0; i < ticks; i++)
-            {
-                u.Gauge += FillPerTick(u);
-                if (u.Gauge > u.GaugeMax) u.Gauge = u.GaugeMax;
-            }
+            var output = new List<CombatEvent>();
+            if (IsOver) return output;
+            ProcessCommands(output);
+            ActReadyUnits(output);
+            CheckEnd(output);
+            return output;
+        }
+
+        /// <summary>Aide de test : fait avancer une seule unite de <paramref name="points"/> points sans declencher de tour.</summary>
+        public void StepSingleUnitForTests(CombatUnit u, int points)
+        {
+            for (int i = 0; i < points; i++) if (u.Point < u.ActionPoint) u.Point++;
         }
     }
 }

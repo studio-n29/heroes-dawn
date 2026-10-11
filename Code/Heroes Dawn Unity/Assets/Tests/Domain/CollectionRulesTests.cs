@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Tests.Domain
         static AllyEntry Ally(string id, ItemId[]? items = null, CardId?[]? cards = null)
             => new AllyEntry(new MemberId(id), 5, 0, 0, items, cards);
 
-        static int Pct(CombatUnit u) => (int)(u.Gauge * 100 / u.GaugeMax);
+        static int Pct(CombatUnit u) => (int)System.Math.Round(u.Point * 100.0 / u.ActionPoint);
 
         // ------------------------------------------------------------------ Contenu
 
@@ -51,8 +51,8 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var shard = Sim(new[] { Ally("ancre", new[] { new ItemId("time_shard") }) }, new[] { "brute" }).Unit(0);
             var baseline = Sim(new[] { Ally("ancre") }, new[] { "brute" }).Unit(0);
-            Assert.That(shard.StartGaugeBonusPercent, Is.EqualTo(30));
-            Assert.That(shard.Gauge, Is.GreaterThan(baseline.Gauge));
+            Assert.That(shard.StartPointBonus, Is.EqualTo(3));
+            Assert.That(shard.Point, Is.GreaterThan(baseline.Point));
             var core = Sim(new[] { Ally("ancre", new[] { new ItemId("phoenix_core") }) }, new[] { "brute" }).Unit(0);
             var shield = core.Statuses.Single(s => s.Type == StatusType.Shield);
             Assert.That(shield.Value, Is.EqualTo(core.MaxHp * 20 / 100));
@@ -66,7 +66,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var a = Sim(new[] { Ally("ancre", new[] { new ItemId("nope") }) }, new[] { "brute" }).Unit(0);
             var b = Sim(new[] { Ally("ancre") }, new[] { "brute" }).Unit(0);
             Assert.That(a.MaxHp, Is.EqualTo(b.MaxHp));
-            Assert.That(a.Gauge, Is.EqualTo(b.Gauge));
+            Assert.That(a.Point, Is.EqualTo(b.Point));
         }
 
         // ------------------------------------------------------------------ Cartes
@@ -99,15 +99,15 @@ namespace N29.HeroesDawn.Tests.Domain
             var s = Sim(new[] { Ally("verre", cards: cards) }, new[] { "brute" });
             var verre = s.Unit(0);
             var brute = s.Unit(1);
-            brute.Gauge = 0;
-            verre.Gauge = verre.GaugeMax;
+            brute.Point = 0;
+            verre.Point = verre.ActionPoint;
             Assert.That(s.CanUse(verre.Id, 3), Is.True);
             s.Submit(CombatCommand.UseSkill(verre.Id, 3, brute.Id));
             var events = s.Step(1);
             Assert.That(events.OfType<SkillUsedEvent>().Single().Skill.Value, Is.EqualTo("card_shackle"));
             Assert.That(Pct(verre), Is.EqualTo(0), "poids lourd : retour à 0 %");
             Assert.That(verre.Cooldowns[3], Is.GreaterThan(0));
-            verre.Gauge = verre.GaugeMax;
+            verre.Point = verre.ActionPoint;
             s.Step(1);
             Assert.That(s.CanUse(verre.Id, 3), Is.False, "toujours en recharge");
         }

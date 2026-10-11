@@ -79,14 +79,16 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que la simulation avance avec le temps réel, deux fois plus vite en ×2 — parce que la vitesse accélère simulation et affichage ensemble (doc 07)")]
         public void Tick_AdvancesSimulationBySpeed()
         {
-            int t0 = _sim.Tick;
+            _view.ClickAuto(); // en Auto, la frise ne s'arrête jamais : on mesure le seul rythme des pas
             _p.Tick();
+            int t0 = _sim.Tick;
+            for (int i = 0; i < 20; i++) _p.Tick();
             int normal = _sim.Tick - t0;
             _view.ClickSpeed();
             int t1 = _sim.Tick;
-            _p.Tick();
-            Assert.That(normal, Is.GreaterThan(0));
-            Assert.That(_sim.Tick - t1, Is.EqualTo(2 * normal));
+            for (int i = 0; i < 20; i++) _p.Tick();
+            Assert.That(normal, Is.GreaterThan(0), "un pas toutes les 0,5 s");
+            Assert.That(_sim.Tick - t1, Is.InRange(2 * normal - 1, 2 * normal + 1));
         }
 
         [Test, Description("Vérifie qu'un allié prêt est sélectionné automatiquement et ses compétences affichées — parce que le plus ancien prêt est choisi d'office (W11a)")]
@@ -133,7 +135,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             TickUntil(() => _view.ComboVisible);
             Assume.That(_view.ComboVisible, "aucun combo disponible");
-            var option = _sim.AvailableCombos()[0];
+            var option = _sim.AvailableCombos().Concat(_sim.AvailableSyncCombos()).First();
             _view.ClickCombo();
             if (_view.Hint == Loc.T("combat.choose_target"))
                 _view.TapUnit(_sim.Units.First(u => u.Side == Side.Enemy && u.IsAlive).Id);

@@ -27,7 +27,7 @@ namespace N29.HeroesDawn.Domain.Combat
             var ids = new List<int>();
             for (int i = first; i < _units.Count; i++)
             {
-                _units[i].Gauge = _units[i].GaugeMax * _rng.Range(0, 21) / 100;
+                _units[i].Point = _rng.Range(0, _b.TimelineStartPointMax + 1);
                 ids.Add(i);
             }
             output.Add(new WaveStartedEvent(Tick, _wave, ids.ToArray()));

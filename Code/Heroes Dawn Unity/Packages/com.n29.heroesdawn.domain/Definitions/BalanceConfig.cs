@@ -6,8 +6,6 @@ namespace N29.HeroesDawn.Definitions
         public int TickMs { get; set; } = 50;
         public int AtbGaugePoints { get; set; } = 1000;
         public int AtbFactorPerSecond { get; set; } = 4;
-        /// <summary>Vitesse de la frise en % (100 = vitesse d'origine) : plus bas, plus de temps de réflexion.</summary>
-        public int TimelineSpeedPercent { get; set; } = 70;
         public int DefK { get; set; } = 300;
         public int CritBasePercent { get; set; } = 15;
         public int CritMultiplierPercent { get; set; } = 150;
@@ -32,21 +30,34 @@ namespace N29.HeroesDawn.Definitions
         /// <summary>Chance en % qu un mini-jeu reussi donne un booster.</summary>
         public int ActivityBoosterChancePercent { get; set; } = 50;
 
-        // ---- Frise chronologique (Timeline) : positions en % de la jauge, 100 = point d action
-        /// <summary>Position après une compétence légère (A1).</summary>
-        public int TimelineLightResetPercent { get; set; } = 30;
-        /// <summary>Position après une compétence intermédiaire (A2).</summary>
-        public int TimelineMediumResetPercent { get; set; } = 15;
-        /// <summary>Position après une compétence lourde ou ultime (A3).</summary>
-        public int TimelineHeavyResetPercent { get; set; } = 0;
-        /// <summary>Position après un combo : négative = temps de canalisation à rattraper.</summary>
-        public int TimelineComboResetPercent { get; set; } = -15;
-        /// <summary>Début de la zone de préparation (80-100 %) : l action est annoncée, un critique l annule.</summary>
-        public int TimelinePrepZonePercent { get; set; } = 80;
-        /// <summary>Début de la zone de préparation vue grâce à la Perception (précognition) : une unité Perception vivante révèle l action ennemie plus tôt.</summary>
-        public int TimelinePrecognitionPercent { get; set; } = 50;
-        /// <summary>Position où une unité interrompue (critique en zone de préparation) est renvoyée.</summary>
-        public int TimelineInterruptResetPercent { get; set; } = 40;
+        // ---- Frise chronologique par points : 0 = depart, TimelinePoints = point d action
+        /// <summary>Nombre de points entre le depart (point 0) et le point d action.</summary>
+        public int TimelinePoints { get; set; } = 10;
+        /// <summary>Point de reprise apres une competence legere (emplacement 1).</summary>
+        public int TimelineResetLightPoint { get; set; } = 3;
+        /// <summary>Point de reprise apres une competence intermediaire (emplacement 2).</summary>
+        public int TimelineResetMediumPoint { get; set; } = 2;
+        /// <summary>Point de reprise apres une competence lourde (emplacement 3, carte 4).</summary>
+        public int TimelineResetHeavyPoint { get; set; } = 0;
+        /// <summary>Point de reprise apres un combo : negatif = canalisation a rattraper.</summary>
+        public int TimelineResetComboPoint { get; set; } = -2;
+        /// <summary>Premier point de la zone de preparation : l action ennemie est annoncee, un critique l annule.</summary>
+        public int TimelinePrepZonePoint { get; set; } = 8;
+        /// <summary>Premier point de la zone de preparation vue grace a la Perception (precognition).</summary>
+        public int TimelinePrecognitionPoint { get; set; } = 5;
+        /// <summary>Point ou une unite interrompue (critique en zone de preparation) est renvoyee.</summary>
+        public int TimelineInterruptResetPoint { get; set; } = 4;
+        /// <summary>Les unites demarrent sur un point tire entre 0 et cette valeur.</summary>
+        public int TimelineStartPointMax { get; set; } = 2;
+        /// <summary>Duree d un pas de frise (un point), en millisecondes.</summary>
+        public int TimelineStepMs { get; set; } = 500;
+        /// <summary>Pause sur un point d action vide : fenetre d interruption du joueur.</summary>
+        public int TimelinePausePerEmptyPointMs { get; set; } = 1500;
+        /// <summary>Temps maximum du joueur pour choisir au point d action.</summary>
+        public int TimelineTurnTimeoutMs { get; set; } = 30000;
+        /// <summary>Delai de reflexion de l IA (presentation) : borne basse et haute.</summary>
+        public int TimelineAiDelayMinMs { get; set; } = 500;
+        public int TimelineAiDelayMaxMs { get; set; } = 1500;
         public int PushBackBindPercent { get; set; } = 25;
         public int PushBackShockPercent { get; set; } = 15;
         public int PushBackFreezePercent { get; set; } = 20;
@@ -54,8 +65,8 @@ namespace N29.HeroesDawn.Definitions
         public int BurnPercentPerTimeline { get; set; } = 8;
 
         // ---- Combo à proximité (gratuit)
-        /// <summary>Quand un allié est à 0, un partenaire de combo valide doit avoir au moins cette position (%) pour lancer le combo.</summary>
-        public int ComboSyncWindowPercent { get; set; } = 60;
+        /// <summary>Quand un allié est à 0, un partenaire de combo valide doit avoir au moins ce point pour lancer le combo.</summary>
+        public int ComboSyncWindowPoint { get; set; } = 6;
         public int ResourceCreditsMin { get; set; } = 150;
         public int ResourceCreditsMax { get; set; } = 400;
         public int ResourcePrMin { get; set; } = 5;

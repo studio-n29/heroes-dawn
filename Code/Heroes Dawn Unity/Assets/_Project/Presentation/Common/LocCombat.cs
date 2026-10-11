@@ -28,6 +28,9 @@ namespace N29.HeroesDawn.Presentation.Common
             d["combat.interrupted"] = "INTERROMPU !";
             d["combat.pushed"] = "RECUL -{0} %";
             d["combat.timeline_action"] = "ACTION";
+            d["combat.turn_passed"] = "passe son tour";
+            d["combat.parade"] = "PARADE !";
+            d["combat.encounter_combo"] = "COMBO POSSIBLE !";
             d["combat.advanced"] = "ÉLAN +{0} %";
             d["combat.propelled"] = "propulsé au point d'action !";
             d["fx.pushback"] = "Recule la cible de {0} % sur la frise";

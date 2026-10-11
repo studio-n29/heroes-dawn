@@ -31,7 +31,7 @@ namespace N29.HeroesDawn.Domain.Combat
             {
                 h.Add(u.Id);
                 h.Add(u.Hp);
-                h.Add(u.Gauge);
+                h.Add(u.Point);
                 h.Add(u.PlannedSlot);
                 h.Add(u.BurnRemainder);
                 foreach (var s in u.Statuses) { h.Add((int)s.Type); h.Add(s.TurnsLeft); h.Add(s.Value); }
