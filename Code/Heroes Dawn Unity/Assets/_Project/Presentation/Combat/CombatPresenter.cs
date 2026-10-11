@@ -52,7 +52,16 @@ namespace N29.HeroesDawn.Presentation.Combat
         int _pendingSlot = -1;
         CombatSimulation.ComboOption? _pendingCombo;
         int _speedFactor = 1;
-        float _accumulator;
+        const float StepEpsilon = 0.0005f; // evite qu une erreur de flottant retarde un pas d une image
+        float _stepTimer;
+        float _pauseLeft;
+        float _turnLeft;
+        bool _waitingForPlayer;
+        System.Random _aiRandom = new System.Random(1);
+        /// <summary>Pause en cours en secondes (fenetre d interruption ou reflexion de l IA) ; tests.</summary>
+        public float PauseLeft => _pauseLeft;
+        /// <summary>Temps restant au joueur pour choisir au point d action, en secondes ; tests.</summary>
+        public float TurnLeft => _turnLeft;
         bool _ended;
         bool _firstRefresh;
         bool _autoShown;
@@ -114,7 +123,10 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (sim == _sim) return;
             _sim = sim;
             _ended = false;
-            _accumulator = 0f;
+            _stepTimer = _session.Content.Balance.TimelineStepMs / 1000f;
+            _pauseLeft = 0f;
+            _waitingForPlayer = false;
+            _aiRandom = new System.Random((int)(sim.Setup.Seed & 0x7fffffff));
             _selected = -1;
             _pendingSlot = -1;
             _pendingCombo = null;
@@ -169,17 +181,47 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             var sim = _sim;
             if (sim == null || _ended || Disposed || !View.IsVisible || _modals.AnyOpen || (_tutorial?.PausesCombat ?? false)) return;
-            int tickMs = _session.Content.Balance.TickMs;
-            _accumulator += _clock.UnscaledDeltaTime * 1000f * _speedFactor;
-            int steps = 0;
-            while (_accumulator >= tickMs && steps < 12 && !sim.IsOver)
+            var balance = _session.Content.Balance;
+            float real = _clock.UnscaledDeltaTime;
+            float dt = real * _speedFactor;
+            var pendingEvents = sim.ApplyCommands(); // ordres du joueur traites des qu ils arrivent (Auto, interruptions, combos)
+            if (pendingEvents.Count > 0) Play(pendingEvents);
+            if (sim.IsAwaitingAction)
             {
-                _accumulator -= tickMs;
-                steps++;
-                var events = sim.Step(1);
-                if (events.Count > 0) Play(events);
+                // Tour d un agent : la frise est figee ; le joueur a au plus TimelineTurnTimeoutMs pour choisir, sinon l unite passe son tour.
+                if (!_waitingForPlayer) { _waitingForPlayer = true; _turnLeft = balance.TimelineTurnTimeoutMs / 1000f; }
+                _turnLeft -= real;
+                if (_turnLeft <= 0f && !sim.Auto)
+                {
+                    int ready = _readyOrder.Count > 0 ? _readyOrder[0] : FirstReadyAlly(sim);
+                    if (ready >= 0) { sim.Submit(CombatCommand.Pass(ready)); ToastTurnPassed(ready); }
+                    _turnLeft = balance.TimelineTurnTimeoutMs / 1000f;
+                }
+                Play(sim.Step(1));
             }
-            if (_accumulator > tickMs * 12) _accumulator = 0f;
+            else
+            {
+                _waitingForPlayer = false;
+                if (_pauseLeft > 0f)
+                {
+                    // Pause (point d action vide ou reflexion de l IA) : le joueur peut interrompre, la frise reprend a la fin.
+                    _pauseLeft -= real;
+                }
+                else
+                {
+                    _stepTimer -= dt;
+                    int steps = 0;
+                    float stepSeconds = balance.TimelineStepMs / 1000f;
+                    while (_stepTimer <= StepEpsilon && steps < 4 && !sim.IsOver && _pauseLeft <= 0f && !sim.IsAwaitingAction)
+                    {
+                        _stepTimer += stepSeconds;
+                        steps++;
+                        var events = sim.Step(1);
+                        if (events.Count > 0) Play(events);
+                    }
+                    if (_stepTimer < -stepSeconds * 4) _stepTimer = 0f;
+                }
+            }
             RefreshAll();
             if (sim.IsOver && !_ended)
             {
@@ -187,6 +229,21 @@ namespace N29.HeroesDawn.Presentation.Combat
                 FinishAsync().Forget();
             }
         }
+
+        /// <summary>Delai de reflexion de l IA, entre les bornes de l equilibrage (presentation seulement).</summary>
+        float AiThinkingSeconds()
+        {
+            var b = _session.Content.Balance;
+            return _aiRandom.Next(b.TimelineAiDelayMinMs, b.TimelineAiDelayMaxMs + 1) / 1000f;
+        }
+
+        int FirstReadyAlly(CombatSimulation sim)
+        {
+            foreach (var u in sim.Units) if (u.Side == Side.Ally && u.IsReady) return u.Id;
+            return -1;
+        }
+
+        void ToastTurnPassed(int unitId) => AddLog(Name(unitId) + " : " + _loc.T("combat.turn_passed"));
 
         void Play(IReadOnlyList<CombatEvent> events)
         {
@@ -204,6 +261,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                     case SkillUsedEvent su:
                         View.Act(su.Actor);
                         if (_sim!.Unit(su.Actor).Side == Side.Ally) _tutorial?.Signal(TutorialSignal.SkillUsed);
+                        else if (!_sim.Auto) _pauseLeft = AiThinkingSeconds();
                         _audio.Play(SfxId.SkillCast);
                         AddLog(Name(su.Actor) + " : " + SkillLabel(su.Actor, su.Skill));
                         break;
@@ -245,6 +303,13 @@ namespace N29.HeroesDawn.Presentation.Combat
                         View.ShowBanner(_loc.T("combat.combo") + " " + comboName, Tone.Danger);
                         _audio.Play(SfxId.Combo);
                         AddLog(Name(cu.A) + " + " + Name(cu.B) + " : " + comboName);
+                        break;
+                    case EmptyPointPauseEvent pause:
+                        _pauseLeft = pause.PauseMs / 1000f;
+                        break;
+                    case EncounterEvent enc:
+                        View.ShowBanner(enc.Kind == TickEncounterKind.Parade ? _loc.T("combat.parade") : _loc.T("combat.encounter_combo"), enc.Kind == TickEncounterKind.Parade ? Tone.Info : Tone.Danger);
+                        AddLog(Name(enc.A) + " + " + Name(enc.B) + " : " + (enc.Kind == TickEncounterKind.Parade ? _loc.T("combat.parade") : _loc.T("combat.encounter_combo")));
                         break;
                     case ActionPlannedEvent ap:
                         if (_sim!.Unit(ap.Unit).Side == Side.Enemy)
@@ -323,7 +388,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                     Ally = ally,
                     Hp01 = u.MaxHp == 0 ? 0 : u.Hp / (float)u.MaxHp,
                     HpText = u.Hp + " / " + u.MaxHp,
-                    Gauge01 = u.GaugeMax == 0 ? 0 : (float)((double)u.Gauge / u.GaugeMax),
+                    Gauge01 = u.ActionPoint == 0 ? 0 : Math.Max(0f, Math.Min(1f, u.Point / (float)u.ActionPoint)),
                     GaugeFull = u.IsReady,
                     Statuses = Statuses(u),
                     Alive = u.IsAlive,
@@ -711,8 +776,9 @@ namespace N29.HeroesDawn.Presentation.Combat
                     Alive = u.IsAlive,
                     Initial = name.Length > 0 ? name.Substring(0, 1).ToUpperInvariant() : "?",
                     Family = u.Family,
-                    Position01 = u.GaugeMax == 0 ? 0f : Math.Max(0f, Math.Min(1f, (float)((double)u.Gauge / u.GaugeMax))),
-                    Channelling = u.Gauge < 0,
+                    Position01 = u.ActionPoint == 0 ? 0f : Math.Max(0f, Math.Min(1f, u.Point / (float)u.ActionPoint)),
+                    Point = u.Point,
+                    Channelling = u.IsChannelling,
                     Ready = u.IsReady,
                     InPrep = sim.InPrepZone(u),
                     PlannedSlot = u.PlannedSlot,
@@ -722,14 +788,15 @@ namespace N29.HeroesDawn.Presentation.Combat
             return new TimelineData
             {
                 Markers = markers.ToArray(),
-                PrepStart01 = b.TimelinePrepZonePercent / 100f,
+                PrepStart01 = b.TimelinePrepZonePoint / (float)b.TimelinePoints,
+                Points = b.TimelinePoints,
             };
         }
 
         /// <summary>Barre des compétences d'avatar : nom court, recharge restante en secondes de temps actif, ciblage en cours.</summary>
         AvatarBarData BuildAvatarBar(CombatSimulation sim)
         {
-            int tickMs = _session.Content.Balance.TickMs;
+            int stepMs = _session.Content.Balance.TimelineStepMs;
             var slots = new AvatarSlotData[sim.AvatarSkills.Count];
             for (int i = 0; i < slots.Length; i++)
             {
@@ -739,7 +806,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 {
                     Visible = true,
                     Label = "[" + AvatarKeys[Math.Min(i, AvatarKeys.Length - 1)] + "] " + AvatarName(def)
-                          + "\n<size=22>" + (left > 0 ? Math.Ceiling(left * tickMs / 1000.0) + " s" : _loc.T("combat.avatar_ready")) + "</size>",
+                          + "\n<size=22>" + (left > 0 ? Math.Ceiling(left * stepMs / 1000.0) + " s" : _loc.T("combat.avatar_ready")) + "</size>",
                     Category = def.Category,
                     Enabled = sim.CanUseAvatar(i),
                     Pending = _pendingAvatar == i,

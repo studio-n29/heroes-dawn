@@ -17,10 +17,10 @@ namespace N29.HeroesDawn.Tests.Domain
                 allies.Select(a => new AllyEntry(new MemberId(a), 5, 0)).ToArray(),
                 enemies.Select(e => new EnemyEntry(new EnemyId(e), 5)).ToArray(), false));
 
-        static int Pct(CombatUnit u) => (int)(u.Gauge * 100 / u.GaugeMax);
+        static int Pct(CombatUnit u) => (int)System.Math.Round(u.Point * 100.0 / u.ActionPoint);
 
         /// <summary>Met l'unité à une position de la frise (sans tour déclenché).</summary>
-        static void At(CombatUnit u, int percent) => u.Gauge = u.GaugeMax * percent / 100;
+        static void At(CombatUnit u, int percent) => u.Point = (int)System.Math.Round(percent * u.ActionPoint / 100.0);
 
         /// <summary>Tous les ennemis loin de leur zone d'action : rien ne vient perturber le test.</summary>
         static void Calm(CombatSimulation s) { foreach (var u in s.Units.Where(x => x.Side == Side.Enemy)) At(u, 0); }
@@ -35,7 +35,7 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test, Description("Vérifie que la compétence A1 replace l'unité à 30 % de la frise, A2 à 15 % et A3 à 0 % — parce que le poids d'une action se paie en temps (spec §A)")]
         public void SkillWeight_SetsPositionAfterAction()
         {
-            foreach (var (slot, expected) in new[] { (0, 30), (1, 15), (2, 0) })
+            foreach (var (slot, expected) in new[] { (0, 30), (1, 20), (2, 0) })
             {
                 var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
                 Calm(s);
@@ -55,8 +55,8 @@ namespace N29.HeroesDawn.Tests.Domain
             s.Submit(CombatCommand.UseCombo(0, 1, 2));
             var ev = s.Step(1);
             Assert.That(ev.OfType<ComboUsedEvent>().Any(), Is.True);
-            Assert.That(Pct(givre), Is.EqualTo(-15));
-            Assert.That(Pct(ancre), Is.EqualTo(-15));
+            Assert.That(givre.Point, Is.EqualTo(-2));
+            Assert.That(ancre.Point, Is.EqualTo(-2));
             Assert.That(givre.IsReady, Is.False);
         }
 
@@ -66,7 +66,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var s = Sim(new[] { "ancre" }, new[] { "brute" }, CombatRank.Elite);
             var brute = s.Unit(1);
             At(s.Unit(0), 0);
-            At(brute, 79);
+            brute.Point = 7;
             Assert.That(brute.PlannedSlot, Is.EqualTo(-1));
             var ev = s.Step(40).ToList();
             var planned = ev.OfType<ActionPlannedEvent>().FirstOrDefault(e => e.Unit == brute.Id);
@@ -81,11 +81,11 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var with = Sim(new[] { "echo", "ancre" }, new[] { "brute" });
             var without = Sim(new[] { "ancre", "givre" }, new[] { "brute" });
-            foreach (var s in new[] { with, without }) { Calm(s); At(s.Unit(2), 55); }
+            foreach (var s in new[] { with, without }) { Calm(s); s.Unit(2).Point = 5; }
             Assert.That(with.Step(1).OfType<ActionPlannedEvent>().Any(), Is.True);
             Assert.That(without.Step(1).OfType<ActionPlannedEvent>().Any(), Is.False);
-            Assert.That(with.PlanStartPercent(with.Unit(2)), Is.EqualTo(50));
-            Assert.That(without.PlanStartPercent(without.Unit(2)), Is.EqualTo(80));
+            Assert.That(with.PlanStartPoint(with.Unit(2)), Is.EqualTo(5));
+            Assert.That(without.PlanStartPoint(without.Unit(2)), Is.EqualTo(8));
         }
 
         [Test, Description("Vérifie qu'un contrôle (Entrave) repousse l'ennemi sur la frise et annule son action annoncée — parce que le contrôle est la réponse à la grosse attaque (spec §A)")]
@@ -94,7 +94,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var s = Sim(new[] { "verre", "ancre" }, new[] { "brute" }, CombatRank.Elite);
             var brute = s.Unit(2);
             At(s.Unit(1), 0);
-            At(brute, 85);
+            brute.Point = 8;
             s.Step(1);
             Assert.That(brute.PlannedSlot, Is.GreaterThanOrEqualTo(0), "action annoncée à 85 %");
             At(s.Unit(0), 100);
@@ -103,7 +103,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(ev.OfType<PushedBackEvent>().Any(e => e.Unit == brute.Id && e.Percent == 25), Is.True);
             Assert.That(ev.OfType<ActionInterruptedEvent>().Any(e => e.Unit == brute.Id && e.Reason == InterruptReason.PushBack), Is.True);
             Assert.That(brute.PlannedSlot, Is.EqualTo(-1));
-            Assert.That(Pct(brute), Is.LessThan(60));
+            Assert.That(brute.Point, Is.LessThan(7));
         }
 
         [Test, Description("Vérifie qu'un coup critique en zone de préparation annule l'action et renvoie l'unité à 40 %, mais pas en dehors de la zone — parce que la zone 80-100 % est la zone de risque (spec §C)")]
@@ -160,10 +160,8 @@ namespace N29.HeroesDawn.Tests.Domain
             At(s.Unit(1), 0);
             u.Statuses.Add(new StatusInstance(StatusType.Burn, 3));
             int hp0 = u.Hp;
-            long g0 = u.Gauge;
-            s.Step(60);
-            long moved = u.Gauge - g0;
-            int expected = (int)((long)u.MaxHp * 8 * moved / (u.GaugeMax * 100));
+            s.Step(6); // six points franchis
+            int expected = u.MaxHp * 8 * 6 / (10 * 100); // 8 % des PV max par frise de 10 points
             Assert.That(hp0 - u.Hp, Is.InRange(expected - 2, expected + 2));
             Assert.That(hp0 - u.Hp, Is.GreaterThan(0));
         }
@@ -193,7 +191,7 @@ namespace N29.HeroesDawn.Tests.Domain
             s.Submit(CombatCommand.SyncCombo(0, 1, 2));
             var ev = s.Step(1);
             Assert.That(ev.OfType<ComboUsedEvent>().Any(), Is.True);
-            Assert.That(Pct(s.Unit(1)), Is.EqualTo(-15));
+            Assert.That(s.Unit(1).Point, Is.EqualTo(-2));
         }
 
         [Test, Description("Vérifie que la synchronisation est refusée si le partenaire est trop loin sur la frise (< 60 %) — parce que le Temps ne rattrape qu'un petit écart")]

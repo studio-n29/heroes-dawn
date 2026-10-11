@@ -42,9 +42,9 @@ namespace N29.HeroesDawn.Domain.Combat
             int S(int v, int itemPercent) => ScaleStat(v, e.Level, b) * f / 1000 * (100 + e.StatPercent) / 100 * (100 + itemPercent) / 100;
             var unit = new CombatUnit(id, Side.Ally, d.Id.Value, d.Family, d.Role, false,
                                       S(d.BaseStats.Hp, hpP), S(d.BaseStats.Atk, atkP), S(d.BaseStats.Def, defP), d.BaseStats.Spd * (100 + spdP) / 100,
-                                      (long)b.AtbGaugePoints * 1000, SkillsWithCards(d, e, collection));
+                                      b.TimelinePoints, SkillsWithCards(d, e, collection));
             unit.CritBonusPercent = crit;
-            unit.StartGaugeBonusPercent = startGauge;
+            unit.StartPointBonus = startGauge * b.TimelinePoints / 100;
             if (shield > 0) unit.Statuses.Add(new StatusInstance(StatusType.Shield, 2, unit.MaxHp * shield / 100));
             return unit;
         }
@@ -77,7 +77,7 @@ namespace N29.HeroesDawn.Domain.Combat
             int S(int v) => ScaleStat(v, e.Level, b) * pct / 100;
             return new CombatUnit(id, Side.Enemy, d.Id.Value, d.Family, d.Role, d.IsBoss,
                                   S(d.BaseStats.Hp), S(d.BaseStats.Atk), S(d.BaseStats.Def), d.BaseStats.Spd,
-                                  (long)b.AtbGaugePoints * 1000, d.Skills);
+                                  b.TimelinePoints, d.Skills);
         }
     }
 }

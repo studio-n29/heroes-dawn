@@ -5,7 +5,7 @@ using N29.HeroesDawn.Definitions;
 namespace N29.HeroesDawn.Domain.Combat
 {
     /// <summary>
-    /// Compétences d'avatar (le joueur lui-même) : lançables à tout moment, même pendant la pause d'action.
+    /// Compétences d avatar (le joueur lui-même) : lançables seulement pendant la fenêtre d interruption (point d action vide) ou pendant le tour d un agent.
     /// La recharge ne baisse que pendant le temps actif (voir <see cref="CombatSimulation.IsAwaitingAction"/>).
     /// Elles ne consomment le tour de personne ; la puissance est celle de l'allié vivant le plus fort.
     /// </summary>
@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Domain.Combat
         public int AvatarCooldownLeft(int index) => index >= 0 && index < AvatarCooldowns.Length ? AvatarCooldowns[index] : 0;
 
         public bool CanUseAvatar(int index)
-            => !IsOver && index >= 0 && index < AvatarCooldowns.Length && AvatarCooldowns[index] == 0 && AvatarCaster() != null;
+            => !IsOver && (InterruptWindowOpen || IsAwaitingAction) && index >= 0 && index < AvatarCooldowns.Length && AvatarCooldowns[index] == 0 && AvatarCaster() != null;
 
         void AdvanceAvatar()
         {

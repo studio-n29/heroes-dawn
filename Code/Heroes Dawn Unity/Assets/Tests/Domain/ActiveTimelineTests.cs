@@ -18,7 +18,7 @@ namespace N29.HeroesDawn.Tests.Domain
                 allies.Select(a => new AllyEntry(new MemberId(a), 5, 0)).ToArray(),
                 enemies.Select(e => new EnemyEntry(new EnemyId(e), 5)).ToArray(), false));
 
-        static void At(CombatUnit u, int percent) => u.Gauge = u.GaugeMax * percent / 100;
+        static void At(CombatUnit u, int percent) => u.Point = (int)System.Math.Round(percent * u.ActionPoint / 100.0);
         static void Calm(CombatSimulation s) { foreach (var u in s.Units.Where(x => x.Side == Side.Enemy)) At(u, 0); }
 
         [Test, Description("Vérifie que lorsqu'un allié arrive au point d'action, plus aucune unité n'avance ni ne perd de recharge, et que le temps actif s'arrête — parce que le monde attend que l'action soit jouée")]
@@ -29,12 +29,12 @@ namespace N29.HeroesDawn.Tests.Domain
             var givre = s.Unit(0); var ancre = s.Unit(1); var brute = s.Unit(2);
             At(ancre, 50); At(brute, 50);
             At(givre, 100);
-            long ancreBefore = ancre.Gauge, bruteBefore = brute.Gauge;
+            int ancreBefore = ancre.Point, bruteBefore = brute.Point;
             int active = s.ActiveTick;
             s.Step(60);
             Assert.That(s.IsAwaitingAction, Is.True);
-            Assert.That(ancre.Gauge, Is.EqualTo(ancreBefore));
-            Assert.That(brute.Gauge, Is.EqualTo(bruteBefore));
+            Assert.That(ancre.Point, Is.EqualTo(ancreBefore));
+            Assert.That(brute.Point, Is.EqualTo(bruteBefore));
             Assert.That(s.ActiveTick, Is.EqualTo(active));
         }
 
@@ -49,9 +49,9 @@ namespace N29.HeroesDawn.Tests.Domain
             s.Submit(CombatCommand.UseSkill(givre.Id, 0, 2));
             s.Step(1);
             Assert.That(s.IsAwaitingAction, Is.False);
-            long before = ancre.Gauge;
+            int before = ancre.Point;
             s.Step(10);
-            Assert.That(ancre.Gauge, Is.GreaterThan(before));
+            Assert.That(ancre.Point, Is.GreaterThan(before));
             Assert.That(s.ActiveTick, Is.GreaterThan(0));
         }
 
@@ -112,7 +112,7 @@ namespace N29.HeroesDawn.Tests.Domain
             s.Submit(CombatCommand.UseSkill(0, 0, 2));
             s.Step(1);
             s.Step(50);
-            Assert.That(s.AvatarCooldownLeft(idx), Is.LessThan(full), $"elle baisse en temps actif (attente={s.IsAwaitingAction}, actif={s.ActiveTick}, over={s.IsOver}, givre={s.Unit(0).Gauge}, hp={s.Unit(0).Hp})");
+            Assert.That(s.AvatarCooldownLeft(idx), Is.LessThan(full), $"elle baisse en temps actif (attente={s.IsAwaitingAction}, actif={s.ActiveTick}, over={s.IsOver}, givre={s.Unit(0).Point}, hp={s.Unit(0).Hp})");
         }
 
         [Test, Description("Vérifie qu'un combat en deux vagues fait apparaître la seconde quand la première est vaincue, et ne se termine qu'à la fin de la dernière — parce que les combats peuvent être découpés en vagues")]

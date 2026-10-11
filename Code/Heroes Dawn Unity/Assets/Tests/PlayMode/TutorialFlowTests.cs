@@ -98,7 +98,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var combat = Object.FindAnyObjectByType<CombatView>()!;
             combat.SkillButton(0).onClick.Invoke();
             combat.EnemyCards().First().Button.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => Guide.Current == TutorialStep.Results, 300);
+            yield return PlayModeHarness.WaitFor(() => Guide.Current == TutorialStep.Results, 1200);
             Assert.That(Guide.Current, Is.EqualTo(TutorialStep.Results), "la compétence lancée fait avancer le tutoriel");
 
             combat.AutoButton.onClick.Invoke();

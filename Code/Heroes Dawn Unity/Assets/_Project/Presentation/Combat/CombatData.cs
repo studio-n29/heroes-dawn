@@ -105,6 +105,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         public bool InPrep;
         /// <summary>Compétence annoncée (0 à 2) ; -1 : aucune.</summary>
         public int PlannedSlot;
+        /// <summary>Point de la frise (negatif en canalisation).</summary>
+        public int Point;
         public bool Boss;
     }
 
@@ -112,6 +114,8 @@ namespace N29.HeroesDawn.Presentation.Combat
     {
         public TimelineMarkerData[] Markers;
         public float PrepStart01;
+        /// <summary>Nombre de points entre le depart et le point d action.</summary>
+        public int Points;
     }
 
     /// <summary>Ligne de fatigue des résultats (avant → après).</summary>

@@ -35,7 +35,7 @@ Une unité repart sur la frise selon le poids de sa compétence :
 
 ## 5. Rencontres sur un même point
 - Deux alliés sur le même point : combo (le combo existant, déclenché par la rencontre).
-- Un allié et un ennemi sur le même point : parade. L'action de l'ennemi est annulée, et l'ennemi repart au point de reprise léger (point 3).
+- Un allié et un ennemi sur le même point : parade. L'action annoncée de l'ennemi est annulée, et l'ennemi repart au point de reprise léger (point 3). Sans action annoncée (hors zone de préparation), il n'y a rien à parer : les rencontres n'ont alors aucun effet.
 - Deux ennemis sur le même point : rien.
 - Une parade ne coûte rien à l'allié (à confirmer dans le plan si besoin).
 

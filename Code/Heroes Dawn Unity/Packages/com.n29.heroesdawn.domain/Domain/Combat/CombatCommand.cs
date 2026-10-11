@@ -1,6 +1,6 @@
 namespace N29.HeroesDawn.Domain.Combat
 {
-    public enum CommandType { Skill, Combo, SetAuto, Retreat, Avatar }
+    public enum CommandType { Skill, Combo, SetAuto, Retreat, Avatar, Pass }
 
     public sealed class CombatCommand
     {
@@ -23,6 +23,8 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Compétence d avatar <paramref name="index"/> (catalogue), lançable à tout moment.</summary>
         public static CombatCommand UseAvatar(int index, int target) => new CombatCommand(CommandType.Avatar, -1, -1, index, target, false);
         public static CombatCommand SetAuto(bool on) => new CombatCommand(CommandType.SetAuto, -1, -1, -1, -1, on);
+        /// <summary>Le joueur passe son tour (delai de 30 s ecoule) : l unite repart au point de reprise leger.</summary>
+        public static CombatCommand Pass(int actor) => new CombatCommand(CommandType.Pass, actor, -1, -1, -1, false);
         public static CombatCommand Retreat() => new CombatCommand(CommandType.Retreat, -1, -1, -1, -1, false);
     }
 

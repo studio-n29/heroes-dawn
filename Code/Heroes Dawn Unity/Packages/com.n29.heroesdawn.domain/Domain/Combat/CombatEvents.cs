@@ -9,6 +9,21 @@ namespace N29.HeroesDawn.Domain.Combat
         protected CombatEvent(int tick) { Tick = tick; }
     }
 
+    /// <summary>Un pas de frise : toutes les unites ont avance d un point (ou franchi leurs points propres).</summary>
+    public sealed class TimelineAdvancedEvent : CombatEvent { public TimelineAdvancedEvent(int t) : base(t) { } }
+
+    /// <summary>Le point d action est vide a ce pas : fenetre d interruption (pause en millisecondes).</summary>
+    public sealed class EmptyPointPauseEvent : CombatEvent { public int PauseMs { get; } public EmptyPointPauseEvent(int t, int pauseMs) : base(t) { PauseMs = pauseMs; } }
+
+    /// <summary>Deux unites sur le meme point : combo (deux allies) ou parade (allie et ennemi).</summary>
+    public sealed class EncounterEvent : CombatEvent
+    {
+        public int A { get; }
+        public int B { get; }
+        public TickEncounterKind Kind { get; }
+        public EncounterEvent(int t, int a, int b, TickEncounterKind kind) : base(t) { A = a; B = b; Kind = kind; }
+    }
+
     public sealed class GaugeFullEvent : CombatEvent { public int Unit { get; } public GaugeFullEvent(int t, int u) : base(t) { Unit = u; } }
     public sealed class TurnSkippedEvent : CombatEvent { public int Unit { get; } public TurnSkippedEvent(int t, int u) : base(t) { Unit = u; } }
 
@@ -73,7 +88,7 @@ namespace N29.HeroesDawn.Domain.Combat
         public ActionPlannedEvent(int t, int unit, int slot) : base(t) { Unit = unit; Slot = slot; }
     }
 
-    public enum InterruptReason { Critical, PushBack }
+    public enum InterruptReason { Critical, PushBack, Parade }
 
     /// <summary>Action annoncée annulée (critique en zone de préparation, recul, dépassement).</summary>
     public sealed class ActionInterruptedEvent : CombatEvent
