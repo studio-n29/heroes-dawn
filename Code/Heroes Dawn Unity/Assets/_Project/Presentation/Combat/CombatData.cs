@@ -49,6 +49,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         public bool Locked;
         /// <summary>Tours de recharge restants (0 : disponible).</summary>
         public int Cooldown;
+        /// <summary>La compétence se pose sur une cible (glisser sur une carte) ; sinon on la lâche dans le vide.</summary>
+        public bool NeedsTarget;
         /// <summary>Initiale affichée sur l'icône.</summary>
         public string Glyph;
     }

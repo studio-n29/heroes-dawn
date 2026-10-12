@@ -97,7 +97,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var countdown = Ui.Txt(rt, "", 36, Theme.Primary, TextAnchor.MiddleRight, FontKind.Title, "Countdown");
             countdown.rectTransform.At(1f, 1f, 0, 0, 620, 48);
             countdown.Inked(1.5f);
-            var row = Ui.Rect(rt, "Cards").At(0.5f, 0.5f, 0, 20, 1300, 540);
+            var shopTabs = ctx.Nest<ShopTabsView>("Widgets/ShopTabs.prefab", rt, "ShopTabs");
+            var tabsRt = (RectTransform)shopTabs.transform;
+            tabsRt.anchorMin = new Vector2(0f, 1f); tabsRt.anchorMax = new Vector2(1f, 1f); tabsRt.pivot = new Vector2(0.5f, 1f);
+            tabsRt.anchoredPosition = new Vector2(0f, -56f); tabsRt.sizeDelta = new Vector2(0f, ShopTabsRecipe.Height);
+            var row = Ui.Rect(rt, "Cards").At(0.5f, 0.5f, 0, -28, 1300, 540);
+            row.localScale = Vector3.one * 0.85f; // les cartes tiennent entre le bandeau d'onglets et les boutons du bas
             row.HLayout(50, 0, TextAnchor.MiddleCenter);
             var cards = new List<Object>();
             for (int i = 0; i < 3; i++) cards.Add(ctx.Nest<ShopCardView>("Widgets/ShopCard.prefab", row, "Card" + i));
@@ -121,6 +126,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "progress", progress);
             ctx.Wire(view, "reroll", reroll);
             ctx.Wire(view, "registry", registry);
+            ctx.Wire(view, "shopTabs", shopTabs);
             return rt.gameObject;
         }
     }

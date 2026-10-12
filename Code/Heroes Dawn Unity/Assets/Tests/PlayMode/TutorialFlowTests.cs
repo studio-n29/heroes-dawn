@@ -54,6 +54,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return WaitStep(TutorialStep.Welcome);
             Overlay.OkButton.Button.onClick.Invoke();
             yield return WaitStep(TutorialStep.OpenTeam);
+            Assert.That(Overlay.FrameSprite, Is.SameAs(N29.HeroesDawn.Presentation.Common.Sprites.PanelFrame), "la mise en valeur est un rectangle à coins coupés, pas un rond");
+            Assert.That(Overlay.VisibleBrackets, Is.EqualTo(4), "quatre équerres aux coins du cadre");
             shell.TabButton(HubPage.Team).Button.onClick.Invoke();
             yield return WaitStep(TutorialStep.Squad);
             Overlay.OkButton.Button.onClick.Invoke();

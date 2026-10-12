@@ -28,6 +28,14 @@ namespace N29.HeroesDawn.Application.Features.Collection
     }
 
     /// <summary>Une offre d'objet de la boutique du jour.</summary>
+    /// <summary>Une carte tirée d'un booster : identifiant et « nouvelle » (absente de la collection avant l'ouverture).</summary>
+    public readonly struct OpenedCard
+    {
+        public CardId Id { get; }
+        public bool IsNew { get; }
+        public OpenedCard(CardId id, bool isNew) { Id = id; IsNew = isNew; }
+    }
+
     public sealed class ItemOffer
     {
         public ItemDef Item { get; }
@@ -88,6 +96,9 @@ namespace N29.HeroesDawn.Application.Features.Collection
         CollectionSave Save => Session.Meta.collection;
 
         TeamMember? Member(MemberId id) => Session.Find(id);
+
+        /// <summary>Boosters en réserve (non ouverts).</summary>
+        public int BoosterStock(string boosterId) => CollectionOps.Boosters(Session, boosterId);
 
         void Changed(bool roster)
         {
@@ -206,6 +217,23 @@ namespace N29.HeroesDawn.Application.Features.Collection
             Save.opened++;
             Changed(false);
             return Result<IReadOnlyList<CardId>>.Ok(opening.Cards);
+        }
+
+        /// <summary>Comme <see cref="OpenBooster"/>, avec pour chaque carte tirée son caractère « nouvelle » (première exemplaire de la collection ; un doublon dans le même booster n'est plus nouveau).</summary>
+        public Result<IReadOnlyList<OpenedCard>> OpenBoosterDetailed(string boosterId)
+        {
+            var owned = new Dictionary<CardId, int>();
+            foreach (var c in Defs.Cards) owned[c.Id] = CollectionOps.OwnedCards(Session, c.Id);
+            var r = OpenBooster(boosterId);
+            if (r.IsFailure) return Result<IReadOnlyList<OpenedCard>>.Fail(r.Error!);
+            var list = new List<OpenedCard>();
+            foreach (var id in r.Value)
+            {
+                bool fresh = owned.TryGetValue(id, out var n) && n == 0;
+                owned[id] = n + 1;
+                list.Add(new OpenedCard(id, fresh));
+            }
+            return Result<IReadOnlyList<OpenedCard>>.Ok(list);
         }
     }
 }

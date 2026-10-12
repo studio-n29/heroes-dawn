@@ -50,14 +50,14 @@ namespace N29.HeroesDawn.Definitions
         /// <summary>Les unites demarrent sur un point tire entre 0 et cette valeur.</summary>
         public int TimelineStartPointMax { get; set; } = 2;
         /// <summary>Duree d un pas de frise (un point), en millisecondes.</summary>
-        public int TimelineStepMs { get; set; } = 500;
-        /// <summary>Pause sur un point d action vide : fenetre d interruption du joueur.</summary>
-        public int TimelinePausePerEmptyPointMs { get; set; } = 1500;
+        public int TimelineStepMs { get; set; } = 350;
+        /// <summary>Pause avant l arrivee d un ennemi au point d action (avatar pret) : fenetre d interruption du joueur.</summary>
+        public int TimelinePausePerEmptyPointMs { get; set; } = 1200;
         /// <summary>Temps maximum du joueur pour choisir au point d action.</summary>
         public int TimelineTurnTimeoutMs { get; set; } = 30000;
         /// <summary>Delai de reflexion de l IA (presentation) : borne basse et haute.</summary>
-        public int TimelineAiDelayMinMs { get; set; } = 500;
-        public int TimelineAiDelayMaxMs { get; set; } = 1500;
+        public int TimelineAiDelayMinMs { get; set; } = 300;
+        public int TimelineAiDelayMaxMs { get; set; } = 700;
         public int PushBackBindPercent { get; set; } = 25;
         public int PushBackShockPercent { get; set; } = 15;
         public int PushBackFreezePercent { get; set; } = 20;

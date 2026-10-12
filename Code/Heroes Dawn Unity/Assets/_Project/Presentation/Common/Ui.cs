@@ -212,7 +212,7 @@ namespace N29.HeroesDawn.Presentation.Common
             colors.highlightedColor = new Color(1f, 1f, 1f, 1f);
             colors.pressedColor = new Color(0.8f, 0.8f, 0.8f, 1f);
             colors.selectedColor = Color.white;
-            colors.disabledColor = new Color(0.45f, 0.45f, 0.45f, 0.9f);
+            colors.disabledColor = Color.white;
             colors.fadeDuration = 0.08f;
             button.colors = colors;
             var nav = button.navigation;

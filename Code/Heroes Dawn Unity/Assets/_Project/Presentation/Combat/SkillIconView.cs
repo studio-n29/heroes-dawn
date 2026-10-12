@@ -22,12 +22,17 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] TMP_Text cooldown = null!;
         [SerializeField, Mvp.OptionalRef] TMP_Text? label;
         [SerializeField, Mvp.OptionalRef] SkillHoldTrigger? hold;
+        [SerializeField, Mvp.OptionalRef] SkillCardDrag? drag;
         [SerializeField] CanvasGroup group = null!;
 
         public Button Button => button;
         public event Action? Clicked;
         /// <summary>Appui maintenu (true) ou relâché (false) sur la carte : affiche sa description d'effet.</summary>
         public event Action<SkillIconView, bool>? Holding;
+        /// <summary>Carte prise au glisser (true : la compétence se pose sur une cible).</summary>
+        public event Action<SkillIconView>? DragBegan;
+        /// <summary>Carte lâchée à cette position de l'écran.</summary>
+        public event Action<SkillIconView, Vector2>? DragEnded;
 
         /// <summary>Dernière donnée affichée (tests).</summary>
         public SkillSlotData Data { get; private set; }
@@ -36,6 +41,11 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             button.onClick.AddListener(() => Clicked?.Invoke());
             if (hold != null) hold.Held += down => Holding?.Invoke(this, down);
+            if (drag != null)
+            {
+                drag.Began += () => DragBegan?.Invoke(this);
+                drag.Ended += at => DragEnded?.Invoke(this, at);
+            }
         }
 
         public void Show(SkillSlotData d, int index)
@@ -57,6 +67,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             ring.gameObject.SetActive(d.Enabled || d.Pending);
             ring.color = d.Pending ? Theme.Primary : Theme.Glow;
             button.interactable = d.Enabled;
+            if (drag != null) drag.CanDrag = d.Enabled;
             group.alpha = d.Locked ? 0.45f : d.Enabled || d.Pending ? 1f : 0.62f;
         }
 

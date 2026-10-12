@@ -271,15 +271,13 @@ namespace N29.HeroesDawn.Presentation.Board
 
         MovePreviewData BuildPreview(ZoneRun run, CaseId tapped, MovePlan plan, FogReachPlan? fog)
         {
-            if (fog != null)
+            if (!run.Fog.IsRevealed(tapped) && !run.IsBlocking(tapped))
             {
-                var stop = run.Graph.Node(fog.StopAt);
-                string stopName = CaseTitle(stop);
                 return new MovePreviewData
                 {
                     Title = _loc.T("board.preview.fog_title"),
-                    Body = _loc.F("board.preview.fog_body", fog.Cost, stopName),
-                    Detail = _loc.F("board.preview.fog_detail", stopName, plan.Cost),
+                    Body = _loc.T("board.preview.fog_hidden"),
+                    Detail = _loc.F("board.preview.fog_cost", plan.Cost, run.PmInHand - plan.Cost),
                     Tone = Tone.Info,
                     ConfirmLabel = _loc.T("board.preview.go"),
                     CancelLabel = _loc.T("board.preview.cancel"),
@@ -290,7 +288,6 @@ namespace N29.HeroesDawn.Presentation.Board
             if (run.Graph.Zone.Objectives.Any(o => o.Target == tapped)) body += "\n" + _loc.T("board.case.objective");
             var detail = plan.Cost >= run.PmInHand ? _loc.F("board.preview.cost_all", plan.Cost) : _loc.F("board.preview.cost", plan.Cost, run.PmInHand - plan.Cost);
             if (run.IsBlocking(tapped)) detail += "\n" + _loc.T("board.preview.stop_combat");
-            else if (run.Fog.WouldReveal(tapped)) detail += "\n" + _loc.T("board.preview.stop_fog");
             if (run.IsSpent(tapped) && def.Type != CaseType.Entry) detail += "\n" + _loc.T("board.preview.spent");
             return new MovePreviewData
             {

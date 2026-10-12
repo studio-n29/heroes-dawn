@@ -64,6 +64,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (t.Active) active = i;
                 tabs[i].SetLabel(t.Label);
                 tabs[i].SetColors(t.Active ? Theme.Primary : Theme.WithAlpha(Theme.Surface, 0f), t.Active ? Theme.TextDark : Theme.TextMuted);
+                if (tabs[i].gameObject.activeSelf == t.Hidden) tabs[i].gameObject.SetActive(!t.Hidden);
                 bool show = !string.IsNullOrEmpty(t.Badge);
                 var badge = badges[i].transform.parent.gameObject;
                 if (badge.activeSelf != show) badge.SetActive(show);

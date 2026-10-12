@@ -27,11 +27,20 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var bottom = Veil("Bottom");
             var left = Veil("Left");
             var right = Veil("Right");
-            var ring = Ui.Img(veilRoot, "Ring", Theme.Primary, Sprites.Ring);
+            var ring = Ui.Img(veilRoot, "Ring", Theme.Primary, Sprites.PanelFrame);
             ring.type = Image.Type.Sliced;
             ring.rectTransform.anchorMin = ring.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-            var ripple = Ui.Img(veilRoot, "Ripple", Theme.Primary, Sprites.Ring);
+            var ripple = Ui.Img(veilRoot, "Ripple", Theme.Primary, Sprites.PanelFrame);
             ripple.rectTransform.anchorMin = ripple.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+            var brackets = new Object[4];
+            for (int i = 0; i < 4; i++)
+            {
+                var br = Ui.Img(veilRoot, "Bracket" + (i + 1), Theme.FrostEdge, Sprites.Bracket);
+                br.rectTransform.anchorMin = br.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+                br.rectTransform.pivot = new Vector2(0f, 0f);
+                br.rectTransform.sizeDelta = new Vector2(34f, 34f);
+                brackets[i] = br.rectTransform;
+            }
 
             var pointerGo = new GameObject("Pointer", typeof(RectTransform), typeof(CanvasRenderer), typeof(UiPolygon)) { layer = 5 };
             var pointer = (RectTransform)pointerGo.transform;
@@ -95,6 +104,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "veilRight", right);
             ctx.Wire(view, "ring", ring);
             ctx.Wire(view, "ripple", ripple);
+            ctx.WireArray(view, "brackets", brackets);
             ctx.Wire(view, "pointer", pointer);
             ctx.Wire(view, "bubble", bubble);
             ctx.Wire(view, "title", title);

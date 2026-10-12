@@ -43,6 +43,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["combat.choose_target"] = "TOUCHE UNE CIBLE · ÉCHAP = ANNULER";
             d["combat.choose_ally"] = "TOUCHE UN ALLIÉ · ÉCHAP = ANNULER";
             d["combat.waiting"] = "Les jauges se remplissent…";
+            d["combat.drop_here"] = "Lâche la carte ici";
             d["combat.auto_hint"] = "AUTO [A]";
             d["combat.speed_hint"] = "{0} [S]";
         }

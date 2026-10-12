@@ -113,3 +113,12 @@ Portraits en bas avec jauges ATB et fatigue ; compétences au toucher ; boutons 
 
 ## Données / paramètres
 Tous les paramètres chiffrés (jauge, facteur ATB, K, critique, écarts de rang, fatigue) sont dans l'onglet **Paramètres** du tableur et exportés vers Remote Config.
+
+## Rythme et prise en main (version 0.8.0)
+- **Pas de la frise** : 0,35 s ; vitesse ×2 par défaut (×1 et ×3 disponibles) ; délai de réflexion de l'IA : 0,3 à 0,7 s ; les pauses suivent la vitesse choisie.
+- **Fenêtre d'interruption** : 1,2 s, seulement au pas qui précède l'arrivée d'un ennemi au point d'action et si une compétence d'avatar est prête ; jamais en Auto.
+- **Cartes de compétence** : appui prolongé = description de l'effet ; glisser-déposer : dans le vide pour une compétence générale ou sur soi, sur une carte cible pour une compétence ciblée (le toucher simple reste possible).
+- **Animations** : ouverture de l'éventail au tour de l'agent, carte jouée qui s'envole vers sa cible, élan de l'attaquant, étincelle d'arrivée sur la frise ; coupées par « réduire les mouvements ».
+
+## Déplacement sur le plateau (version 0.8.0)
+Le pion suit tout son trajet : seules les cases de combat non résolues l'arrêtent. Le brouillard ne bloque plus le déplacement, toute case à portée est une destination et le brouillard se lève au passage du pion.

@@ -65,7 +65,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _shopSub = _shopChanged.Subscribe(_ => RefreshChrome());
             _metaSub = _metaChanged?.Subscribe(_ => RefreshChrome());
             _nav.Changed += OnNavigated;
-            View.TabClicked += _nav.SelectTab;
+            View.TabClicked += OnTabClicked;
             View.BackClicked += OnBackClicked;
             View.SettingsClicked += OpenSettings;
             View.Relay.WipTapped += OnWipTapped;
@@ -77,7 +77,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         protected override void OnDispose()
         {
             _nav.Changed -= OnNavigated;
-            View.TabClicked -= _nav.SelectTab;
+            View.TabClicked -= OnTabClicked;
             View.BackClicked -= OnBackClicked;
             View.SettingsClicked -= OpenSettings;
             View.Relay.WipTapped -= OnWipTapped;
@@ -153,7 +153,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 {
                     Page = page,
                     Label = _loc.T(NavKey(page)),
-                    Active = page == root,
+                    Active = page == HubNavigator.NavTabOf(root),
+                    Hidden = page == HubPage.Recruit,
                     Badge = BadgeOf(page, shop),
                 };
             }
@@ -162,7 +163,8 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         string BadgeOf(HubPage page, IShopReadModel shop)
         {
-            if (page == HubPage.Recruit) return shop.Day.Length > 0 && shop.SeenDay != shop.Day ? "N" : "";
+            if (page == HubPage.Recruit) return "";
+            if (page == HubPage.Shop && shop.Day.Length > 0 && shop.SeenDay != shop.Day) return "N";
             if (_meta == null) return "";
             if (page == HubPage.Pass) { int n = _meta.PassBadge; return n > 0 ? n.ToString() : ""; }
             if (page == HubPage.Shop) return _meta.ShopBadge > 0 ? "!" : "";
@@ -186,6 +188,13 @@ namespace N29.HeroesDawn.Presentation.Hub
         }
 
         void OnBackClicked() => HandleBack();
+
+        /// <summary>Un onglet de la barre : la Boutique rouvre la section mémorisée (les héros ont leur page Recruter).</summary>
+        void OnTabClicked(HubPage page)
+        {
+            if (page == HubPage.Shop) _nav.SelectShopTab(_nav.ShopTab);
+            else _nav.SelectTab(page);
+        }
 
         void OpenSettings() => _nav.Open(HubPage.Settings);
 

@@ -84,9 +84,12 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Skills.Visible, Is.True);
         }
 
-        /// <summary>Fait avancer la frise jusqu a la fenetre d interruption (point d action vide) : les interruptions y sont permises.</summary>
+        /// <summary>Fait avancer la frise jusqu a la fenetre d interruption (ennemi sur le point d agir) : les interruptions y sont permises.</summary>
         void OpenWindow()
         {
+            foreach (var u in _sim.Units) if (u.IsAlive) u.Point = 0;
+            var threat = _sim.Units.First(u => u.Side == Side.Enemy);
+            threat.Point = threat.ActionPoint - 2; // menace imminente : la fenêtre d'interruption s'ouvre au pas suivant
             for (int i = 0; i < 400 && !_sim.InterruptWindowOpen; i++) _p.Tick();
             Assume.That(_sim.InterruptWindowOpen, "aucune fenêtre d'interruption");
         }

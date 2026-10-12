@@ -200,26 +200,22 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(first, Is.Not.Empty);
         }
 
-        [Test, Description("Vérifie que les cases encore cachées mais à portée sont surlignées, que leur fiche annonce la zone inconnue et que « S'y rendre » mène à l'arrêt forcé — parce que la portée complète doit se voir sans enfreindre l'arrêt obligatoire du brouillard")]
-        public void FogReach_IsHighlighted_AndLeadsToItsForcedStop()
+        [Test, Description("Vérifie qu'une case encore cachée à portée est une destination ordinaire (fiche « ZONE INCONNUE ») et que « S'y rendre » mène jusqu'à elle sans s'arrêter en route — parce que seules les cases de combat arrêtent le pion")]
+        public void HiddenDestination_IsReachedWithoutStoppingEnRoute()
         {
             var zone = _app.Session.Content.Zone(PrototypeContent.Zone11);
             _app.Session.Run = ZoneRun.ForTests(_app.Session.Content, zone, 3UL, 6, false);
             _app.Session.RunZone = zone;
             var run = _app.Session.Run!;
-            Assume.That(run.FogReach, Is.Not.Empty);
+            var hidden = run.Destinations.Values.Where(p => !run.Fog.IsRevealed(p.Target) && !run.IsBlocking(p.Target)).OrderByDescending(p => p.Path.Count).First();
             Make();
-            var hidden = _view.MapView.LastNodes.Where(n => n.Mark == NodeMark.FogDestination).ToArray();
-            Assert.That(hidden.Length, Is.EqualTo(run.FogReach.Count));
-            Assert.That(hidden.All(n => !n.Revealed && n.DestinationCost > 0));
-            var fog = run.FogReach.Values.First();
-            _view.MapView.Tap(fog.Target.Value);
+            Assert.That(_view.MapView.LastNodes.Single(n => n.Id == hidden.Target).Mark, Is.EqualTo(NodeMark.Destination));
+            _view.MapView.Tap(hidden.Target.Value);
             Assert.That(_view.Preview!.Value.Title, Is.EqualTo("ZONE INCONNUE"));
-            Assert.That(_view.MapView.LastFit, Has.Member(fog.Target), "le dézoom montre aussi la suite du chemin sous le brouillard");
-            Assert.That(_view.MapView.LastLinks.Any(l => l.Mark == LinkMark.Beyond), Is.True);
             _view.ClickGo();
-            Assert.That(_view.MapView.Moves.Single().Last(), Is.EqualTo(fog.StopAt), "le pion s'arrête au premier arrêt forcé");
+            Assert.That(_view.MapView.Moves.Single().Last(), Is.EqualTo(hidden.Target), "le pion va jusqu'à la case choisie");
         }
+
 
         [Test, Description("Vérifie qu'arriver sur une case Combat engage le combat puis demande la scène de combat — parce que le combat se joue dans sa scène, par-dessus le plateau (doc 07)")]
         public void CombatCase_BeginsCombatAndNavigatesToCombat()

@@ -172,8 +172,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(Object.FindAnyObjectByType<BoardView>()!.PreviewVisible, Is.True);
 
             Object.FindAnyObjectByType<BoardView>()!.PreviewCancelButton.onClick.Invoke();
-            Assume.That(run.FogReach, Is.Not.Empty);
-            map.NodeButton(run.FogReach.Keys.First()).onClick.Invoke();
+            var hiddenDest = run.Destinations.Keys.First(id => !run.Fog.IsRevealed(id));
+            map.NodeButton(hiddenDest).onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.8f);
             yield return Capture("03c-plateau-brouillard");
             Assert.That(File.Exists(Path.Combine(Folder, "03c-plateau-brouillard.png")));

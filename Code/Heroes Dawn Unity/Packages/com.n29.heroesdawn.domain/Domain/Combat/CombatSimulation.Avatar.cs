@@ -23,6 +23,21 @@ namespace N29.HeroesDawn.Domain.Combat
         public bool CanUseAvatar(int index)
             => !IsOver && (InterruptWindowOpen || IsAwaitingAction) && index >= 0 && index < AvatarCooldowns.Length && AvatarCooldowns[index] == 0 && AvatarCaster() != null;
 
+        /// <summary>
+        /// Une fenêtre d'interruption n'a de sens que si un ennemi est sur le point d'agir (il atteindra le point d'action au pas suivant)
+        /// et qu'au moins une compétence d'avatar est prête (spec 2026-10-12 : fluidifier le combat).
+        /// </summary>
+        bool InterruptOpportunity()
+        {
+            if (AvatarCaster() == null) return false;
+            bool ready = false;
+            foreach (var cd in AvatarCooldowns) if (cd == 0) ready = true;
+            if (!ready) return false;
+            foreach (var u in _units)
+                if (u.Side == Side.Enemy && u.IsAlive && !u.IsReady && u.Point >= u.ActionPoint - 1) return true;
+            return false;
+        }
+
         void AdvanceAvatar()
         {
             var cd = AvatarCooldowns;

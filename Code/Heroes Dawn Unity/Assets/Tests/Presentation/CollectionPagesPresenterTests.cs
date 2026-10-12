@@ -106,6 +106,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que l'en-tête du Grimoire grise « Ouvrir » sans booster, que l'achat en PR donne un booster et que son ouverture montre les cartes dans une fenêtre — parce que c'est la boucle de collection")]
         public void Grimoire_BuyThenOpenABooster()
         {
+            _host.Register<IBoosterOpeningPopupView>(() => new FakeBoosterOpeningPopup());
             _app.Session.Wallet.Set(0, 500);
             var p = Grimoire();
             Assert.That(_view.Header.A.Enabled, Is.False);
@@ -114,11 +115,9 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(CollectionOps.Boosters(_app.Session, BoosterDef.StandardId), Is.EqualTo(1));
             Assert.That(_view.Header.A.Enabled, Is.True);
             _view.ClickHeader(0);
-            var popup = (FakeConfirmPopup)_host.Spawned.Single();
-            Assert.That(popup.Asked!.Value.Title, Does.Contain("BOOSTER"));
-            Assert.That(popup.Asked!.Value.Cancel, Is.Empty, "un seul bouton");
-            Assert.That(popup.Asked!.Value.Body.Split('\n').Length, Is.EqualTo(4), "titre + 3 cartes");
-            popup.Answer(true);
+            var popup = (FakeBoosterOpeningPopup)_host.Spawned.Single();
+            Assert.That(popup.Shown!.Value.Cards.Length, Is.EqualTo(3), "trois cartes dans le booster");
+            popup.Continue();
             Assert.That(_view.Rows.Count(r => !r.Dim), Is.GreaterThan(0), "au moins une carte possédée");
             Assert.That(_view.Header.Line, Does.Contain("0 booster(s)"));
             p.Dispose();
@@ -128,16 +127,17 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void Boutique_SellsDailyItems_AndABooster()
         {
             _app.Session.Wallet.Set(50000, 500);
+            _nav.ShopTab = ShopTab.Items;
             var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
                                                     _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, _nav));
-            int first = Boutique.Packs.Count + Boutique.Exchanges.Count + 1;
-            Assert.That(_view.Rows.Length, Is.EqualTo(first + CollectionBook.ItemOfferCount + 1), "section + 4 objets + booster");
+            Assert.That(_view.Rows.Length, Is.EqualTo(CollectionBook.ItemOfferCount), "4 objets du jour");
             var price = _app.Collection.ItemOffers()[0].Item.Price;
             int credits = _app.Session.Wallet.Credits;
-            _view.ClickRow(first);
+            _view.ClickRow(0);
             Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(credits - price));
-            Assert.That(_view.Rows[first].A.Label, Is.EqualTo("VENDU"));
-            _view.ClickRow(first + CollectionBook.ItemOfferCount);
+            Assert.That(_view.Rows[0].A.Label, Is.EqualTo("VENDU"));
+            _view.ClickShopTab((int)ShopTab.Boosters);
+            _view.ClickRow(1);
             Assert.That(CollectionOps.Boosters(_app.Session, BoosterDef.StandardId), Is.EqualTo(1));
             _view.ClickHeader(1);
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Grimoire));

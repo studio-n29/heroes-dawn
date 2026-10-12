@@ -19,11 +19,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["board.preview.cancel"] = "ANNULER";
             d["board.preview.cost"] = "Coût : {0} PM · il t'en restera {1}.";
             d["board.preview.cost_all"] = "Coût : {0} PM · tous tes PM.";
-            d["board.preview.stop_fog"] = "Arrêt forcé : cette case ouvre le brouillard. Les PM restants te permettent de repartir.";
+            d["board.preview.fog_hidden"] = "Zone encore sous le brouillard : le pion la traverse sans s'arrêter et éclaircit le chemin.";
             d["board.preview.stop_combat"] = "Arrêt forcé : le combat se déclenche en arrivant.";
             d["board.preview.fog_title"] = "ZONE INCONNUE";
-            d["board.preview.fog_body"] = "Case sous le brouillard ({0} pas). Le déplacement s'arrête d'abord en {1}, qui ouvre la zone.";
-            d["board.preview.fog_detail"] = "Aller en {0} : {1} PM.";
+            d["board.preview.fog_cost"] = "{0} PM pour y aller (il t'en restera {1}).";
             d["board.preview.spent"] = "Déjà résolue : rien ne s'y passera.";
             d["board.case.Entry.title"] = "ENTRÉE DE LA ZONE";
             d["board.case.Entry.body"] = "Le point de départ. Rien ne s'y passe ; le bouton « Retour au QG » ramène l'équipe à la base.";

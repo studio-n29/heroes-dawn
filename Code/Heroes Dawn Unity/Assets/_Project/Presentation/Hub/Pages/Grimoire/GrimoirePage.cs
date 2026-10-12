@@ -81,21 +81,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         async UniTaskVoid OpenAsync()
         {
-            var before = Defs.Cards.ToDictionary(c => c.Id, c => CollectionOps.OwnedCards(_session, c.Id));
-            var result = _book.OpenBooster(BoosterDef.StandardId);
-            if (result.IsFailure) { Toasts.Show(Loc.Error(result.Error!), ToastKind.Error); return; }
-            var lines = result.Value.Select(id =>
-            {
-                var card = Defs.Card(id);
-                string fresh = before[id] == 0 ? " · " + Loc.T("grimoire.new_card") : "";
-                before[id]++; // deux fois la même carte dans un booster : la seconde n'est plus nouvelle
-                return CollectionText.CardName(Loc, card) + " (" + CollectionText.RarityName(Loc, card.Rarity) + ")" + fresh;
-            });
-            try
-            {
-                await _modals.ConfirmAsync(new ConfirmData(Loc.T("grimoire.opened_title"), Loc.F("grimoire.opened_body", string.Join("\n", lines)),
-                                                           Loc.T("grimoire.opened_ok"), "", Tone.Primary), Lifetime);
-            }
+            try { await BoosterOpening.OpenAndShowAsync(_book, Defs, _modals, Loc, Toasts, Lifetime); }
             catch (System.OperationCanceledException) { }
             if (!Disposed) Refresh();
         }

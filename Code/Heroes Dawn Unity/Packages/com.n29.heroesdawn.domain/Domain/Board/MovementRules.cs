@@ -5,8 +5,8 @@ using N29.HeroesDawn.Core;
 namespace N29.HeroesDawn.Domain.Board
 {
     /// <summary>
-    /// GDD §5 — destinations dont le trajet coûte au plus PM (chaque chemin a un coût en PM) ; on ne traverse ni un combat non résolu
-    /// ni une case qui ouvre du brouillard (elles peuvent être des destinations finales) ; cases visibles uniquement.
+    /// GDD §5 — destinations dont le trajet coûte au plus PM (chaque chemin a un coût en PM) ; on ne traverse pas un combat non résolu
+    /// ; le brouillard ne bloque pas (toute case à portée est une destination, il se lève au passage).
     /// Chemin retenu : le moins cher, puis le plus court en cases, puis l'ordre des identifiants. Le pion suit ce chemin sans s'arrêter
     /// aux bifurcations ni aux cases traversées.
     /// </summary>
@@ -67,34 +67,19 @@ namespace N29.HeroesDawn.Domain.Board
         public static IReadOnlyDictionary<CaseId, MovePlan> FindDestinations(
             BoardGraph g, FogOfWar fog, CaseId from, int pm, Func<CaseId, bool> isBlocking)
         {
-            var labels = Shortest(g, from, pm, fog.IsRevealed, n => !(isBlocking(n) || fog.WouldReveal(n)));
+            var labels = Shortest(g, from, pm, _ => true, n => !isBlocking(n));
             var result = new Dictionary<CaseId, MovePlan>();
             foreach (var kv in labels) result.Add(kv.Key, new MovePlan(kv.Key, kv.Value.Path, kv.Value.Cost));
             return result;
         }
 
         /// <summary>
-        /// Cases encore sous le brouillard et à portée (coût ≤ PM), arrêts forcés ignorés :
-        /// elles sont surlignées pour montrer la portée complète. Chacune renvoie vers son premier arrêt forcé
-        /// (une destination de <paramref name="destinations"/>) : c'est là que le déplacement s'arrête réellement.
+        /// Portée « cachée » : supprimée (spec 2026-10-12) — le brouillard ne bloque plus, toute case à portée est une destination
+        /// (visible ou non) et le brouillard se lève au passage du pion. Renvoie toujours un dictionnaire vide.
         /// </summary>
         public static IReadOnlyDictionary<CaseId, FogReachPlan> FindFogReach(
             BoardGraph g, FogOfWar fog, CaseId from, int pm, Func<CaseId, bool> isBlocking,
             IReadOnlyDictionary<CaseId, MovePlan> destinations)
-        {
-            var labels = Shortest(g, from, pm, _ => true, _ => true);
-            var result = new Dictionary<CaseId, FogReachPlan>();
-            foreach (var kv in labels)
-            {
-                if (fog.IsRevealed(kv.Key)) continue;
-                foreach (var p in kv.Value.Path)
-                {
-                    if (fog.IsRevealed(p) && !isBlocking(p) && !fog.WouldReveal(p)) continue;
-                    if (destinations.TryGetValue(p, out var stop)) result.Add(kv.Key, new FogReachPlan(kv.Key, kv.Value.Path, kv.Value.Cost, p, stop.Path));
-                    break;
-                }
-            }
-            return result;
-        }
+            => new Dictionary<CaseId, FogReachPlan>();
     }
 }

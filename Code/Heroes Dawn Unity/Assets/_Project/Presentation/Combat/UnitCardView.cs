@@ -97,6 +97,15 @@ namespace N29.HeroesDawn.Presentation.Combat
             Feedback.Fx.Flash(portraitArea);
             Feedback.Fx.Sparks((RectTransform)transform, _ally ? Theme.Danger : Theme.Primary, 7, 90f, 14f);
         }
-        public void Act() => Tween.Punch(transform, 0.08f, 0.25f);
+        public void Act()
+        {
+            Tween.Punch(transform, 0.08f, 0.25f);
+            if (Feedback.MotionSettings.Reduced || !UnityEngine.Application.isPlaying) return;
+            // Élan : la carte se penche vers son adversaire (alliés à gauche, ennemis au centre) puis revient.
+            var rt = (RectTransform)transform;
+            float lean = _ally ? -7f : 7f;
+            Tween.Run(0.3f, k => { if (rt != null) rt.localEulerAngles = new Vector3(0f, 0f, lean * Mathf.Sin(k * Mathf.PI)); },
+                      () => { if (rt != null) rt.localEulerAngles = Vector3.zero; }, rt, Tween.Linear);
+        }
     }
 }

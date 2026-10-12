@@ -19,6 +19,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action? ComboClicked;
         public event Action? CycleClicked;
         public event Action<int>? SkillClicked;
+        public event Action<int>? SkillDragBegan;
+        public event Action<int, int>? SkillDropped;
         public event Action<int>? UnitTapped;
 
         public IReadOnlyList<UnitCardData> Built = Array.Empty<UnitCardData>();
@@ -38,6 +40,9 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void ClickCombo() => ComboClicked?.Invoke();
         public void ClickAvatar(int index) => AvatarClicked?.Invoke(index);
         public void ClickSkill(int slot) => SkillClicked?.Invoke(slot);
+        public void DragSkill(int slot, int where) { SkillDragBegan?.Invoke(slot); SkillDropped?.Invoke(slot, where); }
+        public void BeginDragSkill(int slot) => SkillDragBegan?.Invoke(slot);
+        public void DropSkill(int slot, int where) => SkillDropped?.Invoke(slot, where);
         public void TapUnit(int id) => UnitTapped?.Invoke(id);
 
         public void BuildUnits(IReadOnlyList<UnitCardData> units) => Built = units;
@@ -53,6 +58,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void Float(int unitId, string text, Tone tone, int size) { }
         public void Hit(int unitId) { }
         public void Act(int unitId) { }
+        public (int Slot, int Target)? LastPlayedCard;
+        public void PlayCard(int slot, int targetUnitId) => LastPlayedCard = (slot, targetUnitId);
         public UniTask PauseAsync(float seconds, CancellationToken ct) => UniTask.CompletedTask;
     }
 

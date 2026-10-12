@@ -17,6 +17,19 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public event Action<HubLocation>? Changed;
 
+        /// <summary>Onglet de la boutique affiché (mémorisé entre deux ouvertures). Les héros vivent sur la page Recruter, les autres sections sur la page Boutique.</summary>
+        public ShopTab ShopTab { get; set; } = ShopTab.Heroes;
+
+        /// <summary>Onglet de la barre de navigation qui représente une page : Recruter appartient à la Boutique.</summary>
+        public static HubPage NavTabOf(HubPage page) => page == HubPage.Recruit ? HubPage.Shop : page;
+
+        /// <summary>Change d'onglet de boutique : les héros ouvrent la page Recruter, les autres sections la page Boutique.</summary>
+        public void SelectShopTab(ShopTab tab)
+        {
+            ShopTab = tab;
+            SelectTab(tab == ShopTab.Heroes ? HubPage.Recruit : HubPage.Shop);
+        }
+
         public HubLocation Current => _stack[_stack.Count - 1];
         public IReadOnlyList<HubLocation> Stack => _stack;
         public bool IsOnTab => _stack.Count == 1;
