@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.Tests.Editor
         [Test, Description("Vérifie que chaque sprite du HUD pastel (panneau, losange, reflet, skyline) est cuit en asset et que les panneaux sont découpés en 9 — parce qu'un prefab ne référence que des assets et que les coins coupés doivent rester intacts à l'étirement")]
         public void Bake_WritesHudSprites()
         {
-            foreach (var name in new[] { "Panel", "PanelSmall", "Diamond", "Shine", "Skyline", "PanelFrame", "Bracket" })
+            foreach (var name in new[] { "Panel", "PanelSmall", "Diamond", "Shine", "Skyline", "PanelFrame", "Bracket", "Bust" })
                 Assert.That(Resources.Load<Sprite>("UI/" + name), Is.Not.Null, name);
             Assert.That(Resources.Load<Sprite>("UI/Panel").border, Is.EqualTo(new Vector4(15, 15, 15, 15)));
             Assert.That(Resources.Load<Sprite>("UI/PanelSmall").border, Is.EqualTo(new Vector4(9, 9, 9, 9)));
