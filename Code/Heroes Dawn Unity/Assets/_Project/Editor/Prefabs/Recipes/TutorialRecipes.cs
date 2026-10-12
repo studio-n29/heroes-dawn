@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             // ---- Voile et désignation
             var veilRoot = Ui.Rect(root, "Veil").Stretch();
-            var veilColor = new Color(0f, 0f, 0f, 0.7f);
+            var veilColor = Theme.WithAlpha(Theme.Navy, 0.5f);
             Image Veil(string n) { var i = Ui.Img(veilRoot, n, veilColor, null, true); return i; }
             var top = Veil("Top");
             var bottom = Veil("Bottom");

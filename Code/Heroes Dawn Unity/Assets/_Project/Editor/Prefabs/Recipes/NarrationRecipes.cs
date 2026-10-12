@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var root = PrefabContext.NewRoot("DialogueBox");
             var group = root.gameObject.AddComponent<CanvasGroup>();
 
-            var dim = Ui.Img(root, "Dim", Theme.WithAlpha(Color.black, 0.45f), null, true);
+            var dim = Ui.Img(root, "Dim", Theme.WithAlpha(Theme.Navy, 0.45f), null, true);
             dim.rectTransform.Stretch();
             var tap = dim.gameObject.AddComponent<Button>();
             tap.transition = Selectable.Transition.None;

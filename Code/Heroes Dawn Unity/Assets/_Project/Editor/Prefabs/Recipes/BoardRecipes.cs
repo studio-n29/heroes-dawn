@@ -150,7 +150,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             pawn.pivot = new Vector2(0.5f, 0f);
             pawn.sizeDelta = new Vector2(70, 70);
             var shadow = pawn.gameObject.AddComponent<Shadow>();
-            shadow.effectColor = new Color(0, 0, 0, 0.6f);
+            shadow.effectColor = Theme.WithAlpha(Theme.Navy, 0.6f);
             shadow.effectDistance = new Vector2(6, -6);
             return pawn.gameObject;
         }
@@ -165,7 +165,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx)
         {
             var rt = ScreenKit.Root("Board");
-            ScreenKit.Backdrop(rt, Theme.WithAlpha(Theme.Info, 0.16f), Theme.Hex(0x0E1420));
+            ScreenKit.Backdrop(rt, Theme.SkyTop, Theme.SkyBottom);
             ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.86f);
 
             // ---- Barre du haut
@@ -223,7 +223,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(map, "pawnPrefab", ctx.Asset("Widgets/Pawn.prefab").GetComponent<PortraitView>());
 
             // ---- Pop-up d'information de la case visée (déplacement) : se dézoome sur le chemin, « S'y rendre » valide
-            var previewBox = Ui.Panel(rt, "MovePreview", Theme.WithAlpha(Theme.SurfaceDark, 0.96f), 5f, 8f, false);
+            var previewBox = Ui.Panel(rt, "MovePreview", Theme.WithAlpha(Theme.Frost, 0.96f), 5f, 8f, false);
             var previewFrame = previewBox.Frame().At(1f, 0.5f, -30, 20, 520, 480);
             var previewTitle = Ui.Txt(previewBox.transform, "", 36, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
             previewTitle.rectTransform.At(0f, 1f, 18, -12, 484, 52);

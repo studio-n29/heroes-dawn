@@ -24,11 +24,17 @@
 - **Référence comics officielle du projet** : *Secret Wars* (Marvel, 2015). Rendu peint et détaillé, lumière dramatique, palettes crépusculaires (violet, ambre, rouge de la fracture), compositions épiques en plan large.
 - **Traduction dans l'interface** : cadres de case à contour noir épais avec ombre portée décalée, récitatifs jaunes (#FFD23F), titres lettrés à la main, fonds illustrés voilés pour garder la lisibilité.
 
+## Direction actuelle : HUD pastel (octobre 2026)
+La direction « Secret Wars » ci-dessus est remplacée pour l'interface par un **HUD moderne façon *Marvel's Spider-Man*, version pastel** (spec : `Code/docs/specs/2026-10-12-direction-artistique-design.md`, maquette : `Code/docs/specs/assets/2026-10-12-da-hud-pastel.png`).
+- Panneaux de verre givré à coins coupés, filet clair, ombre douce, barre d'accent à gauche ; plus de contour noir épais ni d'ombre dure.
+- Palette : ciel pastel (#A9CDFA, #B7C4F5, #D3C0F0, #F6C4D2), bleu marine #1B2550 (texte, état actif), corail #FF6B5E (action, accent).
+- Combat : alliés en colonne à gauche, frise en haut, ennemis au centre, éventail de 4 cartes de compétence en bas, visible uniquement pour l'agent dont c'est le tour (contour lumineux) ; l'appui maintenu sur une carte affiche la description de son effet.
+
 ## Typographie
 | Usage | Police | Licence |
 |---|---|---|
-| Titres, boutons, chiffres, bandeaux | **Bangers** (lettrage de couverture, capitales condensées) | SIL OFL 1.1 |
-| Textes courants, descriptions, infobulles | **Comic Neue** Bold / Regular (lettrage de bulles, très lisible) | SIL OFL 1.1 |
+| Titres, boutons, chiffres, bandeaux | **Barlow Condensed** ExtraBold Italic, en capitales | SIL OFL 1.1 |
+| Textes courants, descriptions, infobulles | **Barlow Condensed** SemiBold / Regular | SIL OFL 1.1 |
 - Couverture des accents français vérifiée (é, è, à, ç, œ, «, », …).
 - Fichiers et licences : `Code/Heroes Dawn Unity/Assets/_Project/Resources/Fonts/`.
 

@@ -28,9 +28,10 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] LayoutElement layout = null!;
         [SerializeField] FloatingTextView floatPrefab = null!;
         [SerializeField] SkillIconView[] icons = Array.Empty<SkillIconView>();
-        [SerializeField] Tutorial.TutorialTargetMarker readyMarker = null!;
+        [SerializeField, Mvp.OptionalRef] Tutorial.TutorialTargetMarker? readyMarker;
 
         Color _baseFill;
+        Color _nameColor = Color.white;
         bool _ally;
 
         public int UnitId { get; private set; }
@@ -43,6 +44,7 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         void Awake()
         {
+            _nameColor = unitName.color;
             button.onClick.AddListener(() => Tapped?.Invoke(UnitId));
             for (int i = 0; i < icons.Length; i++)
             {
@@ -55,16 +57,14 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             UnitId = d.Id;
             _ally = d.Ally;
-            _baseFill = d.Ally ? Theme.Surface : Theme.Hex(0x2A1C22);
+            _baseFill = d.Ally ? Theme.Surface : Color.Lerp(Theme.Surface, Theme.AccentSoft, 0.35f);
             fill.color = _baseFill;
-            layout.preferredWidth = layout.minWidth = 250;
-            layout.preferredHeight = layout.minHeight = 290;
             sub.text = d.Sub ?? "";
-            portraitArea.color = Color.Lerp(Theme.FamilyColor(d.Family), Color.black, d.Ally ? 0.55f : 0.72f);
+            portraitArea.color = Color.Lerp(Theme.FamilyColor(d.Family), Theme.Navy, d.Ally ? 0.25f : 0.4f);
             strip.color = Theme.FamilyColor(d.Family);
             portrait.Show(d.Portrait);
             unitName.text = d.Name;
-            unitName.color = d.Boss ? Theme.Primary : Color.white;
+            unitName.color = d.Boss ? Theme.Primary : _nameColor;
             hp.SetColor(d.Ally ? Theme.Hp : Theme.HpEnemy);
             name = (d.Ally ? "Ally_" : "Enemy_") + d.Id;
         }
@@ -87,7 +87,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 icons[i].Show(s.Skills != null && i < s.Skills.Length ? s.Skills[i] : default, i);
             bool usable = false;
             if (s.Skills != null) foreach (var sk in s.Skills) usable |= sk.Enabled || sk.Pending;
-            readyMarker.enabled = usable && s.Alive;
+            if (readyMarker != null) readyMarker.enabled = usable && s.Alive;
         }
 
         public void Float(string text, Color color, int size) => Instantiate(floatPrefab, transform).Play(text, color, size);

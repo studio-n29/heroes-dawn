@@ -10,8 +10,8 @@ namespace N29.HeroesDawn.Presentation.Common
 
     /// <summary>
     /// Fabrique d'éléments uGUI construits par code (aucun prefab requis).
-    /// Style « comics » (référence : Secret Wars 2015) : cadres à contour noir épais, ombre portée décalée,
-    /// titres en Bangers, textes courants en Comic Neue.
+    /// Style « HUD pastel » (spec 2026-10-12, référence : Marvel's Spider-Man) : panneaux de verre givré à coins coupés,
+    /// filet clair, ombre douce, accent corail.
     /// </summary>
     public static class Ui
     {
@@ -19,9 +19,9 @@ namespace N29.HeroesDawn.Presentation.Common
         static readonly System.Collections.Generic.Dictionary<TMP_FontAsset, Material> _inked = new System.Collections.Generic.Dictionary<TMP_FontAsset, Material>();
 
         // Polices TextMeshPro générées (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface → Resources/Fonts/TMP).
-        public static TMP_FontAsset TitleFont => _title != null ? _title : (_title = LoadFont("Bangers-Regular"));
-        public static TMP_FontAsset BodyFont => _body != null ? _body : (_body = LoadFont("ComicNeue-Bold"));
-        public static TMP_FontAsset RegularFont => _regular != null ? _regular : (_regular = LoadFont("ComicNeue-Regular"));
+        public static TMP_FontAsset TitleFont => _title != null ? _title : (_title = LoadFont("BarlowCondensed-ExtraBoldItalic"));
+        public static TMP_FontAsset BodyFont => _body != null ? _body : (_body = LoadFont("BarlowCondensed-SemiBold"));
+        public static TMP_FontAsset RegularFont => _regular != null ? _regular : (_regular = LoadFont("BarlowCondensed-Regular"));
 
         static TMP_FontAsset LoadFont(string name)
         {
@@ -130,16 +130,31 @@ namespace N29.HeroesDawn.Presentation.Common
         /// </summary>
         public static Image Panel(Transform parent, string name, Color fill, float border = 4f, float shadow = 8f, bool raycast = true)
         {
-            var frame = Img(parent, name, Theme.Ink, Sprites.Rounded, raycast);
+            // HUD pastel : filet clair (FrostEdge) à coins coupés, fond teinté, ombre douce (jamais d'ombre dure ni de contour noir).
+            var frame = Img(parent, name, Theme.FrostEdge, Sprites.Panel, raycast);
             if (shadow > 0)
             {
                 var sh = frame.gameObject.AddComponent<Shadow>();
-                sh.effectColor = new Color(0, 0, 0, 0.55f);
-                sh.effectDistance = new Vector2(shadow, -shadow);
+                sh.effectColor = new Color(Theme.Navy.r, Theme.Navy.g, Theme.Navy.b, 0.25f);
+                sh.effectDistance = new Vector2(shadow * 0.5f, -shadow * 0.5f);
             }
-            var inner = Img(frame.transform, "Fill", fill, Sprites.Rounded, false);
-            inner.rectTransform.Stretch(border, border, border, border);
+            float edge = Mathf.Min(border, 2f);
+            var inner = Img(frame.transform, "Fill", fill, Sprites.Panel, false);
+            inner.rectTransform.Stretch(edge, edge, edge, edge);
             return inner;
+        }
+
+        /// <summary>Barre d'accent verticale (4 px) sur le bord gauche d'un panneau : signature du HUD. Corail par défaut.</summary>
+        public static Image AccentBar(Image panelFill, Color? color = null)
+        {
+            var bar = Img(panelFill.transform, "AccentBar", color ?? Theme.Accent);
+            var rt = bar.rectTransform;
+            rt.anchorMin = new Vector2(0f, 0f);
+            rt.anchorMax = new Vector2(0f, 1f);
+            rt.pivot = new Vector2(0f, 0.5f);
+            rt.anchoredPosition = Vector2.zero;
+            rt.sizeDelta = new Vector2(4f, -20f);
+            return bar;
         }
 
         public static RectTransform Frame(this Image panelFill) => (RectTransform)panelFill.transform.parent;
@@ -159,6 +174,7 @@ namespace N29.HeroesDawn.Presentation.Common
             t.textWrappingMode = TextWrappingModes.Normal;
             t.overflowMode = TextOverflowModes.Overflow;
             t.lineSpacing = font == FontKind.Title ? -10f : 0f;
+            if (font == FontKind.Title) t.fontStyle = FontStyles.UpperCase;
             return t;
         }
 
@@ -178,12 +194,9 @@ namespace N29.HeroesDawn.Presentation.Common
         public static T Inked<T>(this T g, float size = 2.5f) where T : Graphic
         {
             if (g is TMP_Text tmp) { tmp.fontSharedMaterial = InkedMaterial(tmp.font); return g; }
-            var o = g.gameObject.AddComponent<Outline>();
-            o.effectColor = Theme.Ink;
-            o.effectDistance = new Vector2(size, -size);
             var s = g.gameObject.AddComponent<Shadow>();
-            s.effectColor = new Color(0, 0, 0, 0.8f);
-            s.effectDistance = new Vector2(size + 2, -(size + 2));
+            s.effectColor = new Color(Theme.Navy.r, Theme.Navy.g, Theme.Navy.b, 0.45f);
+            s.effectDistance = new Vector2(size * 0.5f, -size * 0.5f);
             return g;
         }
 
@@ -206,6 +219,13 @@ namespace N29.HeroesDawn.Presentation.Common
             nav.mode = Navigation.Mode.None;
             button.navigation = nav;
 
+            if (bg == Theme.Accent)
+            {
+                // Bouton d'action : reflet diagonal clair sur le dégradé corail.
+                var shine = Img(fill.transform, "Shine", new Color(1f, 1f, 1f, 0.35f), Sprites.Shine);
+                shine.rectTransform.Stretch(0, 0, 0, 0);
+                shine.type = Image.Type.Simple;
+            }
             var text = Txt(fill.transform, label, fontSize, fg, TextAnchor.MiddleCenter, font, "Label");
             text.rectTransform.Stretch(10, 4, 10, 4);
             text.enableAutoSizing = true;
@@ -229,10 +249,10 @@ namespace N29.HeroesDawn.Presentation.Common
 
         public static UiBar Bar(Transform parent, string name, Color fill, Color back, bool withLabel = false, int labelSize = 20)
         {
-            var bg = Img(parent, name, Theme.Ink, Sprites.RoundedSmall);
-            var inner = Img(bg.transform, "Back", back, Sprites.RoundedSmall);
-            inner.rectTransform.Stretch(2, 2, 2, 2);
-            var f = Img(inner.transform, "Fill", fill, Sprites.RoundedSmall);
+            var bg = Img(parent, name, Theme.FrostEdge, Sprites.PanelSmall);
+            var inner = Img(bg.transform, "Back", back, Sprites.PanelSmall);
+            inner.rectTransform.Stretch(1, 1, 1, 1);
+            var f = Img(inner.transform, "Fill", fill, Sprites.PanelSmall);
             var frt = f.rectTransform;
             frt.anchorMin = Vector2.zero;
             frt.anchorMax = Vector2.one;

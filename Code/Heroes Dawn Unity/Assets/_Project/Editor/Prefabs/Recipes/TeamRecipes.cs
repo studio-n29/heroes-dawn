@@ -30,7 +30,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             strip.rectTransform.TopBand(10, 0);
             var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", fill.transform, "Portrait");
             ((RectTransform)portrait.transform).At(0f, 1f, 12, -20, 80, 80);
-            var name = Ui.Txt(fill.transform, "", 30, Color.white, TextAnchor.MiddleLeft, FontKind.Title, "Name");
+            var name = Ui.Txt(fill.transform, "", 30, Theme.Navy, TextAnchor.MiddleLeft, FontKind.Title, "Name");
             name.rectTransform.At(0f, 1f, 102, -18, 158, 38);
             name.AutoSize(30);
             name.Inked(1.5f);
@@ -183,7 +183,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ((RectTransform)portrait.transform).At(0.5f, 0.5f, 0, 0, 180, 180);
             var artWip = ctx.Nest<WipMark>("Widgets/WipMark.prefab", art.transform, "Wip");
             ((RectTransform)artWip.transform).Stretch();
-            artWip.transform.Find("Veil").GetComponent<Image>().color = new Color(0.06f, 0.07f, 0.09f, 0.2f);
+            artWip.transform.Find("Veil").GetComponent<Image>().color = Theme.WithAlpha(Theme.Navy, 0.2f);
             ((RectTransform)artWip.transform.Find("Band")).anchoredPosition = new Vector2(0, -86);
             artWip.FeatureId = WipCatalog.MemberArt.Id;
             var name = Ui.Txt(id.transform, "", 56, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Name");

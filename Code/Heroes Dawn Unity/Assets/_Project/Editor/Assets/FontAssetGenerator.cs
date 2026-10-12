@@ -18,7 +18,7 @@ namespace N29.HeroesDawn.EditorTools.Assets
         public const string ResourcesFolder = "Fonts/TMP";
         const string Folder = "Assets/_Project/Resources/" + ResourcesFolder;
         const string SourceFolder = "Assets/_Project/Resources/Fonts";
-        static readonly string[] Fonts = { "Bangers-Regular", "ComicNeue-Bold", "ComicNeue-Regular" };
+        static readonly string[] Fonts = { "BarlowCondensed-ExtraBoldItalic", "BarlowCondensed-SemiBold", "BarlowCondensed-Regular" };
 
         public static void GenerateAll()
         {
@@ -66,15 +66,15 @@ namespace N29.HeroesDawn.EditorTools.Assets
             }
             inked.shader = fa.material.shader;
             inked.SetTexture(ShaderUtilities.ID_MainTex, fa.atlasTexture);
-            inked.EnableKeyword(ShaderUtilities.Keyword_Outline);
-            inked.SetColor(ShaderUtilities.ID_OutlineColor, Color.black);
-            inked.SetFloat(ShaderUtilities.ID_OutlineWidth, 0.2f);
-            inked.SetFloat(ShaderUtilities.ID_FaceDilate, 0.2f);
+            // HUD pastel : plus de contour noir, une ombre douce bleu marine sous le lettrage.
+            inked.DisableKeyword(ShaderUtilities.Keyword_Outline);
+            inked.SetFloat(ShaderUtilities.ID_OutlineWidth, 0f);
+            inked.SetFloat(ShaderUtilities.ID_FaceDilate, 0f);
             inked.EnableKeyword(ShaderUtilities.Keyword_Underlay);
-            inked.SetColor(ShaderUtilities.ID_UnderlayColor, new Color(0, 0, 0, 0.8f));
-            inked.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, 0.6f);
-            inked.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, -0.6f);
-            inked.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0.1f);
+            inked.SetColor(ShaderUtilities.ID_UnderlayColor, new Color(0.106f, 0.145f, 0.314f, 0.45f));
+            inked.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, 0.4f);
+            inked.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, -0.4f);
+            inked.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0.3f);
             EditorUtility.SetDirty(inked);
         }
     }

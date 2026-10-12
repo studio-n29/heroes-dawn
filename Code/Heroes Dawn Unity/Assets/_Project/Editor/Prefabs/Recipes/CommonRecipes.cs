@@ -68,7 +68,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ring.raycastTarget = false;
             var disc = Ui.Img(root, "Disc", Theme.Surface3, Sprites.Circle);
             disc.rectTransform.Stretch(4, 4, 4, 4);
-            var shade = Ui.Img(disc.transform, "Shade", new Color(0, 0, 0, 0.25f), Sprites.VerticalGradient);
+            var shade = Ui.Img(disc.transform, "Shade", Theme.WithAlpha(Theme.Navy, 0.25f), Sprites.VerticalGradient);
             shade.rectTransform.Stretch();
             shade.rectTransform.localScale = new Vector3(1, -1, 1);
             var initial = Ui.Txt(disc.transform, "?", 48, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Initial").AutoSize(60);
@@ -147,7 +147,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         {
             var fill = RecipeKit.PanelRoot("Toast", Theme.WithAlpha(Theme.Primary, 0.78f), 4f, 0f);
             var frame = fill.Frame();
-            frame.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.55f); // translucide : le plateau reste lisible dessous
+            frame.GetComponent<Image>().color = Theme.WithAlpha(Theme.Navy, 0.55f); // translucide : le plateau reste lisible dessous
             frame.Pref(-1, 64);
             var h = frame.HLayout(0, 0);
             h.padding = new RectOffset(34, 34, 12, 12);

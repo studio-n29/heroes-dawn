@@ -584,6 +584,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         void Submit(CombatCommand cmd)
         {
             _sim?.Submit(cmd);
+            // Tutoriel : l'ordre donné lève la pause de l'étape (un autre allié prêt garderait sinon la cible « compétences » active et figerait le combat).
+            if (cmd.Type == CommandType.Skill) _tutorial?.Signal(TutorialSignal.SkillUsed);
             _pendingSlot = -1;
             _pendingCombo = null;
             _pendingSync = false;

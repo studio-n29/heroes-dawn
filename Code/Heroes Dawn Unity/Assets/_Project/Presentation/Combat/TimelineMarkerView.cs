@@ -19,7 +19,7 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         public void Show(TimelineMarkerData d)
         {
-            disc.color = d.Ally ? Theme.FamilyColor(d.Family) : Color.Lerp(Theme.HpEnemy, Color.black, 0.15f);
+            disc.color = d.Ally ? Theme.FamilyColor(d.Family) : Color.Lerp(Theme.HpEnemy, Theme.Navy, 0.15f);
             initial.text = d.Initial;
             ring.gameObject.SetActive(d.Ready || d.InPrep);
             ring.color = d.Ready ? Color.white : d.Ally ? Theme.Primary : Theme.Danger;

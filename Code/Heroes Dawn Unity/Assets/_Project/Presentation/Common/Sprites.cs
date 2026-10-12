@@ -5,7 +5,7 @@ namespace N29.HeroesDawn.Presentation.Common
     /// <summary>Sprites générés au démarrage (aucun asset requis) : rectangle arrondi 9-slice, disque, anneau, dégradé.</summary>
     public static class Sprites
     {
-        static Sprite _rounded, _roundedSmall, _circle, _ring, _gradient, _burst, _cloud;
+        static Sprite _rounded, _roundedSmall, _circle, _ring, _gradient, _burst, _cloud, _panel, _panelSmall, _diamond, _shine, _skyline;
 
         // Assets générés (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface → Resources/UI) ; repli procédural sinon.
         public static Sprite Rounded => _rounded != null ? _rounded : (_rounded = Load("Rounded"));
@@ -18,8 +18,18 @@ namespace N29.HeroesDawn.Presentation.Common
         /// <summary>Nuage doux aux bords irréguliers (brouillard de guerre).</summary>
         public static Sprite Cloud => _cloud != null ? _cloud : (_cloud = Load("Cloud"));
 
+        /// <summary>Rectangle à coins coupés 9-slice (panneaux du HUD pastel).</summary>
+        public static Sprite Panel => _panel != null ? _panel : (_panel = Load("Panel"));
+        public static Sprite PanelSmall => _panelSmall != null ? _panelSmall : (_panelSmall = Load("PanelSmall"));
+        /// <summary>Losange (marqueurs de la frise, pictos).</summary>
+        public static Sprite Diamond => _diamond != null ? _diamond : (_diamond = Load("Diamond"));
+        /// <summary>Bande diagonale lumineuse (reflet des cartes et boutons).</summary>
+        public static Sprite Shine => _shine != null ? _shine : (_shine = Load("Shine"));
+        /// <summary>Silhouette de ville (bas des fonds d'écran).</summary>
+        public static Sprite Skyline => _skyline != null ? _skyline : (_skyline = Load("Skyline"));
+
         /// <summary>Noms des sprites d'interface générés (Resources/UI/&lt;nom&gt;.png).</summary>
-        public static readonly string[] UiSpriteNames = { "Rounded", "RoundedSmall", "Circle", "Ring", "VerticalGradient", "Burst", "Cloud" };
+        public static readonly string[] UiSpriteNames = { "Rounded", "RoundedSmall", "Circle", "Ring", "VerticalGradient", "Burst", "Cloud", "Panel", "PanelSmall", "Diamond", "Shine", "Skyline" };
 
         static Sprite Load(string name) { var s = Resources.Load<Sprite>("UI/" + name); return s != null ? s : Procedural(name); }
 
@@ -35,6 +45,11 @@ namespace N29.HeroesDawn.Presentation.Common
                 case "VerticalGradient": return MakeGradient();
                 case "Burst": return MakeBurst(256, 14);
                 case "Cloud": return MakeCloud(128);
+                case "Panel": return MakeCutPanel(64, 14);
+                case "PanelSmall": return MakeCutPanel(32, 8);
+                case "Diamond": return MakeDiamond(128);
+                case "Shine": return MakeShine();
+                case "Skyline": return MakeSkyline(512, 128);
                 default: throw new System.ArgumentException("Sprite d'interface inconnu : " + name);
             }
         }
@@ -151,6 +166,85 @@ namespace N29.HeroesDawn.Presentation.Common
             t.SetPixels32(px);
             t.Apply();
             return Sprite.Create(t, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        /// <summary>Rectangle dont les coins haut-droit et bas-gauche sont coupés en biseau (9-slice).</summary>
+        static Sprite MakeCutPanel(int size, int cut)
+        {
+            var t = NewTex(size, size);
+            var px = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                float fx = x + 0.5f, fy = y + 0.5f;
+                float dTopRight = ((size - fx) + (size - fy) - cut) / 1.4142f;   // > 0 à l'intérieur du biseau haut-droit
+                float dBottomLeft = (fx + fy - cut) / 1.4142f;                    // idem bas-gauche
+                float edge = Mathf.Min(Mathf.Min(fx, size - fx), Mathf.Min(fy, size - fy));
+                float a = Mathf.Clamp01(Mathf.Min(Mathf.Min(dTopRight, dBottomLeft), edge) + 0.5f);
+                px[y * size + x] = new Color32(255, 255, 255, (byte)(a * 255));
+            }
+            t.SetPixels32(px);
+            t.Apply();
+            int b = cut + 1;
+            return Sprite.Create(t, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(b, b, b, b));
+        }
+
+        static Sprite MakeDiamond(int size)
+        {
+            var t = NewTex(size, size);
+            var px = new Color32[size * size];
+            float c = size * 0.5f;
+            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                float d = (Mathf.Abs(x + 0.5f - c) + Mathf.Abs(y + 0.5f - c)) / 1.4142f;
+                float a = Mathf.Clamp01(c / 1.4142f - d + 0.5f);
+                px[y * size + x] = new Color32(255, 255, 255, (byte)(a * 255));
+            }
+            t.SetPixels32(px);
+            t.Apply();
+            return Sprite.Create(t, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        /// <summary>Bande oblique douce : transparente aux bords, la plus claire au centre.</summary>
+        static Sprite MakeShine()
+        {
+            const int w = 64, h = 64;
+            var t = NewTex(w, h);
+            var px = new Color32[w * h];
+            for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                float u = (x + y * 0.5f) / (w + h * 0.5f);
+                float k = Mathf.Clamp01(1f - Mathf.Abs(u - 0.5f) * 2f);
+                px[y * w + x] = new Color32(255, 255, 255, (byte)(k * k * 0.8f * 255));
+            }
+            t.SetPixels32(px);
+            t.Apply();
+            return Sprite.Create(t, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        /// <summary>Immeubles de hauteurs déterministes (la même ville à chaque génération).</summary>
+        static Sprite MakeSkyline(int w, int h)
+        {
+            var t = NewTex(w, h);
+            var px = new Color32[w * h];
+            var heights = new int[w];
+            int x0 = 0, seed = 7;
+            while (x0 < w)
+            {
+                seed = (seed * 37 + 11) % 97;
+                int bw = 22 + seed % 34;
+                int bh = (int)(h * (0.25f + 0.7f * ((seed * 13) % 17) / 16f));
+                for (int x = x0; x < Mathf.Min(w, x0 + bw); x++) heights[x] = bh;
+                x0 += bw + 3 + seed % 5;
+            }
+            for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+                px[y * w + x] = new Color32(255, 255, 255, (byte)(y < heights[x] ? 255 : 0));
+            t.SetPixels32(px);
+            t.Apply();
+            return Sprite.Create(t, new Rect(0, 0, w, h), new Vector2(0.5f, 0f), 100f);
         }
 
         static Sprite MakeGradient()

@@ -15,7 +15,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx)
         {
             var root = PrefabContext.NewRoot("WipMark");
-            var veil = Ui.Img(root, "Veil", new Color(0.06f, 0.07f, 0.09f, 0.62f), Sprites.Rounded, true);
+            var veil = Ui.Img(root, "Veil", Theme.WithAlpha(Theme.Navy, 0.62f), Sprites.Rounded, true);
             veil.type = UnityEngine.UI.Image.Type.Sliced;
             veil.rectTransform.Stretch();
             var band = Ui.Img(root, "Band", Theme.Primary, Sprites.RoundedSmall);
