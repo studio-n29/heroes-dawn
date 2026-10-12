@@ -110,9 +110,9 @@ namespace N29.HeroesDawn.Domain.Combat
             ResolveEncounters(output);
             bool someoneActs = false;
             foreach (var u in _units) if (u.IsReady) someoneActs = true;
-            if (!someoneActs && !Auto && !IsOver)
+            if (!someoneActs && !Auto && !IsOver && InterruptOpportunity())
             {
-                // Point d action vide : la frise marque une pause pendant laquelle le joueur peut interrompre.
+                // Menace imminente (un ennemi va arriver au point d action) et un avatar prêt : courte pause pendant laquelle le joueur peut interrompre.
                 InterruptWindowOpen = true;
                 output.Add(new EmptyPointPauseEvent(Tick, _b.TimelinePausePerEmptyPointMs));
             }

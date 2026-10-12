@@ -39,6 +39,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] RectTransform descPanel = null!;
         [SerializeField] TMP_Text descTitle = null!;
         [SerializeField] TMP_Text descText = null!;
+        [SerializeField, Mvp.OptionalRef] RectTransform? dropZone;
 
         readonly Dictionary<int, UnitCardView> _cards = new Dictionary<int, UnitCardView>();
         Coroutine? _bannerFade;
@@ -54,6 +55,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         public event Action? ComboClicked;
         public event Action? CycleClicked;
         public event Action<int>? SkillClicked;
+        public event Action<int>? SkillDragBegan;
+        public event Action<int, int>? SkillDropped;
         public event Action<int>? UnitTapped;
 
         /// <summary>Boutons Auto et vitesse (tests PlayMode : clics réels).</summary>
@@ -71,6 +74,8 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         /// <summary>L'éventail de compétences est-il affiché ? (tests PlayMode)</summary>
         public bool FanVisible => fanRoot.gameObject.activeSelf;
+        /// <summary>Racine de l'éventail (tests PlayMode).</summary>
+        public Transform FanRootForTests => fanRoot;
 
         /// <summary>Description affichée pendant l'appui maintenu sur une carte (tests PlayMode).</summary>
         public bool DescriptionVisible => descPanel.gameObject.activeSelf;
@@ -102,9 +107,57 @@ namespace N29.HeroesDawn.Presentation.Combat
                 int slot = i;
                 fan[i].Clicked += () => SkillClicked?.Invoke(slot);
                 fan[i].Holding += ShowDescription;
+                fan[i].DragBegan += card => OnDragBegan(slot, card);
+                fan[i].DragEnded += (card, at) => OnDragEnded(slot, at);
             }
             descPanel.gameObject.SetActive(false);
             fanRoot.gameObject.SetActive(false);
+        }
+
+        void OnDragBegan(int slot, SkillIconView card)
+        {
+            descPanel.gameObject.SetActive(false);
+            if (dropZone != null) dropZone.gameObject.SetActive(!card.Data.NeedsTarget);
+            SkillDragBegan?.Invoke(slot);
+        }
+
+        void OnDragEnded(int slot, Vector2 screenPos)
+        {
+            if (dropZone != null) dropZone.gameObject.SetActive(false);
+            SkillDropped?.Invoke(slot, ResolveDrop(screenPos));
+        }
+
+        /// <summary>Où la carte est lâchée : sur l'éventail (annule), sur une carte d'unité (sa cible) ou dans le vide.</summary>
+        int ResolveDrop(Vector2 screenPos)
+        {
+            var canvas = GetComponentInParent<Canvas>();
+            var cam = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+            if (RectTransformUtility.RectangleContainsScreenPoint(fanRoot, screenPos, cam)) return ICombatView.DropCancel;
+            return UnitAt(screenPos) ?? ICombatView.DropTerrain;
+        }
+
+        /// <summary>Identifiant de l'unité dont la carte est sous ce point de l'écran (tests et dépose), null si aucune.</summary>
+        public int? UnitAt(Vector2 screenPos)
+        {
+            var es = UnityEngine.EventSystems.EventSystem.current;
+            if (es == null) return null;
+            var hits = new List<UnityEngine.EventSystems.RaycastResult>();
+            es.RaycastAll(new UnityEngine.EventSystems.PointerEventData(es) { position = screenPos }, hits);
+            foreach (var h in hits)
+            {
+                var c = h.gameObject.GetComponentInParent<UnitCardView>();
+                if (c != null) return c.UnitId;
+            }
+            return null;
+        }
+
+        /// <summary>Position de l'écran du centre de la carte d'une unité (tests PlayMode : glisser sur une cible).</summary>
+        public Vector2 UnitScreenPoint(int unitId)
+        {
+            var rt = (RectTransform)_cards[unitId].transform;
+            var canvas = GetComponentInParent<Canvas>();
+            var cam = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+            return RectTransformUtility.WorldToScreenPoint(cam, rt.TransformPoint(rt.rect.center));
         }
 
         /// <summary>Appui maintenu sur une carte : description de l'effet au-dessus de l'éventail, jusqu'au relâchement.</summary>

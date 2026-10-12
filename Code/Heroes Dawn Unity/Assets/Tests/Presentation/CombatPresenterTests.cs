@@ -79,6 +79,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que la simulation avance avec le temps réel, deux fois plus vite en ×2 — parce que la vitesse accélère simulation et affichage ensemble (doc 07)")]
         public void Tick_AdvancesSimulationBySpeed()
         {
+            _view.ClickSpeed(); _view.ClickSpeed(); // 2 → 3 → 1 : on mesure à partir de ×1
             _view.ClickAuto(); // en Auto, la frise ne s'arrête jamais : on mesure le seul rythme des pas
             _p.Tick();
             int t0 = _sim.Tick;
@@ -87,7 +88,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _view.ClickSpeed();
             int t1 = _sim.Tick;
             for (int i = 0; i < 20; i++) _p.Tick();
-            Assert.That(normal, Is.GreaterThan(0), "un pas toutes les 0,5 s");
+            Assert.That(normal, Is.GreaterThan(0), "un pas toutes les 0,35 s");
             Assert.That(_sim.Tick - t1, Is.InRange(2 * normal - 1, 2 * normal + 1));
         }
 
@@ -110,6 +111,72 @@ namespace N29.HeroesDawn.Tests.Presentation
             _view.ClickSkill(slot);
             Assert.That(_view.Hint, Is.EqualTo(Loc.T("combat.choose_target")));
             Assert.That(_view.States.Where(s => !s.Ally && s.Alive).All(s => s.Targetable), Is.True);
+        }
+
+        int ReadyWithGeneralSkill()
+        {
+            TickUntil(() => _view.Skills.Visible);
+            Assume.That(_view.Skills.Visible, "aucun allié prêt");
+            var selected = _view.States.Single(s => s.Selected).Id;
+            var u = _sim.Unit(selected);
+            for (int i = 0; i < CombatSimulation.ActiveSkillCount(u); i++)
+            {
+                var t = u.Skills[i].Target;
+                if (t != TargetRule.SingleEnemy && t != TargetRule.SingleAlly && _sim.CanUse(selected, i)) return i;
+            }
+            Assume.That(false, "pas de compétence générale prête");
+            return -1;
+        }
+
+        [Test, Description("Vérifie qu'en prenant une carte ciblée les cibles valides s'allument puis que la déposer sur un ennemi lance la compétence — parce que les compétences ciblées se jouent au glisser-déposer sur la cible")]
+        public void DragTargetedSkill_OnAnEnemy_UsesIt()
+        {
+            int slot = ReadyWithSingleTargetSkill();
+            Assume.That(AliveEnemies, Is.GreaterThan(1));
+            int actor = _view.States.Single(s => s.Selected).Id;
+            Assert.That(_view.States.Single(s => s.Id == actor).Skills![slot].NeedsTarget, Is.True);
+            _view.BeginDragSkill(slot);
+            Assert.That(_view.States.Where(s => !s.Ally && s.Alive).All(s => s.Targetable), Is.True, "les cibles valides s'allument");
+            int enemy = _sim.Units.First(u => u.Side == Side.Enemy && u.IsAlive).Id;
+            _view.DropSkill(slot, enemy);
+            _p.Tick();
+            Assert.That(_sim.Unit(actor).IsReady, Is.False, "la compétence a été lancée sur la cible");
+        }
+
+        [Test, Description("Vérifie que lâcher une carte ciblée dans le vide ou la rendre à l'éventail ne lance rien et éteint les cibles — parce qu'un lâcher invalide annule sans effet")]
+        public void DragTargetedSkill_DroppedElsewhere_Cancels()
+        {
+            int slot = ReadyWithSingleTargetSkill();
+            Assume.That(AliveEnemies, Is.GreaterThan(1));
+            int actor = _view.States.Single(s => s.Selected).Id;
+            _view.BeginDragSkill(slot);
+            _view.DropSkill(slot, ICombatView.DropTerrain);
+            Assert.That(_sim.Unit(actor).IsReady, Is.True, "rien n'est lancé");
+            Assert.That(_view.States.Where(s => !s.Ally).All(s => !s.Targetable), Is.True, "les cibles sont éteintes");
+            _view.BeginDragSkill(slot);
+            _view.DropSkill(slot, ICombatView.DropCancel);
+            Assert.That(_sim.Unit(actor).IsReady, Is.True);
+        }
+
+        [Test, Description("Vérifie qu'une compétence générale se lance en la lâchant dans le vide — parce qu'elle n'a pas de cible à viser")]
+        public void DragGeneralSkill_OnTerrain_UsesIt()
+        {
+            int slot = ReadyWithGeneralSkill();
+            int actor = _view.States.Single(s => s.Selected).Id;
+            Assert.That(_view.States.Single(s => s.Id == actor).Skills![slot].NeedsTarget, Is.False);
+            _view.BeginDragSkill(slot);
+            _view.DropSkill(slot, ICombatView.DropTerrain);
+            _p.Tick();
+            Assert.That(_sim.Unit(actor).IsReady, Is.False);
+        }
+
+        [Test, Description("Vérifie que lâcher une carte sans l'avoir prise n'a aucun effet — parce qu'un lâcher parasite ne doit rien lancer")]
+        public void DropWithoutDrag_IsIgnored()
+        {
+            int slot = ReadyWithGeneralSkill();
+            int actor = _view.States.Single(s => s.Selected).Id;
+            _view.DropSkill(slot, ICombatView.DropTerrain);
+            Assert.That(_sim.Unit(actor).IsReady, Is.True);
         }
 
         [Test, Description("Vérifie que Retour pendant le ciblage l'annule — parce qu'Échap annule le ciblage (W11b, spec §7)")]
@@ -154,15 +221,16 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_sim.Auto, Is.True);
         }
 
-        [Test, Description("Vérifie que la vitesse tourne entre ×1, ×2 et ×3 — parce que c'est le comportement actuel du bouton de vitesse")]
+        [Test, Description("Vérifie que la vitesse démarre à ×2 puis tourne entre ×3, ×1 et ×2 — parce que le combat est rapide par défaut (spec 0.8.0)")]
         public void Speed_Cycles1To3()
         {
-            _view.ClickSpeed();
-            Assert.That(_view.TopBar.SpeedText, Is.EqualTo(Loc.F("combat.speed", 2)));
+            Assert.That(_view.TopBar.SpeedText, Is.EqualTo(Loc.F("combat.speed", 2)), "vitesse par défaut");
             _view.ClickSpeed();
             Assert.That(_view.TopBar.SpeedText, Is.EqualTo(Loc.F("combat.speed", 3)));
             _view.ClickSpeed();
             Assert.That(_view.TopBar.SpeedText, Is.EqualTo(Loc.F("combat.speed", 1)));
+            _view.ClickSpeed();
+            Assert.That(_view.TopBar.SpeedText, Is.EqualTo(Loc.F("combat.speed", 2)));
         }
 
         [Test, Description("Vérifie que Retraite demande une confirmation — parce qu'une retraite vaut défaite et recul d'une case (W11a)")]

@@ -10,6 +10,9 @@ namespace N29.HeroesDawn.Presentation.Combat
     /// <summary>Combat : unités, compétences, combo, barre du haut, journal, bandeau, retours visuels. Raccourcis 1-3, C, A, Tab relayés.</summary>
     public interface ICombatView : IView
     {
+        /// <summary>Valeurs de <see cref="SkillDropped"/> : lâcher dans le vide, ou annuler.</summary>
+        public const int DropTerrain = -1;
+        public const int DropCancel = -2;
         event Action? RetreatClicked;
         event Action? AutoClicked;
         event Action? SpeedClicked;
@@ -19,6 +22,10 @@ namespace N29.HeroesDawn.Presentation.Combat
         event Action? ComboClicked;
         event Action? CycleClicked;
         event Action<int>? SkillClicked;
+        /// <summary>Une carte de compétence est prise (emplacement 0 à 3).</summary>
+        event Action<int>? SkillDragBegan;
+        /// <summary>Carte lâchée : identifiant de l'unité visée, <see cref="DropTerrain"/> (dans le vide) ou <see cref="DropCancel"/> (retour dans l'éventail).</summary>
+        event Action<int, int>? SkillDropped;
         event Action<int>? UnitTapped;
 
         void BuildUnits(IReadOnlyList<UnitCardData> units);

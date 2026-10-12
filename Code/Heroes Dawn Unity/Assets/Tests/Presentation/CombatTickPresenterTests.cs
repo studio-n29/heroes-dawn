@@ -42,6 +42,7 @@ namespace N29.HeroesDawn.Tests.Presentation
                                      modals, new FakeToasts(), new LocLocalization(), _clock, new BackButtonRouter(new FakeBackInput(), modals));
             _view.Show();
             _p.Start();
+            _view.ClickSpeed(); _view.ClickSpeed(); // ×2 par défaut → ×3 → ×1 : les tests comptent en images de 0,1 s à ×1
         }
 
         void Calm()
@@ -49,29 +50,55 @@ namespace N29.HeroesDawn.Tests.Presentation
             foreach (var u in _sim.Units) u.Point = 0;
         }
 
-        [Test, Description("Vérifie que la frise ne fait qu'un pas toutes les 0,5 s de temps réel (cinq images de 0,1 s) — parce que le déplacement se fait point par point avec une transition de 0,5 s")]
-        public void Timeline_StepsEveryHalfSecond()
+        [Test, Description("Vérifie que la frise ne fait qu'un pas toutes les 0,35 s de temps réel à ×1 (quatre images de 0,1 s) — parce que le déplacement se fait point par point avec une transition de 0,35 s")]
+        public void Timeline_StepsEveryStepDuration()
         {
             Calm();
             int t0 = _sim.Tick;
-            for (int i = 0; i < 4; i++) _p.Tick();
-            Assert.That(_sim.Tick, Is.EqualTo(t0), "0,4 s : pas encore de pas");
+            for (int i = 0; i < 3; i++) _p.Tick();
+            Assert.That(_sim.Tick, Is.EqualTo(t0), "0,3 s : pas encore de pas");
             _p.Tick();
-            Assert.That(_sim.Tick, Is.EqualTo(t0 + 1), "0,5 s : un pas");
+            Assert.That(_sim.Tick, Is.EqualTo(t0 + 1), "0,4 s : un pas");
         }
 
-        [Test, Description("Vérifie qu'après un pas qui laisse le point d'action vide, la frise attend 1,5 s avant le pas suivant et que le joueur peut interrompre pendant ce temps — parce que la fenêtre d'interruption dure 1,5 s")]
-        public void EmptyActionPoint_PausesTheTimelineFor1500ms()
+        [Test, Description("Vérifie que la pause de 1,2 s n'a lieu que lorsqu'un ennemi va arriver au point d'action, que le joueur peut interrompre pendant ce temps et que la frise reprend ensuite — parce que les points vides sans menace ne doivent plus ralentir le combat")]
+        public void ImminentEnemy_PausesTheTimelineFor1200ms()
         {
             Calm();
-            for (int i = 0; i < 5; i++) _p.Tick();
+            var enemy = _sim.Units.First(u => u.Side == Side.Enemy);
+            enemy.Point = enemy.ActionPoint - 2;
+            for (int i = 0; i < 4; i++) _p.Tick();
             int tick = _sim.Tick;
             Assert.That(_sim.InterruptWindowOpen, Is.True);
-            Assert.That(_p.PauseLeft, Is.EqualTo(1.5f).Within(0.01f));
-            for (int i = 0; i < 14; i++) _p.Tick();
-            Assert.That(_sim.Tick, Is.EqualTo(tick), "1,4 s : toujours en pause");
+            Assert.That(_p.PauseLeft, Is.EqualTo(1.2f).Within(0.01f));
+            for (int i = 0; i < 11; i++) _p.Tick();
+            Assert.That(_sim.Tick, Is.EqualTo(tick), "1,1 s : toujours en pause");
             for (int i = 0; i < 6; i++) _p.Tick();
             Assert.That(_sim.Tick, Is.GreaterThan(tick), "la frise a repris");
+        }
+
+        [Test, Description("Vérifie qu'aucune pause n'est ouverte quand aucun ennemi n'est sur le point d'agir — parce que c'était la cause d'un combat beaucoup trop long")]
+        public void NoThreat_NeverPauses()
+        {
+            Calm();
+            for (int i = 0; i < 20; i++) _p.Tick();
+            Assert.That(_p.PauseLeft, Is.EqualTo(0f));
+            Assert.That(_sim.InterruptWindowOpen, Is.False);
+        }
+
+        [Test, Description("Vérifie que la pause d'interruption passe deux fois plus vite à ×2 — parce que la vitesse du combat s'applique aux pauses comme aux pas")]
+        public void Pause_ScalesWithCombatSpeed()
+        {
+            _view.ClickSpeed(); // ×1 → ×2
+            Calm();
+            var enemy = _sim.Units.First(u => u.Side == Side.Enemy);
+            enemy.Point = enemy.ActionPoint - 2;
+            for (int i = 0; i < 2; i++) _p.Tick();
+            Assert.That(_p.PauseLeft, Is.EqualTo(1.2f).Within(0.01f));
+            for (int i = 0; i < 3; i++) _p.Tick();
+            Assert.That(_p.PauseLeft, Is.EqualTo(0.6f).Within(0.02f), "0,3 s réelles à ×2 = 0,6 s de pause écoulées");
+            for (int i = 0; i < 3; i++) _p.Tick();
+            Assert.That(_p.PauseLeft, Is.LessThanOrEqualTo(0.02f), "0,6 s réelles à ×2 = 1,2 s de pause");
         }
 
         [Test, Description("Vérifie que le tour d'un agent laisse 30 s au joueur, que le décompte baisse en temps réel et que passé ce délai l'unité passe son tour et repart au point 3 — parce que la frise ne doit jamais rester figée")]
@@ -96,7 +123,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             var enemy = _sim.Units.First(u => u.Side == Side.Enemy);
             enemy.Point = enemy.ActionPoint - 1;
             for (int i = 0; i < 5; i++) _p.Tick();
-            Assert.That(_p.PauseLeft, Is.InRange(0.4f, 1.5f), "délai aléatoire borné par l'équilibrage");
+            Assert.That(_p.PauseLeft, Is.InRange(0.15f, 0.71f), "délai aléatoire borné par l'équilibrage (0,3 à 0,7 s)");
         }
 
         [Test, Description("Vérifie qu'un ennemi qui agit en mode Auto ne déclenche ni fenêtre d'interruption ni délai — parce que l'Auto doit enchaîner")]

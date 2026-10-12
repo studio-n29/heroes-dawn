@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3548455231312208637}
   - component: {fileID: 4610065755460766619}
   - component: {fileID: 7782802923999350162}
+  - component: {fileID: 287472354156236950}
   m_Layer: 5
   m_Name: Frame
   m_TagString: Untagged
@@ -134,6 +135,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09701b5c99c0aa0429246317807eb43d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: N29.HeroesDawn.Presentation::N29.HeroesDawn.Presentation.Combat.SkillHoldTrigger
+--- !u!114 &287472354156236950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 84928074380428755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2aeb031d83dc804e89b02e6ddf24ac5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: N29.HeroesDawn.Presentation::N29.HeroesDawn.Presentation.Combat.SkillCardDrag
+  card: {fileID: 7110991214700231455}
+  group: {fileID: 5733583279149539319}
 --- !u!1 &645682438576842319
 GameObject:
   m_ObjectHideFlags: 0
@@ -297,6 +312,7 @@ MonoBehaviour:
   cooldown: {fileID: 1820297713488386823}
   label: {fileID: 7594685101885963346}
   hold: {fileID: 7782802923999350162}
+  drag: {fileID: 287472354156236950}
   group: {fileID: 5733583279149539319}
 --- !u!1 &910047742403901728
 GameObject:

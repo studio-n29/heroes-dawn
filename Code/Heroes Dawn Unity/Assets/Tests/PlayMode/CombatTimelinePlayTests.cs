@@ -95,6 +95,36 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(view.DescriptionVisible, Is.False, "relâché : la description disparaît");
         }
 
+        static void DragCard(SkillIconView card, Vector2 to)
+        {
+            var frame = card.transform.Find("Frame").gameObject;
+            var es = UnityEngine.EventSystems.EventSystem.current;
+            var e = new UnityEngine.EventSystems.PointerEventData(es) { position = to };
+            UnityEngine.EventSystems.ExecuteEvents.Execute(frame, e, UnityEngine.EventSystems.ExecuteEvents.beginDragHandler);
+            UnityEngine.EventSystems.ExecuteEvents.Execute(frame, e, UnityEngine.EventSystems.ExecuteEvents.dragHandler);
+            UnityEngine.EventSystems.ExecuteEvents.Execute(frame, e, UnityEngine.EventSystems.ExecuteEvents.endDragHandler);
+        }
+
+        [UnityTest, Timeout(300000), Description("Vérifie que glisser une carte de compétence jusqu'à sa cible (ou dans le vide pour une compétence générale) la lance et la fait revenir dans l'éventail — parce que c'est le geste voulu pour jouer ses cartes")]
+        public IEnumerator Fan_DragAndDrop_PlaysTheCard()
+        {
+            yield return IntoCombat();
+            var view = Object.FindAnyObjectByType<CombatView>()!;
+            yield return PlayModeHarness.WaitFor(() => view.FanVisible, 2400);
+            var sim = ActivityGamesPlayTests.Container.Resolve<N29.HeroesDawn.Application.Features.Combat.IActiveCombatReadModel>().Simulation!;
+            var actor = sim.Units.First(u => u.Side == N29.HeroesDawn.Domain.Combat.Side.Ally && u.IsReady);
+            int slot = -1;
+            for (int i = 0; i < 3; i++) if (view.SkillCard(i).Data.Enabled) { slot = i; break; }
+            Assume.That(slot, Is.GreaterThanOrEqualTo(0), "aucune carte lançable");
+            var card = view.SkillCard(slot);
+            var enemy = sim.Units.First(u => u.Side == N29.HeroesDawn.Domain.Combat.Side.Enemy && u.IsAlive);
+            var target = card.Data.NeedsTarget ? view.UnitScreenPoint(enemy.Id) : new Vector2(Screen.width * 0.92f, Screen.height * 0.2f);
+            DragCard(card, target);
+            Assert.That(card.transform.parent, Is.SameAs(view.FanRootForTests), "la carte est revenue dans l'éventail");
+            yield return PlayModeHarness.WaitFor(() => !actor.IsReady, 600);
+            Assert.That(actor.IsReady, Is.False, "la compétence a été lancée");
+        }
+
         [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures de l'éventail de compétences et de la description d'une carte — parce que ces rendus se relisent à l'œil")]
         public IEnumerator CaptureTheFan()
         {

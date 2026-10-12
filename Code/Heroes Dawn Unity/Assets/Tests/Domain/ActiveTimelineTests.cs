@@ -98,6 +98,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
             Calm(s);
             At(s.Unit(1), 0);
+            s.Unit(2).Point = s.Unit(2).ActionPoint - 2; // menace imminente : la fenêtre d'interruption s'ouvre
             int idx = C.AvatarSkills.ToList().FindIndex(a => a.Id.Value == "avatar_mend");
             s.Submit(CombatCommand.UseAvatar(idx, -1));
             s.Step(1);

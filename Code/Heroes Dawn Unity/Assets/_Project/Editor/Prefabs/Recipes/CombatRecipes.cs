@@ -280,6 +280,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             nav.mode = Navigation.Mode.None;
             button.navigation = nav;
             var hold = frame.gameObject.AddComponent<SkillHoldTrigger>();
+            var drag = frame.gameObject.AddComponent<SkillCardDrag>();
+            ctx.Wire(drag, "card", root);
+            ctx.Wire(drag, "group", group);
             var disc = Ui.Img(frame.transform, "Disc", Theme.Primary, Sprites.Panel);
             disc.rectTransform.Stretch(3, 3, 3, 3);
             var shine = Ui.Img(disc.transform, "Shine", new Color(1f, 1f, 1f, 0.35f), Sprites.Shine);
@@ -319,6 +322,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "cooldown", cooldown);
             ctx.Wire(view, "label", label);
             ctx.Wire(view, "hold", hold);
+            ctx.Wire(view, "drag", drag);
             ctx.Wire(view, "group", group);
             return root.gameObject;
         }
@@ -514,6 +518,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             descText.rectTransform.At(0f, 1f, 22, -58, 656, 86);
             descFill.Frame().gameObject.SetActive(false);
 
+            // ---- Zone de dépose (compétence générale) : visible seulement pendant le glissement d'une carte sans cible
+            var dropFill = Ui.Panel(rt, "DropZone", Theme.WithAlpha(Theme.Glow, 0.35f), 3f, 0f, false);
+            dropFill.Frame().At(0.5f, 0f, 235, 262, 1000, 120);
+            var dropText = Ui.LocTxt(dropFill.transform, "combat.drop_here", 44, Theme.Navy, TextAnchor.MiddleCenter, FontKind.Title, "Label");
+            dropText.rectTransform.Stretch();
+            dropFill.Frame().gameObject.AddComponent<Pulse>().Amplitude = 0.02f;
+            dropFill.Frame().gameObject.SetActive(false);
+
             // ---- Combo
             var combo = Ui.Btn(rt, "", Theme.Danger, Color.white, null!, 40, FontKind.Title, "Combo");
             combo.Rect.At(0f, 0f, 24, 140, 440, 96);
@@ -548,6 +560,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "descPanel", descFill.Frame());
             ctx.Wire(view, "descTitle", descTitle);
             ctx.Wire(view, "descText", descText);
+            ctx.Wire(view, "dropZone", dropFill.Frame());
             return rt.gameObject;
         }
     }

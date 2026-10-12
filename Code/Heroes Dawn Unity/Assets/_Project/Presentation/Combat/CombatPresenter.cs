@@ -50,8 +50,9 @@ namespace N29.HeroesDawn.Presentation.Combat
         readonly BusyGate _finishing = new BusyGate();
         int _selected = -1;
         int _pendingSlot = -1;
+        int _dragSlot = -1;
         CombatSimulation.ComboOption? _pendingCombo;
-        int _speedFactor = 1;
+        int _speedFactor = 2; // vitesse ×2 par défaut (spec 2026-10-12 : combat plus rapide)
         const float StepEpsilon = 0.0005f; // evite qu une erreur de flottant retarde un pas d une image
         float _stepTimer;
         float _pauseLeft;
@@ -95,6 +96,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.ComboClicked += Combo;
             View.CycleClicked += CycleSelection;
             View.SkillClicked += Skill;
+            View.SkillDragBegan += SkillDragBegan;
+            View.SkillDropped += SkillDropped;
             View.UnitTapped += UnitTapped;
         }
 
@@ -109,6 +112,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.ComboClicked -= Combo;
             View.CycleClicked -= CycleSelection;
             View.SkillClicked -= Skill;
+            View.SkillDragBegan -= SkillDragBegan;
+            View.SkillDropped -= SkillDropped;
             View.UnitTapped -= UnitTapped;
         }
 
@@ -205,7 +210,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 if (_pauseLeft > 0f)
                 {
                     // Pause (point d action vide ou reflexion de l IA) : le joueur peut interrompre, la frise reprend a la fin.
-                    _pauseLeft -= real;
+                    _pauseLeft -= dt;
                 }
                 else
                 {
@@ -454,6 +459,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                     Cooldown = u.Cooldowns[i],
                     Pending = active && _pendingSlot == i,
                     Enabled = active && sim.CanUse(u.Id, i),
+                    NeedsTarget = NeedsTarget(s.Target),
                 };
             }
             return slots;
@@ -499,6 +505,41 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (rule == TargetRule.SingleEnemy && AliveCount(Side.Enemy) == 1) Submit(CombatCommand.UseSkill(_selected, slot, FirstAlive(Side.Enemy)));
             else if (rule == TargetRule.SingleEnemy || rule == TargetRule.SingleAlly) _pendingSlot = _pendingSlot == slot ? -1 : slot; // re-toucher annule
             else Submit(CombatCommand.UseSkill(_selected, slot, -1));
+            RefreshAll();
+        }
+
+        /// <summary>Une compétence se pose sur une cible s'il faut en choisir une (un seul ennemi vivant : la cible est évidente).</summary>
+        bool NeedsTarget(TargetRule rule)
+            => (rule == TargetRule.SingleEnemy && AliveCount(Side.Enemy) > 1) || rule == TargetRule.SingleAlly;
+
+        /// <summary>Carte prise : une compétence ciblée allume ses cibles valides, une générale attend d'être lâchée dans le vide.</summary>
+        void SkillDragBegan(int slot)
+        {
+            var sim = _sim;
+            if (!CanCommand || _selected < 0 || !sim!.CanUse(_selected, slot)) return;
+            _dragSlot = slot;
+            _pendingCombo = null;
+            _pendingAvatar = -1;
+            if (NeedsTarget(sim.Unit(_selected).Skills[slot].Target)) _pendingSlot = slot;
+            RefreshAll();
+        }
+
+        /// <summary>Carte lâchée : sur une cible valide (compétence ciblée), dans le vide (compétence générale), sinon retour sans effet.</summary>
+        void SkillDropped(int slot, int where)
+        {
+            var sim = _sim;
+            if (_dragSlot != slot) return;
+            _dragSlot = -1;
+            if (!CanCommand || _selected < 0 || !sim!.CanUse(_selected, slot) || where == ICombatView.DropCancel)
+            {
+                _pendingSlot = -1;
+                RefreshAll();
+                return;
+            }
+            var rule = sim.Unit(_selected).Skills[slot].Target;
+            if (!NeedsTarget(rule)) { Skill(slot); return; }
+            if (where >= 0 && IsValidTarget(rule, sim.Unit(where)) && _pendingSlot == slot) { UnitTapped(where); return; }
+            _pendingSlot = -1;
             RefreshAll();
         }
 

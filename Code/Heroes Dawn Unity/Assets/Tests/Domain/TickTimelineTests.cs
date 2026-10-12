@@ -22,7 +22,7 @@ namespace N29.HeroesDawn.Tests.Domain
 
         // ------------------------------------------------------------------ Constantes et départ
 
-        [Test, Description("Vérifie que la frise a 10 points, des reprises à 3, 2, 0 et -2 et une pause de 1,5 s — parce que ce sont les valeurs validées dans le cahier des charges")]
+        [Test, Description("Vérifie que la frise a 10 points, des reprises à 3, 2, 0 et -2 et une pause de 1,2 s, un pas de 0,35 s et un délai IA de 0,3 à 0,7 s — parce que ce sont les valeurs du cahier des charges 0.8.0")]
         public void Defaults_MatchTheValidatedTimeline()
         {
             var b = new BalanceConfig();
@@ -31,11 +31,11 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(b.TimelineResetMediumPoint, Is.EqualTo(2));
             Assert.That(b.TimelineResetHeavyPoint, Is.EqualTo(0));
             Assert.That(b.TimelineResetComboPoint, Is.EqualTo(-2));
-            Assert.That(b.TimelinePausePerEmptyPointMs, Is.EqualTo(1500));
-            Assert.That(b.TimelineStepMs, Is.EqualTo(500));
+            Assert.That(b.TimelinePausePerEmptyPointMs, Is.EqualTo(1200));
+            Assert.That(b.TimelineStepMs, Is.EqualTo(350));
             Assert.That(b.TimelineTurnTimeoutMs, Is.EqualTo(30000));
-            Assert.That(b.TimelineAiDelayMinMs, Is.EqualTo(500));
-            Assert.That(b.TimelineAiDelayMaxMs, Is.EqualTo(1500));
+            Assert.That(b.TimelineAiDelayMinMs, Is.EqualTo(300));
+            Assert.That(b.TimelineAiDelayMaxMs, Is.EqualTo(700));
         }
 
         [Test, Description("Vérifie que chaque unité vivante démarre entre le point 0 et le point 2 de façon déterministe pour une graine — parce que les premiers tours ne doivent pas tomber tous en même temps")]
@@ -136,25 +136,37 @@ namespace N29.HeroesDawn.Tests.Domain
 
         // ------------------------------------------------------------------ Point vide et interruptions
 
-        [Test, Description("Vérifie qu'un pas qui laisse le point d'action vide émet une pause de 1,5 s et ouvre la fenêtre d'interruption — parce que le joueur a 1,5 s pour réagir sur un point vide")]
-        public void EmptyActionPoint_OpensTheInterruptWindow_For1500ms()
+        [Test, Description("Vérifie que la fenêtre d'interruption de 1,2 s s'ouvre au pas qui précède l'arrivée d'un ennemi au point d'action quand un avatar est prêt — parce que c'est la seule menace sur laquelle le joueur peut réagir")]
+        public void ImminentEnemy_OpensTheInterruptWindow_For1200ms()
         {
             var s = Sim(new[] { "ancre" }, new[] { "brute" });
             AllAt(s, 0);
+            s.Unit(1).Point = s.Unit(1).ActionPoint - 2;
             var pauses = s.Step(1).OfType<EmptyPointPauseEvent>().ToList();
             Assert.That(pauses.Count, Is.EqualTo(1));
-            Assert.That(pauses[0].PauseMs, Is.EqualTo(1500));
+            Assert.That(pauses[0].PauseMs, Is.EqualTo(1200));
             Assert.That(s.InterruptWindowOpen, Is.True);
         }
 
-        [Test, Description("Vérifie que plusieurs pas consécutifs sur un point d'action vide enchaînent chacun leur pause, sans en perdre — parce que chaque point vide laisse son temps de réaction")]
-        public void ConsecutiveEmptyPoints_EachGetAPause()
+        [Test, Description("Vérifie qu'aucune pause n'est émise tant qu'aucun ennemi n'est sur le point d'agir — parce que les points vides sans menace ralentissaient inutilement le combat")]
+        public void NoThreat_NoPause()
         {
             var s = Sim(new[] { "ancre" }, new[] { "brute" });
             AllAt(s, 0);
             int pauses = 0;
-            for (int i = 0; i < 4; i++) pauses += s.Step(1).OfType<EmptyPointPauseEvent>().Count();
-            Assert.That(pauses, Is.EqualTo(4));
+            for (int i = 0; i < 6; i++) pauses += s.Step(1).OfType<EmptyPointPauseEvent>().Count();
+            Assert.That(pauses, Is.EqualTo(0));
+            Assert.That(s.InterruptWindowOpen, Is.False);
+        }
+
+        [Test, Description("Vérifie que la pause n'arrive qu'une fois, au pas où l'ennemi atteint l'avant-dernier point — parce que le joueur ne doit pas être interrompu à chaque point")]
+        public void Window_OpensOnlyOnce_BeforeTheEnemyActs()
+        {
+            var s = Sim(new[] { "ancre" }, new[] { "brute" });
+            AllAt(s, 0);
+            s.Unit(1).Point = s.Unit(1).ActionPoint - 3;
+            Assert.That(s.Step(1).OfType<EmptyPointPauseEvent>().Count(), Is.EqualTo(0), "encore deux pas");
+            Assert.That(s.Step(1).OfType<EmptyPointPauseEvent>().Count(), Is.EqualTo(1), "un pas avant le tour");
         }
 
         [Test, Description("Vérifie qu'aucune pause n'est émise quand une unité est au point d'action ou en mode Auto — parce qu'un tour de jeu ou l'IA ne laissent pas de fenêtre d'interruption")]
@@ -175,6 +187,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var s = Sim(new[] { "ancre", "givre" }, new[] { "brute" });
             Assert.That(s.CanUseAvatar(0), Is.False, "avant le premier pas");
             AllAt(s, 0);
+            s.Unit(2).Point = s.Unit(2).ActionPoint - 2;
             s.Unit(0).Point = 2;
             s.Step(1);
             Assert.That(s.InterruptWindowOpen, Is.True);
