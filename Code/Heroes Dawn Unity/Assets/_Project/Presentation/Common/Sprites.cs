@@ -5,7 +5,7 @@ namespace N29.HeroesDawn.Presentation.Common
     /// <summary>Sprites générés au démarrage (aucun asset requis) : rectangle arrondi 9-slice, disque, anneau, dégradé.</summary>
     public static class Sprites
     {
-        static Sprite _rounded, _roundedSmall, _circle, _ring, _gradient, _burst, _cloud, _panel, _panelSmall, _diamond, _shine, _skyline;
+        static Sprite _rounded, _roundedSmall, _circle, _ring, _gradient, _burst, _cloud, _panel, _panelSmall, _diamond, _shine, _skyline, _panelFrame, _bracket;
 
         // Assets générés (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface → Resources/UI) ; repli procédural sinon.
         public static Sprite Rounded => _rounded != null ? _rounded : (_rounded = Load("Rounded"));
@@ -26,10 +26,14 @@ namespace N29.HeroesDawn.Presentation.Common
         /// <summary>Bande diagonale lumineuse (reflet des cartes et boutons).</summary>
         public static Sprite Shine => _shine != null ? _shine : (_shine = Load("Shine"));
         /// <summary>Silhouette de ville (bas des fonds d'écran).</summary>
+        /// <summary>Contour de panneau à coins coupés (9-slice) : cadre de mise en valeur du tutoriel.</summary>
+        public static Sprite PanelFrame => _panelFrame != null ? _panelFrame : (_panelFrame = Load("PanelFrame"));
+        /// <summary>Équerre d'angle (coin bas-gauche d'un cadre) : tournée aux quatre coins du cadre du tutoriel.</summary>
+        public static Sprite Bracket => _bracket != null ? _bracket : (_bracket = Load("Bracket"));
         public static Sprite Skyline => _skyline != null ? _skyline : (_skyline = Load("Skyline"));
 
         /// <summary>Noms des sprites d'interface générés (Resources/UI/&lt;nom&gt;.png).</summary>
-        public static readonly string[] UiSpriteNames = { "Rounded", "RoundedSmall", "Circle", "Ring", "VerticalGradient", "Burst", "Cloud", "Panel", "PanelSmall", "Diamond", "Shine", "Skyline" };
+        public static readonly string[] UiSpriteNames = { "Rounded", "RoundedSmall", "Circle", "Ring", "VerticalGradient", "Burst", "Cloud", "Panel", "PanelSmall", "Diamond", "Shine", "Skyline", "PanelFrame", "Bracket" };
 
         static Sprite Load(string name) { var s = Resources.Load<Sprite>("UI/" + name); return s != null ? s : Procedural(name); }
 
@@ -50,6 +54,8 @@ namespace N29.HeroesDawn.Presentation.Common
                 case "Diamond": return MakeDiamond(128);
                 case "Shine": return MakeShine();
                 case "Skyline": return MakeSkyline(512, 128);
+                case "PanelFrame": return MakeCutFrame(64, 14, 3);
+                case "Bracket": return MakeBracket(32, 5);
                 default: throw new System.ArgumentException("Sprite d'interface inconnu : " + name);
             }
         }
@@ -187,6 +193,40 @@ namespace N29.HeroesDawn.Presentation.Common
             t.Apply();
             int b = cut + 1;
             return Sprite.Create(t, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(b, b, b, b));
+        }
+
+        /// <summary>Contour (épaisseur <paramref name="thick"/>) d'un rectangle à coins coupés, découpé en 9 : cadre qui s'étire sans épaissir.</summary>
+        static Sprite MakeCutFrame(int size, int cut, int thick)
+        {
+            var t = NewTex(size, size);
+            var px = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                float fx = x + 0.5f, fy = y + 0.5f;
+                float edge = Mathf.Min(Mathf.Min(fx, size - fx), Mathf.Min(fy, size - fy));
+                float diag = Mathf.Min(((size - fx) + (size - fy) - cut) / 1.4142f, (fx + fy - cut) / 1.4142f);
+                float outer = Mathf.Clamp01(Mathf.Min(diag, edge) + 0.5f);
+                float inner = Mathf.Clamp01(Mathf.Min(diag - thick, edge - thick) + 0.5f);
+                px[y * size + x] = new Color32(255, 255, 255, (byte)(Mathf.Clamp01(outer - inner) * 255));
+            }
+            t.SetPixels32(px);
+            t.Apply();
+            int b = cut + 1;
+            return Sprite.Create(t, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(b, b, b, b));
+        }
+
+        /// <summary>Équerre en L (coin bas-gauche), à tourner de 90° pour les autres coins.</summary>
+        static Sprite MakeBracket(int size, int thick)
+        {
+            var t = NewTex(size, size);
+            var px = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+                px[y * size + x] = new Color32(255, 255, 255, (byte)((x < thick || y < thick) ? 255 : 0));
+            t.SetPixels32(px);
+            t.Apply();
+            return Sprite.Create(t, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
         }
 
         static Sprite MakeDiamond(int size)

@@ -19,13 +19,13 @@ namespace N29.HeroesDawn.Presentation.Tutorial
     }
 
     /// <summary>
-    /// Couche du tutoriel (prefab Common/TutorialOverlay) : voile noir 70 % avec une découpe sur l'élément à toucher,
-    /// anneau jaune pulsé, ondes et flèche qui le désignent, bulle de BD de Rayner (titre jaune, 2 lignes, progression),
+    /// Couche du tutoriel (prefab Common/TutorialOverlay) : voile bleu nuit avec une découpe rectangulaire sur l'élément à toucher,
+    /// cadre à coins coupés pulsé, équerres animées et flèche qui le désignent, bulle de BD de Rayner (titre jaune, 2 lignes, progression),
     /// et carte « Astuce » non bloquante pour les mécaniques contextuelles.
     /// </summary>
     public sealed class TutorialOverlayView : MonoBehaviour
     {
-        const float Pad = 14f;
+        const float Pad = 8f;
 
         [SerializeField] RectTransform veilRoot = null!;
         [SerializeField] Image veilTop = null!;
@@ -34,6 +34,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
         [SerializeField] Image veilRight = null!;
         [SerializeField] Image ring = null!;
         [SerializeField] Image ripple = null!;
+        [SerializeField] RectTransform[] brackets = System.Array.Empty<RectTransform>();
         [SerializeField] RectTransform pointer = null!;
         [SerializeField] RectTransform bubble = null!;
         [SerializeField] TMP_Text title = null!;
@@ -60,6 +61,9 @@ namespace N29.HeroesDawn.Presentation.Tutorial
         public UiButton SkipButton => skip;
         public UiButton HintOkButton => hintOk;
         public RectTransform Bubble => bubble;
+        /// <summary>Sprite du cadre de mise en valeur (rectangle à coins coupés) et nombre d'équerres visibles (tests).</summary>
+        public Sprite? FrameSprite => ring.sprite;
+        public int VisibleBrackets { get { int n = 0; foreach (var b in brackets) if (b.gameObject.activeSelf) n++; return n; } }
 
         void Awake()
         {
@@ -76,12 +80,27 @@ namespace N29.HeroesDawn.Presentation.Tutorial
             if (HintVisible && (_hintLeft -= Time.unscaledDeltaTime) <= 0f) { HideHint(); HintClosed?.Invoke(); }
             if (!StepVisible || !_hasHole) return;
             float k = (_clock * 0.9f) % 1f;
-            ripple.rectTransform.localScale = Vector3.one * (1f + 0.55f * k);
+            LayoutBrackets(Mathf.Sin(_clock * 5f) * 0.5f + 0.5f);
+            ripple.rectTransform.localScale = Vector3.one * (1f + 0.07f * k);
             ripple.color = new Color(Theme.Primary.r, Theme.Primary.g, Theme.Primary.b, 0.8f * (1f - k));
             pointer.anchoredPosition = _pointerBase + new Vector2(0f, Mathf.Sin(_clock * 6f) * 10f);
         }
 
         Vector2 _pointerBase;
+        Rect _hole;
+
+        /// <summary>Équerres aux quatre coins du cadre ; elles « respirent » vers l'extérieur (0 à 1).</summary>
+        void LayoutBrackets(float breathe)
+        {
+            if (brackets.Length < 4) return;
+            float o = 2f + 8f * breathe;
+            var c = new[] { new Vector2(_hole.xMin - o, _hole.yMin - o), new Vector2(_hole.xMax + o, _hole.yMin - o), new Vector2(_hole.xMax + o, _hole.yMax + o), new Vector2(_hole.xMin - o, _hole.yMax + o) };
+            for (int i = 0; i < 4; i++)
+            {
+                brackets[i].anchoredPosition = c[i];
+                brackets[i].localRotation = Quaternion.Euler(0f, 0f, 90f * i);
+            }
+        }
 
         /// <summary>Affiche une étape. <paramref name="hole"/> : zone à laisser libre, en coordonnées locales de la couche (null : voile plein). <paramref name="blockHole"/> : la découpe elle-même ne répond pas (étapes « Compris »).</summary>
         public void ShowStep(Rect? hole, TutorialStepView text, bool bubbleAtTop, bool blockHole, bool dim = true)
@@ -101,6 +120,9 @@ namespace N29.HeroesDawn.Presentation.Tutorial
                 ring.gameObject.SetActive(true);
                 ripple.gameObject.SetActive(true);
                 pointer.gameObject.SetActive(true);
+                _hole = h;
+                foreach (var b in brackets) b.gameObject.SetActive(true);
+                LayoutBrackets(0f);
                 ring.rectTransform.anchoredPosition = h.center;
                 ring.rectTransform.sizeDelta = h.size;
                 ring.raycastTarget = blockHole;
@@ -119,6 +141,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
                 ring.gameObject.SetActive(false);
                 ripple.gameObject.SetActive(false);
                 pointer.gameObject.SetActive(false);
+                foreach (var b in brackets) b.gameObject.SetActive(false);
             }
 
             title.text = text.Title;
