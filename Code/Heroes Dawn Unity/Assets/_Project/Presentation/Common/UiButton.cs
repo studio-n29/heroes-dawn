@@ -29,7 +29,7 @@ namespace N29.HeroesDawn.Presentation.Common
         public void Init(Button b, Image fillImage, TMP_Text text, Color bg, Color fg)
         {
             button = b; fill = fillImage; label = text; _bg = bg; _fg = fg;
-            fillImage.color = bg;
+            ApplyState();
         }
 
         public bool Interactable
@@ -38,8 +38,17 @@ namespace N29.HeroesDawn.Presentation.Common
             set
             {
                 Button.interactable = value;
-                Label.color = value ? _fg : Theme.WithAlpha(_fg, 0.55f);
+                ApplyState();
             }
+        }
+
+        /// <summary>Désactivé : fond éclairci vers le gris pastel et libellé marine estompé (lisible sur n'importe quel fond de bouton).</summary>
+        void ApplyState()
+        {
+            if (fill == null) return;
+            bool on = button == null || button.interactable;
+            fill.color = on ? _bg : Color.Lerp(_bg, Theme.Surface3, 0.8f);
+            if (label != null) label.color = on ? _fg : Theme.WithAlpha(Theme.Navy, 0.5f);
         }
 
         void Awake()
@@ -59,8 +68,7 @@ namespace N29.HeroesDawn.Presentation.Common
         public void SetColors(Color bg, Color fg)
         {
             _bg = bg; _fg = fg;
-            Fill.color = bg;
-            Label.color = Button.interactable ? fg : Theme.WithAlpha(fg, 0.55f);
+            ApplyState();
         }
 
         /// <summary>Raison affichée en toast quand on touche le bouton grisé (vide : simple secousse).</summary>
@@ -92,7 +100,7 @@ namespace N29.HeroesDawn.Presentation.Common
         {
             _hover = false;
             transform.localScale = Vector3.one;
-            if (Fill != null) Fill.color = _bg;
+            ApplyState();
         }
 
         void OnDisable() => EndHover();

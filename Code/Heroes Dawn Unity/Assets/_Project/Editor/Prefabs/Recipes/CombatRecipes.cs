@@ -339,7 +339,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         {
             var row = PrefabContext.NewRoot("FatigueRow", 900, 52);
             row.Pref(900, 52);
-            var n = Ui.Txt(row, "", 28, Color.white, TextAnchor.MiddleLeft, FontKind.Title, "Name");
+            var n = Ui.Txt(row, "", 28, Theme.Navy, TextAnchor.MiddleLeft, FontKind.Title, "Name");
             n.rectTransform.At(0f, 0.5f, 0, 0, 220, 50);
             var bar = Ui.Bar(row, "Bar", Theme.Success, Theme.SurfaceDark, true, 20);
             ((RectTransform)bar.transform).At(0f, 0.5f, 230, 0, 520, 30);

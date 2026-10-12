@@ -38,14 +38,17 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(bar.color, Is.EqualTo(Theme.Accent));
         }
 
-        [Test, Description("Vérifie qu'un bouton désactivé a un libellé à 55 % d'alpha — parce qu'en pastel un bouton grisé doit rester distinct d'un bouton actif")]
+        [Test, Description("Vérifie qu'un bouton désactivé a un fond éclairci et un libellé marine estompé encore lisible — parce qu'en pastel un bouton grisé doit rester distinct d'un bouton actif sans devenir illisible")]
         public void Button_DisabledLooksDisabled()
         {
             var b = Ui.Btn(_root.transform, "OK", Theme.Accent, Theme.TextOnDark, null);
             b.Interactable = false;
-            Assert.That(b.Label.color.a, Is.EqualTo(0.55f).Within(0.001f));
+            Assert.That(b.Fill.color, Is.Not.EqualTo(Theme.Accent), "le fond est éclairci");
+            Assert.That(ThemeContrast.Ratio(b.Label.color, b.Fill.color), Is.GreaterThan(1.5f), "le libellé reste lisible sur le fond grisé");
+            Assert.That(b.Label.color.a, Is.LessThan(1f), "libellé estompé");
             b.Interactable = true;
-            Assert.That(b.Label.color.a, Is.EqualTo(1f));
+            Assert.That(b.Fill.color, Is.EqualTo(Theme.Accent));
+            Assert.That(b.Label.color, Is.EqualTo(Theme.TextOnDark));
         }
 
         [Test, Description("Vérifie que la barre à 0 masque son remplissage et à 1 l'étire entièrement — parce que sans contour noir un remplissage résiduel à 0 se verrait")]

@@ -4,7 +4,8 @@
 > Maquettes, wireframes annotés et screen flow : `03_Maquettes_Screen_Flow.md`.
 
 ## Navigation (maquettes 2026-10-04)
-- **Barre de navigation basse** permanente sur le hub : `QG · ÉQUIPE · RECRUTER · PASS · BOUTIQUE` (un menu = un onglet, badges par onglet).
+- **Barre de navigation basse** permanente sur le hub : `QG · ÉQUIPE · PASS · BOUTIQUE` (un menu = un onglet, badges par onglet). Depuis la 0.8.0, le recrutement est l'onglet « Héros » de la Boutique unique.
+- **Boutique unique à onglets** (0.8.0) : `HÉROS · BOOSTERS · OBJETS · GEMMES ET CRÉDITS · CADEAU`. L'onglet Héros est la page Recruter (3 héros par jour). Les boosters s'ouvrent dans une popup animée : paquet à toucher, flash, cartes retournées une à une avec un éclat selon la rareté, résumé avec « Nouveau ».
 - **Barre haute** : titre de l'écran, Crédits / PR / Gemmes (toucher = origine de la ressource), ⚙ Paramètres.
 - **QG** (onglet par défaut) : les 5 pièces en cases de BD (toucher = y entrer), missions du jour, alertes, fil du QG, bouton **MISSION** rouge sous le pouce droit.
 - **Mode mission** (carte → résultats) : plein écran sans barre de navigation ; retour en haut à gauche, ⏸ = pause (Reprendre, Paramètres, Aide, Retour au QG).

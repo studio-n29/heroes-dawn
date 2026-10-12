@@ -160,13 +160,13 @@ namespace N29.HeroesDawn.Presentation.Hub
             var poly = _polygons[b.Id];
             _lockedBoroughs[b.Id] = b.Locked;
             _tagText[b.Id] = b.Tag;
-            poly.color = b.Locked ? new Color(0.13f, 0.15f, 0.2f, 0.9f) : b.Highlight ? new Color(0.28f, 0.22f, 0.07f, 0.95f) : new Color(0.17f, 0.2f, 0.27f, 0.92f);
-            poly.OutlineColor = b.Locked ? new Color(0f, 0f, 0f, 0.9f) : Theme.Primary;
+            poly.color = b.Locked ? Theme.WithAlpha(Theme.Surface3, 0.85f) : b.Highlight ? Theme.WithAlpha(Theme.Glow, 0.9f) : Theme.WithAlpha(Color.Lerp(Theme.SkyTop, Theme.Surface2, 0.5f), 0.95f);
+            poly.OutlineColor = b.Locked ? Theme.WithAlpha(Theme.Navy, 0.5f) : Theme.Primary;
             poly.OutlineWidth = b.Locked ? 4f : 7f;
             poly.material = b.Locked && lockedMaterial != null ? lockedMaterial : null;
             var tag = _tags[b.Id];
             tag.text = b.Name + " · " + b.Tag;
-            tag.color = b.Locked ? Theme.TextMuted : Theme.Primary;
+            tag.color = b.Locked ? Theme.TextMuted : Theme.Navy;
         }
     }
 }
