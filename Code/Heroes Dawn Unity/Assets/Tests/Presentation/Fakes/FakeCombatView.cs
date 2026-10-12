@@ -58,6 +58,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void Float(int unitId, string text, Tone tone, int size) { }
         public void Hit(int unitId) { }
         public void Act(int unitId) { }
+        public (int Slot, int Target)? LastPlayedCard;
+        public void PlayCard(int slot, int targetUnitId) => LastPlayedCard = (slot, targetUnitId);
         public UniTask PauseAsync(float seconds, CancellationToken ct) => UniTask.CompletedTask;
     }
 

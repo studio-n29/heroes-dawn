@@ -42,6 +42,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         void Float(int unitId, string text, Tone tone, int size);
         void Hit(int unitId);
         void Act(int unitId);
+        /// <summary>La carte de l'emplacement <paramref name="slot"/> est jouée : elle s'envole vers l'unité visée (ou le terrain si -1).</summary>
+        void PlayCard(int slot, int targetUnitId);
         UniTask PauseAsync(float seconds, CancellationToken ct);
     }
 }

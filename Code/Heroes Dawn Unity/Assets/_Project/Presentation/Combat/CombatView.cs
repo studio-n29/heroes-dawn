@@ -45,6 +45,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         Coroutine? _bannerFade;
         int _skillUnit = -1;
         IReadOnlyList<UnitStateData> _lastStates = Array.Empty<UnitStateData>();
+        Vector2[] _fanHome = Array.Empty<Vector2>();
+        int _fanUnit = -1;
 
         public event Action? RetreatClicked;
         public event Action? AutoClicked;
@@ -74,6 +76,8 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         /// <summary>L'éventail de compétences est-il affiché ? (tests PlayMode)</summary>
         public bool FanVisible => fanRoot.gameObject.activeSelf;
+        /// <summary>Les animations de combat (éventail, cartes jouées) sont-elles permises ? Faux avec « réduire les mouvements ».</summary>
+        public bool AnimationsAllowed => !Feedback.MotionSettings.Reduced && UnityEngine.Application.isPlaying;
         /// <summary>Racine de l'éventail (tests PlayMode).</summary>
         public Transform FanRootForTests => fanRoot;
 
@@ -111,6 +115,8 @@ namespace N29.HeroesDawn.Presentation.Combat
                 fan[i].DragEnded += (card, at) => OnDragEnded(slot, at);
             }
             descPanel.gameObject.SetActive(false);
+            _fanHome = new Vector2[fan.Length];
+            for (int i = 0; i < fan.Length; i++) _fanHome[i] = ((RectTransform)fan[i].transform).anchoredPosition;
             fanRoot.gameObject.SetActive(false);
         }
 
@@ -218,6 +224,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             SkillSlotData[]? skills = null;
             foreach (var s in _lastStates) if (s.Id == _skillUnit) skills = s.Skills;
             bool show = d.Visible && skills != null;
+            bool opening = show && (!fanRoot.gameObject.activeSelf || _fanUnit != _skillUnit);
+            _fanUnit = show ? _skillUnit : -1;
             if (fanRoot.gameObject.activeSelf != show) fanRoot.gameObject.SetActive(show);
             if (!show) { descPanel.gameObject.SetActive(false); if (fanMarker != null) fanMarker.enabled = false; return; }
             bool usable = false;
@@ -228,6 +236,66 @@ namespace N29.HeroesDawn.Presentation.Combat
                 usable |= slotData.Enabled || slotData.Pending;
             }
             if (fanMarker != null) fanMarker.enabled = usable;
+            if (opening) AnimateFanIn();
+        }
+
+        /// <summary>Début du tour d'un agent : les cartes montent du bas de l'écran et s'ouvrent en éventail, l'une après l'autre.</summary>
+        void AnimateFanIn()
+        {
+            if (!AnimationsAllowed) return;
+            for (int i = 0; i < fan.Length && i < _fanHome.Length; i++)
+            {
+                var rt = (RectTransform)fan[i].transform;
+                var home = _fanHome[i];
+                rt.anchoredPosition = home + new Vector2(0f, -300f);
+                rt.localScale = Vector3.one * 0.8f;
+                Tween.Delay(i * 0.05f, () =>
+                {
+                    if (rt == null) return;
+                    Tween.Run(0.28f, k =>
+                    {
+                        if (rt == null) return;
+                        rt.anchoredPosition = Vector2.LerpUnclamped(home + new Vector2(0f, -300f), home, k);
+                        rt.localScale = Vector3.one * Mathf.LerpUnclamped(0.8f, 1f, k);
+                    }, () => { if (rt != null) { rt.anchoredPosition = home; rt.localScale = Vector3.one; } }, rt, Tween.EaseOutBack);
+                }, rt);
+            }
+        }
+
+        /// <summary>Une carte est jouée : un double s'envole de l'éventail vers sa cible (ou le terrain), grossit puis s'éteint dans un éclat.</summary>
+        public void PlayCard(int slot, int targetUnitId)
+        {
+            if (!AnimationsAllowed || slot < 0 || slot >= fan.Length) return;
+            var src = fan[slot];
+            if (!src.gameObject.activeInHierarchy) return;
+            var canvas = GetComponentInParent<Canvas>();
+            var layer = canvas != null ? canvas.rootCanvas.transform : transform;
+            var ghost = Instantiate(src.gameObject, layer, false);
+            foreach (var mb in ghost.GetComponentsInChildren<MonoBehaviour>(true))
+                if (!(mb is UnityEngine.UI.Graphic) && !(mb is TMP_Text)) Destroy(mb);
+            var grt = (RectTransform)ghost.transform;
+            grt.position = src.transform.position;
+            grt.rotation = src.transform.rotation;
+            grt.localScale = src.transform.localScale;
+            var cg = ghost.GetComponent<CanvasGroup>() ?? ghost.AddComponent<CanvasGroup>();
+            cg.blocksRaycasts = false;
+            RectTransform? targetRect = null;
+            Vector3 to = enemyRow.position;
+            if (targetUnitId >= 0 && _cards.TryGetValue(targetUnitId, out var tc)) { targetRect = (RectTransform)tc.transform; to = targetRect.TransformPoint(targetRect.rect.center); }
+            var from = grt.position;
+            var fromRot = grt.rotation;
+            Tween.Run(0.32f, k =>
+            {
+                if (grt == null) return;
+                grt.position = Vector3.LerpUnclamped(from, to, k);
+                grt.rotation = Quaternion.Slerp(fromRot, Quaternion.identity, k);
+                grt.localScale = Vector3.one * Mathf.Lerp(1f, 1.35f, k);
+            }, () =>
+            {
+                if (grt == null) return;
+                Feedback.Fx.Sparks(targetRect != null ? targetRect : enemyRow, Theme.Glow, 12, 130f, 18f);
+                Tween.Fade(cg, 0f, 0.14f, () => { if (ghost != null) Destroy(ghost); });
+            }, grt, Tween.EaseOutCubic);
         }
 
         public void ShowTimeline(TimelineData d)

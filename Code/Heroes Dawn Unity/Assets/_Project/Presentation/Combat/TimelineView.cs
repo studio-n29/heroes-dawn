@@ -36,6 +36,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         readonly Dictionary<int, TimelineMarkerView> _byId = new Dictionary<int, TimelineMarkerView>();
         readonly Dictionary<int, float> _targets = new Dictionary<int, float>();
         readonly List<Segment> _segments = new List<Segment>();
+        readonly Dictionary<int, bool> _wasReady = new Dictionary<int, bool>();
         int _points;
         int _prepStartPoint;
 
@@ -100,6 +101,8 @@ namespace N29.HeroesDawn.Presentation.Combat
                     first.anchorMin = first.anchorMax = new Vector2(Mathf.Clamp01(m.Position01), 0.5f);
                 }
                 view.Show(m);
+                if (m.Ready && m.Alive && !(_wasReady.TryGetValue(m.Id, out var before) && before)) Feedback.Fx.Sparks(view.Rect, m.Ally ? Theme.Glow : Theme.AccentSoft, 8, 70f, 12f);
+                _wasReady[m.Id] = m.Ready;
                 int clamped = Mathf.Clamp(m.Point, 0, points);
                 if (m.Alive) _segments[clamped].Occupants.Add(m.Id);
                 // Plusieurs unités sur un même point : elles s'écartent horizontalement, l'ordre des identifiants.
@@ -141,6 +144,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             _markers.Clear();
             _byId.Clear();
             _targets.Clear();
+            _wasReady.Clear();
         }
     }
 }

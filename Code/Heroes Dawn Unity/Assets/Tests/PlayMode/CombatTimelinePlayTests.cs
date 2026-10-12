@@ -95,6 +95,32 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(view.DescriptionVisible, Is.False, "relâché : la description disparaît");
         }
 
+        float FanCardY(CombatView view, int i) => ((RectTransform)view.SkillCard(i).transform).anchoredPosition.y;
+
+        [UnityTest, Timeout(300000), Description("Vérifie que les cartes de l'éventail montent du bas de l'écran à l'ouverture du tour d'un agent — parce que le début du tour doit s'animer")]
+        public IEnumerator Fan_OpensWithAnimation()
+        {
+            N29.HeroesDawn.Presentation.Feedback.MotionSettings.ResetForTests();
+            yield return IntoCombat();
+            var view = Object.FindAnyObjectByType<CombatView>()!;
+            yield return PlayModeHarness.WaitFor(() => view.FanVisible, 2400);
+            float start = FanCardY(view, 3);
+            yield return new WaitForSecondsRealtime(0.9f);
+            float end = FanCardY(view, 3);
+            Assert.That(end - start, Is.GreaterThan(100f), "la carte est montée vers sa place");
+        }
+
+        [UnityTest, Timeout(300000), Description("Vérifie que « réduire les mouvements » coupe les animations de combat (éventail, carte jouée) — parce que l'accessibilité doit pouvoir les supprimer")]
+        public IEnumerator Fan_ReducedMotion_SkipsTheAnimation()
+        {
+            yield return IntoCombat();
+            var view = Object.FindAnyObjectByType<CombatView>()!;
+            Assert.That(view.AnimationsAllowed, Is.True);
+            N29.HeroesDawn.Presentation.Feedback.MotionSettings.Reduced = true;
+            try { Assert.That(view.AnimationsAllowed, Is.False, "les animations de combat sont coupées"); }
+            finally { N29.HeroesDawn.Presentation.Feedback.MotionSettings.ResetForTests(); }
+        }
+
         static void DragCard(SkillIconView card, Vector2 to)
         {
             var frame = card.transform.Find("Frame").gameObject;

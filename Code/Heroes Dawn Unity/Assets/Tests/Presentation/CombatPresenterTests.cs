@@ -141,6 +141,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _view.DropSkill(slot, enemy);
             _p.Tick();
             Assert.That(_sim.Unit(actor).IsReady, Is.False, "la compétence a été lancée sur la cible");
+            Assert.That(_view.LastPlayedCard, Is.EqualTo((slot, enemy)), "la carte s'envole vers sa cible");
         }
 
         [Test, Description("Vérifie que lâcher une carte ciblée dans le vide ou la rendre à l'éventail ne lance rien et éteint les cibles — parce qu'un lâcher invalide annule sans effet")]
