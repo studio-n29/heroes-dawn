@@ -106,10 +106,17 @@ namespace N29.HeroesDawn.Domain.Board
             var events = new List<BoardEvent> { new PawnMovedEvent(plan.Path) };
 
             CaseId before = Position;
-            foreach (var step in plan.Path)
+            for (int i = 0; i < plan.Path.Count; i++)
             {
+                var step = plan.Path[i];
                 _previous = before;
                 before = step;
+                // Le brouillard se lève au passage du pion (la dernière case est traitée après, avec l'arrêt éventuel).
+                if (i < plan.Path.Count - 1)
+                {
+                    var passed = Fog.RevealAround(step);
+                    if (passed.Count > 0) events.Add(new FogRevealedEvent(passed));
+                }
                 var node = Graph.Node(step);
                 if (node.Type == CaseType.Resource && _collected.Add(step))
                 {
