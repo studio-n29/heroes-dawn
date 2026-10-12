@@ -119,6 +119,11 @@ namespace N29.HeroesDawn.Tests.Presentation
             _app.Session.CompletedZones.Add(PrototypeZones.Zone13.Value);
             _view = new FakeQgPageView();
             Make();
+            Assert.That(_view.Last.FilText, Is.EqualTo(new LocLocalization().T("qg.fil.zone_ny_1_4")), "la dernière zone de Brooklyn");
+            _p.Dispose();
+            _app.Session.CompletedZones.Add(PrototypeZones.Zone14.Value);
+            _view = new FakeQgPageView();
+            Make();
             Assert.That(_view.Last.FilText, Is.EqualTo(new LocLocalization().T("qg.fil.done")));
         }
 

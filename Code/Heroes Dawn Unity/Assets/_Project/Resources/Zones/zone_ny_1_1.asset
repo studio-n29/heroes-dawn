@@ -129,7 +129,7 @@ MonoBehaviour:
     isFixed: 0
     rank: 0
     x: 4
-    y: 2
+    y: 1
     activity: 
     hasCombat: 0
     enemyTable: []
@@ -364,12 +364,12 @@ MonoBehaviour:
     - speaker: brick
       text: "\xAB Vous avez travers\xE9 tout mon quai pour finir ici. Courageux. Ou idiots. \xBB"
     - speaker: ancre
-      text: 'On ne recule pas. Frost, Echo, couvrez mes angles : je tiens la ligne.'
+      text: 'On ne recule pas. Anchor, tiens la ligne : Frost, Echo, vous couvrez ses angles.'
     narrationAfter:
     - speaker: ancre
-      text: "Brick s'effondre contre un conteneur. Le g\xE9n\xE9rateur du quai se tait enfin."
+      text: "Brick s'effondre contre un conteneur. L'\xE9change est stopp\xE9 : cages, registres, bons de livraison, les preuves sont l\xE0."
     - speaker: ancre
-      text: "La grue du terminal est \xE0 port\xE9e : plus qu'un pas."
+      text: "Il ne reste qu'\xE0 fuir le quai avant que l'AMIF ne revienne."
   - id: n24
     type: 1
     isFixed: 1
@@ -429,6 +429,12 @@ MonoBehaviour:
     control2: {x: 0, y: 0}
   - a: n07
     b: n08
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n05
+    b: n09
     cost: 1
     hasCurve: 0
     control1: {x: 0, y: 0}
@@ -541,27 +547,31 @@ MonoBehaviour:
     hasCurve: 0
     control1: {x: 0, y: 0}
     control2: {x: 0, y: 0}
-  - a: n05
-    b: n09
-    cost: 1
-    hasCurve: 0
-    control1: {x: 0, y: 0}
-    control2: {x: 0, y: 0}
   objectives:
-  - id: obj_warehouse
-    type: 0
-    target: n23
-    nameKey: objectives.ny11.warehouse
+  - id: obj_infiltrate
+    type: 1
+    target: n10
+    nameKey: objectives.ny11.infiltrate
     text: 
   - id: obj_generator
     type: 2
     target: n08
     nameKey: objectives.ny11.generator
     text: 
-  - id: obj_crane
+  - id: obj_documents
+    type: 1
+    target: n18
+    nameKey: objectives.ny11.documents
+    text: 
+  - id: obj_exchange
+    type: 0
+    target: n23
+    nameKey: objectives.ny11.exchange
+    text: 
+  - id: obj_escape
     type: 1
     target: n24
-    nameKey: objectives.ny11.crane
+    nameKey: objectives.ny11.escape
     text: 
   encounters:
   - rank: 0

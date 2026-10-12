@@ -207,10 +207,12 @@ namespace N29.HeroesDawn.Presentation.Common
             // --- Zones & objectifs ---
             ["zones.ny_1_1.name"] = "RED HOOK — LES QUAIS",
             ["zones.ny_1_1.code"] = "Zone 1.1",
-            ["zones.ny_1_1.desc"] = "La bande de Brick a pris le contrôle des docks. Sécurise le quartier avant que la fracture ne s'étende.",
-            ["objectives.ny11.warehouse"] = "Vaincre Brick à l'entrepôt",
-            ["objectives.ny11.generator"] = "Couper le générateur du quai",
-            ["objectives.ny11.crane"] = "Atteindre la grue du terminal",
+            ["zones.ny_1_1.desc"] = "Plusieurs rapports informent que l'AMIF fait transporter des méta-humains kidnappés par le port de Red Hook. Attaquer l'AMIF de front sonnerait la fin de la Guilde et de sa crédibilité : il faut trouver des preuves.",
+            ["objectives.ny11.infiltrate"] = "Infiltrer le quai",
+            ["objectives.ny11.generator"] = "Couper le courant (générateur du quai)",
+            ["objectives.ny11.documents"] = "Trouver les documents de transport",
+            ["objectives.ny11.exchange"] = "Arrêter l'échange en cours",
+            ["objectives.ny11.escape"] = "Fuir le quai",
 
             // --- Familles, rôles, raretés ---
             ["family.Matter"] = "Matière", ["family.Elemental"] = "Élémentaire", ["family.PhysicalBio"] = "Physique / Bio", ["family.Perception"] = "Perception",

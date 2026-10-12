@@ -169,9 +169,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["archives.hero.rempart"] = "REMPART est une forteresse sur deux jambes. Il protège les autres avant lui-même, et c'est un peu son problème.";
             d["archives.hero.seve"] = "SÈVE fait pousser ce qui guérit. Les ronces de ses mains referment les plaies comme elles ouvrent les gardes.";
             d["archives.hero.etincelle"] = "ÉTINCELLE vient de découvrir son pouvoir : de petites décharges qu'elle manie encore avec prudence. On dit qu'elle ira loin.";
-            d["archives.zone.zone_ny_1_1"] = "Red Hook, les quais : la bande de Brick tenait les docks et le terminal. Le générateur est coupé, la grue est à toi. Le quartier respire.";
-            d["archives.zone.zone_ny_1_2"] = "Gowanus, le canal : la crue a noyé les entrepôts, le gang du canal en a profité. Une famille a pu être évacuée du deuxième étage.";
-            d["archives.zone.zone_ny_1_3"] = "Dumbo, le pont : le Titan du pont ne laissait plus rien passer. Maintenant que les câbles sont rétablis, la ville est de nouveau reliée.";
+            d["archives.zone.zone_ny_1_1"] = "Red Hook, les quais : l'AMIF faisait transiter des méta-humains kidnappés par le port. Le courant est coupé, les documents de transport sont en poche et l'échange a été stoppé : vous avez découvert le traitement des méta-humains et leur vente aux mafieux, et vous préparez un plan d'intervention.";
+            d["archives.zone.zone_ny_1_2"] = "Brownsville : l'AMIF vendait ses prisonniers à Antonio Kribelchi, dit « Crocodile », mafieux méta-humain. Les otages sont libérés, mais Crocodile est plus que remonté : il compte bien vous le faire payer.";
+            d["archives.zone.zone_ny_1_3"] = "Coney Island : Crocodile avait tendu un piège en prenant l'île en otage. Il est vaincu, mais Coney Island a été ravagée dans les affrontements.";
+            d["archives.zone.zone_ny_1_4"] = "Dumbo et le pont de Brooklyn : l'AMIF avait quadrillé Brooklyn. Rayner a stoppé l'affrontement en menaçant Stroke de révéler ses petites affaires. Le Général arrête Crocodile, désigné coupable, mais prévient que le tour de la Guilde viendra une fois les Accords de Salem signés.";
             d["archives.enemy.thug"] = "Voyou : le fantassin des gangs. Poings, barres de fer et beaucoup de bruit. Dangereux en nombre.";
             d["archives.enemy.brute"] = "Cogneur : lent mais solide, il provoque ses adversaires et encaisse. Il faut passer à travers sa garde.";
             d["archives.enemy.street_pyro"] = "Pyro de rue : cocktails et jets de flammes. Ses brûlures rongent l'équipe si on le laisse faire.";
