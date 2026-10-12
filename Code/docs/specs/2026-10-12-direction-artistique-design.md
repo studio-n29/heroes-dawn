@@ -47,3 +47,10 @@ Les noms existants sont conservés (aucun appel ne casse), leurs valeurs changen
 ## Questions ouvertes
 - Licence et rendu de Barlow Condensed en TMP (accents français) : à vérifier au lot 1.
 - Lisibilité du pastel sur les petits éléments : si insuffisante, durcir `Navy` ou `Accent` localement sans toucher à la direction.
+
+## Mise à jour (2026-10-12) : organisation du combat
+Sur demande de l'utilisateur (croquis), l'écran de combat est réorganisé dans ce même lot :
+- Frise en haut au centre ; ennemis en rangée sous la frise ; alliés en colonne à gauche (portrait rond, nom, PV, jauge, statuts) ; combo et compétences d'avatar en bas à gauche ; journal à droite.
+- Éventail de 4 cartes de compétence en bas au centre, visible seulement pour l'agent dont c'est le tour ; cet agent a un contour lumineux.
+- Appui maintenu sur une carte : description de l'effet au-dessus de l'éventail, jusqu'au relâchement.
+- Polices : Barlow Condensed (téléchargée avec l'accord de l'utilisateur, licence OFL).
