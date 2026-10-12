@@ -193,9 +193,11 @@ namespace N29.HeroesDawn.Content.Prototype
 
             var objectives = new List<ObjectiveDef>
             {
-                new ObjectiveDef("obj_warehouse", ObjectiveType.DefeatCombat, new CaseId("n23"), "objectives.ny11.warehouse"),
+                new ObjectiveDef("obj_infiltrate", ObjectiveType.ReachCase, new CaseId("n10"), "objectives.ny11.infiltrate"),
                 new ObjectiveDef("obj_generator", ObjectiveType.CompleteMiniGame, new CaseId("n08"), "objectives.ny11.generator"),
-                new ObjectiveDef("obj_crane", ObjectiveType.ReachCase, new CaseId("n24"), "objectives.ny11.crane"),
+                new ObjectiveDef("obj_documents", ObjectiveType.ReachCase, new CaseId("n18"), "objectives.ny11.documents"),
+                new ObjectiveDef("obj_exchange", ObjectiveType.DefeatCombat, new CaseId("n23"), "objectives.ny11.exchange"),
+                new ObjectiveDef("obj_escape", ObjectiveType.ReachCase, new CaseId("n24"), "objectives.ny11.escape"),
             };
 
             var encounters = new List<EncounterDef>

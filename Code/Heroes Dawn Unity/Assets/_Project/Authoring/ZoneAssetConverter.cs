@@ -71,8 +71,12 @@ namespace N29.HeroesDawn.Authoring
             return t;
         }
 
+        static List<NarrationLineData> LinesOf(IReadOnlyList<NarrationLineDef>? lines, System.Func<string, string>? textOf)
+            => lines == null ? new List<NarrationLineData>()
+               : lines.Select(l => new NarrationLineData { speaker = l.Speaker, text = textOf != null ? textOf(l.TextKey) : "" }).ToList();
+
         /// <summary>Remplit un asset d'après une zone du code (import) : même graphe, mêmes objectifs, mêmes rencontres.</summary>
-        public static void FillFrom(ZoneAsset a, ZoneDef d)
+        public static void FillFrom(ZoneAsset a, ZoneDef d, System.Func<string, string>? textOf = null)
         {
             a.zoneId = d.Id.Value;
             a.nameKey = d.NameKey;
@@ -87,6 +91,8 @@ namespace N29.HeroesDawn.Authoring
                 hasCombat = n.Combat != null,
                 enemyTable = n.Combat != null ? n.Combat.EnemyTable.Select(e => e.Value).ToList() : new List<string>(),
                 rounds = n.Combat?.Rounds ?? 1, enemiesMin = n.Combat?.EnemiesMin ?? 2, enemiesMax = n.Combat?.EnemiesMax ?? 3,
+                narrationBefore = LinesOf(n.Narration?.Before, textOf),
+                narrationAfter = LinesOf(n.Narration?.After, textOf),
             }).ToList();
             a.links = d.Links.Select(l => new LinkData
             {

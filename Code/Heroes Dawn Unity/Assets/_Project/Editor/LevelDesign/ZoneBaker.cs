@@ -86,7 +86,7 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
             {
                 string path = Folder + "/" + def.Id.Value + ".asset";
                 var asset = AssetDatabase.LoadAssetAtPath<ZoneAsset>(path) ?? NewZone(def.Id.Value);
-                ZoneAssetConverter.FillFrom(asset, def);
+                ZoneAssetConverter.FillFrom(asset, def, key => N29.HeroesDawn.Presentation.Common.Loc.Has(key) ? N29.HeroesDawn.Presentation.Common.Loc.T(key) : "");
                 if (bake) BakeBackground(asset);
                 EditorUtility.SetDirty(asset);
                 campaign.entries.Add(new CampaignEntry { zone = asset, act = def.Act, codeOverride = "", requires = def.Requires.Select(r => r.Value).ToList() });

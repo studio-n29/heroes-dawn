@@ -13,3 +13,6 @@ Source : texte fourni par l'équipe de game design. Le contenu est repris tel qu
 - Les objectifs des zones 1.2 à 1.4 ne sont pas encore définis (« - »).
 - Personnages nommés : Antonio Kribelchi dit « Crocodile » (mafieux méta-humain), Rayner (Guilde), Stroke, le Général (AMIF).
 - Événement à venir : signature des Accords de Salem.
+
+## Intégration au jeu (version 0.8.1)
+Les quatre zones sont jouables (spec `Code/docs/specs/2026-10-12-campagne-brooklyn-design.md`) : 1.1 Red Hook (les cinq objectifs de l'équipe), 1.2 Brownsville (infiltrer, neutraliser le lieutenant de Crocodile, libérer les otages, les mettre à l'abri), 1.3 Coney Island (évacuer les civils, briser le piège, vaincre Crocodile), 1.4 Dumbo et le pont de Brooklyn (percer le cordon de l'AMIF, couper son réseau, tenir le pont puis scène de Rayner). Déblocage linéaire.

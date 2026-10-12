@@ -22,7 +22,6 @@ MonoBehaviour:
   borough: brooklyn
   recommendedLevel: 8
   requires:
-  - zone_ny_1_1
   - zone_ny_1_2
   biome: 0
   weather: 4
@@ -40,6 +39,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n01
     type: 5
     isFixed: 0
@@ -52,6 +53,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n02
     type: 2
     isFixed: 0
@@ -64,6 +67,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n03
     type: 5
     isFixed: 0
@@ -76,6 +81,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n04
     type: 4
     isFixed: 0
@@ -88,6 +95,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n05
     type: 2
     isFixed: 0
@@ -100,6 +109,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n06
     type: 3
     isFixed: 0
@@ -112,6 +123,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n07
     type: 2
     isFixed: 0
@@ -124,6 +137,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n08
     type: 5
     isFixed: 0
@@ -136,6 +151,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n09
     type: 6
     isFixed: 0
@@ -148,6 +165,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n10
     type: 2
     isFixed: 0
@@ -160,6 +179,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n11
     type: 3
     isFixed: 1
@@ -172,6 +193,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n12
     type: 5
     isFixed: 0
@@ -184,6 +207,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n13
     type: 4
     isFixed: 0
@@ -196,6 +221,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n14
     type: 2
     isFixed: 1
@@ -208,6 +235,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n15
     type: 1
     isFixed: 1
@@ -220,6 +249,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n16
     type: 5
     isFixed: 0
@@ -232,6 +263,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n17
     type: 6
     isFixed: 0
@@ -244,6 +277,8 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
   - id: n18
     type: 2
     isFixed: 1
@@ -256,62 +291,152 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
+    narrationBefore:
+    - speaker: crocodile
+      text: "\xAB Vous \xEAtes venus. C'est exactement ce que je voulais : toute la Guilde sur mon \xEEle. \xBB"
+    - speaker: ancre
+      text: "On savait que c'\xE9tait un pi\xE8ge. Les civils sont \xE0 l'abri : on finit \xE7a ici."
+    narrationAfter:
+    - speaker: crocodile
+      text: "\xAB Impossible... Vous... \xBB"
+    - speaker: ancre
+      text: "Crocodile est \xE0 terre. Mais Coney Island est ravag\xE9e : la victoire a un prix."
   links:
   - a: n00
     b: n01
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n01
     b: n02
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n02
     b: n03
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n02
     b: n06
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n03
     b: n04
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n04
     b: n05
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n06
     b: n07
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n07
     b: n08
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n05
     b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n08
     b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n09
     b: n10
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n10
     b: n11
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n10
     b: n13
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n11
     b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n13
     b: n14
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n12
     b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n14
     b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n15
     b: n16
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n16
     b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   - a: n17
     b: n18
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
   objectives:
-  - id: obj_titan
-    type: 0
-    target: n18
-    nameKey: objectives.ny13.titan
-    text: 
-  - id: obj_cables
+  - id: obj_civilians
     type: 2
     target: n11
-    nameKey: objectives.ny13.cables
+    nameKey: objectives.ny13.civilians
     text: 
-  - id: obj_lieutenant
+  - id: obj_trap
     type: 0
     target: n14
-    nameKey: objectives.ny13.lieutenant
+    nameKey: objectives.ny13.trap
+    text: 
+  - id: obj_crocodile
+    type: 0
+    target: n18
+    nameKey: objectives.ny13.crocodile
     text: 
   encounters:
   - rank: 0
@@ -340,7 +465,7 @@ MonoBehaviour:
   - rank: 3
     waves:
     - enemies:
-      - bridge_titan
+      - crocodile
       - sniper
       - thug
   regions: []

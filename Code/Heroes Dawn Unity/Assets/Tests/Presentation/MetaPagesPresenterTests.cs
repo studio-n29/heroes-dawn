@@ -293,7 +293,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             Make();
             Assert.That(_view.Last.Boroughs.Length, Is.EqualTo(5));
             Assert.That(_view.Last.Boroughs.Where(b => !b.Locked).Select(b => b.Id), Is.EqualTo(new[] { "brooklyn" }));
-            Assert.That(_view.Last.Points.Count(p => p.ZoneId != null), Is.EqualTo(3), "trois zones jouables");
+            Assert.That(_view.Last.Points.Count(p => p.ZoneId != null), Is.EqualTo(4), "quatre zones jouables");
             Assert.That(_view.Last.Points.Count(p => p.ZoneId == null), Is.GreaterThan(0), "points à venir dans les quartiers verrouillés");
         }
 
@@ -302,22 +302,22 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             Make();
             Assert.That(_view.Last.Points.First(p => p.Selected).ZoneId, Is.EqualTo("zone_ny_1_1"));
+            _app.Session.CompletedZones.Add("zone_ny_1_1"); // la campagne est linéaire : 1.2 demande 1.1
             _view.Select("zone_ny_1_2");
             _view.Deploy();
             Assert.That(_app.Session.RunZone!.Id.Value, Is.EqualTo("zone_ny_1_2"));
             Assert.That(_app.Received<N29.HeroesDawn.Application.Messages.NavigateRequested>().Count(n => n.Target == N29.HeroesDawn.Application.Flow.GameState.Board), Is.EqualTo(1));
         }
 
-        [Test, Description("Vérifie que la zone 1.3 est verrouillée tant que 1.1 et 1.2 ne sont pas validées, avec la raison, puis s'ouvre — parce que le boss de l'acte suit les deux autres zones")]
-        public void BossZone_LockedUntilOthersDone()
+        [Test, Description("Vérifie que la zone 1.3 est verrouillée tant que la zone précédente (1.2, Brownsville) n'est pas validée, avec la raison, puis s'ouvre — parce que la campagne de Brooklyn se joue dans l'ordre")]
+        public void ZoneLockedUntilThePreviousIsDone()
         {
             Make();
             _view.Select("zone_ny_1_3");
             Assert.That(_view.Last.Detail.ButtonEnabled, Is.False);
-            Assert.That(_view.Last.Detail.Reason, Does.Contain("Red Hook"));
+            Assert.That(_view.Last.Detail.Reason, Does.Contain("Brownsville"));
             _view.Deploy();
             Assert.That(_app.Session.Run, Is.Null);
-            _app.Session.CompletedZones.Add("zone_ny_1_1");
             _app.Session.CompletedZones.Add("zone_ny_1_2");
             _view.Select("zone_ny_1_3");
             Assert.That(_view.Last.Detail.ButtonEnabled, Is.True);
@@ -344,16 +344,27 @@ namespace N29.HeroesDawn.Tests.Presentation
 
     public sealed class ZoneProgressTests
     {
-        [Test, Description("Vérifie l'ordre libre dans l'acte : 1.1 et 1.2 sont ouvertes d'emblée, 1.3 attend les deux — parce que les maquettes (M60) laissent l'ordre libre à l'intérieur d'un acte")]
-        public void ActOne_FreeOrder_BossLast()
+        [Test, Description("Vérifie que la campagne de Brooklyn est linéaire : 1.1 est ouverte d'emblée, chaque zone suivante attend la précédente — parce que l'histoire (Red Hook, Brownsville, Coney Island, Dumbo) se joue dans l'ordre")]
+        public void Brooklyn_IsLinear()
         {
             var app = new TestApp();
             app.SignInDirect("p1");
             var z = app.Session.Content.Zones;
-            Assert.That(ZoneProgress.StatusOf(app.Session, z.First(x => x.Code == "1.1")), Is.EqualTo(ZoneStatus.Available));
-            Assert.That(ZoneProgress.StatusOf(app.Session, z.First(x => x.Code == "1.2")), Is.EqualTo(ZoneStatus.Available));
-            Assert.That(ZoneProgress.StatusOf(app.Session, z.First(x => x.Code == "1.3")), Is.EqualTo(ZoneStatus.Locked));
+            ZoneStatus Status(string code) => ZoneProgress.StatusOf(app.Session, z.First(x => x.Code == code));
+            Assert.That(Status("1.1"), Is.EqualTo(ZoneStatus.Available));
+            Assert.That(Status("1.2"), Is.EqualTo(ZoneStatus.Locked));
+            Assert.That(Status("1.3"), Is.EqualTo(ZoneStatus.Locked));
+            Assert.That(Status("1.4"), Is.EqualTo(ZoneStatus.Locked));
             Assert.That(ZoneProgress.Recommended(app.Session).Code, Is.EqualTo("1.1"));
+            app.Session.CompletedZones.Add("zone_ny_1_1");
+            Assert.That(Status("1.2"), Is.EqualTo(ZoneStatus.Available));
+            Assert.That(Status("1.3"), Is.EqualTo(ZoneStatus.Locked));
+            app.Session.CompletedZones.Add("zone_ny_1_2");
+            Assert.That(Status("1.3"), Is.EqualTo(ZoneStatus.Available));
+            Assert.That(Status("1.4"), Is.EqualTo(ZoneStatus.Locked));
+            app.Session.CompletedZones.Add("zone_ny_1_3");
+            Assert.That(Status("1.4"), Is.EqualTo(ZoneStatus.Available));
+            Assert.That(ZoneProgress.Recommended(app.Session).Code, Is.EqualTo("1.4"));
         }
 
         [Test, Description("Vérifie que démarrer une zone verrouillée échoue avec une erreur métier — parce que l'interface ne doit pas être la seule garde")]
@@ -365,11 +376,11 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(r.Error?.Code, Is.EqualTo("zone.locked"));
         }
 
-        [Test, Description("Vérifie que les zones 1.2 et 1.3 sont jouables de bout en bout (graphe valide, objectifs atteignables, combats existants) — parce qu'une zone injouable bloquerait la progression")]
+        [Test, Description("Vérifie que les quatre zones de Brooklyn sont jouables de bout en bout (graphe valide, objectifs atteignables, combats existants) — parce qu'une zone injouable bloquerait la progression")]
         public void NewZones_AreWellFormed()
         {
             var c = PrototypeContent.Build();
-            foreach (var id in new[] { PrototypeZones.Zone12, PrototypeZones.Zone13 })
+            foreach (var id in new[] { PrototypeContent.Zone11, PrototypeZones.Zone12, PrototypeZones.Zone13, PrototypeZones.Zone14 })
             {
                 var zone = c.Zone(id);
                 var graph = new N29.HeroesDawn.Domain.Board.BoardGraph(zone);

@@ -20,7 +20,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.AreEqual(30, c.Members.Count);
             var zone = c.Zone(PrototypeContent.Zone11);
             Assert.AreEqual(25, zone.Nodes.Count);
-            Assert.AreEqual(3, zone.Objectives.Count);
+            Assert.AreEqual(5, zone.Objectives.Count);
             foreach (var l in zone.Links)
             {
                 Assert.IsTrue(zone.Nodes.Any(n => n.Id == l.A), l.A.Value);
