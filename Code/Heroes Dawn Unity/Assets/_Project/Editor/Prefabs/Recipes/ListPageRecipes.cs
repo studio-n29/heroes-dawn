@@ -90,7 +90,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public const float HeaderH = 150;
 
-        public static T Build<T>(PrefabContext ctx, string name, float sideWidth, bool sideRows, bool sideText) where T : ListPageView
+        public static T Build<T>(PrefabContext ctx, string name, float sideWidth, bool sideRows, bool sideText, bool shopTabs = false) where T : ListPageView
         {
             var rt = ScreenKit.Root(name);
 
@@ -115,7 +115,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             mainArea.anchorMin = new Vector2(0, 0);
             mainArea.anchorMax = new Vector2(1, 1);
             mainArea.offsetMin = Vector2.zero;
-            mainArea.offsetMax = new Vector2(-(sideWidth > 0 ? sideWidth + 24 : 0), -(HeaderH + 14));
+            float tabsH = shopTabs ? ShopTabsRecipe.Height + 10 : 0f;
+            mainArea.offsetMax = new Vector2(-(sideWidth > 0 ? sideWidth + 24 : 0), -(HeaderH + 14 + tabsH));
             var rows = Ui.VScroll(mainArea, out _);
             rows.VLayout(10, 0, TextAnchor.UpperCenter);
             rows.GetComponent<VerticalLayoutGroup>().childControlHeight = true;
@@ -131,6 +132,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "headerB", b);
             ctx.Wire(view, "rows", rows);
             ctx.Wire(view, "rowPrefab", ctx.Asset("Widgets/InfoRow.prefab").GetComponent<InfoRowView>());
+            if (shopTabs)
+            {
+                var tabs = ctx.Nest<ShopTabsView>("Widgets/ShopTabs.prefab", rt, "ShopTabs");
+                var trt = (RectTransform)tabs.transform;
+                trt.anchorMin = new Vector2(0f, 1f); trt.anchorMax = new Vector2(1f, 1f); trt.pivot = new Vector2(0.5f, 1f);
+                trt.anchoredPosition = new Vector2(0f, -(HeaderH + 8)); trt.sizeDelta = new Vector2(0f, ShopTabsRecipe.Height);
+                ctx.Wire(view, "shopTabs", tabs);
+            }
 
             // ---- Colonne de droite
             if (sideWidth > 0)
@@ -184,7 +193,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Boutique.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<BoutiquePageView>(ctx, "BoutiquePage", 0, false, false).gameObject;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<BoutiquePageView>(ctx, "BoutiquePage", 0, false, false, shopTabs: true).gameObject;
     }
 
     public sealed class OperationsPageRecipe : IPrefabRecipe

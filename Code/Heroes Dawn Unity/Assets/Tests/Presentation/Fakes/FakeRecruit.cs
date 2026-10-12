@@ -16,6 +16,10 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action<int>? RecruitClicked;
         public event Action? RerollClicked;
         public event Action? RegistryClicked;
+        public event Action<int>? ShopTabClicked;
+        public int ShopTabShown = -1;
+        public void ShowShopTab(int active) => ShopTabShown = active;
+        public void ClickShopTab(int tab) => ShopTabClicked?.Invoke(tab);
         public readonly List<RecruitPageData> Shown = new List<RecruitPageData>();
         public RecruitPageData Last => Shown[Shown.Count - 1];
         public void Show(RecruitPageData d) => Shown.Add(d);

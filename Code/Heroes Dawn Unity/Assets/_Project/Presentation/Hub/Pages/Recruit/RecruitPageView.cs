@@ -19,6 +19,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text progress = null!;
         [SerializeField] UiButton reroll = null!;
         [SerializeField] UiButton registry = null!;
+        [SerializeField] ShopTabsView shopTabs = null!;
 
         readonly int[] _slots = new int[8];
         readonly Core.MemberId[] _ids = new Core.MemberId[8];
@@ -28,9 +29,12 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action<int>? RecruitClicked;
         public event Action? RerollClicked;
         public event Action? RegistryClicked;
+        public event Action<int>? ShopTabClicked;
 
         public Button RerollButton => reroll.Button;
         public ShopCardView Card(int index) => cards[index];
+        /// <summary>Bandeau d'onglets de la boutique (tests PlayMode).</summary>
+        public ShopTabsView ShopTabs => shopTabs;
 
         void Awake()
         {
@@ -42,7 +46,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             reroll.Button.onClick.AddListener(() => RerollClicked?.Invoke());
             registry.Button.onClick.AddListener(() => RegistryClicked?.Invoke());
+            shopTabs.TabClicked += i => ShopTabClicked?.Invoke(i);
         }
+
+        public void ShowShopTab(int active) => shopTabs.Show(active);
 
         public void Show(RecruitPageData d)
         {

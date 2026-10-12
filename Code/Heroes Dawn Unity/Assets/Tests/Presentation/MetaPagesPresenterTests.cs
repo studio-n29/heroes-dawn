@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using N29.HeroesDawn.Application.Features.Collection;
 using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Features.World;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Content.Prototype;
+using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Mvp;
@@ -23,6 +25,10 @@ namespace N29.HeroesDawn.Tests.Presentation
         public event Action<int>? RowSelected;
         public event Action<int, int>? SideButtonClicked;
         public event Action<int>? SideRowSelected;
+        public event Action<int>? ShopTabClicked;
+        public int ShopTabShown = -1;
+        public void ShowShopTab(int active) => ShopTabShown = active;
+        public void ClickShopTab(int tab) => ShopTabClicked?.Invoke(tab);
         public ListHeaderData Header;
         public InfoRowData[] Rows = Array.Empty<InfoRowData>();
         public ListSideData Side;
@@ -105,7 +111,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             _app.Session.Wallet.SetGems(0);
             var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
-                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator()));
+                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator { ShopTab = ShopTab.Gems }));
             int row = BoutiqueRow("ex_credits");
             Assert.That(_view.Rows[row].A.Enabled, Is.False);
             Assert.That(_view.Rows[row].A.Reason, Does.Contain("20"));
@@ -124,13 +130,66 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void Boutique_PackPurchase_ConfirmsThenGrantsGems()
         {
             var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
-                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator()));
+                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator { ShopTab = ShopTab.Gems }));
             int gems = _app.Session.Wallet.Gems;
             _view.ClickRow(0);
             var popup = (FakeConfirmPopup)_host.Spawned.Single();
             Assert.That(popup.Asked!.Value.Body, Does.Contain("simulé"));
             popup.Answer(true);
             Assert.That(_app.Session.Wallet.Gems, Is.EqualTo(gems + 100));
+            p.Dispose();
+        }
+
+        BoutiquePagePresenter NewBoutique(HubNavigator nav)
+            => Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
+                                               _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, nav));
+
+        [Test, Description("Vérifie que la boutique affiche un onglet à la fois (boosters, objets, gemmes, cadeau), que changer d'onglet change les lignes et mémorise l'onglet, et que l'onglet Héros ouvre la page Recruter — parce que la boutique est unique, à onglets")]
+        public void Boutique_Tabs_SwitchTheRows_AndHeroesGoToRecruit()
+        {
+            var nav = new HubNavigator();
+            var p = NewBoutique(nav);
+            Assert.That(_view.ShopTabShown, Is.EqualTo((int)ShopTab.Boosters), "les héros ont leur page : on retombe sur les boosters");
+            Assert.That(_view.Rows.Length, Is.EqualTo(2), "stock + achat");
+            _view.ClickShopTab((int)ShopTab.Items);
+            Assert.That(nav.ShopTab, Is.EqualTo(ShopTab.Items));
+            Assert.That(_view.Rows.Length, Is.EqualTo(CollectionBook.ItemOfferCount));
+            _view.ClickShopTab((int)ShopTab.Gems);
+            Assert.That(_view.Rows.Length, Is.EqualTo(Boutique.Packs.Count + Boutique.Exchanges.Count));
+            _view.ClickShopTab((int)ShopTab.Gift);
+            Assert.That(_view.Rows.Length, Is.EqualTo(1));
+            _view.ClickShopTab((int)ShopTab.Heroes);
+            Assert.That(nav.Current.Page, Is.EqualTo(HubPage.Recruit));
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie que l'onglet Cadeau récupère le cadeau du jour et grise la ligne ensuite — parce que le cadeau se prend une fois par jour")]
+        public void Boutique_GiftTab_ClaimsOncePerDay()
+        {
+            var p = NewBoutique(new HubNavigator { ShopTab = ShopTab.Gift });
+            Assert.That(_view.Rows[0].A.Enabled, Is.True);
+            _view.ClickRow(0);
+            Assert.That(_view.Rows[0].A.Enabled, Is.False);
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie qu'« Ouvrir » est grisé sans booster, que l'achat en ajoute un, et qu'ouvrir montre la popup animée avec autant de cartes que le booster en contient puis consomme le booster — parce que l'ouverture est un moment à part")]
+        public void Boutique_Boosters_BuyThenOpenShowsTheAnimatedPopup()
+        {
+            _host.Register<IBoosterOpeningPopupView>(() => new FakeBoosterOpeningPopup());
+            _app.Session.Wallet.Add(0, 1000);
+            var p = NewBoutique(new HubNavigator { ShopTab = ShopTab.Boosters });
+            Assert.That(_view.Rows[0].A.Enabled, Is.False, "aucun booster en réserve");
+            _view.ClickRow(1);
+            Assert.That(_app.Collection.BoosterStock(BoosterDef.StandardId), Is.EqualTo(1));
+            Assert.That(_view.Rows[0].A.Enabled, Is.True);
+            _view.ClickRow(0);
+            var popup = (FakeBoosterOpeningPopup)_host.Spawned.Single(s => s is FakeBoosterOpeningPopup);
+            Assert.That(popup.Shown!.Value.Cards.Length, Is.EqualTo(_app.Session.Content.Collection.Booster(BoosterDef.StandardId).Cards));
+            Assert.That(popup.Shown!.Value.Cards.All(c => c.IsNew || c.Name.Length > 0));
+            Assert.That(_app.Collection.BoosterStock(BoosterDef.StandardId), Is.EqualTo(0), "le booster est consommé");
+            popup.Continue();
+            Assert.That(_host.Despawned, Does.Contain(popup), "la popup est fermée au Continuer");
             p.Dispose();
         }
 

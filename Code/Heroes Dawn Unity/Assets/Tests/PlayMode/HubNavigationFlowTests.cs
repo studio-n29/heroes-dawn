@@ -51,14 +51,20 @@ namespace N29.HeroesDawn.Tests.PlayMode
         static int LivePages() => Object.FindObjectsByType<ViewBase>(FindObjectsSortMode.None)
             .Count(v => v != null && v.gameObject.activeInHierarchy && !(v is HubShellView) && v.GetComponentInParent<HubShellView>() != null);
 
-        [UnityTest, Description("Vérifie que les 5 onglets affichent chacun leur page, une seule à la fois — parce que la barre de navigation est la colonne vertébrale du hub (spec §3.2)")]
-        public IEnumerator TabBar_SwitchesAllFivePages()
+        [UnityTest, Description("Vérifie que les 4 onglets de la barre affichent chacun leur page, une seule à la fois, et que la Boutique s'ouvre sur les héros puis sur ses autres sections par son bandeau d'onglets — parce que la boutique est unique et que la barre de navigation est la colonne vertébrale du hub (spec §3.2)")]
+        public IEnumerator TabBar_SwitchesAllFourPages()
         {
             yield return OnHub();
             yield return Tab(HubPage.Team);
             Assert.That(PlayModeHarness.Visible<TeamPageView>(), Is.True);
-            yield return Tab(HubPage.Recruit);
-            Assert.That(PlayModeHarness.Visible<RecruitPageView>(), Is.True);
+            yield return Tab(HubPage.Pass);
+            Assert.That(PlayModeHarness.Visible<PassPageView>(), Is.True);
+            yield return Tab(HubPage.Shop);
+            Assert.That(PlayModeHarness.Visible<RecruitPageView>(), Is.True, "la boutique s'ouvre sur l'onglet Héros");
+            Object.FindAnyObjectByType<RecruitPageView>()!.ShopTabs.Tab(1).Button.onClick.Invoke();
+            yield return null;
+            yield return null;
+            Assert.That(PlayModeHarness.Visible<BoutiquePageView>(), Is.True, "l'onglet Boosters affiche la page Boutique");
             yield return Tab(HubPage.Pass);
             Assert.That(PlayModeHarness.Visible<PassPageView>(), Is.True);
             yield return Tab(HubPage.Shop);

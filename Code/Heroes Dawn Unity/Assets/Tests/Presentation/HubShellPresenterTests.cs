@@ -69,30 +69,30 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Last.Tabs.Select(t => t.Page), Is.EqualTo(HubNavigator.Tabs));
         }
 
-        [Test, Description("Vérifie que l'onglet Recruter porte le badge « N » tant que la boutique du jour n'a pas été vue — parce que le joueur doit savoir que de nouveaux héros sont arrivés (spec §5)")]
-        public void RecruitTab_ShowsNBadge_WhenShopNotSeen_AndClearsAfterSeen()
+        [Test, Description("Vérifie que l'onglet Boutique porte le badge « N » tant que la boutique du jour n'a pas été vue — parce que le joueur doit savoir que de nouveaux héros sont arrivés (spec §5)")]
+        public void ShopTab_ShowsNBadge_WhenShopNotSeen_AndClearsAfterSeen()
         {
             _app.Shop.Open.ExecuteAsync().GetAwaiter().GetResult();
-            Assert.That(_view.Last.Tabs.Single(t => t.Page == HubPage.Recruit).Badge, Is.EqualTo("N"));
+            Assert.That(_view.Last.Tabs.Single(t => t.Page == HubPage.Shop).Badge, Is.EqualTo("N"));
             _app.Shop.MarkSeen.ExecuteAsync().GetAwaiter().GetResult();
-            Assert.That(_view.Last.Tabs.Single(t => t.Page == HubPage.Recruit).Badge, Is.Empty);
+            Assert.That(_view.Last.Tabs.Single(t => t.Page == HubPage.Shop).Badge, Is.Empty);
         }
 
         [Test, Description("Vérifie que la coque tire la boutique du jour dès son ouverture, badge « N » compris — parce que le joueur doit voir l'arrivée des héros sans ouvrir Recruter (spec §5)")]
         public void Start_OpensShop_ShowsBadge()
         {
             Assert.That(_app.Session.Shop.Day, Is.Not.Empty);
-            Assert.That(_view.Last.Tabs.Single(t => t.Page == HubPage.Recruit).Badge, Is.EqualTo("N"));
+            Assert.That(_view.Last.Tabs.Single(t => t.Page == HubPage.Shop).Badge, Is.EqualTo("N"));
         }
 
         [Test, Description("Vérifie qu'à 9h00 la coque tire la nouvelle boutique et remet le badge « N » — parce que le joueur peut rester sur le hub au moment du renouvellement")]
         public void Tick_At9_ReopensShop_BadgeBack()
         {
             _app.Shop.MarkSeen.ExecuteAsync().GetAwaiter().GetResult();
-            Assert.That(_view.Last.Tabs.Single(t => t.Page == HubPage.Recruit).Badge, Is.Empty);
+            Assert.That(_view.Last.Tabs.Single(t => t.Page == HubPage.Shop).Badge, Is.Empty);
             _app.Time.LocalNow = _app.Time.LocalNow.Date.AddDays(1).AddHours(9);
             _p.Tick();
-            Assert.That(_view.Last.Tabs.Single(t => t.Page == HubPage.Recruit).Badge, Is.EqualTo("N"));
+            Assert.That(_view.Last.Tabs.Single(t => t.Page == HubPage.Shop).Badge, Is.EqualTo("N"));
         }
 
         [Test, Description("Vérifie que toucher un onglet crée sa page et détruit l'ancienne une seule fois — parce qu'il ne doit jamais y avoir deux pages vivantes (Review Focus 1)")]

@@ -58,9 +58,13 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.RecruitClicked += Recruit;
             View.RerollClicked += Reroll;
             View.RegistryClicked += OpenRegistry;
+            View.ShopTabClicked += OpenShopTab;
+            View.ShowShopTab((int)ShopTab.Heroes);
         }
 
         void OpenRegistry() => _nav.Open(HubPage.Agents);
+
+        void OpenShopTab(int tab) => _nav.SelectShopTab((ShopTab)tab);
 
         protected override void OnShown()
         {
@@ -87,6 +91,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.RecruitClicked -= Recruit;
             View.RerollClicked -= Reroll;
             View.RegistryClicked -= OpenRegistry;
+            View.ShopTabClicked -= OpenShopTab;
         }
 
         public void Tick()

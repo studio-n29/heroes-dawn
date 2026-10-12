@@ -55,7 +55,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(book.UnequipItem(session.Roster[0].Id, new ItemId("kevlar_vest")).IsSuccess);
         }
 
-        [UnityTest, Timeout(240000), Description("Vérifie que le Grimoire s'ouvre avec les vrais prefabs, liste toutes les cartes et que l'ouverture d'un booster affiche la fenêtre des cartes tirées — parce que la collection doit se voir à l'écran")]
+        [UnityTest, Timeout(240000), Description("Vérifie que le Grimoire s'ouvre avec les vrais prefabs, liste toutes les cartes et que l'ouverture d'un booster joue la popup animée (paquet, cartes retournées, Continuer) — parce que la collection doit se voir à l'écran")]
         public IEnumerator Grimoire_PageOpens_AndOpensABooster()
         {
             yield return SignedIn();
@@ -68,9 +68,53 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return null;
             var open = page.GetComponentsInChildren<UnityEngine.UI.Button>(true).First(b => b.GetComponentInChildren<TMPro.TMP_Text>(true)?.text == "OUVRIR UN BOOSTER");
             open.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Common.ConfirmPopupView>() != null, 120);
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoosterOpeningPopupView>() != null, 120);
+            var popup = Object.FindAnyObjectByType<BoosterOpeningPopupView>()!;
+            yield return null;
+            Assert.That(popup.Current, Is.EqualTo(BoosterOpeningPopupView.Phase.Sealed), "le paquet attend un toucher");
+            popup.TapButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => popup.Current == BoosterOpeningPopupView.Phase.Revealing, 300);
+            Assert.That(popup.Cards.Count, Is.EqualTo(3));
+            popup.TapButton.onClick.Invoke(); // un toucher pendant la révélation retourne tout
+            yield return PlayModeHarness.WaitFor(() => popup.ContinueVisible, 300);
+            Assert.That(popup.Cards.All(x => x.Revealed && x.FaceVisible), Is.True, "toutes les cartes sont retournées");
+            popup.ContinueButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoosterOpeningPopupView>() == null, 120);
             Assert.That(CollectionOps.Boosters(session, BoosterDef.StandardId), Is.EqualTo(0));
             Assert.That(session.Content.Collection.Cards.Sum(card => CollectionOps.OwnedCards(session, card.Id)), Is.EqualTo(3));
+        }
+
+        [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures de la boutique à onglets et des trois temps de l'ouverture d'un booster (paquet, révélation, résumé) — parce que ces rendus se relisent à l'œil")]
+        public IEnumerator CaptureTheShopAndBoosterOpening()
+        {
+            yield return SignedIn();
+            var c = ActivityGamesPlayTests.Container;
+            var session = c.Resolve<GameSession>();
+            session.Wallet.Set(5000, 600);
+            CollectionOps.AddBooster(session, BoosterDef.StandardId, 2);
+            var nav = Object.FindAnyObjectByType<N29.HeroesDawn.Composition.HubLifetimeScope>()!.Container.Resolve<HubNavigator>();
+            foreach (var tab in new[] { ShopTab.Boosters, ShopTab.Items, ShopTab.Gems, ShopTab.Gift })
+            {
+                nav.SelectShopTab(tab);
+                yield return new WaitForSecondsRealtime(0.7f);
+                yield return ScreenCaptureTests.Capture("60-boutique-" + tab.ToString().ToLowerInvariant());
+            }
+            nav.SelectShopTab(ShopTab.Boosters);
+            yield return new WaitForSecondsRealtime(0.5f);
+            var open = Object.FindAnyObjectByType<BoutiquePageView>()!.GetComponentsInChildren<UnityEngine.UI.Button>(true).First(b => b.GetComponentInChildren<TMPro.TMP_Text>(true)?.text == "OUVRIR");
+            open.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoosterOpeningPopupView>() != null, 120);
+            var popup = Object.FindAnyObjectByType<BoosterOpeningPopupView>()!;
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return ScreenCaptureTests.Capture("61-booster-paquet");
+            popup.TapButton.onClick.Invoke();
+            yield return new WaitForSecondsRealtime(2.2f);
+            yield return ScreenCaptureTests.Capture("62-booster-revelation");
+            popup.TapButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => popup.ContinueVisible, 300);
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return ScreenCaptureTests.Capture("63-booster-resume");
+            popup.ContinueButton.onClick.Invoke();
         }
 
         [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures de la fiche d'agent, de l'équipement, du grimoire, de la boutique d'objets et du combat avec une 4e compétence — parce que ces écrans se relisent à l'œil")]
