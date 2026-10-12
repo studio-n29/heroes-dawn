@@ -18,7 +18,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ScreenKit.Backdrop(rt, Theme.SkyTop, Theme.SkyBottom);
             ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0f);
             // Dégradé sombre en bas pour la lisibilité des boutons.
-            var shade = Ui.Img(rt, "BottomShade", new Color(0, 0, 0, 0.85f), Sprites.VerticalGradient);
+            var shade = Ui.Img(rt, "BottomShade", Theme.WithAlpha(Theme.Navy, 0.3f), Sprites.VerticalGradient);
             var srt = shade.rectTransform;
             srt.anchorMin = new Vector2(0, 0);
             srt.anchorMax = new Vector2(1, 0);
@@ -65,7 +65,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             spinner.gameObject.SetActive(false);
 
             Ui.LocTxt(rt, "game.studio", 30, Theme.Primary, TextAnchor.LowerLeft, FontKind.Title, "Studio").rectTransform.At(0f, 0f, 40, 24, 400, 50);
-            Ui.LocTxt(rt, "game.build", 22, Theme.TextMuted, TextAnchor.LowerRight, FontKind.Regular, "Build").rectTransform.At(1f, 0f, -40, 70, 600, 40);
+            Ui.LocTxt(rt, "game.build", 22, Theme.Navy, TextAnchor.LowerRight, FontKind.Regular, "Build").rectTransform.At(1f, 0f, -40, 70, 600, 40);
 
             var view = rt.gameObject.AddComponent<LoginView>();
             ScreenKit.WireFade(ctx, view);

@@ -32,10 +32,18 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] RectTransform enemyRow = null!;
         [SerializeField] RectTransform allyRow = null!;
         [SerializeField] UnitCardView unitCardPrefab = null!;
+        [SerializeField] UnitCardView allyCardPrefab = null!;
+        [SerializeField] RectTransform fanRoot = null!;
+        [SerializeField] SkillIconView[] fan = Array.Empty<SkillIconView>();
+        [SerializeField, Mvp.OptionalRef] Tutorial.TutorialTargetMarker? fanMarker;
+        [SerializeField] RectTransform descPanel = null!;
+        [SerializeField] TMP_Text descTitle = null!;
+        [SerializeField] TMP_Text descText = null!;
 
         readonly Dictionary<int, UnitCardView> _cards = new Dictionary<int, UnitCardView>();
         Coroutine? _bannerFade;
         int _skillUnit = -1;
+        IReadOnlyList<UnitStateData> _lastStates = Array.Empty<UnitStateData>();
 
         public event Action? RetreatClicked;
         public event Action? AutoClicked;
@@ -56,15 +64,17 @@ namespace N29.HeroesDawn.Presentation.Combat
         public TimelineView Timeline => timeline;
 
         /// <summary>Icône de la compétence <paramref name="i"/> de l'agent prêt (tests PlayMode : clics réels).</summary>
-        public UnityEngine.UI.Button SkillButton(int i)
-        {
-            if (_skillUnit >= 0 && _cards.TryGetValue(_skillUnit, out var active)) return active.Icon(i).Button;
-            foreach (var card in _cards.Values) if (card.Icon(i).Data.Visible) return card.Icon(i).Button; // aucun agent prêt : la première icône affichée
-            return _cards.Values.First().Icon(i).Button;
-        }
+        public UnityEngine.UI.Button SkillButton(int i) => fan[i].Button;
 
-        /// <summary>Icône d'un agent donné (tests PlayMode).</summary>
-        public SkillIconView SkillIcon(int unitId, int i) => _cards[unitId].Icon(i);
+        /// <summary>Carte de l'éventail (visible seulement pour l'agent dont c'est le tour ; tests PlayMode).</summary>
+        public SkillIconView SkillCard(int i) => fan[i];
+
+        /// <summary>L'éventail de compétences est-il affiché ? (tests PlayMode)</summary>
+        public bool FanVisible => fanRoot.gameObject.activeSelf;
+
+        /// <summary>Description affichée pendant l'appui maintenu sur une carte (tests PlayMode).</summary>
+        public bool DescriptionVisible => descPanel.gameObject.activeSelf;
+        public string DescriptionText => descText.text;
 
         /// <summary>Cartes ennemies (tests PlayMode : cibler au toucher).</summary>
         public IReadOnlyList<UnitCardView> EnemyCards()
@@ -87,6 +97,25 @@ namespace N29.HeroesDawn.Presentation.Combat
                 avatarButtons[i].Button.onClick.AddListener(() => AvatarClicked?.Invoke(index));
             }
             combo.Button.onClick.AddListener(() => ComboClicked?.Invoke());
+            for (int i = 0; i < fan.Length; i++)
+            {
+                int slot = i;
+                fan[i].Clicked += () => SkillClicked?.Invoke(slot);
+                fan[i].Holding += ShowDescription;
+            }
+            descPanel.gameObject.SetActive(false);
+            fanRoot.gameObject.SetActive(false);
+        }
+
+        /// <summary>Appui maintenu sur une carte : description de l'effet au-dessus de l'éventail, jusqu'au relâchement.</summary>
+        void ShowDescription(SkillIconView card, bool held)
+        {
+            descPanel.gameObject.SetActive(held && card.Data.Visible && !card.Data.Locked);
+            if (!held) return;
+            var label = card.Data.Label ?? "";
+            int close = label.IndexOf(']');
+            descTitle.text = (close >= 0 ? label.Substring(close + 1) : label).Trim();
+            descText.text = card.Data.Description ?? "";
         }
 
         void Update()
@@ -115,24 +144,37 @@ namespace N29.HeroesDawn.Presentation.Combat
             _cards.Clear();
             foreach (var u in units)
             {
-                var card = Instantiate(unitCardPrefab, u.Ally ? allyRow : enemyRow);
+                var card = Instantiate(u.Ally ? allyCardPrefab : unitCardPrefab, u.Ally ? allyRow : enemyRow);
                 card.Setup(u);
                 card.Tapped += id => UnitTapped?.Invoke(id);
-                card.SkillClicked += slot => { if (u.Id == _skillUnit || _skillUnit < 0) SkillClicked?.Invoke(slot); };
                 _cards[u.Id] = card;
             }
         }
 
         public void ShowUnits(IReadOnlyList<UnitStateData> states)
         {
+            _lastStates = states;
             foreach (var s in states)
                 if (_cards.TryGetValue(s.Id, out var c)) c.Refresh(s);
         }
 
         public void ShowSkills(SkillPanelData d)
         {
-            // Les icônes vivent sous chaque agent (UnitStateData.Skills) ; ici on retient quel agent est lançable.
+            // L'éventail du bas d'écran n'existe que pour l'agent dont c'est le tour ; il reprend les icônes calculées par UnitStateData.Skills.
             _skillUnit = d.Visible ? d.UnitId : -1;
+            SkillSlotData[]? skills = null;
+            foreach (var s in _lastStates) if (s.Id == _skillUnit) skills = s.Skills;
+            bool show = d.Visible && skills != null;
+            if (fanRoot.gameObject.activeSelf != show) fanRoot.gameObject.SetActive(show);
+            if (!show) { descPanel.gameObject.SetActive(false); if (fanMarker != null) fanMarker.enabled = false; return; }
+            bool usable = false;
+            for (int i = 0; i < fan.Length; i++)
+            {
+                var slotData = i < skills!.Length ? skills[i] : default;
+                fan[i].Show(slotData, i);
+                usable |= slotData.Enabled || slotData.Pending;
+            }
+            if (fanMarker != null) fanMarker.enabled = usable;
         }
 
         public void ShowTimeline(TimelineData d)

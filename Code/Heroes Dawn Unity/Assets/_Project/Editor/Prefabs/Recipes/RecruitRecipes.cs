@@ -45,7 +45,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             strip.rectTransform.TopBand(10, 0);
             var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", fill.transform, "Portrait");
             ((RectTransform)portrait.transform).At(0.5f, 1f, 0, -24, 110, 110);
-            var name = Ui.Txt(fill.transform, "", 40, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Name");
+            var name = Ui.Txt(fill.transform, "", 40, Theme.Navy, TextAnchor.MiddleCenter, FontKind.Title, "Name");
             name.rectTransform.At(0.5f, 1f, 0, -140, 360, 48);
             name.AutoSize(40);
             name.Inked();

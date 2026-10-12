@@ -36,7 +36,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             cell.Pref(125, 150);
             var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", cell, "Portrait");
             ((RectTransform)portrait.transform).At(0.5f, 1f, 0, 0, 90, 90);
-            var name = Ui.Txt(cell, "", 22, Color.white, TextAnchor.MiddleCenter, FontKind.Body, "Name");
+            var name = Ui.Txt(cell, "", 22, Theme.Navy, TextAnchor.MiddleCenter, FontKind.Body, "Name");
             name.rectTransform.At(0.5f, 1f, 0, -92, 125, 26);
             var bar = Ui.Bar(cell, "Fatigue", Theme.Success, Theme.SurfaceDark);
             ((RectTransform)bar.transform).At(0.5f, 1f, 0, -122, 110, 16);

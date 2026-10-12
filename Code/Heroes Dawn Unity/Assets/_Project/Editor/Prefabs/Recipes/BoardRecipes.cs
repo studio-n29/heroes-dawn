@@ -150,7 +150,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             pawn.pivot = new Vector2(0.5f, 0f);
             pawn.sizeDelta = new Vector2(70, 70);
             var shadow = pawn.gameObject.AddComponent<Shadow>();
-            shadow.effectColor = new Color(0, 0, 0, 0.6f);
+            shadow.effectColor = Theme.WithAlpha(Theme.Navy, 0.6f);
             shadow.effectDistance = new Vector2(6, -6);
             return pawn.gameObject;
         }

@@ -19,9 +19,9 @@ namespace N29.HeroesDawn.Presentation.Common
         static readonly System.Collections.Generic.Dictionary<TMP_FontAsset, Material> _inked = new System.Collections.Generic.Dictionary<TMP_FontAsset, Material>();
 
         // Polices TextMeshPro générées (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface → Resources/Fonts/TMP).
-        public static TMP_FontAsset TitleFont => _title != null ? _title : (_title = LoadFont("Bangers-Regular"));
-        public static TMP_FontAsset BodyFont => _body != null ? _body : (_body = LoadFont("ComicNeue-Bold"));
-        public static TMP_FontAsset RegularFont => _regular != null ? _regular : (_regular = LoadFont("ComicNeue-Regular"));
+        public static TMP_FontAsset TitleFont => _title != null ? _title : (_title = LoadFont("BarlowCondensed-ExtraBoldItalic"));
+        public static TMP_FontAsset BodyFont => _body != null ? _body : (_body = LoadFont("BarlowCondensed-SemiBold"));
+        public static TMP_FontAsset RegularFont => _regular != null ? _regular : (_regular = LoadFont("BarlowCondensed-Regular"));
 
         static TMP_FontAsset LoadFont(string name)
         {
@@ -174,6 +174,7 @@ namespace N29.HeroesDawn.Presentation.Common
             t.textWrappingMode = TextWrappingModes.Normal;
             t.overflowMode = TextOverflowModes.Overflow;
             t.lineSpacing = font == FontKind.Title ? -10f : 0f;
+            if (font == FontKind.Title) t.fontStyle = FontStyles.UpperCase;
             return t;
         }
 

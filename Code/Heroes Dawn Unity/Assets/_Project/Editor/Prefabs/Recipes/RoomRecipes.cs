@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             strip.rectTransform.offsetMax = new Vector2(10, 0);
             var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", fill.transform, "Portrait");
             ((RectTransform)portrait.transform).At(0f, 0.5f, 22, 0, 96, 96);
-            var name = Ui.Txt(fill.transform, "", 34, Color.white, TextAnchor.MiddleLeft, FontKind.Title, "Name");
+            var name = Ui.Txt(fill.transform, "", 34, Theme.Navy, TextAnchor.MiddleLeft, FontKind.Title, "Name");
             name.rectTransform.At(0f, 1f, 132, -10, 460, 42);
             name.Inked(1.5f);
             var detail = Ui.Txt(fill.transform, "", 22, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Regular, "Detail");

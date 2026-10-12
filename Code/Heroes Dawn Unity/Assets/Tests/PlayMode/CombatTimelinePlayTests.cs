@@ -53,6 +53,62 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(alive, Is.EqualTo(timeline.Markers.Count), "chaque pastille est sur un segment");
         }
 
+        [UnityTest, Timeout(300000), Description("Vérifie que les pastilles de la frise sont des losanges bleu marine sans contour noir — parce que la direction artistique HUD pastel remplace les disques à contour noir")]
+        public IEnumerator Timeline_MarkersAreDiamonds()
+        {
+            yield return IntoCombat();
+            var view = Object.FindAnyObjectByType<CombatView>()!;
+            yield return PlayModeHarness.WaitFor(() => view.Timeline.Markers.Count > 0, 300);
+            foreach (var m in view.Timeline.Markers)
+            {
+                var images = m.GetComponentsInChildren<UnityEngine.UI.Image>(true);
+                var frame = System.Array.Find(images, i => i.name == "Frame")!;
+                Assert.That(frame.sprite, Is.SameAs(N29.HeroesDawn.Presentation.Common.Sprites.Diamond));
+                Assert.That(frame.color, Is.Not.EqualTo(Color.black));
+            }
+        }
+
+        static void Press(SkillIconView card, bool down)
+        {
+            var frame = card.transform.Find("Frame").gameObject;
+            var e = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current);
+            if (down) UnityEngine.EventSystems.ExecuteEvents.Execute(frame, e, UnityEngine.EventSystems.ExecuteEvents.pointerDownHandler);
+            else UnityEngine.EventSystems.ExecuteEvents.Execute(frame, e, UnityEngine.EventSystems.ExecuteEvents.pointerUpHandler);
+        }
+
+        [UnityTest, Timeout(300000), Description("Vérifie que l'éventail de compétences n'apparaît que pour l'agent dont c'est le tour, que cet agent a un contour lumineux et que la description d'une carte s'affiche tant qu'on reste appuyé puis disparaît au relâchement — parce que c'est l'organisation de combat voulue")]
+        public IEnumerator Fan_ShowsOnAgentTurn_AndHoldShowsDescription()
+        {
+            yield return IntoCombat();
+            var view = Object.FindAnyObjectByType<CombatView>()!;
+            yield return PlayModeHarness.WaitFor(() => view.FanVisible, 2400);
+            Assert.That(view.FanVisible, Is.True, "un agent est prêt : l'éventail est visible");
+            Assert.That(view.DescriptionVisible, Is.False, "pas d'appui : pas de description");
+            var card = view.SkillCard(0);
+            Assert.That(card.Data.Visible, Is.True);
+            Press(card, true);
+            Assert.That(view.DescriptionVisible, Is.True, "appui maintenu : la description est affichée");
+            Assert.That(view.DescriptionText, Is.Not.Empty);
+            yield return null;
+            Assert.That(view.DescriptionVisible, Is.True, "tant qu'on reste appuyé");
+            Press(card, false);
+            Assert.That(view.DescriptionVisible, Is.False, "relâché : la description disparaît");
+        }
+
+        [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures de l'éventail de compétences et de la description d'une carte — parce que ces rendus se relisent à l'œil")]
+        public IEnumerator CaptureTheFan()
+        {
+            yield return IntoCombat();
+            var view = Object.FindAnyObjectByType<CombatView>()!;
+            yield return PlayModeHarness.WaitFor(() => view.FanVisible, 2400);
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return ScreenCaptureTests.Capture("22-eventail");
+            Press(view.SkillCard(1), true);
+            yield return new WaitForSecondsRealtime(0.3f);
+            yield return ScreenCaptureTests.Capture("23-description-carte");
+            Press(view.SkillCard(1), false);
+        }
+
         [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit la capture du combat avec la frise par points, une pause sur point vide et l'éventail de compétences — parce que ces rendus se relisent à l'œil")]
         public IEnumerator CaptureTheTickTimeline()
         {

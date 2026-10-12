@@ -46,10 +46,10 @@ namespace N29.HeroesDawn.Tests.Editor
             Object.DestroyImmediate(decoded);
         }
 
-        [Test, Description("Vérifie que les 3 polices TMP existent, sont dynamiques et ont un matériau encré à contour — parce que la spec impose Bangers / Comic Neue en TextMeshPro avec un contour noir « comics » partagé")]
+        [Test, Description("Vérifie que les 3 polices TMP existent, sont dynamiques et ont un matériau encré à contour — parce que la spec impose Barlow Condensed en TextMeshPro avec une ombre douce partagée")]
         public void Fonts_AreDynamicTmpAssets()
         {
-            foreach (var name in new[] { "Bangers-Regular", "ComicNeue-Bold", "ComicNeue-Regular" })
+            foreach (var name in new[] { "BarlowCondensed-ExtraBoldItalic", "BarlowCondensed-SemiBold", "BarlowCondensed-Regular" })
             {
                 var fa = Resources.Load<TMP_FontAsset>(FontAssetGenerator.ResourcesFolder + "/" + name + " SDF");
                 Assert.That(fa, Is.Not.Null, name);
@@ -61,7 +61,19 @@ namespace N29.HeroesDawn.Tests.Editor
             }
         }
 
-        [Test, Description("Vérifie que Ui.Txt crée un texte TextMeshPro avec la police Bangers pour un titre — parce que toutes les recettes de prefabs passent par ce helper")]
+        [Test, Description("Vérifie que les trois polices Barlow Condensed contiennent les accents et les guillemets du français — parce que l'interface est en français et qu'un glyphe manquant s'afficherait en carré")]
+        public void Fonts_CoverFrenchGlyphs()
+        {
+            const string glyphs = "éèêëàâîïôûùüçœÉÈÀÇŒ«»’…°";
+            foreach (var name in new[] { "BarlowCondensed-ExtraBoldItalic", "BarlowCondensed-SemiBold", "BarlowCondensed-Regular" })
+            {
+                var font = Resources.Load<Font>("Fonts/" + name);
+                Assert.That(font, Is.Not.Null, name);
+                foreach (var c in glyphs) Assert.That(font.HasCharacter(c), Is.True, name + " : « " + c + " » manquant");
+            }
+        }
+
+        [Test, Description("Vérifie que Ui.Txt crée un texte TextMeshPro avec la police Barlow Condensed pour un titre — parce que toutes les recettes de prefabs passent par ce helper")]
         public void UiTxt_ReturnsTmpWithFont()
         {
             var parent = new GameObject("p", typeof(RectTransform));
@@ -69,7 +81,7 @@ namespace N29.HeroesDawn.Tests.Editor
             {
                 var t = Ui.Txt(parent.transform, "x", 30, Color.white, TextAnchor.MiddleCenter, FontKind.Title);
                 Assert.That(t, Is.InstanceOf<TextMeshProUGUI>());
-                Assert.That(t.font.name, Does.Contain("Bangers"));
+                Assert.That(t.font.name, Does.Contain("BarlowCondensed"));
             }
             finally { Object.DestroyImmediate(parent); }
         }

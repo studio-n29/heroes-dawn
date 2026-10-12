@@ -18,7 +18,7 @@ namespace N29.HeroesDawn.EditorTools.Assets
         public const string ResourcesFolder = "Fonts/TMP";
         const string Folder = "Assets/_Project/Resources/" + ResourcesFolder;
         const string SourceFolder = "Assets/_Project/Resources/Fonts";
-        static readonly string[] Fonts = { "Bangers-Regular", "ComicNeue-Bold", "ComicNeue-Regular" };
+        static readonly string[] Fonts = { "BarlowCondensed-ExtraBoldItalic", "BarlowCondensed-SemiBold", "BarlowCondensed-Regular" };
 
         public static void GenerateAll()
         {
