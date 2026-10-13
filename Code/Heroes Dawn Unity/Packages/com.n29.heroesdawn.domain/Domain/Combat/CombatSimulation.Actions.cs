@@ -68,10 +68,6 @@ namespace N29.HeroesDawn.Domain.Combat
                     if (_units[cmd.Actor].Side != Side.Ally) return false;
                     PerformSkill(_units[cmd.Actor], _units[cmd.Actor].Skills[cmd.SlotIndex], cmd.SlotIndex, cmd.Target, output);
                     return true;
-                case CommandType.Combo:
-                    return cmd.Flag ? TrySyncCombo(cmd.Actor, cmd.Partner, cmd.Target, output) : TryPerformCombo(cmd.Actor, cmd.Partner, cmd.Target, output);
-                case CommandType.Avatar:
-                    return TryAvatar(cmd.SlotIndex, cmd.Target, output);
                 case CommandType.Pass:
                     if (cmd.Actor < 0 || cmd.Actor >= _units.Count || !_units[cmd.Actor].IsReady || _units[cmd.Actor].Side != Side.Ally) return false;
                     output.Add(new TurnSkippedEvent(Tick, cmd.Actor));
@@ -121,7 +117,6 @@ namespace N29.HeroesDawn.Domain.Combat
             u.KnockbackGuard = false;
             u.PlannedSlot = -1;
             u.PlannedTarget = -1;
-            u.ActionsSinceCombo++;
         }
 
         void PerformSkill(CombatUnit actor, SkillDef skill, int slotIndex, int preferredTarget, List<CombatEvent> output)

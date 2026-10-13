@@ -15,7 +15,8 @@ namespace N29.HeroesDawn.Presentation.Mvp
         public string MemberName(MemberDef d) => Loc.MemberName(d);
         public string EnemyName(EnemyDef d) => Loc.EnemyName(d);
         public string SkillName(SkillDef s) => Loc.SkillName(s);
-        public string ComboName(ComboDef c) => Loc.ComboName(c);
+        public string SynergyName(SynergyDef s) => Loc.SynergyName(s);
+        public string SynergyEffect(SynergyDef s) => Loc.SynergyEffect(s);
         public string StatusName(StatusType s) => Loc.StatusName(s);
         public string FamilyName(Family f) => Loc.FamilyName(f);
         public string RoleName(Role r) => Loc.RoleName(r);

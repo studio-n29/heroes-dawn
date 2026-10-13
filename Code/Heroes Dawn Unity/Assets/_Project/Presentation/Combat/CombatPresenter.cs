@@ -51,7 +51,6 @@ namespace N29.HeroesDawn.Presentation.Combat
         int _selected = -1;
         int _pendingSlot = -1;
         int _dragSlot = -1;
-        CombatSimulation.ComboOption? _pendingCombo;
         int _speedFactor = 2; // vitesse ×2 par défaut (spec 2026-10-12 : combat plus rapide)
         const float StepEpsilon = 0.0005f; // evite qu une erreur de flottant retarde un pas d une image
         float _stepTimer;
@@ -66,9 +65,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         bool _ended;
         bool _firstRefresh;
         bool _autoShown;
-        int _pendingAvatar = -1;
         readonly HashSet<int> _shown = new HashSet<int>();
-        bool _pendingSync;
 
         public CombatPresenter(ICombatView view, IActiveCombatReadModel combat, ISessionReadModel session, ISetAutoCombatUseCase setAuto,
                                IFinishCombatUseCase finish, IVerifyCombatUseCase verify, IForceCombatWinUseCase forceWin,
@@ -91,9 +88,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.AutoClicked += ToggleAuto;
             View.SpeedClicked += ToggleSpeed;
             View.DebugWinClicked += DebugWin;
-            View.AvatarClicked += Avatar;
             View.PauseClicked += Pause;
-            View.ComboClicked += Combo;
             View.CycleClicked += CycleSelection;
             View.SkillClicked += Skill;
             View.SkillDragBegan += SkillDragBegan;
@@ -107,9 +102,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.AutoClicked -= ToggleAuto;
             View.SpeedClicked -= ToggleSpeed;
             View.DebugWinClicked -= DebugWin;
-            View.AvatarClicked -= Avatar;
             View.PauseClicked -= Pause;
-            View.ComboClicked -= Combo;
             View.CycleClicked -= CycleSelection;
             View.SkillClicked -= Skill;
             View.SkillDragBegan -= SkillDragBegan;
@@ -134,9 +127,6 @@ namespace N29.HeroesDawn.Presentation.Combat
             _aiRandom = new System.Random((int)(sim.Setup.Seed & 0x7fffffff));
             _selected = -1;
             _pendingSlot = -1;
-            _pendingCombo = null;
-            _pendingAvatar = -1;
-            _pendingSync = false;
             _readyOrder.Clear();
             _log.Clear();
             View.ShowLog(_log);
@@ -146,7 +136,17 @@ namespace N29.HeroesDawn.Presentation.Combat
             RefreshTopBar();
             RefreshAll();
             View.ShowBanner(_loc.T("combat.rank").Replace("{0}", "").Trim().ToUpperInvariant() + " !", Tone.Primary);
+            LogSynergies(sim);
             _tutorial?.Hint("auto");
+        }
+
+        /// <summary>Synergies d'équipe actives (bonus permanents) : une ligne du journal par paire, au début du combat.</summary>
+        void LogSynergies(CombatSimulation sim)
+        {
+            var allies = sim.Units.Where(u => u.Side == Side.Ally).ToList();
+            var active = SynergyRules.Active(allies.Select(u => u.Family).ToList(), _session.Content.Synergies);
+            foreach (var a in active)
+                AddLog(_loc.F("combat.synergy", _loc.SynergyName(a.Synergy), _loc.SynergyEffect(a.Synergy), Name(allies[a.A].Id), Name(allies[a.B].Id)));
         }
 
         void BuildUnits(CombatSimulation sim)
@@ -302,19 +302,9 @@ namespace N29.HeroesDawn.Presentation.Combat
                         _audio.Play(SfxId.KnockOut);
                         _readyOrder.Remove(ud.Unit);
                         break;
-                    case ComboUsedEvent cu:
-                        var combo = FindCombo(cu.ComboId);
-                        var comboName = combo != null ? _loc.ComboName(combo) : cu.ComboId;
-                        View.ShowBanner(_loc.T("combat.combo") + " " + comboName, Tone.Danger);
-                        _audio.Play(SfxId.Combo);
-                        AddLog(Name(cu.A) + " + " + Name(cu.B) + " : " + comboName);
-                        break;
-                    case EmptyPointPauseEvent pause:
-                        _pauseLeft = pause.PauseMs / 1000f;
-                        break;
                     case EncounterEvent enc:
-                        View.ShowBanner(enc.Kind == TickEncounterKind.Parade ? _loc.T("combat.parade") : _loc.T("combat.encounter_combo"), enc.Kind == TickEncounterKind.Parade ? Tone.Info : Tone.Danger);
-                        AddLog(Name(enc.A) + " + " + Name(enc.B) + " : " + (enc.Kind == TickEncounterKind.Parade ? _loc.T("combat.parade") : _loc.T("combat.encounter_combo")));
+                        View.ShowBanner(_loc.T("combat.parade"), Tone.Info);
+                        AddLog(Name(enc.A) + " + " + Name(enc.B) + " : " + _loc.T("combat.parade"));
                         break;
                     case ActionPlannedEvent ap:
                         if (_sim!.Unit(ap.Unit).Side == Side.Enemy)
@@ -342,12 +332,6 @@ namespace N29.HeroesDawn.Presentation.Combat
                         View.ShowBanner(_loc.F("combat.wave_banner", ws.Wave + 1), Tone.Primary);
                         AddLog(_loc.F("combat.wave", ws.Wave + 1, _sim!.WaveCount));
                         break;
-                    case AvatarSkillUsedEvent av:
-                        _audio.Play(SfxId.SkillCast);
-                        View.ShowBanner(AvatarName(_session.Content.AvatarSkills.First(a => a.Id == av.Skill)), Tone.Info);
-                        AddLog(_loc.T("combat.avatar") + " : " + AvatarName(_session.Content.AvatarSkills.First(a => a.Id == av.Skill)));
-                        foreach (var t in av.Targets) if (av.Category == SkillCategory.Damage) View.Hit(t);
-                        break;
                     case CombatEndedEvent ce:
                         View.ShowBanner(ce.Victory ? _loc.T("combat.victory") : _loc.T("combat.defeat"), ce.Victory ? Tone.Primary : Tone.Danger);
                         _audio.Play(ce.Victory ? SfxId.Victory : SfxId.Defeat); // atténue la musique (catalogue)
@@ -369,13 +353,10 @@ namespace N29.HeroesDawn.Presentation.Combat
                 _selected = _readyOrder.Count > 0 ? _readyOrder[0] : -1;
                 _pendingSlot = -1;
             }
-            if (!manual) { _selected = -1; _pendingSlot = -1; _pendingCombo = null; }
-            if (_pendingCombo.HasValue && !ComboStillAvailable(_pendingCombo.Value)) _pendingCombo = null;
+            if (!manual) { _selected = -1; _pendingSlot = -1; }
 
             bool targetEnemies = false, targetAllies = false;
-            if (_pendingCombo.HasValue) targetEnemies = true;
-            else if (_pendingAvatar >= 0) targetEnemies = true;
-            else if (_selected >= 0 && _pendingSlot >= 0)
+            if (_selected >= 0 && _pendingSlot >= 0)
             {
                 var rule = sim.Unit(_selected).Skills[_pendingSlot].Target;
                 targetEnemies = rule == TargetRule.SingleEnemy;
@@ -422,19 +403,9 @@ namespace N29.HeroesDawn.Presentation.Combat
                 }
             }
             View.ShowSkills(panel);
-            View.ShowAvatar(BuildAvatarBar(sim));
-
-            var combos = manual ? sim.AvailableCombos() : Array.Empty<CombatSimulation.ComboOption>();
-            var syncs = manual && combos.Count == 0 ? sim.AvailableSyncCombos() : Array.Empty<CombatSimulation.ComboOption>();
-            if (combos.Count > 0) _tutorial?.Hint("combo");
-            string comboLabel = combos.Count > 0 ? _loc.T("combat.combo") + "\n<size=24>" + _loc.ComboName(combos[0].Combo) + "</size>"
-                              : syncs.Count > 0 ? _loc.T("combat.combo_sync") + "\n<size=24>" + _loc.ComboName(syncs[0].Combo) + "</size>"
-                              : "";
-            View.ShowCombo(combos.Count > 0 || syncs.Count > 0, comboLabel);
             View.ShowTimeline(BuildTimeline(sim, manual));
 
-            View.SetHint(_pendingAvatar >= 0 ? _loc.F("combat.avatar_pick", AvatarName(sim.AvatarSkills[_pendingAvatar]))
-                       : targetEnemies ? _loc.T("combat.choose_target")
+            View.SetHint(targetEnemies ? _loc.T("combat.choose_target")
                        : targetAllies ? _loc.T("combat.choose_ally")
                        : manual && _selected < 0 ? _loc.T("combat.waiting") : "");
             RefreshTopBar();
@@ -500,7 +471,6 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             var sim = _sim;
             if (!CanCommand || _selected < 0 || !sim!.CanUse(_selected, slot)) return;
-            _pendingCombo = null;
             var rule = sim.Unit(_selected).Skills[slot].Target;
             if (rule == TargetRule.SingleEnemy && AliveCount(Side.Enemy) == 1) Submit(CombatCommand.UseSkill(_selected, slot, FirstAlive(Side.Enemy)));
             else if (rule == TargetRule.SingleEnemy || rule == TargetRule.SingleAlly) _pendingSlot = _pendingSlot == slot ? -1 : slot; // re-toucher annule
@@ -518,8 +488,6 @@ namespace N29.HeroesDawn.Presentation.Combat
             var sim = _sim;
             if (!CanCommand || _selected < 0 || !sim!.CanUse(_selected, slot)) return;
             _dragSlot = slot;
-            _pendingCombo = null;
-            _pendingAvatar = -1;
             if (NeedsTarget(sim.Unit(_selected).Skills[slot].Target)) _pendingSlot = slot;
             RefreshAll();
         }
@@ -543,78 +511,18 @@ namespace N29.HeroesDawn.Presentation.Combat
             RefreshAll();
         }
 
-        void Combo()
-        {
-            var sim = _sim;
-            if (!CanCommand) return;
-            var list = sim!.AvailableCombos();
-            bool sync = false;
-            if (list.Count == 0)
-            {
-                list = sim.AvailableSyncCombos(); // partenaire proche de 0 : le combo part quand même
-                sync = true;
-            }
-            if (list.Count == 0) return;
-            var c = list[0];
-            _pendingAvatar = -1;
-            if (c.Combo.Effect.Target == TargetRule.SingleEnemy && AliveCount(Side.Enemy) > 1)
-            {
-                _pendingCombo = c;
-                _pendingSync = sync;
-                _pendingSlot = -1;
-            }
-            else Submit(ComboCommand(c, sync, FirstAlive(Side.Enemy)));
-            RefreshAll();
-        }
-
-        static CombatCommand ComboCommand(CombatSimulation.ComboOption c, bool sync, int target)
-            => sync ? CombatCommand.SyncCombo(c.A, c.B, target) : CombatCommand.UseCombo(c.A, c.B, target);
-
-        /// <summary>
-        /// Compétence d'avatar : utilisable à tout moment (même pendant la pause d'action). Une cible unique ennemie demande un ciblage
-        /// quand plusieurs ennemis sont vivants ; un second appui sur le même bouton annule.
-        /// </summary>
-        void Avatar(int index)
-        {
-            var sim = _sim;
-            if (sim == null || sim.IsOver || _modals.AnyOpen || Disposed || !sim.CanUseAvatar(index)) return;
-            var def = sim.AvatarSkills[index];
-            _pendingSlot = -1;
-            _pendingCombo = null;
-            if (_pendingAvatar == index) _pendingAvatar = -1;
-            else if (def.Target == TargetRule.SingleEnemy && AliveCount(Side.Enemy) > 1) _pendingAvatar = index;
-            else
-            {
-                Submit(CombatCommand.UseAvatar(index, def.Target == TargetRule.SingleEnemy ? FirstAlive(Side.Enemy) : -1));
-                _tutorial?.Hint("avatar");
-            }
-            RefreshAll();
-        }
-
         void UnitTapped(int unitId)
         {
             var sim = _sim;
             if (sim == null || sim.IsOver || _modals.AnyOpen || Disposed) return;
             var u = sim.Unit(unitId);
-            if (_pendingAvatar >= 0 && u.Side == Side.Enemy && u.IsAlive)
-            {
-                Submit(CombatCommand.UseAvatar(_pendingAvatar, unitId));
-                RefreshAll();
-                return;
-            }
             if (!CanCommand) return;
-            if (_pendingCombo.HasValue && u.Side == Side.Enemy && u.IsAlive)
-            {
-                var c = _pendingCombo.Value;
-                Submit(ComboCommand(c, _pendingSync, unitId));
-            }
-            else if (_selected >= 0 && _pendingSlot >= 0 && IsValidTarget(sim.Unit(_selected).Skills[_pendingSlot].Target, u))
+            if (_selected >= 0 && _pendingSlot >= 0 && IsValidTarget(sim.Unit(_selected).Skills[_pendingSlot].Target, u))
                 Submit(CombatCommand.UseSkill(_selected, _pendingSlot, unitId));
             else if (u.Side == Side.Ally && u.IsReady)
             {
                 _selected = unitId;
                 _pendingSlot = -1;
-                _pendingCombo = null;
             }
             RefreshAll();
         }
@@ -629,23 +537,17 @@ namespace N29.HeroesDawn.Presentation.Combat
             // Tutoriel : l'ordre donné lève la pause de l'étape (un autre allié prêt garderait sinon la cible « compétences » active et figerait le combat).
             if (cmd.Type == CommandType.Skill) _tutorial?.Signal(TutorialSignal.SkillUsed);
             _pendingSlot = -1;
-            _pendingCombo = null;
-            _pendingSync = false;
-            _pendingAvatar = -1;
-            if (cmd.Type == CommandType.Skill || cmd.Type == CommandType.Combo)
+            if (cmd.Type == CommandType.Skill)
             {
                 _readyOrder.Remove(cmd.Actor);
-                if (cmd.Type == CommandType.Combo) _readyOrder.Remove(cmd.Partner);
                 _selected = -1;
             }
         }
 
         public bool HandleBack()
         {
-            if (_pendingSlot < 0 && !_pendingCombo.HasValue && _pendingAvatar < 0) return false;
+            if (_pendingSlot < 0) return false;
             _pendingSlot = -1;
-            _pendingCombo = null;
-            _pendingAvatar = -1;
             RefreshAll();
             return true;
         }
@@ -668,8 +570,6 @@ namespace N29.HeroesDawn.Presentation.Combat
             // La commande est appliquée au prochain tick : on anticipe l'affichage.
             _autoShown = on;
             _pendingSlot = -1;
-            _pendingCombo = null;
-            _pendingAvatar = -1;
             RefreshTopBar();
         }
 
@@ -795,14 +695,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             var u = _sim!.Unit(actor);
             foreach (var s in u.Skills) if (s.Id == id) return _loc.SkillName(s);
-            foreach (var c in _session.Content.Combos) if (c.Effect.Id == id) return _loc.ComboName(c);
             return id.Value;
         }
-
-        ComboDef? FindCombo(string id) => _session.Content.Combos.FirstOrDefault(c => c.Id == id);
-
-        bool ComboStillAvailable(CombatSimulation.ComboOption o)
-            => (_pendingSync ? _sim!.AvailableSyncCombos() : _sim!.AvailableCombos()).Any(c => c.A == o.A && c.B == o.B);
 
         /// <summary>Frise chronologique : position de chaque unité, actions annoncées, Time Bank et bouton DÉPASSER.</summary>
         TimelineData BuildTimeline(CombatSimulation sim, bool manual)
@@ -836,33 +730,6 @@ namespace N29.HeroesDawn.Presentation.Combat
                 Points = b.TimelinePoints,
             };
         }
-
-        /// <summary>Barre des compétences d'avatar : nom court, recharge restante en secondes de temps actif, ciblage en cours.</summary>
-        AvatarBarData BuildAvatarBar(CombatSimulation sim)
-        {
-            int stepMs = _session.Content.Balance.TimelineStepMs;
-            var slots = new AvatarSlotData[sim.AvatarSkills.Count];
-            for (int i = 0; i < slots.Length; i++)
-            {
-                var def = sim.AvatarSkills[i];
-                int left = sim.AvatarCooldownLeft(i);
-                slots[i] = new AvatarSlotData
-                {
-                    Visible = true,
-                    Label = "[" + AvatarKeys[Math.Min(i, AvatarKeys.Length - 1)] + "] " + AvatarName(def)
-                          + "\n<size=22>" + (left > 0 ? Math.Ceiling(left * stepMs / 1000.0) + " s" : _loc.T("combat.avatar_ready")) + "</size>",
-                    Category = def.Category,
-                    Enabled = sim.CanUseAvatar(i),
-                    Pending = _pendingAvatar == i,
-                    Cooldown01 = def.CooldownTicks <= 0 ? 0f : left / (float)def.CooldownTicks,
-                };
-            }
-            return new AvatarBarData { Visible = !sim.IsOver, Title = _loc.T("combat.avatar"), Slots = slots };
-        }
-
-        static readonly string[] AvatarKeys = { "Q", "W", "E", "R", "T" };
-
-        string AvatarName(AvatarSkillDef def) => _loc.Or("avatar." + def.Id.Value + ".name", "combat.avatar");
 
         int AliveCount(Side side) => _sim!.Units.Count(u => u.Side == side && u.IsAlive);
 

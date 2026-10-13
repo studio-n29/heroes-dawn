@@ -198,21 +198,6 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_host.Spawned, Is.Empty);
         }
 
-        [Test, Description("Vérifie qu'un combo disponible engage les deux alliés de la paire — parce que le combo consomme le tour des deux (W11b)")]
-        public void Combo_SubmitsBothActors()
-        {
-            TickUntil(() => _view.ComboVisible);
-            Assume.That(_view.ComboVisible, "aucun combo disponible");
-            var option = _sim.AvailableCombos().Concat(_sim.AvailableSyncCombos()).First();
-            _view.ClickCombo();
-            if (_view.Hint == Loc.T("combat.choose_target"))
-                _view.TapUnit(_sim.Units.First(u => u.Side == Side.Enemy && u.IsAlive).Id);
-            _p.Tick();
-            Assert.That(_sim.Unit(option.A).IsReady, Is.False);
-            Assert.That(_sim.Unit(option.B).IsReady, Is.False);
-            Assert.That(_view.Log.Any(l => l.Contains(" + ")), Is.True);
-        }
-
         [Test, Description("Vérifie que le bouton Auto passe par le cas d'usage et s'affiche activé aussitôt — parce que l'IA joue alors pour le joueur (W11b)")]
         public void Auto_TogglesThroughUseCase()
         {

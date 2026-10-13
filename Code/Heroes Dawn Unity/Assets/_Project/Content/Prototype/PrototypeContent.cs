@@ -5,7 +5,7 @@ using N29.HeroesDawn.Definitions;
 namespace N29.HeroesDawn.Content.Prototype
 {
     /// <summary>
-    /// Contenu du prototype M1 : 8 recrues, 4 ennemis (dont Brick), combos de famille, zone 1.1 (Red Hook).
+    /// Contenu du prototype M1 : 8 recrues, 4 ennemis (dont Brick), synergies de famille, zone 1.1 (Red Hook).
     /// Stats de base = onglet « Stats » du tableur (Agent niv. 1) × multiplicateur de rareté.
     /// </summary>
     public static class PrototypeContent
@@ -49,21 +49,9 @@ namespace N29.HeroesDawn.Content.Prototype
         static EnemyDef E(string id, Role r, Family f, StatBlock st, bool boss, params SkillDef[] skills)
             => new EnemyDef(new EnemyId(id), "enemies." + id + ".name", r, f, st, skills, boss);
 
-        static ComboDef C(string id, Family a, Family b, TargetRule t, params EffectDef[] fx)
-            => new ComboDef(id, "combos." + id + ".name", a, b, S("combo_" + id, SkillSlot.A3, 0, t, fx));
+        static SynergyDef C(string id, Family a, Family b, SynergyStat stat, int percent)
+            => new SynergyDef(id, "synergies." + id + ".name", a, b, stat, percent);
 
-        static AvatarSkillDef A(string id, int cooldownTicks, TargetRule t, params EffectDef[] fx)
-            => new AvatarSkillDef(new SkillId(id), cooldownTicks, t, fx);
-
-        /// <summary>Compétences de l avatar du joueur (une par catégorie) ; recharge en ticks de temps actif (20 ticks = 1 s).</summary>
-        static List<AvatarSkillDef> AvatarSkills() => new List<AvatarSkillDef>
-        {
-            A("avatar_strike", 30, TargetRule.SingleEnemy, Dmg(150), St(StatusType.Vulnerable, 2)),
-            A("avatar_mend", 40, TargetRule.AllAllies, Heal(25)),
-            A("avatar_barrier", 50, TargetRule.AllAllies, Shield(20), St(StatusType.Anchor, 2)),
-            A("avatar_rally", 40, TargetRule.AllAllies, St(StatusType.Haste, 3), St(StatusType.Regen, 2)),
-            A("avatar_rewind", 60, TargetRule.AllEnemies, Gauge(-300), St(StatusType.Vulnerable, 2)),
-        };
 
         public static ContentCatalog Build() => Build(new BalanceConfig());
 
@@ -72,7 +60,7 @@ namespace N29.HeroesDawn.Content.Prototype
             => WithActivities(Build(balance), ActivityParamsJson.Apply(PrototypeActivities.Build(balance), activityOverrides));
 
         static ContentCatalog WithActivities(ContentCatalog c, IReadOnlyList<ActivityDef> activities)
-            => new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Combos, c.Zones, c.AvatarSkills, activities, c.Collection);
+            => new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Synergies, c.Zones, activities, c.Collection);
 
         public static ContentCatalog Build(BalanceConfig balance) => Build(balance, true);
 
@@ -135,24 +123,24 @@ namespace N29.HeroesDawn.Content.Prototype
                     S("brick_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(90), St(StatusType.Shock, 1, 30))),
             };
 
-            var combos = new List<ComboDef>
+            var synergies = new List<SynergyDef>
             {
-                C("charged_projectiles", Family.Matter, Family.Elemental, TargetRule.AllEnemies, Dmg(150), St(StatusType.Burn, 2)),
-                C("forged_armor", Family.Matter, Family.PhysicalBio, TargetRule.AllAllies, Shield(30)),
-                C("trap", Family.Matter, Family.Perception, TargetRule.SingleEnemy, St(StatusType.Bind, 2), Gauge(-500)),
-                C("elemental_body", Family.Elemental, Family.PhysicalBio, TargetRule.AllEnemies, Dmg(120)),
-                C("weak_point", Family.Elemental, Family.Perception, TargetRule.SingleEnemy, Dmg(350)),
-                C("triage", Family.PhysicalBio, Family.Perception, TargetRule.AllAllies, Heal(25)),
-                C("resonance_matter", Family.Matter, Family.Matter, TargetRule.AllAllies, Shield(15)),
-                C("resonance_elemental", Family.Elemental, Family.Elemental, TargetRule.AllEnemies, Dmg(120)),
-                C("resonance_physical", Family.PhysicalBio, Family.PhysicalBio, TargetRule.AllAllies, St(StatusType.Regen, 2)),
-                C("resonance_perception", Family.Perception, Family.Perception, TargetRule.AllAllies, St(StatusType.Haste, 2)),
+                C("charged_projectiles", Family.Matter, Family.Elemental, SynergyStat.Atk, 6),
+                C("forged_armor", Family.Matter, Family.PhysicalBio, SynergyStat.Def, 8),
+                C("trap", Family.Matter, Family.Perception, SynergyStat.Spd, 5),
+                C("elemental_body", Family.Elemental, Family.PhysicalBio, SynergyStat.Hp, 6),
+                C("weak_point", Family.Elemental, Family.Perception, SynergyStat.Atk, 8),
+                C("triage", Family.PhysicalBio, Family.Perception, SynergyStat.Hp, 8),
+                C("resonance_matter", Family.Matter, Family.Matter, SynergyStat.Def, 4),
+                C("resonance_elemental", Family.Elemental, Family.Elemental, SynergyStat.Atk, 4),
+                C("resonance_physical", Family.PhysicalBio, Family.PhysicalBio, SynergyStat.Hp, 4),
+                C("resonance_perception", Family.Perception, Family.Perception, SynergyStat.Spd, 4),
             };
 
             enemies.AddRange(PrototypeZones.Enemies());
             var zones = new List<ZoneDef> { BuildZone11() };
             zones.AddRange(PrototypeZones.Zones());
-            return new ContentCatalog(balance, members, enemies, combos, zones, AvatarSkills(), PrototypeActivities.Build(balance), PrototypeCollection.Build());
+            return new ContentCatalog(balance, members, enemies, synergies, zones, PrototypeActivities.Build(balance), PrototypeCollection.Build());
         }
 
         /// <summary>Red Hook — les quais : 25 cases, 3 embranchements, 6 combats (1 Élite fixe : Brick).</summary>

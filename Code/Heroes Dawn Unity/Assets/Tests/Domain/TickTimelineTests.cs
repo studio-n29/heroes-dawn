@@ -30,8 +30,6 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(b.TimelineResetLightPoint, Is.EqualTo(3));
             Assert.That(b.TimelineResetMediumPoint, Is.EqualTo(2));
             Assert.That(b.TimelineResetHeavyPoint, Is.EqualTo(0));
-            Assert.That(b.TimelineResetComboPoint, Is.EqualTo(-2));
-            Assert.That(b.TimelinePausePerEmptyPointMs, Is.EqualTo(1200));
             Assert.That(b.TimelineStepMs, Is.EqualTo(350));
             Assert.That(b.TimelineTurnTimeoutMs, Is.EqualTo(30000));
             Assert.That(b.TimelineAiDelayMinMs, Is.EqualTo(300));
@@ -136,74 +134,6 @@ namespace N29.HeroesDawn.Tests.Domain
 
         // ------------------------------------------------------------------ Point vide et interruptions
 
-        [Test, Description("Vérifie que la fenêtre d'interruption de 1,2 s s'ouvre au pas qui précède l'arrivée d'un ennemi au point d'action quand un avatar est prêt — parce que c'est la seule menace sur laquelle le joueur peut réagir")]
-        public void ImminentEnemy_OpensTheInterruptWindow_For1200ms()
-        {
-            var s = Sim(new[] { "ancre" }, new[] { "brute" });
-            AllAt(s, 0);
-            s.Unit(1).Point = s.Unit(1).ActionPoint - 2;
-            var pauses = s.Step(1).OfType<EmptyPointPauseEvent>().ToList();
-            Assert.That(pauses.Count, Is.EqualTo(1));
-            Assert.That(pauses[0].PauseMs, Is.EqualTo(1200));
-            Assert.That(s.InterruptWindowOpen, Is.True);
-        }
-
-        [Test, Description("Vérifie qu'aucune pause n'est émise tant qu'aucun ennemi n'est sur le point d'agir — parce que les points vides sans menace ralentissaient inutilement le combat")]
-        public void NoThreat_NoPause()
-        {
-            var s = Sim(new[] { "ancre" }, new[] { "brute" });
-            AllAt(s, 0);
-            int pauses = 0;
-            for (int i = 0; i < 6; i++) pauses += s.Step(1).OfType<EmptyPointPauseEvent>().Count();
-            Assert.That(pauses, Is.EqualTo(0));
-            Assert.That(s.InterruptWindowOpen, Is.False);
-        }
-
-        [Test, Description("Vérifie que la pause n'arrive qu'une fois, au pas où l'ennemi atteint l'avant-dernier point — parce que le joueur ne doit pas être interrompu à chaque point")]
-        public void Window_OpensOnlyOnce_BeforeTheEnemyActs()
-        {
-            var s = Sim(new[] { "ancre" }, new[] { "brute" });
-            AllAt(s, 0);
-            s.Unit(1).Point = s.Unit(1).ActionPoint - 3;
-            Assert.That(s.Step(1).OfType<EmptyPointPauseEvent>().Count(), Is.EqualTo(0), "encore deux pas");
-            Assert.That(s.Step(1).OfType<EmptyPointPauseEvent>().Count(), Is.EqualTo(1), "un pas avant le tour");
-        }
-
-        [Test, Description("Vérifie qu'aucune pause n'est émise quand une unité est au point d'action ou en mode Auto — parce qu'un tour de jeu ou l'IA ne laissent pas de fenêtre d'interruption")]
-        public void NoWindow_WhenSomeoneActs_OrInAuto()
-        {
-            var s = Sim(new[] { "ancre" }, new[] { "brute" });
-            AllAt(s, 0);
-            s.Unit(0).Point = 9;
-            Assert.That(s.Step(1).OfType<EmptyPointPauseEvent>(), Is.Empty, "un allié arrive au point d'action");
-            var auto = Sim(new[] { "ancre" }, new[] { "brute" }, auto: true);
-            AllAt(auto, 0);
-            Assert.That(auto.Step(1).OfType<EmptyPointPauseEvent>(), Is.Empty, "Auto : pas de pause");
-        }
-
-        [Test, Description("Vérifie qu'une compétence d'avatar n'est lançable que pendant la fenêtre d'interruption ou au tour d'un agent, et pas autrement — parce que les interruptions ne sont pas des actions libres")]
-        public void AvatarSkills_OnlyInsideTheWindowOrOnATurn()
-        {
-            var s = Sim(new[] { "ancre", "givre" }, new[] { "brute" });
-            Assert.That(s.CanUseAvatar(0), Is.False, "avant le premier pas");
-            AllAt(s, 0);
-            s.Unit(2).Point = s.Unit(2).ActionPoint - 2;
-            s.Unit(0).Point = 2;
-            s.Step(1);
-            Assert.That(s.InterruptWindowOpen, Is.True);
-            Assert.That(s.CanUseAvatar(0), Is.True, "fenêtre ouverte");
-            s.Submit(CombatCommand.UseAvatar(0, 2));
-            var events = s.ApplyCommands();
-            Assert.That(events.OfType<AvatarSkillUsedEvent>().Count(), Is.EqualTo(1), "traité sans avancer la frise");
-
-            var turn = Sim(new[] { "ancre" }, new[] { "brute" });
-            AllAt(turn, 0);
-            turn.Unit(0).Point = 10;
-            turn.Step(1);
-            Assert.That(turn.IsAwaitingAction, Is.True);
-            Assert.That(turn.CanUseAvatar(0), Is.True, "au tour de l'agent");
-        }
-
         // ------------------------------------------------------------------ Rencontres
 
         static List<CombatUnit> Units(params (Side Side, int Point)[] spec)
@@ -214,11 +144,11 @@ namespace N29.HeroesDawn.Tests.Domain
             return list;
         }
 
-        [Test, Description("Vérifie que deux alliés sur le même point forment une rencontre de combo, un allié et un ennemi une parade, deux ennemis rien — parce que ce sont les règles de rencontre validées")]
+        [Test, Description("Vérifie que deux alliés sur le même point ne se rencontrent pas, qu'un allié et un ennemi forment une parade et que deux ennemis ne font rien — parce que ce sont les règles de rencontre validées")]
         public void Detect_FollowsTheEncounterRules()
         {
             var b = new BalanceConfig();
-            Assert.That(TickEncounters.Detect(Units((Side.Ally, 5), (Side.Ally, 5)), b).Single().Kind, Is.EqualTo(TickEncounterKind.Combo));
+            Assert.That(TickEncounters.Detect(Units((Side.Ally, 5), (Side.Ally, 5)), b), Is.Empty);
             Assert.That(TickEncounters.Detect(Units((Side.Ally, 5), (Side.Enemy, 5)), b).Single().Kind, Is.EqualTo(TickEncounterKind.Parade));
             Assert.That(TickEncounters.Detect(Units((Side.Enemy, 5), (Side.Enemy, 5)), b), Is.Empty);
             Assert.That(TickEncounters.Detect(Units((Side.Ally, 5), (Side.Ally, 6)), b), Is.Empty, "points différents");
@@ -232,12 +162,12 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(TickEncounters.Detect(Units((Side.Ally, 10), (Side.Enemy, 10)), b), Is.Empty);
         }
 
-        [Test, Description("Vérifie que trois unités sur un même point donnent une rencontre par couple, une seule fois chacune — parce qu'un départ commun ne doit pas doubler un combo")]
+        [Test, Description("Vérifie que deux alliés et un ennemi sur un même point donnent une parade par couple allié-ennemi, une seule fois chacune — parce que les alliés entre eux ne se rencontrent plus")]
         public void Detect_ReportsEachPairOnce()
         {
             var r = TickEncounters.Detect(Units((Side.Ally, 0), (Side.Ally, 0), (Side.Enemy, 0)), new BalanceConfig());
-            Assert.That(r.Count, Is.EqualTo(3));
-            Assert.That(r.Select(e => (e.A, e.B)).Distinct().Count(), Is.EqualTo(3));
+            Assert.That(r.Count, Is.EqualTo(2));
+            Assert.That(r.Select(e => (e.A, e.B)).Distinct().Count(), Is.EqualTo(2));
         }
 
         [Test, Description("Vérifie qu'un allié qui rejoint un ennemi sur un point lui annule son action annoncée une seule fois et le renvoie au point 3 — parce que la parade annule le coup annoncé")]
@@ -253,31 +183,6 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(enemy.Point, Is.EqualTo(3));
             var next = s.Step(1);
             Assert.That(next.OfType<ActionInterruptedEvent>(), Is.Empty, "pas de seconde annulation au pas suivant");
-        }
-
-        [Test, Description("Vérifie que deux alliés d'une paire valide sur un même point proposent le combo et que le lancer rend le combo effectif avec canalisation — parce que la rencontre de deux alliés est la règle du combo")]
-        public void TwoAllies_OnOnePoint_OfferAndPerformTheCombo()
-        {
-            var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
-            AllAt(s, 0);
-            s.Unit(0).Point = 4; s.Unit(1).Point = 4;
-            var events = s.Step(1);
-            Assert.That(events.OfType<EncounterEvent>().Any(e => e.Kind == TickEncounterKind.Combo), Is.True);
-            Assert.That(s.AvailableSyncCombos().Count, Is.EqualTo(1));
-            s.Submit(CombatCommand.SyncCombo(0, 1, 2));
-            Assert.That(s.Step(1).OfType<ComboUsedEvent>().Any(), Is.True);
-            Assert.That(s.Unit(0).Point, Is.EqualTo(-2));
-            Assert.That(s.Unit(1).Point, Is.EqualTo(-2));
-        }
-
-        [Test, Description("Vérifie que deux alliés en canalisation sur le même point ne proposent pas de combo tant qu'ils n'ont pas rattrapé le point 0 — parce que la canalisation doit être rattrapée d'abord")]
-        public void Channelling_BlocksTheEncounterCombo()
-        {
-            var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
-            AllAt(s, 0);
-            s.Unit(0).Point = -3; s.Unit(1).Point = -3;
-            s.Step(1);
-            Assert.That(s.AvailableSyncCombos(), Is.Empty);
         }
 
         [Test, Description("Vérifie qu'un combat complet se rejoue à l'identique depuis son journal de commandes avec la frise par points — parce que la vérification serveur repose sur le rejeu")]

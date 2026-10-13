@@ -14,7 +14,7 @@ using N29.HeroesDawn.Presentation.Mvp;
 namespace N29.HeroesDawn.Presentation.Hub
 {
     /// <summary>
-    /// Fiche d'un membre (M21). Membre possédé : stats, compétences, combos de sa famille, flèches pour parcourir l'effectif
+    /// Fiche d'un membre (M21). Membre possédé : stats, compétences, synergies de sa famille, flèches pour parcourir l'effectif
     /// (sans empiler de page), raccourcis Salon / Infirmerie, Entraîner · N CR.
     /// Héros de la boutique (<see cref="HubLocation.FromShop"/>) : même fiche, bouton Recruter · N PR par la confirmation M31 ;
     /// si l'offre disparaît (boutique renouvelée), retour à Recruter avec un toast.
@@ -204,8 +204,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             Card = MemberCards.Card(def, level, _session.Content.Balance, _loc),
             Owned = owned,
             Skills = def.Skills.Select(s => new SkillLineData { Name = _loc.SkillName(s), Description = _loc.DescribeSkill(s) }).ToArray(),
-            Combos = SquadCombos.For(def.Family, _session.Content.Combos)
-                                .Select(c => _loc.F("sheet.combo_line", _loc.ComboName(c), _loc.FamilyName(c.A == def.Family ? c.B : c.A)))
+            Synergies = SquadSynergies.For(def.Family, _session.Content.Synergies)
+                                .Select(c => _loc.F("sheet.synergy_line", _loc.SynergyName(c), _loc.SynergyEffect(c), _loc.FamilyName(c.A == def.Family ? c.B : c.A)))
                                 .ToArray(),
         };
     }

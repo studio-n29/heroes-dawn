@@ -85,7 +85,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 Title = _loc.F("recruit.confirm.title", name),
                 Card = MemberCards.Card(def, MetaRules.RecruitLevel, _session.Content.Balance, _loc),
-                Combo = SignatureCombo(def),
+                Synergy = SignatureSynergy(def),
                 Before = b.Before + " PR",
                 Cost = "-" + b.Cost + " PR",
                 After = b.After + " PR",
@@ -97,16 +97,16 @@ namespace N29.HeroesDawn.Presentation.Hub
             };
         }
 
-        /// <summary>Combo phare : le premier combo que le héros formerait avec un membre de l'escouade, sinon celui de sa famille.</summary>
-        string SignatureCombo(Definitions.MemberDef def)
+        /// <summary>Synergie phare : la première que le héros formerait avec un membre de l'escouade, sinon celle de sa famille.</summary>
+        string SignatureSynergy(Definitions.MemberDef def)
         {
-            var combos = SquadCombos.For(def.Family, _session.Content.Combos);
-            foreach (var c in combos)
+            var synergies = SquadSynergies.For(def.Family, _session.Content.Synergies);
+            foreach (var s in synergies)
                 foreach (var m in _session.Squad)
-                    if (c.Matches(def.Family, m.Def.Family))
-                        return _loc.F("recruit.combo", _loc.ComboName(c), _loc.MemberName(m.Def));
-            var first = combos.FirstOrDefault();
-            return first == null ? "" : _loc.F("recruit.combo.family", _loc.ComboName(first));
+                    if (s.Matches(def.Family, m.Def.Family))
+                        return _loc.F("recruit.synergy", _loc.SynergyName(s), _loc.SynergyEffect(s), _loc.MemberName(m.Def));
+            var first = synergies.FirstOrDefault();
+            return first == null ? "" : _loc.F("recruit.synergy.family", _loc.SynergyName(first), _loc.SynergyEffect(first));
         }
     }
 }

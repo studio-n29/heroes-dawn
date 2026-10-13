@@ -45,21 +45,6 @@ namespace N29.HeroesDawn.Tests.Domain
             }
         }
 
-        [Test, Description("Vérifie qu'un combo impose une canalisation : les deux partenaires repartent en dessous de 0 % et doivent la rattraper — parce que les combos sont l'action la plus lourde (spec §A)")]
-        public void Combo_ImposesChannelling_OnBothPartners()
-        {
-            var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
-            Calm(s);
-            var givre = s.Unit(0); var ancre = s.Unit(1);
-            At(givre, 100); At(ancre, 100);
-            s.Submit(CombatCommand.UseCombo(0, 1, 2));
-            var ev = s.Step(1);
-            Assert.That(ev.OfType<ComboUsedEvent>().Any(), Is.True);
-            Assert.That(givre.Point, Is.EqualTo(-2));
-            Assert.That(ancre.Point, Is.EqualTo(-2));
-            Assert.That(givre.IsReady, Is.False);
-        }
-
         [Test, Description("Vérifie qu'un ennemi qui entre en zone de préparation (80 %) annonce son action sur la frise, puis l'exécute — parce que le joueur doit voir venir la grosse attaque (spec §A, §C)")]
         public void Enemy_AnnouncesAction_InPrepZone_AndExecutesIt()
         {
@@ -179,56 +164,5 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(u.Hp, Is.EqualTo(hp));
         }
 
-        [Test, Description("Vérifie qu'un combo synchronisé rattrape gratuitement un partenaire à 60 % ou plus et déclenche le combo — parce que le joueur n a plus à viser le même instant exact (spec 2026-10-07)")]
-        public void SyncCombo_PullsPartner_ForFree()
-        {
-            var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
-            Calm(s);
-            At(s.Unit(0), 100);
-            At(s.Unit(1), 70);
-            Assert.That(s.AvailableCombos().Count, Is.Zero, "partenaire pas prêt : combo normal impossible");
-            Assert.That(s.AvailableSyncCombos().Count, Is.EqualTo(1));
-            s.Submit(CombatCommand.SyncCombo(0, 1, 2));
-            var ev = s.Step(1);
-            Assert.That(ev.OfType<ComboUsedEvent>().Any(), Is.True);
-            Assert.That(s.Unit(1).Point, Is.EqualTo(-2));
-        }
-
-        [Test, Description("Vérifie que la synchronisation est refusée si le partenaire est trop loin sur la frise (< 60 %) — parce que le Temps ne rattrape qu'un petit écart")]
-        public void SyncCombo_RefusedWhenPartnerTooFar()
-        {
-            var s = Sim(new[] { "givre", "ancre" }, new[] { "brute" });
-            Calm(s);
-            At(s.Unit(0), 100);
-            At(s.Unit(1), 40);
-            Assert.That(s.AvailableSyncCombos().Count, Is.Zero);
-            s.Submit(CombatCommand.SyncCombo(0, 1, 2));
-            Assert.That(s.Step(1).OfType<ComboUsedEvent>().Any(), Is.False);
-            Assert.That(s.InputLog.Any(), Is.False);
-        }
-
-        [Test, Description("Vérifie qu un combat manuel utilisant des combos synchronisés se rejoue à l'identique depuis son journal — parce que la vérification serveur repose sur le rejeu des commandes (doc 05)")]
-        public void NewCommands_ReplayToSameHash()
-        {
-            var setup = new CombatSetup(21UL, CombatRank.Normal,
-                new[] { new AllyEntry(new MemberId("givre"), 5, 0), new AllyEntry(new MemberId("ancre"), 5, 0), new AllyEntry(new MemberId("echo"), 5, 0) },
-                new[] { new EnemyEntry(new EnemyId("brute"), 5), new EnemyEntry(new EnemyId("thug"), 5) }, false);
-            var sim = new CombatSimulation(C, setup);
-            int guard = 0;
-            while (!sim.IsOver && guard++ < 30000)
-            {
-                foreach (var u in sim.Units.Where(x => x.Side == Side.Ally && x.IsReady))
-                {
-                    var sync = sim.AvailableSyncCombos();
-                    if (sync.Count > 0 && sim.CanUse(u.Id, 0)) { sim.Submit(CombatCommand.SyncCombo(sync[0].A, sync[0].B, -1)); continue; }
-                    int slot = sim.CanUse(u.Id, 2) ? 2 : sim.CanUse(u.Id, 1) ? 1 : 0;
-                    sim.Submit(CombatCommand.UseSkill(u.Id, slot, -1));
-                }
-                sim.Step(1);
-            }
-            Assert.That(sim.IsOver);
-            var replay = CombatReplay.Run(C, setup, sim.InputLog);
-            Assert.That(replay.StateHash, Is.EqualTo(sim.StateHash()));
-        }
     }
 }

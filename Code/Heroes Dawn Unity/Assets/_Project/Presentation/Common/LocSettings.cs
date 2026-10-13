@@ -65,7 +65,6 @@ namespace N29.HeroesDawn.Presentation.Common
             d["settings.key.bonus"] = "Dé bonus"; d["settings.key.bonus.v"] = "B";
             d["settings.key.end"] = "Terminer le déplacement"; d["settings.key.end.v"] = "Entrée";
             d["settings.key.skills"] = "Compétences"; d["settings.key.skills.v"] = "1 · 2 · 3";
-            d["settings.key.combo"] = "Combo"; d["settings.key.combo.v"] = "C";
             d["settings.key.auto"] = "Auto"; d["settings.key.auto.v"] = "A";
             d["settings.key.speed"] = "Vitesse"; d["settings.key.speed.v"] = "S";
             d["settings.key.pause"] = "Pause"; d["settings.key.pause.v"] = "P";

@@ -15,20 +15,18 @@ namespace N29.HeroesDawn.Definitions
         public BalanceConfig Balance { get; }
         public IReadOnlyList<MemberDef> Members { get; }
         public IReadOnlyList<EnemyDef> Enemies { get; }
-        public IReadOnlyList<ComboDef> Combos { get; }
+        public IReadOnlyList<SynergyDef> Synergies { get; }
         public IReadOnlyList<ZoneDef> Zones { get; }
-        public IReadOnlyList<AvatarSkillDef> AvatarSkills { get; }
         public IReadOnlyList<ActivityDef> Activities { get; }
         /// <summary>Objets, cartes de competences et boosters.</summary>
         public CollectionDef Collection { get; }
 
         public ContentCatalog(BalanceConfig balance, IReadOnlyList<MemberDef> members, IReadOnlyList<EnemyDef> enemies,
-                              IReadOnlyList<ComboDef> combos, IReadOnlyList<ZoneDef> zones, IReadOnlyList<AvatarSkillDef>? avatarSkills = null,
+                              IReadOnlyList<SynergyDef> synergies, IReadOnlyList<ZoneDef> zones,
                               IReadOnlyList<ActivityDef>? activities = null, CollectionDef? collection = null)
         {
             Collection = collection ?? CollectionDef.Empty;
-            Balance = balance; Members = members; Enemies = enemies; Combos = combos; Zones = zones;
-            AvatarSkills = avatarSkills ?? new List<AvatarSkillDef>();
+            Balance = balance; Members = members; Enemies = enemies; Synergies = synergies; Zones = zones;
             Activities = activities ?? new List<ActivityDef>();
             foreach (var m in members) _members.Add(m.Id, m);
             foreach (var e in enemies) _enemies.Add(e.Id, e);
@@ -51,18 +49,12 @@ namespace N29.HeroesDawn.Definitions
             foreach (var z in zones) byId[z.Id] = z;
             foreach (var z in Zones) merged.Add(byId.TryGetValue(z.Id, out var over) ? over : z);
             foreach (var z in zones) if (!_zones.ContainsKey(z.Id)) merged.Add(z);
-            return new ContentCatalog(Balance, Members, Enemies, Combos, merged, AvatarSkills, Activities, Collection);
+            return new ContentCatalog(Balance, Members, Enemies, Synergies, merged, Activities, Collection);
         }
 
         /// <summary>Meme contenu avec ces objets, cartes et boosters.</summary>
         public ContentCatalog WithCollection(CollectionDef collection)
-            => new ContentCatalog(Balance, Members, Enemies, Combos, Zones, AvatarSkills, Activities, collection);
+            => new ContentCatalog(Balance, Members, Enemies, Synergies, Zones, Activities, collection);
 
-        /// <summary>Premier combo correspondant, dans l'ordre de la liste (ordre stable).</summary>
-        public ComboDef? FindCombo(Family a, Family b)
-        {
-            foreach (var c in Combos) if (c.Matches(a, b)) return c;
-            return null;
-        }
     }
 }

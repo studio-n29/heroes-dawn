@@ -117,15 +117,15 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Last.Squad.Length, Is.EqualTo(4));
         }
 
-        [Test, Description("Vérifie que les combos formés par l'escouade sont listés, et suivent ses changements — parce que l'écran Équipe montre les combos (M20 ⑤)")]
-        public void Combos_ListedForCurrentSquad()
+        [Test, Description("Vérifie que les synergies formées par l'escouade sont listées, et suivent ses changements — parce que l'écran Équipe montre les synergies (M20 ⑤)")]
+        public void Synergies_ListedForCurrentSquad()
         {
             Make();
-            Assert.That(_view.Last.Combos.Length, Is.EqualTo(6));
-            Assert.That(_view.Last.Combos.Any(c => c.Contains("Résonance vitale")), Is.True);
+            Assert.That(_view.Last.Synergies.Length, Is.EqualTo(6));
+            Assert.That(_view.Last.Synergies.Any(c => c.Contains("Résonance vitale")), Is.True);
             _view.ToggleSquad(new MemberId("seve"));
-            Assert.That(_view.Last.Combos.Length, Is.EqualTo(3));
-            Assert.That(_view.Last.Combos.Any(c => c.Contains("Résonance vitale")), Is.False);
+            Assert.That(_view.Last.Synergies.Length, Is.EqualTo(3));
+            Assert.That(_view.Last.Synergies.Any(c => c.Contains("Résonance vitale")), Is.False);
         }
 
         [Test, Description("Vérifie qu'un membre épuisé est signalé par un libellé, pas seulement par la couleur — parce que la couleur ne porte jamais seule le sens (contraintes)")]

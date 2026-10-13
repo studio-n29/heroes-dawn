@@ -392,7 +392,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     }
     /// <summary>
     /// Combat (M65/M66). Adapté à un écran de ~2160 × 972 : barre haute (retraite, titre, AUTO, vitesse, pause), ennemis en haut à droite,
-    /// alliés en bas à droite, panneau de compétences et journal à gauche, combo et consigne dans la bande centrale.
+    /// alliés en bas à droite, panneau de compétences et journal à gauche, consigne dans la bande centrale.
     /// </summary>
     public sealed class CombatRecipe : IPrefabRecipe
     {
@@ -476,18 +476,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(timeline, "prepZone", prep.rectTransform);
             ctx.Wire(timeline, "markerPrefab", ctx.Asset("Widgets/TimelineMarker.prefab").GetComponent<TimelineMarkerView>());
 
-            // ---- Compétences d avatar (lançables à tout moment) : 5 boutons sous le combo
-            var avatarPanel = Ui.Rect(rt, "Avatar").At(0f, 0f, 24, 24, 440, 104);
-            avatarPanel.HLayout(6, 0, TextAnchor.MiddleCenter);
-            var avatarButtons = new Object[5];
-            for (int i = 0; i < 5; i++)
-            {
-                var ab = Ui.Btn(avatarPanel, "", Theme.Danger, Theme.TextDark, null!, 22, FontKind.Title, "Avatar" + (i + 1));
-                ab.Rect.sizeDelta = new Vector2(96, 104);
-                var le = ab.gameObject.AddComponent<LayoutElement>();
-                le.preferredWidth = 96; le.preferredHeight = 104; le.flexibleWidth = 1;
-                avatarButtons[i] = ab;
-            }
 
             // ---- Éventail de compétences (bas centre) : visible seulement pour l'agent dont c'est le tour ; la 1re carte à gauche penche à gauche
             var fanRoot = Ui.Rect(rt, "SkillFan").At(0.5f, 0f, 235, -24, 760, 240);
@@ -526,14 +514,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             dropFill.Frame().gameObject.AddComponent<Pulse>().Amplitude = 0.02f;
             dropFill.Frame().gameObject.SetActive(false);
 
-            // ---- Combo
-            var combo = Ui.Btn(rt, "", Theme.Danger, Color.white, null!, 40, FontKind.Title, "Combo");
-            combo.Rect.At(0f, 0f, 24, 140, 440, 96);
-            combo.Label.Inked();
-            combo.gameObject.AddComponent<Pulse>().Amplitude = 0.07f;
-            RecipeKit.Shine(combo);
-            combo.gameObject.SetActive(false);
-
             var view = rt.gameObject.AddComponent<CombatView>();
             ScreenKit.WireFade(ctx, view);
             ctx.Wire(view, "retreat", retreat);
@@ -541,10 +521,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "speed", speed);
             ctx.Wire(view, "debugWin", debug);
             ctx.Wire(view, "pause", pause);
-            ctx.Wire(view, "avatarPanel", avatarPanel);
-            ctx.WireArray(view, "avatarButtons", avatarButtons);
             ctx.Wire(view, "timeline", timeline);
-            ctx.Wire(view, "combo", combo);
             ctx.Wire(view, "title", title);
             ctx.Wire(view, "hint", hint);
             ctx.Wire(view, "logText", logText);

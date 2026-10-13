@@ -18,8 +18,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public float Fatigue01;
         public int Fatigue;
         public SkillLineData[] Skills;
-        /// <summary>Combos possibles pour la famille du membre : « Point faible · avec Perception ».</summary>
-        public string[] Combos;
+        /// <summary>Synergies possibles pour la famille du membre : « Point faible · +8 % Attaque · avec Perception ».</summary>
+        public string[] Synergies;
         public string PrimaryLabel;
         public bool PrimaryEnabled;
         /// <summary>Pourquoi l'action principale est grisée (« Il manque 400 CR ») ; vide sinon.</summary>

@@ -143,8 +143,8 @@ namespace N29.HeroesDawn.Tests.Presentation
             var givre = _app.Session.Content.Member(new MemberId("givre"));
             Assert.That(d.Skills.Select(s => s.Name), Is.EqualTo(givre.Skills.Select(_loc.SkillName)));
             Assert.That(d.Skills[0].Description, Is.EqualTo(_loc.DescribeSkill(givre.Skills[0])));
-            Assert.That(d.Combos.Length, Is.EqualTo(4));
-            Assert.That(d.Combos.Any(c => c.StartsWith("Point faible")), Is.True);
+            Assert.That(d.Synergies.Length, Is.EqualTo(4));
+            Assert.That(d.Synergies.Any(c => c.StartsWith("Point faible")), Is.True);
             Assert.That(d.Owned, Is.True);
             Assert.That(d.ShowArrows && d.ShowRooms, Is.True);
         }

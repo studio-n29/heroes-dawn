@@ -27,7 +27,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public MemberSort Sort;
         public string SquadTitle;
         public SquadSlotData[] Squad;
-        public string[] Combos;
+        public string[] Synergies;
         public bool MissionEnabled;
         public string MissionHint;
     }

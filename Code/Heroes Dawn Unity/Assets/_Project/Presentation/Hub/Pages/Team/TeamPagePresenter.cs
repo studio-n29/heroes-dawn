@@ -12,7 +12,7 @@ using N29.HeroesDawn.Presentation.Mvp;
 namespace N29.HeroesDawn.Presentation.Hub
 {
     /// <summary>
-    /// Équipe (M20) : grille filtrée par famille et triée, escouade de 4 places composée ici, combos de l'escouade,
+    /// Équipe (M20) : grille filtrée par famille et triée, escouade de 4 places composée ici, synergies de l'escouade,
     /// toucher une carte ouvre la fiche, « Préparer une mission » = MISSION.
     /// </summary>
     public sealed class TeamPagePresenter : PresenterBase<ITeamPageView>, IPageTitle
@@ -94,7 +94,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var s = _session;
             Family? family = _state.FilterIndex <= 0 ? (Family?)null : (Family)(_state.FilterIndex - 1);
             var squad = s.Squad;
-            var combos = SquadCombos.Of(squad.Select(m => m.Def).ToList(), s.Content.Combos);
+            var synergies = SquadSynergies.Of(squad.Select(m => m.Def).ToList(), s.Content.Synergies);
             View.Show(new TeamPageData
             {
                 Members = MemberQuery.Apply(s.Roster, family, _state.Sort).Select(Tile).ToArray(),
@@ -102,7 +102,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Sort = _state.Sort,
                 SquadTitle = _loc.F("hub.squad", squad.Count),
                 Squad = squad.Select(m => MemberCards.Slot(m, _loc)).ToArray(),
-                Combos = combos.Select(c => _loc.F("team.combo_line", _loc.ComboName(c.Combo), _loc.MemberName(c.A), _loc.MemberName(c.B))).ToArray(),
+                Synergies = synergies.Select(c => _loc.F("team.synergy_line", _loc.SynergyName(c.Synergy), _loc.SynergyEffect(c.Synergy), _loc.MemberName(c.A), _loc.MemberName(c.B))).ToArray(),
                 MissionEnabled = !s.SquadExhausted,
                 MissionHint = s.SquadExhausted ? _loc.T("hub.deploy.exhausted") : "",
             });

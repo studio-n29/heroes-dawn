@@ -60,7 +60,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         ContentCatalog With(params ActivityDef[] extra)
         {
             var c = _app.Session.Content;
-            return new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Combos, c.Zones, c.AvatarSkills, extra.Concat(c.Activities).ToList());
+            return new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Synergies, c.Zones, extra.Concat(c.Activities).ToList());
         }
 
         /// <summary>Type d'activité sans jeu dédié : ouvre la fenêtre générique (extensibilité du framework).</summary>

@@ -81,9 +81,9 @@ namespace N29.HeroesDawn.Presentation.Common
             // --- Équipe (M20) et fiche (M21) ---
             ["team.filter.all"] = "TOUS", ["team.sort"] = "TRI", ["team.sort.level"] = "NIVEAU", ["team.sort.rarity"] = "RARETÉ", ["team.sort.fatigue"] = "FATIGUE",
             ["team.exhausted"] = "ÉPUISÉ", ["team.squad.remove"] = "RETIRER",
-            ["team.combos"] = "COMBOS DE L'ESCOUADE", ["team.combos.none"] = "Aucun combo : mélange les familles.", ["team.combo_line"] = "{0} · {1} + {2}",
+            ["team.synergies"] = "SYNERGIES DE L'ESCOUADE", ["team.synergies.none"] = "Aucune synergie : mélange les familles.", ["team.synergy_line"] = "{0} · {1} · {2} + {3}",
             ["team.mission"] = "PRÉPARER UNE MISSION",
-            ["sheet.skills"] = "COMPÉTENCES", ["sheet.combos"] = "COMBOS DE LA FAMILLE", ["sheet.combo_line"] = "{0} · avec {1}",
+            ["sheet.skills"] = "COMPÉTENCES", ["sheet.synergies"] = "SYNERGIES DE LA FAMILLE", ["sheet.synergy_line"] = "{0} · {1} · avec {2}",
             ["sheet.previous"] = "PRÉC.", ["sheet.next"] = "SUIV.", ["sheet.salon"] = "SALON", ["sheet.infirmary"] = "INFIRMERIE",
             ["hub.train.missing"] = "Il manque {0} CR",
             // --- Salon, Infirmerie, Paramètres ---
@@ -102,7 +102,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["recruit.confirm.before"] = "Solde actuel", ["recruit.confirm.cost"] = "Coût", ["recruit.confirm.after"] = "Après l'achat",
             ["recruit.missing"] = "Il manque {0} PR",
             ["recruit.how_to_earn"] = "Gagne des PR en sécurisant des zones et en remplissant leurs objectifs.",
-            ["recruit.combo"] = "Combo phare : {0} avec {1}", ["recruit.combo.family"] = "Combo phare : {0}",
+            ["recruit.synergy"] = "Synergie phare : {0} ({1}) avec {2}", ["recruit.synergy.family"] = "Synergie phare : {0} ({1})",
             // --- Fonctions à venir (WIP) ---
             ["wip.soon"] = "BIENTÔT",
             ["wip.toast"] = "{0} arrive bientôt",
@@ -153,7 +153,6 @@ namespace N29.HeroesDawn.Presentation.Common
             ["combat.auto"] = "AUTO", ["combat.speed"] = "x{0}", ["combat.retreat"] = "RETRAITE",
             ["combat.retreat.title"] = "Battre en retraite ?",
             ["combat.retreat.body"] = "Le combat compte comme une défaite : l'équipe recule d'une case et prend de la fatigue.",
-            ["combat.combo"] = "COMBO !",
             ["combat.choose_target"] = "Choisis une cible",
             ["combat.choose_ally"] = "Choisis un allié",
             ["combat.waiting"] = "Les jauges se remplissent…",
@@ -240,12 +239,13 @@ namespace N29.HeroesDawn.Presentation.Common
             ["skills.pyro_a1"] = "Jet de flammes", ["skills.pyro_a2"] = "Cocktail",
             ["skills.brick_a1"] = "Direct du mur", ["skills.brick_a2"] = "Mur de briques", ["skills.brick_a3"] = "Onde de choc",
 
-            // --- Combos ---
-            ["combos.charged_projectiles.name"] = "Projectiles chargés", ["combos.forged_armor.name"] = "Armure forgée",
-            ["combos.trap.name"] = "Piège", ["combos.elemental_body.name"] = "Corps élémentaire", ["combos.weak_point.name"] = "Point faible",
-            ["combos.triage.name"] = "Triage", ["combos.resonance_matter.name"] = "Résonance de la matière",
-            ["combos.resonance_elemental.name"] = "Résonance élémentaire", ["combos.resonance_physical.name"] = "Résonance vitale",
-            ["combos.resonance_perception.name"] = "Résonance perceptive",
+            // --- Synergies d équipe (bonus permanent) ---
+            ["synergy.stat.Hp"] = "PV", ["synergy.stat.Atk"] = "Attaque", ["synergy.stat.Def"] = "Défense", ["synergy.stat.Spd"] = "Vitesse",
+            ["synergies.charged_projectiles.name"] = "Projectiles chargés", ["synergies.forged_armor.name"] = "Armure forgée",
+            ["synergies.trap.name"] = "Piège", ["synergies.elemental_body.name"] = "Corps élémentaire", ["synergies.weak_point.name"] = "Point faible",
+            ["synergies.triage.name"] = "Triage", ["synergies.resonance_matter.name"] = "Résonance de la matière",
+            ["synergies.resonance_elemental.name"] = "Résonance élémentaire", ["synergies.resonance_physical.name"] = "Résonance vitale",
+            ["synergies.resonance_perception.name"] = "Résonance perceptive",
 
             // --- Statuts ---
             ["status.Burn"] = "Brûlure", ["status.Freeze"] = "Gel", ["status.Shock"] = "Choc", ["status.Corrosion"] = "Corrosion",
@@ -327,7 +327,8 @@ namespace N29.HeroesDawn.Presentation.Common
         public static string MemberName(MemberDef d) => CodeNames.TryGetValue(d.Id.Value, out var n) ? n : T(d.NameKey);
         public static string EnemyName(EnemyDef d) => T(d.NameKey);
         public static string SkillName(SkillDef s) => Or("skills." + s.Id.Value, "skills." + s.Id.Value);
-        public static string ComboName(ComboDef c) => T(c.NameKey);
+        public static string SynergyName(SynergyDef s) => T(s.NameKey);
+        public static string SynergyEffect(SynergyDef s) => "+" + s.Percent + " % " + T("synergy.stat." + s.Stat);
         public static string StatusName(StatusType s) => T("status." + s);
         public static string FamilyName(Family f) => T("family." + f);
         public static string RoleName(Role r) => T("role." + r);
