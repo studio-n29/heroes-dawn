@@ -73,6 +73,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<IClock, SystemClock>(Lifetime.Singleton);
             builder.Register<ISeedProvider>(_ => new LocalSeedProvider(), Lifetime.Singleton);
             builder.Register<IAuthGateway>(_ => new FakeAuthGateway(), Lifetime.Singleton);
+            builder.Register<IAccountGateway>(_ => new LocalAccountGateway(), Lifetime.Singleton); // Supabase Auth plus tard
             builder.Register<IProfileGateway>(_ => new LocalProfileGateway(), Lifetime.Singleton);
             builder.Register<ICombatVerifier>(_ => new LocalCombatVerifier(content), Lifetime.Singleton);
             builder.Register<ISceneLoader, UnitySceneLoader>(Lifetime.Singleton);
@@ -127,6 +128,8 @@ namespace N29.HeroesDawn.Composition
             builder.Register<PlayerSettings>(Lifetime.Singleton);
             builder.Register<MetaOverview>(Lifetime.Singleton);
             builder.Register<TutorialGuide>(Lifetime.Singleton);
+            builder.Register<OnboardingGuide>(Lifetime.Singleton);
+            builder.Register<OnboardingFlow>(Lifetime.Singleton).As<IOnboardingFlow>();
             builder.Register<MetaTracker>(Lifetime.Singleton);
 
             // ---- Use cases : combat

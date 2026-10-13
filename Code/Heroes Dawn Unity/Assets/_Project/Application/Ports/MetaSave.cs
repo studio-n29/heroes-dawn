@@ -66,6 +66,15 @@ namespace N29.HeroesDawn.Application.Ports
         public List<string> hintsSeen = new List<string>();
     }
 
+    /// <summary>Première connexion : cinématique d introduction vue, pseudo choisi, campagne choisie.</summary>
+    [Serializable]
+    public sealed class OnboardingSave
+    {
+        public bool done;
+        public string pseudo = "";
+        public string campaign = "";
+    }
+
     /// <summary>Tout ce qui dépasse le noyau (équipe, ressources, boutique de recrutement) : pass, missions, opérations, labo, archives…</summary>
     [Serializable]
     public sealed class MetaSave
@@ -99,6 +108,7 @@ namespace N29.HeroesDawn.Application.Ports
         // Réglages et tutoriel
         public SettingsSave settings = new SettingsSave();
         public TutorialSave tutorial = new TutorialSave();
+        public OnboardingSave onboarding = new OnboardingSave();
 
         // Objets, grimoire, boosters
         public CollectionSave collection = new CollectionSave();

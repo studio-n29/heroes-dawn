@@ -14,12 +14,13 @@ namespace N29.HeroesDawn.Tests.PlayMode
     public static class PlayModeHarness
     {
         /// <summary>Charge Boot avec les doubles injectés dans le scope racine, puis attend l'écran de connexion.</summary>
-        public static IEnumerator Boot(MemoryProfileGateway profiles, InstantAuthGateway auth)
+        public static IEnumerator Boot(MemoryProfileGateway profiles, InstantAuthGateway auth, bool withIntro = false)
         {
             using (LifetimeScope.Enqueue(b =>
                    {
                        b.RegisterInstance<IProfileGateway>(profiles);
                        b.RegisterInstance<IAuthGateway>(auth);
+                       if (!withIntro) b.RegisterInstance<IOnboardingFlow>(new SkippedOnboarding()); // la première connexion a ses propres tests
                    }))
             {
                 SceneManager.LoadScene("Boot", LoadSceneMode.Single);

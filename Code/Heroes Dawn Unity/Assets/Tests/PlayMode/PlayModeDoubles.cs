@@ -43,4 +43,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
 
         public void SignOut() { }
     }
+
+    /// <summary>Première connexion ignorée : les tests de bout en bout passent directement au QG.</summary>
+    public sealed class SkippedOnboarding : N29.HeroesDawn.Presentation.Login.IOnboardingFlow
+    {
+        public UniTask RunIfNeededAsync(CancellationToken ct) => UniTask.CompletedTask;
+    }
 }

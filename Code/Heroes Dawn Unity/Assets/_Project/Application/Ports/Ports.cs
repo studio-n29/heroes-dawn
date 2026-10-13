@@ -43,6 +43,16 @@ namespace N29.HeroesDawn.Application.Ports
         void SignOut();
     }
 
+    /// <summary>
+    /// Compte joueur avec e-mail et mot de passe (version 0.9.0 : simulé en local ; la cible est Supabase Auth — voir Backend/README.md).
+    /// Le joueur invité (<see cref="IAuthGateway"/>) peut ensuite rattacher son profil à un compte.
+    /// </summary>
+    public interface IAccountGateway
+    {
+        UniTask<Result<PlayerAccount>> SignUpAsync(string email, string password, string displayName, CancellationToken ct);
+        UniTask<Result<PlayerAccount>> SignInAsync(string email, string password, CancellationToken ct);
+    }
+
     [Serializable]
     public sealed class MemberSave
     {
