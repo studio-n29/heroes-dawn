@@ -64,25 +64,6 @@ namespace N29.HeroesDawn.Presentation.Combat
         public SkillSlotData[] Slots;
     }
 
-    /// <summary>Bouton de compétence d avatar (lançable à tout moment, recharge en temps actif).</summary>
-    public struct AvatarSlotData
-    {
-        public bool Visible;
-        public string Label;
-        public SkillCategory Category;
-        public bool Enabled;
-        public bool Pending;
-        /// <summary>Part de recharge restante (1 = juste lancée, 0 = prête).</summary>
-        public float Cooldown01;
-    }
-
-    public struct AvatarBarData
-    {
-        public bool Visible;
-        public string Title;
-        public AvatarSlotData[] Slots;
-    }
-
     public struct CombatTopBarData
     {
         public string Title;
@@ -101,7 +82,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         public string Initial;
         public Family Family;
         public float Position01;
-        /// <summary>En canalisation (position négative après un combo).</summary>
+        /// <summary>En canalisation (position négative).</summary>
         public bool Channelling;
         public bool Ready;
         public bool InPrep;

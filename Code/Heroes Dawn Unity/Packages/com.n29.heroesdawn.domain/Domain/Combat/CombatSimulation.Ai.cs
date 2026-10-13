@@ -5,7 +5,7 @@ using N29.HeroesDawn.Definitions;
 namespace N29.HeroesDawn.Domain.Combat
 {
     /// <summary>
-    /// IA (02_Combat) — alliés en auto : combo → soin si un allié &lt; 40 % → A3 → A2 → A1 sur l'ennemi le plus faible.
+    /// IA (02_Combat) — alliés en auto : soin si un allié &lt; 40 % → A3 → A2 → A1 sur l'ennemi le plus faible.
     /// Ennemis : Facile = au hasard ; Normal = A2/A3 dès que prêtes, cible la plus faible une fois sur deux ;
     /// Élite / Boss = priorités complètes.
     /// </summary>
@@ -13,16 +13,6 @@ namespace N29.HeroesDawn.Domain.Combat
     {
         void AiAct(CombatUnit u, List<CombatEvent> output)
         {
-            if (u.Side == Side.Ally)
-            {
-                foreach (var combo in AvailableCombos())
-                {
-                    if (combo.A == u.Id || combo.B == u.Id)
-                    {
-                        if (TryPerformCombo(combo.A, combo.B, WeakestFoe(u.Side), output)) return;
-                    }
-                }
-            }
 
             // Une action annoncée sur la frise (zone de préparation) est celle qui s exécute, si elle est toujours possible.
             int slot, target;

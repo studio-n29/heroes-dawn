@@ -12,10 +12,6 @@ namespace N29.HeroesDawn.Domain.Combat
     /// <summary>Un pas de frise : toutes les unites ont avance d un point (ou franchi leurs points propres).</summary>
     public sealed class TimelineAdvancedEvent : CombatEvent { public TimelineAdvancedEvent(int t) : base(t) { } }
 
-    /// <summary>Le point d action est vide a ce pas : fenetre d interruption (pause en millisecondes).</summary>
-    public sealed class EmptyPointPauseEvent : CombatEvent { public int PauseMs { get; } public EmptyPointPauseEvent(int t, int pauseMs) : base(t) { PauseMs = pauseMs; } }
-
-    /// <summary>Deux unites sur le meme point : combo (deux allies) ou parade (allie et ennemi).</summary>
     public sealed class EncounterEvent : CombatEvent
     {
         public int A { get; }
@@ -64,21 +60,7 @@ namespace N29.HeroesDawn.Domain.Combat
 
     public sealed class UnitDefeatedEvent : CombatEvent { public int Unit { get; } public UnitDefeatedEvent(int t, int u) : base(t) { Unit = u; } }
 
-    public sealed class ComboAvailableEvent : CombatEvent
-    {
-        public int A { get; }
-        public int B { get; }
-        public string ComboId { get; }
-        public ComboAvailableEvent(int t, int a, int b, string comboId) : base(t) { A = a; B = b; ComboId = comboId; }
-    }
 
-    public sealed class ComboUsedEvent : CombatEvent
-    {
-        public int A { get; }
-        public int B { get; }
-        public string ComboId { get; }
-        public ComboUsedEvent(int t, int a, int b, string comboId) : base(t) { A = a; B = b; ComboId = comboId; }
-    }
 
     /// <summary>Une unité entre en zone de préparation : son action est annoncée sur la frise.</summary>
     public sealed class ActionPlannedEvent : CombatEvent
@@ -122,13 +104,6 @@ namespace N29.HeroesDawn.Domain.Combat
         public WaveStartedEvent(int t, int wave, int[] enemies) : base(t) { Wave = wave; Enemies = enemies; }
     }
 
-    public sealed class AvatarSkillUsedEvent : CombatEvent
-    {
-        public SkillId Skill { get; }
-        public SkillCategory Category { get; }
-        public int[] Targets { get; }
-        public AvatarSkillUsedEvent(int t, SkillId skill, SkillCategory category, int[] targets) : base(t) { Skill = skill; Category = category; Targets = targets; }
-    }
 
     public sealed class CombatEndedEvent : CombatEvent { public bool Victory { get; } public CombatEndedEvent(int t, bool victory) : base(t) { Victory = victory; } }
 }

@@ -24,7 +24,6 @@ namespace N29.HeroesDawn.Definitions
         public int RankEliteLevelOffset { get; set; } = 3;
         public int RankEasyStatPercent { get; set; } = 80;
         public int RankEliteStatPercent { get; set; } = 130;
-        public int ComboCooldownActions { get; set; } = 3;
         /// <summary>Chance en % qu un evenement narratif resolu fasse trouver un objet.</summary>
         public int EventItemChancePercent { get; set; } = 60;
         /// <summary>Chance en % qu un mini-jeu reussi donne un booster.</summary>
@@ -39,8 +38,6 @@ namespace N29.HeroesDawn.Definitions
         public int TimelineResetMediumPoint { get; set; } = 2;
         /// <summary>Point de reprise apres une competence lourde (emplacement 3, carte 4).</summary>
         public int TimelineResetHeavyPoint { get; set; } = 0;
-        /// <summary>Point de reprise apres un combo : negatif = canalisation a rattraper.</summary>
-        public int TimelineResetComboPoint { get; set; } = -2;
         /// <summary>Premier point de la zone de preparation : l action ennemie est annoncee, un critique l annule.</summary>
         public int TimelinePrepZonePoint { get; set; } = 8;
         /// <summary>Premier point de la zone de preparation vue grace a la Perception (precognition).</summary>
@@ -51,8 +48,6 @@ namespace N29.HeroesDawn.Definitions
         public int TimelineStartPointMax { get; set; } = 2;
         /// <summary>Duree d un pas de frise (un point), en millisecondes.</summary>
         public int TimelineStepMs { get; set; } = 350;
-        /// <summary>Pause avant l arrivee d un ennemi au point d action (avatar pret) : fenetre d interruption du joueur.</summary>
-        public int TimelinePausePerEmptyPointMs { get; set; } = 1200;
         /// <summary>Temps maximum du joueur pour choisir au point d action.</summary>
         public int TimelineTurnTimeoutMs { get; set; } = 30000;
         /// <summary>Delai de reflexion de l IA (presentation) : borne basse et haute.</summary>
@@ -64,9 +59,6 @@ namespace N29.HeroesDawn.Definitions
         /// <summary>Brûlure : % des PV max perdus pour une frise complète parcourue (dégâts à chaque pas).</summary>
         public int BurnPercentPerTimeline { get; set; } = 8;
 
-        // ---- Combo à proximité (gratuit)
-        /// <summary>Quand un allié est à 0, un partenaire de combo valide doit avoir au moins ce point pour lancer le combo.</summary>
-        public int ComboSyncWindowPoint { get; set; } = 6;
         public int ResourceCreditsMin { get; set; } = 150;
         public int ResourceCreditsMax { get; set; } = 400;
         public int ResourcePrMin { get; set; } = 5;

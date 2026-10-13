@@ -61,46 +61,6 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_sim.Tick, Is.EqualTo(t0 + 1), "0,4 s : un pas");
         }
 
-        [Test, Description("Vérifie que la pause de 1,2 s n'a lieu que lorsqu'un ennemi va arriver au point d'action, que le joueur peut interrompre pendant ce temps et que la frise reprend ensuite — parce que les points vides sans menace ne doivent plus ralentir le combat")]
-        public void ImminentEnemy_PausesTheTimelineFor1200ms()
-        {
-            Calm();
-            var enemy = _sim.Units.First(u => u.Side == Side.Enemy);
-            enemy.Point = enemy.ActionPoint - 2;
-            for (int i = 0; i < 4; i++) _p.Tick();
-            int tick = _sim.Tick;
-            Assert.That(_sim.InterruptWindowOpen, Is.True);
-            Assert.That(_p.PauseLeft, Is.EqualTo(1.2f).Within(0.01f));
-            for (int i = 0; i < 11; i++) _p.Tick();
-            Assert.That(_sim.Tick, Is.EqualTo(tick), "1,1 s : toujours en pause");
-            for (int i = 0; i < 6; i++) _p.Tick();
-            Assert.That(_sim.Tick, Is.GreaterThan(tick), "la frise a repris");
-        }
-
-        [Test, Description("Vérifie qu'aucune pause n'est ouverte quand aucun ennemi n'est sur le point d'agir — parce que c'était la cause d'un combat beaucoup trop long")]
-        public void NoThreat_NeverPauses()
-        {
-            Calm();
-            for (int i = 0; i < 20; i++) _p.Tick();
-            Assert.That(_p.PauseLeft, Is.EqualTo(0f));
-            Assert.That(_sim.InterruptWindowOpen, Is.False);
-        }
-
-        [Test, Description("Vérifie que la pause d'interruption passe deux fois plus vite à ×2 — parce que la vitesse du combat s'applique aux pauses comme aux pas")]
-        public void Pause_ScalesWithCombatSpeed()
-        {
-            _view.ClickSpeed(); // ×1 → ×2
-            Calm();
-            var enemy = _sim.Units.First(u => u.Side == Side.Enemy);
-            enemy.Point = enemy.ActionPoint - 2;
-            for (int i = 0; i < 2; i++) _p.Tick();
-            Assert.That(_p.PauseLeft, Is.EqualTo(1.2f).Within(0.01f));
-            for (int i = 0; i < 3; i++) _p.Tick();
-            Assert.That(_p.PauseLeft, Is.EqualTo(0.6f).Within(0.02f), "0,3 s réelles à ×2 = 0,6 s de pause écoulées");
-            for (int i = 0; i < 3; i++) _p.Tick();
-            Assert.That(_p.PauseLeft, Is.LessThanOrEqualTo(0.02f), "0,6 s réelles à ×2 = 1,2 s de pause");
-        }
-
         [Test, Description("Vérifie que le tour d'un agent laisse 30 s au joueur, que le décompte baisse en temps réel et que passé ce délai l'unité passe son tour et repart au point 3 — parce que la frise ne doit jamais rester figée")]
         public void PlayerTurn_HasThirtySeconds_ThenPasses()
         {

@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Page Équipe (prefab Pages/Team) : filtres et tri, grille de cartes, escouade, combos, « Préparer une mission ».</summary>
+    /// <summary>Page Équipe (prefab Pages/Team) : filtres et tri, grille de cartes, escouade, synergies, « Préparer une mission ».</summary>
     public sealed class TeamPageView : ViewBase, ITeamPageView
     {
         static readonly MemberSort[] SortOrder = { MemberSort.Level, MemberSort.Rarity, MemberSort.Fatigue };
@@ -21,8 +21,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] RectTransform grid = null!;
         [SerializeField] TMP_Text squadTitle = null!;
         [SerializeField] RectTransform squadRow = null!;
-        [SerializeField] TMP_Text combos = null!;
-        [SerializeField] GameObject combosNone = null!;
+        [SerializeField] TMP_Text synergies = null!;
+        [SerializeField] GameObject synergiesNone = null!;
         [SerializeField] UiButton mission = null!;
         [SerializeField] TMP_Text missionHint = null!;
         [SerializeField] MemberTileView tilePrefab = null!;
@@ -83,9 +83,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             squadTitle.text = d.SquadTitle;
             squadRow.Clear();
             foreach (var s in d.Squad) Instantiate(squadSlotPrefab, squadRow).Show(s);
-            combos.text = string.Join("\n", d.Combos);
-            bool none = d.Combos.Length == 0;
-            if (combosNone.activeSelf != none) combosNone.SetActive(none);
+            synergies.text = string.Join(System.Environment.NewLine, d.Synergies);
+            bool none = d.Synergies.Length == 0;
+            if (synergiesNone.activeSelf != none) synergiesNone.SetActive(none);
             mission.Interactable = d.MissionEnabled;
             mission.DisabledReason = d.MissionHint;
             missionHint.text = d.MissionHint;

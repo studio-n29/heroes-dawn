@@ -22,10 +22,10 @@ namespace N29.HeroesDawn.Domain.Combat
             return 1000 - b.FatigueMalusMaxPercent * 10 * over / span;
         }
 
-        public static CombatUnit Ally(int id, MemberDef d, AllyEntry e, BalanceConfig b, CollectionDef? collection = null)
+        public static CombatUnit Ally(int id, MemberDef d, AllyEntry e, BalanceConfig b, CollectionDef? collection = null, SynergyBonus synergy = default)
         {
             int f = FatigueMultiplierPermille(e.FatiguePercent, b);
-            int hpP = 0, atkP = 0, defP = 0, spdP = 0, crit = 0, startGauge = 0, shield = 0;
+            int hpP = synergy.Hp, atkP = synergy.Atk, defP = synergy.Def, spdP = synergy.Spd, crit = 0, startGauge = 0, shield = 0; // la synergie d équipe est permanente
             if (collection != null)
                 foreach (var itemId in e.Items)
                 {

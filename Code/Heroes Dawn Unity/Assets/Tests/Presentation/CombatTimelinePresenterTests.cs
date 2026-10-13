@@ -48,8 +48,6 @@ namespace N29.HeroesDawn.Tests.Presentation
         CombatUnit Ally(string def) => _sim.Units.First(u => u.Side == Side.Ally && u.DefId == def);
         int FirstEnemy => _sim.Units.First(u => u.Side == Side.Enemy && u.IsAlive).Id;
 
-        int AvatarIndex(string id) => _sim.AvatarSkills.ToList().FindIndex(a => a.Id.Value == id);
-
         [Test, Description("Vérifie que la frise montre une pastille par unité et la zone de préparation à 80 % de progression (les 20 derniers points avant 0) — parce que le joueur lit le combat sur la frise")]
         public void Timeline_ShowsEveryUnit_AndPrepZone()
         {
@@ -84,87 +82,5 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Skills.Visible, Is.True);
         }
 
-        /// <summary>Fait avancer la frise jusqu a la fenetre d interruption (ennemi sur le point d agir) : les interruptions y sont permises.</summary>
-        void OpenWindow()
-        {
-            foreach (var u in _sim.Units) if (u.IsAlive) u.Point = 0;
-            var threat = _sim.Units.First(u => u.Side == Side.Enemy);
-            threat.Point = threat.ActionPoint - 2; // menace imminente : la fenêtre d'interruption s'ouvre au pas suivant
-            for (int i = 0; i < 400 && !_sim.InterruptWindowOpen; i++) _p.Tick();
-            Assume.That(_sim.InterruptWindowOpen, "aucune fenêtre d'interruption");
-        }
-
-        [Test, Description("Vérifie que la barre d'avatar propose une compétence par catégorie, toutes prêtes au départ, avec leur touche — parce que le joueur les lance à tout moment")]
-        public void AvatarBar_ListsEverySkill_ReadyAtStart()
-        {
-            Assert.That(_view.Avatar.Slots.All(s => !s.Enabled), Is.True, "hors fenêtre d'interruption : rien n'est lançable");
-            OpenWindow();
-            var bar = _view.Avatar;
-            Assert.That(bar.Visible, Is.True);
-            Assert.That(bar.Slots.Length, Is.EqualTo(_sim.AvatarSkills.Count));
-            Assert.That(bar.Slots.All(s => s.Enabled && s.Visible));
-            Assert.That(bar.Slots.Select(s => s.Category).Distinct().Count(), Is.EqualTo(5));
-            Assert.That(bar.Slots[0].Label, Does.Contain("[Q]"));
-        }
-
-        [Test, Description("Vérifie qu'une compétence d'avatar à cible unique demande la cible (consigne affichée) puis se lance et entre en recharge — parce que plusieurs ennemis sont en jeu")]
-        public void Avatar_SingleTarget_AsksTarget_ThenFiresAndCoolsDown()
-        {
-            OpenWindow();
-            int idx = AvatarIndex("avatar_strike");
-            int hp = _sim.Units.Where(u => u.Side == Side.Enemy).Sum(u => u.Hp);
-            _view.ClickAvatar(idx);
-            Assert.That(_view.Avatar.Slots[idx].Pending, Is.True);
-            Assert.That(_view.Hint, Does.Contain("TOUCHE"));
-            _view.TapUnit(FirstEnemy);
-            _p.Tick();
-            Assert.That(_sim.AvatarCooldownLeft(idx), Is.GreaterThan(0));
-            Assert.That(_view.Avatar.Slots[idx].Enabled, Is.False);
-            Assert.That(_sim.Units.Where(u => u.Side == Side.Enemy).Sum(u => u.Hp), Is.LessThan(hp));
-        }
-
-        [Test, Description("Vérifie qu'une compétence d'avatar sans cible (soin d'équipe) part tout de suite, même pendant la pause d'action — parce que l'avatar agit à n'importe quel moment")]
-        public void Avatar_NoTarget_FiresAtOnce_EvenWhilePaused()
-        {
-            foreach (var u in _sim.Units.Where(x => x.Side == Side.Enemy)) u.Point = 0;
-            var ancre = Ally("ancre");
-            ancre.Point = ancre.ActionPoint;
-            _p.Tick();
-            Assert.That(_sim.IsAwaitingAction, Is.True);
-            int idx = AvatarIndex("avatar_mend");
-            _view.ClickAvatar(idx);
-            _p.Tick();
-            Assert.That(_sim.AvatarCooldownLeft(idx), Is.GreaterThan(0));
-            Assert.That(ancre.IsReady, Is.True, "le tour de l'agent n'est pas consommé");
-        }
-
-        [Test, Description("Vérifie que Retour annule le ciblage d'une compétence d'avatar sans la lancer — parce qu'annuler n'a aucune conséquence")]
-        public void Avatar_BackCancelsTargeting()
-        {
-            OpenWindow();
-            int idx = AvatarIndex("avatar_strike");
-            _view.ClickAvatar(idx);
-            Assert.That(_view.Avatar.Slots[idx].Pending, Is.True);
-            _p.HandleBack();
-            Assert.That(_view.Avatar.Slots[idx].Pending, Is.False);
-            Assert.That(_sim.AvatarCooldownLeft(idx), Is.Zero);
-        }
-
-        [Test, Description("Vérifie qu'avec un allié à 0 et son partenaire de combo à 70 % de la frise, le bouton propose « COMBO PROCHE » et le lance gratuitement contre un ennemi — parce que le combo ne coûte plus de réserve (spec 2026-10-07)")]
-        public void SyncCombo_OfferedAndPerformed()
-        {
-            foreach (var u in _sim.Units.Where(x => x.Side == Side.Enemy)) u.Point = 0;
-            var ancre = Ally("ancre"); var givre = Ally("givre");
-            foreach (var other in _sim.Units.Where(x => x.Side == Side.Ally && x != ancre && x != givre)) other.Point = 0;
-            ancre.Point = ancre.ActionPoint;
-            givre.Point = 7;
-            _p.Tick();
-            Assert.That(_view.ComboVisible, Is.True);
-            Assert.That(_view.ComboLabel, Does.Contain("PROCHE"));
-            _view.ClickCombo();
-            _view.TapUnit(FirstEnemy);
-            _p.Tick();
-            Assert.That(_sim.InputLog.Any(i => i.Command.Type == CommandType.Combo && i.Command.Flag), Is.True);
-        }
     }
 }

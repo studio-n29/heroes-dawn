@@ -8,7 +8,7 @@ using UnityEngine;
 namespace N29.HeroesDawn.Presentation.Popups
 {
     /// <summary>
-    /// Confirmation d'achat (M31, popup prefab) : héros, combo phare, solde avant / coût / après ; si le solde ne suffit pas,
+    /// Confirmation d'achat (M31, popup prefab) : héros, synergie phare, solde avant / coût / après ; si le solde ne suffit pas,
     /// manque en rouge, piste pour gagner des PR et bouton d'achat désactivé. Retour = Annuler.
     /// </summary>
     public sealed class RecruitConfirmPopupView : MonoBehaviour, IRecruitConfirmPopupView
@@ -18,7 +18,7 @@ namespace N29.HeroesDawn.Presentation.Popups
         [SerializeField] TMP_Text memberName = null!;
         [SerializeField] TMP_Text rarity = null!;
         [SerializeField] TMP_Text role = null!;
-        [SerializeField] TMP_Text combo = null!;
+        [SerializeField] TMP_Text synergy = null!;
         [SerializeField] TMP_Text before = null!;
         [SerializeField] TMP_Text cost = null!;
         [SerializeField] TMP_Text after = null!;
@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Presentation.Popups
             rarity.text = d.Card.RarityText;
             rarity.color = Theme.RarityColor(d.Card.Rarity);
             role.text = d.Card.RoleLine;
-            combo.text = d.Combo;
+            synergy.text = d.Synergy;
             before.text = d.Before;
             cost.text = d.Cost;
             after.text = d.CanAfford ? d.After : "";

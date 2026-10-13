@@ -68,26 +68,26 @@ namespace N29.HeroesDawn.Tests.Presentation
         static ContentCatalog C => PrototypeContent.Build();
         static MemberDef M(string id) => C.Member(new MemberId(id));
 
-        [Test, Description("Vérifie que chaque paire de membres dont les familles forment un combo est listée une fois — parce que l'écran Équipe montre les combos de l'escouade (M20 ⑤)")]
+        [Test, Description("Vérifie que chaque paire de membres dont les familles forment une synergie est listée une fois — parce que l'écran Équipe montre les synergies de l'escouade (M20 ⑤)")]
         public void Pairs_MatchingFamilies_ListedOnce()
         {
             var c = C;
             var squad = new[] { M("givre"), M("echo"), M("seve") };
-            var combos = SquadCombos.Of(squad, c.Combos);
+            var combos = SquadSynergies.Of(squad, c.Synergies);
             Assert.That(combos.Count, Is.EqualTo(3));
             Assert.That(combos.Select(x => (x.A.Id, x.B.Id)).Distinct().Count(), Is.EqualTo(3));
-            Assert.That(combos.All(x => x.Combo.Matches(x.A.Family, x.B.Family)), Is.True);
+            Assert.That(combos.All(x => x.Synergy.Matches(x.A.Family, x.B.Family)), Is.True);
         }
 
-        [Test, Description("Vérifie qu'un membre seul ne forme aucun combo — parce qu'un combo demande deux membres")]
+        [Test, Description("Vérifie qu'un membre seul ne forme aucune synergie — parce qu'une synergie demande deux membres")]
         public void SingleMember_NoCombo()
-            => Assert.That(SquadCombos.Of(new[] { M("givre") }, C.Combos), Is.Empty);
+            => Assert.That(SquadSynergies.Of(new[] { M("givre") }, C.Synergies), Is.Empty);
 
-        [Test, Description("Vérifie que deux membres de même famille forment le combo de résonance — parce que chaque famille a sa résonance (GDD §Combos)")]
+        [Test, Description("Vérifie que deux membres de même famille forment la synergie de résonance — parce que chaque famille a sa résonance")]
         public void SameFamilyPair_UsesResonanceCombo()
         {
-            var combos = SquadCombos.Of(new[] { M("ancre"), M("seve") }, C.Combos);
-            Assert.That(combos.Single().Combo.NameKey, Is.EqualTo("combos.resonance_physical.name"));
+            var combos = SquadSynergies.Of(new[] { M("ancre"), M("seve") }, C.Synergies);
+            Assert.That(combos.Single().Synergy.NameKey, Is.EqualTo("synergies.resonance_physical.name"));
         }
     }
 

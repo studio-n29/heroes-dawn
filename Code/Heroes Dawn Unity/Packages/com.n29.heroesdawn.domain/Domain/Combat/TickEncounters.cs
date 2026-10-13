@@ -4,9 +4,9 @@ using N29.HeroesDawn.Definitions;
 
 namespace N29.HeroesDawn.Domain.Combat
 {
-    public enum TickEncounterKind { Combo, Parade }
+    public enum TickEncounterKind { Parade }
 
-    /// <summary>Deux unites sur le meme point de la frise : un combo (deux allies) ou une parade (un allie et un ennemi).</summary>
+    /// <summary>Deux unites sur le meme point de la frise : une parade (un allie et un ennemi).</summary>
     public readonly struct TickEncounter
     {
         public int A { get; }
@@ -16,7 +16,7 @@ namespace N29.HeroesDawn.Domain.Combat
     }
 
     /// <summary>
-    /// Rencontres sur la frise : deux allies sur un meme point forment un combo possible, un allie et un ennemi sur un meme point
+    /// Rencontres sur la frise : un allie et un ennemi sur un meme point
     /// provoquent une parade, deux ennemis ne font rien. Une unite en canalisation (point negatif) ou deja au point d action
     /// (elle agit) ne rencontre personne. Chaque couple est rapporte une seule fois par appel, dans l ordre des identifiants.
     /// </summary>
@@ -33,8 +33,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 {
                     var v = units[j];
                     if (!Eligible(v) || v.Point != u.Point) continue;
-                    if (u.Side == Side.Ally && v.Side == Side.Ally) result.Add(new TickEncounter(u.Id, v.Id, TickEncounterKind.Combo));
-                    else if (u.Side != v.Side) result.Add(new TickEncounter(u.Id, v.Id, TickEncounterKind.Parade));
+                    if (u.Side != v.Side) result.Add(new TickEncounter(u.Id, v.Id, TickEncounterKind.Parade));
                 }
             }
             return result;

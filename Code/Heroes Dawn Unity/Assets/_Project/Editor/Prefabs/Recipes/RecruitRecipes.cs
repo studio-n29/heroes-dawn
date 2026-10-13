@@ -131,7 +131,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Confirmation d'achat (M31) : héros et combo phare à gauche, solde avant / coût / après à droite, Annuler / Recruter.</summary>
+    /// <summary>Confirmation d'achat (M31) : héros et synergie phare à gauche, solde avant / coût / après à droite, Annuler / Recruter.</summary>
     public sealed class RecruitConfirmPopupRecipe : IPrefabRecipe
     {
         public string RelativePath => "Popups/RecruitConfirmPopup.prefab";
@@ -154,8 +154,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             rarity.rectTransform.At(0f, 1f, 160, -60, 470, 34);
             var role = Ui.Txt(content, "", 24, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Regular, "Role");
             role.rectTransform.At(0f, 1f, 160, -96, 470, 30);
-            var combo = Ui.Txt(content, "", 26, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Combo");
-            combo.rectTransform.At(0f, 1f, 0, -166, 620, 70);
+            var synergy = Ui.Txt(content, "", 26, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Synergy");
+            synergy.rectTransform.At(0f, 1f, 0, -166, 620, 70);
 
             // ---- Solde
             var before = Line(content, "recruit.confirm.before", "Before", 0, Theme.Text);
@@ -180,7 +180,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "memberName", name);
             ctx.Wire(view, "rarity", rarity);
             ctx.Wire(view, "role", role);
-            ctx.Wire(view, "combo", combo);
+            ctx.Wire(view, "synergy", synergy);
             ctx.Wire(view, "before", before);
             ctx.Wire(view, "cost", cost);
             ctx.Wire(view, "after", after);

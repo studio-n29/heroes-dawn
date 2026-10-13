@@ -59,7 +59,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Page Équipe (M20) : filtres par famille et tri en haut, grille défilante, escouade et combos à droite.</summary>
+    /// <summary>Page Équipe (M20) : filtres par famille et tri en haut, grille défilante, escouade et synergies à droite.</summary>
     public sealed class TeamPageRecipe : IPrefabRecipe
     {
         public string RelativePath => "Pages/Team.prefab";
@@ -103,7 +103,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             layout.constraintCount = 4;
 
-            // ---- Escouade, combos, mission
+            // ---- Escouade, synergies, mission
             var side = Ui.Panel(rt, "Squad", Theme.Surface, 5f, 10f, true);
             var sideFrame = side.Frame();
             sideFrame.anchorMin = new Vector2(1, 0);
@@ -116,10 +116,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             squadTitle.Inked();
             var squadRow = Ui.Rect(side.transform, "SquadRow").At(0.5f, 1f, 0, -66, 536, 150);
             squadRow.HLayout(12, 0, TextAnchor.UpperCenter);
-            Ui.LocTxt(side.transform, "team.combos", 28, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "CombosTitle").rectTransform.At(0f, 1f, 22, -232, 520, 38);
-            var combos = Ui.Txt(side.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Combos");
-            combos.rectTransform.Stretch(22, 196, 22, 278);
-            var none = Ui.LocTxt(side.transform, "team.combos.none", 22, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "CombosNone");
+            Ui.LocTxt(side.transform, "team.synergies", 28, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "SynergiesTitle").rectTransform.At(0f, 1f, 22, -232, 520, 38);
+            var synergies = Ui.Txt(side.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Synergies");
+            synergies.rectTransform.Stretch(22, 196, 22, 278);
+            var none = Ui.LocTxt(side.transform, "team.synergies.none", 22, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "SynergiesNone");
             none.rectTransform.Stretch(22, 196, 22, 278);
             none.gameObject.SetActive(false);
             var hint = Ui.Txt(side.transform, "", 22, Theme.Fatigue, TextAnchor.MiddleCenter, FontKind.Body, "MissionHint");
@@ -137,8 +137,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "grid", grid);
             ctx.Wire(view, "squadTitle", squadTitle);
             ctx.Wire(view, "squadRow", squadRow);
-            ctx.Wire(view, "combos", combos);
-            ctx.Wire(view, "combosNone", none.gameObject);
+            ctx.Wire(view, "synergies", synergies);
+            ctx.Wire(view, "synergiesNone", none.gameObject);
             ctx.Wire(view, "mission", mission);
             ctx.Wire(view, "missionHint", hint);
             ctx.Wire(view, "tilePrefab", ctx.Asset("Widgets/MemberTile.prefab").GetComponent<MemberTileView>());
@@ -160,7 +160,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Fiche d'un membre (M21) : identité à gauche, stats et compétences au centre, combos, raccourcis et action principale à droite.</summary>
+    /// <summary>Fiche d'un membre (M21) : identité à gauche, stats et compétences au centre, synergies, raccourcis et action principale à droite.</summary>
     public sealed class MemberSheetRecipe : IPrefabRecipe
     {
         public string RelativePath => "Pages/MemberSheet.prefab";
@@ -211,11 +211,11 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var skills = Ui.Txt(mid.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Regular, "SkillList");
             skills.rectTransform.Stretch(22, 20, 22, 128);
 
-            // ---- Combos, raccourcis, action principale
+            // ---- Synergies, raccourcis, action principale
             var side = Column(rt, "Side", LeftW + Gap + MidW + Gap, RightW);
-            Ui.LocTxt(side.transform, "sheet.combos", 32, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "CombosTitle").rectTransform.At(0f, 1f, 22, -20, 492, 42);
-            var combos = Ui.Txt(side.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Combos");
-            combos.rectTransform.Stretch(22, 468, 22, 72);
+            Ui.LocTxt(side.transform, "sheet.synergies", 32, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "SynergiesTitle").rectTransform.At(0f, 1f, 22, -20, 492, 42);
+            var synergies = Ui.Txt(side.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Synergies");
+            synergies.rectTransform.Stretch(22, 468, 22, 72);
             var salon = Ui.LocBtn(side.transform, "sheet.salon", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Salon");
             salon.Rect.At(0f, 0f, 20, 252, 236, 96);
             var infirmary = Ui.LocBtn(side.transform, "sheet.infirmary", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Infirmary");
@@ -238,7 +238,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "stats", stats);
             ctx.Wire(view, "fatigue", fatigue);
             ctx.Wire(view, "skills", skills);
-            ctx.Wire(view, "combos", combos);
+            ctx.Wire(view, "synergies", synergies);
             ctx.Wire(view, "previous", previous);
             ctx.Wire(view, "next", next);
             ctx.Wire(view, "salon", salon);

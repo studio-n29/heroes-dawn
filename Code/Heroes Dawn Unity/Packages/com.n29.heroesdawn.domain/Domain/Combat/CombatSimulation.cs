@@ -34,7 +34,10 @@ namespace N29.HeroesDawn.Domain.Combat
             Auto = setup.Auto;
             _rng = new Pcg32(setup.Seed).Fork(3);
             int id = 0;
-            foreach (var a in setup.Allies) _units.Add(UnitFactory.Ally(id++, c.Member(a.Member), a, _b, c.Collection));
+            var families = new List<Family>();
+            foreach (var a in setup.Allies) families.Add(c.Member(a.Member).Family);
+            var synergy = SynergyRules.Total(System.Linq.Enumerable.Select(SynergyRules.Active(families, c.Synergies), s => s.Synergy));
+            foreach (var a in setup.Allies) _units.Add(UnitFactory.Ally(id++, c.Member(a.Member), a, _b, c.Collection, synergy));
             SpawnWave(0);
             foreach (var u in _units)
             {
@@ -45,8 +48,6 @@ namespace N29.HeroesDawn.Domain.Combat
 
         public CombatUnit Unit(int id) => _units[id];
 
-        /// <summary>Vrai pendant la fenetre d interruption : le dernier pas de frise est tombe sur un point d action vide.</summary>
-        public bool InterruptWindowOpen { get; private set; }
 
         /// <summary>Points franchis par une unite a ce pas : 1 pour tous ; Hate : 2 un pas sur trois ; Gel : un pas sur deux seulement.</summary>
         int PointsThisStep(CombatUnit u)
@@ -86,8 +87,6 @@ namespace N29.HeroesDawn.Domain.Combat
                 return;
             }
             ActiveTick++;
-            AdvanceAvatar();
-            InterruptWindowOpen = false;
             for (int i = 0; i < _units.Count; i++)
             {
                 var u = _units[i];
@@ -108,14 +107,6 @@ namespace N29.HeroesDawn.Domain.Combat
             }
             output.Add(new TimelineAdvancedEvent(Tick));
             ResolveEncounters(output);
-            bool someoneActs = false;
-            foreach (var u in _units) if (u.IsReady) someoneActs = true;
-            if (!someoneActs && !Auto && !IsOver && InterruptOpportunity())
-            {
-                // Menace imminente (un ennemi va arriver au point d action) et un avatar prêt : courte pause pendant laquelle le joueur peut interrompre.
-                InterruptWindowOpen = true;
-                output.Add(new EmptyPointPauseEvent(Tick, _b.TimelinePausePerEmptyPointMs));
-            }
             ProcessCommands(output);
             ActReadyUnits(output);
             CheckEnd(output);

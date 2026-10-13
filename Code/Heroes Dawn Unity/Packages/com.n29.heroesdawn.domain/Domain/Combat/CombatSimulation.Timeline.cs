@@ -8,8 +8,8 @@ namespace N29.HeroesDawn.Domain.Combat
     /// <summary>
     /// Frise chronologique par points : chaque unité occupe un point de 0 (départ) à ActionPoint (point d'action, c'est son tour).
     /// Tout le monde avance d'un point par pas. Une compétence replace l'unité selon son poids (léger 3, intermédiaire 2, lourd 0,
-    /// combo -2 en canalisation), un contrôle la repousse en arrière, la zone de préparation (points 8 à 10) annonce l'action ennemie
-    /// (visible) et un critique la fait avorter. Deux alliés sur un point : combo possible ; un allié et un ennemi : parade.
+    /// reprise en canalisation), un contrôle la repousse en arrière, la zone de préparation (points 8 à 10) annonce l'action ennemie
+    /// (visible) et un critique la fait avorter. Un allié et un ennemi sur un point : parade.
     /// Tout est entier et déterministe.
     /// </summary>
     public sealed partial class CombatSimulation
@@ -28,12 +28,12 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Convertit un pourcentage de la frise en nombre de points (arrondi au plus proche, au moins 1).</summary>
         int PointsOf(int percent) => Math.Max(1, (percent * _b.TimelinePoints + 50) / 100);
 
-        /// <summary>Point de reprise après l'action : selon l'emplacement de la compétence (-1 = combo).</summary>
+        /// <summary>Point de reprise après l'action : selon l'emplacement de la compétence.</summary>
         int ResetPointAfter(int slotIndex)
             => slotIndex == 0 ? _b.TimelineResetLightPoint
              : slotIndex == 1 ? _b.TimelineResetMediumPoint
              : slotIndex == 2 || slotIndex == 3 ? _b.TimelineResetHeavyPoint
-             : _b.TimelineResetComboPoint;
+             : _b.TimelineResetLightPoint;
 
         /// <summary>Annonce l'action d'une unité ennemie qui entre en zone de préparation.</summary>
         void PlanIfNeeded(CombatUnit u, List<CombatEvent> output)
@@ -90,79 +90,20 @@ namespace N29.HeroesDawn.Domain.Combat
             if (dmg > 0) DealDamage(u, dmg, false, output);
         }
 
-        readonly HashSet<long> _comboEncounters = new HashSet<long>();
-
         /// <summary>
         /// Rencontres du pas. Parade : un allie et un ennemi sur un point annulent l'action annoncee de l'ennemi, qui repart au point leger
-        /// (sans action annoncee il n'y a rien a parer). Combo : deux allies d'une paire valide qui se retrouvent ensemble le declarent
-        /// une fois ; <see cref="AvailableSyncCombos"/> les propose tant qu'ils restent ensemble.
+        /// (sans action annoncee il n'y a rien a parer).
         /// </summary>
         void ResolveEncounters(List<CombatEvent> output)
         {
-            var together = new HashSet<long>();
             foreach (var e in TickEncounters.Detect(_units, _b))
             {
-                if (e.Kind == TickEncounterKind.Combo)
-                {
-                    var a = _units[e.A];
-                    var b = _units[e.B];
-                    if (a.ActionsSinceCombo < _b.ComboCooldownActions || b.ActionsSinceCombo < _b.ComboCooldownActions) continue;
-                    if (_c.FindCombo(a.Family, b.Family) == null) continue;
-                    long key = ((long)e.A << 32) | (uint)e.B;
-                    together.Add(key);
-                    if (_comboEncounters.Add(key)) output.Add(new EncounterEvent(Tick, e.A, e.B, e.Kind));
-                    continue;
-                }
                 var enemy = _units[e.A].Side == Side.Enemy ? _units[e.A] : _units[e.B];
                 if (enemy.PlannedSlot < 0) continue;
                 output.Add(new EncounterEvent(Tick, e.A, e.B, e.Kind));
                 CancelPlan(enemy, InterruptReason.Parade, output);
                 if (enemy.Point > _b.TimelineResetLightPoint) enemy.Point = _b.TimelineResetLightPoint;
             }
-            _comboEncounters.IntersectWith(together);
-        }
-
-        /// <summary>
-        /// Combos par proximité : deux alliés sur le même point (hors canalisation), ou un allié prêt et un partenaire proche du point d'action.
-        /// Un combo n'a lieu qu'avec une paire de familles valide et si les deux alliés ne sont pas en repos de combo.
-        /// </summary>
-        public IReadOnlyList<ComboOption> AvailableSyncCombos()
-        {
-            var list = new List<ComboOption>();
-            foreach (var a in _units)
-            {
-                if (a.Side != Side.Ally || !a.IsAlive || a.ActionsSinceCombo < _b.ComboCooldownActions) continue;
-                foreach (var b in _units)
-                {
-                    if (b.Side != Side.Ally || b.Id == a.Id || !b.IsAlive || b.IsReady) continue;
-                    if (b.ActionsSinceCombo < _b.ComboCooldownActions) continue;
-                    bool together = a.Id < b.Id && !a.IsReady && !a.IsChannelling && !b.IsChannelling && a.Point == b.Point;
-                    bool near = a.IsReady && b.Point >= _b.ComboSyncWindowPoint;
-                    if (!together && !near) continue;
-                    var combo = _c.FindCombo(a.Family, b.Family);
-                    if (combo != null) list.Add(new ComboOption(a.Id, b.Id, combo));
-                }
-            }
-            return list;
-        }
-
-        bool TrySyncCombo(int a, int b, int target, List<CombatEvent> output)
-        {
-            foreach (var o in AvailableSyncCombos())
-            {
-                if (o.A != a || o.B != b) continue;
-                foreach (var u in new[] { _units[a], _units[b] })
-                {
-                    if (u.IsReady) continue;
-                    u.Point = u.ActionPoint;
-                    u.PlannedSlot = -1;
-                    output.Add(new GaugeFullEvent(Tick, u.Id));
-                    BeginTurn(u, output);
-                }
-                if (!_units[a].IsReady || !_units[b].IsReady) return true; // un Choc lui a fait perdre son tour : pas de combo
-                return TryPerformCombo(a, b, target, output);
-            }
-            return false;
         }
     }
 }

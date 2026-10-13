@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Fiche d'un membre (prefab Pages/MemberSheet) : identité, stats, compétences, combos, flèches, raccourcis, action principale.</summary>
+    /// <summary>Fiche d'un membre (prefab Pages/MemberSheet) : identité, stats, compétences, synergies, flèches, raccourcis, action principale.</summary>
     public sealed class MemberSheetView : ViewBase, IMemberSheetView
     {
         [SerializeField] Image strip = null!;
@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text stats = null!;
         [SerializeField] UiBar fatigue = null!;
         [SerializeField] TMP_Text skills = null!;
-        [SerializeField] TMP_Text combos = null!;
+        [SerializeField] TMP_Text synergies = null!;
         [SerializeField] UiButton previous = null!;
         [SerializeField] UiButton next = null!;
         [SerializeField] UiButton salon = null!;
@@ -71,7 +71,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 sb.Append("<b><size=28><color=#FFD23F>").Append(s.Name).Append("</color></size></b>\n").Append(s.Description);
             }
             skills.text = sb.ToString();
-            combos.text = string.Join("\n", d.Combos);
+            synergies.text = string.Join(System.Environment.NewLine, d.Synergies);
 
             SetActive(previous, d.ShowArrows);
             SetActive(next, d.ShowArrows);

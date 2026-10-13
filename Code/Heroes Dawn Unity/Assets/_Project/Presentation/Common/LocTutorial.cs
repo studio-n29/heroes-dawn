@@ -40,7 +40,6 @@ namespace N29.HeroesDawn.Presentation.Common
 
             d["tutorial.hint.title"] = "ASTUCE";
             d["tutorial.hint.ok"] = "OK";
-            d["tutorial.hint.combo"] = "Deux héros de familles qui se complètent peuvent lancer un COMBO : touche le bouton rouge quand il apparaît.";
             d["tutorial.hint.auto"] = "AUTO laisse l'équipe combattre seule ; x1 / x2 / x3 change la vitesse du combat.";
             d["tutorial.hint.bonus_die"] = "Un dé bonus est disponible : il ajoute des points de mouvement à ta réserve.";
             d["tutorial.hint.end_move"] = "TERMINER met les points de mouvement restants en réserve pour le prochain lancer.";
@@ -52,8 +51,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["tutorial.hint.zone_done"] = "Zone sécurisée ! Tu peux la rejouer pour des Crédits, ou ouvrir la suivante sur la carte.";
             d["tutorial.hint.recruit"] = "Trois héros sont proposés chaque jour, les Légendes sont rares. Ils coûtent des PR.";
             d["tutorial.hint.infirmary"] = "Un de tes héros est fatigué : l'Infirmerie le remet sur pied pour quelques Crédits.";
-            d["tutorial.hint.avatar"] = "Tes compétences d avatar (Q W E R T) se lancent à tout moment, même quand le combat attend ton action. Leur recharge ne tourne que pendant que la frise avance.";
-            d["tutorial.hint.timeline"] = "La frise va de 100 à 0 : à 0, c est le tour de l unité et tout le monde attend. Un allié proche de 0 peut se joindre à un combo. Un ennemi qui entre en zone rouge annonce son attaque : un contrôle (Entrave, Choc, Gel) ou un critique l'interrompt.";
+            d["tutorial.hint.timeline"] = "La frise va de 100 à 0 : à 0, c est le tour de l unité et tout le monde attend. Un ennemi qui entre en zone rouge annonce son attaque : un contrôle (Entrave, Choc, Gel) ou un critique l'interrompt.";
         }
     }
 }

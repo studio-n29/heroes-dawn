@@ -213,7 +213,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                     break;
                 case SettingsCategory.Controls:
                     Toggle("settings.show_keys", () => s.showKeys, v => s.showKeys = v);
-                    foreach (var k in new[] { "roll", "bonus", "end", "skills", "combo", "auto", "speed", "pause", "back" })
+                    foreach (var k in new[] { "roll", "bonus", "end", "skills", "auto", "speed", "pause", "back" })
                         Add(SettingRowData.Info(_loc.T("settings.key." + k), _loc.T("settings.key." + k + ".v")));
                     break;
                 case SettingsCategory.Account: BuildAccount(s); break;

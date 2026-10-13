@@ -25,7 +25,6 @@ namespace N29.HeroesDawn.Domain.Combat
         public int[] Cooldowns { get; } = new int[4];
         public List<StatusInstance> Statuses { get; } = new List<StatusInstance>();
         public IReadOnlyList<SkillDef> Skills { get; }
-        public int ActionsSinceCombo { get; set; } = 99;
         /// <summary>Compétence annoncée sur la frise (ennemis, zone de préparation) ; -1 = aucune.</summary>
         public int PlannedSlot { get; set; } = -1;
         public int PlannedTarget { get; set; } = -1;
