@@ -109,7 +109,6 @@ namespace N29.HeroesDawn.Presentation.Combat
             for (int i = 0; i < fan.Length; i++)
             {
                 int slot = i;
-                fan[i].Clicked += () => SkillClicked?.Invoke(slot);
                 fan[i].Holding += ShowDescription;
                 fan[i].DragBegan += card => OnDragBegan(slot, card);
                 fan[i].DragEnded += (card, at) => OnDragEnded(slot, at);

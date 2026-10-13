@@ -121,7 +121,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             finally { N29.HeroesDawn.Presentation.Feedback.MotionSettings.ResetForTests(); }
         }
 
-        static void DragCard(SkillIconView card, Vector2 to)
+        internal static void DragCard(SkillIconView card, Vector2 to)
         {
             var frame = card.transform.Find("Frame").gameObject;
             var es = UnityEngine.EventSystems.EventSystem.current;
@@ -149,6 +149,19 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(card.transform.parent, Is.SameAs(view.FanRootForTests), "la carte est revenue dans l'éventail");
             yield return PlayModeHarness.WaitFor(() => !actor.IsReady, 600);
             Assert.That(actor.IsReady, Is.False, "la compétence a été lancée");
+        }
+
+        [UnityTest, Timeout(300000), Description("Vérifie qu'un simple appui sur une carte de compétence ne la lance pas — parce que les cartes ne se jouent qu'au glisser-déposer")]
+        public IEnumerator Fan_Tap_DoesNotPlayTheCard()
+        {
+            yield return IntoCombat();
+            var view = Object.FindAnyObjectByType<CombatView>()!;
+            yield return PlayModeHarness.WaitFor(() => view.FanVisible, 2400);
+            var sim = ActivityGamesPlayTests.Container.Resolve<N29.HeroesDawn.Application.Features.Combat.IActiveCombatReadModel>().Simulation!;
+            var actor = sim.Units.First(u => u.Side == N29.HeroesDawn.Domain.Combat.Side.Ally && u.IsReady);
+            for (int i = 0; i < 3; i++) view.SkillCard(i).Button.onClick.Invoke();
+            yield return new WaitForSecondsRealtime(0.5f);
+            Assert.That(actor.IsReady, Is.True, "aucune compétence n'a été lancée par un appui");
         }
 
         [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures de l'éventail de compétences et de la description d'une carte — parce que ces rendus se relisent à l'œil")]

@@ -17,6 +17,8 @@ namespace N29.HeroesDawn.Presentation.Common
         public static readonly Color SkyMid = Hex(0xB7C4F5);
         public static readonly Color SkyBottom = Hex(0xF6C4D2);
         public static readonly Color Glow = Hex(0xFFD9A8);
+        /// <summary>Jaune vif des cases accessibles sur le plateau (contour animé).</summary>
+        public static readonly Color Reach = Hex(0xFFD23F);
 
         // ---- Noms historiques (valeurs pastel) -------------------------------------------------------------
         public static readonly Color Primary = AccentDark;

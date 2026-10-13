@@ -5,7 +5,7 @@ using N29.HeroesDawn.Core;
 namespace N29.HeroesDawn.Domain.Board
 {
     /// <summary>
-    /// GDD §5 — destinations dont le trajet coûte au plus PM (chaque chemin a un coût en PM) ; on ne traverse pas un combat non résolu
+    /// GDD §5 — destinations dont le trajet coûte au plus PM (chaque chemin a un coût en PM) ; un combat non résolu en travers du chemin arrête le pion, qui repart ensuite vers sa destination
     /// ; le brouillard ne bloque pas (toute case à portée est une destination, il se lève au passage).
     /// Chemin retenu : le moins cher, puis le plus court en cases, puis l'ordre des identifiants. Le pion suit ce chemin sans s'arrêter
     /// aux bifurcations ni aux cases traversées.
@@ -67,7 +67,7 @@ namespace N29.HeroesDawn.Domain.Board
         public static IReadOnlyDictionary<CaseId, MovePlan> FindDestinations(
             BoardGraph g, FogOfWar fog, CaseId from, int pm, Func<CaseId, bool> isBlocking)
         {
-            var labels = Shortest(g, from, pm, _ => true, n => !isBlocking(n));
+            var labels = Shortest(g, from, pm, _ => true, _ => true);
             var result = new Dictionary<CaseId, MovePlan>();
             foreach (var kv in labels) result.Add(kv.Key, new MovePlan(kv.Key, kv.Value.Path, kv.Value.Cost));
             return result;

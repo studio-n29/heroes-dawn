@@ -98,8 +98,9 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return WaitStep(TutorialStep.CombatSkill, 600, 60f);
             Assert.That(Guide.PausesCombat, Is.True, "figé jusqu'à ce qu'une compétence soit choisie");
             var combat = Object.FindAnyObjectByType<CombatView>()!;
-            combat.SkillButton(0).onClick.Invoke();
-            combat.EnemyCards().First().Button.onClick.Invoke();
+            var slotCard = combat.SkillCard(0);
+            var dropAt = slotCard.Data.NeedsTarget ? combat.UnitScreenPoint(combat.EnemyCards().First().UnitId) : new Vector2(Screen.width * 0.92f, Screen.height * 0.2f);
+            CombatTimelinePlayTests.DragCard(slotCard, dropAt); // la carte se joue au glisser-déposer
             yield return PlayModeHarness.WaitFor(() => Guide.Current == TutorialStep.Results, 1200);
             Assert.That(Guide.Current, Is.EqualTo(TutorialStep.Results), "la compétence lancée fait avancer le tutoriel");
 
