@@ -13,7 +13,7 @@ namespace N29.HeroesDawn.EditorTools.Balance
         public const string RemoteConfigPath = "Assets/_Project/Backend/RemoteConfig/balance.rc";
 
         public static string DefaultSheetPath =>
-            Path.GetFullPath(Path.Combine(Application.dataPath, "../../../01_Game_Design/05_Equilibrage.xlsx"));
+            Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "../../../01_Game_Design/05_Equilibrage.xlsx"));
 
         [MenuItem("Heroes Dawn/Équilibrage/Importer 05_Equilibrage.xlsx")]
         public static void ImportDefault()

@@ -105,7 +105,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs
             var policy = args.Contains("-overwritePrefabs") ? OverwritePolicy.All : selected != null ? OverwritePolicy.Selected : OverwritePolicy.Never;
             var report = Generate(DefaultRoot, policy, selected);
             Debug.Log("[Heroes Dawn] Prefabs : " + report);
-            if (report.Failed.Count > 0 && Application.isBatchMode) EditorApplication.Exit(1);
+            if (report.Failed.Count > 0 && UnityEngine.Application.isBatchMode) EditorApplication.Exit(1);
         }
 
         /// <summary>Chemins relatifs listés après <c>-overwrite</c> (séparés par des virgules) ; null si l'option est absente.</summary>
