@@ -65,6 +65,15 @@ namespace N29.HeroesDawn.Authoring
         [Tooltip("Identifiants des compétences : emplacements A1, A2, A3.")] public List<string> skills = new List<string> { "", "", "" };
     }
 
+    /// <summary>Texte du jeu modifié dans l outil de narration : il remplace le texte d origine de la clé.</summary>
+    [Serializable]
+    public sealed class TextRecord
+    {
+        [Tooltip("Clé du texte (ex. tutorial.step.Move.body).")] public string key = "";
+        public string text = "";
+    }
+
+    [Serializable] public sealed class TextsFile { public List<TextRecord> texts = new List<TextRecord>(); }
     [Serializable] public sealed class ItemsFile { public List<ItemRecord> items = new List<ItemRecord>(); }
     [Serializable] public sealed class SkillsFile { public List<SkillRecord> skills = new List<SkillRecord>(); }
     [Serializable] public sealed class AgentsFile { public List<AgentRecord> agents = new List<AgentRecord>(); }

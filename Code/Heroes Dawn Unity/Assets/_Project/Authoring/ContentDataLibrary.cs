@@ -14,7 +14,7 @@ namespace N29.HeroesDawn.Authoring
     public sealed class ContentDataLibrary
     {
         public const string ResourcesFolder = "Content";
-        public const string ItemsName = "items", SkillsName = "skills", AgentsName = "agents";
+        public const string ItemsName = "items", SkillsName = "skills", AgentsName = "agents", TextsName = "texts";
 
         /// <summary>Objets du fichier, ou null s'il n'existe pas.</summary>
         public IReadOnlyList<ItemDef>? Items { get; }
@@ -32,7 +32,7 @@ namespace N29.HeroesDawn.Authoring
         public static ContentDataLibrary Empty => new ContentDataLibrary(null, null, new Dictionary<string, string>(), new List<string>());
 
         public static ContentDataLibrary Load()
-            => FromFiles(Read<ItemsFile>(ItemsName), Read<SkillsFile>(SkillsName), Read<AgentsFile>(AgentsName));
+            => FromFiles(Read<ItemsFile>(ItemsName), Read<SkillsFile>(SkillsName), Read<AgentsFile>(AgentsName), Read<TextsFile>(TextsName));
 
         static T? Read<T>(string name) where T : class
         {
@@ -40,7 +40,7 @@ namespace N29.HeroesDawn.Authoring
             return asset == null ? null : JsonUtility.FromJson<T>(asset.text);
         }
 
-        public static ContentDataLibrary FromFiles(ItemsFile? items, SkillsFile? skills, AgentsFile? agents)
+        public static ContentDataLibrary FromFiles(ItemsFile? items, SkillsFile? skills, AgentsFile? agents, TextsFile? textsFile = null)
         {
             var texts = new Dictionary<string, string>();
             var skipped = new List<string>();
@@ -75,6 +75,7 @@ namespace N29.HeroesDawn.Authoring
                     texts["members." + a.id + ".name"] = a.name;
                 }
             }
+            if (textsFile != null) foreach (var t in textsFile.texts) if (t.key.Length > 0) texts[t.key] = t.text; // les textes de l outil de narration priment
             return new ContentDataLibrary(itemDefs, memberDefs, texts, skipped);
         }
     }

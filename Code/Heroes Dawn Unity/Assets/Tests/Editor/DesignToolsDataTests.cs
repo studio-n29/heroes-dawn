@@ -137,5 +137,32 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(lib.Skipped.Single(), Does.Contain("casse"));
             Assert.That(lib.Members!.Count, Is.EqualTo(30));
         }
+
+        [Test, Description("Vérifie qu'un texte modifié dans l'outil de narration remplace le texte d'origine du jeu et que « revenir à l'original » le rétablit — parce que le tutoriel et les astuces se corrigent sans toucher au code")]
+        public void TextsFile_OverridesTheGameTexts()
+        {
+            const string key = "tutorial.step.Move.title";
+            string original = N29.HeroesDawn.Presentation.Common.Loc.T(key);
+            var (items, skills, agents) = FromCode();
+            var texts = new TextsFile();
+            texts.texts.Add(new TextRecord { key = key, text = "SE DÉPLACER" });
+            var lib = ContentDataLibrary.FromFiles(items, skills, agents, texts);
+            Assert.That(lib.Texts[key], Is.EqualTo("SE DÉPLACER"));
+            try
+            {
+                N29.HeroesDawn.Presentation.Common.Loc.Override(new Dictionary<string, string> { [key] = lib.Texts[key] });
+                Assert.That(N29.HeroesDawn.Presentation.Common.Loc.T(key), Is.EqualTo("SE DÉPLACER"));
+            }
+            finally { N29.HeroesDawn.Presentation.Common.Loc.Override(new Dictionary<string, string> { [key] = original }); }
+            Assert.That(N29.HeroesDawn.Presentation.Common.Loc.T(key), Is.EqualTo(original));
+        }
+
+        [Test, Description("Vérifie que le fichier de textes livré avec le projet existe et se charge, vide au départ — parce que l'outil de narration y enregistre ses modifications")]
+        public void ShippedTextsFile_Loads()
+        {
+            var asset = UnityEngine.Resources.Load<UnityEngine.TextAsset>("Content/texts");
+            Assert.That(asset, Is.Not.Null);
+            Assert.That(UnityEngine.JsonUtility.FromJson<TextsFile>(asset!.text).texts, Is.Empty);
+        }
     }
 }

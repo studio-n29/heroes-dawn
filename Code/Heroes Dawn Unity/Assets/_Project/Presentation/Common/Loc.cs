@@ -318,6 +318,9 @@ namespace N29.HeroesDawn.Presentation.Common
         public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
         public static bool Has(string key) => Fr.ContainsKey(key);
 
+        /// <summary>Toutes les clés de texte connues (outil de narration).</summary>
+        public static IEnumerable<string> AllKeys() => Fr.Keys;
+
         /// <summary>Ajoute ou remplace des textes (zones et objectifs créés dans l'outil de level design).</summary>
         public static void Override(IEnumerable<KeyValuePair<string, string>> texts)
         {

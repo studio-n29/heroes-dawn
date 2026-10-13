@@ -21,7 +21,8 @@ namespace N29.HeroesDawn.EditorTools.Design
         public static ItemsFile Items { get; private set; } = new ItemsFile();
         public static SkillsFile Skills { get; private set; } = new SkillsFile();
         public static AgentsFile Agents { get; private set; } = new AgentsFile();
-        public static bool ItemsDirty, SkillsDirty, AgentsDirty;
+        public static TextsFile Texts { get; private set; } = new TextsFile();
+        public static bool ItemsDirty, SkillsDirty, AgentsDirty, TextsDirty;
         static bool _loaded;
 
         static string PathOf(string name) => Folder + "/" + name + ".json";
@@ -32,7 +33,7 @@ namespace N29.HeroesDawn.EditorTools.Design
         public static void EnsureLoaded()
         {
             if (_loaded) return;
-            if (!Exists(ContentDataLibrary.ItemsName) || !Exists(ContentDataLibrary.SkillsName) || !Exists(ContentDataLibrary.AgentsName)) ImportFromCode(overwrite: false);
+            if (!Exists(ContentDataLibrary.ItemsName) || !Exists(ContentDataLibrary.SkillsName) || !Exists(ContentDataLibrary.AgentsName) || !Exists(ContentDataLibrary.TextsName)) ImportFromCode(overwrite: false);
             Reload();
         }
 
@@ -41,7 +42,8 @@ namespace N29.HeroesDawn.EditorTools.Design
             Items = Read<ItemsFile>(ContentDataLibrary.ItemsName) ?? new ItemsFile();
             Skills = Read<SkillsFile>(ContentDataLibrary.SkillsName) ?? new SkillsFile();
             Agents = Read<AgentsFile>(ContentDataLibrary.AgentsName) ?? new AgentsFile();
-            ItemsDirty = SkillsDirty = AgentsDirty = false;
+            Texts = Read<TextsFile>(ContentDataLibrary.TextsName) ?? new TextsFile();
+            ItemsDirty = SkillsDirty = AgentsDirty = TextsDirty = false;
             _loaded = true;
         }
 
@@ -58,6 +60,7 @@ namespace N29.HeroesDawn.EditorTools.Design
         public static void SaveItems() { Write(ContentDataLibrary.ItemsName, Items); ItemsDirty = false; }
         public static void SaveSkills() { Write(ContentDataLibrary.SkillsName, Skills); SkillsDirty = false; }
         public static void SaveAgents() { Write(ContentDataLibrary.AgentsName, Agents); AgentsDirty = false; }
+        public static void SaveTexts() { Write(ContentDataLibrary.TextsName, Texts); TextsDirty = false; }
 
         /// <summary>Tous les identifiants de zones du jeu (code et zones créées dans l'outil de level design).</summary>
         public static string[] ZoneIds()
@@ -89,6 +92,7 @@ namespace N29.HeroesDawn.EditorTools.Design
                 foreach (var m in c.Members) f.agents.Add(ContentDataConverter.FromDef(m, Loc.MemberName(m)));
                 Write(ContentDataLibrary.AgentsName, f);
             }
+            if (!Exists(ContentDataLibrary.TextsName)) Write(ContentDataLibrary.TextsName, new TextsFile()); // textes modifiés dans l outil de narration (vide au départ)
             AssetDatabase.Refresh();
             _loaded = false;
         }
