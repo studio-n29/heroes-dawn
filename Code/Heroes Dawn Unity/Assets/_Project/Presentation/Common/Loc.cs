@@ -318,10 +318,19 @@ namespace N29.HeroesDawn.Presentation.Common
         public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
         public static bool Has(string key) => Fr.ContainsKey(key);
 
+        /// <summary>Toutes les clés de texte connues (outil de narration).</summary>
+        public static IEnumerable<string> AllKeys() => Fr.Keys;
+
         /// <summary>Ajoute ou remplace des textes (zones et objectifs créés dans l'outil de level design).</summary>
         public static void Override(IEnumerable<KeyValuePair<string, string>> texts)
         {
-            foreach (var kv in texts) Fr[kv.Key] = kv.Value;
+            foreach (var kv in texts)
+            {
+                Fr[kv.Key] = kv.Value;
+                // Un nom de héros modifié dans l outil prime sur le nom de code d origine.
+                if (kv.Key.StartsWith("members.", System.StringComparison.Ordinal) && kv.Key.EndsWith(".name", System.StringComparison.Ordinal))
+                    CodeNames.Remove(kv.Key.Substring(8, kv.Key.Length - 13));
+            }
         }
         public static string F(string key, params object[] args) => string.Format(T(key), args);
         public static string Or(string key, string fallbackKey) => Has(key) ? T(key) : T(fallbackKey);

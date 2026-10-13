@@ -23,6 +23,9 @@ namespace N29.HeroesDawn.Content.Prototype
         static SkillDef S(string id, SkillSlot slot, int cd, TargetRule t, params EffectDef[] fx)
             => new SkillDef(new SkillId(id), slot, cd, t, fx);
 
+        /// <summary>Statistiques de départ d un agent selon son rôle et sa rareté (valeurs proposées par l outil des agents).</summary>
+        public static StatBlock BaseStats(Role role, Rarity rarity) => Stats(role, rarity);
+
         static StatBlock Stats(Role role, Rarity rarity)
         {
             StatBlock b;
