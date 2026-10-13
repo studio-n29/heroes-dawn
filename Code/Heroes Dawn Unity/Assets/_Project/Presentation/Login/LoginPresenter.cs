@@ -25,13 +25,15 @@ namespace N29.HeroesDawn.Presentation.Login
         readonly ILocalization _loc;
         readonly AppLogger _log;
         readonly IAudioService _audio;
+        readonly IOnboardingFlow? _onboarding;
         readonly BusyGate _gate = new BusyGate();
 
         public LoginPresenter(ILoginView view, ISignInAsGuestUseCase signIn, ISessionReadModel session, IPublisher<NavigateRequested> navigate,
-                              IToastService toasts, ILocalization loc, AppLogger log, IAudioService? audio = null) : base(view, null)
+                              IToastService toasts, ILocalization loc, AppLogger log, IAudioService? audio = null, IOnboardingFlow? onboarding = null) : base(view, null)
         {
             _signIn = signIn; _session = session; _navigate = navigate; _toasts = toasts; _loc = loc; _log = log;
             _audio = audio ?? NullAudioService.Instance;
+            _onboarding = onboarding;
         }
 
         protected override void OnStart() => View.PlayClicked += Play;
@@ -66,6 +68,8 @@ namespace N29.HeroesDawn.Presentation.Login
                     return;
                 }
                 var report = result.Value;
+                if (_onboarding != null) await _onboarding.RunIfNeededAsync(Lifetime); // première connexion : cinématique, pseudo, campagne
+                if (Disposed) return;
                 _audio.Play(SfxId.LoginStart);
                 var name = _session.Account?.DisplayName ?? "";
                 _toasts.Show(_loc.F(report.NewProfile ? "login.welcome_new" : "login.welcome_back", name), ToastKind.Info);

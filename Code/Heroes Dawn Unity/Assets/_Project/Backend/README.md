@@ -23,3 +23,9 @@ Contrôles prévus au M2 :
 3. *Window ▸ Deployment* ▸ **Deploy All**. Attendu : 3 monnaies, les scripts Cloud Code et `balance.rc` affichés « Deployed ».
 
 Après chaque modification du tableur : *Heroes Dawn ▸ Équilibrage ▸ Importer*, puis redéployer `balance.rc`.
+
+## Comptes joueurs : Supabase (à brancher)
+Le jeu passe par le port `IAccountGateway` (`SignUpAsync`, `SignInAsync`) ; en 0.9.0 il est joué par `LocalAccountGateway` (comptes en mémoire). Pour brancher Supabase Auth :
+1. Créer le projet Supabase du studio et fournir l'URL et la clé `anon` (jamais la clé `service_role` dans le client).
+2. Écrire `SupabaseAccountGateway : IAccountGateway` (API REST `/auth/v1/signup` et `/auth/v1/token?grant_type=password`) et l'enregistrer à la place de `LocalAccountGateway` dans `RootLifetimeScope`.
+3. Ajouter l'écran e-mail / mot de passe sur l'écran titre (la première connexion en invité reste possible : pseudo et campagne sont déjà dans le profil).

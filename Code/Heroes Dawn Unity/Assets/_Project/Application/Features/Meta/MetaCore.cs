@@ -8,7 +8,7 @@ using N29.HeroesDawn.Core;
 
 namespace N29.HeroesDawn.Application.Features.Meta
 {
-    public enum MetaArea { Pass, Daily, Objectives, Operations, Lab, Archives, Boutique, Settings, Tutorial, Collection }
+    public enum MetaArea { Pass, Daily, Objectives, Operations, Lab, Archives, Boutique, Settings, Tutorial, Collection, Onboarding }
 
     /// <summary>Un système de méta-progression a changé (pages et badges se rafraîchissent).</summary>
     public readonly struct MetaChanged
