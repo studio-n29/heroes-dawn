@@ -48,6 +48,11 @@ namespace N29.HeroesDawn.Composition
             var zoneLibrary = N29.HeroesDawn.Authoring.ZoneLibrary.Load(); // plateaux créés dans l'outil de level design (Resources/Zones)
             content = content.WithZones(zoneLibrary.Zones);
             Loc.Override(zoneLibrary.Texts);
+            var data = N29.HeroesDawn.Authoring.ContentDataLibrary.Load(); // objets, compétences et agents créés dans les outils de design (Resources/Content)
+            if (data.Items != null) content = content.WithItems(data.Items);
+            if (data.Members != null) content = content.WithMembers(data.Members);
+            Loc.Override(data.Texts);
+            foreach (var s in data.Skipped) log.Warn("Contenu de design : " + s);
 
             // ---- Contenu & état
             builder.RegisterInstance(content);
