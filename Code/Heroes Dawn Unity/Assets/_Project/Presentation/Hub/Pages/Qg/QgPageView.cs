@@ -22,6 +22,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text shopAlert = null!;
         [SerializeField] TMP_Text filSpeaker = null!;
         [SerializeField] TMP_Text filText = null!;
+        [SerializeField] Button filCard = null!;
+        [SerializeField] TMP_Text questsBadge = null!;
         [SerializeField] UiButton mission = null!;
         [SerializeField] TMP_Text missionSub = null!;
         [SerializeField] TMP_Text missionHint = null!;
@@ -33,9 +35,13 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? MissionClicked;
         public event Action? DailyClicked;
         public event Action? SecondaryClicked;
+        public event Action? QuestsClicked;
 
         /// <summary>Bouton MISSION (tests PlayMode : clic réel).</summary>
         public Button MissionButton => mission.Button;
+
+        /// <summary>Carte « suivi des quêtes » (tests PlayMode : clic réel).</summary>
+        public Button QuestsCard => filCard;
 
         /// <summary>Bouton d'une pièce (tests PlayMode), selon le dernier affichage.</summary>
         public Button? RoomButton(HubPage page)
@@ -54,6 +60,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             mission.Button.onClick.AddListener(() => MissionClicked?.Invoke());
             dailyCard.onClick.AddListener(() => DailyClicked?.Invoke());
             secondaryCard.onClick.AddListener(() => SecondaryClicked?.Invoke());
+            filCard.onClick.AddListener(() => QuestsClicked?.Invoke());
         }
 
         public void Show(QgPageData d)
@@ -75,6 +82,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             shopAlert.text = d.ShopAlert;
             filSpeaker.text = d.FilSpeaker;
             filText.text = d.FilText;
+            questsBadge.text = d.QuestsBadge;
+            questsBadge.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(d.QuestsBadge));
             mission.SetLabel(d.MissionTitle);
             mission.Interactable = d.MissionEnabled;
             mission.DisabledReason = d.MissionHint;

@@ -17,6 +17,14 @@ namespace N29.HeroesDawn.Application.Ports
     }
 
     [Serializable]
+    public sealed class QuestSave
+    {
+        public string id = "";
+        public int progress;
+        public bool claimed;
+    }
+
+    [Serializable]
     public sealed class SecondarySave
     {
         public string zoneId = "";
@@ -92,6 +100,8 @@ namespace N29.HeroesDawn.Application.Ports
         public string dailyDay = "";
         public List<DailySave> daily = new List<DailySave>();
         public List<SecondarySave> secondary = new List<SecondarySave>();
+        /// <summary>Quêtes secondaires de la campagne (progression et récompense réclamée).</summary>
+        public List<QuestSave> quests = new List<QuestSave>();
         public long secondaryNextUtcTicks;
 
         // Opérations, labo

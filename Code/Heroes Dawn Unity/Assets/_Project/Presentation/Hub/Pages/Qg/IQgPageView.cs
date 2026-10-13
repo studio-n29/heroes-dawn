@@ -10,6 +10,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         event Action MissionClicked;
         event Action DailyClicked;
         event Action SecondaryClicked;
+        event Action QuestsClicked;
         void Show(QgPageData data);
     }
 }

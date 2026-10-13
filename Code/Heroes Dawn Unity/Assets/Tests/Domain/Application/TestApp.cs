@@ -115,6 +115,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public MetaOverview Overview { get; }
         public PlayerSettings Settings { get; }
         public TutorialGuide Tutorial { get; }
+        public QuestLog Quests { get; }
         public InstantPurchase Purchases { get; } = new InstantPurchase();
 
         public sealed class InstantPurchase : IPurchaseGateway
@@ -172,10 +173,11 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Archives = new ArchiveBook(MetaCtx);
             Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
             Collection = new N29.HeroesDawn.Application.Features.Collection.CollectionBook(MetaCtx, Publisher<RosterChanged>());
-            Overview = new MetaOverview(Pass, Daily, Secondary, Operations, Lab, Archives, Boutique);
+            Quests = new QuestLog(MetaCtx, Pass);
+            Overview = new MetaOverview(Pass, Daily, Secondary, Operations, Lab, Archives, Boutique, Quests);
             Settings = new PlayerSettings(MetaCtx);
             Tutorial = new TutorialGuide(MetaCtx);
-            Tracker = new MetaTracker(MetaCtx, Daily, Pass, Secondary, Subscriber<CombatFinished>(), Subscriber<ZoneValidated>(), Subscriber<RosterChanged>(),
+            Tracker = new MetaTracker(MetaCtx, Daily, Pass, Secondary, Quests, Subscriber<CombatFinished>(), Subscriber<ZoneValidated>(), Subscriber<RosterChanged>(),
                                       Subscriber<WalletChanged>(), Subscriber<GameStateChanged>(), Publisher<MetaRewardEarned>());
         }
 

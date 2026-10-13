@@ -120,6 +120,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<PassProgress>(Lifetime.Singleton);
             builder.Register<DailyMissions>(Lifetime.Singleton);
             builder.Register<SecondaryObjectives>(Lifetime.Singleton);
+            builder.Register<QuestLog>(Lifetime.Singleton);
             builder.Register<Expeditions>(Lifetime.Singleton);
             builder.Register<ResearchLab>(Lifetime.Singleton);
             builder.Register<ArchiveBook>(Lifetime.Singleton);
