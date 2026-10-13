@@ -29,7 +29,7 @@ namespace N29.HeroesDawn.EditorTools.Build
             int v = Array.IndexOf(args, "-appVersion");
             if (v >= 0 && v + 1 < args.Length) ApplyVersion(args[v + 1]);
             var result = Build(args[i + 1]);
-            if (Application.isBatchMode) EditorApplication.Exit(result == BuildResult.Succeeded ? 0 : 1);
+            if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(result == BuildResult.Succeeded ? 0 : 1);
         }
 
         /// <summary>Version affichée (« 0.7.0 ») et code de version Android (0.7.0 → 700).</summary>

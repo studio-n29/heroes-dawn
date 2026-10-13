@@ -23,7 +23,7 @@ namespace N29.HeroesDawn.EditorTools.Testing
         }
 
         public static string ReportsDirectory =>
-            Path.GetFullPath(Path.Combine(Application.dataPath, "../../docs/test-reports"));
+            Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "../../docs/test-reports"));
 
         public void RunStarted(ITestAdaptor testsToRun) => SessionState.SetString(StartKey, DateTime.Now.Ticks.ToString());
 
@@ -34,7 +34,7 @@ namespace N29.HeroesDawn.EditorTools.Testing
                 var entries = new List<TestReportEntry>();
                 Collect(result, entries);
                 var started = long.TryParse(SessionState.GetString(StartKey, ""), out var ticks) ? new DateTime(ticks) : DateTime.Now;
-                var (branch, commit) = GitInfo.Read(Path.GetFullPath(Path.Combine(Application.dataPath, "../../..")));
+                var (branch, commit) = GitInfo.Read(Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "../../..")));
                 var run = new TestRunInfo
                 {
                     Platform = PlatformOf(result), StartedLocal = started, DurationSeconds = result.Duration,

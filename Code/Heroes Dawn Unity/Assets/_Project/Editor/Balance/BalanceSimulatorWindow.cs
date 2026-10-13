@@ -88,7 +88,7 @@ namespace N29.HeroesDawn.EditorTools.Balance
 
         static string Export(IReadOnlyList<EncounterStats> results, int tickMs)
         {
-            var dir = Path.GetFullPath(Path.Combine(Application.dataPath, "../BalanceReports"));
+            var dir = Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "../BalanceReports"));
             Directory.CreateDirectory(dir);
             var file = Path.Combine(dir, $"simulation_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
             File.WriteAllText(file, BalanceSimulation.ToCsv(results, tickMs));
