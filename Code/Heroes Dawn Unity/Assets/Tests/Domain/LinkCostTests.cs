@@ -79,15 +79,15 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(one.Keys.Select(c => c.Value), Is.EquivalentTo(new[] { "n01" }));
         }
 
-        [Test, Description("Vérifie qu'un combat non résolu coupe le trajet (on ne le traverse pas) mais reste une destination — parce que le pion ne s'arrête que sur un combat")]
-        public void Destinations_StopOnAnUnresolvedCombat_AndGoAroundIt()
+        [Test, Description("Vérifie qu'un combat non résolu en travers du chemin n'empêche plus de viser plus loin : il reste une destination et le plus court trajet peut le traverser — parce que le joueur choisit sa destination finale, le combat l'arrêtera en route")]
+        public void Destinations_GoBeyondAnUnresolvedCombat()
         {
             var g = Graph(directCost: 3, middle: CaseType.Combat);
             var dest = Destinations(g, 6, c => c.Value == "n01");
-            Assert.That(dest.ContainsKey(Id("n01")), Is.True, "le combat est une destination finale");
+            Assert.That(dest.ContainsKey(Id("n01")), Is.True, "le combat est une destination");
             var toTarget = dest[Id("n02")];
-            Assert.That(toTarget.Path.Select(c => c.Value), Does.Not.Contain("n01"), "le trajet évite le combat");
-            Assert.That(toTarget.Cost, Is.EqualTo(3), "direct à 3 PM, moins cher que le détour par n03 (2 + 2)");
+            Assert.That(toTarget.Path.Select(c => c.Value), Does.Contain("n01"), "la case au-delà du combat est atteignable par le combat");
+            Assert.That(toTarget.Cost, Is.EqualTo(2));
         }
 
         [Test, Description("Vérifie que le coût total d'un trajet est la somme des coûts de ses chemins — parce que l'affichage et la dépense de PM reposent sur la même valeur")]
@@ -120,9 +120,34 @@ namespace N29.HeroesDawn.Tests.Domain
 
             var fight = ZoneRun.ForTests(new ContentCatalogStub().Catalog, Graph(directCost: 9, middle: CaseType.Combat).Zone, 1UL, 5, true);
             Assert.That(fight.Destinations[Id("n01")].Path.Count, Is.EqualTo(1));
-            Assert.That(fight.Destinations[Id("n02")].Path.Select(c => c.Value), Does.Not.Contain("n01"), "aucun trajet ne traverse un combat non résolu");
+            Assert.That(fight.Destinations[Id("n02")].Path.Select(c => c.Value), Does.Contain("n01"), "le trajet peut traverser le combat, qui arrêtera le pion");
             fight.MoveTo(Id("n01"));
             Assert.That(fight.Phase, Is.EqualTo(ZoneRunPhase.InCombat), "le pion s'arrête en entrant sur le combat");
+        }
+
+        [Test, Description("Vérifie que le pion s'arrête sur un combat en travers de sa route, garde ses PM restants, puis rejoint la destination choisie après la victoire — parce que le joueur ne doit pas redonner l'ordre une fois le combat gagné")]
+        public void ZoneRun_StopsOnACombatOnTheRoute_ThenResumesAfterVictory()
+        {
+            var run = ZoneRun.ForTests(new ContentCatalogStub().Catalog, Graph(directCost: 9, middle: CaseType.Combat).Zone, 1UL, 5, true);
+            var events = run.MoveTo(Id("n02"));
+            Assert.That(events.OfType<PawnMovedEvent>().Single().Path.Select(c => c.Value), Is.EqualTo(new[] { "n01" }), "le pion s'arrête sur le combat");
+            Assert.That(run.Phase, Is.EqualTo(ZoneRunPhase.InCombat));
+            Assert.That(run.PmInHand, Is.EqualTo(4), "les PM restants sont gardés pendant le combat");
+
+            var after = run.ResolveCombat(true);
+            Assert.That(after.OfType<PawnMovedEvent>().Single().Path.Select(c => c.Value), Is.EqualTo(new[] { "n02" }), "le pion repart vers la destination prévue");
+            Assert.That(run.Position, Is.EqualTo(Id("n02")));
+        }
+
+        [Test, Description("Vérifie qu'une défaite ramène le pion en arrière et abandonne la destination prévue — parce qu'on ne repart pas après un échec")]
+        public void ZoneRun_AfterADefeat_DoesNotResume()
+        {
+            var run = ZoneRun.ForTests(new ContentCatalogStub().Catalog, Graph(directCost: 9, middle: CaseType.Combat).Zone, 1UL, 5, true);
+            run.MoveTo(Id("n02"));
+            var after = run.ResolveCombat(false);
+            Assert.That(after.OfType<PawnMovedEvent>(), Is.Empty);
+            Assert.That(run.Position, Is.EqualTo(Id("n00")));
+            Assert.That(run.Phase, Is.EqualTo(ZoneRunPhase.AwaitingRoll));
         }
 
         [Test, Description("Vérifie que la courbe générée d'un chemin est stable, relie bien ses deux cases et n'est jamais une droite — parce que le tracé organique doit être le même en jeu et dans l'éditeur")]

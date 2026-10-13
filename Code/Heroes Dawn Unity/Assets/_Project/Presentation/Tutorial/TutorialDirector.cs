@@ -32,7 +32,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
             TutorialStep.Deploy => new TutorialStepInfo(TutorialTarget.MapDeploy, true, true),
             TutorialStep.Objectives => new TutorialStepInfo(TutorialTarget.BoardObjectives, true, false),
             TutorialStep.Roll => new TutorialStepInfo(TutorialTarget.BoardRoll, true, true),
-            TutorialStep.Move => new TutorialStepInfo(TutorialTarget.BoardDestination, true, false),
+            TutorialStep.Move => new TutorialStepInfo(TutorialTarget.BoardDestination, true, true, dim: false),
             TutorialStep.CombatAtb => new TutorialStepInfo(TutorialTarget.CombatEnemies, true, false),
             TutorialStep.CombatSkill => new TutorialStepInfo(TutorialTarget.CombatSkills, true, true, dim: false),
             TutorialStep.Results => new TutorialStepInfo(TutorialTarget.ResultsContinue, true, true),

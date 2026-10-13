@@ -27,10 +27,21 @@ namespace N29.HeroesDawn.Presentation.Board
         [SerializeField] Button button = null!;
 
         TutorialTargetMarker? _marker;
+        bool _pulse;
 
         public Button Button => button;
 
         void Awake() => _marker = frame.GetComponent<TutorialTargetMarker>();
+
+        /// <summary>Contour jaune des cases accessibles : il pulse doucement (fixe en mouvement réduit).</summary>
+        void Update()
+        {
+            if (!_pulse || !highlight.gameObject.activeSelf) return;
+            if (Feedback.MotionSettings.Reduced) { highlight.transform.localScale = Vector3.one; return; }
+            float k = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 5f);
+            highlight.transform.localScale = Vector3.one * (1f + 0.08f * k);
+            var c = highlight.color; c.a = 0.65f + 0.35f * k; highlight.color = c;
+        }
 
         public void Init(BoardMapNode n)
         {
@@ -78,6 +89,8 @@ namespace N29.HeroesDawn.Presentation.Board
             bool marked = s.Mark != NodeMark.None;
             highlight.gameObject.SetActive(marked);
             if (marked) highlight.color = HighlightColor(s.Mark);
+            _pulse = s.Mark == NodeMark.Destination;
+            if (!_pulse) highlight.transform.localScale = Vector3.one;
             bool real = s.Mark == NodeMark.Destination || s.Mark == NodeMark.Target;
             if (_marker != null) _marker.enabled = s.Mark == NodeMark.Destination; // le tutoriel désigne les cases à portée
             bool badge = s.DestinationCost >= 0 && (real || fogReach);
@@ -92,7 +105,7 @@ namespace N29.HeroesDawn.Presentation.Board
                 case NodeMark.FogDestination: return Theme.WithAlpha(Theme.Info, 0.8f);
                 case NodeMark.Path: return Theme.WithAlpha(Theme.Info, 0.9f);
                 case NodeMark.Target: return Color.white;
-                default: return Theme.Primary;
+                default: return Theme.Reach;
             }
         }
     }

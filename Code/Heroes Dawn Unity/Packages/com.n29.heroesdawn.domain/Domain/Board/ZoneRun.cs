@@ -29,6 +29,7 @@ namespace N29.HeroesDawn.Domain.Board
         ActivityId? _followUpActivity;
         bool _combatIsFollowUp;
         CaseId _previous;
+        CaseId? _resumeTarget;
         IReadOnlyDictionary<CaseId, MovePlan> _destinations = new Dictionary<CaseId, MovePlan>();
         IReadOnlyDictionary<CaseId, FogReachPlan> _fogReach = new Dictionary<CaseId, FogReachPlan>();
 
@@ -101,18 +102,34 @@ namespace N29.HeroesDawn.Domain.Board
         public IReadOnlyList<BoardEvent> MoveTo(CaseId target)
         {
             Require(ZoneRunPhase.ChoosingDestination);
-            if (!_destinations.TryGetValue(target, out var plan)) throw new InvalidOperationException("Destination invalide : " + target);
+            if (!_destinations.ContainsKey(target)) throw new InvalidOperationException("Destination invalide : " + target);
             _log.Add(new BoardAction(BoardActionType.Move, target.Value, 0));
-            var events = new List<BoardEvent> { new PawnMovedEvent(plan.Path) };
+            return MoveCore(target);
+        }
+
+        /// <summary>
+        /// Déplacement vers une destination valide. Un combat non résolu en travers du chemin arrête le pion sur sa case : la destination
+        /// est mémorisée et le pion la rejoint après la victoire (voir <see cref="ResolveCombat"/>).
+        /// </summary>
+        IReadOnlyList<BoardEvent> MoveCore(CaseId finalTarget)
+        {
+            var full = _destinations[finalTarget];
+            int stop = full.Path.Count - 1;
+            for (int i = 0; i < full.Path.Count - 1; i++) if (IsBlocking(full.Path[i])) { stop = i; break; }
+            var path = stop == full.Path.Count - 1 ? full.Path : new List<CaseId>(full.Path).GetRange(0, stop + 1);
+            var target = path[path.Count - 1];
+            int cost = stop == full.Path.Count - 1 ? full.Cost : Graph.PathCost(Position, path);
+            _resumeTarget = target == finalTarget ? (CaseId?)null : finalTarget;
+            var events = new List<BoardEvent> { new PawnMovedEvent(path) };
 
             CaseId before = Position;
-            for (int i = 0; i < plan.Path.Count; i++)
+            for (int i = 0; i < path.Count; i++)
             {
-                var step = plan.Path[i];
+                var step = path[i];
                 _previous = before;
                 before = step;
                 // Le brouillard se lève au passage du pion (la dernière case est traitée après, avec l'arrêt éventuel).
-                if (i < plan.Path.Count - 1)
+                if (i < path.Count - 1)
                 {
                     var passed = Fog.RevealAround(step);
                     if (passed.Count > 0) events.Add(new FogRevealedEvent(passed));
@@ -126,7 +143,7 @@ namespace N29.HeroesDawn.Domain.Board
                 }
             }
             Position = target;
-            PmInHand -= plan.Cost;
+            PmInHand -= cost;
 
             var revealed = Fog.RevealAround(Position);
             if (revealed.Count > 0) events.Add(new FogRevealedEvent(revealed));
@@ -140,7 +157,7 @@ namespace N29.HeroesDawn.Domain.Board
 
             if (type == CaseType.Combat && IsBlocking(Position))
             {
-                BankRemaining(events);
+                if (_resumeTarget == null) BankRemaining(events);
                 PendingCase = new CaseOutcome(Position, type, node0.Rank, PickEncounter(node0.Rank, node0));
                 Phase = ZoneRunPhase.InCombat;
                 events.Add(new CaseTriggeredEvent(PendingCase));
@@ -230,6 +247,20 @@ namespace N29.HeroesDawn.Domain.Board
             }
             _combatIsFollowUp = false;
             PendingCase = null;
+            var resume = victory ? _resumeTarget : null;
+            _resumeTarget = null;
+            if (resume != null && PmInHand > 0)
+            {
+                // Le pion repart vers la destination choisie avant le combat, avec les PM restants.
+                RefreshDestinations();
+                if (_destinations.ContainsKey(resume.Value))
+                {
+                    Phase = ZoneRunPhase.ChoosingDestination;
+                    events.AddRange(MoveCore(resume.Value));
+                    return events;
+                }
+            }
+            BankRemaining(events);
             Phase = ZoneRunPhase.AwaitingRoll;
             CheckValidated(events);
             return events;

@@ -180,10 +180,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             // ---- Objectifs (récitatif en haut à gauche)
             var obj = Ui.Panel(rt, "Objectives", Theme.Primary, 4f, 6f, false);
-            obj.Frame().At(0f, 1f, 24, -112, 520, 156);
+            obj.Frame().At(0f, 1f, 24, -112, 520, 236);
             RecipeKit.Mark(obj.Frame(), TutorialTarget.BoardObjectives);
             Ui.LocTxt(obj.transform, "board.objectives", 30, Theme.TextDark, TextAnchor.UpperLeft, FontKind.Title, "Title").rectTransform.At(0f, 1f, 16, -8, 480, 36);
-            var objectiveList = Ui.Rect(obj.transform, "List").At(0f, 1f, 16, -46, 490, 120);
+            var objectiveList = Ui.Rect(obj.transform, "List").At(0f, 1f, 16, -46, 490, 184);
             objectiveList.VLayout(2, 0, TextAnchor.UpperLeft);
             Ui.LocTxt(rt, "board.legend", 22, Theme.TextMuted, TextAnchor.UpperRight, FontKind.Regular, "Legend").rectTransform.At(1f, 1f, -30, -112, 900, 30);
 
@@ -247,13 +247,13 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var hudFill = hud.GetChild(0);
             var squadStrip = Ui.Rect(hudFill, "Squad").At(0f, 0.5f, 20, 0, 560, 140);
             squadStrip.HLayout(10, 0, TextAnchor.MiddleLeft);
-            var hint = Ui.Txt(hudFill, "", 28, Theme.Text, TextAnchor.MiddleCenter, FontKind.Body, "Hint");
-            hint.rectTransform.At(0.5f, 0.5f, -120, 24, 560, 70);
-            var pm = Ui.Txt(hudFill, "", 40, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Pm");
-            pm.rectTransform.At(0.5f, 0.5f, -120, -34, 300, 50);
+            var hint = Ui.Txt(hudFill, "", 24, Theme.Text, TextAnchor.MiddleCenter, FontKind.Body, "Hint");
+            hint.rectTransform.At(0.5f, 0.5f, -120, 34, 560, 70);
+            var pm = Ui.Txt(hudFill, "", 34, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Pm");
+            pm.rectTransform.At(0.5f, 0.5f, -120, -16, 300, 42);
             pm.Inked();
             var reserve = Ui.Bar(hudFill, "Reserve", Theme.Primary, Theme.SurfaceDark, true, 20);
-            ((RectTransform)reserve.transform).At(0.5f, 0f, -120, 10, 420, 26);
+            ((RectTransform)reserve.transform).At(0.5f, 0f, -120, 8, 420, 24);
             var dieFill = Ui.Panel(hudFill, "Die", Color.white, 5f, 6f, false);
             var die = dieFill.Frame().At(1f, 0.5f, -640, 0, 124, 124);
             var dieFace = Ui.Txt(dieFill.transform, "-", 86, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Face");

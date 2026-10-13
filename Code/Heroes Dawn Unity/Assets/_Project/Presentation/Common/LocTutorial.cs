@@ -30,11 +30,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["tutorial.step.Roll.title"] = "LE DÉ";
             d["tutorial.step.Roll.body"] = "Lance le dé pour avancer : chaque point est un point de mouvement.";
             d["tutorial.step.Move.title"] = "AVANCER";
-            d["tutorial.step.Move.body"] = "Les cases cerclées sont à ta portée. Touche celle que je t'indique.";
+            d["tutorial.step.Move.body"] = "Les cases cerclées sont à ta portée. Touche la case que je t’indique, puis « S’y rendre ».";
             d["tutorial.step.CombatAtb.title"] = "LE COMBAT";
             d["tutorial.step.CombatAtb.body"] = "Chaque héros avance sur la frise : à 100 %, il agit. Le rouge, c'est la zone de préparation.";
             d["tutorial.step.CombatSkill.title"] = "À TOI DE JOUER";
-            d["tutorial.step.CombatSkill.body"] = "Choisis une compétence, puis touche un ennemi pour la lancer.";
+            d["tutorial.step.CombatSkill.body"] = "Fais glisser une carte de compétence sur un ennemi pour la lancer.";
             d["tutorial.step.Results.title"] = "LA FATIGUE";
             d["tutorial.step.Results.body"] = "Chaque combat fatigue l'équipe. Touche CONTINUER.";
 

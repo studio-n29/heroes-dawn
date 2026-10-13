@@ -32,7 +32,7 @@ namespace N29.HeroesDawn.Tests.Domain
         public void MovingToAHiddenCase_WalksTheWholePath_AndRevealsAlongTheWay()
         {
             var run = NewRun(6);
-            var far = run.Destinations.Values.Where(p => !run.Fog.IsRevealed(p.Target)).OrderByDescending(p => p.Path.Count).First();
+            var far = run.Destinations.Values.Where(p => !run.Fog.IsRevealed(p.Target) && p.Path.Take(p.Path.Count - 1).All(c => !run.IsBlocking(c))).OrderByDescending(p => p.Path.Count).First();
             Assert.That(far.Path.Count, Is.GreaterThan(1));
             var events = run.MoveTo(far.Target);
             var moved = events.OfType<PawnMovedEvent>().Single();
@@ -41,13 +41,16 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(events.OfType<FogRevealedEvent>().Count(), Is.GreaterThanOrEqualTo(1));
         }
 
-        [Test, Description("Vérifie qu'une case de combat non résolue reste un arrêt : on peut l'atteindre mais jamais la traverser — parce que c'est la seule case d'arrêt voulue")]
-        public void UnresolvedCombat_StaysTheOnlyStop()
+        [Test, Description("Vérifie qu'un trajet qui traverse un combat non résolu arrête le pion sur ce combat — parce que c'est la seule case d'arrêt voulue, même si la destination choisie est plus loin")]
+        public void UnresolvedCombat_StopsThePawn_EvenWhenTheDestinationIsFarther()
         {
             var run = NewRun(6);
-            foreach (var plan in run.Destinations.Values)
-                foreach (var step in plan.Path.Take(plan.Path.Count - 1))
-                    Assert.That(run.Graph.Node(step).Type == CaseType.Combat && !run.IsSpent(step), Is.False, "pas de combat non résolu au milieu d'un trajet : " + plan.Target);
+            var crossing = run.Destinations.Values.FirstOrDefault(p => p.Path.Take(p.Path.Count - 1).Any(step => run.Graph.Node(step).Type == CaseType.Combat && !run.IsSpent(step)));
+            if (crossing == null) Assert.Ignore("aucune destination ne traverse de combat avec cette graine");
+            var events = run.MoveTo(crossing.Target);
+            var stopped = events.OfType<PawnMovedEvent>().Single().Path.Last();
+            Assert.That(run.Graph.Node(stopped).Type, Is.EqualTo(CaseType.Combat));
+            Assert.That(run.Phase, Is.EqualTo(ZoneRunPhase.InCombat));
         }
 
         [Test, Description("Vérifie que la portée reste limitée aux PM en main — parce qu'avec 1 PM seules les cases voisines sont à portée")]

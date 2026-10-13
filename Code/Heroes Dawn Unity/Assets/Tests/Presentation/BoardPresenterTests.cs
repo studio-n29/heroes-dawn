@@ -207,7 +207,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _app.Session.Run = ZoneRun.ForTests(_app.Session.Content, zone, 3UL, 6, false);
             _app.Session.RunZone = zone;
             var run = _app.Session.Run!;
-            var hidden = run.Destinations.Values.Where(p => !run.Fog.IsRevealed(p.Target) && !run.IsBlocking(p.Target)).OrderByDescending(p => p.Path.Count).First();
+            var hidden = run.Destinations.Values.Where(p => !run.Fog.IsRevealed(p.Target) && !run.IsBlocking(p.Target) && p.Path.Take(p.Path.Count - 1).All(c => !run.IsBlocking(c))).OrderByDescending(p => p.Path.Count).First();
             Make();
             Assert.That(_view.MapView.LastNodes.Single(n => n.Id == hidden.Target).Mark, Is.EqualTo(NodeMark.Destination));
             _view.MapView.Tap(hidden.Target.Value);
