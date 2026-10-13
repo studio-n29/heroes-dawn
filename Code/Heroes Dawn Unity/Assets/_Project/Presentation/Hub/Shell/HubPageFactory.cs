@@ -63,6 +63,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                     b.RegisterInstance<TIView>(view);
                     b.RegisterInstance(location);
                     b.Register<RecruitFlow>(Lifetime.Scoped);
+                    b.Register<QuestLogFlow>(Lifetime.Scoped);
                     b.Register<TPresenter>(Lifetime.Scoped);
                     extra?.Invoke(b);
                 });

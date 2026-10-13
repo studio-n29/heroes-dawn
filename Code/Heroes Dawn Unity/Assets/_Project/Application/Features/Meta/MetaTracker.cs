@@ -27,6 +27,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         readonly DailyMissions _daily;
         readonly PassProgress _pass;
         readonly SecondaryObjectives _secondary;
+        readonly QuestLog _quests;
         readonly ISubscriber<CombatFinished> _combat;
         readonly ISubscriber<ZoneValidated> _zone;
         readonly ISubscriber<RosterChanged> _roster;
@@ -37,11 +38,11 @@ namespace N29.HeroesDawn.Application.Features.Meta
         int _levelSum, _count, _credits;
         bool _armed;
 
-        public MetaTracker(MetaContext context, DailyMissions daily, PassProgress pass, SecondaryObjectives secondary,
+        public MetaTracker(MetaContext context, DailyMissions daily, PassProgress pass, SecondaryObjectives secondary, QuestLog quests,
                            ISubscriber<CombatFinished> combat, ISubscriber<ZoneValidated> zone, ISubscriber<RosterChanged> roster,
                            ISubscriber<WalletChanged> wallet, ISubscriber<GameStateChanged> state, IPublisher<MetaRewardEarned> earned)
         {
-            _c = context; _daily = daily; _pass = pass; _secondary = secondary;
+            _c = context; _daily = daily; _pass = pass; _secondary = secondary; _quests = quests;
             _combat = combat; _zone = zone; _roster = roster; _wallet = wallet; _state = state; _earned = earned;
         }
 
@@ -77,6 +78,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         {
             if (!f.Report.Victory) return;
             _daily.Record(DailyKind.WinCombats);
+            _quests.Record(QuestMetric.CombatsWon);
             _pass.AddXp(XpPerWin);
         }
 
@@ -84,6 +86,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         {
             var id = _c.Session.RunZone?.Id.Value ?? "";
             _daily.Record(DailyKind.ValidateZone);
+            if (z.Rewards.FirstClear) _quests.Record(QuestMetric.ZonesCleared);
             _pass.AddXp(z.Rewards.FirstClear ? XpPerFirstClear : XpPerReplay);
             if (z.Rewards.FirstClear)
             {
@@ -102,8 +105,8 @@ namespace N29.HeroesDawn.Application.Features.Meta
             int sum = 0;
             foreach (var m in _c.Session.Roster) sum += m.Level;
             int count = _c.Session.Roster.Count;
-            if (count > _count && _levelSum > 0) _daily.Record(DailyKind.RecruitHero, count - _count);
-            else if (sum > _levelSum && count == _count) _daily.Record(DailyKind.TrainMember, sum - _levelSum);
+            if (count > _count && _levelSum > 0) { _daily.Record(DailyKind.RecruitHero, count - _count); _quests.Record(QuestMetric.Recruits, count - _count); }
+            else if (sum > _levelSum && count == _count) { _daily.Record(DailyKind.TrainMember, sum - _levelSum); _quests.Record(QuestMetric.Trainings, sum - _levelSum); }
             _count = count;
             _levelSum = sum;
         }

@@ -88,6 +88,15 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             speaker.Inked();
             var filText = Ui.Txt(fil.transform, "", 28, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Text");
             filText.rectTransform.Stretch(24, 16, 24, 104);
+            var filButton = fil.Frame().gameObject.AddComponent<Button>();
+            filButton.targetGraphic = fil;
+            filButton.transition = Selectable.Transition.None;
+            Ui.LocTxt(fil.transform, "qg.fil.open", 24, Theme.Primary, TextAnchor.MiddleRight, FontKind.Title, "OpenHint").rectTransform.At(1f, 0f, -24, 14, 520, 32);
+            var filBadge = Ui.Img(fil.Frame(), "Badge", Theme.Danger, Sprites.Circle);
+            filBadge.rectTransform.At(1f, 1f, -10, -10, 44, 44);
+            var filBadgeText = Ui.Txt(filBadge.transform, "", 26, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Text");
+            filBadgeText.rectTransform.Stretch();
+            filBadge.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
 
             // ---- Missions du jour (à venir)
             var daily = Ui.Panel(rt, "Daily", Theme.Surface, 5f, 10f, true);
@@ -141,6 +150,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "shopAlert", shopAlert);
             ctx.Wire(view, "filSpeaker", speaker);
             ctx.Wire(view, "filText", filText);
+            ctx.Wire(view, "filCard", filButton);
+            ctx.Wire(view, "questsBadge", filBadgeText);
             ctx.Wire(view, "mission", mission);
             ctx.Wire(view, "missionSub", sub);
             ctx.Wire(view, "missionHint", hint);

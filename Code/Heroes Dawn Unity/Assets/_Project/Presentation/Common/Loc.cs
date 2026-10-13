@@ -71,7 +71,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["page.settings"] = "Paramètres", ["page.member_sheet"] = "Fiche de membre",
             // --- QG (M10) ---
             ["qg.rooms"] = "LES PIÈCES DU QG", ["qg.daily"] = "MISSIONS DU JOUR", ["qg.daily.body"] = "Trois missions par jour pour faire avancer le pass.",
-            ["qg.alerts"] = "ALERTES", ["qg.secondary"] = "Objectifs secondaires en temps réel", ["qg.fil"] = "FIL DU QG",
+            ["qg.alerts"] = "ALERTES", ["qg.secondary"] = "Objectifs secondaires en temps réel", ["qg.fil"] = "QUÊTE PRINCIPALE",
             ["qg.salon.one"] = "1 membre à entraîner", ["qg.salon.many"] = "{0} membres à entraîner", ["qg.salon.none"] = "Toute l'équipe est au niveau max",
             ["qg.infirmary.one"] = "1 membre fatigué", ["qg.infirmary.many"] = "{0} membres fatigués", ["qg.infirmary.none"] = "Toute l'équipe est en forme",
             ["qg.fil.speaker"] = "RAYNER",
@@ -297,6 +297,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendCollection(d);
             ExtendAgents(d);
             ExtendOnboarding(d);
+            ExtendQuests(d);
             return d;
         }
 
@@ -312,6 +313,7 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendCollection(Dictionary<string, string> d);
         static partial void ExtendAgents(Dictionary<string, string> d);
         static partial void ExtendOnboarding(Dictionary<string, string> d);
+        static partial void ExtendQuests(Dictionary<string, string> d);
 
         public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
         public static bool Has(string key) => Fr.ContainsKey(key);

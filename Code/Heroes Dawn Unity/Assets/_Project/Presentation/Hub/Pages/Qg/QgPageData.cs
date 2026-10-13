@@ -25,6 +25,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string ShopAlert;
         public string FilSpeaker;
         public string FilText;
+        /// <summary>Quêtes secondaires à réclamer (vide : aucune).</summary>
+        public string QuestsBadge;
         public string MissionTitle;
         public string MissionSub;
         public bool MissionEnabled;

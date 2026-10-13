@@ -14,6 +14,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action<HubPage>? RoomClicked;
         public event Action? DailyClicked;
         public event Action? SecondaryClicked;
+        public event Action? QuestsClicked;
         public event Action? MissionClicked;
         public readonly List<QgPageData> Shown = new List<QgPageData>();
         public QgPageData Last => Shown[Shown.Count - 1];
@@ -21,6 +22,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void ClickRoom(HubPage p) => RoomClicked?.Invoke(p);
         public void ClickDaily() => DailyClicked?.Invoke();
         public void ClickSecondary() => SecondaryClicked?.Invoke();
+        public void ClickQuests() => QuestsClicked?.Invoke();
         public void ClickMission() => MissionClicked?.Invoke();
     }
 

@@ -9,6 +9,7 @@ using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Presentation.Mvp;
+using Cysharp.Threading.Tasks;
 using VContainer.Unity;
 
 namespace N29.HeroesDawn.Presentation.Hub
@@ -27,14 +28,16 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly MetaOverview _meta;
         readonly ISubscriber<RosterChanged> _roster;
         readonly ISubscriber<MetaChanged> _metaChanged;
+        readonly QuestLogFlow? _quests;
         IDisposable? _subs;
         int _lastStamp = -1;
 
         public QgPagePresenter(IQgPageView view, ISessionReadModel session, HubNavigator nav, MissionLauncher mission, IClock clock,
-                               ILocalization loc, MetaOverview meta, ISubscriber<RosterChanged> roster, ISubscriber<MetaChanged> metaChanged)
+                               ILocalization loc, MetaOverview meta, ISubscriber<RosterChanged> roster, ISubscriber<MetaChanged> metaChanged,
+                               QuestLogFlow? quests = null)
             : base(view, null)
         {
-            _session = session; _nav = nav; _mission = mission; _clock = clock; _loc = loc; _meta = meta; _roster = roster; _metaChanged = metaChanged;
+            _session = session; _nav = nav; _mission = mission; _clock = clock; _loc = loc; _meta = meta; _roster = roster; _metaChanged = metaChanged; _quests = quests;
         }
 
         public string Title => _loc.T("page.qg");
@@ -45,6 +48,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.MissionClicked += Launch;
             View.DailyClicked += OpenPass;
             View.SecondaryClicked += Launch;
+            View.QuestsClicked += OpenQuests;
         }
 
         protected override void OnShown()
@@ -70,6 +74,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.MissionClicked -= Launch;
             View.DailyClicked -= OpenPass;
             View.SecondaryClicked -= Launch;
+            View.QuestsClicked -= OpenQuests;
         }
 
         /// <summary>Chaque seconde : le compte à rebours de l'objectif secondaire avance ; sinon une fois par minute (boutique).</summary>
@@ -84,6 +89,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         void OpenRoom(HubPage page) => _nav.Open(page);
         void OpenPass() => _nav.Open(HubPage.Pass);
         void Launch() => _nav.Open(HubPage.CityMap);
+        void OpenQuests() { if (_quests != null) _quests.OpenAsync(_session, Lifetime).Forget(); }
 
         void Refresh()
         {
@@ -115,6 +121,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 ShopAlert = ShopCountdown.Text(now, s.Content.Balance.ShopResetHour, _loc),
                 FilSpeaker = _loc.T("qg.fil.speaker"),
                 FilText = done ? _loc.T("qg.fil.done") : _loc.Or("qg.fil." + zone.Id.Value, "qg.fil.done"),
+                QuestsBadge = _meta.QuestsBadge > 0 ? _meta.QuestsBadge.ToString() : "",
                 MissionTitle = _loc.T("qg.mission"),
                 MissionSub = _loc.T(zone.NameKey),
                 MissionEnabled = !s.SquadExhausted,
