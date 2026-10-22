@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["intro.slide.9"] = "Aujourd'hui, le monde a changé… et notre devoir est d'aider chacun à trouver sa place.";
 
             d["onboarding.speaker"] = "ACCUEIL DE LA GUILDE";
-            d["onboarding.pseudo.line"] = "Bienvenue à la Guilde, recrue. Avant d'ouvrir ton dossier : comment doit-on t'appeler, Agent ?";
+            d["onboarding.pseudo.line"] = "Bienvenue à l'Aube, recrue. Avant d'ouvrir ton dossier : comment doit-on t'appeler, Agent ?";
             d["onboarding.pseudo.placeholder"] = "Ton nom d'agent";
             d["onboarding.pseudo.suggestion"] = "";
             d["onboarding.pseudo.confirm"] = "VALIDER";

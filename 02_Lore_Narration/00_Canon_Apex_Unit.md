@@ -1,5 +1,7 @@
 # Canon de l'Apex Universe — Synthèse
 
+> Note (2026-10-23) : dans Heroes Dawn, l organisation du joueur s appelle **The Dawn (l Aube)** ; « La Guilde » est le nom du canon d origine (documents de `Sources/`), conservé dans cette synthèse. Voir `01_Contexte_Heroes_Dawn.md`.
+
 > Résumé des documents de `Sources/` pour l'équipe Heroes Dawn. Ne remplace pas les originaux.
 
 ## Terminologie

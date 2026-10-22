@@ -1,181 +1,90 @@
-# Kits de compétences — New York (v1)
+# Kits de compétences (réalignés sur la version 0.10.1, 2026-10-23)
 
-> Chaque recrue : **3 actives** (A1 de base, A2 utilitaire, A3 signature) + **1 passive** (P).
-> Dégâts exprimés en % de l'Attaque. Recharge (R) en tours du personnage. A1 n'a pas de recharge.
-> Valeurs de départ, à équilibrer avec le simulateur de combat (voir `04_Tech_Unity/01_Architecture.md`).
+> Chaque agent a **2 compétences de base** propres à lui : **A1** légère et gratuite, **A2** spéciale qui coûte de l'énergie. La **3e place** du combat est une **carte du grimoire** équipée ; une 2e carte prend la 4e place. Les agents n'ont plus de passive ni de A3.
+> Dégâts exprimés en % de l'Attaque. Le coût est une dépense d'**énergie** (voir `02_Combat.md`) ; il n'y a plus de recharge par tour.
+> Valeurs de départ, à équilibrer avec le simulateur d'équilibrage (menu *Heroes Dawn ▸ Équilibrage ▸ Simulateur*).
+> Source des données : `Code/Heroes Dawn Unity/Assets/_Project/Content/Prototype/PrototypeAgents.cs` (gabarits), `Resources/Content/skills.json` (valeurs éditables dans l'outil Compétences), `Presentation/Common/LocDawnAgents.cs` (noms).
 
-## Règles communes
+## Gabarits par rôle
+Chaque compétence est construite sur le **rôle** de l'agent, plus un **statut propre** à l'agent (voir le tableau plus bas). Seuls les noms et les statuts distinguent deux agents du même rôle : des effets entièrement sur mesure restent à écrire. ⚑
 
-### Paliers (niv. 10 / 20 / 30 / 40 / 50)
-| Palier | Effet |
+| Rôle | A1 (gratuite) | A2 (coût 30, 40 pour un contrôle) |
+|---|---|---|
+| Tank | 110 % à 1 ennemi, recul de 10 %, + statut propre (30 %) | Sur lui : Provocation (2 tours) + Bouclier (25 % de ses PV), + statut propre |
+| Dégâts | 100 % à 1 ennemi, + statut propre (40 %) | 90 % à tous les ennemis, + statut propre (30 %) |
+| Contrôle | 90 % à 1 ennemi, + statut propre (30 %) | Entrave (2 tours) + recul de 25 % sur 1 ennemi, + statut propre |
+| Soutien | 80 % à 1 ennemi, + statut propre (25 %) | Soin de 35 % + élan de 20 % sur 1 allié, + statut propre |
+| Précision | 100 % à 1 ennemi + Marque, + statut propre (30 %) | Vulnérabilité (2 tours) + 10 % de la frise retirés à tous les ennemis, + statut propre (30 %) |
+
+## Cartes du grimoire (3e et 4e places)
+Une carte de la **même famille** que l'agent s'équipe en 3e place (la 2e carte en 4e). Une carte d'une autre famille est refusée. Le coût d une carte est dérivé de sa recharge d origine (40 ou 50). Le catalogue des cartes est dans `Resources` (collection) et se complète avec le grimoire.
+
+## Paliers de compétences (niv. 10 / 20 / 30 / 40 / 50) ⚑ — pas encore implémentés
+| Palier | Effet proposé |
 |---|---|
 | 10 | A1 : +15 % de dégâts ou d'effet |
-| 20 | P : effet renforcé |
-| 30 | A2 : recharge −1 tour |
-| 40 | A3 : +20 % de dégâts ou d'effet |
-| 50 | A3 : effet additionnel (précisé par personnage pour Élites et Légendes ; Agents : recharge −1) |
+| 20 | A2 : coût −5 |
+| 30 | A2 : +20 % de dégâts ou d'effet |
+| 40 | Le statut propre de l'agent dure 1 tour de plus |
+| 50 | A2 : effet additionnel (propre à chaque agent) |
 
-### Rareté
-| Rang | Complexité du kit |
-|---|---|
-| Agent | 1 effet par compétence, lisible |
-| Élite | 1-2 effets, une interaction avec une altération ou la jauge ATB |
-| Légende | Mécanique propre (charge, posture, marque…) qui structure l'équipe |
-
-### Altérations (glossaire)
+## Altérations (glossaire, valeurs du jeu)
 | Altération | Effet | Durée type |
 |---|---|---|
-| Brûlure | Dégâts à chaque tour (5 % PV max) | 2 tours |
-| Gel | Jauge ATB remplie 50 % moins vite | 2 tours |
-| Choc | Étourdi : saute son prochain tour | 1 tour |
+| Brûlure | 8 % des PV max par frise complète, versés point par point | 2 tours |
+| Gel | Avance un pas sur deux ; recul de 20 % sur la frise | 2 tours |
+| Choc | Saute son prochain tour ; recul de 15 % | 1 tour |
 | Corrosion | Défense −30 % | 2 tours |
-| Aveuglement | 50 % de chances de rater | 2 tours |
+| Aveuglement | 50 % de chances de rater (prévu, non utilisé par les agents) | 2 tours |
 | Vulnérabilité | Dégâts subis +25 % | 2 tours |
-| Entrave | Ne peut pas utiliser A2/A3 | 1 tour |
+| Entrave | Seule A1 est utilisable ; recul de 25 % | 2 tours |
 | Marque | La prochaine attaque reçue est un coup critique | Jusqu'au coup |
-| Provocation | Doit attaquer le lanceur | 1 tour |
+| Provocation | Doit attaquer le lanceur | 1 à 2 tours |
 | Bouclier | Absorbe des dégâts | 2 tours |
-| Régénération | Soigne 8 % PV max par tour | 2 tours |
-| Hâte | Jauge ATB remplie 30 % plus vite | 2 tours |
+| Régénération | Soigne 8 % des PV max à chaque tour | 2 tours |
+| Hâte | Avance de 2 points un pas sur trois | 2 tours |
 | Esquive | Évite la prochaine attaque | Jusqu'à l'attaque |
+| Ancrage | Insensible aux reculs sur la frise | 2 tours |
 
-**Jauge ATB** : certaines compétences ajoutent ou retirent directement des points de jauge (« +20 % ATB »).
+Certaines compétences déplacent directement les unités sur la frise : **recul** (« −25 % de la frise »), **élan** (« +20 %, à 100 % l'agent agit aussitôt ») et **retrait ou ajout de frise** (« −10 % »).
 
----
+## Les 32 kits
+Rareté : Agent ×1, Élite ×1,2, Légende ×1,45 sur les statistiques. Entre parenthèses : le statut propre de la compétence. Fiches de lore : `02_Lore_Narration/04_Agents_The_Dawn.md`.
 
-## Légendes
-
-### Ancre — Nia Okafor · Physique/Bio · Tank
-- **A1 Poing lesté** : 110 % à 1 ennemi, 30 % de chances de Provocation.
-- **A2 Ancrage** (R3) : Provocation sur tous les ennemis + Bouclier (20 % de ses PV max) sur elle.
-- **A3 Quai inébranlable** (R5) : pendant 2 tours, subit 50 % des dégâts destinés aux alliés et ne peut pas être Choquée ni repoussée.
-- **P Poids mort** : chaque coup reçu donne 1 charge de *Lest* (max 5) ; A1 inflige +10 % par charge et les consomme.
-- **Palier 50** : A3 renvoie aussi 20 % des dégâts absorbés.
-
-### Écho — Kenji Arai · Perception · Détection
-- **A1 Clic** : 100 % à 1 ennemi, applique Marque.
-- **A2 Sonar** (R3) : révèle et retire Esquive/camouflage de tous les ennemis ; alliés +20 % de précision (2 tours).
-- **A3 Résonance** (R5) : 70 % à tous les ennemis ; +100 % supplémentaires sur les ennemis Marqués.
-- **P Monde sonore** : immunisé à l'Aveuglement ; ses attaques ne ratent jamais.
-- **Palier 50** : A3 rend l'A2 immédiatement disponible.
-
-### Verre — Rosa Delgado · Matière · Contrôle
-- **A1 Éclat** : 100 % à 1 ennemi ; 25 % de chances de Vulnérabilité.
-- **A2 Vitrification** (R4) : 1 ennemi devient *Cristal* : Entrave + ne remplit plus sa jauge (1 tour) ; le prochain coup reçu le brise (+50 % de dégâts).
-- **A3 Cathédrale de verre** (R5) : Bouclier (15 % PV max de Verre) sur tous les alliés ; à l'expiration, le verre éclate et inflige 60 % à tous les ennemis.
-- **P Formation militaire** : au début du combat, l'allié le plus faible reçoit un Bouclier.
-- **Palier 50** : A2 s'applique à 2 ennemis.
-
-### Givre — Tomas Reyes · Élémentaire · Dégâts
-- **A1 Morsure du froid** : 100 % à 1 ennemi, applique Gel (40 %).
-- **A2 Souffle polaire** (R3) : 70 % à tous les ennemis, −15 % ATB.
-- **A3 Zéro absolu** (R5) : 220 % à 1 ennemi ; si Gelé, il est aussi Choqué.
-- **P Contre-feu** : dégâts +30 % contre les cibles en Brûlure ; retire la Brûlure des alliés au début de son tour.
-- **Palier 50** : A3 inflige 50 % des dégâts aux autres ennemis.
-
-### Instant — Amara Diallo · Perception · Soutien offensif
-- **A1 Frappe précise** : 100 % à 1 ennemi ; +30 % si la cible a moins de jauge ATB qu'Instant.
-- **A2 Seconde suspendue** (R4) : Hâte sur tous les alliés + 20 % ATB.
-- **A3 Temps figé** (R6) : Instant et 1 allié rejouent immédiatement.
-- **P Réflexes** : 25 % de chances d'Esquive au début de chaque tour.
-- **Palier 50** : A3 cible 2 alliés.
-
----
-
-## Élites
-
-### Maillon — Diego Salazar · Matière
-- **A1 Chaîne** : 100 %, 20 % d'Entrave.
-- **A2 Ligotage** (R3) : Entrave sur 2 ennemis.
-- **A3 Carcan d'acier** (R5) : 180 % à 1 ennemi, −40 % ATB.
-- **P Ferraille** : +10 % de défense par ennemi Entravé.
-- **Palier 50** : A3 applique Entrave.
-
-### Argile — Hannah Kowalski · Matière
-- **A1 Projection de béton** : 100 %.
-- **A2 Muraille** (R4) : Bouclier (20 % PV max) sur l'allié le plus faible + Provocation sur Argile.
-- **A3 Effondrement** (R5) : 120 % à tous les ennemis, 30 % de Choc.
-- **P Fondations** : immunisée au Choc.
-- **Palier 50** : A2 protège 2 alliés.
-
-### Mue — Jalen Brooks · Matière
-- **A1 Fouet élastique** : 90 % à 1 ennemi, frappe 2 fois si la cible est Entravée.
-- **A2 Contorsion** (R3) : Esquive sur Mue + retire une altération.
-- **A3 Étreinte** (R5) : 160 %, Entrave (2 tours).
-- **P Souplesse** : 15 % d'Esquive permanente.
-- **Palier 50** : A3 retire les bonus de la cible.
-
-### Arc — Priya Nair · Élémentaire
-- **A1 Décharge** : 100 %, 20 % de Choc.
-- **A2 Surtension** (R3) : Hâte sur 1 allié + 15 % ATB.
-- **A3 Arc électrique** (R5) : 130 % à 1 ennemi puis rebondit sur 2 autres (70 %).
-- **P Conductrice** : +25 % de dégâts contre les cibles en Gel (eau glacée conductrice).
-- **Palier 50** : A3 rebondit sur 3 ennemis.
-
-### Acide — Victor Hale · Élémentaire
-- **A1 Crachat corrosif** : 100 %, Corrosion (40 %).
-- **A2 Flaque** (R4) : Corrosion sur tous les ennemis.
-- **A3 Réaction exothermique** (R5) : 170 % à 1 ennemi ; Brûlure si Corrodé.
-- **P Catalyse** : ses Brûlures durent 1 tour de plus.
-- **Palier 50** : A3 touche aussi un 2e ennemi.
-
-### Rempart — Samuel Okoye · Physique/Bio
-- **A1 Coup de hache** : 110 %.
-- **A2 Sauvetage** (R3) : Bouclier (25 % PV max) sur 1 allié, retire Brûlure.
-- **A3 Traversée des flammes** (R5) : Provocation + réduction de dégâts 40 % (2 tours).
-- **P Ignifugé** : immunisé à la Brûlure.
-- **Palier 50** : A3 soigne l'équipe de 10 %.
-
-### Sève — Lucia Ferreira · Physique/Bio
-- **A1 Toucher** : 80 % ; soigne l'allié le plus blessé de 50 % des dégâts infligés.
-- **A2 Transfusion** (R3) : soigne 1 allié de 30 % PV max.
-- **A3 Régénération partagée** (R5) : Régénération sur toute l'équipe.
-- **P Vocation** : ses soins sont +25 % sur les alliés sous 30 % PV.
-- **Palier 50** : A3 retire une altération de chaque allié.
-
-### Gecko — Tyler Nguyen · Physique/Bio
-- **A1 Coup plongeant** : 110 %.
-- **A2 Paroi** (R3) : Esquive + 20 % ATB.
-- **A3 Chute libre** (R5) : 200 % à 1 ennemi ; ignore Provocation.
-- **P Prise** : ne peut pas être ralenti (immunisé au Gel).
-- **Palier 50** : A3 réinitialise l'A2.
-
-### Spectre — Imani Carter · Perception
-- **A1 Frappe invisible** : 100 %, +50 % si Spectre a Esquive.
-- **A2 Fondu** (R3) : Esquive + ne peut pas être ciblée (1 tour).
-- **A3 Exposition** (R5) : 220 % à 1 ennemi, coup critique garanti.
-- **P Angle mort** : +20 % de chances de critique contre les cibles Aveuglées.
-- **Palier 50** : A3 rend Spectre invisible 1 tour.
-
-### Boussole — Rafael Ortiz · Perception
-- **A1 Impulsion** : 90 %, −10 % ATB.
-- **A2 Brouillage** (R4) : désactive les drones et gadgets ennemis (AMIF, culte) + Entrave sur 1 ennemi mécanique.
-- **A3 Itinéraire** (R5) : +25 % ATB à toute l'équipe.
-- **P Nord magnétique** : immunisé à l'Aveuglement ; +20 % de dégâts contre les ennemis mécaniques.
-- **Palier 50** : A3 donne aussi Hâte.
-
----
-
-## Agents
-| Agent | Famille | A1 | A2 (R3) | A3 (R5) | Passive |
+| Agent | Famille | Rôle | Rareté | A1 (gratuite) | A2 (coût 30 ou 40) |
 |---|---|---|---|---|---|
-| Rivet | Matière | Plaque projetée 100 % | Bouclier 15 % sur 1 allié | Blindage : Bouclier 10 % sur l'équipe | +10 % défense |
-| Mortier | Matière | Coup de béton 100 % | Provocation + défense +20 % | Prise du béton : 120 %, −30 % ATB | Immunisé au Choc |
-| Filin | Matière | Câble 90 %, 20 % Entrave | Entrave sur 1 ennemi | Toile d'acier : 80 % à tous, 20 % Entrave | +15 % dégâts contre Entravés |
-| Éclat | Matière | Tesson 100 % | Vulnérabilité sur 1 ennemi | Pluie de verre : 90 % à tous | +10 % critique |
-| Masque | Matière | Coup bas 100 % | Leurre : Provocation d'un clone (1 tour) | Imitation : copie l'A1 de la cible à 150 % | 10 % d'Esquive |
-| Étincelle | Élémentaire | Arc 100 %, 15 % Choc | +15 % ATB à 1 allié | Court-circuit : 150 %, Choc si Gelé | +15 % dégâts contre les mécaniques |
-| Fumée | Élémentaire | Souffle brûlant 100 %, Brûlure 30 % | Aveuglement sur 1 ennemi | Four : 80 % à tous, Brûlure 50 % | Brûlures +1 tour |
-| Frimas | Élémentaire | Engelure 100 %, Gel 30 % | Gel sur 1 ennemi | Blizzard : 80 % à tous, −10 % ATB | +15 % dégâts contre Gelés |
-| Néon | Élémentaire | Flash 90 %, Aveuglement 30 % | Aveuglement sur 2 ennemis | Stroboscope : 100 % à tous | Immunisé à l'Aveuglement |
-| Vapeur | Élémentaire | Jet 100 % | Brûlure sur 1 ennemi | Explosion de conduite : 110 % à tous | +10 % dégâts contre Brûlés |
-| Rouille | Élémentaire | Oxydation 90 %, Corrosion 30 % | Corrosion sur 1 ennemi | Décrépitude : Corrosion sur tous | +10 % dégâts contre Corrodés |
-| Bélier | Physique/Bio | Charge 110 % | −20 % ATB sur 1 ennemi | Défonce : 190 % à 1 ennemi | +10 % attaque |
-| Cuirasse | Physique/Bio | Direct 100 % | Provocation + défense +30 % | Uppercut : 150 %, 30 % Choc | −15 % dégâts subis |
-| Marée | Physique/Bio | Coup de reflux 100 % | Régénération sur soi | Lame de fond : 100 % à tous | +5 % PV max par tour sous 50 % PV |
-| Antidote | Physique/Bio | Seringue 80 % | Retire les altérations d'1 allié | Purge : retire 1 altération de chaque allié + soin 10 % | Immunisée à Brûlure et Corrosion |
-| Pouls | Physique/Bio | Frappe 100 % | Hâte sur soi | Second souffle : +15 % ATB à l'équipe | Immunisé au Gel |
-| Veille | Perception | Contre 100 % | Contre-attaque au prochain coup reçu | Garde de nuit : Esquive sur 2 alliés | Immunisée au Choc |
-| Radar | Perception | Ping 90 %, Marque | Révèle les ennemis camouflés | Balayage : 80 % à tous | +10 % précision de l'équipe |
-| Réflexe | Perception | Frappe rapide 90 %, +10 % ATB | Esquive | Enchaînement : 3 × 60 % | 15 % d'Esquive |
-| Thermo | Perception | Tir ciblé 100 % | Révèle + Vulnérabilité sur 1 ennemi | Point chaud : 200 %, +50 % si Brûlé | +15 % critique |
+| Agent D | Matière | Contrôle | Légende | Barrière de craie (Entrave) | Créature dessinée (Vulnérabilité) |
+| Agent M | Perception | Précision | Légende | Vision du présent (Choc) | Futur fragmenté (Vulnérabilité) |
+| Darius Brooks | Matière | Tank | Agent | Poutre propulsée (Vulnérabilité) | Rempart de ferraille (Ancrage) |
+| Mei-Lin Chen | Élémentaire | Dégâts | Agent | Jet de flammes (Brûlure) | Brasier (Brûlure) |
+| Freya Lindqvist | Perception | Soutien | Agent | Murmure mental (Marque) | Esprit partagé (Hâte) |
+| Kwame Abara | Physique/Bio | Dégâts | Agent | Griffes du fauve (Entrave) | Meute déchaînée (Vulnérabilité) |
+| Giulia Rossi | Matière | Dégâts | Agent | Projection (Choc) | Tempête d'objets (Vulnérabilité) |
+| Lucas Mendes | Physique/Bio | Tank | Agent | Frappe fantôme (Marque) | Corps de brume (Esquive) |
+| Rin Takeda | Élémentaire | Contrôle | Agent | Décharge radio (Choc) | Brouillage (Choc) |
+| Amara Hughes | Perception | Soutien | Agent | Note apaisante (Entrave) | Chœur de guérison (Régénération) |
+| Ilona Varga | Perception | Contrôle | Agent | Ombre de la peur (Choc) | Cauchemar (Marque) |
+| Fatou Diallo | Physique/Bio | Tank | Agent | Foulée explosive (Choc) | Bouclier cinétique (Hâte) |
+| Clément Lefèvre | Perception | Précision | Élite | Mirage (Choc) | Grande illusion (Entrave) |
+| Youssef Haddad | Physique/Bio | Précision | Élite | Écoute absolue (Vulnérabilité) | Perception totale (Marque) |
+| Séverine Morel | Physique/Bio | Soutien | Agent | Drain vital (Corrosion) | Transfusion (Régénération) |
+| Sam Okafor | Physique/Bio | Tank | Agent | Encaisser (Choc) | Onde de choc (Ancrage) |
+| Astrid Hallström | Élémentaire | Soutien | Élite | Vague (Gel) | Marée vive (Régénération) |
+| Céleste Moreau | Élémentaire | Contrôle | Agent | Brume toxique (Corrosion) | Nuage soporifique (Corrosion) |
+| Haruto Nakamura | Perception | Contrôle | Agent | Âme errante (Entrave) | Souffle astral (Vulnérabilité) |
+| Yelena Ivanova | Élémentaire | Contrôle | Élite | Givre mordant (Gel) | Glace éternelle (Gel) |
+| Noah Kaplan | Matière | Contrôle | Agent | Permutation (Choc) | Échange forcé (Vulnérabilité) |
+| Tunde Oyelaran | Matière | Soutien | Agent | Poche d'espace (Entrave) | Refuge plié (Bouclier) |
+| Victor Sorel | Perception | Contrôle | Légende | Emprise (Marque) | Volonté dominée (Vulnérabilité) |
+| Odile Ferrand | Perception | Soutien | Légende | Seconde suspendue (Gel) | Temps accéléré (Hâte) |
+| Louis Dubois | Matière | Contrôle | Élite | Aimant (Choc) | Champ magnétique (Choc) |
+| Marco Bellini | Matière | Dégâts | Élite | Transmutation (Corrosion) | Or alchimique (Corrosion) |
+| Zofia Kowalczyk | Élémentaire | Dégâts | Élite | Archet vibrant (Choc) | Crescendo (Choc) |
+| Mateo Vasquez | Physique/Bio | Soutien | Élite | Pression sanguine (Corrosion) | Coagulation (Régénération) |
+| Ada Okonkwo | Physique/Bio | Soutien | Légende | Mutation (Corrosion) | Régénération cellulaire (Régénération) |
+| Eero Nieminen | Matière | Dégâts | Légende | Poids mort (Entrave) | Gravité écrasante (Vulnérabilité) |
+| Ji-Hoon Park | Perception | Précision | Agent | Coup invisible (Choc) | Disparition (Vulnérabilité) |
+| Anna Petrov | Perception | Précision | Agent | Saut instantané (Choc) | Pirouette téléportée (Entrave) |
+
+## Ennemis
+Les compétences des ennemis (Voyou, Gros bras, Pyro de rue, Brick, Crocodile…) sont dans `Content/Prototype/PrototypeContent.cs` et `PrototypeZones.cs` ; elles suivent les mêmes règles d énergie.

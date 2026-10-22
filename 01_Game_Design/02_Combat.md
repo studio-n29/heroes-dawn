@@ -1,21 +1,28 @@
-# Combat en temps actif (ATB)
+# Combat : frise, énergie et synergies
 
-> Résumé dans le GDD : `00_GDD/GDD_Heroes_Dawn.md` §6 · Statut : **v1 complète**
-> Kits des recrues : `06_Kits_Competences.md` · Valeurs : `05_Equilibrage.xlsx` (onglets Combat, Stats)
-> ⚑ = recommandation qui touche le feeling, à confirmer en prototype.
+> Résumé dans le GDD : `00_GDD/GDD_Heroes_Dawn.md` §6 · Statut : **réaligné sur la version 0.10.1 (2026-10-23)**
+> Kits des agents : `06_Kits_Competences.md` · Roster : `03_Metahumains.md` et `02_Lore_Narration/04_Agents_The_Dawn.md` · Valeurs : `05_Equilibrage.xlsx` et `BalanceConfig` dans le code
+> Spécifications détaillées : `Code/docs/specs/` (frise, énergie, synergie, deux compétences, pause de résolution, disposition).
+> ⚑ = valeur proposée, à équilibrer en playtest.
+> Les anciennes règles (jauge ATB, combos de famille, duos légendaires, compétences d'avatar) ont été remplacées ; leur ancienne description est dans l'historique git.
 
 ## Objectif du système
-Des combats **courts (60-90 s)**, lisibles sur mobile, où le joueur crée de la valeur par ses **choix d'équipe et de combos** (pilier « Mon équipe, mes choix »). Le mode auto permet de rejouer vite ; le mode manuel récompense la maîtrise.
+Des combats **courts**, lisibles sur mobile, où le joueur crée de la valeur par ses **choix d'équipe** (familles, rôles, liens entre agents) et par le **moment** où il agit (pilier « Mon équipe, mes choix »). Le mode Auto permet de rejouer vite.
+
+## La frise
+- Chaque unité occupe un point de la **frise** : 10 points entre le départ (0) et le **point d'action** (10). Toutes les unités avancent d'un point à chaque pas : **0,35 s** (×2 par défaut ; ×1 et ×3 disponibles). Au départ, chaque unité est placée au hasard entre les points 0 et 2.
+- Quand une unité atteint le point d'action, c'est son tour. Pour un allié, **la frise se fige** : le joueur a 30 s pour choisir, sinon l'agent passe son tour. Un ennemi choisit après un court délai (0,3 à 0,7 s).
+- Après son action, l'unité repart sur la frise selon le poids de la compétence : **A1 (légère) au point 3**, **A2 au point 2**, **carte du grimoire au point 0**.
+- **Zone de préparation** (points 8 à 10) : l'action d'un ennemi y est **annoncée** sur la frise (dès le point 5 si un allié Perception est dans l'équipe).
+- **Parade** : un allié et un ennemi sur le même point annulent l'action annoncée de l'ennemi, qui repart au point 3.
+- **Critique en zone de préparation** : l'action de la cible avorte et elle repart au point 4.
+- **Recul** : Entrave repousse de 25 % de la frise, Choc de 15 %, Gel de 20 % (sans effet sous Ancrage).
+- **Pause de résolution** : après chaque compétence jouée, la frise attend **1,3 s** (divisée par la vitesse). On voit l'animation dans le terrain et les marqueurs finir leurs déplacements sur la frise. Sans animation (mouvements réduits), pas de pause.
 
 ## Déroulement
-1. Arrivée sur la case → écran de combat (4 alliés à gauche, 1 à 5 ennemis à droite).
-2. Les jauges ATB se remplissent en temps réel. Au départ, chaque jauge est remplie aléatoirement entre 0 et 20 %.
-3. Quand la jauge d'un personnage est pleine, il peut agir :
-   - **Manuel** : son portrait s'allume ; le joueur choisit une compétence puis une cible. Pendant ce temps, **les autres jauges continuent** de se remplir (temps actif). ⚑
-   - **Auto** : l'IA alliée choisit immédiatement.
-4. Après l'action, la jauge repart de 0.
-5. Fin : **victoire** quand tous les ennemis sont à 0 PV ; **défaite** quand tous les alliés sont à 0 PV. Pas de limite de temps.
-6. Bouton **Retraite** : compte comme une défaite (recul d'une case + fatigue de défaite).
+1. Arrivée sur la case → écran de combat : alliés à gauche, ennemis à droite (1 à 4 par camp, en deux rangées décalées), frise en haut, compétences de l'agent actif en bas.
+2. La frise avance. Au tour d'un allié, ses compétences s'ouvrent en éventail : **manuel** (le joueur choisit une compétence puis une cible, au toucher ou par glisser-déposer) ou **auto** (l'IA choisit).
+3. **Victoire** : tous les ennemis à 0 PV (éventuellement après plusieurs vagues) ; **défaite** : tous les alliés à 0 PV. **Retraite** = défaite (recul d'une case + fatigue de défaite).
 
 ## Statistiques
 | Stat | Rôle |
@@ -23,44 +30,55 @@ Des combats **courts (60-90 s)**, lisibles sur mobile, où le joueur crée de la
 | PV | Points de vie |
 | ATQ | Base des dégâts et de certains soins |
 | DEF | Réduit les dégâts reçus |
-| VIT | Vitesse de remplissage de la jauge ATB |
-| Précision | 100 % de base ; réduite par Aveuglement |
+| VIT | Statistique d'agent (ne règle plus le remplissage : tout le monde avance d'un point par pas) |
 | Critique | 15 % de base, ×1,5 dégâts |
+| Énergie | 0 à 100, voir ci-dessous |
 
-Valeurs de base par **rôle** (Tank, Dégâts, Contrôle, Soin/Soutien, Précision) et par rareté : onglet **Stats** du tableur.
+Valeurs de base par **rôle** (Tank, Dégâts, Contrôle, Soutien, Précision) et par rareté : onglet **Stats** du tableur.
+
+## Énergie
+- Chaque unité a une **énergie** (max 100, **30 au départ** ⚑) qui se **régénère de 3 par pas** de la frise ⚑, sauf pendant le tour d'un allié qui attend l'ordre.
+- Une compétence **coûte de l'énergie** : **A1 gratuite**, **A2 : 30** (40 pour un contrôle), carte du grimoire : 40 ou 50. Elle est refusée si l'énergie manque. **Il n'y a plus de recharge par tour.**
+- Conséquence : un agent a toujours une action (A1), et la compétence forte se mérite en laissant l'énergie remonter (environ 10 pas pour 30).
+- Les ennemis suivent les mêmes règles.
 
 ## Formules
-- **Jauge ATB** : 1 000 points ; remplissage = VIT × 4 par seconde (un personnage à VIT 100 agit toutes les 2,5 s).
-- **Dégâts** = ATQ × % de la compétence × (1 − DEF / (DEF + K)) × multiplicateurs (critique, Vulnérabilité, bonus).
-- **K** = 300 × (1,04)^(niveau de l'attaquant − 1), pour que la réduction reste stable à tous les niveaux.
+- **Dégâts** = ATQ × % de la compétence × (1 − DEF / (DEF + K)) × multiplicateurs (critique, Vulnérabilité, bonus). K = 300 de base.
 - **Variation** : ±5 % aléatoire par coup.
-- **Soins** : en % des PV max de la cible ou de l'ATQ du soigneur (précisé dans chaque kit).
+- **Soins** : en % de la cible (précisé dans chaque kit).
+- **Brûlure** : 8 % des PV max par frise complète, versés point par point.
 
 ## Compétences
-- **A1** sans recharge ; **A2** et **A3** avec recharge en **tours du personnage** (précisée dans chaque kit).
-- Les altérations et leur durée sont définies dans le glossaire de `06_Kits_Competences.md`. Une même altération ne se cumule pas : une nouvelle application rafraîchit la durée.
+- Chaque agent a **2 compétences de base** propres à lui (nom, statut lié à son pouvoir) : A1 légère et gratuite, A2 spéciale. La **3e place** de l'éventail est une **carte du grimoire** équipée (une 2e carte prend la 4e place). Détail : `06_Kits_Competences.md`.
+- Les altérations et leur durée : glossaire de `06_Kits_Competences.md`. Une même altération ne se cumule pas : une nouvelle application rafraîchit la durée.
+- Chaque compétence jouée est **animée dans le terrain** selon sa **famille** : feu, givre, foudre, acide, chaînes, marque, soin, bouclier, hâte, temps, impact.
 
-## Combos
-- Condition : **2 alliés d'une paire valide** (combo de famille, Résonance ou duo légendaire) ont leur jauge pleine en même temps.
-- Le bouton **Combo** s'allume et affiche le nom du combo. En manuel, le joueur décide de l'utiliser ou non ; en auto, l'IA l'utilise dès qu'il est disponible.
-- Effet : les deux personnages agissent ensemble (animation commune) et **consomment leur tour**.
-- Puissance : environ **2,5 fois une A1** en valeur totale (dégâts + effet). Recharge : **1 utilisation par paire toutes les 3 actions** de chacun des deux membres.
-- Les duos légendaires remplacent le combo de leur paire de familles (ou la Résonance) et valent environ **3,5 fois une A1**.
+## Synergie d'équipe (remplace les combos)
+Rien à déclencher : tout est actif dès le début du combat.
+1. **Bonus passif de familles** : chaque paire de familles dans l'escouade donne à toute l'équipe un bonus permanent de statistique (PV, ATQ, DEF ou VIT), **plafonné à 30 %** par statistique. Dix synergies : six croisées (Matière + Élémentaire : ATQ +6 %, Matière + Physique/Bio : DEF +8 %, Matière + Perception : VIT +5 %, Élémentaire + Physique/Bio : PV +6 %, Élémentaire + Perception : ATQ +8 %, Physique/Bio + Perception : PV +8 %) et quatre résonances d'une même famille (+4 %).
+2. **Lien entre deux agents** : chaque victoire remportée ensemble le fait progresser. Niveaux 2 à 5 à **3, 8, 15 et 25 victoires** communes. Chaque niveau ajoute **25 %** à l'effet passif de la synergie de leurs deux familles (100, 125, 150, 175, 200 %), sous le plafond de 30 %.
+3. **Effets de composition** (se cumulent) :
+
+| Effet | Condition | Résultat |
+|---|---|---|
+| Quatuor | 4 familles différentes | +10 % de chances de critique |
+| Trinité | un tank, un agent de dégâts, un soutien | +1 énergie par pas |
+| Double front | 2 tanks ou plus | bouclier d'ouverture de 10 % des PV |
+| Étincelle | 2 agents de contrôle ou plus | +20 énergie au départ |
 
 ## IA
-### Alliés (mode auto)
-Priorités, dans l'ordre : combo disponible → soin si un allié est sous 40 % PV → A3 disponible → A2 disponible si son effet est utile (pas d'altération déjà présente) → A1 sur la cible la plus faible.
+### Alliés (mode auto) et ennemis
+L'IA ne choisit que parmi les compétences **payables** (énergie suffisante) et vise en priorité selon son rang. Le prototype applique des priorités simples ; les comportements ci-dessous sont la **cible de design** :
 
-### Ennemis selon le rang
 | Rang | Comportement |
 |---|---|
 | Facile | Compétences au hasard, cible au hasard |
-| Normal | Utilise A2 dès qu'elle est prête, vise la cible la plus faible 50 % du temps |
-| Élite | Priorités complètes (comme l'IA alliée), vise les soigneurs en premier |
+| Normal | Utilise A2 dès qu'elle est payable, vise la cible la plus faible 50 % du temps |
+| Élite | Priorités complètes (soin sous 40 % PV, compétence forte, A1 sur la cible la plus faible), vise les soigneurs en premier |
 | Boss | Élite + phases : nouvelle compétence à 50 % PV |
 
 ### Niveau et puissance des ennemis
-- Niveau = niveau moyen de l'équipe + écart du rang (Facile −3, Normal 0, Élite +3 ; mode difficile +5).
+- Niveau = niveau moyen de l'équipe + écart du rang (Facile −3, Normal 0, Élite +3).
 - Stats × 0,8 (Facile), × 1 (Normal), × 1,3 (Élite). Boss : PV × 3.
 
 ## Fatigue
@@ -78,47 +96,28 @@ Priorités, dans l'ordre : combo disponible → soin si un allié est sous 40 % 
 | Facile | 200 | 40 |
 | Normal | 300 | 60 |
 | Élite | 500 | 100 |
-| Boss (mini-climax) | 1 000 | 200 + Légende de l'acte ajoutée à la pool |
+| Boss (mini-climax) | 1 000 | 200 |
 
-L'XP de combat s'ajoute à l'XP d'entraînement du salon.
+L'XP de combat s'ajoute à l'XP d'entraînement du salon. Les victoires font aussi progresser les **liens** entre les agents engagés.
 
-## Interface (rappel)
-Portraits en bas avec jauges ATB et fatigue ; compétences au toucher ; boutons Combo, Auto, vitesse ×1/×2, Retraite. Détail : `03_Art_UI_UX/01_UX_Ecrans.md`.
+## Interface (disposition 0.10.0)
+- **Frise pleine largeur** sous la barre du haut (Retraite, titre, Auto, vitesse, pause).
+- **Deux camps** de part et d'autre d'un **terrain central** : 2×2 cartes décalées, chaque carte avec portrait, PV et **barre d'énergie** (bleue).
+- **Terrain central** : le nom de la compétence jouée s'y affiche, avec le projectile et l'éclat de sa famille.
+- **Éventail du bas** : 3 cartes pour l'agent dont c'est le tour (A1, A2, carte du grimoire), pastille de **coût en énergie** (rouge si l'énergie manque) ; appui prolongé = description ; glisser-déposer sur une cible.
+- **Journal** en bas à droite : synergies, effets d'équipe et actions.
+- Détail des écrans : `03_Art_UI_UX/01_UX_Ecrans.md`.
 
-## Bestiaire de New York
-| Ennemi | Acte | Rôle | A1 | Spécial (R4) | Passive |
-|---|---|---|---|---|---|
-| Voyou néo-méta | 1 | Dégâts | Coup 100 % | Frénésie : +30 % ATQ 2 tours | — |
-| Gros bras | 1 | Tank | Coup 90 % | Provocation | −15 % dégâts subis |
-| Pyro de rue | 1 | Dégâts | Jet de flammes 90 %, Brûlure 30 % | Cocktail : 70 % à tous | — |
-| Recruteur du Syndicat | 2 | Contrôle | Filet 80 %, Entrave 30 % | Collier : Entrave 2 tours | — |
-| Chimiste | 2 | Soutien | Fiole 80 %, Corrosion 30 % | Stimulant : soigne un allié de 25 % | — |
-| Exécuteur | 2 | Dégâts | Frappe 110 % | Exécution : 200 % sur une cible sous 30 % PV | — |
-| Soldat AMIF | 3 | Précision | Tir 100 % | Rafale : 3 × 50 % | +15 % critique |
-| Drone AMIF | 3 | Contrôle (mécanique) | Taser 70 %, Choc 20 % | Scan : Marque sur 2 alliés | Mécanique |
-| Blindé AMIF | 3 | Tank | Crosse 90 % | Inhibiteur : Entrave sur 1 allié 2 tours | Immunisé au Choc |
-| Fidèle de la Brèche | 4 | Dégâts | Flamme rouge 100 %, Brûlure 30 % | Prière : +20 % ATB aux alliés | — |
-| Voilé | 4 | Précision | Lame 100 % | Disparition : Esquive | 20 % d'Esquive |
-| Possédé | 4 | Tank | Griffe 100 % | Régénération sur soi | Revient une fois à 20 % PV |
-| Porte-flamme | 5 | Élite polyvalent | Flamme 120 %, Brûlure 50 % | Colonne de feu : 90 % à tous | Immunisé à la Brûlure |
+## Bestiaire de New York (acte 1 : Brooklyn)
+| Ennemi | Rôle | Compétences (prototype) |
+|---|---|---|
+| Voyou | Dégâts | Coup 100 % ; coup lourd 160 % |
+| Gros bras | Tank | Coup 90 % ; Provocation |
+| Pyro de rue | Dégâts | Jet de flammes 90 % + Brûlure ; zone 70 % |
+| Brick (boss, zone 1.1) | Tank | Coups lourds, Provocation, choc de zone |
+| Crocodile (boss, zone 1.3) | Mafieux méta-humain | voir `Code/Heroes Dawn Unity/Assets/_Project/Content/Prototype/PrototypeZones.cs` |
 
-### Boss (mini-climax)
-| Boss | Acte | Phase 1 | Phase 2 (sous 50 % PV) |
-|---|---|---|---|
-| Brick | 1 | Coups lourds, Provocation | Enrage : +40 % ATQ, charge sur le soigneur |
-| Collier | 2 | Entrave sur 2 alliés | Colliers : un allié par tour ne peut plus utiliser A2/A3 jusqu'à la fin, sauf s'il est retiré (Antidote, Triage) |
-| Capitaine Mercer | 3 | Tirs de précision + 2 drones | Appelle 2 drones de plus ; grenade inhibitrice (Entrave de zone) |
-| Mère Voile | 4 | Invisible un tour sur deux | Crée 2 illusions (Voilés) ; révélée par Écho, Radar, Thermo |
-| Le Héraut | 5 | Flammes rouge cendre, Brûlure permanente de zone | « Brèche » : à 25 % PV, invoque un Possédé par tour ; Givre et Rempart contrent la Brûlure |
+Le bestiaire des actes suivants (Paris, Moscou, Salem) reste à écrire avec les zones.
 
 ## Données / paramètres
-Tous les paramètres chiffrés (jauge, facteur ATB, K, critique, écarts de rang, fatigue) sont dans l'onglet **Paramètres** du tableur et exportés vers Remote Config.
-
-## Rythme et prise en main (version 0.8.0)
-- **Pas de la frise** : 0,35 s ; vitesse ×2 par défaut (×1 et ×3 disponibles) ; délai de réflexion de l'IA : 0,3 à 0,7 s ; les pauses suivent la vitesse choisie.
-- **Fenêtre d'interruption** : 1,2 s, seulement au pas qui précède l'arrivée d'un ennemi au point d'action et si une compétence d'avatar est prête ; jamais en Auto.
-- **Cartes de compétence** : appui prolongé = description de l'effet ; glisser-déposer : dans le vide pour une compétence générale ou sur soi, sur une carte cible pour une compétence ciblée (le toucher simple reste possible).
-- **Animations** : ouverture de l'éventail au tour de l'agent, carte jouée qui s'envole vers sa cible, élan de l'attaquant, étincelle d'arrivée sur la frise ; coupées par « réduire les mouvements ».
-
-## Déplacement sur le plateau (version 0.8.0)
-Le pion suit tout son trajet : seules les cases de combat non résolues l'arrêtent. Le brouillard ne bloque plus le déplacement, toute case à portée est une destination et le brouillard se lève au passage du pion.
+Énergie (max, départ, régénération), pas de la frise, points de reprise, zone de préparation, reculs, pause de résolution, Brûlure, critique, fatigue, écarts de rang : `BalanceConfig` (code) et onglet **Paramètres** du tableur.

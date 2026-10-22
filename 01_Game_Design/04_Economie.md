@@ -15,10 +15,10 @@ Modèle **F2P + pass saisonnier**. Principe directeur : **l'argent réel fait un
 ## Recrutement
 - **Pool quotidienne** de recrues, propre à la ville.
 - **Choix direct** : chaque recrue a un **coût fixe en PR**. Pas de gacha.
-- Renouvellement de la pool : **1 gratuit/jour**, puis payant en Crédits, puis en premium.
+- Renouvellement de la pool : **1 gratuit**, puis payant en Crédits (100 → 800), puis en premium.
 - **Aucun doublon** : une recrue possédée ne réapparaît jamais.
-- Pool épuisée = **fin de la collection de cette ville**.
-- **Rareté** : Agent / Élite / Légende ; coût en PR croissant. Les Légendes sont liées à l'histoire (une par acte).
+- Les agents d arc, d événement et de prouesse ne passent pas par la boutique : ils se gagnent en jouant.
+- **Rareté** : Agent / Élite / Légende ; coût en PR croissant. Les 4 Légendes numérotées se gagnent par arc ou par prouesse (pas en boutique).
 
 ## Pass saisonnier
 - Saison de **6 semaines**, **piste gratuite + piste premium**.
@@ -43,7 +43,7 @@ Purement visuels : **aucun effet en jeu**.
 ### Volume proposé (équipe de 1-2)
 | Moment | Tenues | Thèmes QG | Dés / pions |
 |---|---|---|---|
-| Lancement | 5 (1 par Légende) | 2 | 3 |
+| Lancement | 4 (1 par Légende) | 2 | 3 |
 | Chaque saison | 3 (pass) + 1 (événement) | 1 | 2 |
 
 ### Prix indicatifs (boutique)
@@ -70,9 +70,9 @@ Soit 3 € / 6 € / 10 € pour une tenue ; aucun cosmétique au-delà de 10 �
 | Élément | Valeur |
 |---|---|
 | Coût Agent / Élite / Légende | 150 / 450 / 1 200 PR |
-| Taille de la pool quotidienne | 5 (+ emplacement réservé pour la Légende de l'acte) |
-| Renouvellements | 1er gratuit, 2e : 3 000 Crédits, suivants : 50 gemmes |
-| Collection complète d'une ville (35) | 13 500 PR ≈ **53 jours** de jeu gratuit |
+| Pool quotidienne | 3 agents à 9 h locale, tirage pondéré 70 / 25 / 5 ⚑ |
+| Renouvellements | 1er gratuit, puis 100 Crédits, jusqu à 800 |
+| Les 14 agents de la boutique (10 Agents + 4 Élites) | 3 300 PR |
 
 ### Premium
 | Élément | Valeur |

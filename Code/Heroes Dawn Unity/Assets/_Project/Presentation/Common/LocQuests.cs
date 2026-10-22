@@ -24,7 +24,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["quest.docks.title"] = "Nettoyer les quais";
             d["quest.docks.desc"] = "Gagne 3 combats : les dockers de Red Hook veulent retrouver leur quartier.";
             d["quest.reinforcements.title"] = "Des renforts pour Rayner";
-            d["quest.reinforcements.desc"] = "Recrute un nouvel agent : la Guilde manque de bras.";
+            d["quest.reinforcements.desc"] = "Recrute un nouvel agent : l'Aube manque de bras.";
             d["quest.drills.title"] = "À l'entraînement";
             d["quest.drills.desc"] = "Entraîne tes agents de 2 niveaux au total.";
             d["quest.hostage_aid.title"] = "Aide aux otages libérés";

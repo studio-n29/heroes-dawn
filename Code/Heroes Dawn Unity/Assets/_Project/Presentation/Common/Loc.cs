@@ -206,7 +206,7 @@ namespace N29.HeroesDawn.Presentation.Common
             // --- Zones & objectifs ---
             ["zones.ny_1_1.name"] = "RED HOOK — LES QUAIS",
             ["zones.ny_1_1.code"] = "Zone 1.1",
-            ["zones.ny_1_1.desc"] = "Plusieurs rapports informent que l'AMIF fait transporter des méta-humains kidnappés par le port de Red Hook. Attaquer l'AMIF de front sonnerait la fin de la Guilde et de sa crédibilité : il faut trouver des preuves.",
+            ["zones.ny_1_1.desc"] = "Plusieurs rapports informent que l'AMIF fait transporter des méta-humains kidnappés par le port de Red Hook. Attaquer l'AMIF de front sonnerait la fin de l'Aube et de sa crédibilité : il faut trouver des preuves.",
             ["objectives.ny11.infiltrate"] = "Infiltrer le quai",
             ["objectives.ny11.generator"] = "Couper le courant (générateur du quai)",
             ["objectives.ny11.documents"] = "Trouver les documents de transport",

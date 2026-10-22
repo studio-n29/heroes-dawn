@@ -26,7 +26,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["narration.ny_1_2.n14.after.0"] = "« Vous ne savez pas ce que vous venez de déclencher. Crocodile vous le fera payer. »";
             d["narration.ny_1_2.n19.after.0"] = "Les otages sont libres et à l'abri. Bien joué, tout le monde.";
             d["narration.ny_1_2.n19.after.1"] = "Mais Crocodile n'oubliera pas : il va vouloir sa revanche.";
-            d["narration.ny_1_3.n18.before.0"] = "« Vous êtes venus. C'est exactement ce que je voulais : toute la Guilde sur mon île. »";
+            d["narration.ny_1_3.n18.before.0"] = "« Vous êtes venus. C'est exactement ce que je voulais : toute l'Aube sur mon île. »";
             d["narration.ny_1_3.n18.before.1"] = "On savait que c'était un piège. Les civils sont à l'abri : on finit ça ici.";
             d["narration.ny_1_3.n18.after.0"] = "« Impossible... Vous... »";
             d["narration.ny_1_3.n18.after.1"] = "Crocodile est à terre. Mais Coney Island est ravagée : la victoire a un prix.";
@@ -35,7 +35,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["narration.ny_1_4.n18.after.0"] = "« Assez ! Stroke, j'ai de quoi révéler vos petites affaires à toute la ville. Voulez-vous que je le fasse ici, devant vos hommes ? »";
             d["narration.ny_1_4.n18.after.1"] = "« ... Repli. Tout le monde. »";
             d["narration.ny_1_4.n18.after.2"] = "« Crocodile sera désigné coupable de tout ceci. Il fera un excellent coupable. »";
-            d["narration.ny_1_4.n18.after.3"] = "« Mais retenez ceci, Rayner : le tour de la Guilde viendra, une fois les Accords de Salem signés. »";
+            d["narration.ny_1_4.n18.after.3"] = "« Mais retenez ceci, Rayner : le tour de l'Aube viendra, une fois les Accords de Salem signés. »";
         }
     }
 }

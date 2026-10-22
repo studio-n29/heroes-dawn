@@ -1,10 +1,10 @@
 # Heroes Dawn — Game Design Document
 
-> Version : 2.4 · Mise à jour : 2026-09-29 · Auteur : Djason (Studio N29)
-> Statut : **v2.0 — prêt pour démarrer la production (M1 Prototype)**. Tous les domaines sont cadrés ; le contenu restant (recrues, kits de compétences, cosmétiques) est listé en §11.
+> Version : 3.0 · Mise à jour : 2026-10-23 · Auteur : Djason (Studio N29) · **Réaligné sur la version 0.10.1 du jeu**
+> Statut : **en production (Early Access visé le 14/11/2026, sortie le 14/12/2026)**. Le canon a changé le 2026-10-22 : l'organisation du joueur est **The Dawn**, le joueur choisit **Agent D ou Agent M**, 30 agents numérotés + 10 cryptides de Salem, 4 actes (New York, Paris, Moscou, Salem). Le roster de 35 recrues de New York et la campagne de Brooklyn en 5 plateaux sont archivés (`02_Lore_Narration/Archive_v1/`).
 
 ## 1. Pitch
-Jeu mobile de gestion-RPG dans l'**Apex Universe**, l'univers partagé de tous les projets de Studio N29 (né de l'œuvre d'origine *Apex Unit*). Le joueur dirige une section de **La Guilde** dans une grande ville, recrute et entraîne des méta-humains — que tout le monde surnomme **« les Apex »**, en référence à l'Apex Unit d'origine — et les engage sur des plateaux de jeu où il affronte combats et mini-jeux.
+Jeu mobile de gestion-RPG dans l'**Apex Universe**, l'univers partagé de tous les projets de Studio N29 (né de l'œuvre d'origine *Apex Unit*). Le joueur dirige un agent de **The Dawn (l'Aube)**, l'organisation qui protège les méta-humains et les civils, recrute et entraîne des méta-humains — que tout le monde surnomme **« les Apex »**, en référence à l'Apex Unit d'origine — et les engage sur des plateaux de jeu où il affronte combats et mini-jeux.
 
 ## 1bis. Vision
 ### Public cible
@@ -13,7 +13,7 @@ Jeu mobile de gestion-RPG dans l'**Apex Universe**, l'univers partagé de tous l
 - **5-10 minutes** par session.
 - Les **zones sont reprenables** : une zone dure 15-30 min au total mais la progression est sauvegardée à chaque case ; une session = quelques lancers de dé, un combat, un passage au QG.
 ### Points forts (USP)
-1. **Plateau + combat** : jeu de plateau (dé, brouillard de guerre, choix de chemins) couplé à un combat ATB en équipe — rare sur mobile.
+1. **Plateau + combat** : jeu de plateau (dé, brouillard de guerre, choix de chemins) couplé à un combat en équipe sur frise (énergie, synergies et liens entre agents) — rare sur mobile.
 2. **Juste, sans pay-to-win** : recrutement au choix, pas de gacha, l'argent ne fait gagner que du temps.
 ### Piliers de design
 Chaque fonctionnalité doit servir au moins un pilier.
@@ -38,20 +38,20 @@ Chaque fonctionnalité doit servir au moins un pilier.
 | Orientation | Paysage |
 | Mode | PvE ; PvP futur envisagé en arène asynchrone |
 | Relation à Apex Unit | Spin-off autonome de l'Apex Universe, pas de cross-progression |
-| Genre | Gestion d'équipe + RPG + jeu de plateau + combat temps actif (ATB) |
+| Genre | Gestion d'équipe + RPG + jeu de plateau + combat sur frise (temps actif, énergie) |
 
-## 2bis. Périmètre de contenu (lancement — New York)
+## 2bis. Périmètre de contenu (réaligné 2026-10-23)
 | Élément | Quantité | Note |
 |---|---|---|
-| Villes | 1 (New York) | 4 autres en live-ops |
-| Plateaux / zones | 5 / 15 | 1 plateau = 1 acte |
+| Personnages joueurs | 2 (Agent D, Agent M) | Le joueur en choisit un à la première connexion ; **Agent M indisponible tant que Moscou n'a pas de zones** |
+| Actes | 4 : New York, Paris, Moscou, Salem | Ordre selon le personnage (D : NY, Paris, Moscou, Salem ; M : Moscou, Paris, NY, Salem) |
+| Zones jouables | 4 (Brooklyn : 1.1 à 1.4) | Paris, Moscou et Salem restent à créer avec l'outil de level design |
 | Cases par zone | ~25 | ~5 combats, 2 mini-jeux, 2 événements par passage |
 | Objectifs par zone | 3 | |
-| Recrues | 35 (20 Agents / 10 Élites / 5 Légendes) | Sortie en **2 vagues** : ~20 au lancement, 15 dans les premières semaines |
-| Types d'ennemis | 13 + 5 boss | 3 par acte (1 pour l'Acte 5) + 5 boss de mini-climax |
+| Agents | 30 numérotés (18 Agents / 8 Élites / 4 Légendes) + 2 personnages joueurs | 10 cryptides de Salem prévus pour l'acte IV |
+| Types d'ennemis | 4 (voyou, gros bras, pyro de rue + boss) pour Brooklyn | Le reste avec les zones suivantes |
 | Mini-jeux | 4 | 1 par format |
-| Événements narratifs | 35 | 30 génériques (pool aléatoire) + 5 scénarisés (1 par acte) |
-| Combos | 7 de famille + duos légendaires | |
+| Synergies | 10 bonus de familles + liens entre agents + 4 effets de composition | Remplace les combos |
 | Pièces du QG | 5 | |
 
 ### Stratégie de production (équipe de 1-2 personnes)
@@ -61,22 +61,14 @@ Chaque fonctionnalité doit servir au moins un pilier.
 - Voir `05_Production/Risques.md`.
 
 ## 3. Univers & contexte
-- Se déroule **après la Supernova de Paris**.
-- Pendant l'**Œuvre 1 — La Guilde** du canon : après le blackout mondial, des milliers de méta-humains naturels apparaissent ; la Guilde, dirigée par **Brie Rayner**, ouvre des sections locales.
-- Les membres de l'**Apex Unit** d'origine (Rayner, Adam West, John Guerin, Erik Bronson) sont des **PNJ** : directrice et mentors. Eda est absent (en Enfer).
-- Lore détaillé : `02_Lore_Narration/` (sources originales dans `Sources/`).
-- Le joueur est chef d'une section de La Guilde dans une ville : **New York, Los Angeles, Paris, Londres, Moscou**.
-- **Campagne New York** : un plateau par arrondissement — 1. Brooklyn, 2. Queens, 3. Bronx, 4. Staten Island, 5. Manhattan.
-  - Menaces : gangs méta-criminels unifiés sous le **Syndicat**, **AMIF / Général Stroke**, culte des **Enfants de la Brèche**.
-  - Antagoniste : **Silas Moreau, « le Héraut »**, chef du culte caché derrière le Syndicat.
-  - Détail : `02_Lore_Narration/Archive_v1/03_New_York.md`.
-- Chaque ville = une campagne avec sa propre histoire.
-- **Structure d'une campagne : 5 plateaux × 3 zones = 15 zones**, débloquées progressivement.
-- **Arc en 5 actes** : chaque plateau = un acte avec son mini-climax ; le 5e plateau conclut l'arc principal de la ville.
-- **Lancement avec New York uniquement** ; les 4 autres villes arrivent en live-ops (une par grosse mise à jour).
-- **Ordre des villes libre** : dès que plusieurs villes sont disponibles, le joueur choisit.
-- **Après une ville** : ville suivante, mode difficile, endgame farm (expéditions + objectifs secondaires), équipe **transférable** entre villes.
-- Les villes sont un **skin narratif** : mécaniques identiques, mais **membres recrutables différents** par ville.
+- Se déroule **cinq ans après la Supernova de Paris**. Tous les méta-humains ont subi une modification génétique cette nuit-là ; leur pouvoir est resté latent et ne s'est activé que lors d'un choc psychologique brutal. Dans le monde, on les appelle **« les Apex »**.
+- **The Dawn (l'Aube)**, fondée par **Brie Rayner**, aide les méta-humains et les civils ; symbole : étoile dorée à quatre branches. Les membres de l'**Apex Unit** d'origine (Adam West, John Guerin, Erik Bronson) sont des **mentors PNJ**.
+- **Forces en présence** : l'**AMIF** (étudie et prélève les capacités et les résidus de la Supernova), les **gangs de New York**, les **cultes de Mephisto et d'Eda** à Paris, les **oligarques et la mafia de Moscou**, les **Accords de Salem** (traité visant à contrôler les méta-humains).
+- **Le joueur choisit Agent D** (illustrateur de Harlem : ce qu'il imagine devient réel) **ou Agent M** (restauratrice de fresques à Moscou : elle voit le passé, le présent et le futur). Ce choix fixe l'ordre des quatre actes ; Salem conclut toujours le parcours.
+- **Actes** : I New York (ou Moscou), II Paris, III Moscou (ou New York), IV Salem (complexe N29 où Rayner soigne les expériences ratées des années 80).
+- **Structure d'un acte** : une ville, plusieurs zones débloquées progressivement ; chaque zone se valide en remplissant 3 objectifs.
+- **Après le dénouement** : mode difficile et endgame (expéditions + objectifs secondaires).
+- Lore détaillé : `02_Lore_Narration/` (`03_Histoire_et_Actes.md`, `04_Agents_The_Dawn.md`, `05_Cinematique_Lancement.md`) ; sources originales dans `Sources/`.
 
 ## 4. Boucle de jeu
 1. Explorer le plateau d'une zone (dé → déplacement → cases).
@@ -120,43 +112,36 @@ Chaque fonctionnalité doit servir au moins un pilier.
 - **3 objectifs** par zone ; un objectif rempli **reste rempli** même si le brouillard se referme. Validation (1re fois) : 1 500 Crédits, 40 PR, 150 XP de pass. Détail : `01_Game_Design/01_Plateau.md`.
 
 ## 6. Combat
-- Système **temps actif (ATB)** : chaque unité a une jauge qui se remplit en temps réel selon sa Vitesse ; le combat ne s'arrête pas pendant que le joueur choisit.
-- Inspiration : Summoners War (compétences, auto/manuel), mais sans pause entre les tours.
-- **Équipe de 4 méta-humains** (jusqu'à 6 paires possibles dans l'équipe).
-- IA ennemie choisit ses actions selon la difficulté.
-- Joueur en **mode auto ou manuel**.
+- Combat sur une **frise** de 10 points : chaque unité avance d'un point à chaque pas (0,35 s) ; à 10, c'est son tour, et pour un allié la frise se fige le temps qu'il choisisse (30 s). Les actions ennemies sont **annoncées** dans la zone de préparation et peuvent être **parées** ou **interrompues**.
+- **Énergie** : chaque compétence coûte de l'énergie (A1 gratuite, A2 : 30), qui se régénère à chaque pas ; plus de recharge par tour.
+- **Pause de résolution** (1,3 s) après chaque compétence, avec une **animation par famille** (feu, givre, foudre, acide, chaînes, marque, soin, bouclier, hâte, temps, impact).
+- **Équipe de 4 méta-humains**, deux camps face à face en 2×2 autour d'un terrain central, frise en haut, éventail de compétences en bas.
+- **Synergie d'équipe** : bonus passif de familles, liens entre agents (niveaux 1 à 5), effets de composition (Quatuor, Trinité, Double front, Étincelle).
+- IA ennemie selon la difficulté ; joueur en **mode auto ou manuel**.
 ### Défaite
 - L'équipe **recule sur la case précédente** et **gagne de la fatigue** ; le joueur peut réessayer ou contourner.
 - Si **toute l'équipe est à 100 % de fatigue**, retour **instantané au QG**.
 ### Fatigue en combat
-- Chaque combat **coûte de la fatigue**. À 100 %, le membre ne peut plus combattre.
-- **Malus de stats** progressif au-delà d'un seuil de fatigue.
-- Valeurs : jauge 1 000 pts remplie à VIT × 4 par seconde ; +12 % de fatigue par combat, +15 % en défaite ; malus au-delà de 60 %, jusqu'à −30 % à 100 %. Récompenses : 200 / 300 / 500 Crédits (Facile / Normal / Élite), 1 000 pour un boss.
-- Formules, IA, bestiaire (13 ennemis + 5 boss) : `01_Game_Design/02_Combat.md`.
+- Chaque combat **coûte de la fatigue**. À 100 %, le membre ne peut plus combattre ; **malus de stats** progressif au-delà de 60 %.
+- Valeurs : +12 % de fatigue par combat, +15 % en défaite ; malus jusqu'à −30 % à 100 %. Récompenses : 200 / 300 / 500 Crédits (Facile / Normal / Élite), 1 000 pour un boss.
+- Règles complètes, formules, IA, bestiaire : `01_Game_Design/02_Combat.md`.
 
 ## 7. Équipe : méta-humains
 ### Compétences
-- Chaque membre : **3 compétences actives + 1 passive**.
+- Chaque agent : **2 compétences de base** propres à lui (A1 légère et gratuite, A2 spéciale payante) ; la **3e place** du combat est une **carte du grimoire**. Détail : `01_Game_Design/06_Kits_Competences.md`.
 - Rattaché à une **famille de pouvoirs** (voir Synergies).
 ### Synergies
-- Combos **prédéfinis** (non émergents).
-- **Familles d'archétypes** (alignées sur le lore, voir `02_Lore_Narration/02_Profils_Pouvoirs.md`) :
-  1. **Matière** (matérialisation, polymorphie, transmutation — contrôle, création)
-  2. **Élémentaire** (électricité, corrosif/incendiaire, thermique — dégâts, altérations)
-  3. **Physique / Bio** (force, résistance, régénération, adaptation — tank, soin)
-  4. **Perception** (bullet-time, écholocation, camouflage, magnétoréception — précision, esquive, détection)
-- **Combos de famille** : chaque paire de familles a son combo (6 inter-familles + *Résonance* pour une même famille). Détail : `01_Game_Design/03_Metahumains.md`.
-- **Duos légendaires** : quelques paires de personnages ont un combo unique (plus fort, animation dédiée) qui **remplace** le combo de famille.
-- **Déclenchement** : compétence commune — quand les jauges ATB des deux membres sont pleines, un bouton Combo apparaît ; les deux consomment leur tour.
-- Duos de New York : **Verre + Givre** (Tempête de cristal), **Écho + Instant** (Œil absolu) — voir `02_Lore_Narration/Archive_v1/04_Recrues_New_York.md`.
-- Effets chiffrés des combos : `01_Game_Design/03_Metahumains.md`.
+- **Familles** (alignées sur le lore, voir `02_Lore_Narration/02_Profils_Pouvoirs.md`) : **Matière** (ambre), **Élémentaire** (cyan), **Physique / Bio** (rouge), **Perception** (violet).
+- **Bonus passif** : chaque paire de familles dans l'escouade donne à toute l'équipe un bonus permanent de statistique (plafond 30 %).
+- **Liens** : les victoires remportées ensemble font monter le niveau de lien de deux agents ; chaque niveau amplifie de 25 % le bonus passif de leurs familles.
+- **Effets de composition** : Quatuor (4 familles), Trinité (tank, dégâts, soutien), Double front (2 tanks), Étincelle (2 contrôles).
+- Détail chiffré : `01_Game_Design/02_Combat.md` et `01_Game_Design/03_Metahumains.md`.
 ### Recrutement
-- Via **Points de Recherche (PR)** obtenus : en campagne, en boutique ($), via expéditions secondaires, pass.
-- **Pool quotidienne** propre à chaque ville ; **choix direct** à coût fixe en PR (pas de gacha).
-- Renouvellement : 1 gratuit/jour, puis Crédits, puis premium.
-- Pas de doublons ; pool épuisée = collection de la ville terminée.
-- **Légendes liées à l'histoire** : une par acte, elle entre dans la pool après le mini-climax.
-- **3 rangs de rareté** : Agent / Élite / Légende — coût en PR et puissance croissants. Les Légendes sont les méta-humains naturels les plus puissants ; les membres de l'Apex Unit ne sont pas recrutables (PNJ).
+- **Équipe de départ** : le personnage joueur + 3 compagnons.
+- Via **Points de Recherche (PR)** : **boutique éphémère** (3 agents par jour à 9 h, coût fixe en PR : 150 / 450 / 1 200 ; pas de gacha sur les agents), **arcs narratifs** (4 agents), **événements de week-end** (4) et **prouesses** (4).
+- Renouvellement de la boutique : 1 gratuit/jour, puis Crédits, puis premium. Pas de doublons.
+- **3 rangs de rareté** : Agent / Élite / Légende — coût en PR et puissance croissants. Les membres de l'Apex Unit ne sont pas recrutables (PNJ).
+
 ### Entraînement & progression
 - Entraînement **automatique au salon** grâce aux objets placés.
 - Niveaux → **paliers de compétences** (effets additionnels), validés en Crédits.
@@ -198,7 +183,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 - **Style comics moderne** ; couleur + icône par famille (Matière ambre, Élémentaire cyan, Physique/Bio rouge, Perception violet).
 - **Hub** : le QG en vue en coupe. **Plateau** : carte illustrée vue de dessus.
 - **Onboarding** : prologue jouable (~5 min), systèmes débloqués pendant l'Acte 1.
-- **Combat** : 4 portraits en bas, compétences au toucher, boutons Combo et Auto. PC : souris + raccourcis clavier.
+- **Combat** : frise pleine largeur en haut, deux camps en 2×2 autour d'un terrain central (portrait, PV, énergie), 3 cartes de compétence en éventail en bas (coût en énergie), boutons Auto, vitesse et Retraite. PC : souris + raccourcis clavier.
 - **Audio** : thème par arrondissement, doublage partiel des répliques de combat, banques sous licence.
 - Détail : `03_Art_UI_UX/01_UX_Ecrans.md`, `03_Art_UI_UX/03_Maquettes_Screen_Flow.md` (wireframes, maquettes, screen flow), `03_Art_UI_UX/02_Direction_Artistique_Audio.md`.
 
@@ -216,19 +201,18 @@ Chaque fonctionnalité doit servir au moins un pilier.
 ## 11. Questions ouvertes
 - [x] Types de cases et récompenses
 - [x] Combat : règles, formules, IA, récompenses, bestiaire
-- [x] Combos de famille + déclenchement ✔ ; duos légendaires à lister
+- [x] Synergies : bonus passif, liens entre agents, effets de composition ✔ (remplacent les combos)
 - [x] Expéditions et objectifs secondaires : durées, récompenses, plafonds
 - [x] Économie : valeurs de départ, packs, pass, missions, consommables
-- [x] Campagne : 5×3 zones, arc en 5 actes, ordre libre, post-ville ✔
+- [x] Campagne : 4 actes (New York, Paris, Moscou, Salem), ordre selon Agent D ou Agent M ✔ ; **zones de Paris, Moscou et Salem à créer**
 - [x] Orientation écran : paysage
 - [x] PvP futur : arène asynchrone (équipe défensive IA) — hors lancement
-- [x] Duos légendaires de New York (2)
 - [x] Cosmétiques : types, sources, volumes, prix indicatifs
-- [x] 10 Élites + 20 Agents de New York (fiches v1)
-- [x] Kits de compétences des 35 recrues (v1, à équilibrer)
+- [x] 30 agents numérotés + 2 personnages joueurs + 10 cryptides (fiches de lore) ✔ ; **portraits à produire**
+- [x] Kits : 2 compétences de base uniques par agent (noms et statuts), énergie ✔ ; **effets sur mesure par agent et cartes du grimoire à compléter**
 - [x] Lieutenants des Actes 2 à 4 ; mentors de l'Apex Unit par acte
 - [ ] **Calage en playtest** des valeurs de départ (`01_Game_Design/05_Equilibrage.xlsx`) — à faire pendant le prototype et l'alpha
-- [ ] **Recommandations ⚑ à confirmer en prototype** : dé 1d6 et 6 PM par dé bonus ; jauges qui continuent pendant le choix en manuel ; plafond de niveau par acte
+- [ ] **Recommandations ⚑ à confirmer en playtest** : énergie (départ 30, régénération 3), pause de résolution 1,3 s, paliers des liens (3, 8, 15, 25 victoires), plafond de niveau par acte, déséquilibre des familles (Perception 9, Élémentaire 6)
 
 ## 12. Index des specs détaillées
 | Système | Fichier |
@@ -239,9 +223,9 @@ Chaque fonctionnalité doit servir au moins un pilier.
 | Économie | `01_Game_Design/04_Economie.md` |
 | QG & expéditions | `01_Game_Design/07_QG_Expeditions.md` |
 | Mini-jeux | `01_Game_Design/08_Mini_Jeux.md` |
-| Événements NY | `02_Lore_Narration/Archive_v1/05_Evenements_New_York.md` |
+| Histoire, agents, cinématique | `02_Lore_Narration/03_Histoire_et_Actes.md`, `04_Agents_The_Dawn.md`, `05_Cinematique_Lancement.md` |
 | Équilibrage (tableur) | `01_Game_Design/05_Equilibrage.xlsx` |
-| Lore & New York | `02_Lore_Narration/` |
+| Lore | `02_Lore_Narration/` |
 | UX & écrans | `03_Art_UI_UX/01_UX_Ecrans.md` |
 | Maquettes & screen flow | `03_Art_UI_UX/03_Maquettes_Screen_Flow.md` |
 | DA & audio | `03_Art_UI_UX/02_Direction_Artistique_Audio.md` |

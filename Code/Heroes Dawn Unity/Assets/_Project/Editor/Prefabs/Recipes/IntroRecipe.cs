@@ -116,7 +116,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var blackout = Ui.Img(cinematic, "Blackout", Color.black, null, false);
             blackout.rectTransform.Stretch();
 
-            // ---- Pseudo : dialogue avec l'accueil de la Guilde
+            // ---- Pseudo : dialogue avec l'accueil de l'Aube
             var pseudoStage = Ui.Rect(root, "Pseudo");
             pseudoStage.Stretch();
             var pseudoBg = Ui.Img(pseudoStage, "Bg", Theme.SkyTop, Sprites.VerticalGradient);

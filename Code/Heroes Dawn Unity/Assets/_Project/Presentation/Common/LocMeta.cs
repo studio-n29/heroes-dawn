@@ -156,11 +156,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["archives.lore.fracture.title"] = "La Fracture";
             d["archives.lore.fracture.body"] = "Après la Supernova de Paris, le monde a connu un blackout. Les radiations ont éveillé des milliers de méta-humains naturels. New York, fragile, est devenue l'une des villes les plus touchées : les gangs, l'AMIF et les civils pris entre deux feux s'y disputent la nuit.";
             d["archives.lore.section.title"] = "La section New York";
-            d["archives.lore.section.body"] = "La Guilde ouvre des sections locales dans les grandes villes. Celle de New York s'installe à Red Hook, dans un entrepôt reconverti. Tu la diriges : recrute, entraîne, soigne, et envoie tes escouades sur le terrain.";
+            d["archives.lore.section.body"] = "L'Aube ouvre des sections locales dans les grandes villes. Celle de New York s'installe à Red Hook, dans un entrepôt reconverti. Tu la diriges : recrute, entraîne, soigne, et envoie tes escouades sur le terrain.";
             d["archives.lore.rayner.title"] = "Brie Rayner";
-            d["archives.lore.rayner.body"] = "Directrice stratégique et scientifique de la Guilde. Hyper-intelligente et électro-kinésiste, elle suit chaque section à distance et te fait parvenir ses ordres par le fil du QG.";
+            d["archives.lore.rayner.body"] = "Directrice stratégique et scientifique de l'Aube. Hyper-intelligente et électro-kinésiste, elle suit chaque section à distance et te fait parvenir ses ordres par le fil du QG.";
             d["archives.lore.apex.title"] = "Les Apex";
-            d["archives.lore.apex.body"] = "Les premiers méta-humains, créés dans les années 80 par le protocole Khost, ont fondé la Guilde. Adam West entraîne ta première équipe à Red Hook. Les Légendes que tu recrutes sont, elles, des méta-humains naturels.";
+            d["archives.lore.apex.body"] = "Les premiers méta-humains, créés dans les années 80 par le protocole Khost, ont fondé l'Aube. Adam West entraîne ta première équipe à Red Hook. Les Légendes que tu recrutes sont, elles, des méta-humains naturels.";
             d["archives.hero.ancre"] = "ANCRE tient la ligne. Né au pied d'une grue de Red Hook, il a retenu un conteneur en chute avec ses seules mains pendant la Supernova. Depuis, rien ne le déplace.";
             d["archives.hero.verre"] = "VERRE plie le verre et la matière transparente. Elle a emprisonné trois pillards dans une cage de vitrine, puis a demandé poliment qu'on la laisse tranquille.";
             d["archives.hero.givre"] = "GIVRE fige l'air autour d'elle. Ses morsures de froid ralentissent tout ce qu'elle touche, y compris ses propres pensées quand elle est fatiguée.";
@@ -172,7 +172,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["archives.zone.zone_ny_1_1"] = "Red Hook, les quais : l'AMIF faisait transiter des méta-humains kidnappés par le port. Le courant est coupé, les documents de transport sont en poche et l'échange a été stoppé : vous avez découvert le traitement des méta-humains et leur vente aux mafieux, et vous préparez un plan d'intervention.";
             d["archives.zone.zone_ny_1_2"] = "Brownsville : l'AMIF vendait ses prisonniers à Antonio Kribelchi, dit « Crocodile », mafieux méta-humain. Les otages sont libérés, mais Crocodile est plus que remonté : il compte bien vous le faire payer.";
             d["archives.zone.zone_ny_1_3"] = "Coney Island : Crocodile avait tendu un piège en prenant l'île en otage. Il est vaincu, mais Coney Island a été ravagée dans les affrontements.";
-            d["archives.zone.zone_ny_1_4"] = "Dumbo et le pont de Brooklyn : l'AMIF avait quadrillé Brooklyn. Rayner a stoppé l'affrontement en menaçant Stroke de révéler ses petites affaires. Le Général arrête Crocodile, désigné coupable, mais prévient que le tour de la Guilde viendra une fois les Accords de Salem signés.";
+            d["archives.zone.zone_ny_1_4"] = "Dumbo et le pont de Brooklyn : l'AMIF avait quadrillé Brooklyn. Rayner a stoppé l'affrontement en menaçant Stroke de révéler ses petites affaires. Le Général arrête Crocodile, désigné coupable, mais prévient que le tour de l'Aube viendra une fois les Accords de Salem signés.";
             d["archives.enemy.thug"] = "Voyou : le fantassin des gangs. Poings, barres de fer et beaucoup de bruit. Dangereux en nombre.";
             d["archives.enemy.brute"] = "Cogneur : lent mais solide, il provoque ses adversaires et encaisse. Il faut passer à travers sa garde.";
             d["archives.enemy.street_pyro"] = "Pyro de rue : cocktails et jets de flammes. Ses brûlures rongent l'équipe si on le laisse faire.";

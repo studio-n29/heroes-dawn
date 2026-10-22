@@ -397,7 +397,7 @@
 
 ![T01](Maquettes/tutoriel/T01-bienvenue.png)
 
-1. Pas de projecteur à la première étape : tout l'écran est voilé, on présente le guide. Rayner (directrice de la Guilde) parle en médaillon, dans une bulle de BD.
+1. Pas de projecteur à la première étape : tout l'écran est voilé, on présente le guide. Rayner (fondatrice de The Dawn) parle en médaillon, dans une bulle de BD.
 2. Récitatif jaune = titre de l'étape ; 2 lignes de texte au maximum, en Comic Neue.
 3. Progression discrète (« 1 / 9 ») : le joueur sait que c'est court.
 4. « Passer le tutoriel » toujours présent mais discret ; il demande une confirmation (T12).

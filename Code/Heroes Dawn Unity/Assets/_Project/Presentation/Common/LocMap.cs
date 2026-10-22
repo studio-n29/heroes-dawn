@@ -40,7 +40,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["zones.ny_1_2.desc"] = "La situation est plus critique que prévu : l'AMIF traite avec Antonio Kribelchi, dit « Crocodile », un mafieux méta-humain qui trafique des méta-humains. L'AMIF les arrête pour les lui vendre et financer son armement. Votre équipe s'introduit à Brownsville pour libérer les otages.";
             d["zones.ny_1_3.name"] = "CONEY ISLAND — LE PIÈGE";
             d["zones.ny_1_3.short"] = "Coney Island";
-            d["zones.ny_1_3.desc"] = "Après Brownsville, Crocodile et ses hommes défient la Guilde : ils ont pris Coney Island en otage pour attirer votre équipe. C'est un piège, mais il faut sauver les innocents.";
+            d["zones.ny_1_3.desc"] = "Après Brownsville, Crocodile et ses hommes défient l'Aube : ils ont pris Coney Island en otage pour attirer votre équipe. C'est un piège, mais il faut sauver les innocents.";
             d["zones.ny_1_4.name"] = "DUMBO ET LE PONT DE BROOKLYN";
             d["zones.ny_1_4.short"] = "Dumbo";
             d["zones.ny_1_4.code"] = "Zone 1.4";

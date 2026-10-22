@@ -31,7 +31,7 @@ Planche de références (à constituer dans `03_Art_UI_UX/Production/Style/`) : 
 ## 3. Ce qu'il faut produire (volumes réels du jeu à la 0.9.0)
 | Catégorie | Quantité | Remarque |
 |---|---|---|
-| Portraits d'agents | 30 | Données dans `Resources/Content/agents.json` ; liste ligne à ligne dans `Prompts/prompts_illustrations.csv` |
+| Portraits d agents | 32 (30 numérotés + Agent D et Agent M) | Données dans `Resources/Content/agents.json` ; liste ligne à ligne dans `Prompts/prompts_illustrations.csv` |
 | Icônes de compétences | 90 (porte EA : 20 génériques) | 3 par agent ; génériques = 5 catégories × 4 familles |
 | Icônes de statuts | 14 | Brûlure, gel, choc, corrosion, aveuglement, vulnérable, entrave, marque, provocation, bouclier, régénération, hâte, esquive, ancrage |
 | Icônes d'objets | 10 | Liste dans le CSV |
