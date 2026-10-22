@@ -12,6 +12,9 @@ namespace N29.HeroesDawn.EditorTools.Build
         public const string CompanyName = "Studio N29";
         public const string AndroidIdentifier = "com.studion29.heroesdawn";
         public const string IconPath = "Assets/_Project/Art/UI/HD_Logo.png";
+        /// <summary>Icône adaptative Android : fond uni (couleur du bord de l icône) et icône à 64 % au centre (zone sûre).</summary>
+        public const string IconBackgroundPath = "Assets/_Project/Art/UI/HD_Icon_Background.png";
+        public const string IconForegroundPath = "Assets/_Project/Art/UI/HD_Icon_Foreground.png";
 
         [MenuItem("Heroes Dawn/Build/Appliquer le nom et le logo du jeu")]
         public static void Apply()
@@ -24,6 +27,7 @@ namespace N29.HeroesDawn.EditorTools.Build
             var logo = AssetDatabase.LoadAssetAtPath<Texture2D>(IconPath);
             if (logo == null) throw new System.InvalidOperationException("Logo introuvable : " + IconPath + " (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface)");
             PlayerSettings.SetIcons(NamedBuildTarget.Unknown, new[] { logo }, IconKind.Any);
+            ApplyAndroidIcons(logo);
 
             // Tous les écrans sont conçus en paysage 16:9.
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.AutoRotation;
@@ -32,6 +36,28 @@ namespace N29.HeroesDawn.EditorTools.Build
             PlayerSettings.allowedAutorotateToPortrait = false;
             PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
             AssetDatabase.SaveAssets();
+        }
+
+        /// <summary>
+        /// Sans réglage par plateforme, Android affiche l'icône Unity : on renseigne tous les emplacements
+        /// (adaptative avec fond et premier plan, ronde, classique).
+        /// </summary>
+        public static void ApplyAndroidIcons(Texture2D logo)
+        {
+            var background = AssetDatabase.LoadAssetAtPath<Texture2D>(IconBackgroundPath);
+            var foreground = AssetDatabase.LoadAssetAtPath<Texture2D>(IconForegroundPath);
+            if (background == null || foreground == null)
+                throw new System.InvalidOperationException("Icône adaptative introuvable : " + IconBackgroundPath + " / " + IconForegroundPath);
+            foreach (var kind in PlayerSettings.GetSupportedIconKinds(NamedBuildTarget.Android))
+            {
+                var icons = PlayerSettings.GetPlatformIcons(NamedBuildTarget.Android, kind);
+                foreach (var icon in icons)
+                {
+                    if (icon.maxLayerCount > 1) { icon.SetTexture(background, 0); icon.SetTexture(foreground, 1); }
+                    else icon.SetTexture(logo, 0);
+                }
+                PlayerSettings.SetPlatformIcons(NamedBuildTarget.Android, kind, icons);
+            }
         }
     }
 }
