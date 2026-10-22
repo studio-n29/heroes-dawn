@@ -69,7 +69,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 - **Campagne New York** : un plateau par arrondissement — 1. Brooklyn, 2. Queens, 3. Bronx, 4. Staten Island, 5. Manhattan.
   - Menaces : gangs méta-criminels unifiés sous le **Syndicat**, **AMIF / Général Stroke**, culte des **Enfants de la Brèche**.
   - Antagoniste : **Silas Moreau, « le Héraut »**, chef du culte caché derrière le Syndicat.
-  - Détail : `02_Lore_Narration/03_New_York.md`.
+  - Détail : `02_Lore_Narration/Archive_v1/03_New_York.md`.
 - Chaque ville = une campagne avec sa propre histoire.
 - **Structure d'une campagne : 5 plateaux × 3 zones = 15 zones**, débloquées progressivement.
 - **Arc en 5 actes** : chaque plateau = un acte avec son mini-climax ; le 5e plateau conclut l'arc principal de la ville.
@@ -148,7 +148,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 - **Combos de famille** : chaque paire de familles a son combo (6 inter-familles + *Résonance* pour une même famille). Détail : `01_Game_Design/03_Metahumains.md`.
 - **Duos légendaires** : quelques paires de personnages ont un combo unique (plus fort, animation dédiée) qui **remplace** le combo de famille.
 - **Déclenchement** : compétence commune — quand les jauges ATB des deux membres sont pleines, un bouton Combo apparaît ; les deux consomment leur tour.
-- Duos de New York : **Verre + Givre** (Tempête de cristal), **Écho + Instant** (Œil absolu) — voir `02_Lore_Narration/04_Recrues_New_York.md`.
+- Duos de New York : **Verre + Givre** (Tempête de cristal), **Écho + Instant** (Œil absolu) — voir `02_Lore_Narration/Archive_v1/04_Recrues_New_York.md`.
 - Effets chiffrés des combos : `01_Game_Design/03_Metahumains.md`.
 ### Recrutement
 - Via **Points de Recherche (PR)** obtenus : en campagne, en boutique ($), via expéditions secondaires, pass.
@@ -239,7 +239,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 | Économie | `01_Game_Design/04_Economie.md` |
 | QG & expéditions | `01_Game_Design/07_QG_Expeditions.md` |
 | Mini-jeux | `01_Game_Design/08_Mini_Jeux.md` |
-| Événements NY | `02_Lore_Narration/05_Evenements_New_York.md` |
+| Événements NY | `02_Lore_Narration/Archive_v1/05_Evenements_New_York.md` |
 | Équilibrage (tableur) | `01_Game_Design/05_Equilibrage.xlsx` |
 | Lore & New York | `02_Lore_Narration/` |
 | UX & écrans | `03_Art_UI_UX/01_UX_Ecrans.md` |

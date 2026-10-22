@@ -2,7 +2,7 @@
 
 > Résumé dans le GDD : `00_GDD/GDD_Heroes_Dawn.md` §7 · Statut : **v1 complète**
 > ⚑ = recommandation qui touche le feeling, à confirmer en prototype.
-> Kits : `06_Kits_Competences.md` · Roster NY : `02_Lore_Narration/04_Recrues_New_York.md` · Stats : tableur, onglet Stats
+> Kits : `06_Kits_Competences.md` · Roster NY : `02_Lore_Narration/Archive_v1/04_Recrues_New_York.md` · Stats : tableur, onglet Stats
 
 ## Objectif du système
 Donner au joueur une collection qu'il **choisit** (pas de hasard) et des équipes dont la force vient des **synergies** entre familles, pour porter les piliers « Mon équipe, mes choix » et « Vivre l'Apex Universe ».

@@ -35,7 +35,7 @@ Porter le pilier **« Chaque lancer compte »** : à chaque lancer, le joueur a 
 |---|---|---|---|---|
 | Combat | En passant | **Oui** | Combat de rang Facile / Normal / Élite | 6 (dont 1-2 Élite) |
 | Mini-jeu | Si on s'y arrête | Non | Un des 4 mini-jeux ; peut être ignoré (pas de récompense) | 3 |
-| Événement narratif | Si on s'y arrête | Non | Situation + 2-3 choix (voir `02_Lore_Narration/05_Evenements_New_York.md`) | 3 |
+| Événement narratif | Si on s'y arrête | Non | Situation + 2-3 choix (voir `02_Lore_Narration/Archive_v1/05_Evenements_New_York.md`) | 3 |
 | Ressource / Coffre | **En passant** | Non | Gain immédiat (voir Récompenses) | 6 |
 | Repos / Soin | Si on s'y arrête | Non | −30 % de fatigue à toute l'équipe ; une fois par ouverture de zone | 2 |
 | Carrefour / vide | — | Non | Aucun | 4 |
@@ -48,7 +48,7 @@ Ramasser les ressources en passant récompense les longs déplacements et rend l
 - Règle de composition : au moins **1 combat clé** par zone ; la **3e zone de chaque acte** contient le **mini-climax** (événement scénarisé + boss).
 - **Persistance** : un objectif rempli reste rempli, même si le brouillard se referme. Les cases objectif sont fixes.
 - **Validation** : quand les 3 objectifs sont remplis → écran de fin de zone, récompenses de validation, zone suivante débloquée, version **difficile** de la zone débloquée.
-- La liste des 15 zones de New York et de leurs objectifs est dans `02_Lore_Narration/03_New_York.md`.
+- La liste des 15 zones de New York et de leurs objectifs est dans `02_Lore_Narration/Archive_v1/03_New_York.md`.
 
 ## Récompenses (valeurs du tableur, joueur à 1 zone/jour)
 | Source | Crédits | PR | Autre |
