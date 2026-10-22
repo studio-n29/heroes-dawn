@@ -8,6 +8,7 @@ using N29.HeroesDawn.Content.Prototype;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Board;
+using N29.HeroesDawn.Domain.Combat;
 using N29.HeroesDawn.Domain.Shop;
 using NUnit.Framework;
 
@@ -43,17 +44,48 @@ namespace N29.HeroesDawn.Tests.Domain
             return run;
         }
 
-        [Test, Description("Vérifie que la première ville compte 30 agents aux identifiants uniques, avec trois compétences chacun, au moins quatre agents par famille et tous les rôles — parce que c'est l'objectif de la roster")]
+        [Test, Description("Vérifie que la première ville compte 30 agents aux identifiants uniques, avec deux compétences de base chacun, au moins quatre agents par famille et tous les rôles — parce que c'est l'objectif de la roster")]
         public void Roster_HasThirtyDistinctAgents_WithAFairSpread()
         {
             Assert.That(C.Members.Count, Is.EqualTo(32), "30 agents numérotés + Agent D + Agent M");
             Assert.That(C.Members.Select(m => m.Id.Value).Distinct().Count(), Is.EqualTo(32));
-            Assert.That(C.Members.All(m => m.Skills.Count == 3), Is.True);
+            Assert.That(C.Members.All(m => m.Skills.Count == 2), Is.True, "deux compétences de base par agent");
             foreach (Family f in Enum.GetValues(typeof(Family))) Assert.That(C.Members.Count(m => m.Family == f), Is.GreaterThanOrEqualTo(4), f.ToString());
             foreach (Role r in Enum.GetValues(typeof(Role))) Assert.That(C.Members.Any(m => m.Role == r), Is.True, r.ToString());
             Assert.That(C.Members.Count(m => m.Rarity == Rarity.Legend && m.Unlock?.Kind != UnlockKind.Hero), Is.EqualTo(4));
             Assert.That(C.Members.Count(m => m.Rarity == Rarity.Elite), Is.EqualTo(8));
             Assert.That(PrototypeAgents.StarterTeam.All(id => C.StarterTeam.Contains(id)), Is.True, "équipe de départ portée par le catalogue");
+        }
+
+        [Test, Description("Vérifie que chaque agent a deux compétences de base : la 1re légère et gratuite, la 2e spéciale qui coûte de l énergie — parce que la 3e place de l éventail est réservée aux cartes du grimoire")]
+        public void EveryAgent_HasTwoSkills_FreeThenCostly()
+        {
+            foreach (var m in C.Members)
+            {
+                Assert.That(m.Skills[0].Slot, Is.EqualTo(SkillSlot.A1), m.Id.Value);
+                Assert.That(m.Skills[1].Slot, Is.EqualTo(SkillSlot.A2), m.Id.Value);
+                Assert.That(m.Skills[0].Cost, Is.EqualTo(0), m.Id.Value);
+                Assert.That(m.Skills[1].Cost, Is.GreaterThanOrEqualTo(30), m.Id.Value);
+            }
+        }
+
+        [Test, Description("Vérifie que les compétences propres aux agents ne sont pas toutes identiques : au moins dix combinaisons d effets différentes sur les deux compétences — parce que chaque agent doit avoir un style propre")]
+        public void Kits_AreNotAllTheSame()
+        {
+            string Sig(MemberDef m) => string.Join("|", m.Skills.Select(s => s.Target + ":" + string.Join(",", s.Effects.Select(e => e.Type + "/" + e.Status))));
+            Assert.That(C.Members.Select(Sig).Distinct().Count(), Is.GreaterThanOrEqualTo(10));
+        }
+
+        [Test, Description("Vérifie qu une carte du grimoire équipée prend la 3e place d un agent à deux compétences, et une seconde carte la 4e — parce que l éventail de trois cartes se complète avec le grimoire")]
+        public void Cards_FillTheThirdAndFourthSlots()
+        {
+            AllyEntry Ally(params string[] cards) => new AllyEntry(new MemberId("darius_brooks"), 5, 0, 0, null, cards.Select(c => (CardId?)new CardId(c)).ToArray());
+            CombatUnit Unit(AllyEntry a) => new CombatSimulation(C, new CombatSetup(3UL, CombatRank.Normal, new[] { a }, new[] { new EnemyEntry(new EnemyId("thug"), 5) }, false)).Unit(0);
+            Assert.That(Unit(Ally()).Skills.Count, Is.EqualTo(2));
+            Assert.That(Unit(Ally("card_glass_wall")).Skills.Count, Is.EqualTo(3));
+            var two = Unit(Ally("card_glass_wall", "card_shackle"));
+            Assert.That(two.Skills.Count, Is.EqualTo(4));
+            Assert.That(two.Skills[2].Id.Value, Is.EqualTo("card_glass_wall"));
         }
 
         [Test, Description("Vérifie la répartition des sources : 4 agents d'arc, 4 d'événement, 4 de prouesse et le reste en boutique — parce que les quatre voies d'obtention doivent toutes exister")]

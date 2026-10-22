@@ -52,7 +52,7 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         /// <summary>
-        /// Compétences de l'agent : les siennes (1, 2, 3) ; une carte équipée remplace la 3e (carte 1) ou s'ajoute en 4e (carte 2).
+        /// Compétences de l agent : ses deux compétences de base ; une carte équipée prend la 3e place (carte 1) puis la 4e (carte 2).
         /// Une carte d'une autre catégorie, absente du jeu ou une carte 2 sans carte 1 est ignorée.
         /// </summary>
         static IReadOnlyList<SkillDef> SkillsWithCards(MemberDef d, AllyEntry e, CollectionDef? collection)
@@ -66,7 +66,8 @@ namespace N29.HeroesDawn.Domain.Combat
             }
             var list = new List<SkillDef>(d.Skills);
             var third = Pick(0);
-            if (third != null && list.Count >= 3) list[2] = third;
+            if (third != null && list.Count == 2) list.Add(third);          // deux compétences de base : la carte 1 prend la 3e place
+            else if (third != null && list.Count >= 3) list[2] = third;     // ancien kit de trois compétences : la carte remplace la 3e
             var fourth = Pick(1);
             if (fourth != null && list.Count >= 3) list.Add(fourth);
             return list;

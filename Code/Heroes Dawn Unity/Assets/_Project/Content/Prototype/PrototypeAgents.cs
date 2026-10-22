@@ -86,60 +86,89 @@ namespace N29.HeroesDawn.Content.Prototype
         static SkillDef S(string id, SkillSlot slot, int cd, TargetRule t, params EffectDef[] fx)
             => new SkillDef(new SkillId(id), slot, cd, t, fx);
 
-        /// <summary>Statut signature de la famille, ajouté à la première compétence offensive.</summary>
-        static EffectDef Signature(Family f)
+        /// <summary>
+        /// Statut propre à chaque agent, ajouté à ses deux compétences de base (premier : compétence 1, second : compétence 2). Les noms sont dans
+        /// <c>LocDawnAgents</c>. Compétence 1 et, selon le rôle, compétence 2 visent l'ennemi (Brûlure, Gel, Choc, Corrosion, Vulnérable, Entrave,
+        /// Marque) ou l'allié (Régénération, Hâte, Bouclier, Esquive, Ancrage).
+        /// </summary>
+        static readonly Dictionary<string, (StatusType First, StatusType Second)> Flavors = new Dictionary<string, (StatusType, StatusType)>
+        {
+            ["agent_d"] = (StatusType.Bind, StatusType.Vulnerable), ["agent_m"] = (StatusType.Shock, StatusType.Vulnerable),
+            ["darius_brooks"] = (StatusType.Vulnerable, StatusType.Anchor), ["mei_lin_chen"] = (StatusType.Burn, StatusType.Burn),
+            ["freya_lindqvist"] = (StatusType.Mark, StatusType.Haste), ["kwame_abara"] = (StatusType.Bind, StatusType.Vulnerable),
+            ["giulia_rossi"] = (StatusType.Shock, StatusType.Vulnerable), ["lucas_mendes"] = (StatusType.Mark, StatusType.Evade),
+            ["rin_takeda"] = (StatusType.Shock, StatusType.Shock), ["amara_hughes"] = (StatusType.Bind, StatusType.Regen),
+            ["ilona_varga"] = (StatusType.Shock, StatusType.Mark), ["fatou_diallo"] = (StatusType.Shock, StatusType.Haste),
+            ["clement_lefevre"] = (StatusType.Shock, StatusType.Bind), ["youssef_haddad"] = (StatusType.Vulnerable, StatusType.Mark),
+            ["severine_morel"] = (StatusType.Corrosion, StatusType.Regen), ["sam_okafor"] = (StatusType.Shock, StatusType.Anchor),
+            ["astrid_hallstrom"] = (StatusType.Freeze, StatusType.Regen), ["celeste_moreau"] = (StatusType.Corrosion, StatusType.Corrosion),
+            ["haruto_nakamura"] = (StatusType.Bind, StatusType.Vulnerable), ["yelena_ivanova"] = (StatusType.Freeze, StatusType.Freeze),
+            ["noah_kaplan"] = (StatusType.Shock, StatusType.Vulnerable), ["tunde_oyelaran"] = (StatusType.Bind, StatusType.Shield),
+            ["victor_sorel"] = (StatusType.Mark, StatusType.Vulnerable), ["odile_ferrand"] = (StatusType.Freeze, StatusType.Haste),
+            ["louis_dubois"] = (StatusType.Shock, StatusType.Shock), ["marco_bellini"] = (StatusType.Corrosion, StatusType.Corrosion),
+            ["zofia_kowalczyk"] = (StatusType.Shock, StatusType.Shock), ["mateo_vasquez"] = (StatusType.Corrosion, StatusType.Regen),
+            ["ada_okonkwo"] = (StatusType.Corrosion, StatusType.Regen), ["eero_nieminen"] = (StatusType.Bind, StatusType.Vulnerable),
+            ["ji_hoon_park"] = (StatusType.Shock, StatusType.Vulnerable), ["anna_petrov"] = (StatusType.Shock, StatusType.Bind),
+        };
+
+        /// <summary>Statut de la famille sur la compétence 1 des agents sans statut propre.</summary>
+        static StatusType Fallback(Family f)
         {
             switch (f)
             {
-                case Family.Matter: return St(StatusType.Vulnerable, 2, 25);
-                case Family.Elemental: return St(StatusType.Burn, 2, 40);
-                case Family.PhysicalBio: return St(StatusType.Taunt, 1, 30);
-                default: return St(StatusType.Mark, 99);
+                case Family.Matter: return StatusType.Vulnerable;
+                case Family.Elemental: return StatusType.Burn;
+                case Family.PhysicalBio: return StatusType.Taunt;
+                default: return StatusType.Mark;
             }
         }
 
-        /// <summary>Les trois compétences d'un agent : A1 légère, A2 intermédiaire, A3 lourde ou de soutien selon le rôle.</summary>
+        static void AddStatus(List<EffectDef> fx, StatusType s, int chance)
+        {
+            if (s != StatusType.None) fx.Add(St(s, 2, chance));
+        }
+
+        /// <summary>
+        /// Les deux compétences de base d'un agent (deux seulement : la 3e place de l'éventail est une carte du grimoire) :
+        /// 1 légère et gratuite, 2 spéciale (coût 30), construites sur son rôle avec un statut propre à l'agent.
+        /// </summary>
         public static IReadOnlyList<SkillDef> Kit(Entry e)
         {
-            string a1 = e.Id + "_a1", a2 = e.Id + "_a2", a3 = e.Id + "_a3";
+            var (first, second) = Flavors.TryGetValue(e.Id, out var f) ? f : (Fallback(e.Family), StatusType.None);
+            string a1 = e.Id + "_a1", a2 = e.Id + "_a2";
+            var fx1 = new List<EffectDef>();
+            var fx2 = new List<EffectDef>();
+            TargetRule target2;
+            int cooldown2 = 3;
             switch (e.Role)
             {
                 case Role.Tank:
-                    return new[]
-                    {
-                        S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), new EffectDef(EffectType.PushBack, 10)),
-                        S(a2, SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(20)),
-                        S(a3, SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15), St(StatusType.Anchor, 2)),
-                    };
+                    fx1.Add(Dmg(110)); fx1.Add(new EffectDef(EffectType.PushBack, 10)); AddStatus(fx1, first, 30);
+                    target2 = TargetRule.Self; fx2.Add(St(StatusType.Taunt, 2)); fx2.Add(Shield(25)); AddStatus(fx2, second, 100);
+                    break;
                 case Role.Damage:
-                    return new[]
-                    {
-                        S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), Signature(e.Family)),
-                        S(a2, SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(70)),
-                        S(a3, SkillSlot.A3, 5, TargetRule.SingleEnemy, Dmg(220)),
-                    };
+                    fx1.Add(Dmg(100)); AddStatus(fx1, first, 40);
+                    target2 = TargetRule.AllEnemies; fx2.Add(Dmg(90)); AddStatus(fx2, second, 30);
+                    break;
                 case Role.Control:
-                    return new[]
-                    {
-                        S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Shock, 1, 15)),
-                        S(a2, SkillSlot.A2, 4, TargetRule.SingleEnemy, St(StatusType.Bind, 2), new EffectDef(EffectType.PushBack, 25)),
-                        S(a3, SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(60), St(StatusType.Vulnerable, 2)),
-                    };
+                    fx1.Add(Dmg(90)); AddStatus(fx1, first, 30);
+                    target2 = TargetRule.SingleEnemy; fx2.Add(St(StatusType.Bind, 2)); fx2.Add(new EffectDef(EffectType.PushBack, 25)); AddStatus(fx2, second, 100);
+                    cooldown2 = 4;
+                    break;
                 case Role.Support:
-                    return new[]
-                    {
-                        S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(80)),
-                        S(a2, SkillSlot.A2, 3, TargetRule.SingleAlly, Heal(30), new EffectDef(EffectType.Advance, 20)),
-                        S(a3, SkillSlot.A3, 5, TargetRule.AllAllies, St(StatusType.Regen, 2), St(StatusType.Haste, 2)),
-                    };
+                    fx1.Add(Dmg(80)); AddStatus(fx1, first, 25);
+                    target2 = TargetRule.SingleAlly; fx2.Add(Heal(35)); fx2.Add(new EffectDef(EffectType.Advance, 20)); AddStatus(fx2, second, 100);
+                    break;
                 default: // Précision
-                    return new[]
-                    {
-                        S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Mark, 99)),
-                        S(a2, SkillSlot.A2, 3, TargetRule.AllEnemies, St(StatusType.Vulnerable, 2), new EffectDef(EffectType.GaugeDelta, -100)),
-                        S(a3, SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(70)),
-                    };
+                    fx1.Add(Dmg(100)); fx1.Add(St(StatusType.Mark, 99)); AddStatus(fx1, first, 30);
+                    target2 = TargetRule.AllEnemies; fx2.Add(St(StatusType.Vulnerable, 2)); fx2.Add(new EffectDef(EffectType.GaugeDelta, -100)); AddStatus(fx2, second, 30);
+                    break;
             }
+            return new[]
+            {
+                S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, fx1.ToArray()),
+                S(a2, SkillSlot.A2, cooldown2, target2, fx2.ToArray()),
+            };
         }
 
         public static IEnumerable<MemberDef> Members(System.Func<Role, Rarity, StatBlock> stats)

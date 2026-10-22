@@ -36,7 +36,7 @@ namespace N29.HeroesDawn.Presentation.Common
                 for (int i = 0; i < 3; i++) d["skills." + id + "_a" + (i + 1)] = kit[i] + " · " + name;
             }
 
-            AddDawnAgents(d, kits);
+            AddDawnAgents(d);
 
             d["page.agents"] = "Registre des agents";
             d["agents.title"] = "REGISTRE DES AGENTS";

@@ -43,15 +43,38 @@ namespace N29.HeroesDawn.Presentation.Common
             ("anna_petrov", "Anna Petrov", "Precision", "Se téléporte vers des points qu'elle connaît", "Ballerine du Bolchoï, elle s'est téléportée sous une fusillade pour sauver un collègue."),
         };
 
-        static void AddDawnAgents(Dictionary<string, string> d, Dictionary<string, string[]> kits)
+        /// <summary>Noms des deux compétences de base de chaque agent (compétence 1 légère, compétence 2 spéciale).</summary>
+        static Dictionary<string, (string First, string Second)> DawnSkillNames() => new Dictionary<string, (string, string)>
         {
+            ["agent_d"] = ("Barrière de craie", "Créature dessinée"), ["agent_m"] = ("Vision du présent", "Futur fragmenté"),
+            ["darius_brooks"] = ("Poutre propulsée", "Rempart de ferraille"), ["mei_lin_chen"] = ("Jet de flammes", "Brasier"),
+            ["freya_lindqvist"] = ("Murmure mental", "Esprit partagé"), ["kwame_abara"] = ("Griffes du fauve", "Meute déchaînée"),
+            ["giulia_rossi"] = ("Projection", "Tempête d'objets"), ["lucas_mendes"] = ("Frappe fantôme", "Corps de brume"),
+            ["rin_takeda"] = ("Décharge radio", "Brouillage"), ["amara_hughes"] = ("Note apaisante", "Chœur de guérison"),
+            ["ilona_varga"] = ("Ombre de la peur", "Cauchemar"), ["fatou_diallo"] = ("Foulée explosive", "Bouclier cinétique"),
+            ["clement_lefevre"] = ("Mirage", "Grande illusion"), ["youssef_haddad"] = ("Écoute absolue", "Perception totale"),
+            ["severine_morel"] = ("Drain vital", "Transfusion"), ["sam_okafor"] = ("Encaisser", "Onde de choc"),
+            ["astrid_hallstrom"] = ("Vague", "Marée vive"), ["celeste_moreau"] = ("Brume toxique", "Nuage soporifique"),
+            ["haruto_nakamura"] = ("Âme errante", "Souffle astral"), ["yelena_ivanova"] = ("Givre mordant", "Glace éternelle"),
+            ["noah_kaplan"] = ("Permutation", "Échange forcé"), ["tunde_oyelaran"] = ("Poche d'espace", "Refuge plié"),
+            ["victor_sorel"] = ("Emprise", "Volonté dominée"), ["odile_ferrand"] = ("Seconde suspendue", "Temps accéléré"),
+            ["louis_dubois"] = ("Aimant", "Champ magnétique"), ["marco_bellini"] = ("Transmutation", "Or alchimique"),
+            ["zofia_kowalczyk"] = ("Archet vibrant", "Crescendo"), ["mateo_vasquez"] = ("Pression sanguine", "Coagulation"),
+            ["ada_okonkwo"] = ("Mutation", "Régénération cellulaire"), ["eero_nieminen"] = ("Poids mort", "Gravité écrasante"),
+            ["ji_hoon_park"] = ("Coup invisible", "Disparition"), ["anna_petrov"] = ("Saut instantané", "Pirouette téléportée"),
+        };
+
+        static void AddDawnAgents(Dictionary<string, string> d)
+        {
+            var skillNames = DawnSkillNames();
             foreach (var (id, name, role, power, bio) in DawnAgents())
             {
                 d["members." + id + ".name"] = name;
                 d["members." + id + ".power"] = power;
                 d["archives.hero." + id] = name.ToUpperInvariant() + " : " + power.ToLowerInvariant() + ". " + bio;
-                var kit = kits[role];
-                for (int i = 0; i < 3; i++) d["skills." + id + "_a" + (i + 1)] = kit[i] + " · " + name;
+                var skills = skillNames[id];
+                d["skills." + id + "_a1"] = skills.First;
+                d["skills." + id + "_a2"] = skills.Second;
             }
         }
     }

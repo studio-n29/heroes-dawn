@@ -97,7 +97,16 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Qg), "agent verrouillé : rien ne s'ouvre");
         }
 
-        [Test, Description("Vérifie que chaque agent du jeu a un nom et trois noms de compétence traduits (jamais une clé brute) — parce que l'interface ne doit jamais afficher « skills.xxx »")]
+        [Test, Description("Vérifie que les deux compétences de chaque agent ont un nom propre, différent de celui de toutes les autres compétences du jeu — parce que les compétences d un agent doivent être uniques et non génériques par rôle")]
+        public void EverySkill_HasAUniqueName()
+        {
+            var names = _session.Content.Members.SelectMany(m => m.Skills.Select(s => _loc.SkillName(s))).ToList();
+            Assert.That(names.Count, Is.EqualTo(_session.Content.Members.Count * 2));
+            Assert.That(names.Distinct().Count(), Is.EqualTo(names.Count), "noms en double : " + string.Join(", ", names.GroupBy(n => n).Where(g => g.Count() > 1).Select(g => g.Key)));
+            Assert.That(names.Any(n => n.Contains(" · ")), Is.False, "plus de nom générique « Compétence · Agent »");
+        }
+
+        [Test, Description("Vérifie que chaque agent du jeu a un nom et deux noms de compétence traduits (jamais une clé brute) — parce que l'interface ne doit jamais afficher « skills.xxx »")]
         public void EveryAgent_HasReadableNames()
         {
             foreach (var m in _session.Content.Members)
@@ -106,7 +115,7 @@ namespace N29.HeroesDawn.Tests.Presentation
                 foreach (var s in m.Skills) Assert.That(_loc.SkillName(s), Does.Not.StartWith("skills."), s.Id.Value);
             }
             Assert.That(_loc.MemberName(_session.Content.Member(new MemberId("ada_okonkwo"))), Is.EqualTo("Ada Okonkwo"));
-            Assert.That(_loc.SkillName(_session.Content.Member(new MemberId("mei_lin_chen")).Skills[1]), Is.EqualTo("Salve · Mei-Lin Chen"));
+            Assert.That(_loc.SkillName(_session.Content.Member(new MemberId("mei_lin_chen")).Skills[1]), Is.EqualTo("Brasier"));
         }
     }
 }

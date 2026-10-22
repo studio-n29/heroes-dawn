@@ -123,9 +123,9 @@ namespace N29.HeroesDawn.EditorTools.Design
             EditorGUILayout.Space(6);
             EditorGUILayout.LabelField("Compétences", EditorStyles.boldLabel);
             var ids = DesignStore.Skills.skills.Select(s => s.id).ToArray();
-            string[] slots = { "A1 (légère)", "A2 (intermédiaire)", "A3 (lourde ou soutien)" };
-            while (a.skills.Count < 3) a.skills.Add("");
-            for (int i = 0; i < 3; i++)
+            string[] slots = { "A1 (légère, gratuite)", "A2 (spéciale)" };
+            while (a.skills.Count < 2) a.skills.Add("");
+            for (int i = 0; i < 2; i++)
             {
                 EditorGUILayout.BeginHorizontal();
                 var all = new[] { "" }.Concat(ids).ToArray();

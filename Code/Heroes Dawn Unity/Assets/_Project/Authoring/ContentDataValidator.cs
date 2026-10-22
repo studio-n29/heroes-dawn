@@ -69,7 +69,7 @@ namespace N29.HeroesDawn.Authoring
             CheckId(a.id, e);
             if (string.IsNullOrWhiteSpace(a.name)) e.Add("nom vide");
             if (a.hp <= 0 || a.atk <= 0 || a.def <= 0 || a.spd <= 0) e.Add("PV, ATK, DEF et VIT doivent être positifs");
-            if (a.skills.Count != 3) e.Add("trois compétences exactement");
+            if (a.skills.Count != 2) e.Add("deux compétences de base exactement");
             if (a.unlockKind != UnlockKind.Shop && a.unlockKind != UnlockKind.Hero && string.IsNullOrEmpty(a.unlockZone)) e.Add("zone de déblocage manquante");
             if (a.unlockKind == UnlockKind.Feat && a.feat == FeatKind.None) e.Add("prouesse manquante");
             if (a.unlockKind != UnlockKind.Feat && a.feat != FeatKind.None) e.Add("prouesse sans déblocage par prouesse");

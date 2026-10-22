@@ -99,12 +99,67 @@ namespace N29.HeroesDawn.Tests.Domain
             new PrototypeAgents.Entry("aegis", "Aegis", Family.Matter, Role.Tank, Rarity.Legend, UnlockDef.FeatOf(Z13, FeatKind.NoDefeat)),
         };
 
+        static EffectDef Signature(Family f)
+        {
+            switch (f)
+            {
+                case Family.Matter: return St(StatusType.Vulnerable, 2, 25);
+                case Family.Elemental: return St(StatusType.Burn, 2, 40);
+                case Family.PhysicalBio: return St(StatusType.Taunt, 1, 30);
+                default: return St(StatusType.Mark, 99);
+            }
+        }
+
+        /// <summary>Ancien kit de trois compétences construit sur le rôle (A1 légère, A2 intermédiaire, A3 lourde ou de soutien).</summary>
+        static IReadOnlyList<SkillDef> LegacyKit(PrototypeAgents.Entry e)
+        {
+            string a1 = e.Id + "_a1", a2 = e.Id + "_a2", a3 = e.Id + "_a3";
+            switch (e.Role)
+            {
+                case Role.Tank:
+                    return new[]
+                    {
+                        S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), Push(10)),
+                        S(a2, SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(20)),
+                        S(a3, SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15), St(StatusType.Anchor, 2)),
+                    };
+                case Role.Damage:
+                    return new[]
+                    {
+                        S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), Signature(e.Family)),
+                        S(a2, SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(70)),
+                        S(a3, SkillSlot.A3, 5, TargetRule.SingleEnemy, Dmg(220)),
+                    };
+                case Role.Control:
+                    return new[]
+                    {
+                        S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Shock, 1, 15)),
+                        S(a2, SkillSlot.A2, 4, TargetRule.SingleEnemy, St(StatusType.Bind, 2), Push(25)),
+                        S(a3, SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(60), St(StatusType.Vulnerable, 2)),
+                    };
+                case Role.Support:
+                    return new[]
+                    {
+                        S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(80)),
+                        S(a2, SkillSlot.A2, 3, TargetRule.SingleAlly, Heal(30), Adv(20)),
+                        S(a3, SkillSlot.A3, 5, TargetRule.AllAllies, St(StatusType.Regen, 2), St(StatusType.Haste, 2)),
+                    };
+                default: // Précision
+                    return new[]
+                    {
+                        S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Mark, 99)),
+                        S(a2, SkillSlot.A2, 3, TargetRule.AllEnemies, St(StatusType.Vulnerable, 2), Gauge(-100)),
+                        S(a3, SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(70)),
+                    };
+            }
+        }
+
         /// <summary>Les 30 anciens agents.</summary>
         public static IReadOnlyList<MemberDef> All()
         {
             var list = Core().ToList();
             list.AddRange(Extra.Select(e => new MemberDef(new MemberId(e.Id), "members." + e.Id + ".name", e.Family, e.Role, e.Rarity,
-                PrototypeContent.BaseStats(e.Role, e.Rarity), PrototypeAgents.Kit(e), null, e.Unlock)));
+                PrototypeContent.BaseStats(e.Role, e.Rarity), LegacyKit(e), null, e.Unlock)));
             return list;
         }
     }

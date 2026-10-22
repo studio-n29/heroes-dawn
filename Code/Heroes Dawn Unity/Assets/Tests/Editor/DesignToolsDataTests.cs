@@ -100,15 +100,15 @@ namespace N29.HeroesDawn.Tests.Editor
         public void Catalog_FollowsTheAgentsFile()
         {
             var (items, skills, agents) = FromCode();
-            agents.agents.RemoveAll(a => a.id == "radar");
-            for (int i = 1; i <= 3; i++)
+            agents.agents.RemoveAll(a => a.id == "giulia_rossi");
+            for (int i = 1; i <= 2; i++)
                 skills.skills.Add(new SkillRecord { id = "nova_a" + i, name = "Nova " + i, slot = (SkillSlot)(i - 1), target = TargetRule.SingleEnemy, effects = { new EffectRecord { type = EffectType.Damage, value = 100 } } });
-            agents.agents.Add(new AgentRecord { id = "nova", name = "Nova", family = Family.Elemental, role = Role.Damage, rarity = Rarity.Elite, skills = new List<string> { "nova_a1", "nova_a2", "nova_a3" }, hp = 1200, atk = 150, def = 90, spd = 110 });
+            agents.agents.Add(new AgentRecord { id = "nova", name = "Nova", family = Family.Elemental, role = Role.Damage, rarity = Rarity.Elite, skills = new List<string> { "nova_a1", "nova_a2" }, hp = 1200, atk = 150, def = 90, spd = 110 });
             var lib = ContentDataLibrary.FromFiles(items, skills, agents);
             var catalog = Code.WithMembers(lib.Members!);
-            Assert.That(catalog.Members.Any(m => m.Id.Value == "radar"), Is.False);
+            Assert.That(catalog.Members.Any(m => m.Id.Value == "giulia_rossi"), Is.False);
             var nova = catalog.Member(new Core.MemberId("nova"));
-            Assert.That(nova.Skills.Count, Is.EqualTo(3));
+            Assert.That(nova.Skills.Count, Is.EqualTo(2));
             Assert.That(nova.BaseStats.Atk, Is.EqualTo(150));
         }
 
