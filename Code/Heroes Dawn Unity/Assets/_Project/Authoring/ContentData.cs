@@ -27,7 +27,8 @@ namespace N29.HeroesDawn.Authoring
         public string id = "";
         [Tooltip("Nom affiché en jeu.")] public string name = "";
         public SkillSlot slot;
-        [Tooltip("Tours de recharge après usage.")] public int cooldown;
+        [Tooltip("Énergie dépensée à chaque usage.")] public int cost;
+        [Tooltip("Recharge historique en tours (n a plus d effet).")] public int cooldown;
         public TargetRule target;
         [Tooltip("Premier effet = effet de base ; les suivants = effets secondaires.")] public List<EffectRecord> effects = new List<EffectRecord>();
     }

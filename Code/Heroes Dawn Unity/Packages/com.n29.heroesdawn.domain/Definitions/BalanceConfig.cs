@@ -30,6 +30,12 @@ namespace N29.HeroesDawn.Definitions
         public int ActivityBoosterChancePercent { get; set; } = 50;
 
         // ---- Frise chronologique par points : 0 = depart, TimelinePoints = point d action
+        /// <summary>Énergie maximale d une unité (coût des compétences).</summary>
+        public int EnergyMax { get; set; } = 100;
+        /// <summary>Énergie au début du combat.</summary>
+        public int EnergyStart { get; set; } = 30;
+        /// <summary>Énergie récupérée à chaque pas de la frise (pas pendant la pause d action).</summary>
+        public int EnergyRegenPerTick { get; set; } = 3;
         /// <summary>Nombre de points entre le depart (point 0) et le point d action.</summary>
         public int TimelinePoints { get; set; } = 10;
         /// <summary>Point de reprise apres une competence legere (emplacement 1).</summary>

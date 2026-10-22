@@ -375,6 +375,8 @@ namespace N29.HeroesDawn.Presentation.Combat
                     Hp01 = u.MaxHp == 0 ? 0 : u.Hp / (float)u.MaxHp,
                     HpText = u.Hp + " / " + u.MaxHp,
                     Gauge01 = u.ActionPoint == 0 ? 0 : Math.Max(0f, Math.Min(1f, u.Point / (float)u.ActionPoint)),
+                    Energy01 = u.MaxEnergy == 0 ? 0f : Math.Max(0f, Math.Min(1f, u.Energy / (float)u.MaxEnergy)),
+                    EnergyText = u.Energy + " / " + u.MaxEnergy,
                     GaugeFull = u.IsReady,
                     Statuses = Statuses(u),
                     Alive = u.IsAlive,
@@ -398,7 +400,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                     if (i >= count) continue;
                     var s = u.Skills[i];
                     string label = "[" + (i + 1) + "] " + _loc.SkillName(s);
-                    if (u.Cooldowns[i] > 0) label += "  (" + _loc.F("combat.cooldown", u.Cooldowns[i]) + ")";
+                    if (s.Cost > 0) label += "  (" + _loc.F("combat.cost", s.Cost) + ")";
                     panel.Slots[i] = new SkillSlotData { Visible = true, Label = label, Description = _loc.DescribeSkill(s), Pending = _pendingSlot == i, Enabled = sim.CanUse(u.Id, i) };
                 }
             }
@@ -427,7 +429,8 @@ namespace N29.HeroesDawn.Presentation.Combat
                     Label = "[" + (i + 1) + "] " + name,
                     Description = _loc.DescribeSkill(s),
                     Glyph = string.IsNullOrEmpty(name) ? "?" : name.Substring(0, 1).ToUpperInvariant(),
-                    Cooldown = u.Cooldowns[i],
+                    Cost = s.Cost,
+                    Affordable = u.Energy >= s.Cost,
                     Pending = active && _pendingSlot == i,
                     Enabled = active && sim.CanUse(u.Id, i),
                     NeedsTarget = NeedsTarget(s.Target),

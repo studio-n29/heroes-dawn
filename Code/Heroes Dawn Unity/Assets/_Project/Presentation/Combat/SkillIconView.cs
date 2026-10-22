@@ -15,11 +15,11 @@ namespace N29.HeroesDawn.Presentation.Combat
     {
         [SerializeField] Button button = null!;
         [SerializeField] Image disc = null!;
-        [SerializeField] Image cooldownFill = null!;
+        [SerializeField] Image costBadge = null!;
         [SerializeField] Image ring = null!;
         [SerializeField] TMP_Text glyph = null!;
         [SerializeField] TMP_Text slot = null!;
-        [SerializeField] TMP_Text cooldown = null!;
+        [SerializeField] TMP_Text cost = null!;
         [SerializeField, Mvp.OptionalRef] TMP_Text? label;
         [SerializeField, Mvp.OptionalRef] SkillHoldTrigger? hold;
         [SerializeField, Mvp.OptionalRef] SkillCardDrag? drag;
@@ -59,11 +59,10 @@ namespace N29.HeroesDawn.Presentation.Combat
             var baseColor = d.Locked ? Theme.Surface3 : Color.Lerp(index == 3 ? Theme.Perception : index == 2 ? Theme.Danger : index == 1 ? Theme.Info : Theme.Primary, Color.white, 0.3f);
             disc.color = d.Pending ? Color.white : baseColor;
             glyph.color = d.Locked ? Theme.TextMuted : Theme.Navy;
-            bool cooling = d.Cooldown > 0;
-            cooldown.gameObject.SetActive(cooling);
-            cooldown.text = cooling ? d.Cooldown.ToString() : "";
-            cooldownFill.gameObject.SetActive(cooling);
-            cooldownFill.fillAmount = cooling ? Mathf.Clamp01(d.Cooldown / 4f) : 0f;
+            bool paid = !d.Locked && d.Cost > 0;
+            costBadge.gameObject.SetActive(paid);
+            cost.text = paid ? d.Cost.ToString() : "";
+            cost.color = d.Affordable ? Theme.Glow : Theme.Danger;
             ring.gameObject.SetActive(d.Enabled || d.Pending);
             ring.color = d.Pending ? Theme.Primary : Theme.Glow;
             button.interactable = d.Enabled;

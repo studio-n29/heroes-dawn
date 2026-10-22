@@ -28,6 +28,7 @@ namespace N29.HeroesDawn.Tests.Domain
         static void Act(CombatSimulation s, CombatUnit ally, int slot, int target)
         {
             At(ally, 100);
+            ally.Energy = ally.MaxEnergy; // ces tests vérifient l effet des compétences, pas leur coût (voir EnergyTests)
             s.Submit(CombatCommand.UseSkill(ally.Id, slot, target));
             s.Step(1);
         }
@@ -83,6 +84,7 @@ namespace N29.HeroesDawn.Tests.Domain
             s.Step(1);
             Assert.That(brute.PlannedSlot, Is.GreaterThanOrEqualTo(0), "action annoncée à 85 %");
             At(s.Unit(0), 100);
+            s.Unit(0).Energy = s.Unit(0).MaxEnergy;
             s.Submit(CombatCommand.UseSkill(0, 1, 2));
             var ev = s.Step(1);
             Assert.That(ev.OfType<PushedBackEvent>().Any(e => e.Unit == brute.Id && e.Percent == 25), Is.True);

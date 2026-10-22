@@ -21,8 +21,9 @@ namespace N29.HeroesDawn.Domain.Combat
         public int Point { get; set; }
         /// <summary>Point d action de la frise (nombre de points du depart a l action).</summary>
         public int ActionPoint { get; }
-        /// <summary>Recharges des compétences A1, A2, A3 (0 = disponible).</summary>
-        public int[] Cooldowns { get; } = new int[4];
+        /// <summary>Énergie disponible : chaque compétence en coûte, elle se régénère à chaque pas de la frise.</summary>
+        public int Energy { get; set; } = 100;
+        public int MaxEnergy { get; set; } = 100;
         public List<StatusInstance> Statuses { get; } = new List<StatusInstance>();
         public IReadOnlyList<SkillDef> Skills { get; }
         /// <summary>Compétence annoncée sur la frise (ennemis, zone de préparation) ; -1 = aucune.</summary>

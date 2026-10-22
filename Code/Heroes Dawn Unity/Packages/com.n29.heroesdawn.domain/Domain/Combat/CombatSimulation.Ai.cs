@@ -53,7 +53,7 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         bool CanUseSlot(CombatUnit u, int slot)
-            => slot < ActiveSkillCount(u) && slot < 4 && u.Cooldowns[slot] == 0 && !(u.Has(StatusType.Bind) && slot > 0);
+            => slot < ActiveSkillCount(u) && slot < 4 && u.Energy >= u.Skills[slot].Cost && !(u.Has(StatusType.Bind) && slot > 0);
 
         static int FindSlot(CombatUnit u, EffectType t)
         {

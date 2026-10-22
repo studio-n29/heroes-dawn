@@ -96,6 +96,7 @@ namespace N29.HeroesDawn.Tests.Domain
                 foreach (var u in s.Units) u.Point = 0;
                 var givre = s.Unit(0);
                 givre.Point = 10;
+                givre.Energy = givre.MaxEnergy;
                 s.Submit(CombatCommand.UseSkill(givre.Id, slot, 2));
                 s.Step(1);
                 Assert.That(givre.Point, Is.EqualTo(expected), "emplacement " + slot);

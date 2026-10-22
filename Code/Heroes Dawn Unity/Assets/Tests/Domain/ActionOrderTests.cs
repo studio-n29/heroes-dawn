@@ -67,7 +67,6 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(again.OfType<PushedBackEvent>(), Is.Empty, "pas de second recul");
             Assert.That(Pct(brute), Is.EqualTo(40));
             brute.KnockbackGuard = false; // la cible a agi entre-temps
-            s.Unit(0).Cooldowns[0] = 0;
             At(brute, 60);
             Assert.That(Act(s, s.Unit(0), 0, brute.Id).OfType<PushedBackEvent>().Count(), Is.EqualTo(1));
         }

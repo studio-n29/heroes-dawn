@@ -19,7 +19,7 @@ namespace N29.HeroesDawn.EditorTools.Design
         {
             ["id"] = "Identifiant", ["name"] = "Nom", ["rarity"] = "Rareté", ["family"] = "Famille", ["role"] = "Rôle",
             ["hp"] = "PV", ["atk"] = "Attaque", ["def"] = "Défense", ["spd"] = "Vitesse", ["perk"] = "Effet spécial", ["perkValue"] = "Valeur de l'effet",
-            ["price"] = "Prix (Crédits)", ["slot"] = "Emplacement", ["cooldown"] = "Recharge (tours)", ["target"] = "Cible", ["effects"] = "Effets",
+            ["price"] = "Prix (Crédits)", ["slot"] = "Emplacement", ["cost"] = "Coût (énergie)", ["cooldown"] = "Recharge historique (inutilisée)", ["target"] = "Cible", ["effects"] = "Effets",
             ["type"] = "Type", ["value"] = "Valeur", ["status"] = "Statut", ["duration"] = "Durée (tours)", ["chance"] = "Chance (%)",
             ["unlockKind"] = "Déblocage", ["unlockZone"] = "Zone", ["feat"] = "Prouesse", ["skills"] = "Compétences",
         };

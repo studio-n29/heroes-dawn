@@ -91,6 +91,7 @@ namespace N29.HeroesDawn.Domain.Combat
             {
                 var u = _units[i];
                 if (!u.IsAlive || u.IsReady) continue;
+                u.Energy = System.Math.Min(u.MaxEnergy, u.Energy + _b.EnergyRegenPerTick); // l énergie se régénère à chaque pas
                 int moves = PointsThisStep(u);
                 for (int m = 0; m < moves && u.IsAlive && !u.IsReady; m++)
                 {

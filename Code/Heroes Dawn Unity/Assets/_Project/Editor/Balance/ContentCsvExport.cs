@@ -89,9 +89,9 @@ namespace N29.HeroesDawn.EditorTools.Balance
 
         static List<string[]> Skills(ContentCatalog c)
         {
-            var rows = new List<string[]> { new[] { "id", "possesseur", "type de possesseur", "emplacement", "nom", "description", "recharge", "cible", "catégorie", "effets" } };
+            var rows = new List<string[]> { new[] { "id", "possesseur", "type de possesseur", "emplacement", "nom", "description", "coût", "cible", "catégorie", "effets" } };
             void Add(string owner, string ownerType, SkillDef s)
-                => rows.Add(new[] { s.Id.Value, owner, ownerType, s.Slot.ToString(), Loc.SkillName(s), Loc.DescribeSkill(s), s.Cooldown.ToString(), s.Target.ToString(), s.Category.ToString(), Effects(s) });
+                => rows.Add(new[] { s.Id.Value, owner, ownerType, s.Slot.ToString(), Loc.SkillName(s), Loc.DescribeSkill(s), s.Cost.ToString(), s.Target.ToString(), s.Category.ToString(), Effects(s) });
             foreach (var m in c.Members) foreach (var s in m.Skills) Add(m.Id.Value, "agent", s);
             foreach (var e in c.Enemies) foreach (var s in e.Skills) Add(e.Id.Value, "ennemi", s);
             foreach (var card in c.Collection.Cards) Add(card.Id.Value + " (" + Loc.FamilyName(card.Family) + ", " + card.Rarity + ")", "carte du grimoire", card.Skill);

@@ -8,15 +8,18 @@ namespace N29.HeroesDawn.Definitions
     {
         public SkillId Id { get; }
         public SkillSlot Slot { get; }
-        /// <summary>Nombre de tours du personnage pendant lesquels la compétence reste indisponible après usage.</summary>
+        /// <summary>Recharge historique en tours (ne bloque plus la compétence : seule l énergie la limite ; sert à dériver le coût par défaut).</summary>
         public int Cooldown { get; }
+        /// <summary>Énergie dépensée à chaque usage. Sans coût explicite, dérivé de la recharge historique (10 par tour de recharge).</summary>
+        public int Cost { get; }
         public TargetRule Target { get; }
         /// <summary>Le premier effet est l'effet de base ; les suivants sont les sous-effets (altérations, faiblesses…).</summary>
         public IReadOnlyList<EffectDef> Effects { get; }
 
-        public SkillDef(SkillId id, SkillSlot slot, int cooldown, TargetRule target, IReadOnlyList<EffectDef> effects)
+        public SkillDef(SkillId id, SkillSlot slot, int cooldown, TargetRule target, IReadOnlyList<EffectDef> effects, int cost = -1)
         {
             Id = id; Slot = slot; Cooldown = cooldown; Target = target; Effects = effects;
+            Cost = cost >= 0 ? cost : cooldown * 10;
         }
 
         public EffectDef? BaseEffect => Effects.Count > 0 ? Effects[0] : null;

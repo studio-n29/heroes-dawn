@@ -92,8 +92,8 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(u.Skills[2].Id.Value, Is.EqualTo("verre_a3"));
         }
 
-        [Test, Description("Vérifie que l'agent peut lancer sa 4e compétence (carte), qu'elle se recharge et le replace en fin de frise comme une compétence lourde — parce que la 4e compétence est une vraie action de combat")]
-        public void FourthSkill_CanBeCast_AndCoolsDown()
+        [Test, Description("Vérifie que l'agent peut lancer sa 4e compétence (carte), qu elle coûte de l énergie et le replace en fin de frise comme une compétence lourde — parce que la 4e compétence est une vraie action de combat")]
+        public void FourthSkill_CanBeCast_AndCostsEnergy()
         {
             var cards = new CardId?[] { new CardId("card_glass_wall"), new CardId("card_shackle") };
             var s = Sim(new[] { Ally("verre", cards: cards) }, new[] { "brute" });
@@ -101,15 +101,17 @@ namespace N29.HeroesDawn.Tests.Domain
             var brute = s.Unit(1);
             brute.Point = 0;
             verre.Point = verre.ActionPoint;
+            verre.Energy = verre.MaxEnergy;
             Assert.That(s.CanUse(verre.Id, 3), Is.True);
             s.Submit(CombatCommand.UseSkill(verre.Id, 3, brute.Id));
             var events = s.Step(1);
             Assert.That(events.OfType<SkillUsedEvent>().Single().Skill.Value, Is.EqualTo("card_shackle"));
             Assert.That(Pct(verre), Is.EqualTo(0), "poids lourd : retour à 0 %");
-            Assert.That(verre.Cooldowns[3], Is.GreaterThan(0));
+            Assert.That(verre.Energy, Is.LessThan(verre.MaxEnergy), "la compétence a coûté de l énergie");
+            verre.Energy = 0;
             verre.Point = verre.ActionPoint;
             s.Step(1);
-            Assert.That(s.CanUse(verre.Id, 3), Is.False, "toujours en recharge");
+            Assert.That(s.CanUse(verre.Id, 3), Is.False, "plus assez d énergie");
         }
 
         [Test, Description("Vérifie que les compétences de l'IA ennemie et des alliés automatiques restent dans leurs emplacements existants avec la 4e compétence — parce que le mode Auto doit pouvoir lancer une carte sans erreur")]

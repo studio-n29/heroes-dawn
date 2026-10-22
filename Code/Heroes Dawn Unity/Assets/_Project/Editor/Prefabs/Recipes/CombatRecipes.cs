@@ -254,7 +254,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Carte de compétence de l'éventail du bas d'écran (150 × 210) : numéro en losange, grande initiale, nom, recharge, anneau lumineux.</summary>
+    /// <summary>Carte de compétence de l'éventail du bas d'écran (150 × 210) : numéro en losange, grande initiale, nom, coût en énergie, anneau lumineux.</summary>
     public sealed class SkillIconRecipe : IPrefabRecipe
     {
         public const float Width = 150f;
@@ -294,18 +294,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             label.enableAutoSizing = true;
             label.fontSizeMax = 24;
             label.fontSizeMin = 20;
-            var cooldownFill = Ui.Img(disc.transform, "CooldownFill", Theme.WithAlpha(Theme.Navy, 0.55f), Sprites.Circle);
-            cooldownFill.rectTransform.Stretch();
-            cooldownFill.type = Image.Type.Filled;
-            cooldownFill.fillMethod = Image.FillMethod.Radial360;
-            cooldownFill.fillOrigin = (int)Image.Origin360.Top;
-            cooldownFill.fillClockwise = false;
-            cooldownFill.raycastTarget = false;
-            cooldownFill.gameObject.SetActive(false);
-            var cooldown = Ui.Txt(disc.transform, "", 64, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Cooldown");
-            cooldown.rectTransform.Stretch();
-            cooldown.Inked();
-            cooldown.gameObject.SetActive(false);
+var costBadge = Ui.Img(root, "CostBadge", Theme.Navy, Sprites.Circle);            costBadge.rectTransform.At(1f, 1f, 12, 12, 52, 52);            costBadge.raycastTarget = false;            var cost = Ui.Txt(costBadge.transform, "", 26, Theme.Glow, TextAnchor.MiddleCenter, FontKind.Title, "Cost");            cost.rectTransform.Stretch();
             var slotBadge = Ui.Img(root, "SlotBadge", Theme.Navy, Sprites.Diamond);
             slotBadge.rectTransform.At(0f, 1f, -10, 10, 44, 44);
             slotBadge.raycastTarget = false;
@@ -315,11 +304,11 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var view = root.gameObject.AddComponent<SkillIconView>();
             ctx.Wire(view, "button", button);
             ctx.Wire(view, "disc", disc);
-            ctx.Wire(view, "cooldownFill", cooldownFill);
             ctx.Wire(view, "ring", ring);
             ctx.Wire(view, "glyph", glyph);
             ctx.Wire(view, "slot", slot);
-            ctx.Wire(view, "cooldown", cooldown);
+            ctx.Wire(view, "cost", cost);
+            ctx.Wire(view, "costBadge", costBadge);
             ctx.Wire(view, "label", label);
             ctx.Wire(view, "hold", hold);
             ctx.Wire(view, "drag", drag);

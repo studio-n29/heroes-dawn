@@ -15,10 +15,10 @@ namespace N29.HeroesDawn.Authoring
             => new EffectRecord { type = e.Type, value = e.Value, status = e.Status, duration = e.Duration, chance = e.ChancePercent };
 
         public static SkillDef ToDef(SkillRecord s)
-            => new SkillDef(new SkillId(s.id), s.slot, s.cooldown, s.target, s.effects.Select(ToDef).ToList());
+            => new SkillDef(new SkillId(s.id), s.slot, s.cooldown, s.target, s.effects.Select(ToDef).ToList(), s.cost);
 
         public static SkillRecord FromDef(SkillDef s, string name)
-            => new SkillRecord { id = s.Id.Value, name = name, slot = s.Slot, cooldown = s.Cooldown, target = s.Target, effects = s.Effects.Select(FromDef).ToList() };
+            => new SkillRecord { id = s.Id.Value, name = name, slot = s.Slot, cost = s.Cost, cooldown = s.Cooldown, target = s.Target, effects = s.Effects.Select(FromDef).ToList() };
 
         public static ItemDef ToDef(ItemRecord i)
             => new ItemDef(new ItemId(i.id), "items." + i.id + ".name", i.rarity, i.hp, i.atk, i.def, i.spd, i.perk, i.perkValue, i.price);

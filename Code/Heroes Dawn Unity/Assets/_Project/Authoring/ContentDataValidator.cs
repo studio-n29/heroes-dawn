@@ -55,6 +55,7 @@ namespace N29.HeroesDawn.Authoring
             var e = new List<string>();
             CheckId(s.id, e);
             if (string.IsNullOrWhiteSpace(s.name)) e.Add("nom vide");
+            if (s.cost < 0 || s.cost > 100) e.Add("coût hors de 0 à 100 d énergie");
             if (s.cooldown < 0 || s.cooldown > 20) e.Add("recharge hors de 0 à 20 tours");
             if (s.effects.Count == 0) e.Add("au moins un effet");
             for (int i = 0; i < s.effects.Count; i++)

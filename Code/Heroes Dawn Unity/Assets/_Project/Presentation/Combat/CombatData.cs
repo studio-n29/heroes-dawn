@@ -25,6 +25,9 @@ namespace N29.HeroesDawn.Presentation.Combat
         public float Hp01;
         public string HpText;
         public float Gauge01;
+        /// <summary>Énergie disponible (0 à 1) et son texte.</summary>
+        public float Energy01;
+        public string EnergyText;
         public bool GaugeFull;
         public string Statuses;
         public bool Alive;
@@ -47,8 +50,10 @@ namespace N29.HeroesDawn.Presentation.Combat
         public bool Enabled;
         /// <summary>Emplacement réservé à une carte du grimoire (4e compétence), pas encore équipé.</summary>
         public bool Locked;
-        /// <summary>Tours de recharge restants (0 : disponible).</summary>
-        public int Cooldown;
+        /// <summary>Énergie dépensée à chaque usage (0 : gratuite).</summary>
+        public int Cost;
+        /// <summary>L énergie de l agent couvre le coût.</summary>
+        public bool Affordable;
         /// <summary>La compétence se pose sur une cible (glisser sur une carte) ; sinon on la lâche dans le vide.</summary>
         public bool NeedsTarget;
         /// <summary>Initiale affichée sur l'icône.</summary>

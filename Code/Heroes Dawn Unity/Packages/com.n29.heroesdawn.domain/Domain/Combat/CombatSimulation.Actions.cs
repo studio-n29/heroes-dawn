@@ -29,7 +29,7 @@ namespace N29.HeroesDawn.Domain.Combat
             var u = _units[actorId];
             if (!u.IsReady || slotIndex < 0 || slotIndex >= ActiveSkillCount(u) || slotIndex > 3) return false;
             if (u.Has(StatusType.Bind) && slotIndex > 0) return false;
-            return u.Cooldowns[slotIndex] == 0;
+            return u.Energy >= u.Skills[slotIndex].Cost;
         }
 
         void ProcessCommands(List<CombatEvent> output)
@@ -77,10 +77,9 @@ namespace N29.HeroesDawn.Domain.Combat
             return false;
         }
 
-        /// <summary>Début de tour : brûlure, régénération, durées des statuts, recharges ; le Choc fait perdre le tour.</summary>
+        /// <summary>Début de tour : régénération de PV, durées des statuts ; le Choc fait perdre le tour.</summary>
         void BeginTurn(CombatUnit u, List<CombatEvent> output)
         {
-            for (int i = 0; i < u.Cooldowns.Length; i++) if (u.Cooldowns[i] > 0) u.Cooldowns[i]--;
 
             if (u.Has(StatusType.Regen))
             {
@@ -123,8 +122,8 @@ namespace N29.HeroesDawn.Domain.Combat
         {
             var targets = ResolveTargets(actor, skill.Target, preferredTarget);
             output.Add(new SkillUsedEvent(Tick, actor.Id, skill.Id, targets.ToArray()));
+            actor.Energy = System.Math.Max(0, actor.Energy - skill.Cost);
             ApplyEffects(actor, skill.Effects, targets, output);
-            if (slotIndex >= 0 && slotIndex < actor.Cooldowns.Length) actor.Cooldowns[slotIndex] = skill.Cooldown + 1;
             EndOfTurn(actor, slotIndex);
         }
 

@@ -168,7 +168,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["combat.debug_win"] = "DEBUG : GAGNER",
             ["combat.miss"] = "RATÉ", ["combat.crit"] = "CRITIQUE !", ["combat.skip"] = "SONNÉ",
             ["combat.rank"] = "Combat {0}",
-            ["combat.cooldown"] = "{0} t",
+            ["combat.cost"] = "coût {0}",
 
             // --- Cases ---
             ["case.Entry"] = "Entrée", ["case.Empty"] = "Rue", ["case.Combat"] = "Combat", ["case.MiniGame"] = "Mini-jeu",

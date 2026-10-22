@@ -75,7 +75,7 @@ namespace N29.HeroesDawn.EditorTools.Design
             EditorGUILayout.LabelField("Aperçu", EditorStyles.boldLabel);
             var users = DesignStore.Agents.agents.Where(a => a.skills.Contains(r.id)).Select(a => a.name).ToList();
             string text = ContentDataValidator.Validate(r).Count == 0 ? SkillText.Describe(ContentDataConverter.ToDef(r)) : "(corrige les erreurs pour voir la description)";
-            EditorGUILayout.HelpBox(r.name + " · " + r.slot + " · recharge " + r.cooldown + "\n" + text + "\nUtilisée par : " + (users.Count == 0 ? "aucun agent" : string.Join(", ", users)), MessageType.None);
+            EditorGUILayout.HelpBox(r.name + " · " + r.slot + " · coût " + r.cost + "\n" + text + "\nUtilisée par : " + (users.Count == 0 ? "aucun agent" : string.Join(", ", users)), MessageType.None);
         }
     }
 
@@ -155,7 +155,7 @@ namespace N29.HeroesDawn.EditorTools.Design
             for (int n = 2; DesignStore.Skills.skills.Any(s => s.id == id); n++) id = a.id + "_a" + (slot + 1) + "_" + n;
             DesignStore.Skills.skills.Add(new SkillRecord
             {
-                id = id, name = a.name + " · compétence " + (slot + 1), slot = (SkillSlot)slot, cooldown = slot == 0 ? 0 : 3 + slot,
+                id = id, name = a.name + " · compétence " + (slot + 1), slot = (SkillSlot)slot, cooldown = slot == 0 ? 0 : 3 + slot, cost = slot == 0 ? 0 : 20 + 10 * slot,
                 target = TargetRule.SingleEnemy, effects = new List<EffectRecord> { new EffectRecord { type = EffectType.Damage, value = 100 } },
             });
             DesignStore.SkillsDirty = true;

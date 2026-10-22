@@ -73,8 +73,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             hp.Set(s.Hp01, s.Instant);
             hp.SetLabel(s.HpText);
-            gauge.Set(s.Gauge01, true);
-            gauge.SetColor(s.GaugeFull ? Color.white : Theme.Gauge);
+            gauge.Set(s.Energy01, true); // la jauge de la carte montre l énergie (la frise du haut montre le temps)
+            gauge.SetColor(Theme.Info);
             statuses.text = s.Statuses;
             ko.gameObject.SetActive(!s.Alive);
             group.alpha = s.Alive ? 1f : 0.45f;
