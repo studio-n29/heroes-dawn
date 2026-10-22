@@ -399,6 +399,18 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public string RelativePath => "Screens/Combat.prefab";
         public int Order => 20;
 
+        /// <summary>Deux rangées de deux cartes, décalées l'une de l'autre (alignement de la 1re puis de la 2e rangée).</summary>
+        static void StaggeredRows(RectTransform block, TextAnchor first, TextAnchor second)
+        {
+            var anchors = new[] { first, second };
+            for (int i = 0; i < 2; i++)
+            {
+                var row = Ui.Rect(block, "Row" + i);
+                row.HLayout(20, 0, anchors[i]);
+                row.gameObject.AddComponent<LayoutElement>().preferredHeight = 255;
+            }
+        }
+
         public GameObject Build(PrefabContext ctx)
         {
             var rt = ScreenKit.Root("Combat");
@@ -421,37 +433,48 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var debug = Ui.LocBtn(top, "combat.debug_win", Theme.Navy, Color.white, null!, 20, FontKind.Body, "DebugWin");
             debug.Rect.At(1f, 0.5f, -500, 0, 200, 46);
 
-            // ---- Ennemis (rangée centrale sous la frise), alliés (colonne de gauche)
-            var enemyRow = Ui.Rect(rt, "Enemies").At(0.5f, 1f, 235, -282, 940, 250);
-            enemyRow.HLayout(20, 0, TextAnchor.UpperCenter);
+            // ---- Terrain central (là où se joueront les animations de compétence), alliés à gauche et ennemis à droite :
+            // deux rangées décalées de deux cartes (croquis du 2026-10-23).
+            var arena = Ui.Img(rt, "Arena", Theme.WithAlpha(Theme.Frost, 0.16f), Sprites.Rounded);
+            arena.rectTransform.At(0.5f, 0.5f, 0, -36, 1000, 520);
+            arena.raycastTarget = false;
+            var enemyRow = Ui.Rect(rt, "Enemies").At(1f, 1f, -36, -250, 500, 530);
+            enemyRow.VLayout(20, 0, TextAnchor.UpperRight);
             RecipeKit.Mark(enemyRow, TutorialTarget.CombatEnemies);
-            var allyRow = Ui.Rect(rt, "Allies").At(0f, 1f, 24, -110, 440, 480);
-            allyRow.VLayout(12, 0, TextAnchor.UpperLeft);
+            StaggeredRows(enemyRow, TextAnchor.UpperLeft, TextAnchor.UpperRight);
+            var allyRow = Ui.Rect(rt, "Allies").At(0f, 1f, 36, -250, 500, 530);
+            allyRow.VLayout(20, 0, TextAnchor.UpperLeft);
+            StaggeredRows(allyRow, TextAnchor.UpperRight, TextAnchor.UpperLeft);
 
             // ---- Journal (haut droite, discret)
             var logFill = Ui.Panel(rt, "Log", Theme.WithAlpha(Theme.Frost, 0.55f), 3f, 0f, false);
-            logFill.Frame().At(1f, 1f, -24, -282, 350, 200);
+            logFill.Frame().At(1f, 0f, -24, 24, 330, 170);
             logFill.gameObject.AddComponent<RectMask2D>();
             var logText = Ui.Txt(logFill.transform, "", 21, Theme.TextMuted, TextAnchor.LowerLeft, FontKind.Regular, "Lines");
             logText.rectTransform.Stretch(14, 10, 14, 10);
 
             // ---- Bandeau central, consigne
             var banner = Ui.Txt(rt, "", 76, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Banner");
-            banner.rectTransform.At(0.5f, 0.5f, 235, 40, 1000, 120);
+            banner.rectTransform.At(0.5f, 0.5f, 0, 40, 1000, 120);
             banner.Inked();
             var bannerGroup = banner.gameObject.AddComponent<CanvasGroup>();
             bannerGroup.blocksRaycasts = false;
             var hintBand = Ui.Img(rt, "HintBand", Theme.WithAlpha(Theme.Primary, 0.9f), Sprites.RoundedSmall);
-            hintBand.rectTransform.At(0.5f, 0f, 235, 420, 900, 52);
+            hintBand.rectTransform.At(0.5f, 0f, 0, 380, 900, 52);
             var hint = Ui.Txt(hintBand.transform, "", 30, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Hint");
             hint.rectTransform.Stretch(10, 0, 10, 0);
 
             // ---- Frise chronologique : grande bande mise en valeur au centre (100 à gauche → 0 à droite : à 0, c'est le tour)
             var glow = Ui.Img(rt, "TimelineGlow", Theme.WithAlpha(Theme.Primary, 0.35f), Sprites.Rounded);
-            glow.rectTransform.At(0.5f, 1f, 235, -98, 1316, 162);
+            glow.rectTransform.At(0.5f, 1f, 0, -98, 2100, 132);
             var stripFill = Ui.Panel(rt, "Timeline", Theme.WithAlpha(Theme.Frost, 0.94f), 5f, 8f, false);
-            var strip = stripFill.Frame().At(0.5f, 1f, 235, -104, 1300, 150);
-            var track = Ui.Rect(stripFill.transform, "Track").At(0f, 0.5f, 110, 0, 1060, 18);
+            var strip = stripFill.Frame().At(0.5f, 1f, 0, -104, 2084, 120);
+            var track = Ui.Rect(stripFill.transform, "Track");
+            track.anchorMin = new Vector2(0f, 0.5f);
+            track.anchorMax = new Vector2(1f, 0.5f);
+            track.pivot = new Vector2(0.5f, 0.5f);
+            track.offsetMin = new Vector2(120f, -9f);
+            track.offsetMax = new Vector2(-150f, 9f);
             var axisStart = Ui.Txt(stripFill.transform, "100", 40, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Title, "AxisStart");
             axisStart.rectTransform.At(0f, 0.5f, 14, 0, 90, 56);
             var axisEnd = Ui.Txt(stripFill.transform, "0", 56, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "AxisEnd");
@@ -478,12 +501,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
 
             // ---- Éventail de compétences (bas centre) : visible seulement pour l'agent dont c'est le tour ; la 1re carte à gauche penche à gauche
-            var fanRoot = Ui.Rect(rt, "SkillFan").At(0.5f, 0f, 235, -24, 760, 240);
+            var fanRoot = Ui.Rect(rt, "SkillFan").At(0.5f, 0f, 0, -24, 760, 240);
             RecipeKit.Mark(fanRoot, TutorialTarget.CombatSkills, enabled: false);
             var fanMarker = fanRoot.GetComponent<TutorialTargetMarker>();
-            float[] fanX = { -255f, -85f, 85f, 255f };
-            float[] fanY = { 0f, 16f, 16f, 0f };
-            float[] fanRot = { 10f, 3.5f, -3.5f, -10f };
+            float[] fanX = { -190f, 0f, 190f, 380f };
+            float[] fanY = { 0f, 16f, 0f, 0f };
+            float[] fanRot = { 8f, 0f, -8f, -14f };
             var fan = new Object[4];
             for (int i = 0; i < 4; i++)
             {
@@ -492,14 +515,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
                 crt.anchorMin = crt.anchorMax = new Vector2(0.5f, 0f);
                 crt.pivot = new Vector2(0.5f, 0f);
                 crt.sizeDelta = new Vector2(SkillIconRecipe.Width, SkillIconRecipe.Height);
-                crt.anchoredPosition = new Vector2(fanX[i], fanY[i] + 24f);
+                crt.anchoredPosition = new Vector2(fanX[i], fanY[i] + 48f);
                 crt.localEulerAngles = new Vector3(0f, 0f, fanRot[i]);
                 fan[i] = card;
             }
 
             // ---- Description de l'effet : affichée pendant l'appui maintenu sur une carte
             var descFill = Ui.Panel(rt, "Description", Theme.Navy, 3f, 8f, false);
-            descFill.Frame().At(0.5f, 0f, 235, 262, 700, 150);
+            descFill.Frame().At(0.5f, 0f, 0, 262, 700, 150);
             var descTitle = Ui.Txt(descFill.transform, "", 34, Theme.Glow, TextAnchor.UpperLeft, FontKind.Title, "DescTitle");
             descTitle.rectTransform.At(0f, 1f, 22, -10, 656, 44);
             var descText = Ui.Txt(descFill.transform, "", 26, Color.white, TextAnchor.UpperLeft, FontKind.Body, "DescText");
@@ -508,7 +531,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             // ---- Zone de dépose (compétence générale) : visible seulement pendant le glissement d'une carte sans cible
             var dropFill = Ui.Panel(rt, "DropZone", Theme.WithAlpha(Theme.Glow, 0.35f), 3f, 0f, false);
-            dropFill.Frame().At(0.5f, 0f, 235, 262, 1000, 120);
+            dropFill.Frame().At(0.5f, 0f, 0, 262, 1000, 120);
             var dropText = Ui.LocTxt(dropFill.transform, "combat.drop_here", 44, Theme.Navy, TextAnchor.MiddleCenter, FontKind.Title, "Label");
             dropText.rectTransform.Stretch();
             dropFill.Frame().gameObject.AddComponent<Pulse>().Amplitude = 0.02f;
@@ -530,7 +553,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "enemyRow", enemyRow);
             ctx.Wire(view, "allyRow", allyRow);
             ctx.Wire(view, "unitCardPrefab", ctx.Asset("Widgets/UnitCard.prefab").GetComponent<UnitCardView>());
-            ctx.Wire(view, "allyCardPrefab", ctx.Asset("Widgets/AllyCard.prefab").GetComponent<UnitCardView>());
+            ctx.Wire(view, "allyCardPrefab", ctx.Asset("Widgets/UnitCard.prefab").GetComponent<UnitCardView>());
             ctx.Wire(view, "fanRoot", fanRoot);
             ctx.WireArray(view, "fan", fan);
             ctx.Wire(view, "fanMarker", fanMarker);

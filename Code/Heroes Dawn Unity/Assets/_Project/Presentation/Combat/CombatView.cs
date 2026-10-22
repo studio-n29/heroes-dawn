@@ -82,7 +82,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         public IReadOnlyList<UnitCardView> EnemyCards()
         {
             var list = new List<UnitCardView>();
-            foreach (Transform t in enemyRow) { var c = t.GetComponent<UnitCardView>(); if (c != null) list.Add(c); }
+            foreach (var c in enemyRow.GetComponentsInChildren<UnitCardView>(true)) list.Add(c);
             return list;
         }
 
@@ -177,17 +177,29 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         public void BuildUnits(IReadOnlyList<UnitCardData> units)
         {
-            enemyRow.Clear();
-            allyRow.Clear();
+            ClearRows(enemyRow);
+            ClearRows(allyRow);
             timeline.Clear();
             _cards.Clear();
+            int allies = 0, enemies = 0;
             foreach (var u in units)
             {
-                var card = Instantiate(u.Ally ? allyCardPrefab : unitCardPrefab, u.Ally ? allyRow : enemyRow);
+                int index = u.Ally ? allies++ : enemies++;
+                var card = Instantiate(u.Ally ? allyCardPrefab : unitCardPrefab, RowFor(u.Ally ? allyRow : enemyRow, index));
                 card.Setup(u);
                 card.Tapped += id => UnitTapped?.Invoke(id);
                 _cards[u.Id] = card;
             }
+        }
+
+        /// <summary>Chaque camp est un bloc de deux rangées de deux cartes (croquis du combat) ; sans rangées, les cartes sont posées dans le bloc.</summary>
+        static RectTransform RowFor(RectTransform block, int index)
+            => block.childCount == 0 ? block : (RectTransform)block.GetChild(Mathf.Min(index / 2, block.childCount - 1));
+
+        static void ClearRows(RectTransform block)
+        {
+            if (block.childCount == 0) return;
+            for (int i = 0; i < block.childCount; i++) block.GetChild(i).Clear();
         }
 
         public void ShowUnits(IReadOnlyList<UnitStateData> states)
@@ -213,6 +225,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             {
                 var slotData = i < skills!.Length ? skills[i] : default;
                 fan[i].Show(slotData, i);
+                // Trois cartes en éventail ; la 4e (carte du grimoire) n apparaît que si elle existe.
+                if (i >= 3) fan[i].gameObject.SetActive(slotData.Visible && !slotData.Locked);
                 usable |= slotData.Enabled || slotData.Pending;
             }
             if (fanMarker != null) fanMarker.enabled = usable;
