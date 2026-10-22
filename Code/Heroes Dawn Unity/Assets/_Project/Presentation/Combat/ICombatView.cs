@@ -40,6 +40,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         void Act(int unitId);
         /// <summary>La carte de l'emplacement <paramref name="slot"/> est jouée : elle s'envole vers l'unité visée (ou le terrain si -1).</summary>
         void PlayCard(int slot, int targetUnitId);
+        /// <summary>Anime la compétence jouée dans le terrain (titre, projectile, éclat de sa famille) et renvoie la durée de la pause de résolution (0 sans animation).</summary>
+        float PlaySkillFx(SkillFxData data, float seconds);
         UniTask PauseAsync(float seconds, CancellationToken ct);
     }
 }

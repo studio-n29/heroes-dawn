@@ -54,6 +54,8 @@ namespace N29.HeroesDawn.Definitions
         public int TimelineStartPointMax { get; set; } = 2;
         /// <summary>Duree d un pas de frise (un point), en millisecondes.</summary>
         public int TimelineStepMs { get; set; } = 350;
+        /// <summary>Pause de résolution après chaque compétence (animation dans le terrain, déplacements visibles sur la frise), en ms ; 0 sans animation.</summary>
+        public int CombatResolutionMs { get; set; } = 1300;
         /// <summary>Temps maximum du joueur pour choisir au point d action.</summary>
         public int TimelineTurnTimeoutMs { get; set; } = 30000;
         /// <summary>Delai de reflexion de l IA (presentation) : borne basse et haute.</summary>

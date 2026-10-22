@@ -13,7 +13,7 @@ using UnityEngine.InputSystem;
 namespace N29.HeroesDawn.Presentation.Combat
 {
     /// <summary>Combat (prefab Screens/Combat) : arène (ennemis en haut, alliés en bas), compétences, journal, bandeau.</summary>
-    public sealed class CombatView : ViewBase, ICombatView
+    public sealed partial class CombatView : ViewBase, ICombatView
     {
         [SerializeField] UiButton retreat = null!;
         [SerializeField] UiButton auto = null!;
@@ -37,6 +37,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] TMP_Text descTitle = null!;
         [SerializeField] TMP_Text descText = null!;
         [SerializeField, Mvp.OptionalRef] RectTransform? dropZone;
+        [SerializeField, Mvp.OptionalRef] RectTransform? arena;
+        [SerializeField, Mvp.OptionalRef] TMP_Text? arenaTitle;
 
         readonly Dictionary<int, UnitCardView> _cards = new Dictionary<int, UnitCardView>();
         Coroutine? _bannerFade;

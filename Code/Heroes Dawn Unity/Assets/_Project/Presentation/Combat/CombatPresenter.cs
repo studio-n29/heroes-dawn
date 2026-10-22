@@ -252,6 +252,19 @@ namespace N29.HeroesDawn.Presentation.Combat
             return -1;
         }
 
+        /// <summary>Animation de la compétence dans le terrain ; la frise attend la fin de la pause de résolution (0 sans animation).</summary>
+        void PlaySkillFx(SkillUsedEvent su)
+        {
+            SkillDef? skill = null;
+            foreach (var s in _sim!.Unit(su.Actor).Skills) if (s.Id == su.Skill) { skill = s; break; }
+            if (skill == null) return;
+            float seconds = View.PlaySkillFx(new SkillFxData
+            {
+                ActorId = su.Actor, TargetIds = su.Targets, Kind = SkillFx.KindOf(skill), Title = _loc.SkillName(skill),
+            }, _session.Content.Balance.CombatResolutionMs / 1000f);
+            _pauseLeft = Math.Max(_pauseLeft, seconds);
+        }
+
         void ToastTurnPassed(int unitId) => AddLog(Name(unitId) + " : " + _loc.T("combat.turn_passed"));
 
         void Play(IReadOnlyList<CombatEvent> events)
@@ -270,7 +283,8 @@ namespace N29.HeroesDawn.Presentation.Combat
                     case SkillUsedEvent su:
                         View.Act(su.Actor);
                         if (_sim!.Unit(su.Actor).Side == Side.Ally) _tutorial?.Signal(TutorialSignal.SkillUsed);
-                        else if (!_sim.Auto) _pauseLeft = AiThinkingSeconds();
+                        else if (!_sim.Auto) _pauseLeft = Math.Max(_pauseLeft, AiThinkingSeconds());
+                        PlaySkillFx(su);
                         _audio.Play(SfxId.SkillCast);
                         AddLog(Name(su.Actor) + " : " + SkillLabel(su.Actor, su.Skill));
                         break;

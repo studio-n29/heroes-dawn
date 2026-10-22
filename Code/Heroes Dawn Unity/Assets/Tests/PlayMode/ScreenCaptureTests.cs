@@ -159,6 +159,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var zone = session.Content.Zone(PrototypeContent.Zone11);
             session.Run = ZoneRun.ForTests(session.Content, zone, 3UL, 6, false);
             session.RunZone = zone;
+            session.Meta.tutorial.done = true; // pas de tutoriel : la capture joue elle-même une compétence
+            session.Meta.tutorial.hintsSeen.AddRange(new[] { "auto", "defeat", "fatigue", "timeline", "zone_done" }); // ni d astuce qui bloque le combat
             var run = session.Run!;
             Container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Board));
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning);
@@ -190,6 +192,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var from = new BoardGraph(zone).Neighbors(new N29.HeroesDawn.Core.CaseId("n15")).First();
             session.Run = ZoneRun.ForTests(session.Content, zone, 3UL, 1, true, from.Value);
             session.RunZone = zone;
+            session.Meta.tutorial.done = true; // pas de tutoriel : la capture joue elle-même une compétence
+            session.Meta.tutorial.hintsSeen.AddRange(new[] { "auto", "defeat", "fatigue", "timeline", "zone_done" }); // ni d astuce qui bloque le combat
             Container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Board));
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning);
             PlayModeHarness.TapNode(new N29.HeroesDawn.Core.CaseId("n15"));
@@ -216,6 +220,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var zone = session.Content.Zone(PrototypeContent.Zone11);
             session.Run = ZoneRun.ForTests(session.Content, zone, 3UL, 1, true, "n02");
             session.RunZone = zone;
+            session.Meta.tutorial.done = true; // pas de tutoriel : la capture joue elle-même une compétence
+            session.Meta.tutorial.hintsSeen.AddRange(new[] { "auto", "defeat", "fatigue", "timeline", "zone_done" }); // ni d astuce qui bloque le combat
             Container.Resolve<IPublisher<NavigateRequested>>().Publish(new NavigateRequested(GameState.Board));
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning);
             yield return Capture("03-plateau");
@@ -224,6 +230,20 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => SceneManager.GetSceneByName(SceneNames.Combat).isLoaded && !Flow.IsTransitioning, 600);
             yield return new WaitForSecondsRealtime(5f); // le temps qu un allié soit prêt (panneau de compétences)
             yield return Capture("04-combat");
+
+            // Animation de compétence : une compétence jouée, capture en plein vol du projectile.
+            var tip = Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Tutorial.TutorialOverlayView>();
+            if (tip != null) { tip.OkButton.Button.onClick.Invoke(); yield return new WaitForSecondsRealtime(0.5f); } // ferme l astuce de la frise
+            var combatView = Object.FindAnyObjectByType<CombatView>()!;
+            // Animations de competence (appel direct de la vue sur le combat reel) : feu vers un ennemi, puis soin sur un allie.
+            int enemyId = combatView.EnemyCards()[0].UnitId;
+            combatView.PlaySkillFx(new SkillFxData { ActorId = 0, TargetIds = new[] { enemyId }, Kind = SkillFxKind.Fire, Title = "Jet de flammes" }, 1.3f);
+            yield return new WaitForSecondsRealtime(0.17f);
+            yield return Capture("04b-combat-animation");
+            yield return new WaitForSecondsRealtime(1.2f);
+            combatView.PlaySkillFx(new SkillFxData { ActorId = 2, TargetIds = new[] { 0, 1 }, Kind = SkillFxKind.Heal, Title = "Choeur de guerison" }, 1.3f);
+            yield return new WaitForSecondsRealtime(0.3f);
+            yield return Capture("04c-combat-animation");
 
             Container.Resolve<IForceCombatWinUseCase>().ExecuteAsync().Forget();
             for (int i = 0; i < 120; i++) yield return null;

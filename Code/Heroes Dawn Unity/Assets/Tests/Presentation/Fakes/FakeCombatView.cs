@@ -50,6 +50,10 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void Hit(int unitId) { }
         public void Act(int unitId) { }
         public (int Slot, int Target)? LastPlayedCard;
+        public SkillFxData? LastSkillFx;
+        /// <summary>Durée renvoyée par PlaySkillFx (0 : pas d animation, comme en mouvements réduits).</summary>
+        public float FxSeconds;
+        public float PlaySkillFx(SkillFxData data, float seconds) { LastSkillFx = data; return FxSeconds; }
         public void PlayCard(int slot, int targetUnitId) => LastPlayedCard = (slot, targetUnitId);
         public UniTask PauseAsync(float seconds, CancellationToken ct) => UniTask.CompletedTask;
     }

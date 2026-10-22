@@ -427,6 +427,10 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Navy, Sprites.Circle);          
             var arena = Ui.Img(rt, "Arena", Theme.WithAlpha(Theme.Frost, 0.16f), Sprites.Rounded);
             arena.rectTransform.At(0.5f, 0.5f, 0, -36, 1000, 520);
             arena.raycastTarget = false;
+            var arenaTitle = Ui.Txt(arena.transform, "", 64, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "SkillTitle");
+            arenaTitle.rectTransform.At(0.5f, 1f, 0, -36, 900, 90);
+            arenaTitle.Inked();
+            arenaTitle.gameObject.SetActive(false);
             var enemyRow = Ui.Rect(rt, "Enemies").At(1f, 1f, -36, -250, 500, 530);
             enemyRow.VLayout(20, 0, TextAnchor.UpperRight);
             RecipeKit.Mark(enemyRow, TutorialTarget.CombatEnemies);
@@ -550,6 +554,8 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Navy, Sprites.Circle);          
             ctx.Wire(view, "descTitle", descTitle);
             ctx.Wire(view, "descText", descText);
             ctx.Wire(view, "dropZone", dropFill.Frame());
+            ctx.Wire(view, "arena", arena.rectTransform);
+            ctx.Wire(view, "arenaTitle", arenaTitle);
             return rt.gameObject;
         }
     }

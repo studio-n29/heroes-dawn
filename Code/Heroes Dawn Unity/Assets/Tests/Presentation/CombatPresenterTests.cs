@@ -171,6 +171,37 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_sim.Unit(actor).IsReady, Is.False);
         }
 
+        [Test, Description("Vérifie qu une compétence jouée est animée dans le terrain avec sa famille et son nom, puis que la frise attend la fin de la pause de résolution avant de reprendre — parce que le joueur doit voir la compétence et les déplacements sur la frise")]
+        public void SkillUsed_PlaysItsFx_AndPausesTheTimeline()
+        {
+            _view.FxSeconds = 1.3f;
+            int slot = ReadyWithGeneralSkill();
+            int actor = _view.States.Single(s => s.Selected).Id;
+            var skill = _sim.Unit(actor).Skills[slot];
+            _view.BeginDragSkill(slot);
+            _view.DropSkill(slot, ICombatView.DropTerrain);
+            _p.Tick();
+            Assert.That(_view.LastSkillFx, Is.Not.Null);
+            Assert.That(_view.LastSkillFx!.Value.ActorId, Is.EqualTo(actor));
+            Assert.That(_view.LastSkillFx.Value.Kind, Is.EqualTo(SkillFx.KindOf(skill)));
+            Assert.That(_view.LastSkillFx.Value.Title, Is.EqualTo(new LocLocalization().SkillName(skill)));
+            Assert.That(_p.PauseLeft, Is.GreaterThan(0.8f), "la frise est en pause de résolution");
+            int tick = _sim.ActiveTick;
+            _p.Tick();
+            Assert.That(_sim.ActiveTick, Is.EqualTo(tick), "la frise n avance pas pendant la résolution");
+        }
+
+        [Test, Description("Vérifie que sans animation (mouvements réduits) il n y a aucune pause de résolution — parce que l attente n a de sens que pour voir l animation")]
+        public void SkillUsed_WithoutAnimation_DoesNotPause()
+        {
+            _view.FxSeconds = 0f;
+            int slot = ReadyWithGeneralSkill();
+            _view.BeginDragSkill(slot);
+            _view.DropSkill(slot, ICombatView.DropTerrain);
+            _p.Tick();
+            Assert.That(_p.PauseLeft, Is.EqualTo(0f));
+        }
+
         [Test, Description("Vérifie que lâcher une carte sans l'avoir prise n'a aucun effet — parce qu'un lâcher parasite ne doit rien lancer")]
         public void DropWithoutDrag_IsIgnored()
         {
