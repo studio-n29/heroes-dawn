@@ -11,7 +11,7 @@ namespace N29.HeroesDawn.Tests.Domain
     /// <summary>Objets, cartes de compétences et boosters (plan 2026-10-10, sous-projets L et M) : règles du domaine et effets en combat.</summary>
     public sealed class CollectionRulesTests
     {
-        static readonly ContentCatalog C = PrototypeContent.Build();
+        static readonly ContentCatalog C = TestContent.Build();
         static CollectionDef Defs => C.Collection;
 
         static CombatSimulation Sim(AllyEntry[] allies, string[] enemies, ulong seed = 11)

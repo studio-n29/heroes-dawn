@@ -11,7 +11,7 @@ namespace N29.HeroesDawn.Tests.Domain
 {
     public sealed class PrototypeDomainTests
     {
-        static ContentCatalog C => PrototypeContent.Build();
+        static ContentCatalog C => TestContent.Build();
 
         [Test, Description("Vérifie que le contenu du prototype est cohérent : 30 agents, zone de 25 cases et 3 objectifs, liens valides, 3 compétences par recrue — parce qu'une donnée incohérente casserait le jeu à l'exécution")]
         public void Content_IsConsistent()

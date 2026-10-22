@@ -14,7 +14,7 @@ namespace N29.HeroesDawn.EditorTools.Balance
     /// <summary>Menu Heroes Dawn ▸ Équilibrage ▸ Simulateur : taux de victoire par rencontre de la zone 1.1, export CSV.</summary>
     public sealed class BalanceSimulatorWindow : EditorWindow
     {
-        static readonly string[] DefaultTeam = { "ancre", "verre", "givre", "echo" };
+        static readonly string[] DefaultTeam = { "darius_brooks", "mei_lin_chen", "freya_lindqvist", "kwame_abara" };
 
         ContentCatalog _content = null!;
         string[] _memberIds = Array.Empty<string>();

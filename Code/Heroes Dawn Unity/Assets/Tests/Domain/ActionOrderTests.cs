@@ -10,7 +10,7 @@ namespace N29.HeroesDawn.Tests.Domain
     /// <summary>Manipulation de l'ordre d'action : reculs d'ennemis, propulsion d'alliés, vitesse de la frise (plan 2026-10-10, sous-projets J et K).</summary>
     public sealed class ActionOrderTests
     {
-        static readonly ContentCatalog C = PrototypeContent.Build();
+        static readonly ContentCatalog C = TestContent.Build();
 
         static CombatSimulation Sim(string[] allies, string[] enemies, ContentCatalog? catalog = null, ulong seed = 11)
             => new CombatSimulation(catalog ?? C, new CombatSetup(seed, CombatRank.Normal,

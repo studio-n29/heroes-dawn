@@ -10,7 +10,7 @@ namespace N29.HeroesDawn.Tests.Editor
 {
     public sealed class BalanceSimulationTests
     {
-        static readonly MemberId[] Team = { new("ancre"), new("verre"), new("givre"), new("echo") };
+        static readonly MemberId[] Team = { new("darius_brooks"), new("mei_lin_chen"), new("freya_lindqvist"), new("kwame_abara") };
 
         static SimulationRequest Req(int runs, int maxTicks = 20000) => new SimulationRequest
         {

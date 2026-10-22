@@ -10,7 +10,7 @@ namespace N29.HeroesDawn.Tests.Domain
     /// <summary>Frise chronologique, zone de préparation, contrôles, combos à proximité (specs 2026-10-05 et 2026-10-07).</summary>
     public sealed class TimelineCombatTests
     {
-        static readonly ContentCatalog C = PrototypeContent.Build();
+        static readonly ContentCatalog C = TestContent.Build();
 
         static CombatSimulation Sim(string[] allies, string[] enemies, CombatRank rank = CombatRank.Normal, ulong seed = 11)
             => new CombatSimulation(C, new CombatSetup(seed, rank,

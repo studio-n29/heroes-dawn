@@ -89,10 +89,10 @@ namespace N29.HeroesDawn.Content.Prototype
         static ZoneDef BuildZone12()
         {
             var lieutenant = new NarrationDef(
-                new[] { L("ny_1_2", "n14", "before", 0, "lieutenant"), L("ny_1_2", "n14", "before", 1, "ancre") },
+                new[] { L("ny_1_2", "n14", "before", 0, "lieutenant"), L("ny_1_2", "n14", "before", 1, "darius_brooks") },
                 new[] { L("ny_1_2", "n14", "after", 0, "lieutenant") });
             var evacuation = new NarrationDef(null,
-                new[] { L("ny_1_2", "n19", "after", 0, "ancre"), L("ny_1_2", "n19", "after", 1, "ancre") });
+                new[] { L("ny_1_2", "n19", "after", 0, "darius_brooks"), L("ny_1_2", "n19", "after", 1, "darius_brooks") });
             var nodes = new List<NodeDef>
             {
                 N("n00", CaseType.Entry, 0, 2, true),
@@ -152,8 +152,8 @@ namespace N29.HeroesDawn.Content.Prototype
         static ZoneDef BuildZone13()
         {
             var crocodile = new NarrationDef(
-                new[] { L("ny_1_3", "n18", "before", 0, "crocodile"), L("ny_1_3", "n18", "before", 1, "ancre") },
-                new[] { L("ny_1_3", "n18", "after", 0, "crocodile"), L("ny_1_3", "n18", "after", 1, "ancre") });
+                new[] { L("ny_1_3", "n18", "before", 0, "crocodile"), L("ny_1_3", "n18", "before", 1, "darius_brooks") },
+                new[] { L("ny_1_3", "n18", "after", 0, "crocodile"), L("ny_1_3", "n18", "after", 1, "darius_brooks") });
             var objectives = new List<ObjectiveDef>
             {
                 new ObjectiveDef("obj_civilians", ObjectiveType.CompleteMiniGame, new CaseId("n11"), "objectives.ny13.civilians"),
@@ -175,7 +175,7 @@ namespace N29.HeroesDawn.Content.Prototype
         static ZoneDef BuildZone14()
         {
             var titan = new NarrationDef(
-                new[] { L("ny_1_4", "n18", "before", 0, "stroke"), L("ny_1_4", "n18", "before", 1, "ancre") },
+                new[] { L("ny_1_4", "n18", "before", 0, "stroke"), L("ny_1_4", "n18", "before", 1, "darius_brooks") },
                 new[] { L("ny_1_4", "n18", "after", 0, "rayner"), L("ny_1_4", "n18", "after", 1, "stroke"), L("ny_1_4", "n18", "after", 2, "general"), L("ny_1_4", "n18", "after", 3, "general") });
             var objectives = new List<ObjectiveDef>
             {

@@ -1,3 +1,4 @@
+using N29.HeroesDawn.Tests.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -379,7 +380,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que les quatre zones de Brooklyn sont jouables de bout en bout (graphe valide, objectifs atteignables, combats existants) — parce qu'une zone injouable bloquerait la progression")]
         public void NewZones_AreWellFormed()
         {
-            var c = PrototypeContent.Build();
+            var c = TestContent.Build();
             foreach (var id in new[] { PrototypeContent.Zone11, PrototypeZones.Zone12, PrototypeZones.Zone13, PrototypeZones.Zone14 })
             {
                 var zone = c.Zone(id);

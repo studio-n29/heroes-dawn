@@ -24,7 +24,6 @@ namespace N29.HeroesDawn.Application.Session
         /// <summary>Récupération passive de fatigue (points par minute réelle, hors mission).</summary>
         public const int FatigueRecoveryPerMinute = 1;
 
-        public static readonly string[] StarterTeam = { "ancre", "givre", "echo", "seve" };
 
         public static int RecruitCost(Rarity r) => r == Rarity.Legend ? 1200 : r == Rarity.Elite ? 450 : 150;
         public static int TrainCost(int level) => 100 * level;
@@ -164,7 +163,7 @@ namespace N29.HeroesDawn.Application.Session
             Meta = new MetaSave();
             Wallet.SetGems(Meta.gems);
             Wallet.Set(MetaRules.StartCredits, MetaRules.StartPr);
-            foreach (var id in MetaRules.StarterTeam)
+            foreach (var id in Content.StarterTeam)
             {
                 var def = FindDef(new MemberId(id));
                 if (def != null) Roster.Add(new TeamMember(def, MetaRules.StarterLevel) { InSquad = true });

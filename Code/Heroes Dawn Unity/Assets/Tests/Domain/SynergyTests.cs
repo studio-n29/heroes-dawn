@@ -10,7 +10,7 @@ namespace N29.HeroesDawn.Tests.Domain
     /// <summary>Synergies d'équipe : boost permanent donné par les paires de familles de l'escouade (remplace les combos, version 0.9.0).</summary>
     public sealed class SynergyTests
     {
-        static readonly ContentCatalog C = PrototypeContent.Build();
+        static readonly ContentCatalog C = TestContent.Build();
 
         static CombatSimulation Sim(params string[] allies)
             => new CombatSimulation(C, new CombatSetup(11UL, CombatRank.Normal,

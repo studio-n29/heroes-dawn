@@ -82,7 +82,7 @@ namespace N29.HeroesDawn.EditorTools.Design
     /// <summary>Outil des agents : ajouter, modifier, dupliquer ou supprimer un agent complet (identité, statistiques, déblocage, compétences).</summary>
     public sealed class AgentsDesignWindow : DesignWindowBase<AgentRecord>
     {
-        static readonly string[] Starter = { "ancre", "givre", "echo", "seve" };
+        static readonly string[] Starter = N29.HeroesDawn.Content.Prototype.PrototypeAgents.StarterTeam;
         static readonly HashSet<string> Hidden = new HashSet<string> { "skills" };
         string[]? _zones;
 

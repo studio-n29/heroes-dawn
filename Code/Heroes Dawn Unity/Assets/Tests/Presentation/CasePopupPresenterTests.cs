@@ -1,3 +1,4 @@
+using N29.HeroesDawn.Tests.Domain;
 using System.Linq;
 using System.Threading;
 using N29.HeroesDawn.Application.Features.Zone;
@@ -133,7 +134,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void ZoneComplete_AnnouncesBoosterAndNewAgents()
         {
             var rewards = new ZoneRewards(1500, 40, true, 1, new[] { new MemberId("vanguard") });
-            var p = new CasePopupPresenter(new ModalService(_host), _resolve, _resolve, _app.Zone.PlanActivity, _resolve, new GameSession(N29.HeroesDawn.Content.Prototype.PrototypeContent.Build()), _toasts, new LocLocalization());
+            var p = new CasePopupPresenter(new ModalService(_host), _resolve, _resolve, _app.Zone.PlanActivity, _resolve, new GameSession(TestContent.Build()), _toasts, new LocLocalization());
             p.ShowZoneCompleteAsync(rewards, CancellationToken.None).GetAwaiter().GetResult();
             Assert.That(_zone.Data!.Value.Rewards, Does.Contain("+1 booster").And.Contain("Vanguard"));
         }

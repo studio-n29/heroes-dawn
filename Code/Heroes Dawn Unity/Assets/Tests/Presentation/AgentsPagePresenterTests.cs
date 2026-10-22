@@ -59,13 +59,13 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             var p = Start();
             string how(string id) => p.How(_session.Content.Member(new MemberId(id)));
-            Assert.That(how("vanguard"), Does.Contain("Arc narratif").And.Contain("1.1"));
-            Assert.That(how("oracle"), Does.Contain("1.2"));
-            Assert.That(how("lone_wolf"), Does.Contain("seul agent").And.Contain("1.1"));
-            Assert.That(how("phoenix"), Does.Contain("sans aucune défaite").And.Contain("1.2"));
-            Assert.That(how("forge"), Does.Contain("week-end").And.Contain("1.1"));
-            Assert.That(how("verre"), Does.Contain("après la zone"));
-            Assert.That(how("prism"), Does.Contain("Boutique"));
+            Assert.That(how("noah_kaplan"), Does.Contain("Arc narratif").And.Contain("1.1"));
+            Assert.That(how("victor_sorel"), Does.Contain("1.2"));
+            Assert.That(how("ada_okonkwo"), Does.Contain("seul agent").And.Contain("1.1"));
+            Assert.That(how("eero_nieminen"), Does.Contain("sans aucune défaite").And.Contain("1.2"));
+            Assert.That(how("louis_dubois"), Does.Contain("week-end").And.Contain("1.1"));
+            Assert.That(how("amara_hughes"), Does.Contain("après la zone"));
+            Assert.That(how("ilona_varga"), Does.Contain("Boutique"));
         }
 
         [Test, Description("Vérifie que l'événement du jour est mis en avant en tête des agents à débloquer le samedi, pas le lundi — parce que l'événement est temporaire")]
@@ -83,7 +83,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _app.Time.LocalNow = new DateTime(2026, 10, 12, 12, 0, 0); // lundi
             Start();
             Assert.That(_view.Rows.Any(r => r.Highlight), Is.False);
-            Assert.That(_view.Rows.First(r => r.Title == "Forge").Subtitle, Does.Contain("samedi ou le dimanche"));
+            Assert.That(_view.Rows.First(r => r.Title == "Louis Dubois").Subtitle, Does.Contain("samedi ou le dimanche"));
         }
 
         [Test, Description("Vérifie que toucher un agent de l'équipe ouvre sa fiche et qu'un agent à débloquer n'ouvre rien — parce que seule l'équipe a une fiche d'agent")]
@@ -105,8 +105,8 @@ namespace N29.HeroesDawn.Tests.Presentation
                 Assert.That(_loc.MemberName(m), Does.Not.StartWith("members."), m.Id.Value);
                 foreach (var s in m.Skills) Assert.That(_loc.SkillName(s), Does.Not.StartWith("skills."), s.Id.Value);
             }
-            Assert.That(_loc.MemberName(_session.Content.Member(new MemberId("lone_wolf"))), Is.EqualTo("Lone Wolf"));
-            Assert.That(_loc.SkillName(_session.Content.Member(new MemberId("cinder")).Skills[1]), Is.EqualTo("Salve · Cinder"));
+            Assert.That(_loc.MemberName(_session.Content.Member(new MemberId("ada_okonkwo"))), Is.EqualTo("Ada Okonkwo"));
+            Assert.That(_loc.SkillName(_session.Content.Member(new MemberId("mei_lin_chen")).Skills[1]), Is.EqualTo("Salve · Mei-Lin Chen"));
         }
     }
 }

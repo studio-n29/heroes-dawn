@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace N29.HeroesDawn.Presentation.Common
 {
-    /// <summary>Noms des 22 agents ajoutés (noms de code identiques dans toutes les langues) et de leurs compétences, déblocages, textes du registre.</summary>
+    /// <summary>Noms des agents (les 22 anciens agents ne servent plus qu aux tests, les 30 agents de The Dawn sont dans LocDawnAgents), compétences, déblocages, textes du registre.</summary>
     public static partial class Loc
     {
         /// <summary>Agent (identifiant, nom de code, rôle) : les noms de compétence se déduisent du rôle.</summary>
@@ -35,6 +35,8 @@ namespace N29.HeroesDawn.Presentation.Common
                 var kit = kits[role];
                 for (int i = 0; i < 3; i++) d["skills." + id + "_a" + (i + 1)] = kit[i] + " · " + name;
             }
+
+            AddDawnAgents(d, kits);
 
             d["page.agents"] = "Registre des agents";
             d["agents.title"] = "REGISTRE DES AGENTS";

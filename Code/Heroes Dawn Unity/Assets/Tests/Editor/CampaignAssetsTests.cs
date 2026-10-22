@@ -24,7 +24,7 @@ namespace N29.HeroesDawn.Tests.Editor
             var lib = ZoneLibrary.Load();
             NarrationDef Of(string zone, string node) => lib.Zones.Single(z => z.Id.Value == zone).Nodes.Single(n => n.Id.Value == node).Narration!;
             Assert.That(Of("zone_ny_1_1", "n23").After.Count, Is.EqualTo(2));
-            Assert.That(Of("zone_ny_1_2", "n14").Before.Select(l => l.Speaker), Is.EqualTo(new[] { "lieutenant", "ancre" }));
+            Assert.That(Of("zone_ny_1_2", "n14").Before.Select(l => l.Speaker), Is.EqualTo(new[] { "lieutenant", "darius_brooks" }));
             Assert.That(Of("zone_ny_1_3", "n18").Before[0].Speaker, Is.EqualTo("crocodile"));
             Assert.That(Of("zone_ny_1_4", "n18").After.Select(l => l.Speaker), Is.EqualTo(new[] { "rayner", "stroke", "general", "general" }));
             foreach (var key in new[] { "narration.ny_1_4.n18.after.0", "narration.ny_1_3.n18.before.0", "narration.ny_1_2.n14.after.0" })

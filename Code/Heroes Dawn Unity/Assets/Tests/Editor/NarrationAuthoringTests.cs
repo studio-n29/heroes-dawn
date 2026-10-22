@@ -17,8 +17,8 @@ namespace N29.HeroesDawn.Tests.Editor
             z.nodes.Add(new NodeData { id = "n00", type = CaseType.Entry, x = 0, y = 0 });
             var n = new NodeData { id = "n01", type = CaseType.Combat, x = 1, y = 0 };
             n.narrationBefore.Add(new NarrationLineData { speaker = "brick", text = "Halte-là !" });
-            n.narrationAfter.Add(new NarrationLineData { speaker = "ancre", text = "C'est fini." });
-            n.narrationAfter.Add(new NarrationLineData { speaker = "ancre", text = "Allons-y." });
+            n.narrationAfter.Add(new NarrationLineData { speaker = "darius_brooks", text = "C'est fini." });
+            n.narrationAfter.Add(new NarrationLineData { speaker = "darius_brooks", text = "Allons-y." });
             z.nodes.Add(n);
             z.links.Add(new LinkData { a = "n00", b = "n01" });
             return z;

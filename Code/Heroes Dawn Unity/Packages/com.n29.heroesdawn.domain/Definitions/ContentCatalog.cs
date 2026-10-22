@@ -20,12 +20,16 @@ namespace N29.HeroesDawn.Definitions
         public IReadOnlyList<ActivityDef> Activities { get; }
         /// <summary>Objets, cartes de competences et boosters.</summary>
         public CollectionDef Collection { get; }
+        /// <summary>Identifiants des agents de l équipe de départ d un nouveau profil.</summary>
+        public IReadOnlyList<string> StarterTeam { get; }
 
         public ContentCatalog(BalanceConfig balance, IReadOnlyList<MemberDef> members, IReadOnlyList<EnemyDef> enemies,
                               IReadOnlyList<SynergyDef> synergies, IReadOnlyList<ZoneDef> zones,
-                              IReadOnlyList<ActivityDef>? activities = null, CollectionDef? collection = null)
+                              IReadOnlyList<ActivityDef>? activities = null, CollectionDef? collection = null,
+                              IReadOnlyList<string>? starterTeam = null)
         {
             Collection = collection ?? CollectionDef.Empty;
+            StarterTeam = starterTeam ?? new string[0];
             Balance = balance; Members = members; Enemies = enemies; Synergies = synergies; Zones = zones;
             Activities = activities ?? new List<ActivityDef>();
             foreach (var m in members) _members.Add(m.Id, m);
@@ -49,12 +53,12 @@ namespace N29.HeroesDawn.Definitions
             foreach (var z in zones) byId[z.Id] = z;
             foreach (var z in Zones) merged.Add(byId.TryGetValue(z.Id, out var over) ? over : z);
             foreach (var z in zones) if (!_zones.ContainsKey(z.Id)) merged.Add(z);
-            return new ContentCatalog(Balance, Members, Enemies, Synergies, merged, Activities, Collection);
+            return new ContentCatalog(Balance, Members, Enemies, Synergies, merged, Activities, Collection, StarterTeam);
         }
 
         /// <summary>Meme contenu avec ces objets, cartes et boosters.</summary>
         public ContentCatalog WithCollection(CollectionDef collection)
-            => new ContentCatalog(Balance, Members, Enemies, Synergies, Zones, Activities, collection);
+            => new ContentCatalog(Balance, Members, Enemies, Synergies, Zones, Activities, collection, StarterTeam);
 
         /// <summary>Même contenu avec ces objets à la place de ceux du code (outil de design des objets).</summary>
         public ContentCatalog WithItems(IReadOnlyList<ItemDef> items)
@@ -62,7 +66,7 @@ namespace N29.HeroesDawn.Definitions
 
         /// <summary>Même contenu avec ces agents à la place de ceux du code (outil de design des agents).</summary>
         public ContentCatalog WithMembers(IReadOnlyList<MemberDef> members)
-            => new ContentCatalog(Balance, members, Enemies, Synergies, Zones, Activities, Collection);
+            => new ContentCatalog(Balance, members, Enemies, Synergies, Zones, Activities, Collection, StarterTeam);
 
     }
 }

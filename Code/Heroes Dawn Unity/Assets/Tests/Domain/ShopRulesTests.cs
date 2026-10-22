@@ -16,7 +16,7 @@ namespace N29.HeroesDawn.Tests.Domain
         /// <summary>Contenu fictif : n recrues par rareté (stats et compétences d'une recrue du prototype).</summary>
         static List<MemberDef> Fake(int agents, int elites, int legends)
         {
-            var proto = PrototypeContent.Build().Members[0];
+            var proto = TestContent.Build().Members[0];
             var list = new List<MemberDef>();
             void Add(Rarity r, int n)
             {
@@ -101,7 +101,7 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test, Description("Vérifie que Verre n'entre dans la boutique qu'après la validation de la zone 1.1 — parce que les Légendes sont liées à l'histoire (GDD §Recrutement)")]
         public void Eligible_UnlockZone_RequiresCompletion()
         {
-            var members = PrototypeContent.Build().Members;
+            var members = TestContent.Build().Members;
             var verre = new MemberId("verre");
             Assert.That(ShopDraw.Eligible(members, _ => false, _ => false).Any(m => m.Id == verre), Is.False);
             Assert.That(ShopDraw.Eligible(members, _ => false, z => z == PrototypeContent.Zone11).Any(m => m.Id == verre), Is.True);

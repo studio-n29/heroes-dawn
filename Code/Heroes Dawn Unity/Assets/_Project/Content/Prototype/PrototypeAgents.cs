@@ -6,9 +6,10 @@ using N29.HeroesDawn.Definitions;
 namespace N29.HeroesDawn.Content.Prototype
 {
     /// <summary>
-    /// Les 22 agents ajoutés aux 8 premiers : 30 agents pour la première ville. Dix entrent dans la boutique de recrutement, quatre rejoignent
-    /// à la fin d'un arc narratif, quatre pendant un événement temporaire (week-end) et quatre sont des compagnons gagnés par une prouesse.
-    /// Chaque agent a trois compétences construites sur son rôle et sa famille.
+    /// Les 30 agents numérotés de The Dawn (02_Lore_Narration/04_Agents_The_Dawn.md). Quatre forment l'équipe de départ, quatorze entrent dans la
+    /// boutique de recrutement (dont un après la zone 1.1), quatre rejoignent à la fin d'un arc narratif, quatre pendant un événement temporaire
+    /// (week-end) et quatre sont des compagnons gagnés par une prouesse. Chaque agent a trois compétences construites sur son rôle.
+    /// L'identifiant est le nom civil sans accent (« ilona_varga ») ; le nom affiché et le pouvoir sont dans <c>Loc</c>.
     /// </summary>
     public static class PrototypeAgents
     {
@@ -20,9 +21,11 @@ namespace N29.HeroesDawn.Content.Prototype
             public readonly Role Role;
             public readonly Rarity Rarity;
             public readonly UnlockDef? Unlock;
-            public Entry(string id, string name, Family family, Role role, Rarity rarity, UnlockDef? unlock = null)
+            /// <summary>Zone à valider avant l'entrée dans la boutique (nul : disponible tout de suite).</summary>
+            public readonly ZoneId? ShopZone;
+            public Entry(string id, string name, Family family, Role role, Rarity rarity, UnlockDef? unlock = null, ZoneId? shopZone = null)
             {
-                Id = id; Name = name; Family = family; Role = role; Rarity = rarity; Unlock = unlock;
+                Id = id; Name = name; Family = family; Role = role; Rarity = rarity; Unlock = unlock; ShopZone = shopZone;
             }
         }
 
@@ -30,34 +33,46 @@ namespace N29.HeroesDawn.Content.Prototype
         static readonly ZoneId Z12 = PrototypeZones.Zone12;
         static readonly ZoneId Z13 = PrototypeZones.Zone13;
 
+        /// <summary>Équipe d'un nouveau profil : une recrue par famille.</summary>
+        public static readonly string[] StarterTeam = { "darius_brooks", "mei_lin_chen", "freya_lindqvist", "kwame_abara" };
+
         public static readonly IReadOnlyList<Entry> Roster = new[]
         {
+            // Départ (New York)
+            new Entry("darius_brooks", "Darius Brooks", Family.Matter, Role.Tank, Rarity.Agent),
+            new Entry("mei_lin_chen", "Mei-Lin Chen", Family.Elemental, Role.Damage, Rarity.Agent),
+            new Entry("freya_lindqvist", "Freya Lindqvist", Family.Perception, Role.Support, Rarity.Agent),
+            new Entry("kwame_abara", "Kwame Abara", Family.PhysicalBio, Role.Damage, Rarity.Agent),
             // Boutique de recrutement
-            new Entry("bastion", "Bastion", Family.Matter, Role.Tank, Rarity.Agent),
-            new Entry("prism", "Prism", Family.Matter, Role.Damage, Rarity.Elite),
-            new Entry("warden", "Warden", Family.Matter, Role.Control, Rarity.Agent),
-            new Entry("cinder", "Cinder", Family.Elemental, Role.Damage, Rarity.Agent),
-            new Entry("volt", "Volt", Family.Elemental, Role.Control, Rarity.Elite),
-            new Entry("tide", "Tide", Family.Elemental, Role.Support, Rarity.Agent),
-            new Entry("sinew", "Sinew", Family.PhysicalBio, Role.Damage, Rarity.Agent),
-            new Entry("marrow", "Marrow", Family.PhysicalBio, Role.Support, Rarity.Elite),
-            new Entry("radar", "Radar", Family.Perception, Role.Precision, Rarity.Agent),
-            new Entry("lens", "Lens", Family.Perception, Role.Control, Rarity.Elite),
+            new Entry("giulia_rossi", "Giulia Rossi", Family.Matter, Role.Damage, Rarity.Agent),
+            new Entry("lucas_mendes", "Lucas Mendes", Family.PhysicalBio, Role.Tank, Rarity.Agent),
+            new Entry("rin_takeda", "Rin Takeda", Family.Elemental, Role.Control, Rarity.Agent),
+            new Entry("amara_hughes", "Amara Hughes", Family.Perception, Role.Support, Rarity.Agent, null, Z11),
+            new Entry("ilona_varga", "Ilona Varga", Family.Perception, Role.Control, Rarity.Agent),
+            new Entry("fatou_diallo", "Fatou Diallo", Family.PhysicalBio, Role.Tank, Rarity.Agent),
+            new Entry("clement_lefevre", "Clément Lefèvre", Family.Perception, Role.Precision, Rarity.Elite),
+            new Entry("youssef_haddad", "Youssef Haddad", Family.PhysicalBio, Role.Precision, Rarity.Elite),
+            new Entry("severine_morel", "Séverine Morel", Family.PhysicalBio, Role.Support, Rarity.Agent),
+            new Entry("sam_okafor", "Sam Okafor", Family.PhysicalBio, Role.Tank, Rarity.Agent),
+            new Entry("astrid_hallstrom", "Astrid Hallström", Family.Elemental, Role.Support, Rarity.Elite),
+            new Entry("celeste_moreau", "Céleste Moreau", Family.Elemental, Role.Control, Rarity.Agent),
+            new Entry("haruto_nakamura", "Haruto Nakamura", Family.Perception, Role.Control, Rarity.Agent),
+            new Entry("yelena_ivanova", "Yelena Ivanova", Family.Elemental, Role.Control, Rarity.Elite),
             // Arcs narratifs : l'agent rejoint à la validation de la zone
-            new Entry("vanguard", "Vanguard", Family.PhysicalBio, Role.Tank, Rarity.Elite, UnlockDef.Arc(Z11)),
-            new Entry("oracle", "Oracle", Family.Perception, Role.Support, Rarity.Legend, UnlockDef.Arc(Z12)),
-            new Entry("meteor", "Meteor", Family.Elemental, Role.Damage, Rarity.Legend, UnlockDef.Arc(Z12)),
-            new Entry("monolith", "Monolith", Family.Matter, Role.Tank, Rarity.Legend, UnlockDef.Arc(Z13)),
+            new Entry("noah_kaplan", "Noah Kaplan", Family.Matter, Role.Control, Rarity.Agent, UnlockDef.Arc(Z11)),
+            new Entry("tunde_oyelaran", "Tunde Oyelaran", Family.Matter, Role.Support, Rarity.Agent, UnlockDef.Arc(Z12)),
+            new Entry("victor_sorel", "Victor Sorel", Family.Perception, Role.Control, Rarity.Legend, UnlockDef.Arc(Z12)),
+            new Entry("odile_ferrand", "Odile Ferrand", Family.Perception, Role.Support, Rarity.Legend, UnlockDef.Arc(Z13)),
             // Événements temporaires (week-end) dans des zones précises
-            new Entry("forge", "Forge", Family.Matter, Role.Damage, Rarity.Elite, UnlockDef.WeekendEvent(Z11)),
-            new Entry("tempest", "Tempest", Family.Elemental, Role.Control, Rarity.Elite, UnlockDef.WeekendEvent(Z12)),
-            new Entry("mend", "Mend", Family.PhysicalBio, Role.Support, Rarity.Elite, UnlockDef.WeekendEvent(Z12)),
-            new Entry("mirage", "Mirage", Family.Perception, Role.Precision, Rarity.Elite, UnlockDef.WeekendEvent(Z13)),
+            new Entry("louis_dubois", "Louis Dubois", Family.Matter, Role.Control, Rarity.Elite, UnlockDef.WeekendEvent(Z11)),
+            new Entry("marco_bellini", "Marco Bellini", Family.Matter, Role.Damage, Rarity.Elite, UnlockDef.WeekendEvent(Z12)),
+            new Entry("zofia_kowalczyk", "Zofia Kowalczyk", Family.Elemental, Role.Damage, Rarity.Elite, UnlockDef.WeekendEvent(Z12)),
+            new Entry("mateo_vasquez", "Mateo Vasquez", Family.PhysicalBio, Role.Support, Rarity.Elite, UnlockDef.WeekendEvent(Z13)),
             // Compagnons : une prouesse
-            new Entry("lone_wolf", "Lone Wolf", Family.PhysicalBio, Role.Damage, Rarity.Legend, UnlockDef.FeatOf(Z11, FeatKind.SoloClear)),
-            new Entry("hermit", "Hermit", Family.Perception, Role.Precision, Rarity.Legend, UnlockDef.FeatOf(Z13, FeatKind.SoloClear)),
-            new Entry("phoenix", "Phoenix", Family.Elemental, Role.Support, Rarity.Legend, UnlockDef.FeatOf(Z12, FeatKind.NoDefeat)),
-            new Entry("aegis", "Aegis", Family.Matter, Role.Tank, Rarity.Legend, UnlockDef.FeatOf(Z13, FeatKind.NoDefeat)),
+            new Entry("ada_okonkwo", "Ada Okonkwo", Family.PhysicalBio, Role.Support, Rarity.Legend, UnlockDef.FeatOf(Z11, FeatKind.SoloClear)),
+            new Entry("eero_nieminen", "Eero Nieminen", Family.Matter, Role.Damage, Rarity.Legend, UnlockDef.FeatOf(Z12, FeatKind.NoDefeat)),
+            new Entry("ji_hoon_park", "Ji-Hoon Park", Family.Perception, Role.Precision, Rarity.Agent, UnlockDef.FeatOf(Z13, FeatKind.SoloClear)),
+            new Entry("anna_petrov", "Anna Petrov", Family.Perception, Role.Precision, Rarity.Agent, UnlockDef.FeatOf(Z13, FeatKind.NoDefeat)),
         };
 
         static EffectDef Dmg(int pct) => new EffectDef(EffectType.Damage, pct);
@@ -127,7 +142,7 @@ namespace N29.HeroesDawn.Content.Prototype
         public static IEnumerable<MemberDef> Members(System.Func<Role, Rarity, StatBlock> stats)
         {
             foreach (var e in Roster)
-                yield return new MemberDef(new MemberId(e.Id), "members." + e.Id + ".name", e.Family, e.Role, e.Rarity, stats(e.Role, e.Rarity), Kit(e), null, e.Unlock);
+                yield return new MemberDef(new MemberId(e.Id), "members." + e.Id + ".name", e.Family, e.Role, e.Rarity, stats(e.Role, e.Rarity), Kit(e), e.ShopZone, e.Unlock);
         }
     }
 }

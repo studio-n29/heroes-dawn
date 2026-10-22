@@ -11,7 +11,7 @@ namespace N29.HeroesDawn.Tests.Domain
     /// <summary>Active Timeline : pause globale au point d'action, temps actif, catégories, vagues, compétences d'avatar (spec 2026-10-07).</summary>
     public sealed class ActiveTimelineTests
     {
-        static readonly ContentCatalog C = PrototypeContent.Build();
+        static readonly ContentCatalog C = TestContent.Build();
 
         static CombatSimulation Sim(string[] allies, string[] enemies, CombatRank rank = CombatRank.Normal, ulong seed = 11)
             => new CombatSimulation(C, new CombatSetup(seed, rank,

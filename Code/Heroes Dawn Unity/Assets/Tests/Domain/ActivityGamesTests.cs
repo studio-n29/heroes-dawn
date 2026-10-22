@@ -12,7 +12,7 @@ namespace N29.HeroesDawn.Tests.Domain
     /// <summary>Les cinq activités jouables : survie en neige, pêche, arène, potion, dialogue (logique pure, spec 2026-10-10-activites-jouables).</summary>
     public sealed class ActivityGamesTests
     {
-        static readonly ContentCatalog C = PrototypeContent.Build();
+        static readonly ContentCatalog C = TestContent.Build();
         static readonly ZoneEnvironment Env = new ZoneEnvironment(Biome.Snow, Weather.Snow);
 
         static ActivityPlan Plan(string id, params (string Key, int Value)[] overrides)

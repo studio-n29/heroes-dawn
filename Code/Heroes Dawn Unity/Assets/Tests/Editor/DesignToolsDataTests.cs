@@ -79,7 +79,7 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(lib.Members, Is.Not.Null);
             Assert.That(lib.Members!.Count, Is.EqualTo(30));
             Assert.That(lib.Items!.Count, Is.EqualTo(10));
-            Assert.That(lib.Texts["members.ancre.name"], Is.EqualTo("Anchor"));
+            Assert.That(lib.Texts["members.darius_brooks.name"], Is.EqualTo("Darius Brooks"));
         }
 
         [Test, Description("Vérifie qu'un objet retiré du fichier disparaît du jeu et qu'un objet ajouté apparaît, avec son nom — parce que le fichier remplace la liste du code en entier")]
@@ -120,10 +120,10 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(ContentDataValidator.Validate(new ItemRecord { id = "ok", name = "x", perk = ItemPerk.CritChance }), Is.Not.Empty, "effet sans valeur");
             Assert.That(ContentDataValidator.Validate(new SkillRecord { id = "ok", name = "x", effects = { new EffectRecord { type = EffectType.ApplyStatus, status = StatusType.Burn } } }), Is.Not.Empty, "statut sans durée");
             Assert.That(ContentDataValidator.Validate(new SkillRecord { id = "ok", name = "x" }), Is.Not.Empty, "aucun effet");
-            agents.agents.Add(new AgentRecord { id = "ancre", name = "Doublon", skills = new List<string> { "ancre_a1", "ancre_a2", "introuvable" } });
-            agents.agents.Add(new AgentRecord { id = "clone", name = "Clone", skills = new List<string> { "ancre_a1", "ancre_a2", "ancre_a3" } });
+            agents.agents.Add(new AgentRecord { id = "darius_brooks", name = "Doublon", skills = new List<string> { "darius_brooks_a1", "darius_brooks_a2", "introuvable" } });
+            agents.agents.Add(new AgentRecord { id = "clone", name = "Clone", skills = new List<string> { "darius_brooks_a1", "darius_brooks_a2", "darius_brooks_a3" } });
             var all = ContentDataValidator.ValidateAll(items, skills, agents);
-            Assert.That(all.Any(m => m.Contains("« ancre » en double")), Is.True);
+            Assert.That(all.Any(m => m.Contains("« darius_brooks » en double")), Is.True);
             Assert.That(all.Any(m => m.Contains("introuvable")), Is.True);
             Assert.That(all.Any(m => m.Contains("plusieurs agents")), Is.True);
         }

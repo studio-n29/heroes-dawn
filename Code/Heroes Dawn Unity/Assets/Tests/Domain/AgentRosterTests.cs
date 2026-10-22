@@ -13,7 +13,7 @@ using NUnit.Framework;
 
 namespace N29.HeroesDawn.Tests.Domain
 {
-    /// <summary>30 agents pour la première ville et leurs déblocages : boutique, arc narratif, événement temporaire, prouesse (plan 2026-10-10, sous-projet N).</summary>
+    /// <summary>Les 30 agents de The Dawn et leurs déblocages : boutique, arc narratif, événement temporaire, prouesse (plan 2026-10-10, sous-projet N).</summary>
     public sealed class AgentRosterTests
     {
         static readonly ContentCatalog C = PrototypeContent.Build();
@@ -51,7 +51,9 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(C.Members.All(m => m.Skills.Count == 3), Is.True);
             foreach (Family f in Enum.GetValues(typeof(Family))) Assert.That(C.Members.Count(m => m.Family == f), Is.GreaterThanOrEqualTo(4), f.ToString());
             foreach (Role r in Enum.GetValues(typeof(Role))) Assert.That(C.Members.Any(m => m.Role == r), Is.True, r.ToString());
-            Assert.That(C.Members.Count(m => m.Rarity == Rarity.Legend), Is.GreaterThanOrEqualTo(8));
+            Assert.That(C.Members.Count(m => m.Rarity == Rarity.Legend), Is.EqualTo(4));
+            Assert.That(C.Members.Count(m => m.Rarity == Rarity.Elite), Is.EqualTo(8));
+            Assert.That(PrototypeAgents.StarterTeam.All(id => C.StarterTeam.Contains(id)), Is.True, "équipe de départ portée par le catalogue");
         }
 
         [Test, Description("Vérifie la répartition des sources : 4 agents d'arc, 4 d'événement, 4 de prouesse et le reste en boutique — parce que les quatre voies d'obtention doivent toutes exister")]
@@ -92,13 +94,13 @@ namespace N29.HeroesDawn.Tests.Domain
         public void Arc_AgentJoinsWhenTheZoneIsValidated()
         {
             var s = NewSession();
-            Assert.That(s.Owns(new MemberId("vanguard")), Is.False);
-            Assert.That(AgentUnlocks.OnZoneValidated(s, null, Z12, Saturday).Any(m => m.Id.Value == "vanguard"), Is.False, "zone 1.2 : pas encore 1.1");
+            Assert.That(s.Owns(new MemberId("noah_kaplan")), Is.False);
+            Assert.That(AgentUnlocks.OnZoneValidated(s, null, Z12, Saturday).Any(m => m.Id.Value == "noah_kaplan"), Is.False, "zone 1.2 : pas encore 1.1");
             s.CompletedZones.Add(Z11.Value);
             var joined = AgentUnlocks.OnZoneValidated(s, null, Z11, Monday);
-            Assert.That(joined.Select(m => m.Id.Value), Is.EqualTo(new[] { "vanguard" }));
-            Assert.That(s.Owns(new MemberId("vanguard")), Is.True);
-            Assert.That(s.Find(new MemberId("vanguard"))!.InSquad, Is.False, "l'agent arrive hors escouade");
+            Assert.That(joined.Select(m => m.Id.Value), Is.EqualTo(new[] { "noah_kaplan" }));
+            Assert.That(s.Owns(new MemberId("noah_kaplan")), Is.True);
+            Assert.That(s.Find(new MemberId("noah_kaplan"))!.InSquad, Is.False, "l'agent arrive hors escouade");
             Assert.That(AgentUnlocks.OnZoneValidated(s, null, Z11, Monday), Is.Empty, "une seule fois");
         }
 
@@ -106,22 +108,22 @@ namespace N29.HeroesDawn.Tests.Domain
         public void Arc_IsCaughtUpWhenLoadingAnOldProfile()
         {
             var profile = new ProfileData();
-            profile.team.Add(new MemberSave { id = "ancre", level = 5, inSquad = true });
+            profile.team.Add(new MemberSave { id = "darius_brooks", level = 5, inSquad = true });
             profile.completedZones.Add(Z11.Value);
             var s = NewSession();
             s.ApplyProfile(profile);
-            Assert.That(s.Owns(new MemberId("vanguard")), Is.True);
-            Assert.That(s.Owns(new MemberId("oracle")), Is.False, "zone 1.2 pas validée");
+            Assert.That(s.Owns(new MemberId("noah_kaplan")), Is.True);
+            Assert.That(s.Owns(new MemberId("victor_sorel")), Is.False, "zone 1.2 pas validée");
         }
 
         [Test, Description("Vérifie qu'un agent d'événement rejoint l'équipe seulement si la zone est validée un jour d'événement (week-end) — parce que l'événement est temporaire")]
         public void Event_AgentJoinsOnlyOnEventDays()
         {
             var s = NewSession();
-            Assert.That(AgentUnlocks.OnZoneValidated(s, null, Z11, Monday).Any(m => m.Id.Value == "forge"), Is.False, "lundi : pas d'événement");
+            Assert.That(AgentUnlocks.OnZoneValidated(s, null, Z11, Monday).Any(m => m.Id.Value == "louis_dubois"), Is.False, "lundi : pas d'événement");
             var joined = AgentUnlocks.OnZoneValidated(s, null, Z11, Saturday);
-            Assert.That(joined.Any(m => m.Id.Value == "forge"), Is.True, "samedi : événement de la zone 1.1");
-            Assert.That(s.Owns(new MemberId("tempest")), Is.False, "autre zone : pas concerné");
+            Assert.That(joined.Any(m => m.Id.Value == "louis_dubois"), Is.True, "samedi : événement de la zone 1.1");
+            Assert.That(s.Owns(new MemberId("marco_bellini")), Is.False, "autre zone : pas concerné");
         }
 
         [Test, Description("Vérifie que la prouesse « un seul agent » débloque son compagnon seulement si un unique agent a combattu pendant le plateau — parce que c'est une prouesse, pas un cadeau")]
@@ -130,11 +132,11 @@ namespace N29.HeroesDawn.Tests.Domain
             var s = NewSession();
             var run = RunWithWonFight();
             s.Run = run;
-            s.RunEngaged.Add("ancre");
-            s.RunEngaged.Add("givre");
-            Assert.That(AgentUnlocks.OnZoneValidated(s, run, Z11, Monday).Any(m => m.Id.Value == "lone_wolf"), Is.False, "deux agents engagés");
-            s.RunEngaged.Remove("givre");
-            Assert.That(AgentUnlocks.OnZoneValidated(s, run, Z11, Monday).Any(m => m.Id.Value == "lone_wolf"), Is.True);
+            s.RunEngaged.Add("darius_brooks");
+            s.RunEngaged.Add("mei_lin_chen");
+            Assert.That(AgentUnlocks.OnZoneValidated(s, run, Z11, Monday).Any(m => m.Id.Value == "ada_okonkwo"), Is.False, "deux agents engagés");
+            s.RunEngaged.Remove("mei_lin_chen");
+            Assert.That(AgentUnlocks.OnZoneValidated(s, run, Z11, Monday).Any(m => m.Id.Value == "ada_okonkwo"), Is.True);
         }
 
         [Test, Description("Vérifie que la prouesse « sans défaite » est refusée après un recul et accordée sinon, et qu'aucun combat ne donne rien — parce qu'il faut avoir combattu et gagné")]
@@ -144,17 +146,17 @@ namespace N29.HeroesDawn.Tests.Domain
             // Plateau 1.2 : on réutilise le journal d'un plateau 1.1 pour tester la règle, la zone validée étant 1.2.
             var clean = RunWithWonFight();
             s.Run = clean;
-            Assert.That(AgentUnlocks.OnZoneValidated(s, clean, Z12, Monday).Any(m => m.Id.Value == "phoenix"), Is.True, "aucune défaite");
+            Assert.That(AgentUnlocks.OnZoneValidated(s, clean, Z12, Monday).Any(m => m.Id.Value == "eero_nieminen"), Is.True, "aucune défaite");
 
             var s2 = NewSession();
             var lost = RunWithWonFight(lostFirst: true);
             s2.Run = lost;
-            Assert.That(AgentUnlocks.OnZoneValidated(s2, lost, Z12, Monday).Any(m => m.Id.Value == "phoenix"), Is.False, "une défaite en cours de route");
+            Assert.That(AgentUnlocks.OnZoneValidated(s2, lost, Z12, Monday).Any(m => m.Id.Value == "eero_nieminen"), Is.False, "une défaite en cours de route");
 
             var s3 = NewSession();
             var noFight = ZoneRun.ForTests(C, C.Zone(Z12), 5UL, 1, true);
             s3.Run = noFight;
-            Assert.That(AgentUnlocks.OnZoneValidated(s3, noFight, Z12, Monday).Any(m => m.Id.Value == "phoenix"), Is.False, "aucun combat");
+            Assert.That(AgentUnlocks.OnZoneValidated(s3, noFight, Z12, Monday).Any(m => m.Id.Value == "eero_nieminen"), Is.False, "aucun combat");
         }
 
         [Test, Description("Vérifie que changer de plateau remet à zéro les agents engagés — parce que la prouesse se juge plateau par plateau")]
@@ -162,10 +164,10 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var s = NewSession();
             s.Run = ZoneRun.ForTests(C, C.Zone(Z11), 1UL, 1, true);
-            s.RunEngaged.Add("ancre");
+            s.RunEngaged.Add("darius_brooks");
             s.Run = ZoneRun.ForTests(C, C.Zone(Z11), 2UL, 1, true);
             Assert.That(s.RunEngaged, Is.Empty);
-            s.RunEngaged.Add("givre");
+            s.RunEngaged.Add("mei_lin_chen");
             s.Run = s.Run;
             Assert.That(s.RunEngaged.Count, Is.EqualTo(1), "même plateau : rien ne change");
         }

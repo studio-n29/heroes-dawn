@@ -107,7 +107,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             _app.Collection.EquipItem(Verre, vest);
             _app.Collection.EquipCard(Verre, 0, wall);
             var json = UnityEngine.JsonUtility.ToJson(S.ToProfile(System.DateTime.UtcNow));
-            var restored = new GameSession(PrototypeContent.Build());
+            var restored = new GameSession(TestContent.Build());
             restored.ApplyProfile(UnityEngine.JsonUtility.FromJson<N29.HeroesDawn.Application.Ports.ProfileData>(json));
             var verre = restored.Find(Verre)!;
             Assert.That(verre.Items, Is.EqualTo(new[] { vest }));
@@ -122,7 +122,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             var profile = new N29.HeroesDawn.Application.Ports.ProfileData();
             profile.team.Add(new N29.HeroesDawn.Application.Ports.MemberSave { id = "ancre", level = 5, inSquad = true });
-            var s = new GameSession(PrototypeContent.Build());
+            var s = new GameSession(TestContent.Build());
             s.ApplyProfile(profile);
             Assert.That(s.Find(Ancre)!.Items, Is.Empty);
             Assert.That(s.Find(Ancre)!.Cards.All(c => !c.HasValue), Is.True);
@@ -136,7 +136,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             m.items.AddRange(new[] { "kevlar_vest", "ghost", "running_shoes", "riot_shield" });
             m.cards.AddRange(new[] { "", "card_shackle" });
             profile.team.Add(m);
-            var s = new GameSession(PrototypeContent.Build());
+            var s = new GameSession(TestContent.Build());
             s.ApplyProfile(profile);
             var verre = s.Find(Verre)!;
             Assert.That(verre.Items.Count, Is.EqualTo(2));
@@ -149,7 +149,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             // Un plateau qui trouve toujours : chance 100 %.
             var balance = new BalanceConfig { EventItemChancePercent = 100 };
-            var content = PrototypeContent.Build(balance);
+            var content = TestContent.Build(balance);
             var session = new GameSession(content);
             var zone = content.Zone(PrototypeContent.Zone11);
             var run = ZoneRun.ForTests(content, zone, 7UL, 1, true, "n04");

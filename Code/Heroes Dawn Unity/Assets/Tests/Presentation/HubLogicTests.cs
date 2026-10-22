@@ -1,3 +1,4 @@
+using N29.HeroesDawn.Tests.Domain;
 using System;
 using System.Linq;
 using N29.HeroesDawn.Application.Flow;
@@ -65,7 +66,7 @@ namespace N29.HeroesDawn.Tests.Presentation
 
     public sealed class SquadCombosTests
     {
-        static ContentCatalog C => PrototypeContent.Build();
+        static ContentCatalog C => TestContent.Build();
         static MemberDef M(string id) => C.Member(new MemberId(id));
 
         [Test, Description("Vérifie que chaque paire de membres dont les familles forment une synergie est listée une fois — parce que l'écran Équipe montre les synergies de l'escouade (M20 ⑤)")]

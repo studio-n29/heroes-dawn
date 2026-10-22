@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 
@@ -62,53 +63,19 @@ namespace N29.HeroesDawn.Content.Prototype
         public static ContentCatalog Build(BalanceConfig balance, IReadOnlyDictionary<string, int> activityOverrides)
             => WithActivities(Build(balance), ActivityParamsJson.Apply(PrototypeActivities.Build(balance), activityOverrides));
 
+        /// <summary>Même chose avec des agents et une équipe de départ donnés (jeux de données de test).</summary>
+        public static ContentCatalog Build(BalanceConfig balance, IReadOnlyDictionary<string, int> activityOverrides, IReadOnlyList<MemberDef> agents, IReadOnlyList<string> starterTeam)
+            => WithActivities(Build(balance, agents, starterTeam), ActivityParamsJson.Apply(PrototypeActivities.Build(balance), activityOverrides));
+
         static ContentCatalog WithActivities(ContentCatalog c, IReadOnlyList<ActivityDef> activities)
-            => new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Synergies, c.Zones, activities, c.Collection);
+            => new ContentCatalog(c.Balance, c.Members, c.Enemies, c.Synergies, c.Zones, activities, c.Collection, c.StarterTeam);
 
-        public static ContentCatalog Build(BalanceConfig balance) => Build(balance, true);
+        public static ContentCatalog Build(BalanceConfig balance) => Build(balance, PrototypeAgents.Members(Stats).ToList(), PrototypeAgents.StarterTeam);
 
-        /// <summary>Les huit premiers agents seulement (tests des regles de boutique, independants du reste de la roster).</summary>
-        public static ContentCatalog BuildCore() => Build(new BalanceConfig(), false);
-
-        public static ContentCatalog Build(BalanceConfig balance, bool extraAgents)
+        /// <summary>Catalogue avec ces agents et cette équipe de départ (jeux de données de test).</summary>
+        public static ContentCatalog Build(BalanceConfig balance, IReadOnlyList<MemberDef> agents, IReadOnlyList<string> starterTeam)
         {
-            var members = new List<MemberDef>
-            {
-                M("ancre", Family.PhysicalBio, Role.Tank, Rarity.Legend,
-                    S("ancre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), St(StatusType.Taunt, 1, 30), Push(15)),
-                    S("ancre_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(20)),
-                    S("ancre_a3", SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15), St(StatusType.Anchor, 2))),
-                Locked(M("verre", Family.Matter, Role.Control, Rarity.Legend,
-                    S("verre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Vulnerable, 2, 25)),
-                    S("verre_a2", SkillSlot.A2, 4, TargetRule.SingleEnemy, St(StatusType.Bind, 2), Push(30)),
-                    S("verre_a3", SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15), St(StatusType.Anchor, 2))), Zone11),
-                M("givre", Family.Elemental, Role.Damage, Rarity.Legend,
-                    S("givre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Freeze, 2, 40)),
-                    S("givre_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(70), Gauge(-150)),
-                    S("givre_a3", SkillSlot.A3, 5, TargetRule.SingleEnemy, Dmg(220))),
-                M("echo", Family.Perception, Role.Precision, Rarity.Legend,
-                    S("echo_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Mark, 99)),
-                    S("echo_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, St(StatusType.Vulnerable, 2), Gauge(-100)),
-                    S("echo_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(70))),
-                M("arc", Family.Elemental, Role.Damage, Rarity.Elite,
-                    S("arc_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Shock, 1, 20)),
-                    S("arc_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, St(StatusType.Haste, 2), Adv(35)),
-                    S("arc_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(90))),
-                M("rempart", Family.PhysicalBio, Role.Tank, Rarity.Elite,
-                    S("rempart_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), Push(15)),
-                    S("rempart_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, Shield(25)),
-                    S("rempart_a3", SkillSlot.A3, 5, TargetRule.Self, St(StatusType.Taunt, 2), Shield(30))),
-                M("seve", Family.PhysicalBio, Role.Support, Rarity.Elite,
-                    S("seve_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(80)),
-                    S("seve_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, Heal(30)),
-                    S("seve_a3", SkillSlot.A3, 5, TargetRule.AllAllies, St(StatusType.Regen, 2))),
-                M("etincelle", Family.Elemental, Role.Control, Rarity.Agent,
-                    S("etincelle_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Shock, 1, 15)),
-                    S("etincelle_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, Adv(60)),
-                    S("etincelle_a3", SkillSlot.A3, 5, TargetRule.SingleEnemy, Dmg(150))),
-            };
-            if (extraAgents) members.AddRange(PrototypeAgents.Members(Stats));
-
+            var members = agents;
             var enemies = new List<EnemyDef>
             {
                 E("thug", Role.Damage, Family.PhysicalBio, new StatBlock(1000, 120, 70, 100), false,
@@ -143,7 +110,7 @@ namespace N29.HeroesDawn.Content.Prototype
             enemies.AddRange(PrototypeZones.Enemies());
             var zones = new List<ZoneDef> { BuildZone11() };
             zones.AddRange(PrototypeZones.Zones());
-            return new ContentCatalog(balance, members, enemies, synergies, zones, PrototypeActivities.Build(balance), PrototypeCollection.Build());
+            return new ContentCatalog(balance, members, enemies, synergies, zones, PrototypeActivities.Build(balance), PrototypeCollection.Build(), starterTeam);
         }
 
         /// <summary>Red Hook — les quais : 25 cases, 3 embranchements, 6 combats (1 Élite fixe : Brick).</summary>
@@ -154,8 +121,8 @@ namespace N29.HeroesDawn.Content.Prototype
 
             NarrationLineDef L(string speaker, string key) => new NarrationLineDef(speaker, "narration.ny_1_1.n23." + key);
             var brickTalk = new NarrationDef(
-                new[] { L("brick", "before.0"), L("ancre", "before.1") },
-                new[] { L("ancre", "after.0"), L("ancre", "after.1") });
+                new[] { L("brick", "before.0"), L("darius_brooks", "before.1") },
+                new[] { L("darius_brooks", "after.0"), L("darius_brooks", "after.1") });
 
             var nodes = new List<NodeDef>
             {

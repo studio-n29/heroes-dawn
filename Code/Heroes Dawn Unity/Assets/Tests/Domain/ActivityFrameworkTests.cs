@@ -13,7 +13,7 @@ namespace N29.HeroesDawn.Tests.Domain
     /// <summary>Framework d'activités : registre, paramètres, niveaux procéduraux, résultats, intégration au plateau (spec 2026-10-07-framework-activites).</summary>
     public sealed class ActivityFrameworkTests
     {
-        static readonly ContentCatalog C = PrototypeContent.Build();
+        static readonly ContentCatalog C = TestContent.Build();
         static readonly ActivityRegistry Reg = ActivityRegistry.Default;
         static readonly ZoneEnvironment Night = new ZoneEnvironment(Biome.Harbor, Weather.Night);
 
@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var parsed = ActivityParamsJson.Parse("{ \"fishing_docks.time_limit_s\": 120, \"arena_training.waves\": 5 }");
             Assert.That(parsed.IsSuccess, Is.True);
-            var content = PrototypeContent.Build(new BalanceConfig(), parsed.Value);
+            var content = TestContent.Build(new BalanceConfig(), parsed.Value);
             Assert.That(Reg.Resolve(content.Activity(new ActivityId("fishing_docks"))).Get("time_limit_s"), Is.EqualTo(120));
             Assert.That(Reg.Resolve(content.Activity(new ActivityId("arena_training"))).Get("waves"), Is.EqualTo(5));
             Assert.That(Reg.Resolve(C.Activity(new ActivityId("arena_training"))).Get("waves"), Is.EqualTo(3), "le contenu d'origine n'est pas modifié");
