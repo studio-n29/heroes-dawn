@@ -28,18 +28,15 @@ namespace N29.HeroesDawn.Presentation.Common
             d["onboarding.pseudo.short"] = "Au moins {0} caractères.";
             d["onboarding.pseudo.long"] = "Pas plus de {1} caractères.";
             d["onboarding.pseudo.chars"] = "Lettres, chiffres, espaces, tirets seulement.";
-            d["onboarding.campaign.title"] = "CHOISIS TA CAMPAGNE";
+            d["onboarding.campaign.title"] = "CHOISIS TON AGENT";
+            d["onboarding.campaign.unavailable"] = "Ce parcours n est pas encore disponible.";
+            d["campaign.agent_d.name"] = "AGENT D";
+            d["campaign.agent_d.desc"] = "Illustrateur de rue à Harlem : ce qu il imagine devient réel. Son parcours : New York, Paris, Moscou, puis Salem.";
+            d["campaign.agent_m.name"] = "AGENT M";
+            d["campaign.agent_m.desc"] = "Restauratrice de fresques à Moscou : elle voit le passé, le présent et le futur. Son parcours : Moscou, Paris, New York, puis Salem.";
             d["onboarding.campaign.confirm"] = "COMMENCER";
             d["onboarding.campaign.open"] = "DISPONIBLE";
             d["onboarding.campaign.wip"] = "EN CRÉATION";
-            d["campaign.new_york.name"] = "NEW YORK";
-            d["campaign.new_york.desc"] = "Brooklyn, Manhattan, le pont… La Guilde a besoin de toi pour percer le trafic de l'AMIF.";
-            d["campaign.paris.name"] = "PARIS";
-            d["campaign.paris.desc"] = "Sur les cendres de la bataille de l'Apex Unit.";
-            d["campaign.tokyo.name"] = "TOKYO";
-            d["campaign.tokyo.desc"] = "Néons, ombres et méta-humains en cavale.";
-            d["campaign.cairo.name"] = "LE CAIRE";
-            d["campaign.cairo.desc"] = "Sables, secrets et radiations.";
 
             d["errors.account_email"] = "Adresse e-mail invalide.";
             d["errors.account_password"] = "Mot de passe trop court (8 caractères minimum).";

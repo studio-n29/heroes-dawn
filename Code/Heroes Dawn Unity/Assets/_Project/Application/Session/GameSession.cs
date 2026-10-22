@@ -152,6 +152,20 @@ namespace N29.HeroesDawn.Application.Session
             return Math.Max(1, sum / squad.Count);
         }
 
+        /// <summary>Parcours du personnage choisi à la première connexion ; Agent D tant qu aucun choix n est enregistré.</summary>
+        public StoryRoute Route => StoryRoutes.For(Meta.onboarding.hero);
+
+        /// <summary>Remplace l effectif par ces agents, tous en escouade (choix du personnage, avant toute progression).</summary>
+        public void StartWithTeam(System.Collections.Generic.IEnumerable<string> ids)
+        {
+            Roster.Clear();
+            foreach (var id in ids)
+            {
+                var def = FindDef(new MemberId(id));
+                if (def != null && !Owns(def.Id)) Roster.Add(new TeamMember(def, MetaRules.StarterLevel) { InSquad = true });
+            }
+        }
+
         public void ResetToNewProfile()
         {
             Roster.Clear();

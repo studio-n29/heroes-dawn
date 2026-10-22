@@ -8,7 +8,12 @@ namespace N29.HeroesDawn.Presentation.Common
     {
         static partial void ExtendMap(Dictionary<string, string> d)
         {
-            d["page.citymap"] = "New York · Acte 1";
+            d["page.citymap"] = "{0} · Acte {1}";
+            d["map.act_title"] = "ACTE {0} · {1}";
+            d["city.new_york"] = "New York";
+            d["city.paris"] = "Paris";
+            d["city.moscow"] = "Moscou";
+            d["city.salem"] = "Salem";
             d["map.act1"] = "ACTE 1 · PREMIÈRE NUIT";
             d["map.act"] = "ACTE {0}";
             d["map.act_soon"] = "ACTE {0} · BIENTÔT";

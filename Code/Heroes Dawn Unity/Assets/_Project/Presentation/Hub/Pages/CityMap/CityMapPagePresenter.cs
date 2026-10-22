@@ -32,7 +32,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _selected = ZoneProgress.Recommended(session).Id.Value;
         }
 
-        public string Title => _loc.T("page.citymap");
+        public string Title { get { var act = StoryProgress.Current(_session); return _loc.F("page.citymap", _loc.T("city." + act.City), act.Number); } }
 
         protected override void OnStart()
         {
@@ -83,6 +83,12 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         void OnLocked(string label) => _toasts.Show(_loc.F("map.locked_act", label), ToastKind.Info);
 
+        string ActTitle()
+        {
+            var act = StoryProgress.Current(_session);
+            return act.Number == 1 && act.City == StoryRoutes.NewYork ? _loc.T("map.act1") : _loc.F("map.act_title", act.Number, _loc.T("city." + act.City));
+        }
+
         string Short(ZoneDef z) => _loc.T(z.NameKey.Replace(".name", ".short"));
 
         ZoneDef? Selected() => _session.Content.Zones.FirstOrDefault(z => z.Id.Value == _selected);
@@ -99,7 +105,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var sel = Selected() ?? zones[0];
             View.Show(new CityMapPageData
             {
-                ActTitle = _loc.T("map.act1"),
+                ActTitle = ActTitle(),
                 Boroughs = CityMapLayout.Boroughs.Select(b => new BoroughData
                 {
                     Id = b.Id,

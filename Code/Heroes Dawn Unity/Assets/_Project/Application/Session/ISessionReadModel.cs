@@ -26,5 +26,7 @@ namespace N29.HeroesDawn.Application.Session
         int TrainCostFor(int level);
         IReadOnlyCollection<string> CompletedZones { get; }
         IShopReadModel Shop { get; }
+        /// <summary>Parcours de l histoire du personnage joueur choisi (actes, ville de chaque acte).</summary>
+        StoryRoute Route { get; }
     }
 }

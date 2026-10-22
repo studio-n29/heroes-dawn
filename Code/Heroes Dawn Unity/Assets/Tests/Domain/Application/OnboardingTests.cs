@@ -49,7 +49,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         [Test, Description("Vérifie que terminer la première connexion enregistre pseudo et campagne, renomme le compte et plus rien n'est demandé — parce que le pseudo choisi remplace le nom d'invité")]
         public void Complete_SavesAndRenamesTheAccount()
         {
-            Assert.That(_service.Complete("Maya", Campaigns.NewYork), Is.Null);
+            Assert.That(_service.Complete("Maya", Campaigns.AgentD), Is.Null);
             Assert.That(_service.Needed, Is.False);
             Assert.That(_app.Session.Account!.DisplayName, Is.EqualTo("Maya"));
             Assert.That(_app.Session.Account.PlayerId, Is.EqualTo("p1"), "l'identifiant ne change pas");
@@ -59,16 +59,24 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         [Test, Description("Vérifie qu'un pseudo invalide n'enregistre rien — parce qu'on ne valide pas la première connexion avec un nom refusé")]
         public void Complete_WithAnInvalidPseudo_SavesNothing()
         {
-            Assert.That(_service.Complete("x", Campaigns.NewYork), Is.EqualTo("onboarding.pseudo.short"));
+            Assert.That(_service.Complete("x", Campaigns.AgentD), Is.EqualTo("onboarding.pseudo.short"));
             Assert.That(_service.Needed, Is.True);
             Assert.That(_app.Session.Meta.onboarding.pseudo, Is.Empty);
         }
 
-        [Test, Description("Vérifie que seule New York est disponible parmi les campagnes — parce que les autres sont en cours de création")]
-        public void OnlyNewYorkIsAvailable()
+        [Test, Description("Vérifie qu Agent M est refusé tant que son parcours n est pas disponible, sans rien enregistrer — parce qu on ne démarre pas un parcours sans zones")]
+        public void Complete_WithAnUnavailableHero_SavesNothing()
         {
-            Assert.That(Campaigns.All.Count, Is.EqualTo(4));
-            Assert.That(System.Linq.Enumerable.Single(Campaigns.All, c => c.Available).Id, Is.EqualTo(Campaigns.NewYork));
+            Assert.That(_service.Complete("Maya", Campaigns.AgentM), Is.EqualTo("onboarding.campaign.unavailable"));
+            Assert.That(_service.Needed, Is.True);
+            Assert.That(_app.Session.Meta.onboarding.hero, Is.Empty);
+        }
+
+        [Test, Description("Vérifie que seul Agent D est disponible parmi les deux personnages — parce que les zones de Moscou (parcours d Agent M) sont en cours de création")]
+        public void OnlyAgentDIsAvailable()
+        {
+            Assert.That(Campaigns.All.Count, Is.EqualTo(2));
+            Assert.That(System.Linq.Enumerable.Single(Campaigns.All, c => c.Available).Id, Is.EqualTo(Campaigns.AgentD));
         }
     }
 }

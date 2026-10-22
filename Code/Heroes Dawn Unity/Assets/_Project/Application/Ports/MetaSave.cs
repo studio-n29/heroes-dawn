@@ -81,6 +81,8 @@ namespace N29.HeroesDawn.Application.Ports
         public bool done;
         public string pseudo = "";
         public string campaign = "";
+        /// <summary>Parcours choisi : Agent D ou Agent M (vide : Agent D par défaut).</summary>
+        public string hero = "";
     }
 
     /// <summary>Tout ce qui dépasse le noyau (équipe, ressources, boutique de recrutement) : pass, missions, opérations, labo, archives…</summary>

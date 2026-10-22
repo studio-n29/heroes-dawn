@@ -41,6 +41,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string How(MemberDef d)
         {
             var u = d.Unlock;
+            if (u != null && u.Kind == UnlockKind.Hero) return Loc.T("agents.how.Hero");
             if (u == null || u.Kind == UnlockKind.Shop)
             {
                 if (d.UnlockZone is Core.ZoneId z) return Loc.F("agents.how.Shop_locked", ZoneName(z));
@@ -64,7 +65,8 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         protected override void Render()
         {
-            var all = _session.Content.Members;
+            // Le personnage joueur non choisi n est pas listé : un seul des deux existe dans une partie.
+            var all = _session.Content.Members.Where(d => d.Unlock?.Kind != UnlockKind.Hero || Owned(d)).ToList();
             int owned = all.Count(Owned);
             View.ShowHeader(new ListHeaderData
             {

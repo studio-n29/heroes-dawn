@@ -82,7 +82,7 @@ namespace N29.HeroesDawn.EditorTools.Design
     /// <summary>Outil des agents : ajouter, modifier, dupliquer ou supprimer un agent complet (identité, statistiques, déblocage, compétences).</summary>
     public sealed class AgentsDesignWindow : DesignWindowBase<AgentRecord>
     {
-        static readonly string[] Starter = N29.HeroesDawn.Content.Prototype.PrototypeAgents.StarterTeam;
+        static readonly string[] Starter = System.Linq.Enumerable.ToArray(N29.HeroesDawn.Content.Prototype.PrototypeAgents.StarterTeam);
         static readonly HashSet<string> Hidden = new HashSet<string> { "skills" };
         string[]? _zones;
 
@@ -195,6 +195,7 @@ namespace N29.HeroesDawn.EditorTools.Design
             string unlock = a.unlockKind == UnlockKind.Shop ? (a.unlockZone.Length == 0 ? "en vente dès le départ" : "en vente après la zone " + a.unlockZone)
                           : a.unlockKind == UnlockKind.Arc ? "rejoint à la fin de la zone " + a.unlockZone
                           : a.unlockKind == UnlockKind.Event ? "événement du week-end, zone " + a.unlockZone
+                          : a.unlockKind == UnlockKind.Hero ? "personnage joueur (rejoint au choix de la première connexion)"
                           : "prouesse " + a.feat + ", zone " + a.unlockZone;
             EditorGUILayout.HelpBox(a.name + " · " + a.family + " · " + a.role + " · " + a.rarity + "\nPV " + a.hp + " · ATK " + a.atk + " · DEF " + a.def + " · VIT " + a.spd + "\n" + unlock, MessageType.None);
         }

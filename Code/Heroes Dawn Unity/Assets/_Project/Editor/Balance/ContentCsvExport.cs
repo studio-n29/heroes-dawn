@@ -62,6 +62,7 @@ namespace N29.HeroesDawn.EditorTools.Balance
                 case UnlockKind.Arc: return "Arc : " + u.Zone?.Value;
                 case UnlockKind.Event: return "Événement week-end : " + u.Zone?.Value;
                 case UnlockKind.Feat: return "Exploit " + u.Feat + " : " + u.Zone?.Value;
+                case UnlockKind.Hero: return "Personnage joueur";
                 default: return "Boutique";
             }
         }

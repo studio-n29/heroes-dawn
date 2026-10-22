@@ -46,12 +46,12 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test, Description("Vérifie que la première ville compte 30 agents aux identifiants uniques, avec trois compétences chacun, au moins quatre agents par famille et tous les rôles — parce que c'est l'objectif de la roster")]
         public void Roster_HasThirtyDistinctAgents_WithAFairSpread()
         {
-            Assert.That(C.Members.Count, Is.EqualTo(30));
-            Assert.That(C.Members.Select(m => m.Id.Value).Distinct().Count(), Is.EqualTo(30));
+            Assert.That(C.Members.Count, Is.EqualTo(32), "30 agents numérotés + Agent D + Agent M");
+            Assert.That(C.Members.Select(m => m.Id.Value).Distinct().Count(), Is.EqualTo(32));
             Assert.That(C.Members.All(m => m.Skills.Count == 3), Is.True);
             foreach (Family f in Enum.GetValues(typeof(Family))) Assert.That(C.Members.Count(m => m.Family == f), Is.GreaterThanOrEqualTo(4), f.ToString());
             foreach (Role r in Enum.GetValues(typeof(Role))) Assert.That(C.Members.Any(m => m.Role == r), Is.True, r.ToString());
-            Assert.That(C.Members.Count(m => m.Rarity == Rarity.Legend), Is.EqualTo(4));
+            Assert.That(C.Members.Count(m => m.Rarity == Rarity.Legend && m.Unlock?.Kind != UnlockKind.Hero), Is.EqualTo(4));
             Assert.That(C.Members.Count(m => m.Rarity == Rarity.Elite), Is.EqualTo(8));
             Assert.That(PrototypeAgents.StarterTeam.All(id => C.StarterTeam.Contains(id)), Is.True, "équipe de départ portée par le catalogue");
         }
@@ -69,7 +69,7 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test, Description("Vérifie que chaque règle de déblocage vise une zone existante du jeu et que chaque compagnon a une prouesse — parce qu'une règle qui vise une zone inconnue ne se déclencherait jamais")]
         public void UnlockRules_TargetRealZones()
         {
-            foreach (var m in C.Members.Where(m => m.Unlock != null && m.Unlock.Kind != UnlockKind.Shop))
+            foreach (var m in C.Members.Where(m => m.Unlock != null && m.Unlock.Kind != UnlockKind.Shop && m.Unlock.Kind != UnlockKind.Hero))
             {
                 Assert.That(m.Unlock!.Zone.HasValue, Is.True, m.Id.Value);
                 Assert.That(C.Zones.Any(z => z.Id == m.Unlock.Zone!.Value), Is.True, m.Id.Value);

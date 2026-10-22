@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Ports;
+using N29.HeroesDawn.Definitions;
 
 namespace N29.HeroesDawn.Application.Features.Auth
 {
-    /// <summary>Une campagne proposée à la première connexion ; les autres que New York sont en cours de création.</summary>
+    /// <summary>Un personnage joueur proposé à la première connexion (Agent D ou Agent M) ; son parcours fixe l ordre des actes.</summary>
     public sealed class CampaignOption
     {
         public string Id { get; }
@@ -17,17 +18,18 @@ namespace N29.HeroesDawn.Application.Features.Auth
 
     public static class Campaigns
     {
-        public const string NewYork = "new_york";
+        public const string AgentD = StoryRoutes.AgentD;
+        public const string AgentM = StoryRoutes.AgentM;
 
-        public static readonly IReadOnlyList<CampaignOption> All = new[]
+        public static readonly IReadOnlyList<CampaignOption> All = BuildAll();
+
+        static IReadOnlyList<CampaignOption> BuildAll()
         {
-            new CampaignOption(NewYork, true),
-            new CampaignOption("paris", false),
-            new CampaignOption("tokyo", false),
-            new CampaignOption("cairo", false),
-        };
+            var list = new List<CampaignOption>();
+            foreach (var r in StoryRoutes.All) list.Add(new CampaignOption(r.Id, r.Available));
+            return list;
+        }
     }
-
     /// <summary>Règles du pseudo : 3 à 16 caractères, lettres, chiffres, espace, tiret ou tiret bas.</summary>
     public static class PseudoRules
     {
@@ -62,14 +64,31 @@ namespace N29.HeroesDawn.Application.Features.Auth
         public bool Needed => !Save.done && _c.Session.CompletedZones.Count == 0;
         public string Pseudo => Save.pseudo;
         public string Campaign => Save.campaign;
+        /// <summary>Personnage joueur choisi (Agent D par défaut).</summary>
+        public string Hero => string.IsNullOrEmpty(Save.hero) ? StoryRoutes.AgentD : Save.hero;
+
+        bool AllExist(IReadOnlyList<string> ids)
+        {
+            foreach (var id in ids)
+            {
+                bool found = false;
+                foreach (var m in _c.Session.Content.Members) if (m.Id.Value == id) { found = true; break; }
+                if (!found) return false;
+            }
+            return true;
+        }
 
         /// <summary>Termine la première connexion. Renvoie la clé d'erreur du pseudo, ou null si tout est enregistré.</summary>
         public string? Complete(string pseudo, string campaign)
         {
+            var route = StoryRoutes.For(campaign);
+            if (route.Id != campaign || !route.Available) return "onboarding.campaign.unavailable";
             var error = PseudoRules.Validate(pseudo, out var clean);
             if (error != null) return error;
             Save.pseudo = clean;
-            Save.campaign = campaign;
+            Save.campaign = route.ActCities[0];
+            Save.hero = route.Id;
+            if (AllExist(route.StarterTeam)) _c.Session.StartWithTeam(route.StarterTeam);
             Save.done = true;
             ApplyPseudo();
             _c.Touch(MetaArea.Onboarding);

@@ -6,7 +6,7 @@ using N29.HeroesDawn.Definitions;
 namespace N29.HeroesDawn.Content.Prototype
 {
     /// <summary>
-    /// Les 30 agents numérotés de The Dawn (02_Lore_Narration/04_Agents_The_Dawn.md). Quatre forment l'équipe de départ, quatorze entrent dans la
+    /// Les 30 agents numérotés de The Dawn (02_Lore_Narration/04_Agents_The_Dawn.md) et les deux personnages joueurs. Trois forment avec le personnage joueur l'équipe de départ, quatorze entrent dans la
     /// boutique de recrutement (dont un après la zone 1.1), quatre rejoignent à la fin d'un arc narratif, quatre pendant un événement temporaire
     /// (week-end) et quatre sont des compagnons gagnés par une prouesse. Chaque agent a trois compétences construites sur son rôle.
     /// L'identifiant est le nom civil sans accent (« ilona_varga ») ; le nom affiché et le pouvoir sont dans <c>Loc</c>.
@@ -33,11 +33,14 @@ namespace N29.HeroesDawn.Content.Prototype
         static readonly ZoneId Z12 = PrototypeZones.Zone12;
         static readonly ZoneId Z13 = PrototypeZones.Zone13;
 
-        /// <summary>Équipe d'un nouveau profil : une recrue par famille.</summary>
-        public static readonly string[] StarterTeam = { "darius_brooks", "mei_lin_chen", "freya_lindqvist", "kwame_abara" };
+        /// <summary>Équipe d un nouveau profil qui n a pas choisi de personnage : celle d Agent D.</summary>
+        public static readonly System.Collections.Generic.IReadOnlyList<string> StarterTeam = StoryRoutes.D.StarterTeam;
 
         public static readonly IReadOnlyList<Entry> Roster = new[]
         {
+            // Personnages joueurs : le choix de la première connexion décide lequel rejoint l équipe
+            new Entry(StoryRoutes.AgentD, "Agent D", Family.Matter, Role.Control, Rarity.Legend, UnlockDef.Hero()),
+            new Entry(StoryRoutes.AgentM, "Agent M", Family.Perception, Role.Precision, Rarity.Legend, UnlockDef.Hero()),
             // Départ (New York)
             new Entry("darius_brooks", "Darius Brooks", Family.Matter, Role.Tank, Rarity.Agent),
             new Entry("mei_lin_chen", "Mei-Lin Chen", Family.Elemental, Role.Damage, Rarity.Agent),

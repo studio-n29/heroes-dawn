@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator TearDown() => PlayModeHarness.TearDown();
 
         [UnityTest, Timeout(240000), Description("Vérifie que le bouton Registre de la page Recruter ouvre la vraie page du registre qui liste les 30 agents — parce que le joueur doit voir toute la collection et comment l'obtenir")]
-        public IEnumerator Registry_OpensFromRecruit_AndListsThirtyAgents()
+        public IEnumerator Registry_OpensFromRecruit_AndListsTheRegistry()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
             Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Login.LoginView>()!.PlayButton.onClick.Invoke();
@@ -33,7 +33,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return null;
             var page = Object.FindAnyObjectByType<AgentsPageView>()!;
             int rows = page.GetComponentsInChildren<InfoRowView>(true).Count(r => r.gameObject.activeInHierarchy);
-            Assert.That(rows, Is.EqualTo(30));
+            Assert.That(rows, Is.EqualTo(31));
             yield return new WaitForSeconds(0.5f);
             yield return ScreenCaptureTests.Capture("20-registre-agents");
         }

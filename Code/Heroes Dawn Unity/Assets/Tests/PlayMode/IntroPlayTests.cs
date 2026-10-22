@@ -1,4 +1,5 @@
 #nullable enable
+using System.Linq;
 using System.Collections;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Composition;
@@ -37,11 +38,11 @@ namespace N29.HeroesDawn.Tests.PlayMode
             intro.PseudoConfirmButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign);
 
-            Assert.That(intro.Cards.Count, Is.EqualTo(4));
-            Assert.That(intro.CampaignConfirmButton.interactable, Is.False, "aucune campagne choisie");
-            intro.SelectCampaign("paris");
-            Assert.That(intro.CampaignConfirmButton.interactable, Is.False, "Paris est en cours de création");
-            intro.SelectCampaign("new_york");
+            Assert.That(intro.Cards.Count, Is.EqualTo(2), "Agent D et Agent M");
+            Assert.That(intro.CampaignConfirmButton.interactable, Is.False, "aucun personnage choisi");
+            intro.SelectCampaign("agent_m");
+            Assert.That(intro.CampaignConfirmButton.interactable, Is.False, "le parcours d Agent M est en cours de création");
+            intro.SelectCampaign("agent_d");
             Assert.That(intro.CampaignConfirmButton.interactable, Is.True);
             intro.CampaignConfirmButton.onClick.Invoke();
 
@@ -49,6 +50,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var session = GameBootstrap.Instance!.Scope.Container.Resolve<GameSession>();
             Assert.That(session.Account!.DisplayName, Is.EqualTo("Maya Dorée"));
             Assert.That(session.Meta.onboarding.campaign, Is.EqualTo("new_york"));
+            Assert.That(session.Meta.onboarding.hero, Is.EqualTo("agent_d"));
+            Assert.That(session.Roster.Select(m => m.Id.Value), Is.EqualTo(new[] { "agent_d", "darius_brooks", "mei_lin_chen", "freya_lindqvist" }));
             Assert.That(Object.FindAnyObjectByType<IntroPopupView>(), Is.Null, "la popup est fermée");
         }
 
@@ -92,7 +95,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             intro.Input.text = "Maya";
             intro.PseudoConfirmButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign);
-            intro.SelectCampaign("new_york");
+            intro.SelectCampaign("agent_d");
             yield return new WaitForSecondsRealtime(0.6f);
             yield return ScreenCaptureTests.Capture("33-campagne");
         }

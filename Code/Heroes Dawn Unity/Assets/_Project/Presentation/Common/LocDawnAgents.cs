@@ -9,6 +9,8 @@ namespace N29.HeroesDawn.Presentation.Common
         /// <summary>Agent (identifiant, nom, rôle de kit, pouvoir, fiche).</summary>
         static (string Id, string Name, string Role, string Power, string Bio)[] DawnAgents() => new[]
         {
+            ("agent_d", "Agent D", "Control", "Matérialise ce que son esprit imagine", "Illustrateur de rue de Harlem, il a tracé à la craie une barrière qui s est matérialisée sous les balles."),
+            ("agent_m", "Agent M", "Precision", "Perçoit le passé, le présent et le futur de ce qui l entoure", "Restauratrice de fresques à Moscou, elle a vu ce qui allait arriver au moment de l attentat de sa cathédrale."),
             ("darius_brooks", "Darius Brooks", "Tank", "Anime et contrôle les objets non organiques", "Mécanicien de Détroit, il a découvert son pouvoir en dégageant un enfant d'un échafaudage effondré à New York."),
             ("mei_lin_chen", "Mei-Lin Chen", "Damage", "Crée, dirige et étouffe les flammes", "Étudiante en art de Hong Kong, elle a senti le feu répondre à sa voix quand un gang a incendié son quartier."),
             ("freya_lindqvist", "Freya Lindqvist", "Support", "Lit et transmet les pensées", "Enfant muette de Stockholm, elle guide désormais l'évacuation d'une foule en entendant chaque pensée."),

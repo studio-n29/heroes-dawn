@@ -15,6 +15,8 @@ namespace N29.HeroesDawn.Definitions
         Event,
         /// <summary>Prouesse : l'agent rejoint l'équipe si la zone est validée en accomplissant l'exploit.</summary>
         Feat,
+        /// <summary>Personnage joueur (Agent D ou Agent M) : rejoint l équipe au choix de la première connexion, jamais en boutique.</summary>
+        Hero,
     }
 
     /// <summary>Prouesses qui débloquent un compagnon.</summary>
@@ -43,6 +45,7 @@ namespace N29.HeroesDawn.Definitions
 
         public static UnlockDef Arc(ZoneId zone) => new UnlockDef(UnlockKind.Arc, zone);
         public static UnlockDef WeekendEvent(ZoneId zone) => new UnlockDef(UnlockKind.Event, zone, DayMask(DayOfWeek.Saturday) | DayMask(DayOfWeek.Sunday));
+        public static UnlockDef Hero() => new UnlockDef(UnlockKind.Hero);
         public static UnlockDef FeatOf(ZoneId zone, FeatKind feat) => new UnlockDef(UnlockKind.Feat, zone, 0, feat);
 
         public static int DayMask(DayOfWeek d) => 1 << (int)d;

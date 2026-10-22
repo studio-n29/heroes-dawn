@@ -77,7 +77,7 @@ namespace N29.HeroesDawn.Tests.Editor
             var lib = ContentDataLibrary.Load();
             Assert.That(lib.Skipped, Is.Empty);
             Assert.That(lib.Members, Is.Not.Null);
-            Assert.That(lib.Members!.Count, Is.EqualTo(30));
+            Assert.That(lib.Members!.Count, Is.EqualTo(32));
             Assert.That(lib.Items!.Count, Is.EqualTo(10));
             Assert.That(lib.Texts["members.darius_brooks.name"], Is.EqualTo("Darius Brooks"));
         }
@@ -135,7 +135,7 @@ namespace N29.HeroesDawn.Tests.Editor
             agents.agents.Add(new AgentRecord { id = "casse", name = "Cassé", skills = new List<string> { "x", "y", "z" } });
             var lib = ContentDataLibrary.FromFiles(items, skills, agents);
             Assert.That(lib.Skipped.Single(), Does.Contain("casse"));
-            Assert.That(lib.Members!.Count, Is.EqualTo(30));
+            Assert.That(lib.Members!.Count, Is.EqualTo(32));
         }
 
         [Test, Description("Vérifie qu'un texte modifié dans l'outil de narration remplace le texte d'origine du jeu et que « revenir à l'original » le rétablit — parce que le tutoriel et les astuces se corrigent sans toucher au code")]

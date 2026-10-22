@@ -38,6 +38,7 @@ namespace N29.HeroesDawn.Authoring
                 case UnlockKind.Arc: if (zone.HasValue) unlock = UnlockDef.Arc(zone.Value); break;
                 case UnlockKind.Event: if (zone.HasValue) unlock = UnlockDef.WeekendEvent(zone.Value); break;
                 case UnlockKind.Feat: if (zone.HasValue) unlock = UnlockDef.FeatOf(zone.Value, a.feat); break;
+                case UnlockKind.Hero: unlock = UnlockDef.Hero(); break;
             }
             var shopZone = a.unlockKind == UnlockKind.Shop ? zone : null;
             return new MemberDef(new MemberId(a.id), "members." + a.id + ".name", a.family, a.role, a.rarity, new StatBlock(a.hp, a.atk, a.def, a.spd), kit, shopZone, unlock);

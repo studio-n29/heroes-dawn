@@ -47,11 +47,11 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void Registry_ListsAllThirty_OwnedFirst()
         {
             Start();
-            Assert.That(_view.Rows.Length, Is.EqualTo(30));
+            Assert.That(_view.Rows.Length, Is.EqualTo(31), "30 agents + le personnage joueur choisi (Agent D par défaut)");
             int owned = _session.Roster.Count;
             Assert.That(_view.Rows.Take(owned).All(r => !r.Dim), Is.True, "les agents de l'équipe d'abord");
             Assert.That(_view.Rows.Skip(owned).All(r => r.Dim), Is.True, "les autres sont grisés avec leur condition");
-            Assert.That(_view.Header.Line, Does.Contain("sur 30").And.Contain((30 - owned) + " à débloquer"));
+            Assert.That(_view.Header.Line, Does.Contain("sur 31").And.Contain((31 - owned) + " à débloquer"));
         }
 
         [Test, Description("Vérifie que chaque voie d'obtention est expliquée par une phrase propre à l'agent (zone, week-end, prouesse) — parce qu'on ne débloque pas ce qu'on ne comprend pas")]

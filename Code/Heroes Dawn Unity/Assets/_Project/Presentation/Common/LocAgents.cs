@@ -50,6 +50,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["agents.how.Event_today"] = "Événement en cours aujourd'hui : valide la zone {0} !";
             d["agents.how.Feat.SoloClear"] = "Prouesse : valide la zone {0} avec un seul agent au combat.";
             d["agents.how.Feat.NoDefeat"] = "Prouesse : valide la zone {0} sans aucune défaite.";
+            d["agents.how.Hero"] = "Personnage joueur.";
+            d["agents.kind.Hero"] = "PERSONNAGE";
             d["agents.joined"] = "{0} rejoint ton équipe !";
             d["agents.joined_rewards"] = " · {0} rejoint l'équipe";
             d["board.agent_joined"] = "Nouvel agent : {0} !";

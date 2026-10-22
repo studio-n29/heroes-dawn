@@ -54,15 +54,15 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(Popup.Campaigns, Is.Null, "la campagne n'est pas encore proposée");
         }
 
-        [Test, Description("Vérifie que New York est proposée comme disponible et les autres campagnes comme en cours de création — parce que seule New York est jouable en 0.9.0")]
-        public void Campaigns_OnlyNewYorkIsAvailable()
+        [Test, Description("Vérifie que les deux personnages sont proposés, Agent D disponible et Agent M en création — parce que les zones de Moscou ne sont pas encore créées")]
+        public void Campaigns_OnlyAgentDIsAvailable()
         {
             _flow.RunIfNeededAsync(default).Forget();
             Popup.FinishCinematic();
             Popup.SubmitPseudo("Maya");
             var cards = Popup.Campaigns!.Value.Cards;
-            Assert.That(cards.Count, Is.EqualTo(4));
-            Assert.That(cards.Single(c => c.Available).Id, Is.EqualTo("new_york"));
+            Assert.That(cards.Count, Is.EqualTo(2));
+            Assert.That(cards.Single(c => c.Available).Id, Is.EqualTo("agent_d"));
             Assert.That(cards.Where(c => !c.Available).Select(c => c.Badge).Distinct().Single(), Is.EqualTo("EN CRÉATION"));
         }
 
@@ -73,11 +73,12 @@ namespace N29.HeroesDawn.Tests.Presentation
             var popup = Popup;
             popup.FinishCinematic();
             popup.SubmitPseudo("  Maya  Dorée ");
-            popup.Choose("new_york");
+            popup.Choose("agent_d");
             Assert.That(run.Status, Is.EqualTo(UniTaskStatus.Succeeded));
             Assert.That(_app.Session.Meta.onboarding.done, Is.True);
             Assert.That(_app.Session.Meta.onboarding.pseudo, Is.EqualTo("Maya Dorée"));
             Assert.That(_app.Session.Meta.onboarding.campaign, Is.EqualTo("new_york"));
+            Assert.That(_app.Session.Meta.onboarding.hero, Is.EqualTo("agent_d"));
             Assert.That(_app.Session.Account!.DisplayName, Is.EqualTo("Maya Dorée"));
             Assert.That(_host.Despawned, Does.Contain(popup));
             Assert.That(_flow.Needed, Is.False);
@@ -98,7 +99,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             for (int i = 1; i <= 9; i++) Assert.That(Loc.Has("intro.slide." + i), Is.True, "intro.slide." + i);
             foreach (var key in new[] { "intro.skip", "intro.tap", "onboarding.speaker", "onboarding.pseudo.line", "onboarding.pseudo.placeholder",
                                         "onboarding.pseudo.confirm", "onboarding.pseudo.short", "onboarding.pseudo.long", "onboarding.pseudo.chars",
-                                        "onboarding.campaign.title", "onboarding.campaign.confirm", "onboarding.campaign.open", "onboarding.campaign.wip" })
+                                        "onboarding.campaign.title", "onboarding.campaign.confirm", "onboarding.campaign.open", "onboarding.campaign.wip", "onboarding.campaign.unavailable" })
                 Assert.That(Loc.Has(key), Is.True, key);
             foreach (var c in Campaigns.All) { Assert.That(Loc.Has(c.NameKey), Is.True, c.NameKey); Assert.That(Loc.Has(c.DescKey), Is.True, c.DescKey); }
         }
