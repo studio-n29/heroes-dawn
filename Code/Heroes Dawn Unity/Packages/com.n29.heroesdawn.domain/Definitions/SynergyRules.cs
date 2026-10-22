@@ -29,6 +29,15 @@ namespace N29.HeroesDawn.Definitions
             return list;
         }
 
+        /// <summary>Même total avec le niveau de lien de chaque paire : l effet passif de la synergie est multiplié (voir <see cref="LinkRules"/>).</summary>
+        public static SynergyBonus Total(IEnumerable<(SynergyDef Synergy, int LinkLevel)> active)
+        {
+            var scaled = new List<SynergyDef>();
+            foreach (var (s, level) in active)
+                scaled.Add(new SynergyDef(s.Id, s.NameKey, s.A, s.B, s.Stat, s.Percent * LinkRules.MultiplierPercent(level) / 100));
+            return Total(scaled);
+        }
+
         public static SynergyBonus Total(IEnumerable<SynergyDef> active)
         {
             int hp = 0, atk = 0, def = 0, spd = 0;

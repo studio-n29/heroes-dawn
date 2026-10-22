@@ -74,6 +74,15 @@ namespace N29.HeroesDawn.Application.Ports
         public List<string> hintsSeen = new List<string>();
     }
 
+    /// <summary>Victoires remportées ensemble par deux agents (identifiants triés : a avant b).</summary>
+    [Serializable]
+    public sealed class LinkSave
+    {
+        public string a = "";
+        public string b = "";
+        public int wins;
+    }
+
     /// <summary>Première connexion : cinématique d introduction vue, pseudo choisi, campagne choisie.</summary>
     [Serializable]
     public sealed class OnboardingSave
@@ -90,6 +99,9 @@ namespace N29.HeroesDawn.Application.Ports
     public sealed class MetaSave
     {
         public int gems = 50;
+
+        /// <summary>Liens entre agents : victoires remportées ensemble, par paire (voir <see cref="N29.HeroesDawn.Definitions.LinkRules"/>).</summary>
+        public List<LinkSave> links = new List<LinkSave>();
 
         // Pass saisonnier
         public string seasonStart = "";

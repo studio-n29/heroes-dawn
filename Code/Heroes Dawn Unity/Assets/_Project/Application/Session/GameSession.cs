@@ -155,6 +155,8 @@ namespace N29.HeroesDawn.Application.Session
         /// <summary>Parcours du personnage choisi à la première connexion ; Agent D tant qu aucun choix n est enregistré.</summary>
         public StoryRoute Route => StoryRoutes.For(Meta.onboarding.hero);
 
+        public int LinkLevel(MemberId a, MemberId b) => Features.Combat.TeamLinks.Level(Meta, a.Value, b.Value);
+
         /// <summary>Remplace l effectif par ces agents, tous en escouade (choix du personnage, avant toute progression).</summary>
         public void StartWithTeam(System.Collections.Generic.IEnumerable<string> ids)
         {

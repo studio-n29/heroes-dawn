@@ -102,7 +102,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Sort = _state.Sort,
                 SquadTitle = _loc.F("hub.squad", squad.Count),
                 Squad = squad.Select(m => MemberCards.Slot(m, _loc)).ToArray(),
-                Synergies = synergies.Select(c => _loc.F("team.synergy_line", _loc.SynergyName(c.Synergy), _loc.SynergyEffect(c.Synergy), _loc.MemberName(c.A), _loc.MemberName(c.B))).ToArray(),
+                Synergies = synergies.Select(c => _loc.F("team.synergy_line", _loc.SynergyName(c.Synergy), _loc.SynergyEffect(c.Synergy, s.LinkLevel(c.A.Id, c.B.Id)), _loc.MemberName(c.A), _loc.MemberName(c.B)))
+                    .Concat(TeamEffects.Active(squad.Select(m => m.Def.Family).ToList(), squad.Select(m => m.Def.Role).ToList()).Select(_loc.TeamEffect)).ToArray(),
                 MissionEnabled = !s.SquadExhausted,
                 MissionHint = s.SquadExhausted ? _loc.T("hub.deploy.exhausted") : "",
             });

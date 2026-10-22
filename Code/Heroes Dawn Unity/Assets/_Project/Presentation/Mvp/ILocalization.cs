@@ -17,6 +17,10 @@ namespace N29.HeroesDawn.Presentation.Mvp
         string SynergyName(SynergyDef s);
         /// <summary>« +6 % Attaque » : ce que la synergie donne à toute l équipe.</summary>
         string SynergyEffect(SynergyDef s);
+        /// <summary>Effet passif d une synergie amplifié par le niveau de lien (voir LinkRules).</summary>
+        string SynergyEffect(SynergyDef s, int linkLevel);
+        /// <summary>Nom et effet d un effet unique de composition d équipe.</summary>
+        string TeamEffect(TeamEffectKind kind);
         string StatusName(StatusType s);
         string FamilyName(Family f);
         string RoleName(Role r);

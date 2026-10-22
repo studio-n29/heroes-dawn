@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
@@ -71,6 +72,29 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(credits + b.CreditsEasy));
             Assert.That(report.Fatigue.All(f => f.After - f.Before == b.FatiguePerWin));
             Assert.That(_app.Session.Run!.IsSpent(new CaseId("n03")));
+        }
+
+        [Test, Description("Vérifie qu une victoire ajoute une victoire commune à chaque paire d agents engagés et qu une défaite n en ajoute pas — parce que le lien se gagne en gagnant ensemble")]
+        public void Finish_Victory_ProgressesTheLinks_DefeatDoesNot()
+        {
+            var sim = BeginEasyCombat();
+            Assert.That(C.ForceWin.ExecuteAsync().GetAwaiter().GetResult().IsSuccess);
+            RunToEnd(sim);
+            var engaged = _app.Session.Squad.Select(m => m.Id.Value).ToList();
+            C.Finish.ExecuteAsync().GetAwaiter().GetResult();
+            Assert.That(engaged.Count, Is.GreaterThan(1));
+            Assert.That(TeamLinks.Wins(_app.Session.Meta, engaged[0], engaged[1]), Is.EqualTo(1));
+            Assert.That(_app.Session.LinkLevel(new MemberId(engaged[0]), new MemberId(engaged[1])), Is.EqualTo(1), "un seul combat : niveau 1");
+        }
+
+        [Test, Description("Vérifie qu une défaite n ajoute aucune victoire commune — parce que seul le fait de gagner ensemble renforce un lien")]
+        public void Finish_Defeat_DoesNotProgressTheLinks()
+        {
+            var sim = BeginEasyCombat();
+            sim.Submit(CombatCommand.Retreat());
+            RunToEnd(sim);
+            C.Finish.ExecuteAsync().GetAwaiter().GetResult();
+            Assert.That(_app.Session.Meta.links, Is.Empty);
         }
 
         [Test, Description("Vérifie qu'une défaite ne rapporte rien, ajoute 12 + 15 % de fatigue et fait reculer le pion — parce que la défaite = recul d'une case + fatigue accrue (GDD §6)")]

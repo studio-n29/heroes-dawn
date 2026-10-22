@@ -40,6 +40,16 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Vagues successives d'ennemis (au moins une) ; la vague 1 est <see cref="Enemies"/>.</summary>
         public IReadOnlyList<IReadOnlyList<EnemyEntry>> Waves { get; }
         public bool Auto { get; }
+        /// <summary>Niveaux de lien des paires d agents de l escouade (une paire absente : niveau 1).</summary>
+        public IReadOnlyList<LinkEntry> Links { get; private set; } = System.Array.Empty<LinkEntry>();
+
+        public CombatSetup WithLinks(IReadOnlyList<LinkEntry> links) { Links = links; return this; }
+
+        public int LinkLevel(MemberId a, MemberId b)
+        {
+            foreach (var l in Links) if (l.Is(a, b)) return l.Level;
+            return 1;
+        }
 
         public CombatSetup(ulong seed, CombatRank rank, IReadOnlyList<AllyEntry> allies, IReadOnlyList<EnemyEntry> enemies, bool auto)
             : this(seed, rank, allies, new[] { enemies }, auto) { }

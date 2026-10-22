@@ -61,7 +61,8 @@ namespace N29.HeroesDawn.Application.Features.Combat
             }
 
             ulong seed = _seeds.NextSeed("combat:" + pending.Case.Value);
-            var setup = new CombatSetup(seed, pending.Rank, allies, waves, _s.AutoCombat);
+            var setup = new CombatSetup(seed, pending.Rank, allies, waves, _s.AutoCombat)
+                .WithLinks(TeamLinks.Entries(_s.Meta, allies.Select(a => a.Member.Value).ToList()));
             var sim = new CombatSimulation(_s.Content, setup);
             _active.Start(sim, setup, pending, engaged);
             _log.Info($"Combat {pending.Rank} sur {pending.Case} — ennemis niv. {enemyLevel} (graine {seed})");

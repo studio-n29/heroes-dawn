@@ -24,6 +24,8 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Énergie disponible : chaque compétence en coûte, elle se régénère à chaque pas de la frise.</summary>
         public int Energy { get; set; } = 100;
         public int MaxEnergy { get; set; } = 100;
+        /// <summary>Énergie en plus à chaque pas de la frise (effet d équipe).</summary>
+        public int EnergyRegenBonus { get; set; }
         public List<StatusInstance> Statuses { get; } = new List<StatusInstance>();
         public IReadOnlyList<SkillDef> Skills { get; }
         /// <summary>Compétence annoncée sur la frise (ennemis, zone de préparation) ; -1 = aucune.</summary>

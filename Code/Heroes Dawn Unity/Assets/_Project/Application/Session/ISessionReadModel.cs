@@ -28,5 +28,7 @@ namespace N29.HeroesDawn.Application.Session
         IShopReadModel Shop { get; }
         /// <summary>Parcours de l histoire du personnage joueur choisi (actes, ville de chaque acte).</summary>
         StoryRoute Route { get; }
+        /// <summary>Niveau de lien (1 à 5) de deux agents : leurs victoires communes amplifient le bonus passif de leur synergie.</summary>
+        int LinkLevel(Core.MemberId a, Core.MemberId b);
     }
 }

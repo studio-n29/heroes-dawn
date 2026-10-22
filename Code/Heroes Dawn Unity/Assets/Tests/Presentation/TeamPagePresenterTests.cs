@@ -117,11 +117,12 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Last.Squad.Length, Is.EqualTo(4));
         }
 
-        [Test, Description("Vérifie que les synergies formées par l'escouade sont listées, et suivent ses changements — parce que l'écran Équipe montre les synergies (M20 ⑤)")]
+        [Test, Description("Vérifie que les synergies et les effets d équipe formés par l escouade sont listés, et suivent ses changements — parce que l'écran Équipe montre les synergies (M20 ⑤)")]
         public void Synergies_ListedForCurrentSquad()
         {
             Make();
-            Assert.That(_view.Last.Synergies.Length, Is.EqualTo(6));
+            Assert.That(_view.Last.Synergies.Length, Is.EqualTo(7), "6 synergies de familles + l effet d équipe Trinité");
+            Assert.That(_view.Last.Synergies.Any(c => c.Contains("Trinité")), Is.True);
             Assert.That(_view.Last.Synergies.Any(c => c.Contains("Résonance vitale")), Is.True);
             _view.ToggleSquad(new MemberId("seve"));
             Assert.That(_view.Last.Synergies.Length, Is.EqualTo(3));

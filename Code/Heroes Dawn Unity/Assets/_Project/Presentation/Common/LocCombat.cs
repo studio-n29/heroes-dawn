@@ -18,6 +18,16 @@ namespace N29.HeroesDawn.Presentation.Common
             d["combat.prepares"] = "prépare {0}";
             d["combat.interrupted"] = "INTERROMPU !";
             d["combat.synergy"] = "SYNERGIE · {0} ({1}) : {2} + {3}";
+            d["combat.team_effect"] = "ÉQUIPE · {0}";
+            d["link.level"] = "lien niv. {0}";
+            d["team_effect.Quartet.name"] = "Quatuor";
+            d["team_effect.Quartet.text"] = "4 familles différentes, +10 % de critique";
+            d["team_effect.Trinity.name"] = "Trinité";
+            d["team_effect.Trinity.text"] = "tank, dégâts et soutien, +1 énergie par pas";
+            d["team_effect.DoubleFront.name"] = "Double front";
+            d["team_effect.DoubleFront.text"] = "2 tanks, bouclier d ouverture de 10 % des PV";
+            d["team_effect.Spark.name"] = "Étincelle";
+            d["team_effect.Spark.text"] = "2 agents de contrôle, +20 énergie au départ";
             d["combat.pushed"] = "RECUL -{0} %";
             d["combat.timeline_action"] = "ACTION";
             d["combat.turn_passed"] = "passe son tour";

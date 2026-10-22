@@ -36,8 +36,13 @@ namespace N29.HeroesDawn.Domain.Combat
             int id = 0;
             var families = new List<Family>();
             foreach (var a in setup.Allies) families.Add(c.Member(a.Member).Family);
-            var synergy = SynergyRules.Total(System.Linq.Enumerable.Select(SynergyRules.Active(families, c.Synergies), s => s.Synergy));
+            var activeSynergies = SynergyRules.Active(families, c.Synergies);
+            var synergy = SynergyRules.Total(System.Linq.Enumerable.Select(activeSynergies,
+                s => (s.Synergy, setup.LinkLevel(setup.Allies[s.A].Member, setup.Allies[s.B].Member))));
             foreach (var a in setup.Allies) _units.Add(UnitFactory.Ally(id++, c.Member(a.Member), a, _b, c.Collection, synergy));
+            var roles = new List<Role>();
+            foreach (var a in setup.Allies) roles.Add(c.Member(a.Member).Role);
+            ApplyTeamEffects(TeamEffects.Active(families, roles));
             SpawnWave(0);
             foreach (var u in _units)
             {
@@ -47,6 +52,23 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         public CombatUnit Unit(int id) => _units[id];
+
+        /// <summary>Effets uniques de la composition d équipe, appliqués à chaque allié au début du combat.</summary>
+        void ApplyTeamEffects(IReadOnlyList<TeamEffectKind> effects)
+        {
+            foreach (var u in _units)
+            {
+                if (u.Side != Side.Ally) continue;
+                foreach (var e in effects)
+                    switch (e)
+                    {
+                        case TeamEffectKind.Quartet: u.CritBonusPercent += TeamEffects.QuartetCritPercent; break;
+                        case TeamEffectKind.Trinity: u.EnergyRegenBonus += TeamEffects.TrinityEnergyRegen; break;
+                        case TeamEffectKind.DoubleFront: u.Statuses.Add(new StatusInstance(StatusType.Shield, 2, u.MaxHp * TeamEffects.DoubleFrontShieldPercent / 100)); break;
+                        case TeamEffectKind.Spark: u.Energy = System.Math.Min(u.MaxEnergy, u.Energy + TeamEffects.SparkStartEnergy); break;
+                    }
+            }
+        }
 
 
         /// <summary>Points franchis par une unite a ce pas : 1 pour tous ; Hate : 2 un pas sur trois ; Gel : un pas sur deux seulement.</summary>
@@ -91,7 +113,7 @@ namespace N29.HeroesDawn.Domain.Combat
             {
                 var u = _units[i];
                 if (!u.IsAlive || u.IsReady) continue;
-                u.Energy = System.Math.Min(u.MaxEnergy, u.Energy + _b.EnergyRegenPerTick); // l énergie se régénère à chaque pas
+                u.Energy = System.Math.Min(u.MaxEnergy, u.Energy + _b.EnergyRegenPerTick + u.EnergyRegenBonus); // l énergie se régénère à chaque pas
                 int moves = PointsThisStep(u);
                 for (int m = 0; m < moves && u.IsAlive && !u.IsReady; m++)
                 {

@@ -342,6 +342,9 @@ namespace N29.HeroesDawn.Presentation.Common
         public static string SkillName(SkillDef s) => Or("skills." + s.Id.Value, "skills." + s.Id.Value);
         public static string SynergyName(SynergyDef s) => T(s.NameKey);
         public static string SynergyEffect(SynergyDef s) => "+" + s.Percent + " % " + T("synergy.stat." + s.Stat);
+        public static string SynergyEffect(SynergyDef s, int linkLevel)
+            => "+" + s.Percent * LinkRules.MultiplierPercent(linkLevel) / 100 + " % " + T("synergy.stat." + s.Stat) + (linkLevel > 1 ? " (" + F("link.level", linkLevel) + ")" : "");
+        public static string TeamEffect(TeamEffectKind kind) => T("team_effect." + kind + ".name") + " : " + T("team_effect." + kind + ".text");
         public static string StatusName(StatusType s) => T("status." + s);
         public static string FamilyName(Family f) => T("family." + f);
         public static string RoleName(Role r) => T("role." + r);

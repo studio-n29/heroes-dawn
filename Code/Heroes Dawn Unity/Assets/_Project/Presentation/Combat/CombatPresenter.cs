@@ -146,7 +146,11 @@ namespace N29.HeroesDawn.Presentation.Combat
             var allies = sim.Units.Where(u => u.Side == Side.Ally).ToList();
             var active = SynergyRules.Active(allies.Select(u => u.Family).ToList(), _session.Content.Synergies);
             foreach (var a in active)
-                AddLog(_loc.F("combat.synergy", _loc.SynergyName(a.Synergy), _loc.SynergyEffect(a.Synergy), Name(allies[a.A].Id), Name(allies[a.B].Id)));
+                AddLog(_loc.F("combat.synergy", _loc.SynergyName(a.Synergy),
+                    _loc.SynergyEffect(a.Synergy, sim.Setup.LinkLevel(new MemberId(allies[a.A].DefId), new MemberId(allies[a.B].DefId))),
+                    Name(allies[a.A].Id), Name(allies[a.B].Id)));
+            foreach (var effect in TeamEffects.Active(allies.Select(u => u.Family).ToList(), allies.Select(u => u.Role).ToList()))
+                AddLog(_loc.F("combat.team_effect", _loc.TeamEffect(effect)));
         }
 
         void BuildUnits(CombatSimulation sim)

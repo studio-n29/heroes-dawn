@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
@@ -59,6 +60,8 @@ namespace N29.HeroesDawn.Application.Features.Combat
                 m.AddFatigue(fatigue);
                 changes.Add(new FatigueChange(m.Id, before, m.Fatigue));
             }
+
+            if (victory) TeamLinks.RecordVictory(s.Meta, _active.FighterMembers.Select(m => m.Id.Value).ToList());
 
             var res = ZoneActions.Apply(_fx, r => r.ResolveCombat(victory));
             IReadOnlyList<BoardEvent> boardEvents = res.IsSuccess ? res.Value : Array.Empty<BoardEvent>();
