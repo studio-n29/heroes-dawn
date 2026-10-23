@@ -8,6 +8,9 @@ namespace N29.HeroesDawn.Presentation.Common
 {
     public enum FontKind { Title, Body, Regular }
 
+    /// <summary>Variante d'un panneau de verre : liseré discret, néon plein avec halo (état actif) ou corail.</summary>
+    public enum PanelVariant { Glass, Active, Accent }
+
     /// <summary>
     /// Fabrique d'éléments uGUI construits par code (aucun prefab requis).
     /// Style « HUD pastel » (spec 2026-10-12, référence : Marvel's Spider-Man) : panneaux de verre givré à coins coupés,
@@ -128,21 +131,50 @@ namespace N29.HeroesDawn.Presentation.Common
         /// Case de BD : contour noir (épaisseur <paramref name="border"/>), fond coloré, ombre portée.
         /// Renvoie le fond intérieur ; son parent (le contour) est le RectTransform à placer.
         /// </summary>
-        public static Image Panel(Transform parent, string name, Color fill, float border = 4f, float shadow = 8f, bool raycast = true)
+        public static Image Panel(Transform parent, string name, Color fill, float border = 4f, float shadow = 8f, bool raycast = true,
+                                  PanelVariant variant = PanelVariant.Glass)
         {
-            // HUD pastel : filet clair (FrostEdge) à coins coupés, fond teinté, ombre douce (jamais d'ombre dure ni de contour noir).
-            var frame = Img(parent, name, Theme.FrostEdge, Sprites.Panel, raycast);
+            // Verre sombre : liseré néon (FrostEdge) à coins coupés, fond teinté, reflet haut et diagonal, ombre en trois couches (jamais de contour noir).
+            var edgeColor = variant == PanelVariant.Active ? Theme.Neon : variant == PanelVariant.Accent ? Theme.Accent : Theme.FrostEdge;
+            var frame = Img(parent, name, edgeColor, Sprites.Panel, raycast);
             if (shadow > 0)
             {
-                var sh = frame.gameObject.AddComponent<Shadow>();
-                sh.effectColor = new Color(Theme.Navy.r, Theme.Navy.g, Theme.Navy.b, 0.25f);
-                sh.effectDistance = new Vector2(shadow * 0.5f, -shadow * 0.5f);
+                AddShadow(frame, new Vector2(0f, -2f), 0.5f);               // contact
+                AddShadow(frame, new Vector2(0f, -shadow * 0.75f), 0.35f);  // moyenne
+                AddShadow(frame, new Vector2(0f, -shadow * 2f), 0.25f);     // diffuse
+            }
+            if (variant == PanelVariant.Active && shadow > 0)
+            {
+                var halo = Img(frame.transform, "Halo", Theme.NeonGlow, Sprites.PanelFrame);
+                halo.rectTransform.Stretch(-4, -4, -4, -4);
+                halo.material = UiMaterial("UiNeonEdge");
+                halo.transform.SetAsFirstSibling();
             }
             float edge = Mathf.Min(border, 2f);
             var inner = Img(frame.transform, "Fill", fill, Sprites.Panel, false);
             inner.rectTransform.Stretch(edge, edge, edge, edge);
+
+            var sheen = Img(inner.transform, "Sheen", Theme.GlassHi, Sprites.VerticalGradient);
+            var srt = sheen.rectTransform;
+            srt.anchorMin = new Vector2(0f, 0.5f);
+            srt.anchorMax = Vector2.one;
+            srt.offsetMin = new Vector2(2f, 0f);
+            srt.offsetMax = new Vector2(-2f, -2f);
+            var reflect = Img(inner.transform, "Reflect", Color.white, Sprites.Panel);
+            reflect.rectTransform.Stretch();
+            reflect.material = UiMaterial("UiGlassSheen");
             return inner;
         }
+
+        static void AddShadow(Graphic g, Vector2 distance, float alpha)
+        {
+            var s = g.gameObject.AddComponent<Shadow>();
+            s.effectColor = Theme.WithAlpha(Theme.Shadow, alpha);
+            s.effectDistance = distance;
+        }
+
+        /// <summary>Matériau d'interface généré (Resources/UI/Materials) ; null s'il n'existe pas encore (le rendu retombe sur le matériau par défaut).</summary>
+        public static Material UiMaterial(string name) => Resources.Load<Material>("UI/Materials/" + name);
 
         /// <summary>Barre d'accent verticale (4 px) sur le bord gauche d'un panneau : signature du HUD. Corail par défaut.</summary>
         public static Image AccentBar(Image panelFill, Color? color = null)

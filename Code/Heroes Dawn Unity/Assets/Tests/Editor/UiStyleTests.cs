@@ -23,8 +23,43 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(frame.color, Is.Not.EqualTo(Color.black));
             Assert.That(frame.color, Is.EqualTo(Theme.FrostEdge));
             Assert.That(frame.sprite, Is.SameAs(Sprites.Panel));
-            var shadow = frame.GetComponent<Shadow>();
-            Assert.That(shadow.effectColor.a, Is.LessThanOrEqualTo(0.3f), "ombre douce");
+            var shadows = frame.GetComponents<Shadow>();
+            Assert.That(shadows.Length, Is.EqualTo(3), "ombre en trois couches");
+            foreach (var s in shadows) Assert.That(s.effectColor.a, Is.LessThanOrEqualTo(0.5f), "ombre douce");
+            Assert.That(shadows[0].effectDistance.magnitude, Is.LessThan(shadows[2].effectDistance.magnitude), "contact puis diffuse");
+        }
+
+        [Test, Description("Vérifie que le panneau de verre porte un reflet haut qui reste dans sa moitié supérieure et un reflet diagonal — parce qu'un reflet qui déborde du cadre casserait les petits panneaux (barres, jauges)")]
+        public void Panel_HasSheenInsideFrame()
+        {
+            var fill = Ui.Panel(_root.transform, "P", Theme.Surface);
+            var sheen = (RectTransform)fill.transform.Find("Sheen");
+            Assert.That(sheen, Is.Not.Null);
+            Assert.That(sheen.anchorMax.y, Is.EqualTo(1f));
+            Assert.That(sheen.anchorMin.y, Is.GreaterThanOrEqualTo(0.5f));
+            Assert.That(sheen.GetComponent<Image>().raycastTarget, Is.False);
+            Assert.That(fill.transform.Find("Reflect"), Is.Not.Null, "reflet diagonal");
+        }
+
+        [Test, Description("Vérifie qu'un panneau sans ombre n'a aucun Shadow ni halo — parce que les éléments à plat (listes denses) ne doivent pas payer le coût du relief")]
+        public void Panel_WithoutShadow_HasNoShadowNorHalo()
+        {
+            var fill = Ui.Panel(_root.transform, "P", Theme.Surface, 4f, 0f);
+            Assert.That(fill.Frame().GetComponents<Shadow>().Length, Is.EqualTo(0));
+            Assert.That(fill.Frame().Find("Halo"), Is.Null);
+        }
+
+        [Test, Description("Vérifie que la variante Active a un liseré néon plein et un halo derrière le remplissage, et la variante Accent un liseré corail — parce que l'état actif doit se lire d'un coup d'œil")]
+        public void Panel_Variants_ChangeEdgeAndHalo()
+        {
+            var active = Ui.Panel(_root.transform, "A", Theme.Surface, 4f, 8f, true, PanelVariant.Active);
+            Assert.That(active.Frame().GetComponent<Image>().color, Is.EqualTo(Theme.Neon));
+            var halo = active.Frame().Find("Halo");
+            Assert.That(halo, Is.Not.Null);
+            Assert.That(halo.GetSiblingIndex(), Is.LessThan(active.transform.GetSiblingIndex()), "halo derrière le remplissage");
+            var accent = Ui.Panel(_root.transform, "C", Theme.Surface, 4f, 8f, true, PanelVariant.Accent);
+            Assert.That(accent.Frame().GetComponent<Image>().color, Is.EqualTo(Theme.Accent));
+            Assert.That(accent.Frame().Find("Halo"), Is.Null);
         }
 
         [Test, Description("Vérifie que la barre d'accent est collée au bord gauche et fait 4 px de large — parce que c'est la signature visuelle des panneaux importants")]
