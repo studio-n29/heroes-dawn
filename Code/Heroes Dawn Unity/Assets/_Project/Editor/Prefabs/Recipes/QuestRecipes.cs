@@ -24,7 +24,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             accent.rectTransform.pivot = new Vector2(0f, 0.5f);
             accent.rectTransform.sizeDelta = new Vector2(10f, 0f);
             accent.rectTransform.anchoredPosition = Vector2.zero;
-            var title = Ui.Txt(fill.transform, "", 34, Theme.Navy, TextAnchor.MiddleLeft, FontKind.Title, "Title");
+            var title = Ui.Txt(fill.transform, "", 34, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Title");
             title.rectTransform.At(0f, 1f, 30, -8, 640, 44);
             title.AutoSize(34);
             var detail = Ui.Txt(fill.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Detail");
@@ -53,7 +53,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var rootRt = fill.Frame();
             rootRt.sizeDelta = new Vector2(1000, 132);
             rootRt.Pref(-1, 132, 1);
-            var title = Ui.Txt(fill.transform, "", 32, Theme.Navy, TextAnchor.MiddleLeft, FontKind.Title, "Title");
+            var title = Ui.Txt(fill.transform, "", 32, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Title");
             title.rectTransform.At(0f, 1f, 24, -8, 600, 42);
             title.AutoSize(32);
             var desc = Ui.Txt(fill.transform, "", 21, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Desc");

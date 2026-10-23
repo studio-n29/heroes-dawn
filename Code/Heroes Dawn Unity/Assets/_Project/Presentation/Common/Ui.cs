@@ -160,9 +160,8 @@ namespace N29.HeroesDawn.Presentation.Common
             srt.anchorMax = Vector2.one;
             srt.offsetMin = new Vector2(2f, 0f);
             srt.offsetMax = new Vector2(-2f, -2f);
-            var reflect = Img(inner.transform, "Reflect", Color.white, Sprites.Panel);
+            var reflect = Img(inner.transform, "Reflect", Theme.WithAlpha(Color.white, 0.10f), Sprites.Shine);
             reflect.rectTransform.Stretch();
-            reflect.material = UiMaterial("UiGlassSheen");
             return inner;
         }
 

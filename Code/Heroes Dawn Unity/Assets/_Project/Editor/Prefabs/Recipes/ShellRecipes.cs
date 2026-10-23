@@ -85,7 +85,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var back = Ui.LocBtn(top.transform, "nav.back", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Back");
             back.Rect.At(0f, 0.5f, Safe - 70, 0, 160, 96);
             back.gameObject.SetActive(false);
-            var title = Ui.Txt(top.transform, "", 56, Theme.Navy, TextAnchor.MiddleLeft, FontKind.Title, "Title");
+            var title = Ui.Txt(top.transform, "", 56, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Title");
             title.rectTransform.At(0f, 0.5f, Safe + 110, 0, 820, 96);
             title.AutoSize(56);
             title.Inked();
