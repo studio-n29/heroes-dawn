@@ -39,6 +39,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField, Mvp.OptionalRef] RectTransform? dropZone;
         [SerializeField, Mvp.OptionalRef] RectTransform? arena;
         [SerializeField, Mvp.OptionalRef] TMP_Text? arenaTitle;
+        [SerializeField] BonusChipView[] bonusChips = null!;
 
         readonly Dictionary<int, UnitCardView> _cards = new Dictionary<int, UnitCardView>();
         Coroutine? _bannerFade;
@@ -326,6 +327,16 @@ namespace N29.HeroesDawn.Presentation.Combat
         }
 
         public void ShowLog(IReadOnlyList<string> lines) => logText.text = string.Join("\n", lines);
+
+        public void ShowBonuses(IReadOnlyList<BonusChipData> bonuses)
+        {
+            for (int i = 0; i < bonusChips.Length; i++)
+            {
+                bool on = i < bonuses.Count;
+                if (bonusChips[i].gameObject.activeSelf != on) bonusChips[i].gameObject.SetActive(on);
+                if (on) bonusChips[i].Show(bonuses[i]);
+            }
+        }
 
         public void Float(int unitId, string text, Tone tone, int size)
         {

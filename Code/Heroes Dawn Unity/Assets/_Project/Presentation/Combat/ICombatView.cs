@@ -35,6 +35,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         void SetHint(string hint);
         void ShowBanner(string text, Tone tone);
         void ShowLog(IReadOnlyList<string> lines);
+        /// <summary>Bonus actifs de l'équipe (synergies et effets de composition), en pastilles sous les alliés.</summary>
+        void ShowBonuses(IReadOnlyList<BonusChipData> bonuses);
         void Float(int unitId, string text, Tone tone, int size);
         void Hit(int unitId);
         void Act(int unitId);

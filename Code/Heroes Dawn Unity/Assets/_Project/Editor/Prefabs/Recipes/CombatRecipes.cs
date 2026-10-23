@@ -439,6 +439,28 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             allyRow.VLayout(20, 0, TextAnchor.UpperLeft);
             StaggeredRows(allyRow, TextAnchor.UpperRight, TextAnchor.UpperLeft);
 
+            // ---- Bonus actifs de l'équipe (bas gauche, sous les alliés) : jusqu'à six pastilles, 3 par rangée
+            var bonusRow = Ui.Rect(rt, "Bonuses").At(0f, 1f, 36, -806, 640, 128);
+            var bonusChips = new Object[6];
+            for (int i = 0; i < bonusChips.Length; i++)
+            {
+                var chipFill = Ui.Panel(bonusRow, "Bonus" + i, Theme.Surface3, 3f, 4f, false);
+                var chipFrame = chipFill.Frame();
+                chipFrame.At(0f, 1f, (i % 3) * 216, -(i / 3) * 68, 208, 60);
+                var chipName = Ui.Txt(chipFill.transform, "", 20, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Name");
+                chipName.rectTransform.At(0f, 1f, 10, -2, 188, 28);
+                chipName.overflowMode = TextOverflowModes.Ellipsis;
+                var chipEffect = Ui.Txt(chipFill.transform, "", 20, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Effect");
+                chipEffect.rectTransform.At(0f, 0f, 10, 2, 188, 26);
+                chipEffect.overflowMode = TextOverflowModes.Ellipsis;
+                var chip = chipFrame.gameObject.AddComponent<BonusChipView>();
+                ctx.Wire(chip, "frame", chipFrame.GetComponent<Image>());
+                ctx.Wire(chip, "title", chipName);
+                ctx.Wire(chip, "effect", chipEffect);
+                bonusChips[i] = chip;
+                chipFrame.gameObject.SetActive(false);
+            }
+
             // ---- Journal (haut droite, discret)
             var logFill = Ui.Panel(rt, "Log", Theme.WithAlpha(Theme.Frost, 0.55f), 3f, 0f, false);
             logFill.Frame().At(1f, 0f, -24, 24, 330, 170);
@@ -549,6 +571,7 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             ctx.Wire(view, "allyCardPrefab", ctx.Asset("Widgets/UnitCard.prefab").GetComponent<UnitCardView>());
             ctx.Wire(view, "fanRoot", fanRoot);
             ctx.WireArray(view, "fan", fan);
+            ctx.WireArray(view, "bonusChips", bonusChips);
             ctx.Wire(view, "fanMarker", fanMarker);
             ctx.Wire(view, "descPanel", descFill.Frame());
             ctx.Wire(view, "descTitle", descTitle);

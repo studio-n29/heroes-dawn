@@ -77,6 +77,15 @@ namespace N29.HeroesDawn.Presentation.Combat
         /// <summary>Éclat à l'arrivée : étincelles et anneau, réglés par famille.</summary>
         static void Burst(RectTransform target, SkillFxKind kind, Color color)
         {
+            // Éclat de fond propre à la famille (sprite plein qui grossit puis s'éteint), sous les étincelles.
+            switch (kind)
+            {
+                case SkillFxKind.Fire: case SkillFxKind.Lightning: case SkillFxKind.Impact: case SkillFxKind.Mark: Pop(target, Sprites.Burst, color, 0.4f, 1.5f, 0.45f); break;
+                case SkillFxKind.Ice: Pop(target, Sprites.Diamond, color, 0.3f, 1.4f, 0.5f); break;
+                case SkillFxKind.Acid: case SkillFxKind.Heal: Pop(target, Sprites.Cloud, color, 0.5f, 1.6f, 0.55f); break;
+                case SkillFxKind.Shield: case SkillFxKind.Chains: case SkillFxKind.Time: Pop(target, Sprites.Circle, Theme.WithAlpha(color, 0.5f), 0.4f, 1.3f, 0.5f); break;
+                case SkillFxKind.Haste: Pop(target, Sprites.Shine, color, 0.6f, 1.8f, 0.4f); break;
+            }
             switch (kind)
             {
                 case SkillFxKind.Fire: Fx.Sparks(target, color, 16, 150f, 20f); Fx.Sparks(target, new Color(1f, 0.25f, 0.1f), 8, 90f, 26f); break;
@@ -91,6 +100,27 @@ namespace N29.HeroesDawn.Presentation.Combat
                 case SkillFxKind.Time: Ring(target, color, 1.8f, 0.6f); Fx.Sparks(target, color, 8, 100f, 14f); break;
                 default: Fx.Sparks(target, color, 12, 130f, 18f); break;
             }
+        }
+
+        /// <summary>Forme pleine (étoile, losange, nuage…) qui grossit au centre d'une carte en tournant légèrement, puis s'éteint.</summary>
+        static void Pop(RectTransform target, Sprite sprite, Color color, float fromScale, float toScale, float seconds)
+        {
+            if (!UnityEngine.Application.isPlaying || MotionSettings.Reduced) return;
+            var go = new GameObject("FxPop", typeof(RectTransform), typeof(Image)) { layer = 5 };
+            var rt = (RectTransform)go.transform;
+            rt.SetParent(target, false);
+            rt.sizeDelta = new Vector2(260f, 260f);
+            var img = go.GetComponent<Image>();
+            img.sprite = sprite;
+            img.raycastTarget = false;
+            float spin = Random.Range(-25f, 25f);
+            Tween.Run(seconds, k =>
+            {
+                if (rt == null) return;
+                rt.localScale = Vector3.one * Mathf.Lerp(fromScale, toScale, k);
+                rt.localRotation = Quaternion.Euler(0f, 0f, spin * k);
+                img.color = new Color(color.r, color.g, color.b, 0.85f * (1f - k * k));
+            }, () => { if (rt != null) Object.Destroy(rt.gameObject); }, rt, Tween.EaseOutCubic);
         }
 
         /// <summary>Anneau qui grossit ou se resserre autour d'une carte puis s'éteint.</summary>

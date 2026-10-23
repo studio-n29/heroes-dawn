@@ -49,6 +49,20 @@ namespace N29.HeroesDawn.Tests.Presentation
             _p.Start();
         }
 
+        [Test, Description("Vérifie que les bonus actifs de l'équipe sont affichés en pastilles nommées, une par ligne SYNERGIE ou ÉQUIPE du journal de début de combat — parce que le joueur doit voir d'un coup d'œil ce qui renforce son équipe")]
+        public void Bonuses_MatchSynergyAndTeamEffectLogLines()
+        {
+            int lines = _view.Log.Count(l => l.Contains("SYNERGIE") || l.Contains("ÉQUIPE"));
+            Assume.That(lines, Is.GreaterThan(0), "aucun bonus actif avec cette équipe");
+            Assert.That(_view.Bonuses.Count, Is.GreaterThanOrEqualTo(Math.Min(lines, 1)), "au moins une pastille");
+            Assert.That(_view.Bonuses.Count, Is.LessThanOrEqualTo(6), "six pastilles au plus");
+            foreach (var b in _view.Bonuses)
+            {
+                Assert.That(b.Name, Is.Not.Empty);
+                Assert.That(b.Effect, Is.Not.Empty);
+            }
+        }
+
         void TickUntil(Func<bool> condition, int max = 3000)
         {
             for (int i = 0; i < max && !condition(); i++) _p.Tick();

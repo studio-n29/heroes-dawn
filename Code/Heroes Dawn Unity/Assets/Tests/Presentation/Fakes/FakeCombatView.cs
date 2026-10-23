@@ -46,6 +46,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void SetHint(string hint) => Hint = hint;
         public void ShowBanner(string text, Tone tone) { }
         public void ShowLog(IReadOnlyList<string> lines) => Log = lines;
+        public IReadOnlyList<BonusChipData> Bonuses = Array.Empty<BonusChipData>();
+        public void ShowBonuses(IReadOnlyList<BonusChipData> bonuses) => Bonuses = bonuses;
         public void Float(int unitId, string text, Tone tone, int size) { }
         public void Hit(int unitId) { }
         public void Act(int unitId) { }

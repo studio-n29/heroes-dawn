@@ -145,12 +145,26 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             var allies = sim.Units.Where(u => u.Side == Side.Ally).ToList();
             var active = SynergyRules.Active(allies.Select(u => u.Family).ToList(), _session.Content.Synergies);
+            var chips = new List<BonusChipData>();
             foreach (var a in active)
-                AddLog(_loc.F("combat.synergy", _loc.SynergyName(a.Synergy),
-                    _loc.SynergyEffect(a.Synergy, sim.Setup.LinkLevel(new MemberId(allies[a.A].DefId), new MemberId(allies[a.B].DefId))),
-                    Name(allies[a.A].Id), Name(allies[a.B].Id)));
+            {
+                string effectText = _loc.SynergyEffect(a.Synergy, sim.Setup.LinkLevel(new MemberId(allies[a.A].DefId), new MemberId(allies[a.B].DefId)));
+                AddLog(_loc.F("combat.synergy", _loc.SynergyName(a.Synergy), effectText, Name(allies[a.A].Id), Name(allies[a.B].Id)));
+                chips.Add(new BonusChipData { Name = _loc.SynergyName(a.Synergy), Effect = effectText, Color = Theme.Accent });
+            }
             foreach (var effect in TeamEffects.Active(allies.Select(u => u.Family).ToList(), allies.Select(u => u.Role).ToList()))
+            {
                 AddLog(_loc.F("combat.team_effect", _loc.TeamEffect(effect)));
+                chips.Add(new BonusChipData { Name = _loc.T("team_effect." + effect + ".name"), Effect = _loc.T("team_effect." + effect + ".short"), Color = Theme.Success });
+            }
+            const int MaxChips = 6;
+            if (chips.Count > MaxChips)
+            {
+                int more = chips.Count - (MaxChips - 1);
+                chips.RemoveRange(MaxChips - 1, more);
+                chips.Add(new BonusChipData { Name = _loc.F("combat.bonus_more", more), Effect = _loc.T("combat.bonus_more_sub"), Color = Theme.Surface2 });
+            }
+            View.ShowBonuses(chips);
         }
 
         void BuildUnits(CombatSimulation sim)

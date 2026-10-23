@@ -28,6 +28,12 @@ namespace N29.HeroesDawn.Presentation.Common
             d["team_effect.DoubleFront.text"] = "2 tanks, bouclier d ouverture de 10 % des PV";
             d["team_effect.Spark.name"] = "Étincelle";
             d["team_effect.Spark.text"] = "2 agents de contrôle, +20 énergie au départ";
+            d["team_effect.Quartet.short"] = "+10 % critique";
+            d["team_effect.Trinity.short"] = "+1 énergie / pas";
+            d["team_effect.DoubleFront.short"] = "Bouclier 10 % PV";
+            d["team_effect.Spark.short"] = "+20 énergie";
+            d["combat.bonus_more"] = "+{0} AUTRES";
+            d["combat.bonus_more_sub"] = "voir le journal";
             d["combat.pushed"] = "RECUL -{0} %";
             d["combat.timeline_action"] = "ACTION";
             d["combat.turn_passed"] = "passe son tour";
