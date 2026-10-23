@@ -220,14 +220,14 @@ namespace N29.HeroesDawn.Presentation.Common
         }
 
         /// <summary>
-        /// Contour noir « lettrage de couverture » : matériau encré partagé pour un texte TMP (l'épaisseur est celle du matériau),
-        /// contour + ombre uGUI pour un autre graphique.
+        /// Lettrage à ombre douce : matériau encré partagé pour un texte TMP (l'ombre est celle du matériau),
+        /// ombre uGUI pour un autre graphique.
         /// </summary>
         public static T Inked<T>(this T g, float size = 2.5f) where T : Graphic
         {
             if (g is TMP_Text tmp) { tmp.fontSharedMaterial = InkedMaterial(tmp.font); return g; }
             var s = g.gameObject.AddComponent<Shadow>();
-            s.effectColor = new Color(Theme.Navy.r, Theme.Navy.g, Theme.Navy.b, 0.45f);
+            s.effectColor = Theme.WithAlpha(Theme.Shadow, 0.6f);
             s.effectDistance = new Vector2(size * 0.5f, -size * 0.5f);
             return g;
         }
@@ -235,7 +235,8 @@ namespace N29.HeroesDawn.Presentation.Common
         public static UiButton Btn(Transform parent, string label, Color bg, Color fg, Action onClick, int fontSize = 34,
                                    FontKind font = FontKind.Title, string name = "Button")
         {
-            var fill = Panel(parent, name, bg, 4f, 6f, true);
+            var variant = bg == Theme.Accent ? PanelVariant.Accent : bg == Theme.Neon ? PanelVariant.Active : PanelVariant.Glass;
+            var fill = Panel(parent, name, bg, 4f, 6f, true, variant);
             var frameGo = fill.transform.parent.gameObject;
             var button = frameGo.AddComponent<Button>();
             button.targetGraphic = fill;
@@ -258,6 +259,14 @@ namespace N29.HeroesDawn.Presentation.Common
                 shine.rectTransform.Stretch(0, 0, 0, 0);
                 shine.type = Image.Type.Simple;
             }
+            if (bg == Theme.Accent)
+            {
+                // Halo corail derrière le bouton d'action (masqué quand il est désactivé).
+                var halo = Img(frameGo.transform, "Halo", Theme.WithAlpha(Theme.Accent, 0.3f), Sprites.PanelFrame);
+                halo.rectTransform.Stretch(-4, -4, -4, -4);
+                halo.material = UiMaterial("UiNeonEdge");
+                halo.transform.SetAsFirstSibling();
+            }
             var text = Txt(fill.transform, label, fontSize, fg, TextAnchor.MiddleCenter, font, "Label");
             text.rectTransform.Stretch(10, 4, 10, 4);
             text.enableAutoSizing = true;
@@ -265,7 +274,7 @@ namespace N29.HeroesDawn.Presentation.Common
             text.fontSizeMax = fontSize;
 
             var ub = frameGo.AddComponent<UiButton>();
-            ub.Init(button, fill, text, bg, fg);
+            ub.Init(button, fill, text, bg, fg, frameGo.transform.Find("Halo")?.gameObject);
             if (onClick != null) button.onClick.AddListener(() => onClick());
             return ub;
         }
@@ -290,6 +299,8 @@ namespace N29.HeroesDawn.Presentation.Common
             frt.anchorMax = Vector2.one;
             frt.offsetMin = Vector2.zero;
             frt.offsetMax = Vector2.zero;
+            var glow = Img(f.transform, "Glow", Theme.WithAlpha(fill, 0.35f), Sprites.PanelSmall);
+            glow.rectTransform.Stretch(-2, -2, -2, -2);
             TMP_Text label = null;
             if (withLabel)
             {
@@ -298,7 +309,7 @@ namespace N29.HeroesDawn.Presentation.Common
                 label.Inked(1.5f);
             }
             var bar = bg.gameObject.AddComponent<UiBar>();
-            bar.Init(frt, f, label);
+            bar.Init(frt, f, label, glow);
             return bar;
         }
 

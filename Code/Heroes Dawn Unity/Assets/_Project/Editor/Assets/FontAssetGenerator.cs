@@ -66,12 +66,12 @@ namespace N29.HeroesDawn.EditorTools.Assets
             }
             inked.shader = fa.material.shader;
             inked.SetTexture(ShaderUtilities.ID_MainTex, fa.atlasTexture);
-            // HUD pastel : plus de contour noir, une ombre douce bleu marine sous le lettrage.
+            // Thème sombre néon : plus de contour noir, une ombre douce sous le lettrage.
             inked.DisableKeyword(ShaderUtilities.Keyword_Outline);
             inked.SetFloat(ShaderUtilities.ID_OutlineWidth, 0f);
             inked.SetFloat(ShaderUtilities.ID_FaceDilate, 0f);
             inked.EnableKeyword(ShaderUtilities.Keyword_Underlay);
-            inked.SetColor(ShaderUtilities.ID_UnderlayColor, new Color(0.106f, 0.145f, 0.314f, 0.45f));
+            inked.SetColor(ShaderUtilities.ID_UnderlayColor, new Color(0f, 0f, 0f, 0.6f));
             inked.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, 0.4f);
             inked.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, -0.4f);
             inked.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0.3f);

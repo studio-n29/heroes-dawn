@@ -11,6 +11,7 @@ namespace N29.HeroesDawn.Presentation.Common
         [SerializeField] RectTransform _fill;
         [SerializeField] Image _fillImage;
         [SerializeField, Mvp.OptionalRef] TMP_Text _label;
+        [SerializeField, Mvp.OptionalRef] Image _glow;
         float _target = 1f;
         float _shown = 1f;
         public bool Smooth = true;
@@ -18,9 +19,9 @@ namespace N29.HeroesDawn.Presentation.Common
 
         public TMP_Text Label => _label;
 
-        public void Init(RectTransform fill, Image fillImage, TMP_Text label)
+        public void Init(RectTransform fill, Image fillImage, TMP_Text label, Image glow = null)
         {
-            _fill = fill; _fillImage = fillImage; _label = label;
+            _fill = fill; _fillImage = fillImage; _label = label; _glow = glow;
             Apply();
         }
 
@@ -30,7 +31,7 @@ namespace N29.HeroesDawn.Presentation.Common
             if (instant || !Smooth || !isActiveAndEnabled) { _shown = _target; Apply(); }
         }
 
-        public void SetColor(Color c) => _fillImage.color = c;
+        public void SetColor(Color c) { _fillImage.color = c; if (_glow != null) _glow.color = Theme.WithAlpha(c, 0.35f); }
         public void SetLabel(string s) { if (_label != null) _label.text = s; }
 
         void Update()
@@ -45,6 +46,7 @@ namespace N29.HeroesDawn.Presentation.Common
             if (_fill == null) return;
             _fill.anchorMax = new Vector2(_shown, 1f);
             _fillImage.enabled = _shown > 0.001f;
+            if (_glow != null) _glow.enabled = _fillImage.enabled;
         }
     }
 }

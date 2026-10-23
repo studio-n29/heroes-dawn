@@ -17,6 +17,7 @@ namespace N29.HeroesDawn.Presentation.Common
         [SerializeField] TMP_Text label;
         [SerializeField] Color _bg;
         [SerializeField] Color _fg;
+        [SerializeField, Mvp.OptionalRef] GameObject halo;
         [Tooltip("Son joué au clic (None : muet).")]
         [SerializeField] SfxId clickSound = SfxId.UiClick;
         UiSoundRelay _relay;
@@ -26,9 +27,9 @@ namespace N29.HeroesDawn.Presentation.Common
         public TMP_Text Label => label;
         public RectTransform Rect => (RectTransform)transform;
 
-        public void Init(Button b, Image fillImage, TMP_Text text, Color bg, Color fg)
+        public void Init(Button b, Image fillImage, TMP_Text text, Color bg, Color fg, GameObject haloObject = null)
         {
-            button = b; fill = fillImage; label = text; _bg = bg; _fg = fg;
+            button = b; fill = fillImage; label = text; _bg = bg; _fg = fg; halo = haloObject;
             ApplyState();
         }
 
@@ -42,13 +43,14 @@ namespace N29.HeroesDawn.Presentation.Common
             }
         }
 
-        /// <summary>Désactivé : fond éclairci vers le gris pastel et libellé marine estompé (lisible sur n'importe quel fond de bouton).</summary>
+        /// <summary>Désactivé : fond assombri vers le verre et libellé estompé, halo masqué (lisible sur n'importe quel fond de bouton).</summary>
         void ApplyState()
         {
             if (fill == null) return;
             bool on = button == null || button.interactable;
             fill.color = on ? _bg : Color.Lerp(_bg, Theme.Surface3, 0.8f);
-            if (label != null) label.color = on ? _fg : Theme.WithAlpha(Theme.Navy, 0.5f);
+            if (halo != null) halo.SetActive(on);
+            if (label != null) label.color = on ? _fg : Theme.WithAlpha(Theme.Text, 0.5f);
         }
 
         void Awake()
