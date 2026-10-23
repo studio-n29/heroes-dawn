@@ -3,24 +3,9 @@ using UnityEngine;
 
 namespace N29.HeroesDawn.Presentation.Login
 {
-    /// <summary>Motif de l'illustration provisoire d'un écran de la cinématique (remplacé par une illustration dessinée quand elle existe).</summary>
-    public enum IntroMotif { Battle, Wormhole, Arrival, Phoenix, Farewell, Portal, Wave, Dna, Guild }
-
-    /// <summary>Un écran de la cinématique d'introduction : texte, motif et couleurs du fond, illustration éventuelle.</summary>
-    public struct IntroSlideData
-    {
-        public string Text;
-        public IntroMotif Motif;
-        public Color Top;
-        public Color Bottom;
-        /// <summary>Illustration dessinée (Resources/Intro/intro_NN) ; null : le motif provisoire est dessiné par code.</summary>
-        public Sprite? Art;
-    }
-
     public struct IntroCinematicTexts
     {
         public string Skip;
-        public string TapHint;
     }
 
 

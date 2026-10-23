@@ -298,6 +298,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendAgents(d);
             ExtendOnboarding(d);
             ExtendQuests(d);
+            ExtendCinematic(d);
             return d;
         }
 
@@ -314,6 +315,7 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendAgents(Dictionary<string, string> d);
         static partial void ExtendOnboarding(Dictionary<string, string> d);
         static partial void ExtendQuests(Dictionary<string, string> d);
+        static partial void ExtendCinematic(Dictionary<string, string> d);
 
         public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
         public static bool Has(string key) => Fr.ContainsKey(key);

@@ -31,14 +31,14 @@ namespace N29.HeroesDawn.Tests.Presentation
 
         FakeIntroPopup Popup => (FakeIntroPopup)_host.Spawned.Single();
 
-        [Test, Description("Vérifie que la cinématique montre les neuf écrans de l'univers, chacun avec son texte — parce que l'introduction raconte la bataille de Paris jusqu'à la Guilde")]
-        public void Cinematic_ShowsTheNineScreens()
+        [Test, Description("Vérifie que la cinématique montre les 46 plans du découpage, dans l ordre, et qu elle coupe le thème principal du jeu — parce que le flux doit jouer le document de cinématique de bout en bout")]
+        public void Cinematic_PlaysTheFortySixShots()
         {
             _flow.RunIfNeededAsync(default).Forget();
-            Assert.That(Popup.Slides!.Count, Is.EqualTo(9));
-            Assert.That(Popup.Slides.All(s => !string.IsNullOrWhiteSpace(s.Text)), Is.True);
-            Assert.That(Popup.Slides[0].Text, Does.Contain("Méphisto"));
-            Assert.That(Popup.Slides[8].Text, Does.Contain("trouver sa place"));
+            Assert.That(Popup.Shots!.Count, Is.EqualTo(46));
+            Assert.That(Popup.Shots[0].Id, Is.EqualTo("S01"));
+            Assert.That(Popup.Shots[45].Id, Is.EqualTo("S46"));
+            Assert.That(Popup.MainTheme, Is.Not.Null, "le thème principal est piloté par la cinématique");
         }
 
         [Test, Description("Vérifie que les deux personnages sont proposés, Agent D disponible et Agent M en création — parce que les zones de Moscou ne sont pas encore créées")]
@@ -81,8 +81,8 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que chaque texte de la première connexion existe — parce qu'une clé manquante s'afficherait telle quelle à l'écran")]
         public void EveryOnboardingTextExists()
         {
-            for (int i = 1; i <= 9; i++) Assert.That(Loc.Has("intro.slide." + i), Is.True, "intro.slide." + i);
-            foreach (var key in new[] { "intro.skip", "intro.tap",
+            foreach (var id in Loc.CinematicVoiceIds) Assert.That(Loc.Has("cinematic.vo." + id), Is.True, "cinematic.vo." + id);
+            foreach (var key in new[] { "intro.skip",
                                         "onboarding.campaign.title", "onboarding.campaign.confirm", "onboarding.campaign.open", "onboarding.campaign.wip", "onboarding.campaign.unavailable" })
                 Assert.That(Loc.Has(key), Is.True, key);
             foreach (var c in Campaigns.All) { Assert.That(Loc.Has(c.NameKey), Is.True, c.NameKey); Assert.That(Loc.Has(c.DescKey), Is.True, c.DescKey); }

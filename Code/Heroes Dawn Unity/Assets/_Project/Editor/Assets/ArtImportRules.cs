@@ -16,6 +16,7 @@ namespace N29.HeroesDawn.EditorTools.Assets
             "Assets/_Project/Resources/KeyArts/",
             "Assets/_Project/Resources/Portraits/",
             "Assets/_Project/Resources/Illustrations/",
+            "Assets/_Project/Resources/Cinematic/Art/",
         };
 
         void OnPreprocessTexture()

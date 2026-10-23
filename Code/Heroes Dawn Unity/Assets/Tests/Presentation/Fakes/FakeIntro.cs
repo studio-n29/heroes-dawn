@@ -13,12 +13,14 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         UniTaskCompletionSource? _cinematic;
         UniTaskCompletionSource<string>? _campaign;
 
-        public IReadOnlyList<IntroSlideData>? Slides { get; private set; }
+        public IReadOnlyList<CinematicShot>? Shots { get; private set; }
+        public System.Action<float>? MainTheme { get; private set; }
         public ChooseCampaignData? Campaigns { get; private set; }
 
-        public UniTask PlayCinematicAsync(IReadOnlyList<IntroSlideData> slides, IntroCinematicTexts texts, CancellationToken ct)
+        public UniTask PlayCinematicAsync(IReadOnlyList<CinematicShot> shots, IntroCinematicTexts texts, System.Action<float>? mainTheme, CancellationToken ct)
         {
-            Slides = slides;
+            Shots = shots;
+            MainTheme = mainTheme;
             _cinematic = new UniTaskCompletionSource();
             return _cinematic.Task;
         }

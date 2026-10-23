@@ -65,7 +65,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(gw.SignInAsync("maya@example.com", "faux", default).GetAwaiter().GetResult().IsFailure, Is.True);
         }
 
-        [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures de la cinématique, du choix du personnage joueur — parce que ces rendus se relisent à l'œil")]
+        [UnityTest, Explicit("Captures à la demande"), Timeout(600000), Description("Produit une capture de chacun des 46 plans de la cinématique (à 2,4 s dans le plan, ou à l instant demandé) puis du choix du personnage joueur — parce que les cadrages, les lumières et les scènes dessinées par code se relisent à l œil")]
         public IEnumerator CaptureTheFirstConnection()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway(), withIntro: true);
@@ -73,22 +73,20 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<IntroPopupView>() != null);
             var intro = Object.FindAnyObjectByType<IntroPopupView>()!;
             yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Cinematic);
-            yield return new WaitForSecondsRealtime(4.5f);
-            yield return ScreenCaptureTests.Capture("30-intro-ecran-1");
-            for (int slide = 2; slide <= 4; slide++)
+            var player = intro.Player;
+            yield return PlayModeHarness.WaitFor(() => player.CurrentShot >= 0, 600);
+            for (int shot = 0; shot < CinematicScript.Shots.Count; shot++)
             {
-                intro.TapButton.onClick.Invoke(); // texte entier
-                intro.TapButton.onClick.Invoke(); // écran suivant
-                yield return new WaitForSecondsRealtime(slide == 4 ? 5.5f : 3.5f);
+                // Avance de plan en plan par des touchers, puis laisse vivre le plan 2,4 s avant de le photographier.
+                for (int guard = 0; player.CurrentShot < shot && guard < 400; guard++) { player.SkipShot(); yield return null; }
+                yield return new WaitForSecondsRealtime(2.4f);
+                yield return ScreenCaptureTests.Capture("cin-" + CinematicScript.Shots[shot].Id);
             }
-            yield return ScreenCaptureTests.Capture("31-intro-ecran-4");
             intro.SkipButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign);
-            yield return new WaitForSecondsRealtime(0.6f);
-            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign);
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign, 1200);
             intro.SelectCampaign("agent_d");
             yield return new WaitForSecondsRealtime(0.6f);
-            yield return ScreenCaptureTests.Capture("33-campagne");
+            yield return ScreenCaptureTests.Capture("cin-choix");
         }
     }
 }
