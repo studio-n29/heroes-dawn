@@ -60,6 +60,19 @@ namespace N29.HeroesDawn.Presentation.Common
             return s;
         }
 
+        /// <summary>Illustration temporaire d une carte (recadrage de l art du Drive, teinté par catégorie) ; à défaut un visuel de capacité.</summary>
+        public static Sprite? Card(string id) => Load("Illustrations/Cards/" + id, 3000, id) ?? Ability(id);
+
+        /// <summary>Illustration temporaire d un objet (recadrage de l art du Drive, teinté par statistique) ; null si elle manque.</summary>
+        public static Sprite? Item(string id) => Load("Illustrations/Items/" + id, 4000, id);
+
+        static Sprite? Load(string path, int cacheBase, string id)
+        {
+            int key = cacheBase + Mathf.Abs(StableHash(id)) % 997;
+            if (!Cache.TryGetValue(key, out var s) || s == null) Cache[key] = s = Resources.Load<Sprite>(path);
+            return s;
+        }
+
         static int StableHash(string id)
         {
             int h = 17;

@@ -163,6 +163,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var r = InfoRowData.Basic(CollectionText.ItemName(Loc, it), CollectionText.RarityName(Loc, it.Rarity) + " · " + CollectionText.ItemEffects(Loc, it));
             r.Tag = CollectionText.Tag(CollectionText.ItemName(Loc, it));
             r.TagColor = CollectionText.RarityColor(it.Rarity);
+            r.Art = AgentArt.Item(it.Id.Value);
             return r;
         }
 
@@ -171,7 +172,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var r = InfoRowData.Basic(title, CollectionText.CardLine(Loc, def));
             r.Tag = CollectionText.Tag(CollectionText.CardName(Loc, def));
             r.TagColor = CollectionText.RarityColor(def.Rarity);
-            r.Art = AgentArt.Ability(def.Id.ToString());
+            r.Art = AgentArt.Card(def.Id.Value);
             return r;
         }
 

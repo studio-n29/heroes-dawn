@@ -67,7 +67,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.TagColor = count > 0 ? CollectionText.RarityColor(card.Rarity) : Theme.Surface3;
                 r.Badge = count > 0 ? Loc.F("grimoire.owned", count) : Loc.T("grimoire.missing");
                 r.Dim = count == 0;
-                r.Art = AgentArt.Ability(card.Id.ToString());
+                r.Art = AgentArt.Card(card.Id.Value);
                 rows.Add(r);
                 _rows.Add(card);
             }

@@ -290,7 +290,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (card.HasValue && defs.HasCard(card.Value))
                 {
                     var cd = defs.Card(card.Value);
-                    tiles[slot + 2] = new SheetTile { Title = CollectionText.CardName(_loc, cd), Sub = sub, Art = AgentArt.Ability(card.Value.ToString()),
+                    tiles[slot + 2] = new SheetTile { Title = CollectionText.CardName(_loc, cd), Sub = sub, Art = AgentArt.Card(card.Value.Value),
                                                       Frame = CollectionText.RarityColor(cd.Rarity), Kind = SheetTileKind.Card };
                 }
                 else
@@ -312,7 +312,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (m != null && i < m.Items.Count && defs.HasItem(m.Items[i]))
                 {
                     var it = defs.Item(m.Items[i]);
-                    tiles[i] = new SheetTile { Title = CollectionText.ItemName(_loc, it), Sub = CollectionText.ItemEffects(_loc, it), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item };
+                    tiles[i] = new SheetTile { Title = CollectionText.ItemName(_loc, it), Sub = CollectionText.ItemEffects(_loc, it), Art = AgentArt.Item(it.Id.Value), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item };
                 }
                 else
                 {
@@ -374,7 +374,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 var id = cd.Id;
                 string name = CollectionText.CardName(_loc, cd);
                 options.Add(new SheetTile { Title = name, Sub = free > 1 ? _loc.F("loadout.copies", free) : CollectionText.RarityName(_loc, cd.Rarity),
-                                            Art = AgentArt.Ability(id.ToString()), Frame = CollectionText.RarityColor(cd.Rarity), Kind = SheetTileKind.Card });
+                                            Art = AgentArt.Card(id.Value), Frame = CollectionText.RarityColor(cd.Rarity), Kind = SheetTileKind.Card });
                 _pickActions.Add(() => Apply(_book!.EquipCard(_member, slot, id), "loadout.equipped", name));
             }
             var current = m.Cards[slot];
@@ -403,7 +403,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 var id = it.Id;
                 string name = CollectionText.ItemName(_loc, it);
                 options.Add(new SheetTile { Title = name, Sub = free > 1 ? _loc.F("loadout.copies", free) : CollectionText.ItemEffects(_loc, it),
-                                            Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item });
+                                            Art = AgentArt.Item(id.Value), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item });
                 _pickActions.Add(() =>
                 {
                     // Emplacement occupé : l'objet actuel est retiré avant d'équiper le nouveau (remis en place si l'échange échoue).
