@@ -3,53 +3,60 @@ using UnityEngine;
 
 namespace N29.HeroesDawn.Presentation.Common
 {
-    /// <summary>Palette « HUD pastel » (spec 2026-10-12 : verre givré, bleu marine, accent corail). Les noms historiques sont conservés.</summary>
+    /// <summary>
+    /// Palette « Mo.Co » (style jeu mobile épais et lisible) : panneaux violets pleins, contour sombre épais, aplats vifs par rôle
+    /// (jaune action, vert validation, orange boutique, rouge danger), texte blanc à contour. Les noms historiques sont conservés.
+    /// </summary>
     public static class Theme
     {
-        // ---- Nouveaux jetons -------------------------------------------------------------------------------
-        public static readonly Color Navy = Hex(0x1B2550);
-        public static readonly Color Frost = Hex(0xF2F6FF);
-        public static readonly Color FrostEdge = Color.white;
-        public static readonly Color Accent = Hex(0xFF6B5E);
-        public static readonly Color AccentSoft = Hex(0xFF8F84);
-        public static readonly Color AccentDark = Hex(0xF0566A);
-        public static readonly Color SkyTop = Hex(0xA9CDFA);
-        public static readonly Color SkyMid = Hex(0xB7C4F5);
-        public static readonly Color SkyBottom = Hex(0xF6C4D2);
-        public static readonly Color Glow = Hex(0xFFD9A8);
+        // ---- Jetons du style ---------------------------------------------------------------------------------
+        /// <summary>Contour épais de tous les panneaux, boutons et textes (violet presque noir).</summary>
+        public static readonly Color Outline = Hex(0x17123A);
+        public static readonly Color Navy = Outline;
+        public static readonly Color Frost = Hex(0x4B3FA0);
+        public static readonly Color FrostEdge = Outline;
+        public static readonly Color Accent = Hex(0xFFCF33);
+        public static readonly Color AccentSoft = Hex(0xFFE27A);
+        public static readonly Color AccentDark = Hex(0xE8A317);
+        public static readonly Color SkyTop = Hex(0x5B49C4);
+        public static readonly Color SkyMid = Hex(0x3A2F7A);
+        public static readonly Color SkyBottom = Hex(0x241C57);
+        public static readonly Color Glow = Hex(0xFFE27A);
         /// <summary>Jaune vif des cases accessibles sur le plateau (contour animé).</summary>
         public static readonly Color Reach = Hex(0xFFD23F);
 
-        // ---- Noms historiques (valeurs pastel) -------------------------------------------------------------
-        public static readonly Color Primary = AccentDark;
-        public static readonly Color Danger = Accent;
-        public static readonly Color Success = Hex(0x4CCB8A);
-        public static readonly Color Info = Hex(0x3AA6F5);
-        public static readonly Color Background = SkyMid;
-        public static readonly Color SurfaceDark = Navy;
-        public static readonly Color Surface = Frost;
-        public static readonly Color Surface2 = Hex(0xE1EAFB);
-        public static readonly Color Surface3 = Hex(0xCCD8F4);
-        public static readonly Color Text = Navy;
-        public static readonly Color TextDark = Navy;
-        public static readonly Color TextMuted = Hex(0x3B4A8A);
-        /// <summary>Texte posé sur un fond foncé (Navy, corail soutenu).</summary>
+        // ---- Noms historiques ---------------------------------------------------------------------------------
+        public static readonly Color Primary = Accent;
+        public static readonly Color Danger = Hex(0xE8453C);
+        public static readonly Color Success = Hex(0x3AD6A0);
+        public static readonly Color Info = Hex(0x4DA3FF);
+        public static readonly Color Background = Hex(0x2D2566);
+        public static readonly Color SurfaceDark = Outline;
+        public static readonly Color Surface = Hex(0x4B3FA0);
+        public static readonly Color Surface2 = Hex(0x5D58B8);
+        public static readonly Color Surface3 = Hex(0x3A2F7A);
+        /// <summary>Bleu vif des boutons secondaires (les boutons de fond Surface2/Surface3 sont repeints avec).</summary>
+        public static readonly Color Secondary = Hex(0x5B8CFF);
+        public static readonly Color Text = Color.white;
+        /// <summary>Texte sombre posé sur un aplat clair (jaune, vert, orange).</summary>
+        public static readonly Color TextDark = Outline;
+        public static readonly Color TextMuted = Hex(0xCBC5F5);
         public static readonly Color TextOnDark = Color.white;
-        public static readonly Color Ink = Navy;
-        public static readonly Color Overlay = new Color(Navy.r, Navy.g, Navy.b, 0.55f);
+        public static readonly Color Ink = Outline;
+        public static readonly Color Overlay = new Color(Outline.r, Outline.g, Outline.b, 0.7f);
 
-        public static readonly Color Matter = Hex(0xF7C06A);
-        public static readonly Color Elemental = Hex(0x7FD8F7);
-        public static readonly Color PhysicalBio = Hex(0xF08A8E);
-        public static readonly Color Perception = Hex(0xB79BF7);
+        public static readonly Color Matter = Hex(0xFFB547);
+        public static readonly Color Elemental = Hex(0x3CD7FF);
+        public static readonly Color PhysicalBio = Hex(0xFF5C7A);
+        public static readonly Color Perception = Hex(0xB07CFF);
 
-        public static readonly Color Credits = Hex(0xF5B83D);
-        public static readonly Color Pr = Hex(0x5CCBB0);
-        public static readonly Color Hp = Hex(0x5ED48A);
-        public static readonly Color HpEnemy = Accent;
+        public static readonly Color Credits = Hex(0xFFC53D);
+        public static readonly Color Pr = Hex(0x3AD6A0);
+        public static readonly Color Hp = Hex(0x4CE06B);
+        public static readonly Color HpEnemy = Danger;
         public static readonly Color Gauge = Accent;
-        public static readonly Color Fatigue = Hex(0xF5A05A);
-        public static readonly Color Shield = Hex(0x9FD8FF);
+        public static readonly Color Fatigue = Hex(0xFF9F43);
+        public static readonly Color Shield = Hex(0x7CC4FF);
 
         public static Color FamilyColor(Family f)
         {
@@ -92,8 +99,8 @@ namespace N29.HeroesDawn.Presentation.Common
 
         public static Color WithAlpha(Color c, float a) => new Color(c.r, c.g, c.b, a);
 
-        /// <summary>Même teinte, éclaircie de 25 % vers le blanc (adoucissement pastel).</summary>
-        static Color Soft(uint rgb) => Color.Lerp(Hex(rgb), Color.white, 0.25f);
+        
+        static Color Soft(uint rgb) => Hex(rgb);
 
         public static Color Hex(uint rgb)
             => new Color(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, (rgb & 0xFF) / 255f, 1f);

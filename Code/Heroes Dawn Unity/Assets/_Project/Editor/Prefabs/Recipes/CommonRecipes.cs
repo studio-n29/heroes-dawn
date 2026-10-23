@@ -68,11 +68,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ring.raycastTarget = false;
             var disc = Ui.Img(root, "Disc", Theme.Surface3, Sprites.Circle);
             disc.rectTransform.Stretch(4, 4, 4, 4);
+            disc.gameObject.AddComponent<Mask>().showMaskGraphic = true;
             var bust = Ui.Img(disc.transform, "Bust", Theme.Navy, Sprites.Bust);
             bust.rectTransform.Stretch();
             var art = Ui.Img(disc.transform, "Art", Color.white, Sprites.Circle);
             art.rectTransform.Stretch();
-            art.preserveAspect = true;
+            art.gameObject.AddComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
             art.gameObject.SetActive(false);
             var shade = Ui.Img(disc.transform, "Shade", Theme.WithAlpha(Theme.Navy, 0.25f), Sprites.VerticalGradient);
             shade.rectTransform.Stretch();

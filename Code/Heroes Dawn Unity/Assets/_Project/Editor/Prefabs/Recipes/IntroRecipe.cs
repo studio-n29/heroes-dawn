@@ -20,7 +20,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             rootRt.sizeDelta = new Vector2(300, 420);
             rootRt.Pref(300, 420);
             var frame = rootRt.GetComponent<Image>();
-            var name = Ui.Txt(fill.transform, "", 40, Theme.Navy, TextAnchor.UpperCenter, FontKind.Title, "Name");
+            var name = Ui.Txt(fill.transform, "", 40, Theme.Text, TextAnchor.UpperCenter, FontKind.Title, "Name");
             name.rectTransform.At(0.5f, 1f, 0, -26, 270, 120);
             name.AutoSize(40);
             var desc = Ui.Txt(fill.transform, "", 26, Theme.TextDark, TextAnchor.UpperCenter, FontKind.Body, "Desc");
@@ -142,7 +142,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var campaignBg = Ui.Img(campaignStage, "Bg", Theme.SkyMid, Sprites.VerticalGradient);
             campaignBg.rectTransform.Stretch();
             campaignBg.raycastTarget = false;
-            var campaignTitle = Ui.Txt(campaignStage, "", 64, Theme.Navy, TextAnchor.MiddleCenter, FontKind.Title, "Title");
+            var campaignTitle = Ui.Txt(campaignStage, "", 64, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Title");
             campaignTitle.rectTransform.At(0.5f, 1f, 0, -60, 1400, 100);
             campaignTitle.Inked();
             var cardRow = Ui.Rect(campaignStage, "Cards");
@@ -257,7 +257,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var viewport = Ui.Rect(bg.transform, "Viewport");
             viewport.Stretch(24, 8, 24, 8);
             viewport.gameObject.AddComponent<RectMask2D>();
-            var text = Ui.Txt(viewport, "", 44, Theme.Navy, TextAnchor.MiddleLeft, FontKind.Body, "Text");
+            var text = Ui.Txt(viewport, "", 44, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "Text");
             text.rectTransform.Stretch();
             var placeholder = Ui.Txt(viewport, "", 44, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Placeholder");
             placeholder.rectTransform.Stretch();

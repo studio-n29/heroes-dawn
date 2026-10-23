@@ -7,16 +7,15 @@ namespace N29.HeroesDawn.Tests.Editor
 {
     public sealed class ThemeTests
     {
-        [Test, Description("Vérifie que le texte courant atteint 4,5:1 sur les surfaces et le fond du thème, et le grand texte blanc 3:1 sur le corail — parce que le pastel clair rend vite le texte illisible")]
+        [Test, Description("Vérifie que le texte blanc atteint 4,5:1 sur les panneaux violets et le fond, le texte secondaire sur les surfaces principales et le texte sombre sur le jaune d'action — parce que le style Mo.Co repose sur des aplats pleins où le texte doit rester lisible")]
         public void Theme_TextOnSurfaces_MeetsContrast()
         {
             foreach (var bg in new[] { Theme.Surface, Theme.Surface2, Theme.Surface3, Theme.Background })
                 Assert.That(ThemeContrast.Ratio(Theme.Text, bg), Is.GreaterThanOrEqualTo(4.5f), "Text sur " + bg);
-            foreach (var bg in new[] { Theme.Surface, Theme.Surface2, Theme.Surface3 })
+            foreach (var bg in new[] { Theme.Surface, Theme.Surface3, Theme.Background })
                 Assert.That(ThemeContrast.Ratio(Theme.TextMuted, bg), Is.GreaterThanOrEqualTo(4.5f), "TextMuted sur " + bg);
-            Assert.That(ThemeContrast.Ratio(Theme.TextOnDark, Theme.Navy), Is.GreaterThanOrEqualTo(4.5f));
-            Assert.That(ThemeContrast.Ratio(Theme.TextOnDark, Theme.AccentDark), Is.GreaterThanOrEqualTo(3f), "grand texte blanc sur corail soutenu");
-            Assert.That(ThemeContrast.Ratio(Theme.Navy, Theme.Accent), Is.GreaterThanOrEqualTo(4.5f), "texte marine sur corail");
+            Assert.That(ThemeContrast.Ratio(Theme.TextDark, Theme.Accent), Is.GreaterThanOrEqualTo(4.5f), "texte sombre sur jaune d'action");
+            Assert.That(ThemeContrast.Ratio(Theme.Outline, Theme.Surface), Is.GreaterThanOrEqualTo(1.5f), "le contour se détache du panneau");
         }
 
         [Test, Description("Vérifie que les quatre familles restent deux à deux distinctes après l'adoucissement — parce qu'elles servent à lire le gameplay d'un coup d'œil")]

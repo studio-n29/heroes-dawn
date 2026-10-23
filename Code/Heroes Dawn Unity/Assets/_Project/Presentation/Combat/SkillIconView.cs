@@ -58,7 +58,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (label != null) label.text = d.Locked ? "" : NameOf(d.Label);
             var baseColor = d.Locked ? Theme.Surface3 : Color.Lerp(index == 3 ? Theme.Perception : index == 2 ? Theme.Danger : index == 1 ? Theme.Info : Theme.Primary, Color.white, 0.3f);
             disc.color = d.Pending ? Color.white : baseColor;
-            glyph.color = d.Locked ? Theme.TextMuted : Theme.Navy;
+            glyph.color = d.Locked ? Theme.TextMuted : Theme.TextOnDark;
             bool paid = !d.Locked && d.Cost > 0;
             costBadge.gameObject.SetActive(paid);
             cost.text = paid ? d.Cost.ToString() : "";

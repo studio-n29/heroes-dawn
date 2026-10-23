@@ -29,7 +29,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             Active = active;
             for (int i = 0; i < tabs.Length; i++)
-                tabs[i].SetColors(i == active ? Theme.Navy : Theme.Surface2, i == active ? Theme.TextOnDark : Theme.Navy);
+                tabs[i].SetColors(i == active ? Theme.Accent : Theme.Surface2, i == active ? Theme.TextOnDark : Theme.Text);
         }
     }
 }

@@ -1,14 +1,21 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
+using N29.HeroesDawn.Application.Features.Collection;
 using N29.HeroesDawn.Application.Features.Hub;
+using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
+using N29.HeroesDawn.Domain.Board;
+using N29.HeroesDawn.Domain.Combat;
+using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 
 namespace N29.HeroesDawn.Presentation.Hub
@@ -32,17 +39,22 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISubscriber<ShopChanged> _shop;
         readonly PageAction _action;
         readonly bool _fromShop;
+        readonly GameSession? _game;
+        readonly CollectionBook? _book;
+        readonly List<Action> _pickActions = new List<Action>();
+        Action? _pickRemove;
         IDisposable? _subs;
         MemberId _member;
         bool _left;
 
         public MemberSheetPresenter(IMemberSheetView view, HubLocation location, ISessionReadModel session, ITrainMemberUseCase train,
                                     RecruitFlow recruit, HubNavigator nav, IToastService toasts, ILocalization loc,
-                                    ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, ISubscriber<ShopChanged> shop)
+                                    ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, ISubscriber<ShopChanged> shop,
+                                    GameSession? game = null, CollectionBook? book = null)
             : base(view, null)
         {
             _session = session; _train = train; _recruit = recruit; _nav = nav; _toasts = toasts; _loc = loc;
-            _wallet = wallet; _roster = roster; _shop = shop;
+            _wallet = wallet; _roster = roster; _shop = shop; _game = game; _book = book;
             _member = location.Member ?? throw new ArgumentException("Fiche sans membre", nameof(location));
             _fromShop = location.FromShop;
             _action = new PageAction(toasts, loc);
@@ -57,6 +69,11 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.PrimaryClicked += Primary;
             View.RoomClicked += OpenRoom;
             View.LoadoutClicked += OpenLoadout;
+            View.SkillTileClicked += OnSkillTile;
+            View.ItemTileClicked += OnItemTile;
+            View.PickerChosen += OnPickerChosen;
+            View.PickerRemoved += OnPickerRemoved;
+            View.PickerClosed += ClosePicker;
         }
 
         protected override void OnShown()
@@ -84,6 +101,11 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.PrimaryClicked -= Primary;
             View.RoomClicked -= OpenRoom;
             View.LoadoutClicked -= OpenLoadout;
+            View.SkillTileClicked -= OnSkillTile;
+            View.ItemTileClicked -= OnItemTile;
+            View.PickerChosen -= OnPickerChosen;
+            View.PickerRemoved -= OnPickerRemoved;
+            View.PickerClosed -= ClosePicker;
         }
 
         void Previous() => Step(-1);
@@ -170,7 +192,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             bool max = m.Level >= MetaRules.MaxLevel;
             int cost = _session.TrainCostFor(m.Level);
             int missing = cost - _session.Wallet.Credits;
-            var d = Sheet(m.Def, m.Level, true);
+            var d = Sheet(m.Def, m.Level, true, m);
             d.FatigueText = _loc.F("ui.fatigue", m.Fatigue);
             d.Fatigue01 = m.Fatigue / 100f;
             d.Fatigue = m.Fatigue;
@@ -199,14 +221,225 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.Show(d);
         }
 
-        MemberSheetData Sheet(MemberDef def, int level, bool owned) => new MemberSheetData
+        MemberSheetData Sheet(MemberDef def, int level, bool owned, ITeamMemberReadModel? m = null)
         {
-            Card = MemberCards.Card(def, level, _session.Content.Balance, _loc),
-            Owned = owned,
-            Skills = def.Skills.Select(s => new SkillLineData { Name = _loc.SkillName(s), Description = _loc.DescribeSkill(s) }).ToArray(),
-            Synergies = SquadSynergies.For(def.Family, _session.Content.Synergies)
-                                .Select(c => _loc.F("sheet.synergy_line", _loc.SynergyName(c), _loc.SynergyEffect(c), _loc.FamilyName(c.A == def.Family ? c.B : c.A)))
-                                .ToArray(),
-        };
+            var d = new MemberSheetData
+            {
+                Card = MemberCards.Card(def, level, _session.Content.Balance, _loc),
+                Owned = owned,
+                Skills = def.Skills.Select(s => new SkillLineData { Name = _loc.SkillName(s), Description = _loc.DescribeSkill(s) }).ToArray(),
+                Synergies = SquadSynergies.For(def.Family, _session.Content.Synergies)
+                                    .Select(c => _loc.F("sheet.synergy_line", _loc.SynergyName(c), _loc.SynergyEffect(c), _loc.FamilyName(c.A == def.Family ? c.B : c.A)))
+                                    .ToArray(),
+                Equippable = owned && m != null && _game != null && _book != null,
+            };
+            string bioKey = "members." + def.Id.Value + ".bio";
+            d.Bio = _loc.Has(bioKey) ? _loc.T(bioKey) : "";
+            int max = MetaRules.MaxLevel;
+            d.Level01 = max <= 1 ? 1f : Mathf.Clamp01((level - 1f) / (max - 1f));
+            d.LevelBarText = _loc.F("sheet.level_bar", level, max);
+            d.TiersTitle = _loc.T("sheet.tiers");
+            d.Tiers = Tiers(def, level, max);
+            d.SkillTiles = SkillTiles(def, m);
+            d.ItemTiles = ItemTiles(m);
+            d.Affinity = Affinity(def);
+            d.AffinityTitle = _loc.T("sheet.affinity");
+            return d;
+        }
+
+        TierLineData[] Tiers(MemberDef def, int level, int max)
+        {
+            var levels = new[] { 1, Math.Max(2, max / 4), Math.Max(3, max / 2), max }.Distinct().OrderBy(x => x).ToArray();
+            int current = levels.Where(l => l <= level).DefaultIfEmpty(1).Max();
+            var b = _session.Content.Balance;
+            return levels.Select(l => new TierLineData
+            {
+                Level = _loc.F("sheet.tier_level", l),
+                Stats = _loc.F("sheet.tier_stats", UnitFactory.ScaleStat(def.BaseStats.Hp, l, b), UnitFactory.ScaleStat(def.BaseStats.Atk, l, b),
+                               UnitFactory.ScaleStat(def.BaseStats.Def, l, b)),
+                Reached = l <= level,
+                Current = l == current,
+            }).ToArray();
+        }
+
+        SheetTile[] SkillTiles(MemberDef def, ITeamMemberReadModel? m)
+        {
+            var tiles = new SheetTile[4];
+            var family = Theme.FamilyColor(def.Family);
+            for (int i = 0; i < 2; i++)
+            {
+                bool has = i < def.Skills.Count;
+                tiles[i] = new SheetTile
+                {
+                    Title = has ? _loc.SkillName(def.Skills[i]) : "",
+                    Sub = _loc.F("sheet.skill_fixed", i + 1),
+                    Art = has ? AgentArt.Ability(def.Id.Value + i) : null,
+                    Frame = family,
+                    Kind = has ? SheetTileKind.Fixed : SheetTileKind.Empty,
+                };
+            }
+            var defs = _session.Content.Collection;
+            for (int slot = 0; slot < CollectionRules.CardSlots; slot++)
+            {
+                var card = m != null && slot < m.Cards.Count ? m.Cards[slot] : null;
+                string sub = _loc.F("sheet.skill_card", slot + 3);
+                if (card.HasValue && defs.HasCard(card.Value))
+                {
+                    var cd = defs.Card(card.Value);
+                    tiles[slot + 2] = new SheetTile { Title = CollectionText.CardName(_loc, cd), Sub = sub, Art = AgentArt.Ability(card.Value.ToString()),
+                                                      Frame = CollectionText.RarityColor(cd.Rarity), Kind = SheetTileKind.Card };
+                }
+                else
+                {
+                    bool locked = m == null || (slot == 1 && (m.Cards.Count == 0 || !m.Cards[0].HasValue));
+                    tiles[slot + 2] = new SheetTile { Title = locked ? _loc.T("sheet.slot_locked") : _loc.T("sheet.slot_empty"), Sub = sub,
+                                                      Frame = Theme.Outline, Kind = locked ? SheetTileKind.Locked : SheetTileKind.Empty };
+                }
+            }
+            return tiles;
+        }
+
+        SheetTile[] ItemTiles(ITeamMemberReadModel? m)
+        {
+            var tiles = new SheetTile[CollectionRules.MaxItems + 1];
+            var defs = _session.Content.Collection;
+            for (int i = 0; i < CollectionRules.MaxItems; i++)
+            {
+                if (m != null && i < m.Items.Count && defs.HasItem(m.Items[i]))
+                {
+                    var it = defs.Item(m.Items[i]);
+                    tiles[i] = new SheetTile { Title = CollectionText.ItemName(_loc, it), Sub = CollectionText.ItemEffects(_loc, it), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item };
+                }
+                else
+                {
+                    tiles[i] = new SheetTile { Title = m == null ? _loc.T("sheet.slot_locked") : _loc.T("sheet.slot_empty"), Sub = _loc.F("sheet.item_slot", i + 1),
+                                               Frame = Theme.Outline, Kind = m == null ? SheetTileKind.Locked : SheetTileKind.Empty };
+                }
+            }
+            tiles[CollectionRules.MaxItems] = new SheetTile { Title = _loc.T("sheet.slot_locked"), Sub = _loc.F("sheet.item_slot", CollectionRules.MaxItems + 1), Frame = Theme.Outline, Kind = SheetTileKind.Locked };
+            return tiles;
+        }
+
+        /// <summary>Agents de l'effectif dont la famille forme une synergie avec celle de l'agent (les plus hauts niveaux d'abord).</summary>
+        PortraitData[] Affinity(MemberDef def)
+        {
+            var partners = new HashSet<Family>(SquadSynergies.For(def.Family, _session.Content.Synergies).Select(c => c.A == def.Family ? c.B : c.A));
+            return _session.Roster.Where(x => x.Id != _member && partners.Contains(x.Def.Family))
+                           .OrderByDescending(x => x.Level)
+                           .Take(3)
+                           .Select(x => new PortraitData(_loc.MemberName(x.Def), x.Def.Family, art: AgentArt.For(x.Def.Id.Value)))
+                           .ToArray();
+        }
+
+        // ---------------------------------------------------------------- Équipement (panneau d'inventaire)
+
+        ITeamMemberReadModel? OwnedMember() => _fromShop ? null : _session.Roster.FirstOrDefault(x => x.Id == _member);
+
+        void OnSkillTile(int index)
+        {
+            var m = OwnedMember();
+            if (m == null || _game == null || _book == null) return;
+            if (index < 2)
+            {
+                if (index < m.Def.Skills.Count) _toasts.Show(_loc.SkillName(m.Def.Skills[index]) + " · " + _loc.DescribeSkill(m.Def.Skills[index]), ToastKind.Info);
+                return;
+            }
+            int slot = index - 2;
+            if (slot == 1 && !m.Cards[0].HasValue) { _toasts.Show(_loc.T("loadout.locked_card_sub"), ToastKind.Warning); return; }
+            OpenCardPicker(m, slot);
+        }
+
+        void OnItemTile(int index)
+        {
+            var m = OwnedMember();
+            if (m == null || _game == null || _book == null) return;
+            if (index >= CollectionRules.MaxItems) { _toasts.Show(_loc.T("sheet.item_locked_toast"), ToastKind.Info); return; }
+            OpenItemPicker(m, index);
+        }
+
+        void OpenCardPicker(ITeamMemberReadModel m, int slot)
+        {
+            var defs = _session.Content.Collection;
+            var options = new List<SheetTile>();
+            _pickActions.Clear();
+            foreach (var cd in CollectionText.CardsFor(defs, m.Def).OrderByDescending(c => c.Rarity).ThenBy(c => c.Id))
+            {
+                int free = CollectionOps.AvailableCards(_game!, cd.Id);
+                if (free <= 0) continue;
+                var id = cd.Id;
+                string name = CollectionText.CardName(_loc, cd);
+                options.Add(new SheetTile { Title = name, Sub = free > 1 ? _loc.F("loadout.copies", free) : CollectionText.RarityName(_loc, cd.Rarity),
+                                            Art = AgentArt.Ability(id.ToString()), Frame = CollectionText.RarityColor(cd.Rarity), Kind = SheetTileKind.Card });
+                _pickActions.Add(() => Apply(_book!.EquipCard(_member, slot, id), "loadout.equipped", name));
+            }
+            var current = m.Cards[slot];
+            _pickRemove = current.HasValue && defs.HasCard(current.Value)
+                ? () => Apply(_book!.UnequipCard(_member, slot), "loadout.removed", CollectionText.CardName(_loc, defs.Card(current.Value)))
+                : (Action?)null;
+            View.ShowPicker(new PickerData
+            {
+                Title = _loc.F("sheet.picker_cards", slot + 3),
+                Hint = options.Count == 0 ? _loc.T("loadout.none_cards") : _loc.T("sheet.picker_hint"),
+                Options = options.Take(8).ToArray(),
+                CanRemove = _pickRemove != null,
+            });
+        }
+
+        void OpenItemPicker(ITeamMemberReadModel m, int slot)
+        {
+            var defs = _session.Content.Collection;
+            var options = new List<SheetTile>();
+            _pickActions.Clear();
+            ItemId? currentId = slot < m.Items.Count ? m.Items[slot] : (ItemId?)null;
+            foreach (var it in defs.Items.OrderByDescending(i => i.Rarity).ThenBy(i => i.Id))
+            {
+                int free = CollectionOps.AvailableItems(_game!, it.Id);
+                if (free <= 0) continue;
+                var id = it.Id;
+                string name = CollectionText.ItemName(_loc, it);
+                options.Add(new SheetTile { Title = name, Sub = free > 1 ? _loc.F("loadout.copies", free) : CollectionText.ItemEffects(_loc, it),
+                                            Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item });
+                _pickActions.Add(() =>
+                {
+                    // Emplacement occupé : l'objet actuel est retiré avant d'équiper le nouveau (remis en place si l'échange échoue).
+                    if (currentId.HasValue) _book!.UnequipItem(_member, currentId.Value);
+                    var r = _book!.EquipItem(_member, id);
+                    if (r.IsFailure && currentId.HasValue) _book.EquipItem(_member, currentId.Value);
+                    Apply(r, "loadout.equipped", name);
+                });
+            }
+            _pickRemove = currentId.HasValue
+                ? () => Apply(_book!.UnequipItem(_member, currentId.Value), "loadout.removed", CollectionText.ItemName(_loc, defs.Item(currentId.Value)))
+                : (Action?)null;
+            View.ShowPicker(new PickerData
+            {
+                Title = _loc.F("sheet.picker_items", slot + 1),
+                Hint = options.Count == 0 ? _loc.T("loadout.none_items") : _loc.T("sheet.picker_hint"),
+                Options = options.Take(8).ToArray(),
+                CanRemove = _pickRemove != null,
+            });
+        }
+
+        void OnPickerChosen(int index)
+        {
+            if (index >= 0 && index < _pickActions.Count) _pickActions[index]();
+        }
+
+        void OnPickerRemoved() => _pickRemove?.Invoke();
+
+        void ClosePicker()
+        {
+            _pickActions.Clear();
+            _pickRemove = null;
+            View.HidePicker();
+        }
+
+        void Apply(Result r, string successKey, string what)
+        {
+            if (r.IsFailure) _toasts.Show(_loc.Error(r.Error!), ToastKind.Error);
+            else _toasts.Show(_loc.F(successKey, what), ToastKind.Reward);
+            ClosePicker();
+            Refresh();
+        }
     }
 }

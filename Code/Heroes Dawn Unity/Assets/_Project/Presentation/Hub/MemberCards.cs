@@ -26,14 +26,14 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Stats = loc.F("hub.stats", UnitFactory.ScaleStat(def.BaseStats.Hp, level, b), UnitFactory.ScaleStat(def.BaseStats.Atk, level, b),
                               UnitFactory.ScaleStat(def.BaseStats.Def, level, b), def.BaseStats.Spd),
                 Skills = string.Join(" · ", def.Skills.Select(loc.SkillName)),
-                Portrait = new PortraitData(name, def.Family),
+                Portrait = new PortraitData(name, def.Family, art: AgentArt.For(def.Id.Value)),
             };
         }
 
         public static SquadSlotData Slot(ITeamMemberReadModel m, ILocalization loc)
         {
             var name = loc.MemberName(m.Def);
-            return new SquadSlotData { Name = name, Portrait = new PortraitData(name, m.Def.Family), Fatigue01 = m.Fatigue / 100f, Fatigue = m.Fatigue, Exhausted = m.Exhausted };
+            return new SquadSlotData { Name = name, Portrait = new PortraitData(name, m.Def.Family, art: AgentArt.For(m.Def.Id.Value)), Fatigue01 = m.Fatigue / 100f, Fatigue = m.Fatigue, Exhausted = m.Exhausted };
         }
     }
 }

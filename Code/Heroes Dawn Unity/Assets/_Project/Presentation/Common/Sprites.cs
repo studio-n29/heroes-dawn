@@ -51,8 +51,8 @@ namespace N29.HeroesDawn.Presentation.Common
                 case "VerticalGradient": return MakeGradient();
                 case "Burst": return MakeBurst(256, 14);
                 case "Cloud": return MakeCloud(128);
-                case "Panel": return MakeCutPanel(64, 14);
-                case "PanelSmall": return MakeCutPanel(32, 8);
+                case "Panel": return MakeRounded(64, 14);
+                case "PanelSmall": return MakeRounded(32, 8);
                 case "Diamond": return MakeDiamond(128);
                 case "Shine": return MakeShine();
                 case "Skyline": return MakeSkyline(512, 128);

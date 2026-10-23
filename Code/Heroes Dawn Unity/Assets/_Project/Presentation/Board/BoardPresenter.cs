@@ -171,7 +171,7 @@ namespace N29.HeroesDawn.Presentation.Board
                     A = l.A, B = l.B, Cost = l.Cost,
                     Curve = LinkCurves.Resolve(run.Graph.Node(l.A), run.Graph.Node(l.B), l),
                 }).ToArray(),
-                Pawn = new PortraitData(_loc.MemberName(leader), leader.Family),
+                Pawn = new PortraitData(_loc.MemberName(leader), leader.Family, art: AgentArt.For(leader.Id.Value)),
                 PawnAt = run.Position,
                 BackgroundKey = run.Graph.Zone.Background?.Key ?? "",
                 BgMinX = run.Graph.Zone.Background?.MinX ?? 0, BgMinY = run.Graph.Zone.Background?.MinY ?? 0,
@@ -365,7 +365,7 @@ namespace N29.HeroesDawn.Presentation.Board
             View.ShowSquad(_session.Squad.Select(m =>
             {
                 var name = _loc.MemberName(m.Def);
-                return new SquadSlotData { Name = name, Portrait = new PortraitData(name, m.Def.Family), Fatigue01 = m.Fatigue / 100f, Fatigue = m.Fatigue, Exhausted = m.Exhausted };
+                return new SquadSlotData { Name = name, Portrait = new PortraitData(name, m.Def.Family, art: AgentArt.For(m.Def.Id.Value)), Fatigue01 = m.Fatigue / 100f, Fatigue = m.Fatigue, Exhausted = m.Exhausted };
             }).ToArray());
         }
 

@@ -26,7 +26,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var tabs = new Object[keys.Length];
             for (int i = 0; i < keys.Length; i++)
             {
-                var b = Ui.LocBtn(root, keys[i], Theme.Surface2, Theme.Navy, null!, 30, FontKind.Title, "Tab" + i);
+                var b = Ui.LocBtn(root, keys[i], Theme.Surface2, Theme.Text, null!, 30, FontKind.Title, "Tab" + i);
                 var le = b.gameObject.AddComponent<UnityEngine.UI.LayoutElement>();
                 le.preferredHeight = Height;
                 le.flexibleWidth = 1f;

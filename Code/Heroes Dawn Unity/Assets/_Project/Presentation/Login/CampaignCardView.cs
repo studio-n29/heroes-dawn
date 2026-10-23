@@ -33,7 +33,7 @@ namespace N29.HeroesDawn.Presentation.Login
             description.text = d.Description;
             badge.text = d.Badge;
             fill.color = d.Available ? Theme.Frost : Theme.Surface3;
-            cardName.color = d.Available ? Theme.Navy : Theme.TextMuted;
+            cardName.color = d.Available ? Theme.Text : Theme.TextMuted;
             badge.color = d.Available ? Theme.Success : Theme.TextMuted;
             SetSelected(false);
         }

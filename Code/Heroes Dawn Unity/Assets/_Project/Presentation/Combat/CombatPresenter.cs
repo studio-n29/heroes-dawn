@@ -179,7 +179,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 _names[u.Id] = name;
                 if (u.Side == Side.Enemy && !u.IsAlive) continue; // ennemis des vagues précédentes
                 _shown.Add(u.Id);
-                cards.Add(new UnitCardData { Id = u.Id, Ally = u.Side == Side.Ally, Name = name.ToUpperInvariant(), Boss = u.IsBoss, Family = fam, Portrait = new PortraitData(name, fam, u.IsBoss), Sub = u.Side == Side.Ally && u.Id < fighters.Count ? _loc.F("ui.fatigue", fighters[u.Id].Fatigue) : "" });
+                cards.Add(new UnitCardData { Id = u.Id, Ally = u.Side == Side.Ally, Name = name.ToUpperInvariant(), Boss = u.IsBoss, Family = fam, Portrait = new PortraitData(name, fam, u.IsBoss, u.Side == Side.Ally ? AgentArt.For(u.DefId) : null), Sub = u.Side == Side.Ally && u.Id < fighters.Count ? _loc.F("ui.fatigue", fighters[u.Id].Fatigue) : "" });
             }
             View.BuildUnits(cards);
         }

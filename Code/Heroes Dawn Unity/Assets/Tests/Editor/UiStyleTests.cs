@@ -13,18 +13,18 @@ namespace N29.HeroesDawn.Tests.Editor
         [SetUp] public void SetUp() => _root = new GameObject("root", typeof(RectTransform));
         [TearDown] public void TearDown() => Object.DestroyImmediate(_root);
 
-        [Test, Description("Vérifie que Ui.Panel garde son contrat (cadre parent, enfant Fill étiré avec marge) et dessine un filet clair sans contour noir ni ombre dure — parce que tous les écrans l'appellent et que le HUD pastel proscrit les gros contours noirs")]
-        public void Panel_KeepsContract_AndHasNoBlackOutline()
+        [Test, Description("Vérifie que Ui.Panel garde son contrat (cadre parent, enfant Fill étiré avec marge) et dessine un contour sombre épais autour d'un aplat plein — parce que tous les écrans l'appellent et que le style Mo.Co repose sur ce contour")]
+        public void Panel_KeepsContract_AndHasThickOutline()
         {
             var fill = Ui.Panel(_root.transform, "P", Theme.Surface, 4f, 8f);
             var frame = fill.Frame().GetComponent<Image>();
             Assert.That(fill.name, Is.EqualTo("Fill"));
             Assert.That(fill.rectTransform.offsetMin.x, Is.GreaterThan(0f), "marge intérieure");
-            Assert.That(frame.color, Is.Not.EqualTo(Color.black));
+            Assert.That(frame.color, Is.EqualTo(Theme.Outline));
             Assert.That(frame.color, Is.EqualTo(Theme.FrostEdge));
             Assert.That(frame.sprite, Is.SameAs(Sprites.Panel));
             var shadow = frame.GetComponent<Shadow>();
-            Assert.That(shadow.effectColor.a, Is.LessThanOrEqualTo(0.3f), "ombre douce");
+            Assert.That(shadow.effectColor.a, Is.LessThanOrEqualTo(0.5f), "une seule ombre, jamais dure");
         }
 
         [Test, Description("Vérifie que la barre d'accent est collée au bord gauche et fait 4 px de large — parce que c'est la signature visuelle des panneaux importants")]

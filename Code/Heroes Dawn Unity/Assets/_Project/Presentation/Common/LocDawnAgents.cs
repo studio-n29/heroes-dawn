@@ -71,6 +71,7 @@ namespace N29.HeroesDawn.Presentation.Common
             {
                 d["members." + id + ".name"] = name;
                 d["members." + id + ".power"] = power;
+                d["members." + id + ".bio"] = bio;
                 d["archives.hero." + id] = name.ToUpperInvariant() + " : " + power.ToLowerInvariant() + ". " + bio;
                 var skills = skillNames[id];
                 d["skills." + id + "_a1"] = skills.First;

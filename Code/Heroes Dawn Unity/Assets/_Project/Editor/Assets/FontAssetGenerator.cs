@@ -66,15 +66,16 @@ namespace N29.HeroesDawn.EditorTools.Assets
             }
             inked.shader = fa.material.shader;
             inked.SetTexture(ShaderUtilities.ID_MainTex, fa.atlasTexture);
-            // HUD pastel : plus de contour noir, une ombre douce bleu marine sous le lettrage.
-            inked.DisableKeyword(ShaderUtilities.Keyword_Outline);
-            inked.SetFloat(ShaderUtilities.ID_OutlineWidth, 0f);
+            // Style Mo.Co : contour sombre épais autour du lettrage, avec un léger décalage d'ombre sous le contour.
+            inked.EnableKeyword(ShaderUtilities.Keyword_Outline);
+            inked.SetColor(ShaderUtilities.ID_OutlineColor, new Color(0.09f, 0.07f, 0.227f, 1f));
+            inked.SetFloat(ShaderUtilities.ID_OutlineWidth, 0.3f);
             inked.SetFloat(ShaderUtilities.ID_FaceDilate, 0f);
             inked.EnableKeyword(ShaderUtilities.Keyword_Underlay);
-            inked.SetColor(ShaderUtilities.ID_UnderlayColor, new Color(0.106f, 0.145f, 0.314f, 0.45f));
-            inked.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, 0.4f);
-            inked.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, -0.4f);
-            inked.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0.3f);
+            inked.SetColor(ShaderUtilities.ID_UnderlayColor, new Color(0.09f, 0.07f, 0.227f, 0.55f));
+            inked.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, 0f);
+            inked.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, -0.6f);
+            inked.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0.1f);
             EditorUtility.SetDirty(inked);
         }
     }

@@ -15,6 +15,7 @@ namespace N29.HeroesDawn.EditorTools.Assets
             "Assets/_Project/Resources/Intro/",
             "Assets/_Project/Resources/KeyArts/",
             "Assets/_Project/Resources/Portraits/",
+            "Assets/_Project/Resources/Illustrations/",
         };
 
         void OnPreprocessTexture()
@@ -24,7 +25,7 @@ namespace N29.HeroesDawn.EditorTools.Assets
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
             importer.mipmapEnabled = false;
-            importer.maxTextureSize = 2048;
+            importer.maxTextureSize = assetPath.Contains("/Illustrations/") ? 1280 : 2048;
             importer.alphaIsTransparency = assetPath.EndsWith(".png", System.StringComparison.OrdinalIgnoreCase);
         }
 

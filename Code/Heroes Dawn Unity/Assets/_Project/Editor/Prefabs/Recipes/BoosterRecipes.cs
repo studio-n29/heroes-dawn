@@ -24,12 +24,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var face = Ui.Rect(fill.transform, "Face").Stretch();
             var shine = Ui.Img(face, "Shine", new Color(1f, 1f, 1f, 0.45f), Sprites.Shine);
             shine.rectTransform.Stretch();
-            var glyph = Ui.Txt(face, "A", 150, Theme.Navy, TextAnchor.MiddleCenter, FontKind.Title, "Glyph");
+            var glyph = Ui.Txt(face, "A", 150, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Glyph");
             glyph.rectTransform.At(0.5f, 1f, 0, -40, 260, 200);
-            var name = Ui.Txt(face, "", 40, Theme.Navy, TextAnchor.MiddleCenter, FontKind.Title, "Name");
+            var name = Ui.Txt(face, "", 40, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Name");
             name.rectTransform.At(0.5f, 0f, 0, 78, 270, 100);
             name.AutoSize(40);
-            var rarity = Ui.Txt(face, "", 28, Theme.Navy, TextAnchor.MiddleCenter, FontKind.Body, "Rarity");
+            var rarity = Ui.Txt(face, "", 28, Theme.Text, TextAnchor.MiddleCenter, FontKind.Body, "Rarity");
             rarity.rectTransform.At(0.5f, 0f, 0, 28, 270, 40);
             var badgeFill = Ui.Panel(face, "NewBadge", Theme.Accent, 3f, 4f, false);
             badgeFill.Frame().At(0.5f, 1f, 0, -8, 230, 44);
@@ -101,7 +101,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             hint.rectTransform.At(0.5f, 0f, 0, 110, 1000, 70);
             hint.gameObject.AddComponent<Pulse>().Amplitude = 0.04f;
 
-            var skip = Ui.LocBtn(root, "booster.skip", Theme.Surface2, Theme.Navy, null!, 30, FontKind.Title, "Skip");
+            var skip = Ui.LocBtn(root, "booster.skip", Theme.Surface2, Theme.Text, null!, 30, FontKind.Title, "Skip");
             skip.Rect.At(1f, 1f, -40, -40, 260, 72);
             var cont = Ui.LocBtn(root, "ui.continue", Theme.Accent, Theme.TextOnDark, null!, 44, FontKind.Title, "Continue");
             cont.Rect.At(0.5f, 0f, 0, 50, 460, 104);

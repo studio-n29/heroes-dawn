@@ -50,6 +50,22 @@ namespace N29.HeroesDawn.Presentation.Common
             // Fiche d'agent et page Équipement
             d["sheet.loadout"] = "ÉQUIPEMENT";
             d["sheet.loadout_counts"] = "ÉQUIPEMENT · objets {0}/{1} · cartes {2}/{3}";
+            d["sheet.level_bar"] = "NIV. {0} / {1}";
+            d["sheet.tiers"] = "PALIERS PAR NIVEAU";
+            d["sheet.tier_level"] = "NIV. {0}";
+            d["sheet.tier_stats"] = "PV {0} · ATQ {1} · DÉF {2}";
+            d["sheet.affinity"] = "AGENTS À FORTE AFFINITÉ";
+            d["sheet.skill_fixed"] = "COMPÉTENCE {0}";
+            d["sheet.skill_card"] = "CARTE {0}";
+            d["sheet.item_slot"] = "OBJET {0}";
+            d["sheet.slot_empty"] = "VIDE";
+            d["sheet.slot_locked"] = "VERROUILLÉ";
+            d["sheet.item_locked_toast"] = "Un troisième emplacement d'objet arrivera bientôt.";
+            d["sheet.picker_items"] = "OBJETS DISPONIBLES · EMPLACEMENT {0}";
+            d["sheet.picker_cards"] = "CARTES DISPONIBLES · EMPLACEMENT {0}";
+            d["sheet.picker_hint"] = "Touche un élément pour l'équiper.";
+            d["sheet.picker_remove"] = "RETIRER";
+            d["sheet.picker_close"] = "FERMER";
             d["page.loadout"] = "Équipement";
             d["page.grimoire"] = "Grimoire";
             d["loadout.header"] = "Équipement de {0}";

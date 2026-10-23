@@ -65,7 +65,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             spinner.gameObject.SetActive(false);
 
             Ui.LocTxt(rt, "game.studio", 30, Theme.Primary, TextAnchor.LowerLeft, FontKind.Title, "Studio").rectTransform.At(0f, 0f, 40, 24, 400, 50);
-            Ui.LocTxt(rt, "game.build", 22, Theme.Navy, TextAnchor.LowerRight, FontKind.Regular, "Build").rectTransform.At(1f, 0f, -40, 70, 600, 40);
+            Ui.LocTxt(rt, "game.build", 22, Theme.Text, TextAnchor.LowerRight, FontKind.Regular, "Build").rectTransform.At(1f, 0f, -40, 70, 600, 40);
 
             var view = rt.gameObject.AddComponent<LoginView>();
             ScreenKit.WireFade(ctx, view);

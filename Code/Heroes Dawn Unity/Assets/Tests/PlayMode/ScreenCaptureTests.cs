@@ -97,7 +97,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
             var session = Container.Resolve<GameSession>();
             session.Find(new N29.HeroesDawn.Core.MemberId("freya_lindqvist"))!.Fatigue = 70;
-            session.Find(new N29.HeroesDawn.Core.MemberId("kwame_abara"))!.Fatigue = 30;
+            session.Find(new N29.HeroesDawn.Core.MemberId("darius_brooks"))!.Fatigue = 30;
             yield return CaptureSettled("10-qg");
             Container.Resolve<N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide>().Skip();
             yield return new WaitForSecondsRealtime(0.3f);
@@ -118,6 +118,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("20-equipe");
             Object.FindAnyObjectByType<TeamPageView>()!.Tiles[0].TapButton.onClick.Invoke();
             yield return CaptureSettled("21-fiche");
+            Object.FindAnyObjectByType<MemberSheetView>()!.ItemTileButton(0).onClick.Invoke();
+            yield return CaptureSettled("21b-fiche-objets");
+            Object.FindAnyObjectByType<MemberSheetView>()!.SkillTileButton(2).onClick.Invoke();
+            yield return CaptureSettled("21c-fiche-cartes");
 
             yield return Tab(HubPage.Recruit);
             yield return CaptureSettled("30-recruter");

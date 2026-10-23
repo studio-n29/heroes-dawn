@@ -13,6 +13,16 @@ namespace N29.HeroesDawn.Presentation.Hub
         event Action<HubPage> RoomClicked;
         /// <summary>Equipement : objets et cartes de l agent.</summary>
         event Action LoadoutClicked;
+        /// <summary>Case de compétence touchée (0 à 3).</summary>
+        event Action<int> SkillTileClicked;
+        /// <summary>Case d'objet touchée (0 à 2).</summary>
+        event Action<int> ItemTileClicked;
+        /// <summary>Option choisie dans le panneau d'inventaire.</summary>
+        event Action<int> PickerChosen;
+        event Action PickerRemoved;
+        event Action PickerClosed;
         void Show(MemberSheetData data);
+        void ShowPicker(PickerData data);
+        void HidePicker();
     }
 }

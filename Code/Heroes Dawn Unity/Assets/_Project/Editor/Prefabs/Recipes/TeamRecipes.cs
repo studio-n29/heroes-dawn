@@ -30,7 +30,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             strip.rectTransform.TopBand(10, 0);
             var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", fill.transform, "Portrait");
             ((RectTransform)portrait.transform).At(0f, 1f, 12, -20, 80, 80);
-            var name = Ui.Txt(fill.transform, "", 30, Theme.Navy, TextAnchor.MiddleLeft, FontKind.Title, "Name");
+            var name = Ui.Txt(fill.transform, "", 30, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Name");
             name.rectTransform.At(0f, 1f, 102, -18, 158, 38);
             name.AutoSize(30);
             name.Inked(1.5f);
@@ -160,84 +160,158 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Fiche d'un membre (M21) : identité à gauche, stats et compétences au centre, synergies, raccourcis et action principale à droite.</summary>
+    /// <summary>
+    /// Fiche d'un membre (maquette) : grande illustration à gauche, niveau, histoire, stats et paliers au centre, quatre compétences,
+    /// trois objets et agents à forte affinité à droite. Le panneau d'inventaire (maquettes « cartes » et « objets ») recouvre la grille de compétences.
+    /// </summary>
     public sealed class MemberSheetRecipe : IPrefabRecipe
     {
         public string RelativePath => "Pages/MemberSheet.prefab";
         public int Order => 10;
 
-        const float LeftW = 560, MidW = 600, RightW = 536, Gap = 24;
+        const float LeftW = 520, MidX = 544, MidW = 560, RightX = 1128, RightW = 616;
 
         public GameObject Build(PrefabContext ctx)
         {
             var rt = ScreenKit.Root("MemberSheet");
 
-            // ---- Identité
+            // ---- Illustration large, en opacité réduite, derrière toute la fiche
+            var wideHolder = Ui.Rect(rt, "WideArt").Stretch();
+            wideHolder.gameObject.AddComponent<RectMask2D>();
+            var wide = Ui.Img(wideHolder, "Image", new Color(1f, 1f, 1f, 0.28f), null);
+            wide.gameObject.AddComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+
+            // ---- Colonne gauche : illustration de l'agent, nom, rareté, rôle, fatigue, flèches
             var id = Column(rt, "Identity", 0, LeftW);
-            var strip = Ui.Img(id.transform, "Family", Theme.Primary, Sprites.Rounded);
-            strip.rectTransform.TopBand(12, 0);
-            var art = Ui.Img(id.transform, "Art", Theme.SurfaceDark, Sprites.RoundedSmall, true);
-            art.type = Image.Type.Sliced;
-            art.rectTransform.At(0.5f, 1f, 0, -30, 320, 240);
-            var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", art.transform, "Portrait");
-            ((RectTransform)portrait.transform).At(0.5f, 0.5f, 0, 0, 180, 180);
-            var artWip = ctx.Nest<WipMark>("Widgets/WipMark.prefab", art.transform, "Wip");
-            ((RectTransform)artWip.transform).Stretch();
-            artWip.transform.Find("Veil").GetComponent<Image>().color = Theme.WithAlpha(Theme.Navy, 0.2f);
-            ((RectTransform)artWip.transform.Find("Band")).anchoredPosition = new Vector2(0, -86);
-            artWip.FeatureId = WipCatalog.MemberArt.Id;
-            var name = Ui.Txt(id.transform, "", 56, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Name");
-            name.rectTransform.At(0.5f, 1f, 0, -280, 520, 66);
-            name.AutoSize(56);
-            name.Inked();
-            var rarity = Ui.Txt(id.transform, "", 26, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Body, "Rarity");
-            rarity.rectTransform.At(0.5f, 1f, 0, -348, 520, 32);
+            var holder = Ui.Rect(id.transform, "ArtHolder").Stretch(6, 6, 6, 6);
+            holder.gameObject.AddComponent<RectMask2D>();
+            var art = Ui.Img(holder, "Art", Color.white, null);
+            art.gameObject.AddComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            var shade = Ui.Img(id.transform, "Shade", Theme.WithAlpha(Theme.Outline, 0.9f), Sprites.VerticalGradient);
+            shade.rectTransform.At(0.5f, 0f, 0, 6, LeftW - 12, 300);
+            shade.rectTransform.localScale = new Vector3(1, -1, 1);
+            var strip = Ui.Img(id.transform, "Family", Theme.Primary, Sprites.Panel);
+            strip.rectTransform.TopBand(14, 0);
+            var name = Ui.Txt(id.transform, "", 60, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Name");
+            name.rectTransform.At(0.5f, 0f, 0, 228, LeftW - 40, 70);
+            name.AutoSize(60);
+            var rarity = Ui.Txt(id.transform, "", 28, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Body, "Rarity");
+            rarity.rectTransform.At(0.5f, 0f, 0, 196, LeftW - 40, 32);
             var role = Ui.Txt(id.transform, "", 24, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Regular, "Role");
-            role.rectTransform.At(0.5f, 1f, 0, -382, 520, 30);
-            var level = Ui.Txt(id.transform, "", 40, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Level");
-            level.rectTransform.At(0.5f, 1f, 0, -418, 520, 46);
-            var fatigue = Ui.Bar(id.transform, "Fatigue", Theme.Success, Theme.SurfaceDark, true, 22);
-            ((RectTransform)fatigue.transform).At(0.5f, 1f, 0, -474, 480, 32);
-            var previous = Ui.LocBtn(id.transform, "sheet.previous", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Previous");
-            previous.Rect.At(0f, 0f, 20, 20, 200, 96);
-            var next = Ui.LocBtn(id.transform, "sheet.next", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Next");
-            next.Rect.At(1f, 0f, -20, 20, 200, 96);
+            role.rectTransform.At(0.5f, 0f, 0, 164, LeftW - 40, 30);
+            var fatigue = Ui.Bar(id.transform, "Fatigue", Theme.Success, Theme.Outline, true, 22);
+            ((RectTransform)fatigue.transform).At(0.5f, 0f, 0, 126, LeftW - 60, 30);
+            var previous = Ui.LocBtn(id.transform, "sheet.previous", Theme.Surface3, Theme.Text, null!, 28, FontKind.Title, "Previous");
+            previous.Rect.At(0f, 0f, 20, 14, 150, 96);
+            var next = Ui.LocBtn(id.transform, "sheet.next", Theme.Surface3, Theme.Text, null!, 28, FontKind.Title, "Next");
+            next.Rect.At(1f, 0f, -20, 14, 150, 96);
 
-            // ---- Stats et compétences
-            var mid = Column(rt, "Skills", LeftW + Gap, MidW);
-            var stats = Ui.Txt(mid.transform, "", 26, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Stats");
-            stats.rectTransform.At(0f, 1f, 22, -20, 556, 40);
-            Ui.LocTxt(mid.transform, "sheet.skills", 32, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "SkillsTitle").rectTransform.At(0f, 1f, 22, -74, 556, 42);
-            var skills = Ui.Txt(mid.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Regular, "SkillList");
-            skills.rectTransform.Stretch(22, 20, 22, 128);
+            // ---- Colonne centrale : niveau, histoire, stats, paliers, action principale
+            var levelBar = Ui.Bar(rt, "Level", Theme.Accent, Theme.Outline, true, 26);
+            ((RectTransform)levelBar.transform).At(0f, 1f, MidX, 0, MidW, 46);
 
-            // ---- Synergies, raccourcis, action principale
-            var side = Column(rt, "Side", LeftW + Gap + MidW + Gap, RightW);
-            Ui.LocTxt(side.transform, "sheet.synergies", 32, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "SynergiesTitle").rectTransform.At(0f, 1f, 22, -20, 492, 42);
-            var synergies = Ui.Txt(side.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Synergies");
-            synergies.rectTransform.Stretch(22, 468, 22, 72);
-            var salon = Ui.LocBtn(side.transform, "sheet.salon", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Salon");
-            salon.Rect.At(0f, 0f, 20, 252, 236, 96);
-            var infirmary = Ui.LocBtn(side.transform, "sheet.infirmary", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Infirmary");
-            infirmary.Rect.At(1f, 0f, -20, 252, 236, 96);
-            var loadout = Ui.LocBtn(side.transform, "sheet.loadout", Theme.Info, Theme.TextDark, null!, 30, FontKind.Title, "Loadout");
-            loadout.Rect.At(0.5f, 0f, 0, 356, 492, 96);
-            var reason = Ui.Txt(side.transform, "", 24, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Body, "PrimaryReason");
-            reason.rectTransform.At(0.5f, 0f, 0, 140, 492, 34);
-            var primary = Ui.Btn(side.transform, "", Theme.Primary, Theme.TextDark, null!, 40, FontKind.Title, "Primary");
-            primary.Rect.At(0.5f, 0f, 0, 20, 492, 112);
+            var bioFill = Ui.Panel(rt, "Bio", Theme.Surface, 4f, 6f, false);
+            bioFill.Frame().At(0f, 1f, MidX, -56, MidW, 130);
+            var bio = Ui.Txt(bioFill.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "BioText");
+            bio.rectTransform.Stretch(18, 10, 18, 22);
 
+            var statsFill = Ui.Panel(rt, "Stats", Theme.Surface, 4f, 6f, false);
+            statsFill.Frame().At(0f, 1f, MidX, -190, MidW, 54);
+            var stats = Ui.Txt(statsFill.transform, "", 26, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "StatsText");
+            stats.rectTransform.Stretch(12, 4, 12, 8);
+            stats.AutoSize(26);
+
+            var tiersFill = Ui.Panel(rt, "Tiers", Theme.Surface, 4f, 6f, false);
+            tiersFill.Frame().At(0f, 1f, MidX, -258, MidW, 196);
+            var tiersTitle = Ui.Txt(tiersFill.transform, "", 28, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "TiersTitle");
+            tiersTitle.rectTransform.At(0f, 1f, 20, -14, MidW - 40, 36);
+            var tiers = Ui.Txt(tiersFill.transform, "", 24, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "TiersText");
+            tiers.rectTransform.Stretch(20, 12, 20, 58);
+            tiers.lineSpacing = 8;
+
+            var reason = Ui.Txt(rt, "", 24, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Body, "PrimaryReason");
+            reason.rectTransform.At(0f, 0f, MidX, 108, MidW, 32);
+            var primary = Ui.Btn(rt, "", Theme.Primary, Theme.TextDark, null!, 40, FontKind.Title, "Primary");
+            primary.Rect.At(0f, 0f, MidX, 0, MidW, 104);
+
+            // ---- Colonne droite : compétences, objets, affinités, raccourcis
+            var skillTiles = new List<Object>();
+            for (int i = 0; i < 4; i++)
+            {
+                var t = Tile(ctx, rt, "Skill" + i, 304, 140, false);
+                ((RectTransform)t.transform).At(0f, 1f, RightX + (i % 2) * 312, -(i / 2) * 148, 304, 140);
+                skillTiles.Add(t);
+            }
+            var itemTiles = new List<Object>();
+            for (int i = 0; i < 3; i++)
+            {
+                var t = Tile(ctx, rt, "Item" + i, 200, 104, false);
+                ((RectTransform)t.transform).At(0f, 1f, RightX + i * 208, -304, 200, 104);
+                itemTiles.Add(t);
+            }
+
+            var affinityFill = Ui.Panel(rt, "Affinity", Theme.Surface, 4f, 6f, false);
+            affinityFill.Frame().At(0f, 1f, RightX, -416, RightW, 92);
+            var affinityTitle = Ui.Txt(affinityFill.transform, "", 22, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "AffinityTitle");
+            affinityTitle.rectTransform.At(0f, 1f, 18, -8, 330, 28);
+            var affinity = new List<Object>();
+            for (int i = 0; i < 3; i++)
+            {
+                var p = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", affinityFill.transform, "Affinity" + i);
+                ((RectTransform)p.transform).At(0f, 1f, 18 + i * 70, -34, 56, 56);
+                affinity.Add(p);
+            }
+            var synergies = Ui.Txt(affinityFill.transform, "", 20, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "Synergies");
+            synergies.rectTransform.At(1f, 0.5f, -12, 0, 330, 80);
+            synergies.overflowMode = TMPro.TextOverflowModes.Ellipsis;
+
+            var salon = Ui.LocBtn(rt, "sheet.salon", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Salon");
+            salon.Rect.At(0f, 0f, RightX, 0, 200, 96);
+            var infirmary = Ui.LocBtn(rt, "sheet.infirmary", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Infirmary");
+            infirmary.Rect.At(0f, 0f, RightX + 208, 0, 200, 96);
+            var loadout = Ui.LocBtn(rt, "sheet.loadout", Theme.Info, Theme.TextDark, null!, 22, FontKind.Title, "Loadout");
+            loadout.Rect.At(0f, 0f, RightX + 416, 0, 200, 96);
+
+            // ---- Panneau d'inventaire (recouvre la grille de compétences)
+            var pickerFill = Ui.Panel(rt, "Picker", Theme.Surface, 5f, 10f, true);
+            var pickerFrame = pickerFill.Frame();
+            pickerFrame.At(0f, 1f, RightX, 0, RightW, 304);
+            var pickerTitle = Ui.Txt(pickerFill.transform, "", 24, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "PickerTitle");
+            pickerTitle.rectTransform.At(0f, 1f, 16, -10, 370, 44);
+            pickerTitle.AutoSize(24);
+            var pickerHint = Ui.Txt(pickerFill.transform, "", 20, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "PickerHint");
+            pickerHint.rectTransform.At(0f, 1f, 16, -56, 380, 30);
+            var pickerRemove = Ui.LocBtn(pickerFill.transform, "sheet.picker_remove", Theme.Danger, Theme.Text, null!, 22, FontKind.Title, "Remove");
+            pickerRemove.Rect.At(1f, 1f, -112, 0, 130, 96);
+            var pickerClose = Ui.LocBtn(pickerFill.transform, "sheet.picker_close", Theme.Surface3, Theme.Text, null!, 22, FontKind.Title, "Close");
+            pickerClose.Rect.At(1f, 1f, -8, 0, 100, 96);
+            var pickerTiles = new List<Object>();
+            for (int i = 0; i < 8; i++)
+            {
+                var t = Tile(ctx, pickerFill.transform, "Option" + i, 144, 96, true);
+                ((RectTransform)t.transform).At(0f, 1f, 12 + (i % 4) * 150, -100 - (i / 4) * 102, 144, 96);
+                pickerTiles.Add(t);
+            }
+
+            pickerFrame.gameObject.SetActive(false);
             var view = rt.gameObject.AddComponent<MemberSheetView>();
             ScreenKit.WireFade(ctx, view);
+            ctx.Wire(view, "wideArt", wide);
             ctx.Wire(view, "strip", strip);
-            ctx.Wire(view, "portrait", portrait);
+            ctx.Wire(view, "art", art);
             ctx.Wire(view, "memberName", name);
             ctx.Wire(view, "rarity", rarity);
             ctx.Wire(view, "role", role);
-            ctx.Wire(view, "level", level);
+            ctx.Wire(view, "levelBar", levelBar);
+            ctx.Wire(view, "bio", bio);
             ctx.Wire(view, "stats", stats);
+            ctx.Wire(view, "tiersTitle", tiersTitle);
+            ctx.Wire(view, "tiers", tiers);
             ctx.Wire(view, "fatigue", fatigue);
-            ctx.Wire(view, "skills", skills);
+            ctx.WireArray(view, "skillTiles", skillTiles);
+            ctx.WireArray(view, "itemTiles", itemTiles);
+            ctx.WireArray(view, "affinity", affinity);
+            ctx.Wire(view, "affinityTitle", affinityTitle);
             ctx.Wire(view, "synergies", synergies);
             ctx.Wire(view, "previous", previous);
             ctx.Wire(view, "next", next);
@@ -246,10 +320,53 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "loadout", loadout);
             ctx.Wire(view, "primary", primary);
             ctx.Wire(view, "primaryReason", reason);
+            ctx.Wire(view, "pickerRoot", pickerFrame.gameObject);
+            ctx.Wire(view, "pickerTitle", pickerTitle);
+            ctx.Wire(view, "pickerHint", pickerHint);
+            ctx.WireArray(view, "pickerTiles", pickerTiles);
+            ctx.Wire(view, "pickerRemove", pickerRemove);
+            ctx.Wire(view, "pickerClose", pickerClose);
             return rt.gameObject;
         }
 
-        /// <summary>Colonne pleine hauteur (case de BD) placée à <paramref name="x"/> depuis le bord gauche.</summary>
+        /// <summary>Case de la fiche : cadre coloré, illustration, titre en bas, sous-titre en haut, voile quand elle est verrouillée.</summary>
+        static SheetTileView Tile(PrefabContext ctx, Transform parent, string name, float w, float h, bool compact)
+        {
+            var fill = Ui.Panel(parent, name, Theme.Surface3, 4f, 6f, true);
+            var frame = fill.Frame();
+            frame.sizeDelta = new Vector2(w, h);
+            var frameImg = frame.GetComponent<Image>();
+            var holder = Ui.Rect(fill.transform, "ArtHolder").Stretch();
+            holder.gameObject.AddComponent<RectMask2D>();
+            var art = Ui.Img(holder, "Art", new Color(1f, 1f, 1f, 0.6f), null);
+            art.gameObject.AddComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            var shade = Ui.Img(fill.transform, "Shade", Theme.WithAlpha(Theme.Outline, 0.75f), Sprites.VerticalGradient);
+            shade.rectTransform.Stretch();
+            shade.rectTransform.localScale = new Vector3(1, -1, 1);
+            var sub = Ui.Txt(fill.transform, "", 20, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "Sub");
+            sub.rectTransform.Stretch(10, 4, 8, 6);
+            var title = Ui.Txt(fill.transform, "", compact ? 21 : 30, Theme.Text, TextAnchor.LowerLeft, FontKind.Title, "Title");
+            title.rectTransform.Stretch(10, 6, 8, compact ? 18 : 24);
+            title.AutoSize(compact ? 21 : 30);
+            var veil = Ui.Img(fill.transform, "Locked", Theme.WithAlpha(Theme.Outline, 0.55f), Sprites.Panel);
+            veil.rectTransform.Stretch();
+            var button = frame.gameObject.AddComponent<Button>();
+            button.targetGraphic = frameImg;
+            button.transition = Selectable.Transition.None;
+            var nav = button.navigation;
+            nav.mode = Navigation.Mode.None;
+            button.navigation = nav;
+            var view = frame.gameObject.AddComponent<SheetTileView>();
+            ctx.Wire(view, "button", button);
+            ctx.Wire(view, "frame", frameImg);
+            ctx.Wire(view, "art", art);
+            ctx.Wire(view, "title", title);
+            ctx.Wire(view, "sub", sub);
+            ctx.Wire(view, "locked", veil.gameObject);
+            return view;
+        }
+
+        /// <summary>Colonne pleine hauteur (panneau) placée à <paramref name="x"/> depuis le bord gauche.</summary>
         static Image Column(RectTransform parent, string name, float x, float width)
         {
             var fill = Ui.Panel(parent, name, Theme.Surface, 5f, 10f, true);

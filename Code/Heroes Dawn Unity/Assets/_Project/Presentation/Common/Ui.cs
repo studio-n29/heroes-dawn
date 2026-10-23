@@ -130,17 +130,23 @@ namespace N29.HeroesDawn.Presentation.Common
         /// </summary>
         public static Image Panel(Transform parent, string name, Color fill, float border = 4f, float shadow = 8f, bool raycast = true)
         {
-            // HUD pastel : filet clair (FrostEdge) à coins coupés, fond teinté, ombre douce (jamais d'ombre dure ni de contour noir).
-            var frame = Img(parent, name, Theme.FrostEdge, Sprites.Panel, raycast);
+            // Style Mo.Co : contour sombre épais (3 à 6 px), aplat plein, liseré clair en haut et une seule ombre portée.
+            var frame = Img(parent, name, Theme.Outline, Sprites.Panel, raycast);
             if (shadow > 0)
             {
                 var sh = frame.gameObject.AddComponent<Shadow>();
-                sh.effectColor = new Color(Theme.Navy.r, Theme.Navy.g, Theme.Navy.b, 0.25f);
-                sh.effectDistance = new Vector2(shadow * 0.5f, -shadow * 0.5f);
+                sh.effectColor = Theme.WithAlpha(Theme.Outline, 0.45f);
+                sh.effectDistance = new Vector2(0f, -shadow * 0.5f);
             }
-            float edge = Mathf.Min(border, 2f);
+            float edge = Mathf.Clamp(border, 3f, 6f);
             var inner = Img(frame.transform, "Fill", fill, Sprites.Panel, false);
             inner.rectTransform.Stretch(edge, edge, edge, edge);
+            var hi = Img(inner.transform, "Hi", new Color(1f, 1f, 1f, 0.16f));
+            var hrt = hi.rectTransform;
+            hrt.anchorMin = new Vector2(0f, 1f);
+            hrt.anchorMax = new Vector2(1f, 1f);
+            hrt.offsetMin = new Vector2(12f, -12f);
+            hrt.offsetMax = new Vector2(-12f, -5f);
             return inner;
         }
 
@@ -174,7 +180,12 @@ namespace N29.HeroesDawn.Presentation.Common
             t.textWrappingMode = TextWrappingModes.Normal;
             t.overflowMode = TextOverflowModes.Overflow;
             t.lineSpacing = font == FontKind.Title ? -10f : 0f;
-            if (font == FontKind.Title) t.fontStyle = FontStyles.UpperCase;
+            if (font == FontKind.Title)
+            {
+                // Titres à contour épais (style Mo.Co) : matériau partagé « encré » de la police.
+                t.fontStyle = FontStyles.UpperCase;
+                t.fontSharedMaterial = InkedMaterial(t.font);
+            }
             return t;
         }
 
@@ -195,7 +206,7 @@ namespace N29.HeroesDawn.Presentation.Common
         {
             if (g is TMP_Text tmp) { tmp.fontSharedMaterial = InkedMaterial(tmp.font); return g; }
             var s = g.gameObject.AddComponent<Shadow>();
-            s.effectColor = new Color(Theme.Navy.r, Theme.Navy.g, Theme.Navy.b, 0.45f);
+            s.effectColor = Theme.WithAlpha(Theme.Outline, 0.6f);
             s.effectDistance = new Vector2(size * 0.5f, -size * 0.5f);
             return g;
         }
@@ -203,8 +214,17 @@ namespace N29.HeroesDawn.Presentation.Common
         public static UiButton Btn(Transform parent, string label, Color bg, Color fg, Action onClick, int fontSize = 34,
                                    FontKind font = FontKind.Title, string name = "Button")
         {
-            var fill = Panel(parent, name, bg, 4f, 6f, true);
-            var frameGo = fill.transform.parent.gameObject;
+            // Style Mo.Co : contour épais, socle plus sombre (« lèvre » du bas) et face colorée par-dessus ; les fonds de panneau deviennent bleu vif.
+            if (bg == Theme.Surface2 || bg == Theme.Surface3) bg = Theme.Secondary;
+            var lip = Panel(parent, name, Color.Lerp(bg, Theme.Outline, 0.5f), 4f, 6f, true);
+            var frameGo = lip.transform.parent.gameObject;
+            var fill = Img(lip.transform, "Face", bg, Sprites.Panel, true);
+            fill.rectTransform.Stretch(0, 9, 0, 0);
+            var faceHi = Img(fill.transform, "Hi", new Color(1f, 1f, 1f, 0.28f));
+            faceHi.rectTransform.anchorMin = new Vector2(0f, 1f);
+            faceHi.rectTransform.anchorMax = new Vector2(1f, 1f);
+            faceHi.rectTransform.offsetMin = new Vector2(12f, -13f);
+            faceHi.rectTransform.offsetMax = new Vector2(-12f, -6f);
             var button = frameGo.AddComponent<Button>();
             button.targetGraphic = fill;
             var colors = button.colors;
@@ -221,19 +241,19 @@ namespace N29.HeroesDawn.Presentation.Common
 
             if (bg == Theme.Accent)
             {
-                // Bouton d'action : reflet diagonal clair sur le dégradé corail.
+                // Bouton d'action : reflet diagonal clair sur la face jaune.
                 var shine = Img(fill.transform, "Shine", new Color(1f, 1f, 1f, 0.35f), Sprites.Shine);
                 shine.rectTransform.Stretch(0, 0, 0, 0);
                 shine.type = Image.Type.Simple;
             }
-            var text = Txt(fill.transform, label, fontSize, fg, TextAnchor.MiddleCenter, font, "Label");
+            var text = Txt(fill.transform, label, fontSize, font == FontKind.Title ? Theme.TextOnDark : fg, TextAnchor.MiddleCenter, font, "Label");
             text.rectTransform.Stretch(10, 4, 10, 4);
             text.enableAutoSizing = true;
             text.fontSizeMin = Mathf.Min(fontSize, Mathf.Max(20, fontSize / 2));
             text.fontSizeMax = fontSize;
 
             var ub = frameGo.AddComponent<UiButton>();
-            ub.Init(button, fill, text, bg, fg);
+            ub.Init(button, fill, text, bg, font == FontKind.Title ? Theme.TextOnDark : fg);
             if (onClick != null) button.onClick.AddListener(() => onClick());
             return ub;
         }
@@ -249,9 +269,9 @@ namespace N29.HeroesDawn.Presentation.Common
 
         public static UiBar Bar(Transform parent, string name, Color fill, Color back, bool withLabel = false, int labelSize = 20)
         {
-            var bg = Img(parent, name, Theme.FrostEdge, Sprites.PanelSmall);
+            var bg = Img(parent, name, Theme.Outline, Sprites.PanelSmall);
             var inner = Img(bg.transform, "Back", back, Sprites.PanelSmall);
-            inner.rectTransform.Stretch(1, 1, 1, 1);
+            inner.rectTransform.Stretch(3, 3, 3, 3);
             var f = Img(inner.transform, "Fill", fill, Sprites.PanelSmall);
             var frt = f.rectTransform;
             frt.anchorMin = Vector2.zero;

@@ -27,7 +27,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var c = d.Status == 2 ? Theme.Success : d.Status == 1 ? Theme.Primary : Theme.TextMuted;
             accent.color = c;
             state.color = c;
-            title.color = d.Status == 0 ? Theme.TextMuted : Theme.Navy;
+            title.color = d.Status == 0 ? Theme.TextMuted : Theme.Text;
         }
     }
 }

@@ -166,7 +166,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             poly.material = b.Locked && lockedMaterial != null ? lockedMaterial : null;
             var tag = _tags[b.Id];
             tag.text = b.Name + " · " + b.Tag;
-            tag.color = b.Locked ? Theme.TextMuted : Theme.Navy;
+            tag.color = b.Locked ? Theme.TextMuted : Theme.Text;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(s.border, Is.EqualTo(new Vector4(19, 19, 19, 19)));
         }
 
-        [Test, Description("Vérifie que chaque sprite du HUD pastel (panneau, losange, reflet, skyline) est cuit en asset et que les panneaux sont découpés en 9 — parce qu'un prefab ne référence que des assets et que les coins coupés doivent rester intacts à l'étirement")]
+        [Test, Description("Vérifie que chaque sprite du HUD (panneau, losange, reflet, skyline) est cuit en asset et que les panneaux sont découpés en 9 — parce qu'un prefab ne référence que des assets et que les coins coupés doivent rester intacts à l'étirement")]
         public void Bake_WritesHudSprites()
         {
             foreach (var name in new[] { "Panel", "PanelSmall", "Diamond", "Shine", "Skyline", "PanelFrame", "Bracket", "Bust" })
@@ -56,7 +56,7 @@ namespace N29.HeroesDawn.Tests.Editor
                 Assert.That(fa.atlasPopulationMode, Is.EqualTo(AtlasPopulationMode.Dynamic), name);
                 var inked = Resources.Load<Material>(FontAssetGenerator.ResourcesFolder + "/" + name + " SDF Inked");
                 Assert.That(inked, Is.Not.Null, name);
-                Assert.That(inked.GetFloat(ShaderUtilities.ID_OutlineWidth), Is.EqualTo(0f), name + " : plus de contour noir");
+                Assert.That(inked.GetFloat(ShaderUtilities.ID_OutlineWidth), Is.GreaterThan(0.1f), name + " : contour épais du style Mo.Co");
                 Assert.That(inked.IsKeywordEnabled(ShaderUtilities.Keyword_Underlay), Is.True, name + " : ombre douce");
             }
         }

@@ -43,12 +43,17 @@ namespace N29.HeroesDawn.Presentation.Common
         public void Show(PortraitData d)
         {
             var family = Theme.FamilyColor(d.Family);
-            disc.color = Color.Lerp(family, Color.white, 0.25f);
-            bust.color = Color.Lerp(family, Theme.Navy, 0.5f);
+            disc.color = family;
+            bust.color = Color.Lerp(family, Theme.Outline, 0.5f);
             bool hasArt = d.Art != null;
             art.gameObject.SetActive(hasArt);
             bust.gameObject.SetActive(!hasArt);
-            if (hasArt) art.sprite = d.Art;
+            if (hasArt)
+            {
+                art.sprite = d.Art;
+                var fitter = art.GetComponent<AspectRatioFitter>();
+                if (fitter != null) fitter.aspectRatio = d.Art!.rect.width / d.Art.rect.height;
+            }
             initial.text = d.Initial;
             boss.SetActive(d.Boss);
         }

@@ -42,13 +42,13 @@ namespace N29.HeroesDawn.Presentation.Common
             }
         }
 
-        /// <summary>Désactivé : fond éclairci vers le gris pastel et libellé marine estompé (lisible sur n'importe quel fond de bouton).</summary>
+        /// <summary>Désactivé : fond grisé vers le violet et libellé blanc estompé.</summary>
         void ApplyState()
         {
             if (fill == null) return;
             bool on = button == null || button.interactable;
             fill.color = on ? _bg : Color.Lerp(_bg, Theme.Surface3, 0.8f);
-            if (label != null) label.color = on ? _fg : Theme.WithAlpha(Theme.Navy, 0.5f);
+            if (label != null) label.color = on ? _fg : Theme.WithAlpha(Theme.Text, 0.55f);
         }
 
         void Awake()
@@ -67,6 +67,7 @@ namespace N29.HeroesDawn.Presentation.Common
 
         public void SetColors(Color bg, Color fg)
         {
+            if (bg == Theme.Surface2 || bg == Theme.Surface3) bg = Theme.Secondary;
             _bg = bg; _fg = fg;
             ApplyState();
         }

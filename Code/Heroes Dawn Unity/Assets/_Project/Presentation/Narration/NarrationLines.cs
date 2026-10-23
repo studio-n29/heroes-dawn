@@ -21,11 +21,11 @@ namespace N29.HeroesDawn.Presentation.Narration
             if (member != null)
             {
                 string name = loc.MemberName(member);
-                return new DialogueBoxLine(name, new PortraitData(name, member.Family), text, true);
+                return new DialogueBoxLine(name, new PortraitData(name, member.Family, art: AgentArt.For(member.Id.Value)), text, true);
             }
             string key = "speaker." + line.Speaker;
             string npc = loc.Has(key) ? loc.T(key) : Capitalize(line.Speaker);
-            return new DialogueBoxLine(npc, new PortraitData(npc, FamilyOf(line.Speaker), boss: false), text, false);
+            return new DialogueBoxLine(npc, new PortraitData(npc, FamilyOf(line.Speaker), boss: false, art: AgentArt.For(line.Speaker)), text, false);
         }
 
         /// <summary>Couleur stable d'un personnage non joueur (selon son identifiant).</summary>
