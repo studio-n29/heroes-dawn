@@ -19,7 +19,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         [UnityTearDown]
         public IEnumerator TearDown() => PlayModeHarness.TearDown();
 
-        [UnityTest, Timeout(300000), Description("Vérifie qu'un nouveau joueur passe par la cinématique (passée d'un clic), saisit son pseudo, ne peut pas choisir une campagne en cours de création, choisit New York puis arrive au QG avec son pseudo — parce que c'est le parcours de première connexion")]
+        [UnityTest, Timeout(300000), Description("Vérifie qu'un nouveau joueur passe par la cinématique (passée d'un clic), ne peut pas choisir une campagne en cours de création, choisit New York puis arrive au QG avec son pseudo — parce que c'est le parcours de première connexion")]
         public IEnumerator FirstConnection_GoesThroughIntro_ThenTheHq()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway(), withIntro: true);
@@ -28,14 +28,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var intro = Object.FindAnyObjectByType<IntroPopupView>()!;
             yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Cinematic);
             intro.SkipButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Pseudo);
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign);
 
-            intro.Input.text = "x";
-            intro.PseudoConfirmButton.onClick.Invoke();
-            Assert.That(intro.InputError, Is.Not.Empty, "un pseudo trop court est refusé");
-            Assert.That(intro.Current, Is.EqualTo(IntroPopupView.Stage.Pseudo));
-            intro.Input.text = "Maya Dorée";
-            intro.PseudoConfirmButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign);
 
             Assert.That(intro.Cards.Count, Is.EqualTo(2), "Agent D et Agent M");
@@ -48,10 +42,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
 
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>());
             var session = GameBootstrap.Instance!.Scope.Container.Resolve<GameSession>();
-            Assert.That(session.Account!.DisplayName, Is.EqualTo("Maya Dorée"));
+            Assert.That(session.Account!.DisplayName, Is.EqualTo("Agent D"));
             Assert.That(session.Meta.onboarding.campaign, Is.EqualTo("new_york"));
             Assert.That(session.Meta.onboarding.hero, Is.EqualTo("agent_d"));
-            Assert.That(session.Roster.Select(m => m.Id.Value), Is.EqualTo(new[] { "agent_d", "darius_brooks", "mei_lin_chen", "freya_lindqvist" }));
+            Assert.That(session.Roster.Select(m => m.Id.Value), Is.EqualTo(new[] { "darius_brooks" }));
             Assert.That(Object.FindAnyObjectByType<IntroPopupView>(), Is.Null, "la popup est fermée");
         }
 
@@ -71,7 +65,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(gw.SignInAsync("maya@example.com", "faux", default).GetAwaiter().GetResult().IsFailure, Is.True);
         }
 
-        [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures de la cinématique, du choix du pseudo et du choix de la campagne — parce que ces rendus se relisent à l'œil")]
+        [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures de la cinématique, du choix du personnage joueur — parce que ces rendus se relisent à l'œil")]
         public IEnumerator CaptureTheFirstConnection()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway(), withIntro: true);
@@ -89,11 +83,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             }
             yield return ScreenCaptureTests.Capture("31-intro-ecran-4");
             intro.SkipButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Pseudo);
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign);
             yield return new WaitForSecondsRealtime(0.6f);
-            yield return ScreenCaptureTests.Capture("32-pseudo");
-            intro.Input.text = "Maya";
-            intro.PseudoConfirmButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign);
             intro.SelectCampaign("agent_d");
             yield return new WaitForSecondsRealtime(0.6f);

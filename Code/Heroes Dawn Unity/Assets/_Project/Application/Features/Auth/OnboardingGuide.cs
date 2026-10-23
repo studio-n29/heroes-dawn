@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using N29.HeroesDawn.Application.Features.Collection;
 using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Definitions;
@@ -30,28 +31,10 @@ namespace N29.HeroesDawn.Application.Features.Auth
             return list;
         }
     }
-    /// <summary>Règles du pseudo : 3 à 16 caractères, lettres, chiffres, espace, tiret ou tiret bas.</summary>
-    public static class PseudoRules
-    {
-        public const int MinLength = 3;
-        public const int MaxLength = 16;
-
-        /// <summary>Clé de texte de l'erreur, ou null si le pseudo (nettoyé dans <paramref name="clean"/>) est valide.</summary>
-        public static string? Validate(string? raw, out string clean)
-        {
-            clean = (raw ?? "").Trim();
-            while (clean.Contains("  ")) clean = clean.Replace("  ", " ");
-            if (clean.Length < MinLength) return "onboarding.pseudo.short";
-            if (clean.Length > MaxLength) return "onboarding.pseudo.long";
-            foreach (var c in clean)
-                if (!(char.IsLetterOrDigit(c) || c == ' ' || c == '-' || c == '_')) return "onboarding.pseudo.chars";
-            return null;
-        }
-    }
-
     /// <summary>
-    /// Première connexion : un profil qui n'a encore validé aucune zone passe par la cinématique, le choix du pseudo et celui de la campagne.
-    /// Le pseudo remplace le nom d'invité du compte pour toute la session (et les suivantes, il est dans le profil).
+    /// Première connexion : un profil qui n'a encore validé aucune zone passe par la cinématique puis le choix du personnage joueur
+    /// (Agent D ou Agent M). Il n'y a plus de pseudo : le joueur incarne cet agent, avatar du chef d'unité, qui devient le nom du compte.
+    /// Le personnage joueur ne combat pas : l'effectif de départ ne compte qu'une recrue, et un objet de départ sert au tutoriel d'équipement.
     /// </summary>
     public sealed class OnboardingGuide
     {
@@ -62,6 +45,7 @@ namespace N29.HeroesDawn.Application.Features.Auth
         OnboardingSave Save => _c.Meta.onboarding;
 
         public bool Needed => !Save.done && _c.Session.CompletedZones.Count == 0;
+        /// <summary>Nom du compte : celui du personnage joueur choisi (vide avant le choix).</summary>
         public string Pseudo => Save.pseudo;
         public string Campaign => Save.campaign;
         /// <summary>Personnage joueur choisi (Agent D par défaut).</summary>
@@ -78,24 +62,32 @@ namespace N29.HeroesDawn.Application.Features.Auth
             return true;
         }
 
-        /// <summary>Termine la première connexion. Renvoie la clé d'erreur du pseudo, ou null si tout est enregistré.</summary>
-        public string? Complete(string pseudo, string campaign)
+        /// <summary>Termine la première connexion. Renvoie la clé d'erreur du choix, ou null si tout est enregistré.</summary>
+        public string? Complete(string campaign)
         {
             var route = StoryRoutes.For(campaign);
             if (route.Id != campaign || !route.Available) return "onboarding.campaign.unavailable";
-            var error = PseudoRules.Validate(pseudo, out var clean);
-            if (error != null) return error;
-            Save.pseudo = clean;
+            Save.pseudo = route.HeroName;
             Save.campaign = route.ActCities[0];
             Save.hero = route.Id;
             if (AllExist(route.StarterTeam)) _c.Session.StartWithTeam(route.StarterTeam);
+            GrantStarterItem();
             Save.done = true;
             ApplyPseudo();
             _c.Touch(MetaArea.Onboarding);
             return null;
         }
 
-        /// <summary>Un profil existant garde son pseudo à la reconnexion.</summary>
+        /// <summary>Un objet courant offert au départ : le tutoriel apprend à l'équiper sur la recrue.</summary>
+        void GrantStarterItem()
+        {
+            ItemDef? pick = null;
+            foreach (var it in _c.Session.Content.Collection.Items)
+                if (pick == null || it.Rarity < pick.Rarity || (it.Rarity == pick.Rarity && string.CompareOrdinal(it.Id.Value, pick.Id.Value) < 0)) pick = it;
+            if (pick != null) CollectionOps.AddItem(_c.Session, pick.Id);
+        }
+
+        /// <summary>Un profil existant garde le nom de son personnage joueur à la reconnexion.</summary>
         public void ApplyPseudo()
         {
             var account = _c.Session.Account;

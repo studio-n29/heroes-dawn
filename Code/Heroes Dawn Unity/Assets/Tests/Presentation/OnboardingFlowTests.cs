@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 namespace N29.HeroesDawn.Tests.Presentation
 {
-    /// <summary>Première connexion : cinématique, pseudo narratif, choix de la campagne (version 0.9.0).</summary>
+    /// <summary>Première connexion : cinématique, choix du personnage joueur (sans pseudo).</summary>
     public sealed class OnboardingFlowTests
     {
         TestApp _app = null!;
@@ -41,45 +41,30 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(Popup.Slides[8].Text, Does.Contain("trouver sa place"));
         }
 
-        [Test, Description("Vérifie que le pseudo invalide est refusé avec une explication et que le flux n'avance pas — parce que le joueur doit corriger avant de continuer")]
-        public void Pseudo_Invalid_IsRefusedWithAnExplanation()
-        {
-            _flow.RunIfNeededAsync(default).Forget();
-            Popup.FinishCinematic();
-            Assert.That(Popup.Prompt, Is.Not.Null);
-            Popup.SubmitPseudo("ab");
-            Assert.That(Popup.LastError, Is.Not.Null.And.Contain("3"));
-            Popup.SubmitPseudo("Agent <3>");
-            Assert.That(Popup.LastError, Is.Not.Null);
-            Assert.That(Popup.Campaigns, Is.Null, "la campagne n'est pas encore proposée");
-        }
-
         [Test, Description("Vérifie que les deux personnages sont proposés, Agent D disponible et Agent M en création — parce que les zones de Moscou ne sont pas encore créées")]
         public void Campaigns_OnlyAgentDIsAvailable()
         {
             _flow.RunIfNeededAsync(default).Forget();
             Popup.FinishCinematic();
-            Popup.SubmitPseudo("Maya");
             var cards = Popup.Campaigns!.Value.Cards;
             Assert.That(cards.Count, Is.EqualTo(2));
             Assert.That(cards.Single(c => c.Available).Id, Is.EqualTo("agent_d"));
             Assert.That(cards.Where(c => !c.Available).Select(c => c.Badge).Distinct().Single(), Is.EqualTo("EN CRÉATION"));
         }
 
-        [Test, Description("Vérifie que le parcours complet enregistre le pseudo, la campagne et l'état « terminé », renomme le compte et ferme la popup — parce que la première connexion ne se joue qu'une fois")]
-        public void FullRun_SavesThePseudoAndTheCampaign()
+        [Test, Description("Vérifie que le parcours complet enregistre le personnage, la campagne et l état « terminé », renomme le compte et ferme la popup — parce que la première connexion ne se joue qu'une fois")]
+        public void FullRun_SavesTheHeroAndRenamesTheAccount()
         {
             var run = _flow.RunIfNeededAsync(default);
             var popup = Popup;
             popup.FinishCinematic();
-            popup.SubmitPseudo("  Maya  Dorée ");
             popup.Choose("agent_d");
             Assert.That(run.Status, Is.EqualTo(UniTaskStatus.Succeeded));
             Assert.That(_app.Session.Meta.onboarding.done, Is.True);
-            Assert.That(_app.Session.Meta.onboarding.pseudo, Is.EqualTo("Maya Dorée"));
+            Assert.That(_app.Session.Meta.onboarding.pseudo, Is.EqualTo("Agent D"));
             Assert.That(_app.Session.Meta.onboarding.campaign, Is.EqualTo("new_york"));
             Assert.That(_app.Session.Meta.onboarding.hero, Is.EqualTo("agent_d"));
-            Assert.That(_app.Session.Account!.DisplayName, Is.EqualTo("Maya Dorée"));
+            Assert.That(_app.Session.Account!.DisplayName, Is.EqualTo("Agent D"));
             Assert.That(_host.Despawned, Does.Contain(popup));
             Assert.That(_flow.Needed, Is.False);
         }
@@ -97,8 +82,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void EveryOnboardingTextExists()
         {
             for (int i = 1; i <= 9; i++) Assert.That(Loc.Has("intro.slide." + i), Is.True, "intro.slide." + i);
-            foreach (var key in new[] { "intro.skip", "intro.tap", "onboarding.speaker", "onboarding.pseudo.line", "onboarding.pseudo.placeholder",
-                                        "onboarding.pseudo.confirm", "onboarding.pseudo.short", "onboarding.pseudo.long", "onboarding.pseudo.chars",
+            foreach (var key in new[] { "intro.skip", "intro.tap",
                                         "onboarding.campaign.title", "onboarding.campaign.confirm", "onboarding.campaign.open", "onboarding.campaign.wip", "onboarding.campaign.unavailable" })
                 Assert.That(Loc.Has(key), Is.True, key);
             foreach (var c in Campaigns.All) { Assert.That(Loc.Has(c.NameKey), Is.True, c.NameKey); Assert.That(Loc.Has(c.DescKey), Is.True, c.DescKey); }

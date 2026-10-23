@@ -6,7 +6,7 @@ using N29.HeroesDawn.Definitions;
 namespace N29.HeroesDawn.Content.Prototype
 {
     /// <summary>
-    /// Les 30 agents numérotés de The Dawn (02_Lore_Narration/04_Agents_The_Dawn.md) et les deux personnages joueurs. Trois forment avec le personnage joueur l'équipe de départ, quatorze entrent dans la
+    /// Les 30 agents numérotés de The Dawn (02_Lore_Narration/04_Agents_The_Dawn.md) et les deux personnages joueurs. Un seul forme l équipe de départ (le personnage joueur est un avatar hors effectif), quatorze entrent dans la
     /// boutique de recrutement (dont un après la zone 1.1), quatre rejoignent à la fin d'un arc narratif, quatre pendant un événement temporaire
     /// (week-end) et quatre sont des compagnons gagnés par une prouesse. Chaque agent a trois compétences construites sur son rôle.
     /// L'identifiant est le nom civil sans accent (« ilona_varga ») ; le nom affiché et le pouvoir sont dans <c>Loc</c>.

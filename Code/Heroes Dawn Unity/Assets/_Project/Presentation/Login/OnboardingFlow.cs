@@ -15,7 +15,7 @@ namespace N29.HeroesDawn.Presentation.Login
     }
 
     /// <summary>
-    /// Première connexion : si le profil n'a encore rien joué, ouvre la popup plein écran (cinématique, pseudo narratif, campagne)
+    /// Première connexion : si le profil n'a encore rien joué, ouvre la popup plein écran (cinématique, choix du personnage joueur)
     /// et enregistre le résultat. Sans effet pour un profil qui a déjà joué.
     /// </summary>
     public sealed class OnboardingFlow : IOnboardingFlow
@@ -38,21 +38,13 @@ namespace N29.HeroesDawn.Presentation.Login
             try
             {
                 await view.PlayCinematicAsync(Slides(), new IntroCinematicTexts { Skip = _loc.T("intro.skip"), TapHint = _loc.T("intro.tap") }, ct);
-                string pseudo = await view.AskPseudoAsync(new PseudoPromptData
-                {
-                    Speaker = _loc.T("onboarding.speaker"),
-                    Line = _loc.T("onboarding.pseudo.line"),
-                    Placeholder = _loc.T("onboarding.pseudo.placeholder"),
-                    Confirm = _loc.T("onboarding.pseudo.confirm"),
-                    Suggestion = _loc.T("onboarding.pseudo.suggestion"),
-                }, text => { var key = PseudoRules.Validate(text, out _); return key == null ? null : _loc.F(key, PseudoRules.MinLength, PseudoRules.MaxLength); }, ct);
                 string campaign = await view.ChooseCampaignAsync(new ChooseCampaignData
                 {
                     Title = _loc.T("onboarding.campaign.title"),
                     Confirm = _loc.T("onboarding.campaign.confirm"),
                     Cards = Cards(),
                 }, ct);
-                _onboarding.Complete(pseudo, campaign);
+                _onboarding.Complete(campaign);
             }
             finally { _modals.Close(view); }
         }

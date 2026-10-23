@@ -13,12 +13,12 @@ namespace N29.HeroesDawn.Presentation.Login
 {
     /// <summary>
     /// Première connexion (popup plein écran) : cinématique d'écrans fondus au noir (zoom lent, braises, bandes de cinéma, texte qui s'écrit),
-    /// pseudo demandé sous forme de dialogue, choix de la campagne. Les illustrations sont provisoires : un motif par écran (dans le prefab),
+    /// choix du personnage joueur (Agent D ou Agent M). Les illustrations sont provisoires : un motif par écran (dans le prefab),
     /// remplacé par l'image dessinée dès qu'elle existe (Resources/Intro/intro_NN).
     /// </summary>
     public sealed class IntroPopupView : MonoBehaviour, IIntroPopupView
     {
-        public enum Stage { None, Cinematic, Pseudo, Campaign }
+        public enum Stage { None, Cinematic, Campaign }
 
         [SerializeField] CanvasGroup group = null!;
         [SerializeField] RectTransform cinematic = null!;
@@ -34,12 +34,6 @@ namespace N29.HeroesDawn.Presentation.Login
         [SerializeField] TMP_Text tapHint = null!;
         [SerializeField] Button tapArea = null!;
         [SerializeField] UiButton skip = null!;
-        [SerializeField] RectTransform pseudoStage = null!;
-        [SerializeField] TMP_Text speaker = null!;
-        [SerializeField] TMP_Text line = null!;
-        [SerializeField] TMP_InputField input = null!;
-        [SerializeField] TMP_Text inputError = null!;
-        [SerializeField] UiButton pseudoConfirm = null!;
         [SerializeField] RectTransform campaignStage = null!;
         [SerializeField] TMP_Text campaignTitle = null!;
         [SerializeField] RectTransform cardRow = null!;
@@ -60,11 +54,8 @@ namespace N29.HeroesDawn.Presentation.Login
         public Stage Current { get; private set; } = Stage.None;
         public Button TapButton => tapArea;
         public Button SkipButton => skip.Button;
-        public TMP_InputField Input => input;
-        public Button PseudoConfirmButton => pseudoConfirm.Button;
         public Button CampaignConfirmButton => campaignConfirm.Button;
         public string Caption => caption.text;
-        public string InputError => inputError.text;
         public IReadOnlyList<CampaignCardView> Cards => _cards;
         /// <summary>Motif provisoire affiché (null si une illustration dessinée est montrée).</summary>
         public int ShownMotif { get; private set; } = -1;
@@ -105,7 +96,6 @@ namespace N29.HeroesDawn.Presentation.Login
         {
             Current = s;
             cinematic.gameObject.SetActive(s == Stage.Cinematic);
-            pseudoStage.gameObject.SetActive(s == Stage.Pseudo);
             campaignStage.gameObject.SetActive(s == Stage.Campaign);
             if (group.alpha < 1f) Tween.Fade(group, 1f, Animated ? 0.2f : 0f);
         }
@@ -184,31 +174,6 @@ namespace N29.HeroesDawn.Presentation.Login
             if (picture) { artPicture.sprite = slide.Art; return; }
             artBack.color = slide.Bottom;
             artTop.color = slide.Top;
-        }
-
-        // ------------------------------------------------------------------ Pseudo
-
-        public async UniTask<string> AskPseudoAsync(PseudoPromptData d, Func<string, string?> validate, CancellationToken ct)
-        {
-            speaker.text = d.Speaker;
-            line.text = d.Line;
-            ((TMP_Text)input.placeholder).text = d.Placeholder;
-            input.text = d.Suggestion;
-            inputError.text = "";
-            pseudoConfirm.SetLabel(d.Confirm);
-            SetStage(Stage.Pseudo);
-            if (Animated) Tween.PopIn(pseudoStage, 0.3f);
-            var done = new UniTaskCompletionSource<string>();
-            void Confirm()
-            {
-                var error = validate(input.text);
-                if (error != null) { inputError.text = error; if (Animated) Fx.Shake((RectTransform)input.transform); return; }
-                done.TrySetResult(input.text);
-            }
-            pseudoConfirm.Button.onClick.AddListener(Confirm);
-            input.onSubmit.AddListener(_ => Confirm());
-            try { return await done.Task.AttachExternalCancellation(ct); }
-            finally { pseudoConfirm.Button.onClick.RemoveListener(Confirm); input.onSubmit.RemoveAllListeners(); }
         }
 
         // ------------------------------------------------------------------ Campagne

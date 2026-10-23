@@ -14,14 +14,16 @@ namespace N29.HeroesDawn.Definitions
         public string HeroId { get; }
         /// <summary>Ville de chaque acte, dans l'ordre (acte I en premier).</summary>
         public IReadOnlyList<string> ActCities { get; }
-        /// <summary>Agent joueur et trois compagnons, en escouade au début de la partie.</summary>
+        /// <summary>Nom affiché du personnage joueur (avatar du chef d unité) : il remplace le pseudo du compte.</summary>
+        public string HeroName { get; }
+        /// <summary>Agents de l effectif au début de la partie : une seule recrue ; le personnage joueur est un avatar, absent de l effectif.</summary>
         public IReadOnlyList<string> StarterTeam { get; }
         /// <summary>Vrai si la première ville du parcours est jouable (zones créées).</summary>
         public bool Available { get; }
 
-        public StoryRoute(string id, string heroId, IReadOnlyList<string> actCities, IReadOnlyList<string> starterTeam, bool available)
+        public StoryRoute(string id, string heroId, string heroName, IReadOnlyList<string> actCities, IReadOnlyList<string> starterTeam, bool available)
         {
-            Id = id; HeroId = heroId; ActCities = actCities; StarterTeam = starterTeam; Available = available;
+            Id = id; HeroId = heroId; HeroName = heroName; ActCities = actCities; StarterTeam = starterTeam; Available = available;
         }
     }
 
@@ -36,14 +38,14 @@ namespace N29.HeroesDawn.Definitions
         public const string Salem = "salem";
 
         /// <summary>Agent D : New York, Paris, Moscou, Salem.</summary>
-        public static readonly StoryRoute D = new StoryRoute(AgentD, AgentD,
+        public static readonly StoryRoute D = new StoryRoute(AgentD, AgentD, "Agent D",
             new[] { NewYork, Paris, Moscow, Salem },
-            new[] { AgentD, "darius_brooks", "mei_lin_chen", "freya_lindqvist" }, true);
+            new[] { "darius_brooks" }, true);
 
         /// <summary>Agent M : Moscou, Paris, New York, Salem. Indisponible tant que les zones de Moscou ne sont pas créées.</summary>
-        public static readonly StoryRoute M = new StoryRoute(AgentM, AgentM,
+        public static readonly StoryRoute M = new StoryRoute(AgentM, AgentM, "Agent M",
             new[] { Moscow, Paris, NewYork, Salem },
-            new[] { AgentM, "sam_okafor", "celeste_moreau", "haruto_nakamura" }, false);
+            new[] { "sam_okafor" }, false);
 
         public static readonly IReadOnlyList<StoryRoute> All = new[] { D, M };
 

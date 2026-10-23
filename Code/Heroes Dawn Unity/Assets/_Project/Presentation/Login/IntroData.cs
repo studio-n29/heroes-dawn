@@ -23,15 +23,6 @@ namespace N29.HeroesDawn.Presentation.Login
         public string TapHint;
     }
 
-    /// <summary>Choix du pseudo, sous forme de dialogue avec l'accueil de l'Aube.</summary>
-    public struct PseudoPromptData
-    {
-        public string Speaker;
-        public string Line;
-        public string Placeholder;
-        public string Confirm;
-        public string Suggestion;
-    }
 
     public struct CampaignCardData
     {

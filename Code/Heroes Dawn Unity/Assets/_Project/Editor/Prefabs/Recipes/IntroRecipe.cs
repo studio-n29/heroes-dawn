@@ -116,26 +116,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var blackout = Ui.Img(cinematic, "Blackout", Color.black, null, false);
             blackout.rectTransform.Stretch();
 
-            // ---- Pseudo : dialogue avec l'accueil de l'Aube
-            var pseudoStage = Ui.Rect(root, "Pseudo");
-            pseudoStage.Stretch();
-            var pseudoBg = Ui.Img(pseudoStage, "Bg", Theme.SkyTop, Sprites.VerticalGradient);
-            pseudoBg.rectTransform.Stretch();
-            pseudoBg.raycastTarget = false;
-            var panel = Ui.Panel(pseudoStage, "Panel", Theme.Frost, 5f, 10f, true);
-            panel.Frame().At(0.5f, 0.5f, 0, 0, 1300, 560);
-            var speaker = Ui.Txt(panel.transform, "", 40, Theme.Primary, TextAnchor.UpperLeft, FontKind.Title, "Speaker");
-            speaker.rectTransform.At(0f, 1f, 50, -30, 1000, 60);
-            var line = Ui.Txt(panel.transform, "", 38, Theme.TextDark, TextAnchor.UpperLeft, FontKind.Body, "Line");
-            line.rectTransform.At(0f, 1f, 50, -100, 1200, 130);
-            var input = BuildInput(panel.transform);
-            input.GetComponent<RectTransform>().At(0.5f, 0.5f, 0, -60, 760, 90);
-            var error = Ui.Txt(panel.transform, "", 28, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Body, "Error");
-            error.rectTransform.At(0.5f, 0.5f, 0, -140, 1100, 44);
-            var pseudoConfirm = Ui.LocBtn(panel.transform, "onboarding.pseudo.confirm", Theme.Primary, Theme.TextDark, null!, 44, FontKind.Title, "Confirm");
-            pseudoConfirm.Rect.At(0.5f, 0f, 0, 40, 460, 96);
-            pseudoStage.gameObject.SetActive(false);
-
             // ---- Campagne
             var campaignStage = Ui.Rect(root, "Campaign");
             campaignStage.Stretch();
@@ -168,12 +148,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "tapHint", hint);
             ctx.Wire(view, "tapArea", tapButton);
             ctx.Wire(view, "skip", skip);
-            ctx.Wire(view, "pseudoStage", pseudoStage);
-            ctx.Wire(view, "speaker", speaker);
-            ctx.Wire(view, "line", line);
-            ctx.Wire(view, "input", input);
-            ctx.Wire(view, "inputError", error);
-            ctx.Wire(view, "pseudoConfirm", pseudoConfirm);
             ctx.Wire(view, "campaignStage", campaignStage);
             ctx.Wire(view, "campaignTitle", campaignTitle);
             ctx.Wire(view, "cardRow", cardRow);
@@ -249,29 +223,5 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             return g;
         }
 
-        /// <summary>Champ de saisie TextMeshPro : fond clair, texte et texte d'indication.</summary>
-        static TMP_InputField BuildInput(Transform parent)
-        {
-            var bg = Ui.Panel(parent, "Input", Color.white, 4f, 0f, true);
-            var frame = bg.Frame();
-            var viewport = Ui.Rect(bg.transform, "Viewport");
-            viewport.Stretch(24, 8, 24, 8);
-            viewport.gameObject.AddComponent<RectMask2D>();
-            var text = Ui.Txt(viewport, "", 44, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "Text");
-            text.rectTransform.Stretch();
-            var placeholder = Ui.Txt(viewport, "", 44, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Placeholder");
-            placeholder.rectTransform.Stretch();
-            placeholder.fontStyle = FontStyles.Italic;
-            var field = frame.gameObject.AddComponent<TMP_InputField>();
-            field.targetGraphic = bg;
-            field.textViewport = viewport;
-            field.textComponent = text;
-            field.placeholder = placeholder;
-            field.characterLimit = 16;
-            field.lineType = TMP_InputField.LineType.SingleLine;
-            field.fontAsset = Ui.BodyFont;
-            field.pointSize = 44;
-            return field;
-        }
     }
 }

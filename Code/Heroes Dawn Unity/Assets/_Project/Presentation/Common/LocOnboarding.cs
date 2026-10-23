@@ -20,20 +20,12 @@ namespace N29.HeroesDawn.Presentation.Common
             d["intro.slide.8"] = "… et l'ADN de nombreux humains a été altéré.";
             d["intro.slide.9"] = "Aujourd'hui, le monde a changé… et notre devoir est d'aider chacun à trouver sa place.";
 
-            d["onboarding.speaker"] = "ACCUEIL DE LA GUILDE";
-            d["onboarding.pseudo.line"] = "Bienvenue à l'Aube, recrue. Avant d'ouvrir ton dossier : comment doit-on t'appeler, Agent ?";
-            d["onboarding.pseudo.placeholder"] = "Ton nom d'agent";
-            d["onboarding.pseudo.suggestion"] = "";
-            d["onboarding.pseudo.confirm"] = "VALIDER";
-            d["onboarding.pseudo.short"] = "Au moins {0} caractères.";
-            d["onboarding.pseudo.long"] = "Pas plus de {1} caractères.";
-            d["onboarding.pseudo.chars"] = "Lettres, chiffres, espaces, tirets seulement.";
-            d["onboarding.campaign.title"] = "CHOISIS TON AGENT";
+            d["onboarding.campaign.title"] = "INCARNE TON AGENT";
             d["onboarding.campaign.unavailable"] = "Ce parcours n est pas encore disponible.";
             d["campaign.agent_d.name"] = "AGENT D";
-            d["campaign.agent_d.desc"] = "Illustrateur de rue à Harlem : ce qu il imagine devient réel. Son parcours : New York, Paris, Moscou, puis Salem.";
+            d["campaign.agent_d.desc"] = "Illustrateur de rue à Harlem : ce qu il imagine devient réel. Tu diriges l unité à travers lui, sans qu il combatte. Parcours : New York, Paris, Moscou, puis Salem. Première recrue : Darius Brooks.";
             d["campaign.agent_m.name"] = "AGENT M";
-            d["campaign.agent_m.desc"] = "Restauratrice de fresques à Moscou : elle voit le passé, le présent et le futur. Son parcours : Moscou, Paris, New York, puis Salem.";
+            d["campaign.agent_m.desc"] = "Restauratrice de fresques à Moscou : elle voit le passé, le présent et le futur. Tu diriges l unité à travers elle, sans qu elle combatte. Parcours : Moscou, Paris, New York, puis Salem. Première recrue : Sam Okafor.";
             d["onboarding.campaign.confirm"] = "COMMENCER";
             d["onboarding.campaign.open"] = "DISPONIBLE";
             d["onboarding.campaign.wip"] = "EN CRÉATION";

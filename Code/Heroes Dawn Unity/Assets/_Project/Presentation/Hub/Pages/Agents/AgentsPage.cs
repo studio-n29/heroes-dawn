@@ -65,7 +65,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         protected override void Render()
         {
-            // Le personnage joueur non choisi n est pas listé : un seul des deux existe dans une partie.
+            // Le personnage joueur (Agent D ou Agent M) est un avatar : il n entre jamais dans le registre.
             var all = _session.Content.Members.Where(d => d.Unlock?.Kind != UnlockKind.Hero || Owned(d)).ToList();
             int owned = all.Count(Owned);
             View.ShowHeader(new ListHeaderData
