@@ -125,13 +125,14 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var session = c.Resolve<GameSession>();
             var book = c.Resolve<CollectionBook>();
             foreach (var id in new[] { "kevlar_vest", "time_shard", "steel_knuckles" }) CollectionOps.AddItem(session, new ItemId(id));
-            foreach (var id in new[] { "card_glass_wall", "card_shackle", "card_ember", "card_second_wind" }) CollectionOps.AddCard(session, new CardId(id));
+            var memberDef = session.Roster[0].Def; // la seule recrue de départ
+            var familyCards = session.Content.Collection.Cards.Where(card => card.Family == memberDef.Family).Take(4).ToList();
+            foreach (var card in familyCards) CollectionOps.AddCard(session, card.Id);
             CollectionOps.AddBooster(session, BoosterDef.StandardId, 2);
             session.Wallet.Set(5000, 600);
-            var member = session.Roster.First(m => m.Def.Family == Family.PhysicalBio).Id; // l'agent Ancre (PhysicalBio) pour les cartes de sa catégorie
+            var member = session.Roster[0].Id;
             book.EquipItem(member, new ItemId("kevlar_vest"));
-            CollectionOps.AddCard(session, new CardId("card_bulwark_charge"));
-            book.EquipCard(member, 0, new CardId("card_second_wind"));
+            if (familyCards.Count > 0) book.EquipCard(member, 0, familyCards[0].Id);
             var nav = Object.FindAnyObjectByType<N29.HeroesDawn.Composition.HubLifetimeScope>()!.Container.Resolve<HubNavigator>();
             nav.Open(HubPage.MemberSheet, member);
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<MemberSheetView>());

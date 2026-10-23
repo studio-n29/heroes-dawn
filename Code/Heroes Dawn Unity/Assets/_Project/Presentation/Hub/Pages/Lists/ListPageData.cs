@@ -32,6 +32,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public bool Highlight;
         public bool Dim;
         public RowButtonData A, B, C;
+        /// <summary>Illustration de la tuile (pages en grille) ; nulle : aucune.</summary>
+        public Sprite? Art;
 
         public static InfoRowData Basic(string title, string subtitle = "") => new InfoRowData { Title = title, Subtitle = subtitle, Progress = -1f, TagColor = Color.clear };
     }

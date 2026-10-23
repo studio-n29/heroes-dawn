@@ -334,7 +334,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
 
         /// <summary>Case de la fiche : cadre coloré, illustration, titre en bas, sous-titre en haut, voile quand elle est verrouillée.</summary>
-        static SheetTileView Tile(PrefabContext ctx, Transform parent, string name, float w, float h, bool compact)
+        internal static SheetTileView Tile(PrefabContext ctx, Transform parent, string name, float w, float h, bool compact)
         {
             var fill = Ui.Panel(parent, name, Theme.Surface3, 4f, 6f, true);
             var frame = fill.Frame();

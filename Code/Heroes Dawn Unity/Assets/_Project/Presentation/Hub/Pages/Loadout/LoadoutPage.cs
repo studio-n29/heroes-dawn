@@ -77,6 +77,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                     var it = Defs.Item(id);
                     var r = ItemRow(it);
                     r.A = RowButtonData.Of(Loc.T("loadout.remove"), true, "", 2);
+                    r.Badge = Loc.T("loadout.badge_equipped");
                     rows.Add(r); _a.Add(() => Do(_book.UnequipItem(_member, id), "loadout.removed", CollectionText.ItemName(Loc, it))); _b.Add(null);
                 }
                 else
@@ -98,6 +99,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                     var def = Defs.Card(card.Value);
                     var r = CardRow(def, Loc.F("loadout.card_slot", slot + 3, CollectionText.CardName(Loc, def)));
                     r.A = RowButtonData.Of(Loc.T("loadout.remove"), true, "", 2);
+                    r.Badge = Loc.T("loadout.badge_equipped");
                     rows.Add(r); _a.Add(() => Do(_book.UnequipCard(_member, s), "loadout.removed", CollectionText.CardName(Loc, def))); _b.Add(null);
                 }
                 else
@@ -169,6 +171,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var r = InfoRowData.Basic(title, CollectionText.CardLine(Loc, def));
             r.Tag = CollectionText.Tag(CollectionText.CardName(Loc, def));
             r.TagColor = CollectionText.RarityColor(def.Rarity);
+            r.Art = AgentArt.Ability(def.Id.ToString());
             return r;
         }
 

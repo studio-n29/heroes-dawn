@@ -51,6 +51,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["sheet.loadout"] = "ÉQUIPEMENT";
             d["sheet.loadout_counts"] = "ÉQUIPEMENT · objets {0}/{1} · cartes {2}/{3}";
             d["hub.avatar_role"] = "CHEF D’UNITÉ";
+            d["loadout.badge_equipped"] = "ÉQUIPÉ";
             d["sheet.level_bar"] = "NIV. {0} / {1}";
             d["sheet.tiers"] = "PALIERS PAR NIVEAU";
             d["sheet.tier_level"] = "NIV. {0}";
