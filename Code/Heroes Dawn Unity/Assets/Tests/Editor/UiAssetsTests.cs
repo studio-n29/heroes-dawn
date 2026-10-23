@@ -34,6 +34,18 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(Resources.Load<Sprite>("UI/PanelSmall").border, Is.EqualTo(new Vector4(9, 9, 9, 9)));
         }
 
+        [Test, Description("Vérifie que les matériaux NeonEdge et GlassSheen sont générés avec leurs shaders — parce que Ui.Panel et Ui.Btn les chargent par nom pour dessiner le liseré néon et le reflet du verre")]
+        public void Materials_IncludeNeonAndGlass()
+        {
+            UiMaterialBuilder.EnsureAll();
+            var neon = Resources.Load<Material>("UI/Materials/UiNeonEdge");
+            var sheen = Resources.Load<Material>("UI/Materials/UiGlassSheen");
+            Assert.That(neon, Is.Not.Null);
+            Assert.That(sheen, Is.Not.Null);
+            Assert.That(neon.shader.name, Is.EqualTo("HD/UI/NeonEdge"));
+            Assert.That(sheen.shader.name, Is.EqualTo("HD/UI/GlassSheen"));
+        }
+
         [Test, Description("Vérifie que le fond paysage importé garde la largeur de l'image d'origine — parce que les illustrations étaient stockées en octets pour ne pas être redimensionnées par l'import Unity")]
         public void Bake_KeepsArtResolution()
         {
