@@ -96,8 +96,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
             var session = Container.Resolve<GameSession>();
-            session.Find(new N29.HeroesDawn.Core.MemberId("freya_lindqvist"))!.Fatigue = 70;
-            session.Find(new N29.HeroesDawn.Core.MemberId("darius_brooks"))!.Fatigue = 30;
+            session.Find(new N29.HeroesDawn.Core.MemberId("darius_brooks"))!.Fatigue = 30; // la seule recrue de départ
             yield return CaptureSettled("10-qg");
             Container.Resolve<N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide>().Skip();
             yield return new WaitForSecondsRealtime(0.3f);

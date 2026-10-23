@@ -93,6 +93,15 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             settings.Rect.At(1f, 0.5f, -(Safe - 70), 0, 170, 96);
             var wallet = ctx.Nest<HubWalletView>("Widgets/HubWallet.prefab", top.transform, "Wallet");
             ((RectTransform)wallet.transform).At(1f, 0.5f, -(Safe - 70) - 190, 0, 920, 70);
+            // Avatar du chef d'unité (Agent D ou M) : portrait, nom et fonction, entre le titre et la bourse.
+            var avatarRoot = Ui.Rect(top.transform, "Avatar");
+            avatarRoot.At(0f, 0.5f, 835, 0, 250, 84);
+            var avatarPortrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", avatarRoot, "Portrait");
+            ((RectTransform)avatarPortrait.transform).At(0f, 0.5f, 0, 0, 76, 76);
+            var avatarName = Ui.Txt(avatarRoot, "", 30, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Name");
+            avatarName.rectTransform.At(0f, 0.5f, 88, 18, 162, 38);
+            var avatarRole = Ui.Txt(avatarRoot, "", 20, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Role");
+            avatarRole.rectTransform.At(0f, 0.5f, 88, -18, 162, 30);
 
             // ---- Barre de navigation basse
             var nav = Ui.Img(rt, "NavBar", Theme.WithAlpha(Theme.Frost, 0.95f), null, true);
@@ -126,6 +135,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var view = rt.gameObject.AddComponent<HubShellView>();
             ScreenKit.WireFade(ctx, view);
             ctx.Wire(view, "title", title);
+            ctx.Wire(view, "avatarRoot", avatarRoot);
+            ctx.Wire(view, "avatar", avatarPortrait);
+            ctx.Wire(view, "avatarName", avatarName);
+            ctx.Wire(view, "avatarRole", avatarRole);
             ctx.Wire(view, "back", back);
             ctx.Wire(view, "settings", settings);
             ctx.Wire(view, "wallet", wallet);

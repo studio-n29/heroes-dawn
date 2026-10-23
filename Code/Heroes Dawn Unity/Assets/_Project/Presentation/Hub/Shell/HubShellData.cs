@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using N29.HeroesDawn.Presentation.Common;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
@@ -20,6 +21,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string Title;
         public bool ShowBack;
         public HubTabData[] Tabs;
+        /// <summary>Avatar du chef d unité (Agent D ou M) affiché dans la barre haute ; nom vide : masqué.</summary>
+        public PortraitData Avatar;
+        public string AvatarName;
+        public string AvatarRole;
 
         public static HubShellData Empty => new HubShellData { Title = "", Tabs = Array.Empty<HubTabData>() };
     }

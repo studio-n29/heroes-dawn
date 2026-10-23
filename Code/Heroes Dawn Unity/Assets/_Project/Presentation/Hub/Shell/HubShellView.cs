@@ -25,6 +25,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UiTapRelay relay = null!;
         [SerializeField] UiButton[] tabs = Array.Empty<UiButton>();
         [SerializeField] TMP_Text[] badges = Array.Empty<TMP_Text>();
+        [SerializeField] RectTransform avatarRoot = null!;
+        [SerializeField] PortraitView avatar = null!;
+        [SerializeField] TMP_Text avatarName = null!;
+        [SerializeField] TMP_Text avatarRole = null!;
         [SerializeField, OptionalRef] RectTransform? tabIndicator;
 
         int _activeTab = -1;
@@ -56,6 +60,14 @@ namespace N29.HeroesDawn.Presentation.Hub
         public void ShowChrome(HubShellData d)
         {
             title.text = d.Title;
+            bool hasAvatar = !string.IsNullOrEmpty(d.AvatarName);
+            if (avatarRoot.gameObject.activeSelf != hasAvatar) avatarRoot.gameObject.SetActive(hasAvatar);
+            if (hasAvatar)
+            {
+                avatar.Show(d.Avatar);
+                avatarName.text = d.AvatarName;
+                avatarRole.text = d.AvatarRole;
+            }
             if (back.gameObject.activeSelf != d.ShowBack) back.gameObject.SetActive(d.ShowBack);
             int active = -1;
             for (int i = 0; i < tabs.Length && i < d.Tabs.Length; i++)

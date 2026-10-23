@@ -36,7 +36,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _action = new PageAction(toasts, loc);
         }
 
-        public string Title => _loc.F("page.team", _session.Roster.Count);
+        public string Title => _session.Roster.Count == 1 ? _loc.T("page.team_one") : _loc.F("page.team", _session.Roster.Count);
 
         protected override void OnStart()
         {

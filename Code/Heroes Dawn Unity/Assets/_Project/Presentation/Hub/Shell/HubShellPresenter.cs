@@ -8,6 +8,8 @@ using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
+using N29.HeroesDawn.Core;
+using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using N29.HeroesDawn.Presentation.Wip;
@@ -159,7 +161,15 @@ namespace N29.HeroesDawn.Presentation.Hub
                     Badge = BadgeOf(page, shop),
                 };
             }
-            View.ShowChrome(new HubShellData { Title = _page?.Title ?? "", ShowBack = !_nav.IsOnTab, Tabs = tabs });
+            var route = _session.Route;
+            MemberDef? hero = null;
+            foreach (var m in _session.Content.Members) if (m.Id.Value == route.HeroId) { hero = m; break; }
+            View.ShowChrome(new HubShellData
+            {
+                Title = _page?.Title ?? "", ShowBack = !_nav.IsOnTab, Tabs = tabs,
+                Avatar = new PortraitData(route.HeroName, hero?.Family ?? Family.Matter, art: AgentArt.For(route.HeroId)),
+                AvatarName = route.HeroName.ToUpperInvariant(), AvatarRole = _loc.T("hub.avatar_role"),
+            });
         }
 
         string BadgeOf(HubPage page, IShopReadModel shop)
