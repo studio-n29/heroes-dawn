@@ -176,6 +176,20 @@ namespace N29.HeroesDawn.Presentation.Common
         /// <summary>Matériau d'interface généré (Resources/UI/Materials) ; null s'il n'existe pas encore (le rendu retombe sur le matériau par défaut).</summary>
         public static Material UiMaterial(string name) => Resources.Load<Material>("UI/Materials/" + name);
 
+        /// <summary>Fond nuit plein cadre (dégradé Night vers NightBottom + vignettage), sans capter les touchers : fond par défaut des écrans.</summary>
+        public static Image NightBackdrop(Transform parent, string name = "Backdrop")
+        {
+            var root = Img(parent, name, Theme.NightBottom);
+            root.rectTransform.Stretch();
+            // VerticalGradient est opaque en haut : Night recouvre progressivement NightBottom.
+            Img(root.transform, "Gradient", Theme.Night, Sprites.VerticalGradient).rectTransform.Stretch();
+            var vignette = Img(root.transform, "Vignette", Theme.Night);
+            vignette.rectTransform.Stretch();
+            var mat = UiMaterial("UiBackdrop");
+            if (mat != null) vignette.material = mat;
+            return root;
+        }
+
         /// <summary>Barre d'accent verticale (4 px) sur le bord gauche d'un panneau : signature du HUD. Corail par défaut.</summary>
         public static Image AccentBar(Image panelFill, Color? color = null)
         {

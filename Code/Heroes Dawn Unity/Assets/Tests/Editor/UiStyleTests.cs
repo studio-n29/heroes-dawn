@@ -123,5 +123,17 @@ namespace N29.HeroesDawn.Tests.Editor
             var secondary = Ui.Btn(_root.transform, "Non", Theme.Surface2, Theme.Text, null);
             Assert.That(secondary.transform.Find("Halo"), Is.Null);
         }
+
+        [Test, Description("Vérifie que le fond nuit est étiré sur tout le cadre, ne capte aucun toucher et porte un vignettage — parce qu'il remplace les ciels pastel sous tous les écrans et ne doit jamais gêner les boutons")]
+        public void NightBackdrop_IsFullStretchAndIgnoresInput()
+        {
+            var bd = Ui.NightBackdrop(_root.transform);
+            Assert.That(bd.rectTransform.anchorMin, Is.EqualTo(Vector2.zero));
+            Assert.That(bd.rectTransform.anchorMax, Is.EqualTo(Vector2.one));
+            Assert.That(bd.raycastTarget, Is.False);
+            Assert.That(bd.color, Is.EqualTo(Theme.NightBottom));
+            Assert.That(bd.transform.Find("Gradient"), Is.Not.Null);
+            Assert.That(bd.transform.Find("Vignette"), Is.Not.Null);
+        }
     }
 }
