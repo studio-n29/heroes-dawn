@@ -114,6 +114,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
                 pulse.Speed = 4f;
                 badge.gameObject.SetActive(false);
                 if (page == HubPage.Team) RecipeKit.Mark(tab, TutorialTarget.TabTeam);
+                if (page == HubPage.Shop) RecipeKit.Mark(tab, TutorialTarget.TabRecruit);
                 tabs.Add(tab);
                 badges.Add(badgeText);
             }

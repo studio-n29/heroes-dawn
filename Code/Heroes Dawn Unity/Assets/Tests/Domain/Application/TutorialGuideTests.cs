@@ -25,6 +25,17 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(T.Current, Is.EqualTo(TutorialStep.OpenTeam));
             T.Signal(TutorialSignal.TeamOpened);
             Assert.That(T.Acknowledge());
+            var hub = new[] { (TutorialStep.OpenSheet, TutorialSignal.SheetOpened), (TutorialStep.Train, TutorialSignal.Trained), (TutorialStep.EquipSlot, TutorialSignal.SlotOpened),
+                              (TutorialStep.EquipPick, TutorialSignal.ItemEquipped), (TutorialStep.OpenRecruit, TutorialSignal.RecruitOpened), (TutorialStep.Recruit, TutorialSignal.Recruited),
+                              (TutorialStep.BackToTeam, TutorialSignal.TeamOpened) };
+            foreach (var (step, signal) in hub)
+            {
+                Assert.That(T.Current, Is.EqualTo(step));
+                T.Signal(signal);
+            }
+            Assert.That(T.Current, Is.EqualTo(TutorialStep.Duo));
+            Assert.That(T.Acknowledge());
+            Assert.That(T.Current, Is.EqualTo(TutorialStep.StartMission));
             T.Signal(TutorialSignal.MapOpened);
             T.Signal(TutorialSignal.BoardOpened);
             Assert.That(T.Acknowledge());
@@ -37,6 +48,39 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             T.Signal(TutorialSignal.ResultsClosed);
             Assert.That(T.Active, Is.False);
             Assert.That(T.Current, Is.EqualTo(TutorialStep.Finished));
+        }
+
+        /// <summary>Joue toutes les étapes du hub (équipe, fiche, entraînement, équipement, recrutement, duo) jusqu'à « Mission ».</summary>
+        void ThroughHubSteps()
+        {
+            T.Acknowledge();
+            T.Signal(TutorialSignal.TeamOpened);
+            T.Acknowledge();
+            foreach (var s in new[] { TutorialSignal.SheetOpened, TutorialSignal.Trained, TutorialSignal.SlotOpened, TutorialSignal.ItemEquipped,
+                                      TutorialSignal.RecruitOpened, TutorialSignal.Recruited, TutorialSignal.TeamOpened })
+                T.Signal(s);
+            T.Acknowledge();
+        }
+
+        [Test, Description("Vérifie qu'un geste du hub fait trop tôt (équiper avant d'avoir ouvert la fiche, recruter avant l'onglet) n'avance rien — parce que ces étapes s'enchaînent dans l'ordre et un geste hors étape ne doit pas sauter l'enseignement")]
+        public void HubGestures_OutOfOrder_DoNothing()
+        {
+            T.Acknowledge();
+            T.Signal(TutorialSignal.TeamOpened);
+            T.Acknowledge();
+            Assert.That(T.Current, Is.EqualTo(TutorialStep.OpenSheet));
+            T.Signal(TutorialSignal.ItemEquipped);
+            T.Signal(TutorialSignal.Recruited);
+            T.Signal(TutorialSignal.Trained);
+            Assert.That(T.Current, Is.EqualTo(TutorialStep.OpenSheet));
+            T.Signal(TutorialSignal.SheetOpened);
+            Assert.That(T.Current, Is.EqualTo(TutorialStep.Train));
+        }
+
+        [Test, Description("Vérifie que la partie guidée compte 19 étapes — parce que la barre de progression « n / 19 » et la sauvegarde en dépendent")]
+        public void StepCount_IsNineteen()
+        {
+            Assert.That(TutorialGuide.StepCount, Is.EqualTo(19));
         }
 
         [Test, Description("Vérifie qu'un geste fait hors de l'étape attendue n'avance rien — parce que les étapes sont bloquantes et dans l'ordre")]
@@ -106,7 +150,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             T.Presenting = true;
             Assert.That(T.PausesCombat, Is.False);
-            T.Acknowledge(); T.Signal(TutorialSignal.TeamOpened); T.Acknowledge(); T.Signal(TutorialSignal.MapOpened);
+            ThroughHubSteps(); T.Signal(TutorialSignal.MapOpened);
             T.Signal(TutorialSignal.BoardOpened); T.Acknowledge(); T.Signal(TutorialSignal.Rolled); T.Signal(TutorialSignal.Moved);
             Assert.That(T.Current, Is.EqualTo(TutorialStep.CombatAtb));
             Assert.That(T.PausesCombat, Is.True);
@@ -117,7 +161,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         [Test, Description("Vérifie que fermer les résultats termine la partie guidée même si des étapes de combat ont été sautées — parce que le joueur ne doit jamais rester coincé dans le tutoriel")]
         public void ResultsClosed_FinishesEvenIfStepsSkipped()
         {
-            T.Acknowledge(); T.Signal(TutorialSignal.TeamOpened); T.Acknowledge(); T.Signal(TutorialSignal.MapOpened);
+            ThroughHubSteps(); T.Signal(TutorialSignal.MapOpened);
             T.Signal(TutorialSignal.BoardOpened); T.Acknowledge(); T.Signal(TutorialSignal.Rolled); T.Signal(TutorialSignal.Moved);
             T.Signal(TutorialSignal.ResultsClosed);
             Assert.That(T.Active, Is.False);

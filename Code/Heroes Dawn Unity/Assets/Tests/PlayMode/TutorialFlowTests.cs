@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections;
 using System.Linq;
+using N29.HeroesDawn.Application.Features.Collection;
 using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Session;
@@ -11,6 +12,7 @@ using N29.HeroesDawn.Presentation.Board;
 using N29.HeroesDawn.Presentation.Combat;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Login;
+using N29.HeroesDawn.Presentation.Popups;
 using N29.HeroesDawn.Presentation.Tutorial;
 using NUnit.Framework;
 using UnityEngine;
@@ -58,6 +60,27 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(Overlay.VisibleBrackets, Is.EqualTo(4), "quatre équerres aux coins du cadre");
             shell.TabButton(HubPage.Team).Button.onClick.Invoke();
             yield return WaitStep(TutorialStep.Squad);
+            Overlay.OkButton.Button.onClick.Invoke();
+            // Hub : la recrue apprend l entraînement, l équipement puis le recrutement avant la mission.
+            CollectionOps.AddItem(session, session.Content.Collection.Items.First().Id); // offert par la première connexion (non jouée ici)
+            yield return WaitStep(TutorialStep.OpenSheet);
+            Object.FindAnyObjectByType<TeamPageView>()!.Tiles[0].TapButton.onClick.Invoke();
+            yield return WaitStep(TutorialStep.Train);
+            Object.FindAnyObjectByType<MemberSheetView>()!.PrimaryButton.onClick.Invoke();
+            yield return WaitStep(TutorialStep.EquipSlot);
+            Object.FindAnyObjectByType<MemberSheetView>()!.ItemTileButton(0).onClick.Invoke();
+            yield return WaitStep(TutorialStep.EquipPick);
+            Object.FindAnyObjectByType<MemberSheetView>()!.PickerTileButton(0).onClick.Invoke();
+            yield return WaitStep(TutorialStep.OpenRecruit);
+            shell.TabButton(HubPage.Shop).Button.onClick.Invoke();
+            yield return WaitStep(TutorialStep.Recruit);
+            Object.FindAnyObjectByType<RecruitPageView>()!.Card(0).RecruitButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<RecruitConfirmPopupView>() != null);
+            Object.FindAnyObjectByType<RecruitConfirmPopupView>()!.OkButton.Button.onClick.Invoke();
+            yield return WaitStep(TutorialStep.BackToTeam);
+            shell.TabButton(HubPage.Team).Button.onClick.Invoke();
+            yield return WaitStep(TutorialStep.Duo);
+            Assert.That(session.Roster.Count, Is.EqualTo(2), "la recrue du départ et le héros recruté");
             Overlay.OkButton.Button.onClick.Invoke();
             yield return WaitStep(TutorialStep.StartMission);
             Object.FindAnyObjectByType<TeamPageView>()!.MissionButton.onClick.Invoke();

@@ -61,6 +61,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public Button NextButton => next.Button;
         public Button SkillTileButton(int i) => skillTiles[i].Button;
         public Button ItemTileButton(int i) => itemTiles[i].Button;
+        public Button PickerTileButton(int i) => pickerTiles[i].Button;
 
         void Awake()
         {

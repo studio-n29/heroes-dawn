@@ -125,6 +125,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _page = page;
             if (location.Page == HubPage.Team) _tutorial?.Signal(TutorialSignal.TeamOpened);
             if (location.Page == HubPage.CityMap) _tutorial?.Signal(TutorialSignal.MapOpened);
+            if (location.Page == HubPage.Recruit) _tutorial?.Signal(TutorialSignal.RecruitOpened);
             OfferHints(location);
             RefreshChrome();
         }

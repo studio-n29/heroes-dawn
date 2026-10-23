@@ -11,8 +11,24 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
         Welcome,
         /// <summary>Toucher l'onglet Équipe.</summary>
         OpenTeam,
-        /// <summary>Équipe : « Une mission se joue à 4 » (Compris).</summary>
+        /// <summary>Équipe : « Voici ta recrue » (Compris).</summary>
         Squad,
+        /// <summary>Toucher la recrue : ouvre sa fiche.</summary>
+        OpenSheet,
+        /// <summary>Fiche : toucher Entraîner.</summary>
+        Train,
+        /// <summary>Fiche : toucher le premier emplacement d objet.</summary>
+        EquipSlot,
+        /// <summary>Inventaire : choisir l objet offert.</summary>
+        EquipPick,
+        /// <summary>Toucher l onglet Recruter.</summary>
+        OpenRecruit,
+        /// <summary>Recruter un héros (confirmation comprise).</summary>
+        Recruit,
+        /// <summary>Revenir sur l onglet Équipe.</summary>
+        BackToTeam,
+        /// <summary>Équipe : le duo et sa synergie (Compris).</summary>
+        Duo,
         /// <summary>Toucher MISSION : ouvre la carte de la ville.</summary>
         StartMission,
         /// <summary>Carte : toucher Déployer.</summary>
@@ -33,7 +49,7 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
     }
 
     /// <summary>Un geste ou un événement du jeu qui peut faire avancer le tutoriel.</summary>
-    public enum TutorialSignal { TeamOpened, MapOpened, BoardOpened, Rolled, Moved, SkillUsed, ResultsClosed }
+    public enum TutorialSignal { TeamOpened, MapOpened, BoardOpened, Rolled, Moved, SkillUsed, ResultsClosed, SheetOpened, Trained, SlotOpened, ItemEquipped, RecruitOpened, Recruited }
 
     /// <summary>
     /// Tutoriel : machine d'étapes enregistrée dans le profil (reprise après fermeture). Les étapes « Compris » avancent par
@@ -59,7 +75,7 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
         public bool Active => !Save.done;
         public bool Skipped => Save.skipped;
 
-        /// <summary>Rang affiché dans la bulle (« 3 / 11 »).</summary>
+        /// <summary>Rang affiché dans la bulle (« 3 / 19 »).</summary>
         public int Position => Math.Min((int)Current + 1, StepCount);
 
         /// <summary>Vrai tant que le jeu doit attendre le joueur : le combat est figé pendant une bulle de combat.</summary>
@@ -70,7 +86,7 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
         public event Action<string>? HintRaised;
 
         public static bool NeedsAcknowledge(TutorialStep s)
-            => s == TutorialStep.Welcome || s == TutorialStep.Squad || s == TutorialStep.Objectives || s == TutorialStep.CombatAtb;
+            => s == TutorialStep.Welcome || s == TutorialStep.Squad || s == TutorialStep.Duo || s == TutorialStep.Objectives || s == TutorialStep.CombatAtb;
 
         /// <summary>À l'arrivée au QG : un joueur qui a déjà validé une zone n'a pas besoin de la partie guidée.</summary>
         public void BeginIfNeeded()
@@ -96,7 +112,13 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
                 if (cur >= TutorialStep.CombatAtb) Finish(skipped: false);
                 return;
             }
-            bool match = (cur == TutorialStep.OpenTeam && signal == TutorialSignal.TeamOpened)
+            bool match = ((cur == TutorialStep.OpenTeam || cur == TutorialStep.BackToTeam) && signal == TutorialSignal.TeamOpened)
+                      || (cur == TutorialStep.OpenSheet && signal == TutorialSignal.SheetOpened)
+                      || (cur == TutorialStep.Train && signal == TutorialSignal.Trained)
+                      || (cur == TutorialStep.EquipSlot && signal == TutorialSignal.SlotOpened)
+                      || (cur == TutorialStep.EquipPick && signal == TutorialSignal.ItemEquipped)
+                      || (cur == TutorialStep.OpenRecruit && signal == TutorialSignal.RecruitOpened)
+                      || (cur == TutorialStep.Recruit && signal == TutorialSignal.Recruited)
                       || (cur == TutorialStep.StartMission && signal == TutorialSignal.MapOpened)
                       || (cur == TutorialStep.Deploy && signal == TutorialSignal.BoardOpened)
                       || (cur == TutorialStep.Roll && signal == TutorialSignal.Rolled)

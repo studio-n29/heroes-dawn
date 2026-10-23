@@ -8,6 +8,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
     public enum TutorialTarget
     {
         None, QgPage, TabTeam, TeamSquad, TeamMission, MapDeploy, BoardObjectives, BoardRoll, BoardDestination,
+        TeamTile, SheetTrain, SheetSlot, SheetPick, TabRecruit, RecruitCard,
         CombatEnemies, CombatSkills, ResultsContinue,
     }
 

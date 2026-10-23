@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Application.Features.Shop;
+using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
@@ -26,11 +27,13 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISessionReadModel _session;
         readonly IToastService _toasts;
         readonly ILocalization _loc;
+        readonly TutorialGuide? _tutorial;
         readonly BusyGate _gate = new BusyGate();
 
-        public RecruitFlow(IModalService modals, IRecruitFromShopUseCase recruit, ISessionReadModel session, IToastService toasts, ILocalization loc)
+        public RecruitFlow(IModalService modals, IRecruitFromShopUseCase recruit, ISessionReadModel session, IToastService toasts, ILocalization loc,
+                           TutorialGuide? tutorial = null)
         {
-            _modals = modals; _recruit = recruit; _session = session; _toasts = toasts; _loc = loc;
+            _modals = modals; _recruit = recruit; _session = session; _toasts = toasts; _loc = loc; _tutorial = tutorial;
         }
 
         public bool IsBusy => _gate.IsBusy;
@@ -69,6 +72,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 return RecruitOutcome.Failed;
             }
             _toasts.Show(_loc.F("hub.recruited", _loc.MemberName(def)), ToastKind.Reward);
+            _tutorial?.Signal(TutorialSignal.Recruited);
             return RecruitOutcome.Recruited;
         }
 

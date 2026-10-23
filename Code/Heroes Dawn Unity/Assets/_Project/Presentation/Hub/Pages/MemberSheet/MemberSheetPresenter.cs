@@ -8,6 +8,7 @@ using MessagePipe;
 using N29.HeroesDawn.Application.Features.Collection;
 using N29.HeroesDawn.Application.Features.Hub;
 using N29.HeroesDawn.Application.Features.Meta;
+using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Features.Shop;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
@@ -41,6 +42,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly bool _fromShop;
         readonly GameSession? _game;
         readonly CollectionBook? _book;
+        readonly TutorialGuide? _tutorial;
         readonly List<Action> _pickActions = new List<Action>();
         Action? _pickRemove;
         IDisposable? _subs;
@@ -50,11 +52,11 @@ namespace N29.HeroesDawn.Presentation.Hub
         public MemberSheetPresenter(IMemberSheetView view, HubLocation location, ISessionReadModel session, ITrainMemberUseCase train,
                                     RecruitFlow recruit, HubNavigator nav, IToastService toasts, ILocalization loc,
                                     ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, ISubscriber<ShopChanged> shop,
-                                    GameSession? game = null, CollectionBook? book = null)
+                                    GameSession? game = null, CollectionBook? book = null, TutorialGuide? tutorial = null)
             : base(view, null)
         {
             _session = session; _train = train; _recruit = recruit; _nav = nav; _toasts = toasts; _loc = loc;
-            _wallet = wallet; _roster = roster; _shop = shop; _game = game; _book = book;
+            _wallet = wallet; _roster = roster; _shop = shop; _game = game; _book = book; _tutorial = tutorial;
             _member = location.Member ?? throw new ArgumentException("Fiche sans membre", nameof(location));
             _fromShop = location.FromShop;
             _action = new PageAction(toasts, loc);
@@ -85,6 +87,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _shop.Subscribe(_ => Refresh()).AddTo(bag);
             _subs = bag.Build();
             Refresh();
+            if (!_fromShop) _tutorial?.Signal(TutorialSignal.SheetOpened);
         }
 
         protected override void OnHidden()
@@ -140,6 +143,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 var m = _session.Roster.FirstOrDefault(x => x.Id == id);
                 if (m != null) _toasts.Show(_loc.F("hub.trained", _loc.MemberName(m.Def), m.Level), ToastKind.Reward);
+                _tutorial?.Signal(TutorialSignal.Trained);
                 Refresh();
             });
         }
@@ -355,6 +359,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (m == null || _game == null || _book == null) return;
             if (index >= CollectionRules.MaxItems) { _toasts.Show(_loc.T("sheet.item_locked_toast"), ToastKind.Info); return; }
             OpenItemPicker(m, index);
+            _tutorial?.Signal(TutorialSignal.SlotOpened);
         }
 
         void OpenCardPicker(ITeamMemberReadModel m, int slot)
@@ -437,7 +442,11 @@ namespace N29.HeroesDawn.Presentation.Hub
         void Apply(Result r, string successKey, string what)
         {
             if (r.IsFailure) _toasts.Show(_loc.Error(r.Error!), ToastKind.Error);
-            else _toasts.Show(_loc.F(successKey, what), ToastKind.Reward);
+            else
+            {
+                _toasts.Show(_loc.F(successKey, what), ToastKind.Reward);
+                if (successKey == "loadout.equipped") _tutorial?.Signal(TutorialSignal.ItemEquipped);
+            }
             ClosePicker();
             Refresh();
         }

@@ -44,6 +44,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ((RectTransform)bar.transform).At(0f, 1f, 14, -146, 242, 26);
             var squad = Ui.Btn(fill.transform, "", Theme.Primary, Theme.TextDark, null!, 30, FontKind.Title, "Squad");
             squad.Rect.At(0.5f, 0f, 0, 12, 242, 96);
+            RecipeKit.Mark(frame, TutorialTarget.TeamTile);
             var view = frame.gameObject.AddComponent<MemberTileView>();
             ctx.Wire(view, "tap", tap);
             ctx.Wire(view, "fill", fill);
@@ -233,6 +234,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             reason.rectTransform.At(0f, 0f, MidX, 108, MidW, 32);
             var primary = Ui.Btn(rt, "", Theme.Primary, Theme.TextDark, null!, 40, FontKind.Title, "Primary");
             primary.Rect.At(0f, 0f, MidX, 0, MidW, 104);
+            RecipeKit.Mark(primary, TutorialTarget.SheetTrain);
 
             // ---- Colonne droite : compétences, objets, affinités, raccourcis
             var skillTiles = new List<Object>();
@@ -248,6 +250,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
                 var t = Tile(ctx, rt, "Item" + i, 200, 104, false);
                 ((RectTransform)t.transform).At(0f, 1f, RightX + i * 208, -304, 200, 104);
                 itemTiles.Add(t);
+                if (i == 0) RecipeKit.Mark(t, TutorialTarget.SheetSlot);
             }
 
             var affinityFill = Ui.Panel(rt, "Affinity", Theme.Surface, 4f, 6f, false);
@@ -291,6 +294,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
                 var t = Tile(ctx, pickerFill.transform, "Option" + i, 144, 96, true);
                 ((RectTransform)t.transform).At(0f, 1f, 12 + (i % 4) * 150, -100 - (i / 4) * 102, 144, 96);
                 pickerTiles.Add(t);
+                if (i == 0) RecipeKit.Mark(t, TutorialTarget.SheetPick);
             }
 
             pickerFrame.gameObject.SetActive(false);

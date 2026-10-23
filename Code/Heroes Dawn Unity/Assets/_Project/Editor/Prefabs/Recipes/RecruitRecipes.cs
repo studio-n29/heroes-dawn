@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Popups;
+using N29.HeroesDawn.Presentation.Tutorial;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -59,6 +60,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             skills.rectTransform.At(0.5f, 1f, 0, -292, 360, 72);
             var recruit = Ui.Btn(fill.transform, "", Theme.Pr, Theme.TextDark, null!, 30, FontKind.Title, "Recruit");
             recruit.Rect.At(0.5f, 0f, 0, 16, 352, 96);
+            RecipeKit.Mark(recruit, TutorialTarget.RecruitCard);
             var inTeam = Ui.Txt(card, "", 46, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "InTeam");
             inTeam.rectTransform.At(0.5f, 0f, 0, 30, 360, 80);
             inTeam.rectTransform.localRotation = Quaternion.Euler(0, 0, 8);
