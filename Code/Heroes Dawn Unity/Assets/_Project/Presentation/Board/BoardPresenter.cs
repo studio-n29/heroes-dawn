@@ -9,6 +9,7 @@ using N29.HeroesDawn.Application.Features.Combat;
 using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Features.Zone;
 using N29.HeroesDawn.Application.Flow;
+using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
@@ -47,6 +48,7 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly ISubscriber<SaveStateChanged> _saving;
         readonly IPublisher<NavigateRequested> _navigate;
         readonly IModalService _modals;
+        readonly PlaytestFeedback? _feedback;
         readonly IToastService _toasts;
         readonly ILocalization _loc;
         readonly IAudioService _audio;
@@ -71,14 +73,14 @@ namespace N29.HeroesDawn.Presentation.Board
                               ISubscriber<ZoneValidated> zoneValidated, ISubscriber<ReturnedToBoard> returned, ISubscriber<RosterChanged> roster,
                               ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving, IPublisher<NavigateRequested> navigate,
                               IModalService modals, IToastService toasts, ILocalization loc, BackButtonRouter router,
-                              IAudioService? audio = null, TutorialGuide? tutorial = null)
+                              IAudioService? audio = null, TutorialGuide? tutorial = null, PlaytestFeedback? feedback = null)
             : base(view, router)
         {
             _session = session; _roll = roll; _bonus = bonus; _moveTo = moveTo; _endMove = endMove; _beginCombat = beginCombat;
             _leave = leave; _flow = flow; _cases = cases; _zoneValidated = zoneValidated; _returned = returned; _roster = roster;
             _wallet = wallet; _saving = saving; _navigate = navigate; _modals = modals; _toasts = toasts; _loc = loc;
             _audio = audio ?? NullAudioService.Instance;
-            _tutorial = tutorial;
+            _tutorial = tutorial; _feedback = feedback;
         }
 
         protected override IBackHandler BackHandler => this;
@@ -611,8 +613,19 @@ namespace N29.HeroesDawn.Presentation.Board
         async UniTask ShowZoneCompleteAsync()
         {
             await _cases.ShowZoneCompleteAsync(LastZoneRewards, Lifetime);
+            await AskPlaytestFeedbackAsync();
             _tutorial?.Hint("zone_done");
             await LeaveToHqAsync();
+        }
+
+        /// <summary>AprÃ¨s la premiÃ¨re validation de la zone 1.1 : propose le formulaire de retour de playtest (une seule fois).</summary>
+        async UniTask AskPlaytestFeedbackAsync()
+        {
+            var zone = _session.RunZone;
+            if (_feedback == null || zone == null || !_feedback.ShouldAsk(zone.Id.Value, LastZoneRewards?.FirstClear ?? false)) return;
+            _feedback.MarkAsked();
+            bool open = await _modals.ConfirmAsync(new ConfirmData(_loc.T("playtest.title"), _loc.T("playtest.body"), _loc.T("playtest.ok"), _loc.T("playtest.later"), Tone.Primary), Lifetime);
+            if (open) UnityEngine.Application.OpenURL(_feedback.Url);
         }
 
         async UniTask LeaveToHqAsync()

@@ -142,6 +142,8 @@ namespace N29.HeroesDawn.Application.Ports
         // Réglages et tutoriel
         public SettingsSave settings = new SettingsSave();
         public TutorialSave tutorial = new TutorialSave();
+        /// <summary>Vrai une fois le formulaire de retour de playtest proposé (après la zone 1.1).</summary>
+        public bool playtestFormAsked;
         public OnboardingSave onboarding = new OnboardingSave();
 
         // Objets, grimoire, boosters

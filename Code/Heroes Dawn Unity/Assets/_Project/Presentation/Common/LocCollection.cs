@@ -157,6 +157,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["errors.collection_max_level"] = "Cette carte est déjà au niveau maximum.";
             d["errors.collection_copies"] = "Il manque des exemplaires en doublon.";
             d["errors.preset_empty"] = "Aucune composition enregistrée ici.";
+            d["playtest.title"] = "TON AVIS COMPTE";
+            d["playtest.body"] = "Bravo, la zone 1.1 est terminée ! Prends deux minutes pour remplir le formulaire de retour de playtest : il nous aide à améliorer le jeu.";
+            d["playtest.ok"] = "REMPLIR LE FORMULAIRE";
+            d["playtest.later"] = "PLUS TARD";
             d["team.preset.filled"] = "{0} · {1} agents";
             d["team.preset.empty"] = "{0} · vide";
             d["team.preset.save"] = "SAUVER";
