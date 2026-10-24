@@ -183,5 +183,21 @@ namespace N29.HeroesDawn.Presentation.Tutorial
         }
 
         public void HideHint() => hintCard.gameObject.SetActive(false);
+
+        /// <summary>Étape réussie : l'anneau et la bulle explosent en étincelles dorées (avant la bulle de l'étape suivante).</summary>
+        public void StepDone()
+        {
+            if (Feedback.MotionSettings.Reduced) return;
+            Feedback.Fx.Sparks(ring.gameObject.activeInHierarchy ? ring.rectTransform : bubble, Theme.Primary, 14, 170f, 18f);
+            Tween.Punch(bubble, 0.08f, 0.3f);
+        }
+
+        /// <summary>Fin du tutoriel : une grande gerbe d'étincelles au centre de l'écran.</summary>
+        public void Celebrate()
+        {
+            if (Feedback.MotionSettings.Reduced) return;
+            Feedback.Fx.Sparks((RectTransform)transform, Theme.Primary, 26, 420f, 22f);
+            Feedback.Fx.Sparks((RectTransform)transform, Theme.Success, 18, 300f, 18f);
+        }
     }
 }

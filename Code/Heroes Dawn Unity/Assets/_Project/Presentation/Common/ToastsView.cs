@@ -24,7 +24,7 @@ namespace N29.HeroesDawn.Presentation.Common
                 Destroy(old);
             }
             var item = Instantiate(toastPrefab, stack);
-            item.Play(text, AccentOf(kind));
+            item.Play(text, AccentOf(kind), kind == ToastKind.Reward);
         }
 
         static Color AccentOf(ToastKind kind) => kind == ToastKind.Reward ? Theme.Success

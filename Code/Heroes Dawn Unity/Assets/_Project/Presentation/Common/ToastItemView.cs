@@ -12,13 +12,14 @@ namespace N29.HeroesDawn.Presentation.Common
         [SerializeField] Image accent = null!;
         [SerializeField] CanvasGroup group = null!;
 
-        public void Play(string text, Color accentColor)
+        public void Play(string text, Color accentColor, bool celebrate = false)
         {
             label.text = text;
             accent.color = accentColor;
             group.alpha = 0f;
             Tween.Fade(group, 0.92f, 0.18f);
             Tween.PopIn(transform, 0.25f);
+            if (celebrate && !Feedback.MotionSettings.Reduced) { Feedback.Fx.Sparks((RectTransform)transform, Theme.Primary, 10, 150f, 16f); Tween.Punch(transform, 0.1f, 0.35f); }
             Tween.Delay(2.4f, () => Tween.Fade(group, 0f, 0.35f, () => { if (this != null) Destroy(gameObject); }), this);
         }
     }

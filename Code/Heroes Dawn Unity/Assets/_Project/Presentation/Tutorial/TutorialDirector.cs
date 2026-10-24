@@ -62,11 +62,14 @@ namespace N29.HeroesDawn.Presentation.Tutorial
         IDisposable? _subs;
         TutorialOverlayView? _view;
         bool _skipping;
+        readonly IToastService? _toasts;
+        TutorialStep? _lastStep;
+        bool _wasActive;
 
         public TutorialDirector(TutorialGuide tutorial, UiRoot ui, ILocalization loc, IModalService modals,
-                                ISubscriber<CombatResultsClosed> results, ISubscriber<GameStateChanged> state)
+                                ISubscriber<CombatResultsClosed> results, ISubscriber<GameStateChanged> state, IToastService? toasts = null)
         {
-            _tutorial = tutorial; _ui = ui; _loc = loc; _modals = modals; _results = results; _state = state;
+            _tutorial = tutorial; _ui = ui; _loc = loc; _modals = modals; _results = results; _state = state; _toasts = toasts;
         }
 
         public void Start()
@@ -90,6 +93,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
         {
             var view = _view;
             if (view == null) return;
+            Celebrate(view);
             var current = TutorialStepInfo.Of(_tutorial.Current);
             // Une modale ouverte (confirmation, achat…) prend la main, sauf l étape qui désigne le bouton d une popup (Résultats).
             bool blockedByModal = _modals.AnyOpen && current.Target != TutorialTarget.ResultsContinue;
@@ -129,6 +133,21 @@ namespace N29.HeroesDawn.Presentation.Tutorial
                 ShowOk = ack,
             }, info.BubbleAtTop, blockHole: ack, dim: info.Dim);
             _tutorial.Presenting = true;
+        }
+
+        /// <summary>Retours visuels : Ã©tincelles quand une Ã©tape est rÃ©ussie, grande gerbe et message Ã  la fin du tutoriel.</summary>
+        void Celebrate(TutorialOverlayView view)
+        {
+            bool active = _tutorial.Active;
+            var step = _tutorial.Current;
+            if (active && _lastStep.HasValue && _lastStep.Value != step && _wasActive) view.StepDone();
+            if (_wasActive && !active && !_tutorial.Skipped)
+            {
+                view.Celebrate();
+                _toasts?.Show(_loc.T("tutorial.done"), ToastKind.Reward);
+            }
+            _lastStep = step;
+            _wasActive = active;
         }
 
         void Skip()
