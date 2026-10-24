@@ -7,33 +7,15 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
     /// <summary>Étapes bloquantes de la première partie guidée (spec « Maquettes UI et tutoriel » §6), dans l'ordre.</summary>
     public enum TutorialStep
     {
+        // 1. L'interface de base : lancer une partie.
         /// <summary>QG : « Bienvenue à Red Hook » (Compris).</summary>
         Welcome,
-        /// <summary>Toucher l'onglet Équipe.</summary>
-        OpenTeam,
-        /// <summary>Équipe : « Voici ta recrue » (Compris).</summary>
-        Squad,
-        /// <summary>Toucher la recrue : ouvre sa fiche.</summary>
-        OpenSheet,
-        /// <summary>Fiche : toucher Entraîner.</summary>
-        Train,
-        /// <summary>Fiche : toucher le premier emplacement d objet.</summary>
-        EquipSlot,
-        /// <summary>Inventaire : choisir l objet offert.</summary>
-        EquipPick,
-        /// <summary>Toucher l onglet Recruter.</summary>
-        OpenRecruit,
-        /// <summary>Recruter un héros (confirmation comprise).</summary>
-        Recruit,
-        /// <summary>Revenir sur l onglet Équipe.</summary>
-        BackToTeam,
-        /// <summary>Équipe : le duo et sa synergie (Compris).</summary>
-        Duo,
-        /// <summary>Toucher MISSION : ouvre la carte de la ville.</summary>
+        /// <summary>QG : toucher MISSION ouvre la carte de la ville.</summary>
         StartMission,
-        /// <summary>Carte : toucher Déployer.</summary>
+        /// <summary>Carte : toucher Déployer lance le niveau tutoriel.</summary>
         Deploy,
-        /// <summary>Plateau : les 3 objectifs (Compris).</summary>
+        // 2. Le niveau tutoriel : très court, un seul combat.
+        /// <summary>Plateau : l'objectif (Compris).</summary>
         Objectives,
         /// <summary>Toucher Lancer.</summary>
         Roll,
@@ -43,8 +25,21 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
         CombatAtb,
         /// <summary>Combat : choisir une compétence puis une cible (combat figé jusqu'à l'action).</summary>
         CombatSkill,
-        /// <summary>Résultats : la fatigue ; toucher Continuer termine la partie guidée.</summary>
+        /// <summary>Résultats : toucher Continuer offre un agent gratuit.</summary>
         Results,
+        // 3. La progression : équipe, entraînement, équipement, synergie.
+        /// <summary>Toucher l'onglet Équipe.</summary>
+        OpenTeam,
+        /// <summary>Équipe : « Voici ton nouvel agent » (Compris).</summary>
+        Squad,
+        /// <summary>Toucher un agent : ouvre sa fiche.</summary>
+        OpenSheet,
+        /// <summary>Fiche : toucher Entraîner.</summary>
+        Train,
+        /// <summary>Fiche : toucher le premier emplacement d objet.</summary>
+        EquipSlot,
+        /// <summary>Inventaire : choisir l objet offert.</summary>
+        EquipPick,
         Finished,
     }
 
@@ -86,7 +81,7 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
         public event Action<string>? HintRaised;
 
         public static bool NeedsAcknowledge(TutorialStep s)
-            => s == TutorialStep.Welcome || s == TutorialStep.Squad || s == TutorialStep.Duo || s == TutorialStep.Objectives || s == TutorialStep.CombatAtb;
+            => s == TutorialStep.Welcome || s == TutorialStep.Squad || s == TutorialStep.Objectives || s == TutorialStep.CombatAtb;
 
         /// <summary>À l'arrivée au QG : un joueur qui a déjà validé une zone n'a pas besoin de la partie guidée.</summary>
         public void BeginIfNeeded()
@@ -102,23 +97,35 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
             return true;
         }
 
+        /// <summary>Vrai tant que le joueur doit jouer le niveau tutoriel (de MISSION aux résultats) : la carte lance alors ce niveau.</summary>
+        public bool InLevelPhase => Active && Current >= TutorialStep.StartMission && Current <= TutorialStep.Results;
+
+        /// <summary>Niveau tutoriel court, hors carte : un seul combat très facile.</summary>
+        public static readonly N29.HeroesDawn.Core.ZoneId LevelZone = new N29.HeroesDawn.Core.ZoneId("zone_tuto");
+
+        /// <summary>Agent offert à la fin du niveau tutoriel (le premier de la liste que le joueur n'a pas déjà).</summary>
+        public static readonly string[] FreeAgentIds = { "mei_lin_chen", "kwame_abara", "giulia_rossi" };
+
         public void Signal(TutorialSignal signal)
         {
             if (!Active) return;
             var cur = Current;
-            // Fin des résultats : quoi qu'il reste, la partie guidée est terminée.
+            // Fin des résultats du niveau : l'agent gratuit rejoint l'équipe et la progression commence.
             if (signal == TutorialSignal.ResultsClosed)
             {
-                if (cur >= TutorialStep.CombatAtb) Finish(skipped: false);
+                if (cur >= TutorialStep.CombatAtb && cur <= TutorialStep.Results)
+                {
+                    GrantFreeAgent();
+                    Save.step = (int)TutorialStep.OpenTeam;
+                    _c.Touch(MetaArea.Tutorial);
+                }
                 return;
             }
-            bool match = ((cur == TutorialStep.OpenTeam || cur == TutorialStep.BackToTeam) && signal == TutorialSignal.TeamOpened)
+            bool match = (cur == TutorialStep.OpenTeam && signal == TutorialSignal.TeamOpened)
                       || (cur == TutorialStep.OpenSheet && signal == TutorialSignal.SheetOpened)
                       || (cur == TutorialStep.Train && signal == TutorialSignal.Trained)
                       || (cur == TutorialStep.EquipSlot && signal == TutorialSignal.SlotOpened)
                       || (cur == TutorialStep.EquipPick && signal == TutorialSignal.ItemEquipped)
-                      || (cur == TutorialStep.OpenRecruit && signal == TutorialSignal.RecruitOpened)
-                      || (cur == TutorialStep.Recruit && signal == TutorialSignal.Recruited)
                       || (cur == TutorialStep.StartMission && signal == TutorialSignal.MapOpened)
                       || (cur == TutorialStep.Deploy && signal == TutorialSignal.BoardOpened)
                       || (cur == TutorialStep.Roll && signal == TutorialSignal.Rolled)
@@ -127,6 +134,26 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
             if (match) Advance();
         }
 
+        /// <summary>Ajoute l'agent gratuit à l'équipe (et à l'escouade s'il reste de la place) ; sans effet s'il les possède tous.</summary>
+        void GrantFreeAgent()
+        {
+            var s = _c.Session;
+            foreach (var id in FreeAgentIds)
+            {
+                N29.HeroesDawn.Definitions.MemberDef? def = null;
+                foreach (var m in s.Content.Members) if (m.Id.Value == id) def = m;
+                if (def == null || s.Owns(def.Id)) continue;
+                s.Roster.Add(new N29.HeroesDawn.Application.Session.TeamMember(def, N29.HeroesDawn.Application.Session.MetaRules.RecruitLevel) { InSquad = s.Squad.Count < N29.HeroesDawn.Application.Session.MetaRules.SquadSize });
+                return;
+            }
+            // Contenu sans l'un des agents prÃ©vus : le premier agent courant du catalogue que le joueur n'a pas.
+            foreach (var m in s.Content.Members)
+            {
+                if (s.Owns(m.Id) || m.Rarity != N29.HeroesDawn.Definitions.Rarity.Agent || (m.Unlock != null && m.Unlock.Kind != N29.HeroesDawn.Definitions.UnlockKind.Shop)) continue;
+                s.Roster.Add(new N29.HeroesDawn.Application.Session.TeamMember(m, N29.HeroesDawn.Application.Session.MetaRules.RecruitLevel) { InSquad = s.Squad.Count < N29.HeroesDawn.Application.Session.MetaRules.SquadSize });
+                return;
+            }
+        }
         void Advance()
         {
             Save.step = Math.Min(StepCount, Save.step + 1);
@@ -143,7 +170,12 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
             _c.Touch(MetaArea.Tutorial);
         }
 
-        public void Skip() { if (Active) Finish(skipped: true); }
+        public void Skip()
+        {
+            if (!Active) return;
+            if (Current <= TutorialStep.Results && _c.Session.CompletedZones.Count == 0) GrantFreeAgent();
+            Finish(skipped: true);
+        }
 
         /// <summary>Revoir le tutoriel (Paramètres ▸ Support) : repart de l'étape 1 ; les astuces déjà vues restent vues.</summary>
         public void Restart()

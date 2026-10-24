@@ -42,7 +42,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(Overlay.StepVisible, Is.True, "la bulle de l'étape " + step + " est affichée");
         }
 
-        static readonly CaseId[] PathToCombat = { new CaseId("n03"), new CaseId("n02"), new CaseId("n01") };
+        static readonly CaseId[] PathToCombat = { new CaseId("n02"), new CaseId("n01") };
 
         [UnityTest, Timeout(400000), Description("Vérifie le parcours guidé de bout en bout sur la vraie interface : Bienvenue → Équipe → Escouade → MISSION → Déployer → Objectifs → Dé → Déplacement → Combat (figé) → Compétence → Résultats → fin — parce que c'est la première partie de tout nouveau joueur (spec §6)")]
         public IEnumerator GuidedFirstMission_WalksEveryStep()
@@ -51,42 +51,16 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
             var session = Container.Resolve<GameSession>();
-            var shell = Object.FindAnyObjectByType<HubShellView>()!;
 
             yield return WaitStep(TutorialStep.Welcome);
             Overlay.OkButton.Button.onClick.Invoke();
-            yield return WaitStep(TutorialStep.OpenTeam);
-            Assert.That(Overlay.FrameSprite, Is.SameAs(N29.HeroesDawn.Presentation.Common.Sprites.PanelFrame), "la mise en valeur est un rectangle à coins coupés, pas un rond");
-            Assert.That(Overlay.VisibleBrackets, Is.EqualTo(4), "quatre équerres aux coins du cadre");
-            shell.TabButton(HubPage.Team).Button.onClick.Invoke();
-            yield return WaitStep(TutorialStep.Squad);
-            Overlay.OkButton.Button.onClick.Invoke();
-            // Hub : la recrue apprend l entraînement, l équipement puis le recrutement avant la mission.
-            CollectionOps.AddItem(session, session.Content.Collection.Items.First().Id); // offert par la première connexion (non jouée ici)
-            yield return WaitStep(TutorialStep.OpenSheet);
-            Object.FindAnyObjectByType<TeamPageView>()!.Tiles[0].TapButton.onClick.Invoke();
-            yield return WaitStep(TutorialStep.Train);
-            Object.FindAnyObjectByType<MemberSheetView>()!.PrimaryButton.onClick.Invoke();
-            yield return WaitStep(TutorialStep.EquipSlot);
-            Object.FindAnyObjectByType<MemberSheetView>()!.ItemTileButton(0).onClick.Invoke();
-            yield return WaitStep(TutorialStep.EquipPick);
-            Object.FindAnyObjectByType<MemberSheetView>()!.PickerTileButton(0).onClick.Invoke();
-            yield return WaitStep(TutorialStep.OpenRecruit);
-            shell.TabButton(HubPage.Shop).Button.onClick.Invoke();
-            yield return WaitStep(TutorialStep.Recruit);
-            Object.FindAnyObjectByType<RecruitPageView>()!.Card(0).RecruitButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<RecruitConfirmPopupView>() != null);
-            Object.FindAnyObjectByType<RecruitConfirmPopupView>()!.OkButton.Button.onClick.Invoke();
-            yield return WaitStep(TutorialStep.BackToTeam);
-            shell.TabButton(HubPage.Team).Button.onClick.Invoke();
-            yield return WaitStep(TutorialStep.Duo);
-            Assert.That(session.Roster.Count, Is.EqualTo(2), "la recrue du départ et le héros recruté");
-            Overlay.OkButton.Button.onClick.Invoke();
+            // 1. Interface de base : lancer une partie depuis le QG.
             yield return WaitStep(TutorialStep.StartMission);
-            Object.FindAnyObjectByType<TeamPageView>()!.MissionButton.onClick.Invoke();
+            Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
             yield return WaitStep(TutorialStep.Deploy);
             PlayModeHarness.DeployNow();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning, 600);
+            Assert.That(session.RunZone!.IsTutorial, Is.True, "DÉPLOYER lance le niveau tutoriel, pas la zone 1.1");
             yield return WaitStep(TutorialStep.Objectives);
             Overlay.OkButton.Button.onClick.Invoke();
             yield return WaitStep(TutorialStep.Roll);
@@ -133,6 +107,25 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<CombatResultsPopupView>() != null, 20000);
             yield return WaitStep(TutorialStep.Results);
             Assert.That(PlayModeHarness.ContinueResults(), Is.True);
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.ZoneCompletePopupView>() != null, 300);
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.ZoneCompletePopupView>()!.ToHqButton.onClick.Invoke();
+            // 3. Progression : l'agent gratuit a rejoint l'équipe, on apprend l'entraînement et l'équipement.
+            yield return WaitStep(TutorialStep.OpenTeam);
+            Assert.That(session.Roster.Count, Is.EqualTo(2), "la recrue du départ et l'agent gratuit");
+            Assert.That(session.CompletedZones, Is.Empty, "le niveau tutoriel ne compte pas dans la progression");
+            Assert.That(Overlay.FrameSprite, Is.SameAs(N29.HeroesDawn.Presentation.Common.Sprites.PanelFrame), "la mise en valeur est un rectangle à coins coupés, pas un rond");
+            Object.FindAnyObjectByType<HubShellView>()!.TabButton(HubPage.Team).Button.onClick.Invoke();
+            yield return WaitStep(TutorialStep.Squad);
+            Overlay.OkButton.Button.onClick.Invoke();
+            CollectionOps.AddItem(session, session.Content.Collection.Items.First().Id); // offert par la première connexion (non jouée ici)
+            yield return WaitStep(TutorialStep.OpenSheet);
+            Object.FindAnyObjectByType<TeamPageView>()!.Tiles[0].TapButton.onClick.Invoke();
+            yield return WaitStep(TutorialStep.Train);
+            Object.FindAnyObjectByType<MemberSheetView>()!.PrimaryButton.onClick.Invoke();
+            yield return WaitStep(TutorialStep.EquipSlot);
+            Object.FindAnyObjectByType<MemberSheetView>()!.ItemTileButton(0).onClick.Invoke();
+            yield return WaitStep(TutorialStep.EquipPick);
+            Object.FindAnyObjectByType<MemberSheetView>()!.PickerTileButton(0).onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => !Guide.Active, 120);
             Assert.That(Guide.Active, Is.False, "tutoriel terminé");
             for (int f = 0; f < 5; f++) yield return null;

@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Application.Features.World
         public static IReadOnlyList<ZoneDef> ZonesOf(ISessionReadModel session, string city)
         {
             var list = new List<ZoneDef>();
-            foreach (var z in session.Content.Zones) if (StoryRoutes.CityOfBorough(z.Borough) == city) list.Add(z);
+            foreach (var z in session.Content.Zones) if (!z.IsTutorial && StoryRoutes.CityOfBorough(z.Borough) == city) list.Add(z);
             return list;
         }
 

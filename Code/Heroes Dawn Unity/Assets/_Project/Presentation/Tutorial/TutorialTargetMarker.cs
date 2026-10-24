@@ -10,6 +10,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
         None, QgPage, TabTeam, TeamSquad, TeamMission, MapDeploy, BoardObjectives, BoardRoll, BoardDestination,
         TeamTile, SheetTrain, SheetSlot, SheetPick, TabRecruit, RecruitCard,
         CombatEnemies, CombatSkills, ResultsContinue,
+        QgMission,
     }
 
     /// <summary>

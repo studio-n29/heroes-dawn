@@ -46,7 +46,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
             Add("lore.apex", ArchiveCategory.Lore, "archives.lore.apex.title", "archives.lore.apex.body", Done("zone_ny_1_1"));
             foreach (var m in s.Content.Members)
                 Add("hero." + m.Id.Value, ArchiveCategory.Hero, m.NameKey, "archives.hero." + m.Id.Value, s.Roster.Any(r => r.Id == m.Id));
-            foreach (var z in s.Content.Zones)
+            foreach (var z in s.Content.Zones.Where(x => !x.IsTutorial))
             {
                 bool done = Done(z.Id.Value);
                 Add("zone." + z.Id.Value, ArchiveCategory.Zone, z.NameKey, "archives.zone." + z.Id.Value, done);

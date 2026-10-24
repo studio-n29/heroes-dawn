@@ -32,6 +32,7 @@ namespace N29.HeroesDawn.Application.Features.World
             ZoneDef? lastDone = null;
             foreach (var z in session.Content.Zones)
             {
+                if (z.IsTutorial) continue;
                 var st = StatusOf(session, z);
                 if (st == ZoneStatus.Available) return z;
                 if (st == ZoneStatus.Done) lastDone = z;

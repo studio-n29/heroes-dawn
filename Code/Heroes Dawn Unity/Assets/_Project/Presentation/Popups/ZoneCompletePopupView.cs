@@ -14,6 +14,8 @@ namespace N29.HeroesDawn.Presentation.Popups
         [SerializeField] UiButton toHq = null!;
         UniTaskCompletionSource? _done;
 
+        public UnityEngine.UI.Button ToHqButton => toHq.Button;
+
         void Awake() => toHq.Button.onClick.AddListener(() => _done?.TrySetResult());
 
         public UniTask ShowAsync(ZoneCompleteData d, CancellationToken ct)

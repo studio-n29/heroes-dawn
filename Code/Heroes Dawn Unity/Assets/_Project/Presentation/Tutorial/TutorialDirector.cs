@@ -26,17 +26,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
         public static TutorialStepInfo Of(TutorialStep step) => step switch
         {
             TutorialStep.Welcome => new TutorialStepInfo(TutorialTarget.QgPage, false, false),
-            TutorialStep.OpenTeam => new TutorialStepInfo(TutorialTarget.TabTeam, true, true),
-            TutorialStep.Squad => new TutorialStepInfo(TutorialTarget.TeamSquad, true, true),
-            TutorialStep.OpenSheet => new TutorialStepInfo(TutorialTarget.TeamTile, true, true),
-            TutorialStep.Train => new TutorialStepInfo(TutorialTarget.SheetTrain, true, true),
-            TutorialStep.EquipSlot => new TutorialStepInfo(TutorialTarget.SheetSlot, true, true),
-            TutorialStep.EquipPick => new TutorialStepInfo(TutorialTarget.SheetPick, true, true),
-            TutorialStep.OpenRecruit => new TutorialStepInfo(TutorialTarget.TabRecruit, true, true),
-            TutorialStep.Recruit => new TutorialStepInfo(TutorialTarget.RecruitCard, true, true),
-            TutorialStep.BackToTeam => new TutorialStepInfo(TutorialTarget.TabTeam, true, true),
-            TutorialStep.Duo => new TutorialStepInfo(TutorialTarget.TeamSquad, true, true),
-            TutorialStep.StartMission => new TutorialStepInfo(TutorialTarget.TeamMission, true, true),
+            TutorialStep.StartMission => new TutorialStepInfo(TutorialTarget.QgMission, true, true),
             TutorialStep.Deploy => new TutorialStepInfo(TutorialTarget.MapDeploy, true, true),
             TutorialStep.Objectives => new TutorialStepInfo(TutorialTarget.BoardObjectives, true, false),
             TutorialStep.Roll => new TutorialStepInfo(TutorialTarget.BoardRoll, true, true),
@@ -44,6 +34,12 @@ namespace N29.HeroesDawn.Presentation.Tutorial
             TutorialStep.CombatAtb => new TutorialStepInfo(TutorialTarget.CombatEnemies, true, false),
             TutorialStep.CombatSkill => new TutorialStepInfo(TutorialTarget.CombatSkills, true, true, dim: false),
             TutorialStep.Results => new TutorialStepInfo(TutorialTarget.ResultsContinue, true, true),
+            TutorialStep.OpenTeam => new TutorialStepInfo(TutorialTarget.TabTeam, true, true),
+            TutorialStep.Squad => new TutorialStepInfo(TutorialTarget.TeamSquad, true, true),
+            TutorialStep.OpenSheet => new TutorialStepInfo(TutorialTarget.TeamTile, true, true),
+            TutorialStep.Train => new TutorialStepInfo(TutorialTarget.SheetTrain, true, true),
+            TutorialStep.EquipSlot => new TutorialStepInfo(TutorialTarget.SheetSlot, true, true),
+            TutorialStep.EquipPick => new TutorialStepInfo(TutorialTarget.SheetPick, true, true),
             _ => new TutorialStepInfo(TutorialTarget.None, false, false),
         };
     }

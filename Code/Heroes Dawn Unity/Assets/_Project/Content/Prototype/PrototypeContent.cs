@@ -12,6 +12,8 @@ namespace N29.HeroesDawn.Content.Prototype
     public static class PrototypeContent
     {
         public static readonly ZoneId Zone11 = new ZoneId("zone_ny_1_1");
+        /// <summary>Niveau tutoriel (hors carte et hors progression).</summary>
+        public static readonly ZoneId ZoneTuto = new ZoneId("zone_tuto");
 
         static EffectDef Dmg(int pct) => new EffectDef(EffectType.Damage, pct);
         static EffectDef St(StatusType s, int turns, int chance = 100) => new EffectDef(EffectType.ApplyStatus, 0, s, turns, chance);
@@ -108,9 +110,24 @@ namespace N29.HeroesDawn.Content.Prototype
             };
 
             enemies.AddRange(PrototypeZones.Enemies());
-            var zones = new List<ZoneDef> { BuildZone11() };
+            var zones = new List<ZoneDef> { BuildZone11(), BuildTutorialZone() };
             zones.AddRange(PrototypeZones.Zones());
             return new ContentCatalog(balance, members, enemies, synergies, zones, PrototypeActivities.Build(balance), PrototypeCollection.Build(), starterTeam);
+        }
+
+        /// <summary>Niveau tutoriel : trois cases et un seul combat très facile. Il n'est pas une vraie zone (ni carte, ni récompenses, ni progression).</summary>
+        static ZoneDef BuildTutorialZone()
+        {
+            var nodes = new List<NodeDef>
+            {
+                new NodeDef(new CaseId("n00"), CaseType.Entry, true, CombatRank.Normal, 0, 2, null, null, null),
+                new NodeDef(new CaseId("n01"), CaseType.Empty, false, CombatRank.Normal, 1, 2, null, null, null),
+                new NodeDef(new CaseId("n02"), CaseType.Combat, true, CombatRank.Easy, 2, 2, null, null, null),
+            };
+            var links = new List<LinkDef> { new LinkDef(new CaseId("n00"), new CaseId("n01")), new LinkDef(new CaseId("n01"), new CaseId("n02")) };
+            var objectives = new List<ObjectiveDef> { new ObjectiveDef("obj_tuto", ObjectiveType.DefeatCombat, new CaseId("n02"), "objectives.tuto.fight") };
+            var encounters = new List<EncounterDef> { new EncounterDef(CombatRank.Easy, new[] { new EnemyId("thug") }) };
+            return new ZoneDef(ZoneTuto, "zones.tuto.name", new CaseId("n00"), nodes, links, objectives, encounters, "0", 1, ZoneDef.TutorialBorough, 1, null, new ZoneEnvironment(Biome.Harbor, Weather.Night));
         }
 
         /// <summary>Red Hook — les quais : 25 cases, 3 embranchements, 6 combats (1 Élite fixe : Brick).</summary>

@@ -31,6 +31,10 @@ namespace N29.HeroesDawn.Definitions
         /// <summary>Position sur la carte de la ville (vide : point défini par la mise en page de la ville).</summary>
         public ZoneMapPoint? MapPoint { get; }
 
+        /// <summary>Quartier réservé au niveau tutoriel : il n'apparaît pas sur la carte et ne compte pas dans la progression.</summary>
+        public const string TutorialBorough = "tutorial";
+        public bool IsTutorial => Borough == TutorialBorough;
+
         public ZoneDef(ZoneId id, string nameKey, CaseId entry, IReadOnlyList<NodeDef> nodes, IReadOnlyList<LinkDef> links,
                        IReadOnlyList<ObjectiveDef> objectives, IReadOnlyList<EncounterDef> encounters,
                        string code = "", int act = 1, string borough = "brooklyn", int recommendedLevel = 1, IReadOnlyList<ZoneId>? requires = null,

@@ -18,6 +18,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         readonly ISessionReadModel _session;
         readonly MissionLauncher _mission;
+        readonly N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide? _tutorial;
         readonly IToastService _toasts;
         readonly ILocalization _loc;
         readonly ISubscriber<RosterChanged> _roster;
@@ -25,10 +26,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         string _selected;
 
         public CityMapPagePresenter(ICityMapPageView view, ISessionReadModel session, MissionLauncher mission, IToastService toasts,
-                                    ILocalization loc, ISubscriber<RosterChanged> roster)
+                                    ILocalization loc, ISubscriber<RosterChanged> roster, N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide? tutorial = null)
             : base(view, null)
         {
-            _session = session; _mission = mission; _toasts = toasts; _loc = loc; _roster = roster;
+            _session = session; _mission = mission; _toasts = toasts; _loc = loc; _roster = roster; _tutorial = tutorial;
             _selected = ZoneProgress.Recommended(session).Id.Value;
         }
 
@@ -71,6 +72,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         void Deploy()
         {
+            if (_tutorial != null && _tutorial.InLevelPhase) { _mission.Launch(N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide.LevelZone, Lifetime); return; }
             var zone = Selected();
             if (zone == null) return;
             if (ZoneProgress.StatusOf(_session, zone) == ZoneStatus.Locked)

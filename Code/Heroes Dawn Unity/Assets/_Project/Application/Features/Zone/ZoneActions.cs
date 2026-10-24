@@ -58,6 +58,12 @@ namespace N29.HeroesDawn.Application.Features.Zone
                         collection = true;
                         break;
                     case ZoneValidatedEvent _:
+                        if (s.RunZone != null && s.RunZone.IsTutorial)
+                        {
+                            validated = new ZoneRewards(0, 0, false);
+                            fx.Log.Info("Niveau tutoriel terminé");
+                            break;
+                        }
                         var zoneId = s.RunZone != null ? s.RunZone.Id.Value : "";
                         bool first = s.CompletedZones.Add(zoneId);
                         validated = first
