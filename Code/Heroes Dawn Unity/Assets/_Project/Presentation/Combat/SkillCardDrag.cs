@@ -56,7 +56,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (!_dragging) return;
             _dragging = false;
             var at = e.position;
-            Restore();
+            Restore(animate: true);
             Ended?.Invoke(at);
         }
 
@@ -66,13 +66,42 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (rt != null && RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, e.position, e.pressEventCamera, out var world)) card.position = world;
         }
 
-        void Restore()
+        /// <summary>
+        /// Remet la carte dans l'Ã©ventail ; avec <paramref name="animate"/>, elle glisse de l'endroit oÃ¹ elle a Ã©tÃ© lÃ¢chÃ©e jusqu'Ã  sa place
+        /// (en retrouvant sa taille et son inclinaison) au lieu de sauter.
+        /// </summary>
+        void Restore(bool animate = false)
         {
+            var fromWorld = card.position;
+            var fromScale = card.localScale;
+            var fromEuler = card.localEulerAngles;
             if (_parent != null) card.SetParent(_parent, false);
             card.SetSiblingIndex(_sibling);
             card.anchorMin = _anchorMin; card.anchorMax = _anchorMax; card.pivot = _pivot; card.anchoredPosition = _anchored;
             card.localEulerAngles = _euler; card.localScale = _scale;
             group.blocksRaycasts = true;
+            if (animate && UnityEngine.Application.isPlaying && !Feedback.MotionSettings.Reduced) Glide(fromWorld, fromScale, fromEuler);
+        }
+
+        void Glide(Vector3 fromWorld, Vector3 fromScale, Vector3 fromEuler)
+        {
+            var home = card.anchoredPosition;
+            card.position = fromWorld;
+            var start = card.anchoredPosition;
+            float z0 = fromEuler.z > 180f ? fromEuler.z - 360f : fromEuler.z, z1 = _euler.z > 180f ? _euler.z - 360f : _euler.z;
+            var target = card;
+            var scale = _scale; var homeEuler = _euler;
+            Common.Tween.Run(0.22f, k =>
+            {
+                if (target == null) return;
+                target.anchoredPosition = Vector2.LerpUnclamped(start, home, k);
+                target.localScale = Vector3.LerpUnclamped(fromScale, scale, k);
+                target.localEulerAngles = new Vector3(homeEuler.x, homeEuler.y, Mathf.LerpUnclamped(z0, z1, k));
+            }, () =>
+            {
+                if (target == null) return;
+                target.anchoredPosition = home; target.localScale = scale; target.localEulerAngles = homeEuler;
+            }, target, Common.Tween.EaseOutBack);
         }
 
         void OnDisable()

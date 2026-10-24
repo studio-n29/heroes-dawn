@@ -76,7 +76,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             _rows = data;
             _rowOf.Clear();
             for (int i = 0; i < data.Length; i++) if (!IsSection(data[i])) _rowOf.Add(i);
-            if (_selectedRow < 0 || _selectedRow >= data.Length || IsSection(data[_selectedRow])) _selectedRow = FirstActionable();
+            int focus = Array.FindIndex(data, r => r.Highlight && !IsSection(r));
+            if (focus >= 0) _selectedRow = focus;
+            else if (_selectedRow < 0 || _selectedRow >= data.Length || IsSection(data[_selectedRow])) _selectedRow = FirstActionable();
             Redraw();
         }
 

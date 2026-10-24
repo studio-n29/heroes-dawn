@@ -348,6 +348,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             int slot = index - 2;
             if (slot == 1 && !m.Cards[0].HasValue) { _toasts.Show(_loc.T("loadout.locked_card_sub"), ToastKind.Warning); return; }
+            // Une carte Ã©quipÃ©e s'ouvre dans le grimoire (description, niveau, amÃ©lioration) ; un emplacement vide ouvre le choix des cartes.
+            if (m.Cards[slot].HasValue) { _nav.FocusCard = m.Cards[slot]!.Value.Value; _nav.Open(HubPage.Grimoire); return; }
             OpenCardPicker(m, slot);
         }
 

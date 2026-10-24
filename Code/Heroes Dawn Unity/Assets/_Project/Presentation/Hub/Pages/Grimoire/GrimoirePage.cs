@@ -27,13 +27,16 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly GameSession _session;
         readonly IModalService _modals;
         readonly List<SkillCardDef> _rows = new List<SkillCardDef>();
+        string? _focus;
 
         public GrimoirePagePresenter(IGrimoirePageView view, CollectionBook book, GameSession session, IModalService modals, ILocalization loc,
                                      IToastService toasts, ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet,
-                                     ISubscriber<RosterChanged> roster, IClock clock)
+                                     ISubscriber<RosterChanged> roster, IClock clock, HubNavigator? nav = null)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
             _book = book; _session = session; _modals = modals;
+            _focus = nav?.FocusCard;
+            if (nav != null) nav.FocusCard = null;
         }
 
         public override string Title => Loc.T("page.grimoire");
@@ -70,10 +73,12 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (count > 0) r.A = UpgradeButton(card, level, count);
                 r.Dim = count == 0;
                 r.Art = AgentArt.Card(card.Id.Value);
+                r.Highlight = _focus != null && card.Id.Value == _focus;
                 rows.Add(r);
                 _rows.Add(card);
             }
             View.ShowRows(rows.ToArray());
+            _focus = null;
         }
 
         /// <summary>Bouton Â« AmÃ©liorer Â» de la fiche : coÃ»t en doublons et en CrÃ©dits, avec la raison quand il est grisÃ©.</summary>
