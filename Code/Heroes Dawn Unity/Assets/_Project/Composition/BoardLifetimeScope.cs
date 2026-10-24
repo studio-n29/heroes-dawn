@@ -14,6 +14,7 @@ namespace N29.HeroesDawn.Composition
             builder.RegisterComponentInNewPrefab(Catalog.Screen("Board").GetComponent<BoardView>(), Lifetime.Scoped)
                    .UnderTransform(root).As<IBoardView>();
             builder.Register<CasePopupPresenter>(Lifetime.Scoped);
+            builder.Register<Presentation.Hub.PlaytestFormFlow>(Lifetime.Scoped);
             builder.RegisterEntryPoint<BoardPresenter>().AsSelf();
         }
     }
