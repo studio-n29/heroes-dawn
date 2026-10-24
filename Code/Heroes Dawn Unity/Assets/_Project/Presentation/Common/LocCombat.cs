@@ -40,6 +40,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["combat.parade"] = "PARADE !";
             d["combat.advanced"] = "ÉLAN +{0} %";
             d["combat.propelled"] = "propulsé au point d'action !";
+            d["fx.damage_raw"] = "Dégâts {0}"; d["fx.heal_raw"] = "Soin {0} PV"; d["fx.shield_raw"] = "Bouclier {0}";
             d["fx.pushback"] = "Recule la cible de {0} % sur la frise";
             d["fx.advance"] = "Propulse la cible de {0} % vers l'action";
             d["combat.pause"] = "II";

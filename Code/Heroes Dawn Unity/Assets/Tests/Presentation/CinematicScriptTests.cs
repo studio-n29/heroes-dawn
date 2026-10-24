@@ -11,11 +11,10 @@ namespace N29.HeroesDawn.Tests.Presentation
     {
         static IReadOnlyList<CinematicShot> Shots => CinematicScript.Shots;
 
-        [Test, Description("Vérifie que le découpage compte 46 plans numérotés S01 à S46, sans doublon ni trou — parce que le document de cinématique les numérote ainsi et que le montage s'y réfère")]
-        public void Shots_AreNumberedS01ToS46()
+        [Test, Description("Vérifie que la version courte garde 12 plans du découpage, dans l ordre du document, de S01 à S46 — parce que la cinématique doit condenser l histoire sans la réordonner")]
+        public void Shots_AreTheCondensedCut()
         {
-            Assert.That(Shots.Count, Is.EqualTo(46));
-            for (int i = 0; i < Shots.Count; i++) Assert.That(Shots[i].Id, Is.EqualTo("S" + (i + 1).ToString("D2")));
+            Assert.That(Shots.Select(s => s.Id), Is.EqualTo(new[] { "S01", "S02", "S10", "S11", "S15", "S20", "S24", "S33", "S37", "S41", "S44", "S46" }));
         }
 
         [Test, Description("Vérifie que chaque illustration citée par un plan existe dans Resources/Cinematic/Art — parce qu'un plan sans image jouerait un écran noir")]
@@ -44,15 +43,15 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void SilentShots_AreTheDocumentedOnes()
         {
             var silent = Shots.Where(s => !s.Voice).Select(s => s.Id);
-            Assert.That(silent, Is.EqualTo(new[] { "S04", "S40", "S46" }));
+            Assert.That(silent, Is.EqualTo(new[] { "S46" }));
             Assert.That(Loc.CinematicVoiceIds, Is.EquivalentTo(Shots.Where(s => s.Voice).Select(s => s.Id)));
         }
 
-        [Test, Description("Vérifie que la durée minimale cumulée des plans (hors voix) approche les 4 minutes du document — parce que la cinématique doit rester un récap d'environ quatre minutes")]
-        public void MinimumDuration_IsAboutFourMinutes()
+        [Test, Description("Vérifie que la durée réelle (voix comprise) reste sous la minute — parce que la cinématique est un condensé de l histoire, pas un film")]
+        public void TotalDuration_StaysUnderAMinute()
         {
-            float total = Shots.Sum(s => s.Seconds);
-            Assert.That(total, Is.InRange(220f, 270f));
+            float total = Shots.Sum(s => Mathf.Max(s.Seconds, s.Voice ? 0.8f + Resources.Load<AudioClip>("Cinematic/Voice/vo_" + s.Id).length : 0f));
+            Assert.That(total, Is.InRange(40f, 57f));
         }
 
         [Test, Description("Vérifie que les poses de caméra restent dans l'image (échelle ≥ 1, point regardé entre 0 et 1) et que les lueurs sont placées dans l'image — parce qu'un cadrage hors image montrerait du noir")]
@@ -70,11 +69,11 @@ namespace N29.HeroesDawn.Tests.Presentation
             }
         }
 
-        [Test, Description("Vérifie que les titres d'époque du montage (1973, 1981, URSS, 1991, 2026) sont posés sur les bons plans — parce que le document les place au début de chaque séquence")]
+        [Test, Description("Vérifie que les titres d époque du montage (1973, URSS, 2026) sont posés sur les bons plans — parce que le document les place au début de chaque séquence")]
         public void EraTitles_AreOnTheDocumentedShots()
         {
             var titled = Shots.Where(s => s.Title != null).Select(s => s.Id + ":" + s.Title);
-            Assert.That(titled, Is.EqualTo(new[] { "S02:1973", "S05:1981", "S11:URSS", "S12:1991", "S15:2026" }));
+            Assert.That(titled, Is.EqualTo(new[] { "S02:1973", "S11:URSS", "S15:2026" }));
         }
     }
 }

@@ -4,14 +4,22 @@ using N29.HeroesDawn.Definitions;
 
 namespace N29.HeroesDawn.Presentation.Common
 {
+    /// <summary>Statistiques de l'agent qui porte la compétence : permettent d'afficher les montants bruts (Atk × valeur, PV max × valeur).</summary>
+    public readonly struct SkillOwnerStats
+    {
+        public readonly int Atk;
+        public readonly int MaxHp;
+        public SkillOwnerStats(int atk, int maxHp) { Atk = atk; MaxHp = maxHp; }
+    }
+
     /// <summary>Description courte d'une compétence, générée à partir de ses effets (évite 40 textes à maintenir).</summary>
     public static class SkillText
     {
-        public static string Describe(SkillDef s)
+        public static string Describe(SkillDef s, SkillOwnerStats? owner = null)
         {
             var sb = new StringBuilder();
             sb.Append(Loc.T("target." + s.Target));
-            foreach (var line in Effects(s.Effects))
+            foreach (var line in Effects(s.Effects, owner))
             {
                 sb.Append(" · ");
                 sb.Append(line);
@@ -19,15 +27,22 @@ namespace N29.HeroesDawn.Presentation.Common
             return sb.ToString();
         }
 
-        public static IEnumerable<string> Effects(IReadOnlyList<EffectDef> effects)
+        /// <summary>Avec les statistiques de l'agent, les dégâts, soins et boucliers sont des montants bruts ; sans elles, des pourcentages.</summary>
+        public static IEnumerable<string> Effects(IReadOnlyList<EffectDef> effects, SkillOwnerStats? owner = null)
         {
             foreach (var fx in effects)
             {
                 switch (fx.Type)
                 {
-                    case EffectType.Damage: yield return Loc.F("fx.damage", fx.Value); break;
-                    case EffectType.Heal: yield return Loc.F("fx.heal", fx.Value); break;
-                    case EffectType.Shield: yield return Loc.F("fx.shield", fx.Value); break;
+                    case EffectType.Damage:
+                        yield return owner.HasValue ? Loc.F("fx.damage_raw", owner.Value.Atk * fx.Value / 100) : Loc.F("fx.damage", fx.Value);
+                        break;
+                    case EffectType.Heal:
+                        yield return owner.HasValue ? Loc.F("fx.heal_raw", owner.Value.MaxHp * fx.Value / 100) : Loc.F("fx.heal", fx.Value);
+                        break;
+                    case EffectType.Shield:
+                        yield return owner.HasValue ? Loc.F("fx.shield_raw", owner.Value.MaxHp * fx.Value / 100) : Loc.F("fx.shield", fx.Value);
+                        break;
                     case EffectType.PushBack: yield return Loc.F("fx.pushback", fx.Value); break;
                     case EffectType.Advance: yield return Loc.F("fx.advance", fx.Value); break;
                     case EffectType.GaugeDelta:

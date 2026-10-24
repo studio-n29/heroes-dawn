@@ -433,7 +433,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                     var s = u.Skills[i];
                     string label = "[" + (i + 1) + "] " + _loc.SkillName(s);
                     if (s.Cost > 0) label += "  (" + _loc.F("combat.cost", s.Cost) + ")";
-                    panel.Slots[i] = new SkillSlotData { Visible = true, Label = label, Description = _loc.DescribeSkill(s), Pending = _pendingSlot == i, Enabled = sim.CanUse(u.Id, i) };
+                    panel.Slots[i] = new SkillSlotData { Visible = true, Label = label, Description = _loc.DescribeSkill(s, u.Atk, u.MaxHp), Pending = _pendingSlot == i, Enabled = sim.CanUse(u.Id, i) };
                 }
             }
             View.ShowSkills(panel);
@@ -459,7 +459,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 {
                     Visible = true,
                     Label = "[" + (i + 1) + "] " + name,
-                    Description = _loc.DescribeSkill(s),
+                    Description = _loc.DescribeSkill(s, u.Atk, u.MaxHp),
                     Glyph = string.IsNullOrEmpty(name) ? "?" : name.Substring(0, 1).ToUpperInvariant(),
                     Cost = s.Cost,
                     Affordable = u.Energy >= s.Cost,

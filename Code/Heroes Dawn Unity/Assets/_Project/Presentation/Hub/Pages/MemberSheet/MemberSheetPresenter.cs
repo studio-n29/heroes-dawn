@@ -231,7 +231,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 Card = MemberCards.Card(def, level, _session.Content.Balance, _loc),
                 Owned = owned,
-                Skills = def.Skills.Select(s => new SkillLineData { Name = _loc.SkillName(s), Description = _loc.DescribeSkill(s) }).ToArray(),
+                Skills = def.Skills.Select(s => { var st = CollectionText.StatsOf(def, level, _session.Content.Balance); return new SkillLineData { Name = _loc.SkillName(s), Description = _loc.DescribeSkill(s, st.Atk, st.MaxHp) }; }).ToArray(),
                 Synergies = SquadSynergies.For(def.Family, _session.Content.Synergies)
                                     .Select(c => _loc.F("sheet.synergy_line", _loc.SynergyName(c), _loc.SynergyEffect(c), _loc.FamilyName(c.A == def.Family ? c.B : c.A)))
                                     .ToArray(),
@@ -345,7 +345,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (m == null || _game == null || _book == null) return;
             if (index < 2)
             {
-                if (index < m.Def.Skills.Count) _toasts.Show(_loc.SkillName(m.Def.Skills[index]) + " · " + _loc.DescribeSkill(m.Def.Skills[index]), ToastKind.Info);
+                if (index < m.Def.Skills.Count) _toasts.Show(_loc.SkillName(m.Def.Skills[index]) + " · " + _loc.DescribeSkill(m.Def.Skills[index], CollectionText.StatsOf(m.Def, m.Level, _session.Content.Balance).Atk, CollectionText.StatsOf(m.Def, m.Level, _session.Content.Balance).MaxHp), ToastKind.Info);
                 return;
             }
             int slot = index - 2;

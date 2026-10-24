@@ -11,7 +11,23 @@ namespace N29.HeroesDawn.Presentation.Login
     /// </summary>
     public static class CinematicScript
     {
-        public static readonly IReadOnlyList<CinematicShot> Shots = Build();
+        static IReadOnlyList<CinematicShot>? _shots;
+        public static IReadOnlyList<CinematicShot> Shots => _shots ??= Condense(Build());
+
+        /// <summary>Plans retenus pour la version courte (moins d une minute) et leur durée minimale en secondes.</summary>
+        static readonly (string Id, float Seconds)[] Kept =
+        {
+            ("S01", 3f), ("S02", 4f), ("S10", 4f), ("S11", 4f), ("S15", 4f), ("S20", 4f), ("S24", 3.5f), ("S33", 3.5f), ("S37", 3.5f), ("S41", 4.5f), ("S44", 4.5f), ("S46", 3.5f),
+        };
+
+        static IReadOnlyList<CinematicShot> Condense(IReadOnlyList<CinematicShot> all)
+        {
+            var list = new List<CinematicShot>();
+            foreach (var (id, seconds) in Kept)
+                foreach (var s in all)
+                    if (s.Id == id) { s.Seconds = seconds; list.Add(s); }
+            return list;
+        }
 
         static CamPose P(float scale, float fx, float fy) => new CamPose(scale, fx, fy);
 

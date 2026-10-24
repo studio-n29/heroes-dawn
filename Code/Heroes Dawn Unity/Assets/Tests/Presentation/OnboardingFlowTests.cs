@@ -31,13 +31,13 @@ namespace N29.HeroesDawn.Tests.Presentation
 
         FakeIntroPopup Popup => (FakeIntroPopup)_host.Spawned.Single();
 
-        [Test, Description("Vérifie que la cinématique montre les 46 plans du découpage, dans l ordre, et qu elle coupe le thème principal du jeu — parce que le flux doit jouer le document de cinématique de bout en bout")]
-        public void Cinematic_PlaysTheFortySixShots()
+        [Test, Description("Vérifie que la cinématique montre les 12 plans de la version courte, dans l ordre, et qu elle coupe le thème principal du jeu — parce que le flux doit jouer le document de cinématique de bout en bout")]
+        public void Cinematic_PlaysTheCondensedCut()
         {
             _flow.RunIfNeededAsync(default).Forget();
-            Assert.That(Popup.Shots!.Count, Is.EqualTo(46));
+            Assert.That(Popup.Shots!.Count, Is.EqualTo(12));
             Assert.That(Popup.Shots[0].Id, Is.EqualTo("S01"));
-            Assert.That(Popup.Shots[45].Id, Is.EqualTo("S46"));
+            Assert.That(Popup.Shots[11].Id, Is.EqualTo("S46"));
             Assert.That(Popup.MainTheme, Is.Not.Null, "le thème principal est piloté par la cinématique");
         }
 

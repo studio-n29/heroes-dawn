@@ -185,8 +185,8 @@ namespace N29.HeroesDawn.Presentation.Login
 
             var voiceClip = shot.Voice ? Resources.Load<AudioClip>("Cinematic/Voice/vo_" + shot.Id) : null;
             float voiceLen = voiceClip != null ? voiceClip.length : 0f;
-            float voiceStart = 0.6f;
-            slot.Duration = Mathf.Max(shot.Seconds, voiceStart + voiceLen + 0.8f);
+            float voiceStart = 0.4f;
+            slot.Duration = Mathf.Max(shot.Seconds, voiceStart + voiceLen + 0.4f);
             string subtitle = shot.Voice ? Loc.T("cinematic.vo." + shot.Id) : "";
             ApplyMusic(shot, mainTheme);
 
@@ -435,7 +435,7 @@ namespace N29.HeroesDawn.Presentation.Login
             if (voiceStarted && !string.IsNullOrEmpty(subtitle))
             {
                 float local = t - voiceStart;
-                a = Mathf.Clamp01(local / 0.3f) * Mathf.Clamp01((voiceLen + 0.5f - local) / 0.4f);
+                a = Mathf.Clamp01(local / 0.3f) * Mathf.Clamp01((voiceLen + 0.4f - local) / 0.4f);
                 if (_subtitle.text != subtitle) _subtitle.text = subtitle;
             }
             _subtitle.color = new Color(1f, 1f, 1f, a);

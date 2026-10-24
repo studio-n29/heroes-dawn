@@ -62,7 +62,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             foreach (var card in Defs.Cards.OrderByDescending(c => CollectionOps.OwnedCards(_session, c.Id) > 0).ThenByDescending(c => c.Rarity).ThenBy(c => c.Family).ThenBy(c => c.Id))
             {
                 int count = CollectionOps.OwnedCards(_session, card.Id);
-                var r = InfoRowData.Basic(CollectionText.CardName(Loc, card), CollectionText.CardLine(Loc, card));
+                var r = InfoRowData.Basic(CollectionText.CardName(Loc, card), CollectionText.CardLine(Loc, card, CollectionText.ReferenceStats(_session)));
                 r.Tag = CollectionText.Tag(CollectionText.CardName(Loc, card));
                 r.TagColor = count > 0 ? CollectionText.RarityColor(card.Rarity) : Theme.Surface3;
                 r.Badge = count > 0 ? Loc.F("grimoire.owned", count) : Loc.T("grimoire.missing");
