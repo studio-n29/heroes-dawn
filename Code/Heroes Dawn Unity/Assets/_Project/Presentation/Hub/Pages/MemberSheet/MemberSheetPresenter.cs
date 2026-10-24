@@ -251,18 +251,16 @@ namespace N29.HeroesDawn.Presentation.Hub
             return d;
         }
 
+        /// <summary>Paliers de niveau : les bonus passifs que l'agent gagne en montant (atteints en clair, le prochain en Ã©vidence).</summary>
         TierLineData[] Tiers(MemberDef def, int level, int max)
         {
-            var levels = new[] { 1, Math.Max(2, max / 4), Math.Max(3, max / 2), max }.Distinct().OrderBy(x => x).ToArray();
-            int current = levels.Where(l => l <= level).DefaultIfEmpty(1).Max();
-            var b = _session.Content.Balance;
-            return levels.Select(l => new TierLineData
+            var next = LevelTiers.All.Where(t => t.Level > level).Select(t => (int?)t.Level).FirstOrDefault();
+            return LevelTiers.All.Select(t => new TierLineData
             {
-                Level = _loc.F("sheet.tier_level", l),
-                Stats = _loc.F("sheet.tier_stats", UnitFactory.ScaleStat(def.BaseStats.Hp, l, b), UnitFactory.ScaleStat(def.BaseStats.Atk, l, b),
-                               UnitFactory.ScaleStat(def.BaseStats.Def, l, b)),
-                Reached = l <= level,
-                Current = l == current,
+                Level = _loc.F("sheet.tier_level", t.Level),
+                Stats = _loc.F("sheet.tier_passive", t.Percent, _loc.T("synergy.stat." + t.Stat)),
+                Reached = t.Level <= level,
+                Current = t.Level == next,
             }).ToArray();
         }
 

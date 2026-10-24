@@ -25,7 +25,8 @@ namespace N29.HeroesDawn.Domain.Combat
         public static CombatUnit Ally(int id, MemberDef d, AllyEntry e, BalanceConfig b, CollectionDef? collection = null, SynergyBonus synergy = default)
         {
             int f = FatigueMultiplierPermille(e.FatiguePercent, b);
-            int hpP = synergy.Hp, atkP = synergy.Atk, defP = synergy.Def, spdP = synergy.Spd, crit = 0, startGauge = 0, shield = 0; // la synergie d équipe est permanente
+            var tiers = LevelTiers.BonusAt(e.Level); // paliers de niveau : bonus passifs de l agent
+            int hpP = synergy.Hp + tiers.Hp, atkP = synergy.Atk + tiers.Atk, defP = synergy.Def + tiers.Def, spdP = synergy.Spd + tiers.Spd, crit = 0, startGauge = 0, shield = 0; // la synergie d équipe est permanente
             if (collection != null)
                 foreach (var itemId in e.Items)
                 {

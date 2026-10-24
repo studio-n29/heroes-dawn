@@ -53,7 +53,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["hub.avatar_role"] = "CHEF D’UNITÉ";
             d["loadout.badge_equipped"] = "ÉQUIPÉ";
             d["sheet.level_bar"] = "NIV. {0} / {1}";
-            d["sheet.tiers"] = "PALIERS PAR NIVEAU";
+            d["sheet.tiers"] = "PALIERS PASSIFS";
+            d["sheet.tier_passive"] = "+{0} % {1}";
             d["sheet.tier_level"] = "NIV. {0}";
             d["sheet.tier_stats"] = "PV {0} · ATQ {1} · DÉF {2}";
             d["sheet.affinity"] = "AGENTS À FORTE AFFINITÉ";
