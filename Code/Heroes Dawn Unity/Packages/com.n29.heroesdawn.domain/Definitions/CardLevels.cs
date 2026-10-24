@@ -21,10 +21,12 @@ namespace N29.HeroesDawn.Definitions
         public static int EffectPercent(int level) => 100 + PercentPerLevel * (System.Math.Max(1, level) - 1);
 
         /// <summary>La compétence de la carte à ce niveau : dégâts, soins et boucliers augmentés ; les autres effets sont inchangés.</summary>
-        public static SkillDef Scale(SkillDef skill, int level)
+        public static SkillDef Scale(SkillDef skill, int level) => ScalePercent(skill, EffectPercent(level));
+
+        /// <summary>La compétence avec dégâts, soins et boucliers à <paramref name="pct"/> % (100 : inchangée).</summary>
+        public static SkillDef ScalePercent(SkillDef skill, int pct)
         {
-            if (level <= 1) return skill;
-            int pct = EffectPercent(level);
+            if (pct == 100) return skill;
             var list = new List<EffectDef>(skill.Effects.Count);
             foreach (var e in skill.Effects)
             {

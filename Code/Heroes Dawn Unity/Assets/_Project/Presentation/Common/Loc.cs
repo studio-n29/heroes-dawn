@@ -159,6 +159,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["combat.ready"] = "{0} est prêt !",
             ["combat.victory"] = "VICTOIRE !", ["combat.defeat"] = "DÉFAITE…",
             ["combat.reward"] = "+{0} Crédits",
+            ["combat.drop"] = "Objet trouvé : {0}",
             ["combat.fatigue"] = "Fatigue de l'escouade",
             ["combat.to_hq"] = "Escouade épuisée : retour instantané au QG.",
             ["combat.verify.pending"] = "Vérification serveur (simulée)…",

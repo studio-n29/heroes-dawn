@@ -42,6 +42,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 case ItemPerk.StartGauge: parts.Add(loc.F("item.fx.start_gauge", item.PerkValue)); break;
                 case ItemPerk.OpeningShield: parts.Add(loc.F("item.fx.opening_shield", item.PerkValue)); break;
                 case ItemPerk.CritChance: parts.Add(loc.F("item.fx.crit", item.PerkValue)); break;
+                case ItemPerk.SkillPower: parts.Add(loc.F("item.fx.skill_power", item.PerkValue)); break;
             }
             return string.Join(" · ", parts);
         }

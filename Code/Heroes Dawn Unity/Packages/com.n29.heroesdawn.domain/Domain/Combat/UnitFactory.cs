@@ -26,7 +26,7 @@ namespace N29.HeroesDawn.Domain.Combat
         {
             int f = FatigueMultiplierPermille(e.FatiguePercent, b);
             var tiers = LevelTiers.BonusAt(e.Level); // paliers de niveau : bonus passifs de l agent
-            int hpP = synergy.Hp + tiers.Hp, atkP = synergy.Atk + tiers.Atk, defP = synergy.Def + tiers.Def, spdP = synergy.Spd + tiers.Spd, crit = 0, startGauge = 0, shield = 0; // la synergie d équipe est permanente
+            int hpP = synergy.Hp + tiers.Hp, atkP = synergy.Atk + tiers.Atk, defP = synergy.Def + tiers.Def, spdP = synergy.Spd + tiers.Spd, crit = 0, startGauge = 0, shield = 0, skillPower = 0; // la synergie d équipe est permanente
             if (collection != null)
                 foreach (var itemId in e.Items)
                 {
@@ -38,12 +38,13 @@ namespace N29.HeroesDawn.Domain.Combat
                         case ItemPerk.StartGauge: startGauge += it.PerkValue; break;
                         case ItemPerk.OpeningShield: shield += it.PerkValue; break;
                         case ItemPerk.CritChance: crit += it.PerkValue; break;
+                        case ItemPerk.SkillPower: skillPower += it.PerkValue; break;
                     }
                 }
             int S(int v, int itemPercent) => ScaleStat(v, e.Level, b) * f / 1000 * (100 + e.StatPercent) / 100 * (100 + itemPercent) / 100;
             var unit = new CombatUnit(id, Side.Ally, d.Id.Value, d.Family, d.Role, false,
                                       S(d.BaseStats.Hp, hpP), S(d.BaseStats.Atk, atkP), S(d.BaseStats.Def, defP), d.BaseStats.Spd * (100 + spdP) / 100,
-                                      b.TimelinePoints, SkillsWithCards(d, e, collection));
+                                      b.TimelinePoints, EmpoweredSkills(SkillsWithCards(d, e, collection), skillPower));
             unit.MaxEnergy = b.EnergyMax;
             unit.Energy = System.Math.Min(b.EnergyMax, b.EnergyStart);
             unit.CritBonusPercent = crit;
@@ -73,6 +74,15 @@ namespace N29.HeroesDawn.Domain.Combat
             else if (third != null && list.Count >= 3) list[2] = third;     // ancien kit de trois compétences : la carte remplace la 3e
             var fourth = Pick(1);
             if (fourth != null && list.Count >= 3) list.Add(fourth);
+            return list;
+        }
+
+        /// <summary>Applique la puissance de compétence des objets (dégâts, soins, boucliers) à toutes les compétences.</summary>
+        static IReadOnlyList<SkillDef> EmpoweredSkills(IReadOnlyList<SkillDef> skills, int skillPower)
+        {
+            if (skillPower <= 0) return skills;
+            var list = new List<SkillDef>(skills.Count);
+            foreach (var s in skills) list.Add(CardLevels.ScalePercent(s, 100 + skillPower));
             return list;
         }
 

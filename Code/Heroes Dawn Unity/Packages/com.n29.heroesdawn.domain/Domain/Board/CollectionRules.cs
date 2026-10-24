@@ -27,6 +27,18 @@ namespace N29.HeroesDawn.Domain.Board
         /// <summary>Poids de rareté d'un objet trouvé en événement : Commun, Rare, Épique, Légendaire.</summary>
         public static readonly IReadOnlyList<int> FoundItemWeights = new[] { 60, 28, 10, 2 };
 
+        /// <summary>Chance en % qu'une victoire laisse un objet : combat facile, normal, élite, boss.</summary>
+        public static int DropChancePercent(CombatRank rank, bool boss) => boss ? 100 : rank == CombatRank.Easy ? 12 : rank == CombatRank.Normal ? 25 : 60;
+
+        static readonly IReadOnlyList<int> EliteDropWeights = new[] { 30, 40, 25, 5 };
+
+        /// <summary>Objet laissé par un combat gagné (null : rien). Les élites et les boss laissent de meilleurs objets.</summary>
+        public static ItemDef? RollCombatDrop(CollectionDef c, IRandom rng, CombatRank rank, bool boss)
+        {
+            if (rng.Range(0, 100) >= DropChancePercent(rank, boss)) return null;
+            return RollItem(c, rng, boss || rank == CombatRank.Elite ? EliteDropWeights : FoundItemWeights);
+        }
+
         /// <summary>Raretés par ordre croissant.</summary>
         public static ItemRarity RollRarity(IRandom rng, IReadOnlyList<int> weights)
         {

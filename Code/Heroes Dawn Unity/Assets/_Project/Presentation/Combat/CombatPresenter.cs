@@ -673,6 +673,9 @@ namespace N29.HeroesDawn.Presentation.Combat
             finally { _finishing.Exit(); }
         }
 
+        string DropLine(CombatReport report, ContentCatalog content)
+            => report.Drop.HasValue ? System.Environment.NewLine + _loc.F("combat.drop", _loc.T(content.Collection.Item(report.Drop.Value).NameKey)) : "";
+
         async UniTask ShowResultsAsync(CombatReport report)
         {
             var view = await _modals.OpenAsync<ICombatResultsPopupView>(Lifetime);
@@ -683,7 +686,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 {
                     Title = report.Victory ? _loc.T("combat.victory") : _loc.T("combat.defeat"),
                     Victory = report.Victory,
-                    Reward = report.Victory ? _loc.F("combat.reward", report.Credits) : "",
+                    Reward = report.Victory ? _loc.F("combat.reward", report.Credits) + DropLine(report, content) : "",
                     FatigueTitle = _loc.T("combat.fatigue"),
                     Fatigue = report.Fatigue.Select(f => new FatigueRowData
                     {

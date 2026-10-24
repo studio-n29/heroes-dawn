@@ -20,6 +20,8 @@ namespace N29.HeroesDawn.Application.Ports
         public int pity;
         /// <summary>Nombre de boosters ouverts : fait varier la graine de chaque tirage.</summary>
         public int opened;
+        /// <summary>Nombre de tirages d'objets de fin de combat : fait varier la graine de chacun.</summary>
+        public int drops;
         /// <summary>Jour des offres d'objets mémorisées et rangs déjà achetés ce jour-là.</summary>
         public string itemShopDay = "";
         public List<int> itemShopBought = new List<int>();

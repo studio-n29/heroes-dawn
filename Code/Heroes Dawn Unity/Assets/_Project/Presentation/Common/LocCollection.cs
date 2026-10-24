@@ -19,6 +19,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["items.phoenix_core.name"] = "Cœur de Phénix";
             d["items.time_shard.name"] = "Éclat temporel";
             d["items.apex_module.name"] = "Module Apex";
+            d["items.power_gauntlet.name"] = "Gantelet de puissance";
+            d["items.arcane_focus.name"] = "Focalisateur arcanique";
             // Cartes (noms de compétence)
             d["skills.card_glass_wall"] = "Mur de verre";
             d["skills.card_shackle"] = "Entrave";
@@ -46,6 +48,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["item.fx.start_gauge"] = "Départ +{0} % sur la frise";
             d["item.fx.opening_shield"] = "Bouclier {0} % au début";
             d["item.fx.crit"] = "Critique +{0} %";
+            d["item.fx.skill_power"] = "Compétences +{0} %";
 
             // Fiche d'agent et page Équipement
             d["sheet.loadout"] = "ÉQUIPEMENT";

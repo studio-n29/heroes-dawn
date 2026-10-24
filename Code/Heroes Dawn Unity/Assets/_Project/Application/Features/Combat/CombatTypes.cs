@@ -29,11 +29,13 @@ namespace N29.HeroesDawn.Application.Features.Combat
         public IReadOnlyList<FatigueChange> Fatigue { get; }
         public IReadOnlyList<BoardEvent> BoardEvents { get; }
         public bool ReturnedToHq { get; }
+        /// <summary>Objet laissé par ce combat gagné (aucun : null).</summary>
+        public ItemId? Drop { get; }
 
         public CombatReport(bool victory, int credits, CombatRank rank, bool boss, IReadOnlyList<FatigueChange> fatigue,
-                            IReadOnlyList<BoardEvent> boardEvents, bool returnedToHq)
+                            IReadOnlyList<BoardEvent> boardEvents, bool returnedToHq, ItemId? drop = null)
         {
-            Victory = victory; Credits = credits; Rank = rank; Boss = boss; Fatigue = fatigue; BoardEvents = boardEvents; ReturnedToHq = returnedToHq;
+            Victory = victory; Credits = credits; Rank = rank; Boss = boss; Fatigue = fatigue; BoardEvents = boardEvents; ReturnedToHq = returnedToHq; Drop = drop;
         }
     }
 }

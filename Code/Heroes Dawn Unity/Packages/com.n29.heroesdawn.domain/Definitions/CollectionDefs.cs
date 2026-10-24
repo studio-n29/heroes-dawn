@@ -18,6 +18,8 @@ namespace N29.HeroesDawn.Definitions
         OpeningShield,
         /// <summary>N % de chances de critique en plus.</summary>
         CritChance,
+        /// <summary>Toutes les compétences de l'agent infligent, soignent et protègent N % de plus.</summary>
+        SkillPower,
     }
 
     /// <summary>Objet équipable (jusqu'à 2 par agent) : bonus de statistiques en % et effet spécial éventuel.</summary>

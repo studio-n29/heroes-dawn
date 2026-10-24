@@ -29,6 +29,17 @@ namespace N29.HeroesDawn.Application.Features.Combat
             _active = active; _fx = fx; _roster = roster; _finished = finished; _leave = leave;
         }
 
+        /// <summary>Tire l'objet laissé par la victoire (déterministe selon le joueur et le nombre de tirages) et l'ajoute à l'inventaire.</summary>
+        static ItemId? RollDrop(GameSession s, CombatRank rank, bool boss)
+        {
+            var save = s.Meta.collection;
+            var rng = new Pcg32(CollectionRules.Seed(s.Account?.PlayerId ?? "local", "drop", save.drops++));
+            var item = CollectionRules.RollCombatDrop(s.Content.Collection, rng, rank, boss);
+            if (item == null) return null;
+            Collection.CollectionOps.AddItem(s, item.Id);
+            return item.Id;
+        }
+
         public async UniTask<Result<CombatReport>> ExecuteAsync(CancellationToken ct = default)
         {
             ct.ThrowIfCancellationRequested();
@@ -42,6 +53,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
             bool boss = false;
             foreach (var u in sim.Units) if (u.Side == Side.Enemy && u.IsBoss) boss = true;
             int credits = 0;
+            ItemId? drop = null;
             if (victory)
             {
                 credits = boss ? MetaRules.BossCredits
@@ -49,6 +61,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
                         : pending.Rank == CombatRank.Normal ? b.CreditsNormal : b.CreditsElite;
                 credits = credits * Meta.LabBonuses.CombatCreditsPercent(s.Meta) / 100;
                 s.Wallet.Add(credits, 0);
+                drop = RollDrop(s, pending.Rank, boss);
             }
 
             var changes = new List<FatigueChange>();
@@ -73,8 +86,8 @@ namespace N29.HeroesDawn.Application.Features.Combat
                 toHq = true;
             }
 
-            var report = new CombatReport(victory, credits, pending.Rank, boss, changes, boardEvents, toHq);
-            _fx.Log.Info($"Combat terminé : {(victory ? "victoire" : "défaite")} en {sim.Tick} ticks, +{credits} Crédits");
+            var report = new CombatReport(victory, credits, pending.Rank, boss, changes, boardEvents, toHq, drop);
+            _fx.Log.Info($"Combat terminé : {(victory ? "victoire" : "défaite")} en {sim.Tick} ticks, +{credits} Crédits" + (drop.HasValue ? ", objet " + drop.Value.Value : ""));
             _fx.Wallet.PublishWallet(s);
             _roster.PublishRoster();
             _fx.Save.RequestSave();
