@@ -32,7 +32,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             }));
             Assert.That(o.Select(x => L.T(x.NameKey)), Is.EqualTo(new[]
             {
-                "Infiltrer le quai", "Couper le courant (générateur du quai)", "Trouver les documents de transport", "Arrêter l'échange en cours", "Fuir le quai",
+                "Franchir les grilles du quai", "Plonger le port dans le noir (générateur)", "Arracher les registres de transport", "Briser l'échange en cours", "Disparaître avec la vérité",
             }));
         }
 

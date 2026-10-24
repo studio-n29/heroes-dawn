@@ -17,49 +17,56 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var root = PrefabContext.NewRoot("DialogueBox");
             var group = root.gameObject.AddComponent<CanvasGroup>();
 
-            var dim = Ui.Img(root, "Dim", Theme.WithAlpha(Theme.Navy, 0.45f), null, true);
+            var dim = Ui.Img(root, "Dim", Theme.WithAlpha(Theme.Navy, 0.3f), null, true);
             dim.rectTransform.Stretch();
+            // Voile cinÃ©ma : un dÃ©gradÃ© sombre qui monte du bas de l'Ã©cran, pour que la rÃ©plique se lise sur n'importe quel fond.
+            var shade = Ui.Img(root, "Shade", Theme.WithAlpha(Theme.Outline, 0.92f), Sprites.VerticalGradient);
+            shade.raycastTarget = false;
+            shade.rectTransform.anchorMin = new Vector2(0f, 0f);
+            shade.rectTransform.anchorMax = new Vector2(1f, 0.62f);
+            shade.rectTransform.offsetMin = shade.rectTransform.offsetMax = Vector2.zero;
             var tap = dim.gameObject.AddComponent<Button>();
             tap.transition = Selectable.Transition.None;
             var nav = tap.navigation;
             nav.mode = Navigation.Mode.None;
             tap.navigation = nav;
 
-            var strip = Ui.Rect(root, "Strip").At(0.5f, 0f, 0, 60, 1760, 360);
+            var strip = Ui.Rect(root, "Strip").At(0.5f, 0f, 0, 40, 1800, 400);
 
-            var bubbleFill = Ui.Panel(strip, "Bubble", Color.white, 6f, 10f, false);
+            var bubbleFill = Ui.Panel(strip, "Bubble", Theme.WithAlpha(Theme.Navy, 0.94f), 5f, 12f, false);
             var bubble = bubbleFill.Frame();
             bubble.anchorMin = new Vector2(0f, 0f);
             bubble.anchorMax = new Vector2(1f, 1f);
-            bubble.offsetMin = new Vector2(330, 30);
-            bubble.offsetMax = new Vector2(-30, -30);
+            bubble.offsetMin = new Vector2(380, 20);
+            bubble.offsetMax = new Vector2(-30, -70);
 
-            var body = Ui.Txt(bubbleFill.transform, "", 40, Theme.TextDark, TextAnchor.MiddleLeft, FontKind.Body, "Body");
-            body.rectTransform.Stretch(34, 54, 34, 34);
+            var body = Ui.Txt(bubbleFill.transform, "", 40, Color.white, TextAnchor.MiddleLeft, FontKind.Body, "Body");
+            body.rectTransform.Stretch(40, 50, 40, 34);
+            body.lineSpacing = 6;
             body.overflowMode = TMPro.TextOverflowModes.Ellipsis;
             body.enableAutoSizing = true;
             body.fontSizeMin = 28;
             body.fontSizeMax = 44;
-            var hint = Ui.LocTxt(bubbleFill.transform, "narration.next", 24, Theme.TextMuted, TextAnchor.LowerRight, FontKind.Body, "Hint");
+            var hint = Ui.LocTxt(bubbleFill.transform, "narration.next", 24, Theme.Primary, TextAnchor.LowerRight, FontKind.Title, "Hint");
             hint.rectTransform.At(1f, 0f, -26, 10, 420, 36);
             hint.gameObject.AddComponent<Pulse>().Amplitude = 0.04f;
 
             // Queue de la bulle : un losange encré, posé sur le bord de la bulle côté avatar.
-            var tail = Ui.Img(strip, "Tail", Theme.Ink, Sprites.Rounded);
+            var tail = Ui.Img(strip, "Tail", Theme.WithAlpha(Theme.Ink, 0f), Sprites.Rounded);
             tail.rectTransform.At(0f, 0.5f, 324, 20, 46, 46);
             tail.rectTransform.localRotation = Quaternion.Euler(0, 0, 45f);
-            var tailFill = Ui.Img(tail.transform, "Fill", Color.white, Sprites.Rounded);
+            var tailFill = Ui.Img(tail.transform, "Fill", Theme.WithAlpha(Color.white, 0f), Sprites.Rounded);
             tailFill.rectTransform.Stretch(6, 6, 6, 6);
 
-            var avatarRoot = Ui.Rect(strip, "Avatar").At(0f, 0.5f, 30, 0, 300, 320);
+            var avatarRoot = Ui.Rect(strip, "Avatar").At(0f, 0.5f, 30, 20, 340, 400);
             avatarRoot.pivot = new Vector2(0f, 0.5f);
             var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", avatarRoot, "Portrait");
-            ((RectTransform)portrait.transform).At(0.5f, 1f, 0, -10, 230, 230);
+            ((RectTransform)portrait.transform).At(0.5f, 1f, 0, -6, 320, 320);
             var plateFill = Ui.Panel(avatarRoot, "NamePlate", Theme.Primary, 4f, 6f, false);
-            plateFill.Frame().At(0.5f, 0f, 0, 14, 280, 64);
-            var name = Ui.Txt(plateFill.transform, "", 34, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Name");
+            plateFill.Frame().At(0.5f, 0f, 0, 6, 330, 70);
+            var name = Ui.Txt(plateFill.transform, "", 38, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Name");
             name.rectTransform.Stretch(6, 2, 6, 2);
-            name.Inked();
+            name.AutoSize(38);
 
             var skip = Ui.LocBtn(root, "narration.skip", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Skip");
             skip.Rect.At(1f, 1f, -40, -40, 220, 80);

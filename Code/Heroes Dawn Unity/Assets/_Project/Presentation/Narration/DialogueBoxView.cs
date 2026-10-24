@@ -29,7 +29,7 @@ namespace N29.HeroesDawn.Presentation.Narration
         [SerializeField] Button skip = null!;
 
         const float CharsPerSecond = 55f;
-        const float AvatarWidth = 300f;
+        const float AvatarWidth = 350f;
         const float Margin = 30f;
 
         public bool Cancelable => false;
@@ -52,6 +52,7 @@ namespace N29.HeroesDawn.Presentation.Narration
                 if (skipped) break;
                 Show(line);
                 Tween.PopIn(bubble, 0.2f);
+                Tween.PopIn(avatarRoot, 0.3f);
                 var advance = new UniTaskCompletionSource();
                 bool finishTyping = false;
                 tapArea.onClick.RemoveAllListeners();
@@ -90,7 +91,7 @@ namespace N29.HeroesDawn.Presentation.Narration
             float x = line.Left ? 0f : 1f;
             avatarRoot.anchorMin = avatarRoot.anchorMax = new Vector2(x, 0.5f);
             avatarRoot.pivot = new Vector2(x, 0.5f);
-            avatarRoot.anchoredPosition = new Vector2(line.Left ? Margin : -Margin, 0f);
+            avatarRoot.anchoredPosition = new Vector2(line.Left ? Margin : -Margin, 20f);
             bubble.offsetMin = new Vector2(line.Left ? AvatarWidth + Margin : Margin, bubble.offsetMin.y);
             bubble.offsetMax = new Vector2(line.Left ? -Margin : -(AvatarWidth + Margin), bubble.offsetMax.y);
             tail.anchorMin = tail.anchorMax = new Vector2(x, 0.5f);

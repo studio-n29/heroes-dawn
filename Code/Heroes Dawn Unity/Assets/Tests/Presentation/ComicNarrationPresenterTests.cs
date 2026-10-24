@@ -52,7 +52,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             var line = NarrationLines.Build(new NarrationLineDef(agent.Id.Value, "narration.ny_1_1.n23.after.1"), C, L);
             Assert.That(line.Speaker, Is.EqualTo(L.MemberName(agent)));
             Assert.That(line.Left, Is.True);
-            Assert.That(line.Text, Does.Contain("fuir le quai"));
+            Assert.That(line.Text, Does.Contain("Partez avant l'aube"));
 
             var npc = NarrationLines.Build(new NarrationLineDef("brick", "narration.ny_1_1.n23.before.0"), C, L);
             Assert.That(npc.Speaker, Is.EqualTo("Brick"));
