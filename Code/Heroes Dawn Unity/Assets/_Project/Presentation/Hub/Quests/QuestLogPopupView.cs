@@ -18,6 +18,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text sideEmpty = null!;
         [SerializeField] RectTransform mainList = null!;
         [SerializeField] RectTransform sideList = null!;
+        [SerializeField] TMP_Text activityTitle = null!;
+        [SerializeField] TMP_Text activityEmpty = null!;
+        [SerializeField] RectTransform activityList = null!;
         [SerializeField] QuestMainRowView mainRowPrefab = null!;
         [SerializeField] QuestSideRowView sideRowPrefab = null!;
         [SerializeField] UiButton close = null!;
@@ -26,12 +29,14 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         readonly List<QuestMainRowView> _main = new List<QuestMainRowView>();
         readonly List<QuestSideRowView> _side = new List<QuestSideRowView>();
+        readonly List<QuestSideRowView> _activities = new List<QuestSideRowView>();
         UniTaskCompletionSource? _done;
 
         public bool Cancelable => true;
         public event Action<string>? ClaimClicked;
         public IReadOnlyList<QuestMainRowView> MainRows => _main;
         public IReadOnlyList<QuestSideRowView> SideRows => _side;
+        public IReadOnlyList<QuestSideRowView> ActivityRows => _activities;
         public UiButton CloseButton => close;
 
         void Awake() => close.Button.onClick.AddListener(() => _done?.TrySetResult());
@@ -70,6 +75,18 @@ namespace N29.HeroesDawn.Presentation.Hub
                 row.Claimed += id => ClaimClicked?.Invoke(id);
                 _side.Add(row);
             }
+            activityTitle.text = d.ActivityTitle;
+            activityList.Clear();
+            _activities.Clear();
+            foreach (var s in d.Activities)
+            {
+                var row = Instantiate(sideRowPrefab, activityList);
+                row.Show(s);
+                row.Claimed += id => ClaimClicked?.Invoke(id);
+                _activities.Add(row);
+            }
+            activityEmpty.text = d.ActivityEmpty;
+            activityEmpty.gameObject.SetActive(d.Activities.Length == 0);
             sideEmpty.text = d.SideEmpty;
             sideEmpty.gameObject.SetActive(d.Side.Length == 0);
         }

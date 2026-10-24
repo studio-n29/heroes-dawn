@@ -78,6 +78,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         {
             if (!f.Report.Victory) return;
             _daily.Record(DailyKind.WinCombats);
+            if (_c.Session.RunZone != null) _quests.RecordCombatWon(_c.Session.RunZone.Id.Value);
             _quests.Record(QuestMetric.CombatsWon);
             _pass.AddXp(XpPerWin);
         }
@@ -86,6 +87,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         {
             var id = _c.Session.RunZone?.Id.Value ?? "";
             _daily.Record(DailyKind.ValidateZone);
+            if (id.Length > 0) _quests.RecordZoneValidated(id);
             if (z.Rewards.FirstClear) _quests.Record(QuestMetric.ZonesCleared);
             _pass.AddXp(z.Rewards.FirstClear ? XpPerFirstClear : XpPerReplay);
             if (z.Rewards.FirstClear)

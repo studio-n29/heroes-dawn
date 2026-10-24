@@ -13,9 +13,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         event Action<MemberId> MemberTapped;
         event Action<MemberId> SquadToggled;
         event Action MissionClicked;
-        /// <summary>Emplacement de composition touchÃ© (0 Ã  2) : charge la composition, ou l'enregistre en mode sauvegarde.</summary>
+        /// <summary>Emplacement de composition touché (0 à 2) : charge la composition, ou l'enregistre en mode sauvegarde.</summary>
         event Action<int> PresetClicked;
-        /// <summary>Bouton Â« Sauver Â» touchÃ© : le prochain emplacement touchÃ© enregistre l'escouade.</summary>
+        /// <summary>Bouton « Sauver » touché : le prochain emplacement touché enregistre l'escouade.</summary>
         event Action PresetSaveClicked;
         void Show(TeamPageData data);
     }

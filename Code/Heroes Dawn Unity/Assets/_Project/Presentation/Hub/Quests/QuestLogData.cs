@@ -30,6 +30,11 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string MainTitle;
         public string SideTitle;
         public string SideEmpty;
+        /// <summary>Titre de la section « Activités du jour ».</summary>
+        public string ActivityTitle;
+        public string ActivityEmpty;
+        /// <summary>Activités du jour (même présentation qu'une quête secondaire ; identifiant act:n).</summary>
+        public SideQuestRowData[] Activities;
         public string Close;
         public MainQuestRowData[] Main;
         public SideQuestRowData[] Side;

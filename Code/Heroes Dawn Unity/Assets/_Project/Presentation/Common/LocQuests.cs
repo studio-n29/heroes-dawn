@@ -13,6 +13,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["quests.main"] = "QUÊTES PRINCIPALES · BROOKLYN";
             d["quests.side"] = "QUÊTES SECONDAIRES";
             d["quests.side.empty"] = "Aucune quête secondaire pour l'instant. Avance dans la campagne.";
+            d["activity.section"] = "ACTIVITÉS DU JOUR";
+            d["activity.empty"] = "Termine une zone pour débloquer des activités quotidiennes.";
+            d["activity.title"] = "Activité · {0}";
+            d["activity.wins"] = "Gagne {0} combats dans la zone {1}.";
+            d["activity.clear"] = "Valide à nouveau la zone {0}.";
             d["quests.locked"] = "Termine la zone précédente pour la débloquer.";
             d["quests.main.done"] = "Zone sécurisée.";
             d["quests.state.active"] = "EN COURS";

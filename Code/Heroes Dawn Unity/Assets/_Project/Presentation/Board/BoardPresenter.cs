@@ -619,7 +619,7 @@ namespace N29.HeroesDawn.Presentation.Board
             await LeaveToHqAsync();
         }
 
-        /// <summary>AprÃ¨s la premiÃ¨re validation de la zone 1.1 : propose le formulaire de retour de playtest (une seule fois).</summary>
+        /// <summary>Après la première validation de la zone 1.1 : propose le formulaire de retour de playtest (une seule fois).</summary>
         async UniTask AskPlaytestFeedbackAsync()
         {
             var zone = _session.RunZone;

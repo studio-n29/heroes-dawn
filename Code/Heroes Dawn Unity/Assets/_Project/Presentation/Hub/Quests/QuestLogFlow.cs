@@ -31,7 +31,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var view = await _modals.OpenAsync<IQuestLogPopupView>(ct);
             void Claim(string id)
             {
-                var result = _quests.Claim(id);
+                var result = id.StartsWith("act:") && int.TryParse(id.Substring(4), out var act) ? _quests.ClaimActivity(act) : _quests.Claim(id);
                 if (result.IsFailure) { _toasts.Show(_loc.Error(result.Error!), ToastKind.Error); return; }
                 _toasts.Show(_loc.F("quests.claimed", MetaFormat.RewardText(result.Value, _loc)), ToastKind.Reward);
                 view.Refresh(Build(session));
@@ -39,6 +39,12 @@ namespace N29.HeroesDawn.Presentation.Hub
             view.ClaimClicked += Claim;
             try { await view.ShowAsync(Build(session), ct); }
             finally { view.ClaimClicked -= Claim; _modals.Close(view); }
+        }
+
+        string ZoneName(string zoneId)
+        {
+            foreach (var z in _quests.Zones) if (z.Id.Value == zoneId) return _loc.T(z.NameKey.Replace(".name", ".short"));
+            return zoneId;
         }
 
         public QuestLogData Build(ISessionReadModel session)
@@ -64,8 +70,21 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Claimed = v.Claimed,
                 ClaimLabel = _loc.T("quests.claim"),
             }).ToArray();
+            var activities = _quests.Activities().Select(a => new SideQuestRowData
+            {
+                Id = "act:" + a.Index,
+                Title = _loc.F("activity.title", ZoneName(a.ZoneId)),
+                Description = a.Kind == ActivityKind.WinCombats ? _loc.F("activity.wins", a.Target, ZoneName(a.ZoneId)) : _loc.F("activity.clear", ZoneName(a.ZoneId)),
+                ProgressText = a.Claimed ? _loc.T("quests.state.done") : a.Progress + " / " + a.Target,
+                Progress01 = a.Target == 0 ? 1f : a.Progress / (float)a.Target,
+                RewardText = MetaFormat.RewardText(a.Reward, _loc),
+                Claimable = a.Claimable,
+                Claimed = a.Claimed,
+                ClaimLabel = _loc.T("quests.claim"),
+            }).ToArray();
             return new QuestLogData
             {
+                ActivityTitle = _loc.T("activity.section"), ActivityEmpty = _loc.T("activity.empty"), Activities = activities,
                 Title = _loc.T("quests.title"), MainTitle = _loc.T("quests.main"), SideTitle = _loc.T("quests.side"),
                 SideEmpty = _loc.T("quests.side.empty"), Close = _loc.T("ui.close"), Main = main, Side = side,
             };

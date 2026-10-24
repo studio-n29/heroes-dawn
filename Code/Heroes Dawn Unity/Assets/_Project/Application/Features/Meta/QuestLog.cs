@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
     /// Suivi des quêtes du QG. Principales : les zones de la campagne (verrouillée, en cours, terminée). Secondaires : des compteurs
     /// qui se débloquent au fil des zones validées et se réclament une fois remplis.
     /// </summary>
-    public sealed class QuestLog
+    public sealed partial class QuestLog
     {
         public static readonly IReadOnlyList<QuestDef> Catalog = new[]
         {
@@ -135,6 +135,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         {
             int n = 0;
             foreach (var v in Side()) if (v.Claimable) n++;
+            foreach (var a in Activities()) if (a.Claimable) n++;
             return n;
         }
 

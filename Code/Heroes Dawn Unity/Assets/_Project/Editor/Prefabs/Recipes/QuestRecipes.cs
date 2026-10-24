@@ -98,6 +98,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             v.childForceExpandWidth = true;
             v.childForceExpandHeight = false;
 
+var actTitle = Ui.Txt(scrollBody, "", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "ActivityTitle");            actTitle.rectTransform.Pref(-1, 48, 1);            actTitle.Inked();            var actEmpty = Ui.Txt(scrollBody, "", 24, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "ActivityEmpty");            actEmpty.rectTransform.Pref(-1, 44, 1);            var actList = Ui.Rect(scrollBody, "ActivityList");            var al = actList.gameObject.AddComponent<VerticalLayoutGroup>();            al.spacing = 10;            al.childControlWidth = true; al.childControlHeight = true; al.childForceExpandWidth = true; al.childForceExpandHeight = false;            actList.Pref(-1, -1, 1);
             var mainTitle = Ui.Txt(scrollBody, "", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "MainTitle");
             mainTitle.rectTransform.Pref(-1, 48, 1);
             mainTitle.Inked();
@@ -127,6 +128,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "mainTitle", mainTitle);
             ctx.Wire(view, "sideTitle", sideTitle);
             ctx.Wire(view, "sideEmpty", sideEmpty);
+            ctx.Wire(view, "activityTitle", actTitle);
+            ctx.Wire(view, "activityEmpty", actEmpty);
+            ctx.Wire(view, "activityList", actList);
             ctx.Wire(view, "mainList", mainList);
             ctx.Wire(view, "sideList", sideList);
             ctx.Wire(view, "mainRowPrefab", mainRow);
