@@ -181,6 +181,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["playtest.comment_hint"] = "Écris ici…";
             d["playtest.send"] = "ENVOYER";
             d["playtest.later"] = "PLUS TARD";
+            d["playtest.sent"] = "Merci ! Ton retour a bien été envoyé à l’équipe.";
             d["playtest.need_all"] = "Note les quatre questions.";
             d["playtest.thanks"] = "Merci ! Ton retour est copié : colle-le dans un message à l’équipe.";
             d["team.preset.filled"] = "{0} · {1} agents";

@@ -18,6 +18,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly IModalService _modals;
         readonly ILocalization _loc;
         readonly IToastService _toasts;
+        readonly PlaytestFormSender _sender = new PlaytestFormSender();
 
         public PlaytestFormFlow(PlaytestFeedback feedback, IModalService modals, ILocalization loc, IToastService toasts)
         {
@@ -53,7 +54,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (answers == null) return false;
             string report = _feedback.Submit(answers, UnityEngine.Application.version, Labels());
             Deliver(report);
-            _toasts.Show(_loc.T("playtest.thanks"), ToastKind.Reward);
+            bool sent = _sender.Enabled && await _sender.SendAsync(answers, UnityEngine.Application.version, ct);
+            _toasts.Show(_loc.T(sent ? "playtest.sent" : "playtest.thanks"), ToastKind.Reward);
             return true;
         }
 
