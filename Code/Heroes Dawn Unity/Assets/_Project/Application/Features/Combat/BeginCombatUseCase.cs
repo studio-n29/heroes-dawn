@@ -49,7 +49,8 @@ namespace N29.HeroesDawn.Application.Features.Combat
             foreach (var m in fighters)
             {
                 if (allies.Count >= MetaRules.SquadSize) break;
-                allies.Add(new AllyEntry(m.Id, m.Level, m.Fatigue, run.MalusPercent(m.Id), m.Items.ToArray(), m.Cards.ToArray()));
+                allies.Add(new AllyEntry(m.Id, m.Level, m.Fatigue, run.MalusPercent(m.Id), m.Items.ToArray(), m.Cards.ToArray(),
+                                         m.Cards.Select(c => c.HasValue ? Collection.CollectionOps.CardLevel(_s, c.Value) : 1).ToArray()));
                 engaged.Add(m);
             }
             var waves = new List<IReadOnlyList<EnemyEntry>>();

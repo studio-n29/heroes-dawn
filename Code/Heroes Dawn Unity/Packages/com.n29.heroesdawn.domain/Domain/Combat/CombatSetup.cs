@@ -15,11 +15,14 @@ namespace N29.HeroesDawn.Domain.Combat
         public IReadOnlyList<ItemId> Items { get; }
         /// <summary>Cartes equipees : emplacement 3 puis 4 (une entree vide = pas de carte).</summary>
         public IReadOnlyList<CardId?> Cards { get; }
-        public AllyEntry(MemberId member, int level, int fatiguePercent, int statPercent = 0, IReadOnlyList<ItemId>? items = null, IReadOnlyList<CardId?>? cards = null)
+        /// <summary>Niveau de chaque carte équipée (même ordre que <see cref="Cards"/>) ; absent : niveau 1.</summary>
+        public IReadOnlyList<int> CardLevels { get; }
+        public AllyEntry(MemberId member, int level, int fatiguePercent, int statPercent = 0, IReadOnlyList<ItemId>? items = null, IReadOnlyList<CardId?>? cards = null, IReadOnlyList<int>? cardLevels = null)
         {
             Member = member; Level = level; FatiguePercent = fatiguePercent; StatPercent = statPercent;
             Items = items ?? System.Array.Empty<ItemId>();
             Cards = cards ?? System.Array.Empty<CardId?>();
+            CardLevels = cardLevels ?? System.Array.Empty<int>();
         }
     }
 

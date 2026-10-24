@@ -170,7 +170,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         InfoRowData CardRow(SkillCardDef def, string title)
         {
             var owner = _session.Find(_member);
-            var r = InfoRowData.Basic(title, CollectionText.CardLine(Loc, def, owner != null ? CollectionText.StatsOf(owner.Def, owner.Level, _session.Content.Balance) : (SkillOwnerStats?)null));
+            var r = InfoRowData.Basic(title, CollectionText.CardLine(Loc, def, owner != null ? CollectionText.StatsOf(owner.Def, owner.Level, _session.Content.Balance) : (SkillOwnerStats?)null, CollectionOps.CardLevel(_session, def.Id)));
             r.Tag = CollectionText.Tag(CollectionText.CardName(Loc, def));
             r.TagColor = CollectionText.RarityColor(def.Rarity);
             r.Art = AgentArt.Card(def.Id.Value);

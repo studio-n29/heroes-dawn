@@ -25,6 +25,8 @@ namespace N29.HeroesDawn.Application.Features.Collection
         public static readonly DomainError NoBooster = new DomainError("collection.no_booster", "errors.collection_no_booster");
         public static readonly DomainError NotForSale = new DomainError("collection.not_for_sale", "errors.collection_not_for_sale");
         public static readonly DomainError NotEnoughPr = new DomainError("collection.pr", "errors.not_enough_pr");
+        public static readonly DomainError MaxLevel = new DomainError("collection.max_level", "errors.collection_max_level");
+        public static readonly DomainError NeedCopies = new DomainError("collection.copies", "errors.collection_copies");
     }
 
     /// <summary>Une offre d'objet de la boutique du jour.</summary>
@@ -72,6 +74,13 @@ namespace N29.HeroesDawn.Application.Features.Collection
         public static int EquippedCards(GameSession s, CardId id) => s.Roster.Sum(m => m.Cards.Count(c => c.HasValue && c.Value == id));
         public static int AvailableCards(GameSession s, CardId id) => OwnedCards(s, id) - EquippedCards(s, id);
         public static void AddCard(GameSession s, CardId id, int count = 1) => Add(Save(s).cards, id.Value, count);
+        /// <summary>Niveau d'une carte (1 à <see cref="CardLevels.Max"/>).</summary>
+        public static int CardLevel(GameSession s, CardId id) => System.Math.Min(CardLevels.Max, System.Math.Max(1, Get(Save(s).cardLevels, id.Value)));
+        public static void SetCardLevel(GameSession s, CardId id, int level)
+        {
+            foreach (var c in Save(s).cardLevels) if (c.id == id.Value) { c.value = level; return; }
+            Save(s).cardLevels.Add(new CounterSave { id = id.Value, value = level });
+        }
 
         // ---- Boosters
         public static int Boosters(GameSession s, string id) => Get(Save(s).boosters, id);
@@ -153,6 +162,29 @@ namespace N29.HeroesDawn.Application.Features.Collection
             if (slot < 0 || slot >= m.Cards.Length || !m.Cards[slot].HasValue) return Result.Fail(CollectionErrors.NothingEquipped);
             m.Cards[slot] = null;
             if (slot == 0 && m.Cards[1].HasValue) { m.Cards[0] = m.Cards[1]; m.Cards[1] = null; }
+            Changed(true);
+            return Result.Ok();
+        }
+
+        // ------------------------------------------------------------------ Amélioration des cartes
+
+        /// <summary>
+        /// Monte une carte d'un niveau : consomme des exemplaires en doublon (jamais celui qu'elle garde, ni ceux équipés) et des Crédits.
+        /// </summary>
+        public Result UpgradeCard(CardId card)
+        {
+            if (!Defs.HasCard(card)) return Result.Fail(CollectionErrors.UnknownThing);
+            int owned = CollectionOps.OwnedCards(Session, card);
+            if (owned <= 0) return Result.Fail(CollectionErrors.NotOwned);
+            int level = CollectionOps.CardLevel(Session, card);
+            if (level >= CardLevels.Max) return Result.Fail(CollectionErrors.MaxLevel);
+            int copies = CardLevels.CopiesToUpgrade(level);
+            int keep = System.Math.Max(1, CollectionOps.EquippedCards(Session, card));
+            if (owned - copies < keep) return Result.Fail(CollectionErrors.NeedCopies);
+            if (!Session.Wallet.TrySpend(CardLevels.CreditsToUpgrade(level), 0)) return Result.Fail(MetaErrors.NotEnoughCredits);
+            CollectionOps.AddCard(Session, card, -copies);
+            CollectionOps.SetCardLevel(Session, card, level + 1);
+            _c.PublishWallet();
             Changed(true);
             return Result.Ok();
         }

@@ -15,6 +15,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>0 commune, 1 rare, 2 épique, 3 légendaire : règle l'intensité de l'éclat à la révélation.</summary>
         public int RarityRank;
         public string Glyph;
+        /// <summary>Illustration de la carte ; nulle : la pastille d'initiale la remplace.</summary>
+        public Sprite? Art;
+        /// <summary>Effets de la carte (dÃ©gÃ¢ts, soinsâ€¦ en montants bruts).</summary>
+        public string Description;
         public bool IsNew;
     }
 

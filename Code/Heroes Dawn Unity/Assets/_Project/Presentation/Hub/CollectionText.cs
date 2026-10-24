@@ -51,7 +51,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             => new SkillOwnerStats(UnitFactory.ScaleStat(def.BaseStats.Atk, level, balance), UnitFactory.ScaleStat(def.BaseStats.Hp, level, balance));
 
         /// <summary>Statistiques de référence quand la carte n'est pas portée : le meilleur agent de l'équipe, ou le premier niveau à défaut.</summary>
-        public static SkillOwnerStats ReferenceStats(GameSession session)
+        public static SkillOwnerStats ReferenceStats(ISessionReadModel session)
         {
             var best = session.Roster.OrderByDescending(m => m.Level).FirstOrDefault();
             return best != null ? StatsOf(best.Def, best.Level, session.Content.Balance) : new SkillOwnerStats(100, 1000);
@@ -60,8 +60,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public static string CardName(ILocalization loc, SkillCardDef card) => loc.SkillName(card.Skill);
 
         /// <summary>« Matière · Rare · Dégâts 80 % … » (catégorie, rareté, effets).</summary>
-        public static string CardLine(ILocalization loc, SkillCardDef card, SkillOwnerStats? owner = null)
-            => loc.F("grimoire.card_line", loc.FamilyName(card.Family), RarityName(loc, card.Rarity), owner.HasValue ? loc.DescribeSkill(card.Skill, owner.Value.Atk, owner.Value.MaxHp) : loc.DescribeSkill(card.Skill));
+        public static string CardLine(ILocalization loc, SkillCardDef card, SkillOwnerStats? owner = null, int level = 1)
+            => loc.F("grimoire.card_line", loc.FamilyName(card.Family), RarityName(loc, card.Rarity), owner.HasValue ? loc.DescribeSkill(CardLevels.Scale(card.Skill, level), owner.Value.Atk, owner.Value.MaxHp) : loc.DescribeSkill(CardLevels.Scale(card.Skill, level)));
 
         /// <summary>Initiale colorée pour la pastille d'une ligne.</summary>
         public static string Tag(string name) => string.IsNullOrEmpty(name) ? "?" : name.Substring(0, 1).ToUpperInvariant();

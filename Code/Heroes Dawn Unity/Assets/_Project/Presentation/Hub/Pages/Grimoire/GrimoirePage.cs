@@ -62,16 +62,35 @@ namespace N29.HeroesDawn.Presentation.Hub
             foreach (var card in Defs.Cards.OrderByDescending(c => CollectionOps.OwnedCards(_session, c.Id) > 0).ThenByDescending(c => c.Rarity).ThenBy(c => c.Family).ThenBy(c => c.Id))
             {
                 int count = CollectionOps.OwnedCards(_session, card.Id);
-                var r = InfoRowData.Basic(CollectionText.CardName(Loc, card), CollectionText.CardLine(Loc, card, CollectionText.ReferenceStats(_session)));
+                int level = CollectionOps.CardLevel(_session, card.Id);
+                var r = InfoRowData.Basic(CollectionText.CardName(Loc, card), CollectionText.CardLine(Loc, card, CollectionText.ReferenceStats(_session), level));
                 r.Tag = CollectionText.Tag(CollectionText.CardName(Loc, card));
                 r.TagColor = count > 0 ? CollectionText.RarityColor(card.Rarity) : Theme.Surface3;
-                r.Badge = count > 0 ? Loc.F("grimoire.owned", count) : Loc.T("grimoire.missing");
+                r.Badge = count > 0 ? Loc.F("grimoire.owned_level", count, level, CardLevels.Max) : Loc.T("grimoire.missing");
+                if (count > 0) r.A = UpgradeButton(card, level, count);
                 r.Dim = count == 0;
                 r.Art = AgentArt.Card(card.Id.Value);
                 rows.Add(r);
                 _rows.Add(card);
             }
             View.ShowRows(rows.ToArray());
+        }
+
+        /// <summary>Bouton Â« AmÃ©liorer Â» de la fiche : coÃ»t en doublons et en CrÃ©dits, avec la raison quand il est grisÃ©.</summary>
+        RowButtonData UpgradeButton(SkillCardDef card, int level, int count)
+        {
+            if (level >= CardLevels.Max) return RowButtonData.Of(Loc.T("grimoire.max_level"), false, Loc.T("errors.collection_max_level"), 3);
+            int copies = CardLevels.CopiesToUpgrade(level), credits = CardLevels.CreditsToUpgrade(level);
+            int keep = System.Math.Max(1, CollectionOps.EquippedCards(_session, card.Id));
+            string reason = count - copies < keep ? Loc.F("grimoire.upgrade_copies", copies)
+                          : _session.Wallet.Credits < credits ? Loc.F("grimoire.upgrade_credits", credits - _session.Wallet.Credits) : "";
+            return RowButtonData.Of(Loc.F("grimoire.upgrade", copies, credits), reason.Length == 0, reason, 1);
+        }
+
+        protected override void OnRowButton(int row, int button)
+        {
+            if (row < 0 || row >= _rows.Count || button != 0) return;
+            if (Report(_book.UpgradeCard(_rows[row].Id), Loc.T("grimoire.upgraded"))) Refresh();
         }
 
         protected override void OnHeader(int index)
@@ -82,7 +101,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         async UniTaskVoid OpenAsync()
         {
-            try { await BoosterOpening.OpenAndShowAsync(_book, Defs, _modals, Loc, Toasts, Lifetime); }
+            try { await BoosterOpening.OpenAndShowAsync(_book, Defs, _modals, Loc, Toasts, Lifetime, CollectionText.ReferenceStats(_session)); }
             catch (System.OperationCanceledException) { }
             if (!Disposed) Refresh();
         }

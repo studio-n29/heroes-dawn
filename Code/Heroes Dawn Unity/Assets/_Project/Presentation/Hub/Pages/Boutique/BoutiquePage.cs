@@ -192,7 +192,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _opening = true;
             try
             {
-                await BoosterOpening.OpenAndShowAsync(_collection, _session.Content.Collection, _modals, Loc, Toasts, Lifetime);
+                await BoosterOpening.OpenAndShowAsync(_collection, _session.Content.Collection, _modals, Loc, Toasts, Lifetime, CollectionText.ReferenceStats(_session));
             }
             catch (OperationCanceledException) { }
             finally { _opening = false; if (!Disposed) Refresh(); }

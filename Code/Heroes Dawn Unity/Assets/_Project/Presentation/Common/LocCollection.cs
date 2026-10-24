@@ -106,6 +106,12 @@ namespace N29.HeroesDawn.Presentation.Common
             d["grimoire.owned"] = "×{0}";
             d["grimoire.missing"] = "—";
             d["grimoire.card_line"] = "{0} · {1} · {2}";
+            d["grimoire.owned_level"] = "×{0} · Niv. {1}/{2}";
+            d["grimoire.upgrade"] = "AMÉLIORER ({0} doublon(s) + {1} Cr)";
+            d["grimoire.max_level"] = "NIVEAU MAX";
+            d["grimoire.upgrade_copies"] = "Il faut {0} exemplaire(s) en doublon.";
+            d["grimoire.upgrade_credits"] = "Il manque {0} Crédits.";
+            d["grimoire.upgraded"] = "Carte améliorée !";
             d["grimoire.opened_title"] = "BOOSTER OUVERT !";
             d["grimoire.opened_body"] = "Tu obtiens :\n{0}";
             d["grimoire.opened_ok"] = "SUPER";
@@ -143,6 +149,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["errors.collection_member"] = "Agent introuvable.";
             d["errors.collection_unknown"] = "Objet ou carte inconnu.";
             d["errors.collection_no_slot"] = "Aucun emplacement libre.";
+            d["errors.collection_max_level"] = "Cette carte est déjà au niveau maximum.";
+            d["errors.collection_copies"] = "Il manque des exemplaires en doublon.";
             d["errors.collection_not_owned"] = "Tu n'en as plus de libre en réserve.";
             d["errors.collection_family"] = "Cette carte ne va pas à la catégorie de cet agent.";
             d["errors.collection_first_card"] = "Équipe d'abord la carte de l'emplacement 3.";

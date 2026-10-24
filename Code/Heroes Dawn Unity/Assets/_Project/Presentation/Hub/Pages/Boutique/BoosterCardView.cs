@@ -14,6 +14,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] GameObject faceRoot = null!;
         [SerializeField] GameObject back = null!;
         [SerializeField] TMP_Text glyph = null!;
+        [SerializeField] Image art = null!;
+        [SerializeField] TMP_Text description = null!;
         [SerializeField] TMP_Text cardName = null!;
         [SerializeField] TMP_Text rarity = null!;
         [SerializeField] GameObject newBadge = null!;
@@ -33,6 +35,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             Revealed = false;
             frame.color = Theme.FrostEdge;
             glyph.text = d.Glyph;
+            art.sprite = d.Art;
+            art.enabled = d.Art != null;
+            glyph.enabled = d.Art == null;
+            description.text = d.Description ?? "";
             cardName.text = d.Name;
             rarity.text = d.RarityName;
             rarity.color = Color.Lerp(d.RarityColor, Theme.Navy, 0.35f);
