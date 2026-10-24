@@ -79,6 +79,17 @@ namespace N29.HeroesDawn.Presentation.Common
             d["sheet.picker_close"] = "FERMER";
             d["page.loadout"] = "Équipement";
             d["page.grimoire"] = "Grimoire";
+            d["page.inventory"] = "Inventaire";
+            d["inventory.header"] = "TES OBJETS";
+            d["inventory.line"] = "{0} objet(s) · {1} équipé(s)";
+            d["inventory.team"] = "ÉQUIPE";
+            d["inventory.worn"] = "Équipé sur : {0}";
+            d["inventory.count"] = "×{0}";
+            d["inventory.empty"] = "Aucun objet";
+            d["inventory.empty_sub"] = "Gagne des combats : les objets se trouvent sur les ennemis vaincus.";
+            d["qg.grimoire.info"] = "{0} / {1} cartes";
+            d["qg.inventory.info"] = "{0} objet(s)";
+            d["qg.agents.info"] = "{0} / {1} agents";
             d["loadout.header"] = "Équipement de {0}";
             d["loadout.line"] = "Objets {0}/{1} · Cartes {2}/{3} · {4}";
             d["loadout.grimoire"] = "GRIMOIRE";

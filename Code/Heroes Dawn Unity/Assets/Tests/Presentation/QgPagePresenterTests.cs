@@ -66,7 +66,9 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(Room(HubPage.Operations).Info, Is.EqualTo(new LocLocalization().T("qg.ops.idle")));
             Assert.That(Room(HubPage.Lab).Info, Is.EqualTo(new LocLocalization().T("qg.lab.idle")));
             Assert.That(Room(HubPage.Archives).Badge, Is.GreaterThan(0), "des fiches de départ sont à lire");
-            Assert.That(_view.Last.Rooms.Length, Is.EqualTo(5));
+            Assert.That(_view.Last.Rooms.Length, Is.EqualTo(8), "salon, infirmerie, opérations, labo, archives, grimoire, inventaire, agents");
+            Assert.That(_view.Last.Rooms.Select(r => r.Page).ToArray(), Does.Contain(HubPage.Grimoire));
+            Assert.That(_view.Last.Rooms.Select(r => r.Page).ToArray(), Does.Contain(HubPage.Inventory));
         }
 
         [Test, Description("Vérifie que le QG montre les trois missions du jour avec leur avancement et l'objectif secondaire quand il existe — parce que ces cartes ne sont plus BIENTÔT")]

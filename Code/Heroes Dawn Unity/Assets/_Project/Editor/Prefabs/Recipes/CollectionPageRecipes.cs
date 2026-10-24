@@ -134,3 +134,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx) => CardGridKit.Build<GrimoirePageView>(ctx, "GrimoirePage").gameObject;
     }
 }
+
+namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
+{
+    /// <summary>Page Inventaire : les objets possédés en grille avec fiche détaillée.</summary>
+    public sealed class InventoryPageRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Pages/Inventory.prefab";
+        public int Order => 10;
+        public UnityEngine.GameObject Build(PrefabContext ctx) => CardGridKit.Build<N29.HeroesDawn.Presentation.Hub.InventoryPageView>(ctx, "InventoryPage").gameObject;
+    }
+}

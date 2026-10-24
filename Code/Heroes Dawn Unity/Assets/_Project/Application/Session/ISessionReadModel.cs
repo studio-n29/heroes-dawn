@@ -14,6 +14,10 @@ namespace N29.HeroesDawn.Application.Session
     {
         ContentCatalog Content { get; }
         PlayerAccount? Account { get; }
+        /// <summary>Nombre d'objets possédés (tous exemplaires).</summary>
+        int OwnedItemCount { get; }
+        /// <summary>Nombre de cartes différentes possédées.</summary>
+        int OwnedCardKinds { get; }
         IWalletReadModel Wallet { get; }
         IReadOnlyList<ITeamMemberReadModel> Roster { get; }
         IReadOnlyList<ITeamMemberReadModel> Squad { get; }

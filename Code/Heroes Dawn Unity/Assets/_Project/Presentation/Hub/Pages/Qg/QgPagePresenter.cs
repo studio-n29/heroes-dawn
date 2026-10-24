@@ -113,6 +113,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                     new RoomCardData { Page = HubPage.Operations, Title = _loc.T("page.operations"), Info = OperationsInfo(), Badge = _meta.OperationsBadge },
                     new RoomCardData { Page = HubPage.Lab, Title = _loc.T("page.lab"), Info = LabInfo(), Badge = _meta.LabBadge },
                     new RoomCardData { Page = HubPage.Archives, Title = _loc.T("page.archives"), Info = ArchivesInfo(), Badge = _meta.ArchivesBadge },
+                    new RoomCardData { Page = HubPage.Grimoire, Title = _loc.T("page.grimoire"), Info = GrimoireInfo() },
+                    new RoomCardData { Page = HubPage.Inventory, Title = _loc.T("page.inventory"), Info = _loc.F("qg.inventory.info", _session.OwnedItemCount) },
+                    new RoomCardData { Page = HubPage.Agents, Title = _loc.T("page.agents"), Info = _loc.F("qg.agents.info", s.Roster.Count, s.Content.Members.Count) },
                 },
                 DailyLines = daily.Select(d => _loc.F("qg.daily.line", _loc.F("daily." + d.Template.Id, d.Template.Target), d.Progress, d.Template.Target)).ToArray(),
                 DailyBadge = claimable > 0 ? claimable.ToString() : "",
@@ -134,6 +137,13 @@ namespace N29.HeroesDawn.Presentation.Hub
             var zone = _session.Content.Zones.FirstOrDefault(z => z.Id.Value == v.ZoneId);
             string name = zone != null ? _loc.T(zone.NameKey.Replace(".name", ".short")) : v.ZoneId;
             return _loc.F("qg.secondary.line", name, MetaFormat.Duration(v.Left));
+        }
+
+        string GrimoireInfo()
+        {
+            var defs = _session.Content.Collection;
+            int owned = _session.OwnedCardKinds;
+            return _loc.F("qg.grimoire.info", owned, defs.Cards.Count);
         }
 
         string OperationsInfo()

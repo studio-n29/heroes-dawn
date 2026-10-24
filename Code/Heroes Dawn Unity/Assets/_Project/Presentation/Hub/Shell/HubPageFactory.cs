@@ -42,6 +42,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             HubPage.Loadout => Make<LoadoutPageView, ILoadoutPageView, LoadoutPagePresenter>(location),
             HubPage.Grimoire => Make<GrimoirePageView, IGrimoirePageView, GrimoirePagePresenter>(location),
             HubPage.Agents => Make<AgentsPageView, IAgentsPageView, AgentsPagePresenter>(location),
+            HubPage.Inventory => Make<InventoryPageView, IInventoryPageView, InventoryPagePresenter>(location),
             _ => throw new InvalidOperationException("Page du hub pas encore disponible : " + location.Page),
         };
 

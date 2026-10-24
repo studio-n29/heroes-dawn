@@ -96,6 +96,9 @@ namespace N29.HeroesDawn.Application.Session
         /// <summary>Méta-progression (pass, missions, opérations…) : modifiée uniquement par les services de Features/Meta.</summary>
         public MetaSave Meta { get; private set; } = new MetaSave();
 
+        public int OwnedItemCount { get { int n = 0; foreach (var i in Meta.collection.items) n += i.value; return n; } }
+        public int OwnedCardKinds { get { int n = 0; foreach (var c in Meta.collection.cards) if (c.value > 0) n++; return n; } }
+
         public GameSession(ContentCatalog content)
         {
             Content = content;

@@ -72,12 +72,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             roomsTitle.Inked();
             var grid = Ui.Rect(rt, "Rooms").At(0f, 1f, 0, -52, LeftW, 356);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(350, 168);
-            layout.spacing = new Vector2(25, 20);
+            layout.cellSize = new Vector2(262, 168);
+            layout.spacing = new Vector2(17, 20);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            layout.constraintCount = 3;
+            layout.constraintCount = 4;
             var rooms = new List<Object>();
-            for (int i = 0; i < 5; i++) rooms.Add(ctx.Nest<RoomCardView>("Widgets/RoomCard.prefab", grid, "Room" + i));
+            for (int i = 0; i < 8; i++) rooms.Add(ctx.Nest<RoomCardView>("Widgets/RoomCard.prefab", grid, "Room" + i));
 
             // ---- Fil du QG
             var fil = Ui.Panel(rt, "Fil", Theme.Surface, 5f, 10f, true);
