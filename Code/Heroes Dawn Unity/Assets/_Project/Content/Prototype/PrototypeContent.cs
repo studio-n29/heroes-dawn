@@ -149,7 +149,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 N("n06", CaseType.Resource, 3, 1), N("n07", CaseType.Combat, 4, 1, r: CombatRank.Easy), N("n08", CaseType.MiniGame, 5, 1, true),
                 N("n09", CaseType.Empty, 6, 2), N("n10", CaseType.Rest, 7, 2),
                 N("n11", CaseType.Combat, 8, 3), N("n12", CaseType.Resource, 9, 3), N("n13", CaseType.Narrative, 10, 3),
-                N("n14", CaseType.Resource, 8, 1), N("n15", CaseType.MiniGame, 9, 1, activity: "fishing_docks"), N("n16", CaseType.Combat, 10, 1),
+                N("n14", CaseType.Resource, 8, 1), N("n15", CaseType.MiniGame, 9, 1, activity: "deflect_docks"), N("n16", CaseType.Combat, 10, 1),
                 N("n17", CaseType.Empty, 11, 2), N("n18", CaseType.Resource, 12, 2),
                 N("n19", CaseType.Combat, 13, 3), N("n20", CaseType.Narrative, 14, 3), N("n21", CaseType.MiniGame, 13, 1, activity: "dialogue_dockers"),
                 N("n22", CaseType.Rest, 14, 1), N("n23", CaseType.Combat, 15, 2, true, CombatRank.Elite, narration: brickTalk),

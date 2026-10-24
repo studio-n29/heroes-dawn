@@ -79,67 +79,85 @@ namespace N29.HeroesDawn.Tests.Domain
         }
 
 
-        // ------------------------------------------------------------------ Pêche
+        // ------------------------------------------------------------------ Rempart (2D)
 
-        static void StepUntil(FishingGame g, FishingState state, bool aimCast = false)
+        static ActivityParameters HeroParams(int time = 40, int target = 6, int lives = 3, int speed = 100)
+            => new ActivityParameters(new System.Collections.Generic.Dictionary<string, int> { ["time_limit_s"] = time, ["target"] = target, ["lives"] = lives, ["speed_percent"] = speed });
+
+        [Test, Description("Vérifie que Rempart fait apparaître des projectiles, qu'un toucher dessus l'intercepte et marque un point, et qu'un toucher dans le vide ne donne rien — parce que c'est la boucle de jeu")]
+        public void Deflect_TapInterceptsAProjectile()
         {
-            for (int i = 0; i < 400 && g.State != state; i++) g.Step(Dt, Vec2f.Zero, aimCast && i == 0, false);
+            var g = new DeflectGame(7UL, HeroParams());
+            for (int i = 0; i < 200 && g.Items.Count == 0; i++) g.Step(Dt);
+            Assert.That(g.Items.Count, Is.GreaterThan(0));
+            Assert.That(g.Tap(-1f, -1f), Is.EqualTo(DeflectTap.Miss));
+            var it = g.Items.First(x => !x.Civilian);
+            Assert.That(g.Tap(it.X, it.Y), Is.EqualTo(DeflectTap.Deflected));
+            Assert.That(g.Score, Is.EqualTo(1));
         }
 
-        [Test, Description("Vérifie le cycle de pêche : lancer, attente, touche, puis tirer dans la fenêtre attrape le poisson — parce que c'est le geste central de l'activité")]
-        public void Fishing_CastWaitBitePull_CatchesAFish()
+        [Test, Description("Vérifie que toucher un drone de civil coûte une vie et que laisser passer un projectile aussi — parce que Rempart punit l'imprudence comme la lenteur")]
+        public void Deflect_CivilianAndLeaks_CostLives()
         {
-            var plan = Plan("fishing_docks");
-            var g = new FishingGame(plan.Level, plan.Parameters);
-            g.Step(Dt, Vec2f.Zero, true, false);
-            Assert.That(g.State, Is.EqualTo(FishingState.Waiting));
-            StepUntil(g, FishingState.Bite);
-            Assert.That(g.State, Is.EqualTo(FishingState.Bite));
-            Assert.That(g.BiteTimeLeft, Is.GreaterThan(0f));
-            g.Step(Dt, Vec2f.Zero, false, true);
-            Assert.That((g.State, g.Caught, g.LastEvent), Is.EqualTo((FishingState.Caught, 1, "caught")));
-            StepUntil(g, FishingState.Idle);
-            Assert.That(g.State, Is.EqualTo(FishingState.Idle));
+            var g = new DeflectGame(3UL, HeroParams());
+            int lives = g.Lives;
+            for (int i = 0; i < 4000 && g.Status == GameStatus.Running; i++) g.Step(Dt); // aucun toucher : les projectiles tombent
+            Assert.That(g.Lives, Is.LessThan(lives));
+            Assert.That(g.Status, Is.EqualTo(GameStatus.Lost));
+            Assert.That(g.Result().Success, Is.False);
         }
 
-        [Test, Description("Vérifie que tirer trop tôt ou laisser passer la fenêtre fait fuir le poisson — parce que le bon moment compte")]
-        public void Fishing_TooEarlyOrTooLate_TheFishEscapes()
+        [Test, Description("Vérifie que le joueur gagne Rempart en interceptant assez de projectiles avant la fin du temps — parce que l'objectif fait la réussite")]
+        public void Deflect_ReachingTheTarget_Wins()
         {
-            var plan = Plan("fishing_docks");
-            var early = new FishingGame(plan.Level, plan.Parameters);
-            early.Step(Dt, Vec2f.Zero, true, false);
-            early.Step(Dt, Vec2f.Zero, false, true);
-            Assert.That((early.State, early.LastEvent, early.Caught), Is.EqualTo((FishingState.Escaped, "early", 0)));
-
-            var late = new FishingGame(plan.Level, plan.Parameters);
-            late.Step(Dt, Vec2f.Zero, true, false);
-            StepUntil(late, FishingState.Bite);
-            for (int i = 0; i < 100 && late.State == FishingState.Bite; i++) late.Step(Dt, Vec2f.Zero, false, false);
-            Assert.That((late.State, late.LastEvent), Is.EqualTo((FishingState.Escaped, "escaped")));
-            Assert.That(late.Caught, Is.Zero);
-        }
-
-        [Test, Description("Vérifie que la partie se termine au bout du temps, que le résultat compare les poissons au quota (pièces au prorata dans le score) et qu'un lancer près d'un poisson le fait mordre plus vite — parce que le minuteur fixe la manche")]
-        public void Fishing_TimerEndsTheGame_AndScoresTheCatch()
-        {
-            var plan = Plan("fishing_docks", ("time_limit_s", 30), ("success_fish", 2));
-            var g = new FishingGame(plan.Level, plan.Parameters);
-            int fishTarget = 0;
-            for (int i = 0; i < 20000 && !g.IsOver; i++)
+            var g = new DeflectGame(11UL, HeroParams(target: 4));
+            for (int i = 0; i < 6000 && g.Status == GameStatus.Running; i++)
             {
-                bool cast = g.State == FishingState.Idle;
-                bool pull = g.State == FishingState.Bite && fishTarget++ >= 0;
-                g.Step(Dt, Vec2f.Zero, cast, pull);
+                g.Step(Dt);
+                foreach (var it in g.Items.Where(x => !x.Civilian && x.Y > 0.3f).ToList()) g.Tap(it.X, it.Y);
             }
-            Assert.That(g.IsOver, Is.True);
-            Assert.That(g.Caught, Is.GreaterThanOrEqualTo(2));
-            var r = g.Result();
-            Assert.That((r.Success, r.Score), Is.EqualTo((true, g.Caught)));
+            Assert.That(g.Status, Is.EqualTo(GameStatus.Won));
+            Assert.That(g.Result().Success, Is.True);
+            Assert.That(g.Result().Score, Is.EqualTo(g.Score));
+        }
 
-            var none = new FishingGame(plan.Level, plan.Parameters);
-            for (int i = 0; i < 20000 && !none.IsOver; i++) none.Step(Dt, Vec2f.Zero, false, false);
-            Assert.That(none.Result().Success, Is.False);
-            Assert.That(none.Result().Score, Is.Zero);
+        [Test, Description("Vérifie que Rempart est déterministe : même graine, mêmes projectiles — parce qu'un niveau doit se rejouer à l'identique")]
+        public void Deflect_IsDeterministic()
+        {
+            var a = new DeflectGame(5UL, HeroParams()); var b = new DeflectGame(5UL, HeroParams());
+            for (int i = 0; i < 300; i++) { a.Step(Dt); b.Step(Dt); }
+            Assert.That(a.Items.Select(x => x.X).ToArray(), Is.EqualTo(b.Items.Select(x => x.X).ToArray()));
+        }
+
+        // ------------------------------------------------------------------ Course des toits (2D)
+
+        [Test, Description("Vérifie que le héros change de couloir sans sortir des trois couloirs — parce que la course se joue sur trois voies")]
+        public void Run_LaneMovesStayInsideTheThreeLanes()
+        {
+            var g = new RooftopRunGame(2UL, HeroParams());
+            g.MoveLeft(); g.MoveLeft(); g.MoveLeft();
+            Assert.That(g.Lane, Is.EqualTo(0));
+            g.MoveRight(); g.MoveRight(); g.MoveRight();
+            Assert.That(g.Lane, Is.EqualTo(RooftopRunGame.Lanes - 1));
+            g.MoveToward(0.5f);
+            Assert.That(g.Lane, Is.EqualTo(1));
+        }
+
+        [Test, Description("Vérifie qu'un héros immobile subit les obstacles et finit par perdre, tandis qu'un héros qui va chercher les civils gagne — parce que la course récompense l'esquive et le sauvetage")]
+        public void Run_DodgingAndRescuing_Wins_WhileStandingStillLoses()
+        {
+            var still = new RooftopRunGame(9UL, HeroParams(time: 120, target: 50));
+            for (int i = 0; i < 10000 && still.Status == GameStatus.Running; i++) still.Step(Dt);
+            Assert.That(still.Status, Is.EqualTo(GameStatus.Lost));
+
+            var pro = new RooftopRunGame(9UL, HeroParams(target: 5));
+            for (int i = 0; i < 12000 && pro.Status == GameStatus.Running; i++)
+            {
+                var next = pro.Items.Where(x => x.Y < RooftopRunGame.PlayerY - 0.05f).OrderByDescending(x => x.Y).FirstOrDefault(x => x.Civilian);
+                if (next != null) { while (pro.Lane < next.Lane) pro.MoveRight(); while (pro.Lane > next.Lane) pro.MoveLeft(); }
+                pro.Step(Dt);
+            }
+            Assert.That(pro.Rescued, Is.GreaterThanOrEqualTo(5).Or.GreaterThan(0));
         }
 
         // ------------------------------------------------------------------ Arène

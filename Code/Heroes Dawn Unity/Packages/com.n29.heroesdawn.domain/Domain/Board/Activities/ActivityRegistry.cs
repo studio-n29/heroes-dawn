@@ -66,13 +66,14 @@ namespace N29.HeroesDawn.Domain.Activities
 
         static ActivityRegistry? _default;
 
-        /// <summary>Types du prototype : réflexe (historique), potion, survie en neige, pêche, arène de combat, dialogue.</summary>
+        /// <summary>Types du prototype : réflexe (historique), potion, survie en neige, arène de combat, dialogue, et les deux mini-jeux 2D de héros (rempart, course des toits).</summary>
         public static ActivityRegistry Default => _default ??= new ActivityRegistry()
             .Register(new ReflexKind())
             .Register(new PotionKind())
             .Register(new SnowSurvivalKind())
-            .Register(new FishingKind())
             .Register(new CombatArenaKind())
+            .Register(new DeflectKind())
+            .Register(new RooftopRunKind())
             .Register(new DialogueKind());
     }
 

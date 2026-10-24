@@ -15,7 +15,6 @@ namespace N29.HeroesDawn.Presentation.Common
             d["stage.terrain.Snow"] = "neige"; d["stage.terrain.TallGrass"] = "herbe haute"; d["stage.terrain.Sand"] = "sable"; d["stage.terrain.ground"] = "sol";
 
             d["stage.instr.survival"] = "Traverse la neige, l'herbe haute et le sable jusqu'à l'objet marqué par la balise jaune. Ta jauge de survie baisse (plus vite dans la neige) : recharge-la près d'un totem.\n\nZQSD / flèches ou joystick pour te déplacer.";
-            d["stage.instr.fishing"] = "Vise un point de l'étang, lance, attends la touche puis TIRE au bon moment. Pêche le plus de poissons possible avant la fin du temps : chaque poisson rapporte des Crédits.\n\nZQSD / flèches ou joystick pour viser · Espace ou LANCER pour lancer et tirer · Maj ou TIRER pour tirer.";
             d["stage.instr.arena"] = "Choisis ton agent, puis vaincs toutes les vagues. Les ennemis chargent, tirent ou foncent après un préavis jaune : esquive !\n\nZQSD / flèches ou joystick pour te déplacer · Espace : attaque · Maj : compétence spéciale.";
             d["stage.choose_agent"] = "Choisis ton agent";
 
@@ -25,17 +24,6 @@ namespace N29.HeroesDawn.Presentation.Common
             d["stage.survival.gauge"] = "SURVIE";
             d["stage.survival.cold"] = "GELÉ…";
 
-            d["stage.fishing.time"] = "Temps : {0} s";
-            d["stage.fishing.count"] = "Poissons : {0} / {1}";
-            d["stage.fishing.aim"] = "Vise, puis lance";
-            d["stage.fishing.wait"] = "Attends la touche…";
-            d["stage.fishing.pull"] = "TIRE !";
-            d["stage.fishing.caught"] = "Attrapé !";
-            d["stage.fishing.early"] = "Trop tôt…";
-            d["stage.fishing.escaped"] = "Il s'est échappé…";
-            d["stage.fishing.window"] = "TOUCHE";
-            d["stage.fishing.cast"] = "LANCER";
-            d["stage.fishing.pullbutton"] = "TIRER";
 
             d["stage.arena.wave"] = "Vague {0} / {1}";
             d["stage.arena.enemies"] = "Ennemis : {0} · vaincus : {1}";

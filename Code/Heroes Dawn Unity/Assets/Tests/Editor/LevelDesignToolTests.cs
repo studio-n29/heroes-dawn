@@ -69,7 +69,7 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(z.nodes.Count(n => n.type == CaseType.Entry), Is.EqualTo(1));
             Assert.That(b.hasCombat, Is.False, "plus un combat");
             var m = LevelEditorModel.AddNode(z, CaseType.MiniGame, 2, 0)!;
-            m.activity = "fishing_docks";
+            m.activity = "deflect_docks";
             LevelEditorModel.SetType(z, m, CaseType.Rest);
             Assert.That(m.activity, Is.Empty);
         }

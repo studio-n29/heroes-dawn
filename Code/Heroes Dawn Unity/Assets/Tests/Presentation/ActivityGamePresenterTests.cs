@@ -27,6 +27,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         FakeCaseResolutions _resolve = null!;
         FakeActivityPopup _generic = null!;
         FakeStagePopup _stage = null!;
+        FakeHeroGamePopup _hero = null!;
         FakePotionPopup _potion = null!;
         FakeDialoguePopup _dialogue = null!;
 
@@ -37,11 +38,13 @@ namespace N29.HeroesDawn.Tests.Presentation
             _host = new FakeModalHost();
             _generic = new FakeActivityPopup();
             _stage = new FakeStagePopup();
+            _hero = new FakeHeroGamePopup();
             _potion = new FakePotionPopup();
             _dialogue = new FakeDialoguePopup();
             _host.Register<IMiniGamePopupView>(() => new FakeMiniGamePopup());
             _host.Register<IActivityPopupView>(() => _generic);
             _host.Register<IStageGameView>(() => _stage);
+            _host.Register<IHeroGamePopupView>(() => _hero);
             _host.Register<IPotionPopupView>(() => _potion);
             _host.Register<IDialoguePopupView>(() => _dialogue);
             _toasts = new FakeToasts();
@@ -75,39 +78,49 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void UnknownGame_OpensTheGenericWindow()
         {
             ActivityRegistry.Default.Register(new PlaceholderKind());
-            var def = new ActivityDef(new ActivityId("placeholder"), "test_placeholder", "activities.fishing.name", "activities.fishing.desc", credits: 50);
+            var def = new ActivityDef(new ActivityId("placeholder"), "test_placeholder", "activities.arena.name", "activities.arena.desc", credits: 50);
             Run(new FakePlanActivity(With(def), "placeholder"));
             var data = _generic.Data!.Value;
-            Assert.That(data.Title, Is.EqualTo("PÊCHE"));
+            Assert.That(data.Title, Is.EqualTo("ARÈNE DE COMBAT"));
             Assert.That(data.Lines, Has.Some.EqualTo("Décor : Port · nuit"));
             Assert.That(data.Lines, Has.Some.Contains("Niveau généré"));
             Assert.That(((ActivityResult)_resolve.Calls.Single()).Success, Is.True);
             Assert.That(Toasted(ToastKind.Reward, Loc.F("mg.success", 50, 0)), Is.True);
         }
 
-        [Test, Description("Vérifie que la pêche ouvre la fenêtre 3D avec une partie de pêche, ses consignes et son titre, et que le score rendu donne base + pièces par poisson — parce que la quantité pêchée paie au prorata")]
-        public void Fishing_OpensTheStageWindow_AndPaysProRata()
+        [Test, Description("Vérifie que Rempart ouvre la fenêtre 2D de héros avec sa partie, ses consignes et son titre, et que le score rendu donne base + crédits par projectile — parce que la quantité interceptée est récompensée")]
+        public void Deflect_OpensTheHeroWindow_AndPaysProRata()
         {
-            _stage.Result = ActivityResult.Won(4);
-            Run(new FakePlanActivity(_app.Session.Content, "fishing_docks"));
-            var r = _stage.Request!;
-            Assert.That(r.Kind, Is.EqualTo(StageKind.Fishing));
-            Assert.That(r.Title, Is.EqualTo("PÊCHE"));
-            Assert.That(r.Fishing, Is.Not.Null);
-            Assert.That(r.Instructions, Does.Contain("TIRE"));
-            Assert.That(r.Level.Fact("fish"), Is.EqualTo(10));
-            Assert.That(Toasted(ToastKind.Reward, Loc.F("mg.success", 100 + 40 * 4, 5)), Is.True);
+            _hero.Result = ActivityResult.Won(14);
+            Run(new FakePlanActivity(_app.Session.Content, "deflect_docks"));
+            var r = _hero.Request!;
+            Assert.That(r.Kind, Is.EqualTo(HeroGameKind.Deflect));
+            Assert.That(r.Title, Is.EqualTo("REMPART"));
+            Assert.That(r.Deflect, Is.Not.Null);
+            Assert.That(r.Instructions, Does.Contain("projectiles"));
+            Assert.That(Toasted(ToastKind.Reward, Loc.F("mg.success", 100 + 10 * 14, 5)), Is.True);
             Assert.That(_host.Spawned.OfType<FakeActivityPopup>(), Is.Empty);
         }
 
-        [Test, Description("Vérifie qu'une pêche ratée paie quand même au prorata des poissons — parce que la quantité pêchée donne des pièces même sous le quota")]
-        public void FishingFailure_StillPaysProRata()
+        [Test, Description("Vérifie qu'un Rempart raté paie quand même au prorata des projectiles interceptés — parce que chaque interception compte même sous l'objectif")]
+        public void DeflectFailure_StillPaysProRata()
         {
-            _stage.Result = ActivityResult.Lost(2);
-            Run(new FakePlanActivity(_app.Session.Content, "fishing_docks"));
-            Assert.That(((ActivityResult)_resolve.Calls.Single()).Score, Is.EqualTo(2));
+            _hero.Result = ActivityResult.Lost(6);
+            Run(new FakePlanActivity(_app.Session.Content, "deflect_docks"));
+            Assert.That(((ActivityResult)_resolve.Calls.Single()).Score, Is.EqualTo(6));
             Assert.That(Toasted(ToastKind.Warning, Loc.T("mg.fail")), Is.True);
-            Assert.That(Toasted(ToastKind.Reward, Loc.F("mg.success", 80, 0)), Is.True);
+            Assert.That(Toasted(ToastKind.Reward, Loc.F("mg.success", 60, 0)), Is.True);
+        }
+
+        [Test, Description("Vérifie que la course des toits ouvre la fenêtre 2D de héros avec sa partie de couloirs — parce que c'est le second mini-jeu 2D")]
+        public void RooftopRun_OpensTheHeroWindow()
+        {
+            _hero.Result = ActivityResult.Won(10);
+            Run(new FakePlanActivity(_app.Session.Content, "rooftop_rescue"));
+            var r = _hero.Request!;
+            Assert.That(r.Kind, Is.EqualTo(HeroGameKind.RooftopRun));
+            Assert.That(r.Run, Is.Not.Null);
+            Assert.That(r.Title, Is.EqualTo("COURSE DES TOITS"));
         }
 
         [Test, Description("Vérifie que la survie en neige et l'arène ouvrent la fenêtre 3D avec la bonne partie, et que l'arène propose les agents de l'escouade avec leur fabrique de partie — parce que l'arène commence par le choix d'un agent")]
@@ -161,13 +174,13 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie qu'un échec qui enchaîne une autre activité la fait jouer ensuite sur la même case — parce que les activités peuvent s'enchaîner")]
         public void Failure_ChainsTheNextActivity()
         {
-            var chain = new ActivityDef(new ActivityId("chain_a"), ActivityKinds.Fishing, "activities.fishing.name", "activities.fishing.desc",
-                                        failureFollowUp: FollowUpDef.ThenActivity(new ActivityId("fishing_docks")));
-            var plan = new FakePlanActivity(With(chain), "chain_a", "fishing_docks");
+            var chain = new ActivityDef(new ActivityId("chain_a"), ActivityKinds.Deflect, "activities.deflect.name", "activities.deflect.desc",
+                                        failureFollowUp: FollowUpDef.ThenActivity(new ActivityId("deflect_docks")));
+            var plan = new FakePlanActivity(With(chain), "chain_a", "deflect_docks");
             _resolve.ActivityEvents = r => new BoardEvent[] { new ActivityResolvedEvent(ActivityRules.Resolve(plan.Plans.Last(), r)) };
-            _stage.Result = ActivityResult.Lost();
+            _hero.Result = ActivityResult.Lost();
             Run(plan);
-            Assert.That(plan.Plans.Select(p => p.Def.Id.Value), Is.EqualTo(new[] { "chain_a", "fishing_docks" }));
+            Assert.That(plan.Plans.Select(p => p.Def.Id.Value), Is.EqualTo(new[] { "chain_a", "deflect_docks" }));
             Assert.That(_resolve.Calls.Count, Is.EqualTo(2));
             Assert.That(Toasted(ToastKind.Info, Loc.T("activity.followup_activity")), Is.True);
         }

@@ -15,6 +15,13 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public UniTask<ActivityResult> PlayAsync(StageRequest request, CancellationToken ct) { Request = request; return UniTask.FromResult(Result); }
     }
 
+    public sealed class FakeHeroGamePopup : FakePopup, IHeroGamePopupView
+    {
+        public ActivityResult Result = ActivityResult.Won();
+        public HeroGameRequest? Request;
+        public UniTask<ActivityResult> PlayAsync(HeroGameRequest request, CancellationToken ct) { Request = request; return UniTask.FromResult(Result); }
+    }
+
     public sealed class FakePotionPopup : FakePopup, IPotionPopupView
     {
         public ActivityResult Result = ActivityResult.Won();

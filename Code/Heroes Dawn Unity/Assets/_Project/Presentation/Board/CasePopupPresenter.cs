@@ -148,8 +148,10 @@ namespace N29.HeroesDawn.Presentation.Board
             {
                 case ActivityKinds.Potion when plan.Level.PayloadAs<PotionRecipe>() != null: return await PlayPotionAsync(plan, ct);
                 case ActivityKinds.Dialogue when plan.Level.PayloadAs<DialogueScript>() != null: return await PlayDialogueAsync(plan, ct);
+                case ActivityKinds.Deflect:
+                case ActivityKinds.RooftopRun:
+                    return await PlayHeroGameAsync(plan, ct);
                 case ActivityKinds.SnowSurvival:
-                case ActivityKinds.Fishing:
                 case ActivityKinds.CombatArena:
                     return await PlayStageAsync(plan, ct);
             }
@@ -214,6 +216,38 @@ namespace N29.HeroesDawn.Presentation.Board
                 Loc = _loc,
             };
 
+        async UniTask<ActivityResult> PlayHeroGameAsync(ActivityPlan plan, CancellationToken ct)
+        {
+            var request = HeroGameRequestFor(plan);
+            var view = await _modals.OpenAsync<IHeroGamePopupView>(ct);
+            try { return await view.PlayAsync(request, ct); }
+            finally { _modals.Close(view); }
+        }
+
+        /// <summary>Mini-jeu 2D de héros : « Rempart » ou « Course des toits », avec ses consignes et l'illustration du héros.</summary>
+        public HeroGameRequest HeroGameRequestFor(ActivityPlan plan)
+        {
+            bool deflect = plan.Def.Kind == ActivityKinds.Deflect;
+            string key = deflect ? "hero.deflect" : "hero.run";
+            var r = new HeroGameRequest
+            {
+                Kind = deflect ? HeroGameKind.Deflect : HeroGameKind.RooftopRun,
+                Title = _loc.T(plan.Def.NameKey).ToUpperInvariant(),
+                Instructions = _loc.T(key + ".instructions"),
+                Start = _loc.T("hero.start"),
+                Abandon = _loc.T("hero.abandon"),
+                ScoreFormat = _loc.T(key + ".score"),
+                TimeFormat = _loc.T("hero.time"),
+                WonText = _loc.T("hero.won"),
+                LostText = _loc.T("hero.lost"),
+                HeroArt = N29.HeroesDawn.Presentation.Common.AgentArt.For(_session.Route.HeroId),
+            };
+            ulong seed = plan.Level.Seed;
+            if (deflect) r.Deflect = new DeflectGame(seed, plan.Parameters);
+            else r.Run = new RooftopRunGame(seed, plan.Parameters);
+            return r;
+        }
+
         async UniTask<ActivityResult> PlayStageAsync(ActivityPlan plan, CancellationToken ct)
         {
             var request = StageRequestFor(plan);
@@ -231,10 +265,6 @@ namespace N29.HeroesDawn.Presentation.Board
                 case ActivityKinds.SnowSurvival:
                     r.Kind = StageKind.Survival; r.Instructions = _loc.T("stage.instr.survival");
                     r.Survival = new SnowSurvivalGame(plan.Level, plan.Parameters);
-                    break;
-                case ActivityKinds.Fishing:
-                    r.Kind = StageKind.Fishing; r.Instructions = _loc.T("stage.instr.fishing");
-                    r.Fishing = new FishingGame(plan.Level, plan.Parameters);
                     break;
                 default:
                     r.Kind = StageKind.Arena; r.Instructions = _loc.T("stage.instr.arena") + "\n\n" + _loc.T("stage.choose_agent");

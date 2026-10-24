@@ -116,7 +116,8 @@ namespace N29.HeroesDawn.Definitions
         public const string Reflex = "reflex";
         public const string Potion = "potion";
         public const string SnowSurvival = "snow_survival";
-        public const string Fishing = "fishing";
+        public const string Deflect = "deflect";
+        public const string RooftopRun = "rooftop_run";
         public const string CombatArena = "combat_arena";
         public const string Dialogue = "dialogue";
     }

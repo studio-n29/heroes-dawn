@@ -6,7 +6,7 @@ using N29.HeroesDawn.Definitions;
 namespace N29.HeroesDawn.Content.Prototype
 {
     /// <summary>
-    /// Activités du prototype : une par type (réflexe historique, potion, survie en neige, pêche, arène, dialogue).
+    /// Activités du prototype : réflexe historique, potion, survie en neige, arène, dialogue, et les deux mini-jeux 2D de héros (rempart, course des toits).
     /// Pour régler une activité sans code : surcharger ses paramètres (Resources/Balance/activities.json, voir <see cref="ActivityParamsJson"/>).
     /// Pour en ajouter une : une <see cref="ActivityDef"/> ici (type existant) ou un nouveau IActivityKind dans le registre (Domain.Activities.ActivityRegistry).
     /// </summary>
@@ -33,9 +33,13 @@ namespace N29.HeroesDawn.Content.Prototype
             new ActivityDef(new ActivityId("survival_snow"), ActivityKinds.SnowSurvival, "activities.survival.name", "activities.survival.desc",
                             P(("time_limit_s", 90), ("totem_count", 3)), credits: 300, pr: 10),
 
-            // Pêche : 40 Crédits par poisson (même si le quota n'est pas atteint) + 100 Crédits et 5 PR à la réussite.
-            new ActivityDef(new ActivityId("fishing_docks"), ActivityKinds.Fishing, "activities.fishing.name", "activities.fishing.desc",
-                            P(("time_limit_s", 60), ("fish_count", 10), ("success_fish", 4)), credits: 100, pr: 5, creditsPerScore: 40),
+            // Rempart (2D) : 10 Crédits par projectile intercepté (même si l'objectif n'est pas atteint) + 100 Crédits et 5 PR à la réussite.
+            new ActivityDef(new ActivityId("deflect_docks"), ActivityKinds.Deflect, "activities.deflect.name", "activities.deflect.desc",
+                            P(("time_limit_s", 40), ("target", 14), ("lives", 3), ("speed_percent", 100)), credits: 100, pr: 5, creditsPerScore: 10),
+
+            // Course des toits (2D) : 15 Crédits par civil sauvé + 150 Crédits et 5 PR à la réussite.
+            new ActivityDef(new ActivityId("rooftop_rescue"), ActivityKinds.RooftopRun, "activities.rooftop.name", "activities.rooftop.desc",
+                            P(("time_limit_s", 40), ("target", 10), ("lives", 3), ("speed_percent", 100)), credits: 150, pr: 5, creditsPerScore: 15),
 
             new ActivityDef(new ActivityId("arena_training"), ActivityKinds.CombatArena, "activities.arena.name", "activities.arena.desc",
                             P(("waves", 3), ("enemies_per_wave", 4)), credits: 350, pr: 10),

@@ -199,27 +199,31 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(view, Is.Not.Null);
         }
 
-        [UnityTest, Timeout(240000), Description("Vérifie que la pêche se joue sur le vrai écran 3D : un joueur qui lance puis tire quand ça mord attrape des poissons, et abandonner rend le score — parce que le jeu doit réagir aux entrées")]
-        public IEnumerator Fishing_PlayedOnTheRealStage_CatchesFish()
+        [UnityTest, Timeout(120000), Description("Vérifie que Rempart se joue sur la vraie fenêtre 2D : le premier toucher lance la partie, puis un joueur qui touche les projectiles gagne avant la fin du temps — parce que c'est le mini-jeu du quai de Red Hook")]
+        public IEnumerator Deflect_PlayedOnTheRealWindow_Wins()
         {
             yield return OnBoardNext(PrototypeContent.Zone11, "n15");
-            var plan = PlanOf("fishing_docks", new ZoneEnvironment(Biome.Harbor, Weather.Day), ("bite_wait_min_ms", 300), ("bite_wait_max_ms", 600));
-            var request = CasePresenter().StageRequestFor(plan);
-            var game = request.Fishing!;
-            ActivityResult? result = null;
-            var run = OpenStage(request, v =>
+            var plan = PlanOf("deflect_docks", new ZoneEnvironment(Biome.Harbor, Weather.Day), ("target", 3), ("time_limit_s", 60));
+            var request = CasePresenter().HeroGameRequestFor(plan);
+            var host = Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Common.ModalLayer>()!;
+            var view = host.Spawn<N29.HeroesDawn.Presentation.Activities.IHeroGamePopupView>();
+            var task = view.PlayAsync(request, default);
+            var popup = (N29.HeroesDawn.Presentation.Activities.HeroGamePopupView)view;
+            var tap = popup.Field.GetComponent<N29.HeroesDawn.Presentation.Activities.HeroFieldTap>();
+            tap.OnPointerDown(new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current) { position = Vector2.zero });
+            Assert.That(popup.Started, Is.True, "le premier toucher lance la partie");
+            var game = request.Deflect!;
+            for (int i = 0; i < 60; i++) { game.Step(0.05f); yield return null; }
+            yield return ScreenCaptureTests.Capture("18-rempart");
+            for (int i = 0; i < 1800 && game.Status == GameStatus.Running; i++)
             {
-                v.StartButton.onClick.Invoke();
-                v.InputOverride = () =>
-                {
-                    bool idle = game.State == FishingState.Idle;
-                    if (game.Caught >= 2) v.Driver!.Abandon();
-                    return new StageInput { APressed = idle, BPressed = game.State == FishingState.Bite };
-                };
-            }, r => result = r);
-            while (result == null && run.MoveNext()) yield return run.Current;
-            Assert.That(game.Caught, Is.GreaterThanOrEqualTo(2));
-            Assert.That(result!.Value.Score, Is.GreaterThanOrEqualTo(2));
+                foreach (var it in game.Items.Where(x => !x.Civilian && x.Y > 0.25f).ToList()) game.Tap(it.X, it.Y);
+                yield return null;
+            }
+            Assert.That(game.Status, Is.EqualTo(GameStatus.Won));
+            for (int i = 0; i < 10 && task.Status == Cysharp.Threading.Tasks.UniTaskStatus.Pending; i++) yield return null;
+            Assert.That(task.Status, Is.EqualTo(Cysharp.Threading.Tasks.UniTaskStatus.Succeeded));
+            host.Despawn(view);
         }
 
         [UnityTest, Timeout(300000), Description("Vérifie que l'arène se joue sur le vrai écran 3D : choix d'un agent de l'escouade, puis un joueur qui fonce sur les ennemis en attaquant vainc la vague — parce que l'arène est un combat jouable")]

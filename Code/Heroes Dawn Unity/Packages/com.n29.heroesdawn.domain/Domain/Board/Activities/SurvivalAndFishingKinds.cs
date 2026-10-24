@@ -108,62 +108,6 @@ namespace N29.HeroesDawn.Domain.Activities
     }
 
     /// <summary>
-    /// Pêche (3D, façon Animal Crossing NH) : un minuteur, pêcher le plus de poissons possible ; la quantité donne des pièces au prorata.
-    /// </summary>
-    public sealed class FishingKind : IActivityKind
-    {
-        const int Field = 4000;
-
-        public string Id => ActivityKinds.Fishing;
-
-        public IReadOnlyList<ParameterDef> Schema { get; } = new[]
-        {
-            new ParameterDef("time_limit_s", 60, 15, 180),
-            new ParameterDef("fish_count", 10, 3, 30),
-            new ParameterDef("bite_window_ms", 900, 300, 3000),
-            new ParameterDef("bite_wait_min_ms", 800, 200, 5000),
-            new ParameterDef("bite_wait_max_ms", 3000, 500, 10000),
-            // nombre de poissons à pêcher pour réussir (en dessous : échec, mais les pièces restent au prorata)
-            new ParameterDef("success_fish", 4, 1, 20),
-            new ParameterDef("pond_radius_m", 14, 6, 30),
-        };
-
-        public ActivityLevel Generate(ActivityContext c)
-        {
-            var rng = new Pcg32(c.Seed).Fork(12);
-            var pal = EnvironmentPalette.For(c.Environment);
-            int pond = c.Param("pond_radius_m") * 100;
-            var prims = new List<LevelPrimitive>
-            {
-                new LevelPrimitive(PrimitiveShape.Plane, 0, 0, 0, Field, 1, Field, "ground", pal.Ground),
-                new LevelPrimitive(PrimitiveShape.Cylinder, 0, -5, 0, pond * 2, 10, pond * 2, "water", pal.Water),
-                new LevelPrimitive(PrimitiveShape.Cube, 0, 10, -pond - 100, 200, 20, 600, "dock", pal.Obstacle),
-            };
-            var markers = new List<LevelMarker> { new LevelMarker("spawn", 0, 0, -pond - 300) };
-
-            // Roseaux et rochers sur la berge.
-            for (int i = 0; i < 10; i++)
-            {
-                var d = Gen.Dir16[rng.Range(0, 16)];
-                int r = pond + rng.Range(80, 400);
-                prims.Add(new LevelPrimitive(PrimitiveShape.Cylinder, d.X * r / 1000, 60, d.Z * r / 1000, 30, 120, 30, "reed", pal.Foliage));
-            }
-
-            int fish = c.Param("fish_count");
-            for (int i = 0; i < fish; i++)
-            {
-                var (x, z) = Gen.Around(rng, 100, pond - 150);
-                int size = rng.Range(30, 71);
-                prims.Add(new LevelPrimitive(PrimitiveShape.Capsule, x, -20, z, size, size / 2, size / 2, "fish", pal.Accent));
-                markers.Add(new LevelMarker("fish_" + i, x, -20, z));
-            }
-
-            var facts = new Dictionary<string, int> { ["fish"] = fish, ["pond_radius_cm"] = pond };
-            return new ActivityLevel(c.Seed, c.Environment, Field, Field, prims, markers, facts);
-        }
-    }
-
-    /// <summary>
     /// Arène de combat (3D hack'n'slash, caméra top-down) : un agent choisi, deux compétences, déplacement à 360°,
     /// des vagues d'ennemis aux comportements simples (0 = poursuite, 1 = charge, 2 = tir).
     /// </summary>

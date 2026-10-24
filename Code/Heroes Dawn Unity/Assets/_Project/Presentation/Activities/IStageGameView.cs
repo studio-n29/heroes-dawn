@@ -9,7 +9,7 @@ using N29.HeroesDawn.Presentation.Mvp;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
-    public enum StageKind { Survival, Fishing, Arena }
+    public enum StageKind { Survival, Arena }
 
     /// <summary>Un agent proposé pour l'arène (nom de code, famille et compétences en une ligne).</summary>
     public struct AgentChoice
@@ -26,7 +26,6 @@ namespace N29.HeroesDawn.Presentation.Activities
         public string Instructions { get; set; } = "";
         public ActivityLevel Level { get; set; } = null!;
         public SnowSurvivalGame? Survival { get; set; }
-        public FishingGame? Fishing { get; set; }
         /// <summary>Arène : un agent à choisir dans l'escouade, puis la partie est créée pour lui (index dans <see cref="Agents"/>).</summary>
         public IReadOnlyList<AgentChoice> Agents { get; set; } = Array.Empty<AgentChoice>();
         public Func<int, ArenaGame>? ArenaFactory { get; set; }

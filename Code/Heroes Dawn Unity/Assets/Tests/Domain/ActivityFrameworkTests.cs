@@ -28,28 +28,28 @@ namespace N29.HeroesDawn.Tests.Domain
         public void Registry_HasEveryKind_AndEveryActivityHasAKind()
         {
             var kinds = Reg.Kinds.Select(k => k.Id).OrderBy(x => x).ToArray();
-            Assert.That(kinds, Is.EqualTo(new[] { "combat_arena", "dialogue", "fishing", "potion", "reflex", "snow_survival" }));
+            Assert.That(kinds, Is.EqualTo(new[] { "combat_arena", "deflect", "dialogue", "potion", "reflex", "rooftop_run", "snow_survival" }));
             foreach (var a in C.Activities) Assert.That(Reg.TryGet(a.Kind, out _), Is.True, a.Id.Value);
         }
 
         [Test, Description("Vérifie que les paramètres d'une activité sont complétés par les défauts du type et bornés par son schéma — parce que les réglages externes ne doivent jamais produire un niveau impossible")]
         public void Parameters_AreFilledWithDefaults_AndClamped()
         {
-            var def = Def("fishing_docks").WithParameters(new ActivityParameters(new Dictionary<string, int> { ["time_limit_s"] = 99999, ["fish_count"] = -5 }));
+            var def = Def("deflect_docks").WithParameters(new ActivityParameters(new Dictionary<string, int> { ["time_limit_s"] = 99999, ["target"] = -5 }));
             var p = Reg.Resolve(def);
-            Assert.That(p.Get("time_limit_s"), Is.EqualTo(180), "borné au maximum du schéma");
-            Assert.That(p.Get("fish_count"), Is.EqualTo(3), "borné au minimum du schéma");
-            Assert.That(p.Get("bite_window_ms"), Is.EqualTo(900), "défaut du type pour une clé absente");
-            foreach (var k in Reg.Get("fishing").Schema) Assert.That(p.Has(k.Key), Is.True, k.Key);
+            Assert.That(p.Get("time_limit_s"), Is.EqualTo(120), "borné au maximum du schéma");
+            Assert.That(p.Get("target"), Is.EqualTo(3), "borné au minimum du schéma");
+            Assert.That(p.Get("lives"), Is.EqualTo(3), "défaut du type pour une clé absente");
+            foreach (var k in Reg.Get("deflect").Schema) Assert.That(p.Has(k.Key), Is.True, k.Key);
         }
 
         [Test, Description("Vérifie que les réglages JSON (« activité.paramètre ») s'appliquent aux activités et que le JSON invalide est refusé — parce qu'on doit pouvoir régler une activité sans toucher au code")]
         public void ParamsJson_OverridesAnActivity_AndRejectsGarbage()
         {
-            var parsed = ActivityParamsJson.Parse("{ \"fishing_docks.time_limit_s\": 120, \"arena_training.waves\": 5 }");
+            var parsed = ActivityParamsJson.Parse("{ \"deflect_docks.time_limit_s\": 120, \"arena_training.waves\": 5 }");
             Assert.That(parsed.IsSuccess, Is.True);
             var content = TestContent.Build(new BalanceConfig(), parsed.Value);
-            Assert.That(Reg.Resolve(content.Activity(new ActivityId("fishing_docks"))).Get("time_limit_s"), Is.EqualTo(120));
+            Assert.That(Reg.Resolve(content.Activity(new ActivityId("deflect_docks"))).Get("time_limit_s"), Is.EqualTo(120));
             Assert.That(Reg.Resolve(content.Activity(new ActivityId("arena_training"))).Get("waves"), Is.EqualTo(5));
             Assert.That(Reg.Resolve(C.Activity(new ActivityId("arena_training"))).Get("waves"), Is.EqualTo(3), "le contenu d'origine n'est pas modifié");
             Assert.That(ActivityParamsJson.Parse("pas du json").IsFailure, Is.True);
@@ -62,7 +62,7 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test, Description("Vérifie que la même graine et le même environnement redonnent exactement le même niveau, et qu'une autre tentative en donne un autre — parce que le niveau doit être reproductible mais varier d'une partie à l'autre")]
         public void Levels_AreDeterministic_PerSeed()
         {
-            foreach (var id in new[] { "survival_snow", "fishing_docks", "arena_training" })
+            foreach (var id in new[] { "survival_snow", "arena_training" })
             {
                 var a = Plan(id).Level; var b = Plan(id).Level; var other = Plan(id, attempt: 2).Level;
                 Assert.That(a.Primitives.Select(p => (p.X, p.Z, p.Role)), Is.EqualTo(b.Primitives.Select(p => (p.X, p.Z, p.Role))), id);
@@ -107,17 +107,6 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(SnowPatches(Biome.Snow), Is.GreaterThan(SnowPatches(Biome.Desert) * 3));
         }
 
-        [Test, Description("Vérifie que la pêche place autant de poissons que demandé, tous dans l'étang, et un point de départ sur le ponton — parce que le niveau doit être jouable tel quel")]
-        public void Fishing_Level_PutsEveryFishInThePond()
-        {
-            var plan = Plan("fishing_docks");
-            int pond = plan.Level.Fact("pond_radius_cm");
-            var fish = plan.Level.Primitives.Where(p => p.Role == "fish").ToList();
-            Assert.That(fish.Count, Is.EqualTo(plan.Parameters.Get("fish_count")));
-            Assert.That(fish.All(f => (long)f.X * f.X + (long)f.Z * f.Z <= (long)pond * pond));
-            Assert.That(plan.Level.TryMarker("spawn", out _), Is.True);
-        }
-
         [Test, Description("Vérifie que l'arène génère un point d'apparition par ennemi et par vague, et un comportement simple par vague — parce que les vagues d'ennemis suivent des patterns basiques")]
         public void Arena_Level_HasSpawnsAndPatternsPerWave()
         {
@@ -157,7 +146,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(squad, Does.Contain(a.Patient!.Value.Value));
             Assert.That(b.Patient, Is.EqualTo(a.Patient));
             Assert.That(Plan("potion_field").Patient, Is.Null);
-            Assert.That(Plan("fishing_docks", squad: squad).Patient, Is.Null, "une activité sans patient n'en tire pas");
+            Assert.That(Plan("deflect_docks", squad: squad).Patient, Is.Null, "une activité sans patient n'en tire pas");
         }
 
         [Test, Description("Vérifie que chaque réplique du dialogue a une bonne, une mauvaise et des réponses acceptables, que les meilleures réponses réussissent et les pires échouent — parce que les réponses décident de la réussite")]
@@ -185,12 +174,12 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test, Description("Vérifie que les gains suivent le résultat : base à la réussite, pièces au prorata du score même en cas d'échec (pêche), rien d'autre à l'échec — parce que la quantité pêchée donne des pièces au prorata")]
         public void Rules_Rewards_AreProRata()
         {
-            var plan = Plan("fishing_docks");
+            var plan = Plan("deflect_docks");
             var won = ActivityRules.Resolve(plan, ActivityResult.Won(6));
-            Assert.That(won.Credits, Is.EqualTo(100 + 40 * 6));
+            Assert.That(won.Credits, Is.EqualTo(100 + 10 * 6));
             Assert.That(won.Pr, Is.EqualTo(5));
             var lost = ActivityRules.Resolve(plan, ActivityResult.Lost(2));
-            Assert.That(lost.Credits, Is.EqualTo(40 * 2), "échec : pas de base, mais les poissons rapportent");
+            Assert.That(lost.Credits, Is.EqualTo(10 * 2), "échec : pas de base, mais les projectiles interceptés rapportent");
             Assert.That(lost.Pr, Is.Zero);
             Assert.That(lost.Malus, Is.Null);
             Assert.That(lost.FollowUp, Is.Null);
@@ -240,7 +229,7 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var run = RunAt(PrototypeContent.Zone11, "n15");
             var plan = run.PlanActivity(Squad("ancre", "givre"));
-            Assert.That(plan.Def.Id.Value, Is.EqualTo("fishing_docks"));
+            Assert.That(plan.Def.Id.Value, Is.EqualTo("deflect_docks"));
             Assert.That(plan.Environment, Is.EqualTo(C.Zone(PrototypeContent.Zone11).Environment));
             Assert.That(run.PlanActivity(Squad("ancre")), Is.SameAs(plan), "idempotent");
             Assert.That(RunAt(PrototypeContent.Zone11, "n08").PlanActivity(Squad("ancre")).Def.Id, Is.EqualTo(ActivityIds.Reflex), "case sans activité : réflexe");
@@ -259,7 +248,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var events = again.ResolveActivity(ActivityResult.Won(5));
             Assert.That(again.IsSpent(new CaseId("n15")), Is.True);
             Assert.That(again.Phase, Is.EqualTo(ZoneRunPhase.AwaitingRoll));
-            Assert.That(events.OfType<ActivityResolvedEvent>().Single().Outcome.Credits, Is.EqualTo(100 + 40 * 5));
+            Assert.That(events.OfType<ActivityResolvedEvent>().Single().Outcome.Credits, Is.EqualTo(100 + 10 * 5));
 
             var objective = RunAt(PrototypeContent.Zone11, "n08");
             objective.ResolveActivity(ActivityResult.Won());

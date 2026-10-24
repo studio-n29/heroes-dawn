@@ -136,7 +136,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 N("n03", CaseType.Resource, 3, 3), N("n04", CaseType.Narrative, 4, 3), N("n05", CaseType.Combat, 5, 3),
                 N("n06", CaseType.MiniGame, 3, 1, activity: "potion_field"), N("n07", CaseType.Combat, 4, 1, r: CombatRank.Easy), N("n08", CaseType.Resource, 5, 1),
                 N("n09", CaseType.Rest, 6, 2), N("n10", CaseType.Combat, 7, 2),
-                N("n11", CaseType.MiniGame, 8, 3, true), N("n12", CaseType.Resource, 9, 3),
+                N("n11", CaseType.MiniGame, 8, 3, true, activity: "rooftop_rescue"), N("n12", CaseType.Resource, 9, 3),
                 N("n13", CaseType.Narrative, 8, 1), N("n14", CaseType.Combat, 9, 1, true, CombatRank.Elite),
                 N("n15", CaseType.Empty, 10, 2, true), N("n16", CaseType.Resource, 11, 2), N("n17", CaseType.Rest, 12, 2),
                 N("n18", CaseType.Combat, 13, 2, true, CombatRank.Boss, narration: bossTalk),
