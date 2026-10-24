@@ -79,6 +79,12 @@ namespace N29.HeroesDawn.Presentation.Common
             d["sheet.picker_close"] = "FERMER";
             d["page.loadout"] = "Équipement";
             d["page.grimoire"] = "Grimoire";
+            d["nav.profile"] = "PROFIL";
+            d["page.salon"] = "Salon des agents";
+            d["page.infirmary"] = "Salon des agents";
+            d["lounge.header"] = "SALON DES AGENTS";
+            d["lounge.line"] = "{0} agent(s) · {1} fatigué(s) — entraîne-les ou soigne toute l’équipe.";
+            d["lounge.row"] = "Niv. {0} · {1}";
             d["page.inventory"] = "Inventaire";
             d["inventory.header"] = "TES OBJETS";
             d["inventory.line"] = "{0} objet(s) · {1} équipé(s)";

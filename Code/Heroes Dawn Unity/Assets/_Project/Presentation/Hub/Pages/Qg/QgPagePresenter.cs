@@ -8,6 +8,7 @@ using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
+using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using Cysharp.Threading.Tasks;
 using VContainer.Unity;
@@ -29,15 +30,16 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISubscriber<RosterChanged> _roster;
         readonly ISubscriber<MetaChanged> _metaChanged;
         readonly QuestLogFlow? _quests;
+        readonly IModalService? _modals;
         IDisposable? _subs;
         int _lastStamp = -1;
 
         public QgPagePresenter(IQgPageView view, ISessionReadModel session, HubNavigator nav, MissionLauncher mission, IClock clock,
                                ILocalization loc, MetaOverview meta, ISubscriber<RosterChanged> roster, ISubscriber<MetaChanged> metaChanged,
-                               QuestLogFlow? quests = null)
+                               QuestLogFlow? quests = null, IModalService? modals = null)
             : base(view, null)
         {
-            _session = session; _nav = nav; _mission = mission; _clock = clock; _loc = loc; _meta = meta; _roster = roster; _metaChanged = metaChanged; _quests = quests;
+            _session = session; _nav = nav; _mission = mission; _clock = clock; _loc = loc; _meta = meta; _roster = roster; _metaChanged = metaChanged; _quests = quests; _modals = modals;
         }
 
         public string Title => _loc.T("page.qg");
@@ -46,8 +48,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             View.RoomClicked += OpenRoom;
             View.MissionClicked += Launch;
-            View.DailyClicked += OpenPass;
-            View.SecondaryClicked += Launch;
+            View.DailyClicked += OpenQuests;
+            View.ShopAlertClicked += OnShopAlert;
+            View.SecondaryClicked += OnSecondaryAlert;
             View.QuestsClicked += OpenQuests;
         }
 
@@ -72,8 +75,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             _subs?.Dispose();
             View.RoomClicked -= OpenRoom;
             View.MissionClicked -= Launch;
-            View.DailyClicked -= OpenPass;
-            View.SecondaryClicked -= Launch;
+            View.DailyClicked -= OpenQuests;
+            View.ShopAlertClicked -= OnShopAlert;
+            View.SecondaryClicked -= OnSecondaryAlert;
             View.QuestsClicked -= OpenQuests;
         }
 
@@ -87,7 +91,27 @@ namespace N29.HeroesDawn.Presentation.Hub
         static int Stamp(DateTime now, bool seconds) => seconds ? now.Second + now.Minute * 60 + now.Hour * 3600 : now.Hour * 60 + now.Minute;
 
         void OpenRoom(HubPage page) => _nav.Open(page);
-        void OpenPass() => _nav.Open(HubPage.Pass);
+        /// <summary>Icône Boutique : pop-up avec le compte à rebours ; « Voir » ouvre la boutique.</summary>
+        void OnShopAlert() => AlertAsync(_loc.T("qg.alert.shop.title"), ShopCountdown.Text(_clock.LocalNow, _session.Content.Balance.ShopResetHour, _loc), _loc.T("qg.alert.shop.go"), () => _nav.SelectTab(HubPage.Shop)).Forget();
+
+        /// <summary>Icône Objectif : pop-up avec l'objectif secondaire du moment ; « J'y vais » ouvre la carte.</summary>
+        void OnSecondaryAlert()
+        {
+            var secondary = _meta.Secondary.Active;
+            AlertAsync(_loc.T("qg.alert.objective.title"), secondary.HasValue ? SecondaryLine(secondary.Value) : _loc.T("qg.secondary.none"),
+                       _loc.T("qg.alert.objective.go"), secondary.HasValue ? Launch : (Action?)null).Forget();
+        }
+
+        async UniTaskVoid AlertAsync(string title, string body, string goLabel, Action? go)
+        {
+            if (_modals == null) { go?.Invoke(); return; }
+            try
+            {
+                bool ok = await _modals.ConfirmAsync(new ConfirmData(title, body, goLabel, _loc.T("ui.close"), Tone.Primary), Lifetime);
+                if (ok) go?.Invoke();
+            }
+            catch (OperationCanceledException) { }
+        }
         void Launch() => _nav.Open(HubPage.CityMap);
         void OpenQuests() { if (_quests != null) _quests.OpenAsync(_session, Lifetime).Forget(); }
 
@@ -102,25 +126,28 @@ namespace N29.HeroesDawn.Presentation.Hub
             int tired = s.Roster.Count(m => m.Fatigue > 0);
             var secondary = _meta.Secondary.Active;
             _lastStamp = Stamp(now, secondary.HasValue);
-            var daily = _meta.Daily.Today();
-            int claimable = daily.Count(d => d.Claimable);
+            var activities = _meta.Quests.Activities();
+            int claimable = activities.Count(a => a.Claimable);
+            var firstAgent = s.Roster.Count > 0 ? s.Roster[0].Def.Id.Value : s.Route.HeroId;
+            var firstCard = s.Content.Collection.Cards.Count > 0 ? s.Content.Collection.Cards[0].Id.Value : "card";
+            var firstItem = s.Content.Collection.Items.Count > 0 ? s.Content.Collection.Items[0].Id.Value : "item";
             View.Show(new QgPageData
             {
                 Rooms = new[]
                 {
-                    new RoomCardData { Page = HubPage.Salon, Title = _loc.T("page.salon"), Info = Count("qg.salon", toTrain) },
-                    new RoomCardData { Page = HubPage.Infirmary, Title = _loc.T("page.infirmary"), Info = Count("qg.infirmary", tired) },
-                    new RoomCardData { Page = HubPage.Operations, Title = _loc.T("page.operations"), Info = OperationsInfo(), Badge = _meta.OperationsBadge },
-                    new RoomCardData { Page = HubPage.Lab, Title = _loc.T("page.lab"), Info = LabInfo(), Badge = _meta.LabBadge },
-                    new RoomCardData { Page = HubPage.Archives, Title = _loc.T("page.archives"), Info = ArchivesInfo(), Badge = _meta.ArchivesBadge },
-                    new RoomCardData { Page = HubPage.Grimoire, Title = _loc.T("page.grimoire"), Info = GrimoireInfo() },
-                    new RoomCardData { Page = HubPage.Inventory, Title = _loc.T("page.inventory"), Info = _loc.F("qg.inventory.info", _session.OwnedItemCount) },
-                    new RoomCardData { Page = HubPage.Agents, Title = _loc.T("page.agents"), Info = _loc.F("qg.agents.info", s.Roster.Count, s.Content.Members.Count) },
+                    new RoomCardData { Page = HubPage.Salon, Title = _loc.T("page.salon"), Info = SalonInfo(toTrain, tired), Badge = tired > 0 ? tired : 0, Art = AgentArt.For(firstAgent) },
+                    new RoomCardData { Page = HubPage.Lab, Title = _loc.T("page.lab"), Info = LabInfo(), Badge = _meta.LabBadge, Art = AgentArt.Environment(1) },
+                    new RoomCardData { Page = HubPage.Operations, Title = _loc.T("page.operations"), Info = OperationsInfo(), Badge = _meta.OperationsBadge, Art = AgentArt.Environment(2) },
+                    new RoomCardData { Page = HubPage.Grimoire, Title = _loc.T("page.grimoire"), Info = GrimoireInfo(), Art = AgentArt.Card(firstCard) },
+                    new RoomCardData { Page = HubPage.Inventory, Title = _loc.T("page.inventory"), Info = _loc.F("qg.inventory.info", _session.OwnedItemCount), Art = AgentArt.Item(firstItem) },
+                    new RoomCardData { Page = HubPage.Agents, Title = _loc.T("page.agents"), Info = _loc.F("qg.agents.info", s.Roster.Count, s.Content.Members.Count), Art = AgentArt.For(s.Route.HeroId) },
                 },
-                DailyLines = daily.Select(d => _loc.F("qg.daily.line", _loc.F("daily." + d.Template.Id, d.Template.Target), d.Progress, d.Template.Target)).ToArray(),
+                DailyLines = activities.Count == 0 ? new[] { _loc.T("activity.empty") }
+                           : activities.Select(a => _loc.F("qg.activity.line", ActivityText(a), a.Claimed ? _loc.T("quests.state.done") : a.Progress + " / " + a.Target)).ToArray(),
                 DailyBadge = claimable > 0 ? claimable.ToString() : "",
                 SecondaryText = secondary.HasValue ? SecondaryLine(secondary.Value) : _loc.T("qg.secondary.none"),
                 SecondaryActive = secondary.HasValue,
+                ShopAlertBadge = s.Shop.Day.Length > 0 && s.Shop.SeenDay != s.Shop.Day ? "N" : "",
                 ShopAlert = ShopCountdown.Text(now, s.Content.Balance.ShopResetHour, _loc),
                 FilSpeaker = _loc.T("qg.fil.speaker"),
                 FilText = done ? _loc.T("qg.fil.done") : _loc.Or("qg.fil." + zone.Id.Value, "qg.fil.done"),
@@ -131,6 +158,16 @@ namespace N29.HeroesDawn.Presentation.Hub
                 MissionHint = s.SquadExhausted ? _loc.T("hub.deploy.exhausted") : "",
             });
         }
+
+        string ActivityText(DailyActivityView a)
+        {
+            var zone = _session.Content.Zones.FirstOrDefault(z => z.Id.Value == a.ZoneId);
+            string name = zone != null ? _loc.T(zone.NameKey.Replace(".name", ".short")) : a.ZoneId;
+            return a.Kind == ActivityKind.WinCombats ? _loc.F("qg.activity.wins", a.Target, name) : _loc.F("qg.activity.clear", name);
+        }
+
+        string SalonInfo(int toTrain, int tired)
+            => tired > 0 ? Count("qg.infirmary", tired) : Count("qg.salon", toTrain);
 
         string SecondaryLine(SecondaryView v)
         {

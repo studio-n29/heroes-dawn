@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Page QG (prefab Pages/Qg) : 5 pièces, missions du jour, alertes, fil du QG, MISSION.</summary>
+    /// <summary>Page QG (prefab Pages/Qg) : pièces illustrées, activités du jour, icônes d'alerte, quête principale, MISSION.</summary>
     public sealed class QgPageView : ViewBase, IQgPageView
     {
         [SerializeField] RoomCardView[] rooms = Array.Empty<RoomCardView>();
@@ -18,8 +18,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text dailyBody = null!;
         [SerializeField] TMP_Text dailyBadge = null!;
         [SerializeField] Button secondaryCard = null!;
-        [SerializeField] TMP_Text secondaryBody = null!;
-        [SerializeField] TMP_Text shopAlert = null!;
+        [SerializeField] Button shopAlertButton = null!;
+        [SerializeField] TMP_Text shopAlertBadge = null!;
+        [SerializeField] GameObject secondaryDot = null!;
         [SerializeField] TMP_Text filSpeaker = null!;
         [SerializeField] TMP_Text filText = null!;
         [SerializeField] Button filCard = null!;
@@ -35,6 +36,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? MissionClicked;
         public event Action? DailyClicked;
         public event Action? SecondaryClicked;
+        public event Action? ShopAlertClicked;
         public event Action? QuestsClicked;
 
         /// <summary>Bouton MISSION (tests PlayMode : clic réel).</summary>
@@ -60,6 +62,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             mission.Button.onClick.AddListener(() => MissionClicked?.Invoke());
             dailyCard.onClick.AddListener(() => DailyClicked?.Invoke());
             secondaryCard.onClick.AddListener(() => SecondaryClicked?.Invoke());
+            shopAlertButton.onClick.AddListener(() => ShopAlertClicked?.Invoke());
             filCard.onClick.AddListener(() => QuestsClicked?.Invoke());
         }
 
@@ -77,9 +80,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             dailyBody.text = string.Join("\n", d.DailyLines);
             dailyBadge.text = d.DailyBadge;
             dailyBadge.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(d.DailyBadge));
-            secondaryBody.text = d.SecondaryText;
-            secondaryBody.color = d.SecondaryActive ? Theme.Fatigue : Theme.TextMuted;
-            shopAlert.text = d.ShopAlert;
+            secondaryDot.SetActive(d.SecondaryActive);
+            shopAlertBadge.text = d.ShopAlertBadge;
+            shopAlertBadge.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(d.ShopAlertBadge));
             filSpeaker.text = d.FilSpeaker;
             filText.text = d.FilText;
             questsBadge.text = d.QuestsBadge;

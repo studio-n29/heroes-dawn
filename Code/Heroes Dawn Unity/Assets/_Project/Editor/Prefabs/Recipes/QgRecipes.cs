@@ -21,6 +21,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var button = Ui.Btn(root, "", Theme.Surface2, Theme.Text, null!, 34, FontKind.Title, "Button");
             button.Rect.Stretch();
             button.Label.gameObject.SetActive(false);
+            var holder = Ui.Rect(button.Fill.transform, "ArtHolder").Stretch();
+            holder.gameObject.AddComponent<RectMask2D>();
+            var art = Ui.Img(holder, "Art", Color.white, null);
+            art.raycastTarget = false;
+            art.gameObject.AddComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            var shade = Ui.Img(holder, "Shade", Theme.WithAlpha(Theme.Outline, 0.88f), Sprites.VerticalGradient);
+            shade.raycastTarget = false;
+            shade.rectTransform.Stretch();
             var title = Ui.Txt(button.Fill.transform, "", 36, Theme.Primary, TextAnchor.UpperLeft, FontKind.Title, "Title");
             title.rectTransform.Stretch(18, 64, 18, 12);
             title.AutoSize(36);
@@ -41,6 +49,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             badgeImg.gameObject.SetActive(false);
             var view = root.gameObject.AddComponent<RoomCardView>();
             ctx.Wire(view, "button", button);
+            ctx.Wire(view, "art", art);
             ctx.Wire(view, "title", title);
             ctx.Wire(view, "info", info);
             ctx.Wire(view, "wip", wip);
@@ -61,6 +70,25 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         const float LeftW = 1100, RightW = 590;
 
+
+        /// <summary>Icône d'alerte ronde (108 px) avec pastille ; renvoie le bouton et le texte de la pastille.</summary>
+        static Button AlertIcon(RectTransform parent, string name, string glyph, Color color, out TMPro.TextMeshProUGUI badgeText)
+        {
+            var fill = Ui.Panel(parent, name, color, 5f, 54f, true);
+            var frame = fill.Frame();
+            frame.sizeDelta = new Vector2(108, 108);
+            frame.Pref(108, 108);
+            var g = Ui.Txt(fill.transform, glyph, 64, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Glyph");
+            g.rectTransform.Stretch();
+            var button = frame.gameObject.AddComponent<Button>();
+            button.transition = Selectable.Transition.None;
+            var dot = Ui.Img(frame, "Badge", Theme.Danger, Sprites.Circle);
+            dot.rectTransform.At(1f, 1f, 4, 4, 40, 40);
+            badgeText = Ui.Txt(dot.transform, "", 24, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Text");
+            badgeText.rectTransform.Stretch();
+            dot.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
+            return button;
+        }
         public GameObject Build(PrefabContext ctx)
         {
             var rt = ScreenKit.Root("QgPage");
@@ -72,12 +100,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             roomsTitle.Inked();
             var grid = Ui.Rect(rt, "Rooms").At(0f, 1f, 0, -52, LeftW, 356);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(262, 168);
-            layout.spacing = new Vector2(17, 20);
+            layout.cellSize = new Vector2(350, 168);
+            layout.spacing = new Vector2(25, 20);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            layout.constraintCount = 4;
+            layout.constraintCount = 3;
             var rooms = new List<Object>();
-            for (int i = 0; i < 8; i++) rooms.Add(ctx.Nest<RoomCardView>("Widgets/RoomCard.prefab", grid, "Room" + i));
+            for (int i = 0; i < 6; i++) rooms.Add(ctx.Nest<RoomCardView>("Widgets/RoomCard.prefab", grid, "Room" + i));
 
             // ---- Fil du QG
             var fil = Ui.Panel(rt, "Fil", Theme.Surface, 5f, 10f, true);
@@ -100,10 +128,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             // ---- Missions du jour (à venir)
             var daily = Ui.Panel(rt, "Daily", Theme.Surface, 5f, 10f, true);
-            daily.Frame().At(1f, 1f, 0, 0, RightW, 176);
+            daily.Frame().At(1f, 1f, 0, 0, RightW, 300);
             Ui.LocTxt(daily.transform, "qg.daily", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title").rectTransform.At(0f, 1f, 22, -14, 540, 46);
             var dailyBody = Ui.Txt(daily.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Body");
             dailyBody.rectTransform.Stretch(22, 12, 22, 62);
+            dailyBody.fontSize = 24;
+            dailyBody.lineSpacing = 8;
             var dailyButton = daily.Frame().gameObject.AddComponent<Button>();
             dailyButton.targetGraphic = daily;
             dailyButton.transition = Selectable.Transition.None;
@@ -113,20 +143,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             dailyBadgeText.rectTransform.Stretch();
             dailyBadge.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
 
-            // ---- Alertes
-            var alerts = Ui.Panel(rt, "Alerts", Theme.Surface, 5f, 10f, true);
-            alerts.Frame().At(1f, 1f, 0, -192, RightW, 238);
-            Ui.LocTxt(alerts.transform, "qg.alerts", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title").rectTransform.At(0f, 1f, 22, -14, 540, 46);
-            var shopAlert = Ui.Txt(alerts.transform, "", 28, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "ShopAlert");
-            shopAlert.rectTransform.At(0f, 1f, 22, -66, 540, 44);
-            var secondary = Ui.Img(alerts.transform, "Secondary", Theme.Surface2, Sprites.RoundedSmall, true);
-            secondary.type = Image.Type.Sliced;
-            secondary.rectTransform.At(0.5f, 0f, 0, 16, 546, 96);
-            var secondaryBody = Ui.Txt(secondary.transform, "", 22, Theme.Fatigue, TextAnchor.MiddleLeft, FontKind.Body, "Label");
-            secondaryBody.rectTransform.Stretch(16, 0, 16, 0);
-            var secondaryButton = secondary.gameObject.AddComponent<Button>();
-            secondaryButton.targetGraphic = secondary;
-            secondaryButton.transition = Selectable.Transition.None;
+            // ---- Alertes : deux icônes (boutique, objectif secondaire) ; le détail s'ouvre dans un pop-up
+            var alertRow = Ui.Rect(rt, "Alerts").At(1f, 1f, 0, -316, RightW, 108);
+            alertRow.HLayout(20, 0, TextAnchor.MiddleRight);
+            var shopIcon = AlertIcon(alertRow, "ShopAlert", "B", Theme.Pr, out var shopBadgeText);
+            var secondaryIcon = AlertIcon(alertRow, "SecondaryAlert", "!", Theme.Fatigue, out var secondaryDotText);
+            var secondaryButton = secondaryIcon;
+            var shopAlertButton = shopIcon;
+            var secondaryDot = secondaryDotText.transform.parent.gameObject;
 
             // ---- MISSION
             var hint = Ui.Txt(rt, "", 22, Theme.Fatigue, TextAnchor.MiddleRight, FontKind.Body, "MissionHint");
@@ -147,8 +171,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "dailyBody", dailyBody);
             ctx.Wire(view, "dailyBadge", dailyBadgeText);
             ctx.Wire(view, "secondaryCard", secondaryButton);
-            ctx.Wire(view, "secondaryBody", secondaryBody);
-            ctx.Wire(view, "shopAlert", shopAlert);
+            ctx.Wire(view, "shopAlertButton", shopAlertButton);
+            ctx.Wire(view, "shopAlertBadge", shopBadgeText);
+            ctx.Wire(view, "secondaryDot", secondaryDot);
             ctx.Wire(view, "filSpeaker", speaker);
             ctx.Wire(view, "filText", filText);
             ctx.Wire(view, "filCard", filButton);

@@ -11,6 +11,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     public sealed class RoomCardView : MonoBehaviour
     {
         [SerializeField] UiButton button = null!;
+        [SerializeField] UnityEngine.UI.Image art = null!;
         [SerializeField] TMP_Text title = null!;
         [SerializeField] TMP_Text info = null!;
         [SerializeField] WipMark wip = null!;
@@ -26,6 +27,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         public void Show(RoomCardData d)
         {
             title.text = d.Title;
+            art.sprite = d.Art;
+            art.enabled = d.Art != null;
+            if (d.Art != null) { var fit = art.GetComponent<UnityEngine.UI.AspectRatioFitter>(); if (fit != null) fit.aspectRatio = d.Art.rect.width / d.Art.rect.height; }
             info.text = d.Info;
             bool soon = d.WipId != null;
             if (wip.gameObject.activeSelf != soon) wip.gameObject.SetActive(soon);

@@ -237,12 +237,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             stats.AutoSize(26);
 
             var tiersFill = Ui.Panel(rt, "Tiers", Theme.Surface, 4f, 6f, false);
-            tiersFill.Frame().At(0f, 1f, MidX, -258, MidW, 196);
+            tiersFill.Frame().At(0f, 1f, MidX, -258, MidW, 226);
             var tiersTitle = Ui.Txt(tiersFill.transform, "", 28, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "TiersTitle");
             tiersTitle.rectTransform.At(0f, 1f, 20, -14, MidW - 40, 36);
-            var tiers = Ui.Txt(tiersFill.transform, "", 24, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "TiersText");
+            var tiers = Ui.Txt(tiersFill.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "TiersText");
             tiers.rectTransform.Stretch(20, 12, 20, 58);
-            tiers.lineSpacing = 8;
+            tiers.lineSpacing = 4;
 
             var reason = Ui.Txt(rt, "", 24, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Body, "PrimaryReason");
             reason.rectTransform.At(0f, 0f, MidX, 108, MidW, 32);

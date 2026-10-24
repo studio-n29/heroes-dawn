@@ -18,6 +18,14 @@ namespace N29.HeroesDawn.Presentation.Common
             d["activity.title"] = "Activité · {0}";
             d["activity.wins"] = "Gagne {0} combats dans la zone {1}.";
             d["activity.clear"] = "Valide à nouveau la zone {0}.";
+            d["qg.activity.line"] = "{0} · {1}";
+            d["qg.daily"] = "ACTIVITÉS DU JOUR";
+            d["qg.activity.wins"] = "{0} victoires · {1}";
+            d["qg.activity.clear"] = "Valider {0}";
+            d["qg.alert.shop.title"] = "BOUTIQUE";
+            d["qg.alert.shop.go"] = "VOIR LA BOUTIQUE";
+            d["qg.alert.objective.title"] = "OBJECTIF SECONDAIRE";
+            d["qg.alert.objective.go"] = "J’Y VAIS";
             d["quests.locked"] = "Termine la zone précédente pour la débloquer.";
             d["quests.main.done"] = "Zone sécurisée.";
             d["quests.state.active"] = "EN COURS";

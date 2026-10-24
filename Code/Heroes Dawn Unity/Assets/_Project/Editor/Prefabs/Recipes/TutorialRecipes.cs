@@ -83,10 +83,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             // ---- Carte « Astuce » (non bloquante, en bas)
             var hintPanel = Ui.Panel(root, "Hint", Theme.Surface, 5f, 10f, true);
             var hint = hintPanel.Frame();
-            hint.anchorMin = hint.anchorMax = new Vector2(0.5f, 0f);
-            hint.pivot = new Vector2(0.5f, 0f);
-            hint.sizeDelta = new Vector2(1000, 190);
-            hint.anchoredPosition = new Vector2(0, 150);
+            hint.anchorMin = hint.anchorMax = new Vector2(0.5f, 1f);
+            hint.pivot = new Vector2(0.5f, 1f);
+            hint.sizeDelta = new Vector2(1000, 170);
+            hint.anchoredPosition = new Vector2(0, -116);
             var hBand = Ui.Panel(hintPanel.transform, "Band", Theme.Info, 4f, 4f, false);
             hBand.Frame().At(0f, 1f, 24, -14, 240, 50);
             var hTitle = Ui.Txt(hBand.transform, "", 30, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Title");

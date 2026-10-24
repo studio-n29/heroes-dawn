@@ -145,3 +145,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public UnityEngine.GameObject Build(PrefabContext ctx) => CardGridKit.Build<N29.HeroesDawn.Presentation.Hub.InventoryPageView>(ctx, "InventoryPage").gameObject;
     }
 }
+
+namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
+{
+    /// <summary>Salon des agents : entraînement et infirmerie réunis en une liste d'agents.</summary>
+    public sealed class LoungePageRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Pages/Lounge.prefab";
+        public int Order => 10;
+        public UnityEngine.GameObject Build(PrefabContext ctx) => ListPageKit.Build<N29.HeroesDawn.Presentation.Hub.LoungePageView>(ctx, "LoungePage", 0, false, false).gameObject;
+    }
+}

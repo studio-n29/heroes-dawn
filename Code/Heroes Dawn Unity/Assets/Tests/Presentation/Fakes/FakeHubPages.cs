@@ -14,6 +14,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action<HubPage>? RoomClicked;
         public event Action? DailyClicked;
         public event Action? SecondaryClicked;
+        public event Action? ShopAlertClicked;
+        public void ClickShopAlert() => ShopAlertClicked?.Invoke();
         public event Action? QuestsClicked;
         public event Action? MissionClicked;
         public readonly List<QgPageData> Shown = new List<QgPageData>();

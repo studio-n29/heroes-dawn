@@ -12,6 +12,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string? WipId;
         /// <summary>Pastille de notification (0 : aucune).</summary>
         public int Badge;
+        /// <summary>Illustration de la pièce (fond de la carte) ; nulle : fond uni.</summary>
+        public UnityEngine.Sprite? Art;
     }
 
     /// <summary>Tout ce qu'affiche la page QG (M10).</summary>
@@ -23,6 +25,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string SecondaryText;
         public bool SecondaryActive;
         public string ShopAlert;
+        /// <summary>Pastille de l'icône Boutique (vide : aucune).</summary>
+        public string ShopAlertBadge;
         public string FilSpeaker;
         public string FilText;
         /// <summary>Quêtes secondaires à réclamer (vide : aucune).</summary>

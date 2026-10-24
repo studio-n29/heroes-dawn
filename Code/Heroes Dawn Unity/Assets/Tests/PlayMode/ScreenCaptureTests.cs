@@ -109,9 +109,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Salon)!.onClick.Invoke();
             yield return CaptureSettled("11-salon");
             Shell.BackButton.Button.onClick.Invoke();
-            yield return null;
-            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Infirmary)!.onClick.Invoke();
-            yield return CaptureSettled("12-infirmerie");
+            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Salon)!.onClick.Invoke();
 
             yield return Tab(HubPage.Team);
             yield return CaptureSettled("20-equipe");
@@ -135,13 +133,15 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("50-boutique");
             yield return Tab(HubPage.Qg);
             yield return null;
-            foreach (var room in new[] { (HubPage.Operations, "13-operations"), (HubPage.Lab, "14-labo"), (HubPage.Archives, "15-archives") })
+            foreach (var room in new[] { (HubPage.Operations, "13-operations"), (HubPage.Lab, "14-labo"), (HubPage.Grimoire, "16-grimoire"), (HubPage.Inventory, "17-inventaire") })
             {
                 Object.FindAnyObjectByType<QgPageView>()!.RoomButton(room.Item1)!.onClick.Invoke();
                 yield return CaptureSettled(room.Item2);
                 Shell.BackButton.Button.onClick.Invoke();
                 yield return null;
             }
+            yield return Tab(HubPage.Archives);
+            yield return CaptureSettled("15-profil");
             Shell.SettingsButton.Button.onClick.Invoke();
             yield return CaptureSettled("80-parametres-audio");
             Object.FindAnyObjectByType<SettingsPageView>()!.CategoryButton(2).onClick.Invoke();

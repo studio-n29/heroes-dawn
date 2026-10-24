@@ -15,13 +15,15 @@ namespace N29.HeroesDawn.Presentation.Hub
     public sealed class ArchivesPagePresenter : ListPagePresenter<IArchivesPageView>
     {
         readonly ArchiveBook _archives;
+        readonly N29.HeroesDawn.Application.Session.ISessionReadModel? _session;
         string _selected = "";
 
         public ArchivesPagePresenter(IArchivesPageView view, ArchiveBook archives, ILocalization loc, IToastService toasts,
-                                     ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, IClock clock)
+                                     ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, IClock clock,
+                                     N29.HeroesDawn.Application.Session.ISessionReadModel? session = null)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
-            _archives = archives;
+            _archives = archives; _session = session;
         }
 
         public override string Title => Loc.T("page.archives");
@@ -35,7 +37,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.ShowHeader(new ListHeaderData
             {
                 Title = Loc.T("archives.title"),
-                Line = Loc.F("archives.count", unlocked, entries.Count),
+                Line = _session == null ? Loc.F("archives.count", unlocked, entries.Count)
+                     : Loc.F("profile.line", _session.Route.HeroName, _session.CompletedZones.Count, _session.Roster.Count, unlocked, entries.Count),
                 Progress = unlocked / (float)entries.Count,
                 ProgressLabel = unlocked + " / " + entries.Count,
             });

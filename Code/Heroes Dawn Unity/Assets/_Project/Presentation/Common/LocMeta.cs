@@ -143,9 +143,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["lab.done"] = "Recherche terminée : {0}";
 
             // --- Archives
-            d["page.archives"] = "Archives";
-            d["archives.title"] = "DOSSIERS DE LA GUILDE";
+            d["page.archives"] = "Profil";
+            d["archives.title"] = "PROFIL · DOSSIERS DE LA GUILDE";
             d["archives.count"] = "{0} fiches sur {1} débloquées.";
+            d["profile.line"] = "{0} · {1} zone(s) validée(s) · {2} agent(s) · {3}/{4} dossiers lus.";
             d["archives.locked"] = "Fiche verrouillée";
             d["archives.locked_hint"] = "Avance dans l'histoire pour débloquer cette fiche : recrute des héros, valide des zones et bats leurs ennemis.";
             d["archives.new"] = "NOUVEAU";

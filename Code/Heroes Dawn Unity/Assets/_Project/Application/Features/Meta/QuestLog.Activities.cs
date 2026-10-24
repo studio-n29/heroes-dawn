@@ -43,7 +43,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public IReadOnlyList<DailyActivityView> Activities()
         {
             var m = _c.Meta;
-            if (m.activityDay != _c.Today)
+            if (m.activityDay != _c.Today || (m.activities.Count == 0 && _c.Session.CompletedZones.Count > 0))
             {
                 m.activityDay = _c.Today;
                 m.activities.Clear();

@@ -43,55 +43,54 @@ namespace N29.HeroesDawn.Tests.Presentation
 
         RoomCardData Room(HubPage p) => _view.Last.Rooms.Single(r => r.Page == p);
 
-        [Test, Description("Vérifie que le Salon et l'Infirmerie affichent des infos réelles (« 2 membres à entraîner », « 1 membre fatigué ») — parce que ces deux pièces fonctionnent dans ce lot (spec §4, M10)")]
-        public void Rooms_ShowRealInfoForSalonAndInfirmary()
+        [Test, Description("Vérifie que le Salon des agents réunit entraînement et infirmerie : il annonce les agents fatigués, sinon ceux à entraîner — parce que les deux anciennes pièces n'en font plus qu'une")]
+        public void SalonDesAgents_MergesTrainingAndInfirmary()
         {
             _app.Session.Find(new MemberId("ancre"))!.Level = 50;
             _app.Session.Find(new MemberId("givre"))!.Level = 50;
-            _app.Session.Find(new MemberId("echo"))!.Fatigue = 40;
             Make();
             Assert.That(Room(HubPage.Salon).Info, Is.EqualTo("2 membres à entraîner"));
-            Assert.That(Room(HubPage.Infirmary).Info, Is.EqualTo("1 membre fatigué"));
-            Assert.That(Room(HubPage.Salon).WipId, Is.Null);
-            Assert.That(Room(HubPage.Infirmary).WipId, Is.Null);
+            Assert.That(_view.Last.Rooms.Any(r => r.Page == HubPage.Infirmary), Is.False, "plus de pièce Infirmerie séparée");
+            _p.Dispose();
+            _app.Session.Find(new MemberId("echo"))!.Fatigue = 40;
+            _view = new FakeQgPageView();
+            Make();
+            Assert.That(Room(HubPage.Salon).Info, Is.EqualTo("1 membre fatigué"));
+            Assert.That(Room(HubPage.Salon).Badge, Is.EqualTo(1));
         }
 
-        [Test, Description("Vérifie qu'Opérations, Labo et Archives affichent leur état réel et plus de bandeau BIENTÔT — parce que ces trois pièces fonctionnent maintenant")]
-        public void OperationsLabArchives_AreRealRooms()
+        [Test, Description("Vérifie que le QG montre six pièces illustrées (salon, labo, opérations, grimoire, inventaire, registre) et plus les Archives, déplacées dans Profil — parce que le QG est simplifié")]
+        public void Rooms_AreSixAndNoArchives()
         {
             Make();
-            Assert.That(Room(HubPage.Operations).WipId, Is.Null);
-            Assert.That(Room(HubPage.Lab).WipId, Is.Null);
-            Assert.That(Room(HubPage.Archives).WipId, Is.Null);
+            Assert.That(_view.Last.Rooms.Select(r => r.Page).ToArray(),
+                        Is.EqualTo(new[] { HubPage.Salon, HubPage.Lab, HubPage.Operations, HubPage.Grimoire, HubPage.Inventory, HubPage.Agents }));
             Assert.That(Room(HubPage.Operations).Info, Is.EqualTo(new LocLocalization().T("qg.ops.idle")));
             Assert.That(Room(HubPage.Lab).Info, Is.EqualTo(new LocLocalization().T("qg.lab.idle")));
-            Assert.That(Room(HubPage.Archives).Badge, Is.GreaterThan(0), "des fiches de départ sont à lire");
-            Assert.That(_view.Last.Rooms.Length, Is.EqualTo(8), "salon, infirmerie, opérations, labo, archives, grimoire, inventaire, agents");
-            Assert.That(_view.Last.Rooms.Select(r => r.Page).ToArray(), Does.Contain(HubPage.Grimoire));
-            Assert.That(_view.Last.Rooms.Select(r => r.Page).ToArray(), Does.Contain(HubPage.Inventory));
         }
 
-        [Test, Description("Vérifie que le QG montre les trois missions du jour avec leur avancement et l'objectif secondaire quand il existe — parce que ces cartes ne sont plus BIENTÔT")]
-        public void DailyMissions_And_SecondaryObjective_AreReal()
+        [Test, Description("Vérifie que le QG ne montre plus les missions du jour (réservées au Pass) mais les activités du jour, et l'objectif secondaire en icône — parce que la quête principale et les quêtes secondaires sont séparées")]
+        public void Activities_ReplaceDailyMissions_AndSecondaryIsAnIcon()
         {
             Make();
-            Assert.That(_view.Last.DailyLines.Length, Is.EqualTo(3));
-            Assert.That(_view.Last.DailyLines[0], Does.Contain("0 /"));
+            Assert.That(_view.Last.DailyLines.Length, Is.EqualTo(1), "aucune zone terminée : un message d'invitation");
             Assert.That(_view.Last.SecondaryActive, Is.False);
             _p.Dispose();
             _app.Session.CompletedZones.Add(PrototypeContent.Zone11.Value);
             _view = new FakeQgPageView();
             Make();
+            Assert.That(_view.Last.DailyLines.Length, Is.EqualTo(1), "une zone terminée : une activité");
+            Assert.That(_view.Last.DailyLines[0], Does.Contain("0 /"));
             Assert.That(_view.Last.SecondaryActive, Is.True);
             Assert.That(_view.Last.SecondaryText, Does.Contain("Red Hook"));
         }
 
-        [Test, Description("Vérifie que toucher les missions du jour ouvre le pass — parce que les missions nourrissent le pass (M40)")]
-        public void DailyCard_OpensPass()
+        [Test, Description("Vérifie que toucher le panneau des activités ouvre le suivi des quêtes, pas le Pass — parce que les missions du jour ne sont plus au QG")]
+        public void ActivitiesPanel_DoesNotOpenPass()
         {
             Make();
             _view.ClickDaily();
-            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Pass));
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Qg));
         }
 
         [Test, Description("Vérifie que les alertes montrent le vrai compte à rebours de la boutique — parce que le joueur doit savoir quand arrivent les nouveaux héros (M10 ⑤)")]

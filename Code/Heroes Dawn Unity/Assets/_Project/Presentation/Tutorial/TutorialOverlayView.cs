@@ -178,7 +178,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
             hintBody.text = text;
             hintOk.SetLabel(okLabel);
             hintCard.gameObject.SetActive(true);
-            _hintLeft = 9f;
+            _hintLeft = 6f;
             Tween.PopIn(hintCard, 0.25f);
         }
 
