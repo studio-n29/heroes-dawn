@@ -34,7 +34,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public IReadOnlyList<HubLocation> Stack => _stack;
         public bool IsOnTab => _stack.Count == 1;
 
-        /// <summary>Carte Ã  mettre en avant Ã  la prochaine ouverture du grimoire (lue puis effacÃ©e par la page).</summary>
+        /// <summary>Carte à mettre en avant à la prochaine ouverture du grimoire (lue puis effacée par la page).</summary>
         public string? FocusCard { get; set; }
 
         public static bool IsTab(HubPage page) => Array.IndexOf(Tabs, page) >= 0;

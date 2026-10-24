@@ -81,7 +81,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _focus = null;
         }
 
-        /// <summary>Bouton Â« AmÃ©liorer Â» de la fiche : coÃ»t en doublons et en CrÃ©dits, avec la raison quand il est grisÃ©.</summary>
+        /// <summary>Bouton « Améliorer » de la fiche : coût en doublons et en Crédits, avec la raison quand il est grisé.</summary>
         RowButtonData UpgradeButton(SkillCardDef card, int level, int count)
         {
             if (level >= CardLevels.Max) return RowButtonData.Of(Loc.T("grimoire.max_level"), false, Loc.T("errors.collection_max_level"), 3);

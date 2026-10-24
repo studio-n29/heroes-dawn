@@ -254,19 +254,20 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             }
 
             var affinityFill = Ui.Panel(rt, "Affinity", Theme.Surface, 4f, 6f, false);
-            affinityFill.Frame().At(0f, 1f, RightX, -416, RightW, 92);
+            affinityFill.Frame().At(0f, 1f, RightX, -416, RightW, 100);
             var affinityTitle = Ui.Txt(affinityFill.transform, "", 22, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "AffinityTitle");
             affinityTitle.rectTransform.At(0f, 1f, 18, -8, 330, 28);
             var affinity = new List<Object>();
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 5; i++)
             {
                 var p = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", affinityFill.transform, "Affinity" + i);
-                ((RectTransform)p.transform).At(0f, 1f, 18 + i * 70, -34, 56, 56);
+                ((RectTransform)p.transform).At(0f, 1f, 18 + i * 74, -34, 60, 56);
                 affinity.Add(p);
             }
-            var synergies = Ui.Txt(affinityFill.transform, "", 20, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "Synergies");
-            synergies.rectTransform.At(1f, 0.5f, -12, 0, 330, 80);
-            synergies.overflowMode = TMPro.TextOverflowModes.Ellipsis;
+            // Toucher la zone ouvre le pop-up d'affinités avec tous les agents.
+            affinityFill.Frame().GetComponent<Image>().raycastTarget = true;
+            var affinityButton = affinityFill.Frame().gameObject.AddComponent<Button>();
+            affinityButton.transition = Selectable.Transition.None;
 
             var salon = Ui.LocBtn(rt, "sheet.salon", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Salon");
             salon.Rect.At(0f, 0f, RightX, 0, 200, 96);
@@ -316,7 +317,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.WireArray(view, "itemTiles", itemTiles);
             ctx.WireArray(view, "affinity", affinity);
             ctx.Wire(view, "affinityTitle", affinityTitle);
-            ctx.Wire(view, "synergies", synergies);
+            ctx.Wire(view, "affinityButton", affinityButton);
             ctx.Wire(view, "previous", previous);
             ctx.Wire(view, "next", next);
             ctx.Wire(view, "salon", salon);

@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string Glyph;
         /// <summary>Illustration de la carte ; nulle : la pastille d'initiale la remplace.</summary>
         public Sprite? Art;
-        /// <summary>Effets de la carte (dÃ©gÃ¢ts, soinsâ€¦ en montants bruts).</summary>
+        /// <summary>Effets de la carte (dégâts, soins… en montants bruts).</summary>
         public string Description;
         public bool IsNew;
     }

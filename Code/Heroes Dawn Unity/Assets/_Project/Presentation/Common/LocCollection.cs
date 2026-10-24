@@ -58,6 +58,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["sheet.tier_level"] = "NIV. {0}";
             d["sheet.tier_stats"] = "PV {0} · ATQ {1} · DÉF {2}";
             d["sheet.affinity"] = "AGENTS À FORTE AFFINITÉ";
+            d["affinity.title"] = "Affinités de {0}";
+            d["affinity.subtitle"] = "Chaque duo donne un seul bonus quand les deux agents sont dans l’escouade.";
+            d["affinity.empty"] = "Aucun autre agent dans ton équipe pour l’instant.";
+            d["affinity.link"] = "Lien niv. {0} · {1} victoire(s)";
+            d["affinity.none"] = "Aucune synergie";
             d["sheet.skill_fixed"] = "COMPÉTENCE {0}";
             d["sheet.skill_card"] = "CARTE {0}";
             d["sheet.item_slot"] = "OBJET {0}";

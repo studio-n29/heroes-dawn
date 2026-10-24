@@ -31,7 +31,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] SheetTileView[] itemTiles = null!;
         [SerializeField] PortraitView[] affinity = null!;
         [SerializeField] TMP_Text affinityTitle = null!;
-        [SerializeField] TMP_Text synergies = null!;
+        [SerializeField] Button affinityButton = null!;
         [SerializeField] UiButton previous = null!;
         [SerializeField] UiButton next = null!;
         [SerializeField] UiButton salon = null!;
@@ -51,6 +51,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? PrimaryClicked;
         public event Action<HubPage>? RoomClicked;
         public event Action? LoadoutClicked;
+        public event Action? AffinityClicked;
         public event Action<int>? SkillTileClicked;
         public event Action<int>? ItemTileClicked;
         public event Action<int>? PickerChosen;
@@ -71,6 +72,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             salon.Button.onClick.AddListener(() => RoomClicked?.Invoke(HubPage.Salon));
             infirmary.Button.onClick.AddListener(() => RoomClicked?.Invoke(HubPage.Infirmary));
             loadout.Button.onClick.AddListener(() => LoadoutClicked?.Invoke());
+            affinityButton.onClick.AddListener(() => AffinityClicked?.Invoke());
             for (int i = 0; i < skillTiles.Length; i++) { int k = i; skillTiles[i].Button.onClick.AddListener(() => SkillTileClicked?.Invoke(k)); }
             for (int i = 0; i < itemTiles.Length; i++) { int k = i; itemTiles[i].Button.onClick.AddListener(() => ItemTileClicked?.Invoke(k)); }
             for (int i = 0; i < pickerTiles.Length; i++) { int k = i; pickerTiles[i].Button.onClick.AddListener(() => PickerChosen?.Invoke(k)); }
@@ -129,7 +131,6 @@ namespace N29.HeroesDawn.Presentation.Hub
                 affinity[i].gameObject.SetActive(on);
                 if (on) affinity[i].Show(d.Affinity![i]);
             }
-            synergies.text = d.Synergies.Length > 1 ? d.Synergies[0] + Environment.NewLine + d.Synergies[1] : string.Join(Environment.NewLine, d.Synergies);
 
             SetActive(previous, d.ShowArrows);
             SetActive(next, d.ShowArrows);

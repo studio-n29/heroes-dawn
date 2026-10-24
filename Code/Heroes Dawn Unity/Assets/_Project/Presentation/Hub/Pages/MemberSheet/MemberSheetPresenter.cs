@@ -43,6 +43,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly GameSession? _game;
         readonly CollectionBook? _book;
         readonly TutorialGuide? _tutorial;
+        readonly AffinityFlow? _affinity;
         readonly List<Action> _pickActions = new List<Action>();
         Action? _pickRemove;
         IDisposable? _subs;
@@ -52,11 +53,11 @@ namespace N29.HeroesDawn.Presentation.Hub
         public MemberSheetPresenter(IMemberSheetView view, HubLocation location, ISessionReadModel session, ITrainMemberUseCase train,
                                     RecruitFlow recruit, HubNavigator nav, IToastService toasts, ILocalization loc,
                                     ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, ISubscriber<ShopChanged> shop,
-                                    GameSession? game = null, CollectionBook? book = null, TutorialGuide? tutorial = null)
+                                    GameSession? game = null, CollectionBook? book = null, TutorialGuide? tutorial = null, AffinityFlow? affinity = null)
             : base(view, null)
         {
             _session = session; _train = train; _recruit = recruit; _nav = nav; _toasts = toasts; _loc = loc;
-            _wallet = wallet; _roster = roster; _shop = shop; _game = game; _book = book; _tutorial = tutorial;
+            _wallet = wallet; _roster = roster; _shop = shop; _game = game; _book = book; _tutorial = tutorial; _affinity = affinity;
             _member = location.Member ?? throw new ArgumentException("Fiche sans membre", nameof(location));
             _fromShop = location.FromShop;
             _action = new PageAction(toasts, loc);
@@ -71,6 +72,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.PrimaryClicked += Primary;
             View.RoomClicked += OpenRoom;
             View.LoadoutClicked += OpenLoadout;
+            View.AffinityClicked += OpenAffinity;
             View.SkillTileClicked += OnSkillTile;
             View.ItemTileClicked += OnItemTile;
             View.PickerChosen += OnPickerChosen;
@@ -104,6 +106,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.PrimaryClicked -= Primary;
             View.RoomClicked -= OpenRoom;
             View.LoadoutClicked -= OpenLoadout;
+            View.AffinityClicked -= OpenAffinity;
             View.SkillTileClicked -= OnSkillTile;
             View.ItemTileClicked -= OnItemTile;
             View.PickerChosen -= OnPickerChosen;
@@ -129,6 +132,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         void OpenRoom(HubPage page) => _nav.Open(page);
 
         void OpenLoadout() => _nav.Open(HubPage.Loadout, _member);
+
+        void OpenAffinity() { if (_affinity != null && OwnedMember() != null) _affinity.OpenAsync(_member, Lifetime).Forget(); }
 
         void Primary()
         {
@@ -251,7 +256,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             return d;
         }
 
-        /// <summary>Paliers de niveau : les bonus passifs que l'agent gagne en montant (atteints en clair, le prochain en Ã©vidence).</summary>
+        /// <summary>Paliers de niveau : les bonus passifs que l'agent gagne en montant (atteints en clair, le prochain en évidence).</summary>
         TierLineData[] Tiers(MemberDef def, int level, int max)
         {
             var next = LevelTiers.All.Where(t => t.Level > level).Select(t => (int?)t.Level).FirstOrDefault();
@@ -328,7 +333,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var partners = new HashSet<Family>(SquadSynergies.For(def.Family, _session.Content.Synergies).Select(c => c.A == def.Family ? c.B : c.A));
             return _session.Roster.Where(x => x.Id != _member && partners.Contains(x.Def.Family))
                            .OrderByDescending(x => x.Level)
-                           .Take(3)
+                           .Take(5)
                            .Select(x => new PortraitData(_loc.MemberName(x.Def), x.Def.Family, art: AgentArt.For(x.Def.Id.Value)))
                            .ToArray();
         }
@@ -348,7 +353,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             int slot = index - 2;
             if (slot == 1 && !m.Cards[0].HasValue) { _toasts.Show(_loc.T("loadout.locked_card_sub"), ToastKind.Warning); return; }
-            // Une carte Ã©quipÃ©e s'ouvre dans le grimoire (description, niveau, amÃ©lioration) ; un emplacement vide ouvre le choix des cartes.
+            // Une carte équipée s'ouvre dans le grimoire (description, niveau, amélioration) ; un emplacement vide ouvre le choix des cartes.
             if (m.Cards[slot].HasValue) { _nav.FocusCard = m.Cards[slot]!.Value.Value; _nav.Open(HubPage.Grimoire); return; }
             OpenCardPicker(m, slot);
         }

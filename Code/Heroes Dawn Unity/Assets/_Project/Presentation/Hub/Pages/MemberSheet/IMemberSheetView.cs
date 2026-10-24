@@ -13,6 +13,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         event Action<HubPage> RoomClicked;
         /// <summary>Equipement : objets et cartes de l agent.</summary>
         event Action LoadoutClicked;
+        /// <summary>Zone des affinités touchée : ouvre le pop-up avec tous les agents.</summary>
+        event Action AffinityClicked;
         /// <summary>Case de compétence touchée (0 à 3).</summary>
         event Action<int> SkillTileClicked;
         /// <summary>Case d'objet touchée (0 à 2).</summary>

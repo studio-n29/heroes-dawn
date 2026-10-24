@@ -67,7 +67,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         }
 
         /// <summary>
-        /// Remet la carte dans l'Ã©ventail ; avec <paramref name="animate"/>, elle glisse de l'endroit oÃ¹ elle a Ã©tÃ© lÃ¢chÃ©e jusqu'Ã  sa place
+        /// Remet la carte dans l'éventail ; avec <paramref name="animate"/>, elle glisse de l'endroit où elle a été lâchée jusqu'à sa place
         /// (en retrouvant sa taille et son inclinaison) au lieu de sauter.
         /// </summary>
         void Restore(bool animate = false)

@@ -146,7 +146,7 @@ namespace N29.HeroesDawn.Application.Features.Tutorial
                 s.Roster.Add(new N29.HeroesDawn.Application.Session.TeamMember(def, N29.HeroesDawn.Application.Session.MetaRules.RecruitLevel) { InSquad = s.Squad.Count < N29.HeroesDawn.Application.Session.MetaRules.SquadSize });
                 return;
             }
-            // Contenu sans l'un des agents prÃ©vus : le premier agent courant du catalogue que le joueur n'a pas.
+            // Contenu sans l'un des agents prévus : le premier agent courant du catalogue que le joueur n'a pas.
             foreach (var m in s.Content.Members)
             {
                 if (s.Owns(m.Id) || m.Rarity != N29.HeroesDawn.Definitions.Rarity.Agent || (m.Unlock != null && m.Unlock.Kind != N29.HeroesDawn.Definitions.UnlockKind.Shop)) continue;

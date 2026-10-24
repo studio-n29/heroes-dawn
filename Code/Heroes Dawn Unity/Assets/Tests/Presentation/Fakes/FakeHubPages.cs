@@ -50,6 +50,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action? PrimaryClicked;
         public event Action<HubPage>? RoomClicked;
         public event Action? LoadoutClicked;
+        public event Action? AffinityClicked;
+        public void ClickAffinity() => AffinityClicked?.Invoke();
         public event Action<int>? SkillTileClicked;
         public event Action<int>? ItemTileClicked;
         public event Action<int>? PickerChosen;
