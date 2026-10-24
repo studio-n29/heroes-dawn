@@ -156,6 +156,14 @@ namespace N29.HeroesDawn.Presentation.Common
             d["errors.collection_no_slot"] = "Aucun emplacement libre.";
             d["errors.collection_max_level"] = "Cette carte est déjà au niveau maximum.";
             d["errors.collection_copies"] = "Il manque des exemplaires en doublon.";
+            d["errors.preset_empty"] = "Aucune composition enregistrée ici.";
+            d["team.preset.filled"] = "{0} · {1} agents";
+            d["team.preset.empty"] = "{0} · vide";
+            d["team.preset.save"] = "SAUVER";
+            d["team.preset.saving"] = "CHOISIS";
+            d["team.preset.saved"] = "Composition {0} enregistrée.";
+            d["team.preset.loaded"] = "Composition {0} chargée.";
+            d["errors.preset_unavailable"] = "Aucun agent de cette composition n’est disponible.";
             d["errors.collection_not_owned"] = "Tu n'en as plus de libre en réserve.";
             d["errors.collection_family"] = "Cette carte ne va pas à la catégorie de cet agent.";
             d["errors.collection_first_card"] = "Équipe d'abord la carte de l'emplacement 3.";

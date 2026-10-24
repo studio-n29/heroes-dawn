@@ -12,6 +12,8 @@ namespace N29.HeroesDawn.Application.Features.Hub
         public static readonly DomainError MaxLevel = new DomainError("hub.max_level", "errors.max_level");
         public static readonly DomainError SquadFull = new DomainError("hub.squad_full", "errors.squad_full");
         public static readonly DomainError SquadEmpty = new DomainError("hub.squad_empty", "errors.squad_empty");
+        public static readonly DomainError PresetEmpty = new DomainError("hub.preset_empty", "errors.preset_empty");
+        public static readonly DomainError PresetUnavailable = new DomainError("hub.preset_unavailable", "errors.preset_unavailable");
         public static readonly DomainError NothingToHeal = new DomainError("hub.no_fatigue", "errors.nothing_to_heal");
         public static readonly DomainError InMission = new DomainError("hub.in_mission", "errors.in_mission");
         public static readonly DomainError OnExpedition = new DomainError("hub.expedition", "errors.on_expedition");

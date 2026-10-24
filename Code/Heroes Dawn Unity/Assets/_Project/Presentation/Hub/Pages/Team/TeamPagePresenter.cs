@@ -24,15 +24,18 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ILocalization _loc;
         readonly ISubscriber<RosterChanged> _roster;
         readonly TeamViewState _state;
+        readonly SquadPresets? _presets;
+        bool _saveMode;
         readonly PageAction _action;
+        readonly IToastService _toasts;
         IDisposable? _subs;
 
         public TeamPagePresenter(ITeamPageView view, ISessionReadModel session, IToggleSquadUseCase toggle, MissionLauncher mission,
-                                 HubNavigator nav, TeamViewState state, IToastService toasts, ILocalization loc, ISubscriber<RosterChanged> roster)
+                                 HubNavigator nav, TeamViewState state, IToastService toasts, ILocalization loc, ISubscriber<RosterChanged> roster, SquadPresets? presets = null)
             : base(view, null)
         {
             _session = session; _toggle = toggle; _mission = mission; _nav = nav; _loc = loc; _roster = roster;
-            _state = state;
+            _state = state; _presets = presets; _toasts = toasts;
             _action = new PageAction(toasts, loc);
         }
 
@@ -45,6 +48,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.MemberTapped += OpenSheet;
             View.SquadToggled += Toggle;
             View.MissionClicked += Launch;
+            View.PresetClicked += OnPreset;
+            View.PresetSaveClicked += OnPresetSave;
         }
 
         protected override void OnShown()
@@ -68,6 +73,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.MemberTapped -= OpenSheet;
             View.SquadToggled -= Toggle;
             View.MissionClicked -= Launch;
+            View.PresetClicked -= OnPreset;
+            View.PresetSaveClicked -= OnPresetSave;
         }
 
         void SetFilter(int index)
@@ -88,6 +95,32 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         void Launch() => _nav.Open(HubPage.CityMap);
 
+        void Report(Result r, string ok)
+        {
+            if (r.IsFailure) _toasts.Show(_loc.Error(r.Error!), ToastKind.Error);
+            else _toasts.Show(ok, ToastKind.Info);
+        }
+
+        void OnPresetSave()
+        {
+            _saveMode = !_saveMode;
+            Refresh();
+        }
+
+        /// <summary>Hors mode sauvegarde : charge la composition ; en mode sauvegarde : y enregistre l'escouade actuelle.</summary>
+        void OnPreset(int slot)
+        {
+            if (_presets == null) return;
+            if (_saveMode)
+            {
+                _saveMode = false;
+                Report(_presets.Save(slot), _loc.F("team.preset.saved", slot + 1));
+                Refresh();
+                return;
+            }
+            Report(_presets.Load(slot), _loc.F("team.preset.loaded", slot + 1));
+        }
+
         void Refresh()
         {
             if (Disposed) return;
@@ -106,6 +139,11 @@ namespace N29.HeroesDawn.Presentation.Hub
                     .Concat(TeamEffects.Active(squad.Select(m => m.Def.Family).ToList(), squad.Select(m => m.Def.Role).ToList()).Select(_loc.TeamEffect)).ToArray(),
                 MissionEnabled = !s.SquadExhausted,
                 MissionHint = s.SquadExhausted ? _loc.T("hub.deploy.exhausted") : "",
+                PresetLabels = _presets == null ? new string[0] : Enumerable.Range(0, SquadPresets.Slots)
+                    .Select(i => _presets.IsSaved(i) ? _loc.F("team.preset.filled", i + 1, _presets.Members(i).Count) : _loc.F("team.preset.empty", i + 1)).ToArray(),
+                PresetSaved = _presets == null ? new bool[0] : Enumerable.Range(0, SquadPresets.Slots).Select(_presets.IsSaved).ToArray(),
+                SaveMode = _saveMode,
+                SaveLabel = _loc.T(_saveMode ? "team.preset.saving" : "team.preset.save"),
             });
         }
 

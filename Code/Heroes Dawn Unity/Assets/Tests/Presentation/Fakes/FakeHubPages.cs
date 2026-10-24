@@ -33,6 +33,10 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action<MemberId>? MemberTapped;
         public event Action<MemberId>? SquadToggled;
         public event Action? MissionClicked;
+        public event Action<int>? PresetClicked;
+        public event Action? PresetSaveClicked;
+        public void ClickPreset(int i) => PresetClicked?.Invoke(i);
+        public void ClickPresetSave() => PresetSaveClicked?.Invoke();
         public readonly List<TeamPageData> Shown = new List<TeamPageData>();
         public TeamPageData Last => Shown[Shown.Count - 1];
         public void Show(TeamPageData d) => Shown.Add(d);

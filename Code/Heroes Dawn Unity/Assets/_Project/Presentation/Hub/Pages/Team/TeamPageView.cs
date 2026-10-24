@@ -24,6 +24,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text synergies = null!;
         [SerializeField] GameObject synergiesNone = null!;
         [SerializeField] UiButton mission = null!;
+        [SerializeField] UiButton[] presets = Array.Empty<UiButton>();
+        [SerializeField] UiButton presetSave = null!;
         [SerializeField] TMP_Text missionHint = null!;
         [SerializeField] MemberTileView tilePrefab = null!;
         [SerializeField] SquadSlotView squadSlotPrefab = null!;
@@ -37,6 +39,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action<MemberId>? MemberTapped;
         public event Action<MemberId>? SquadToggled;
         public event Action? MissionClicked;
+        public event Action<int>? PresetClicked;
+        public event Action? PresetSaveClicked;
 
         public Button MissionButton => mission.Button;
         public IReadOnlyList<MemberTileView> Tiles => _tiles;
@@ -54,6 +58,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 sorts[i].Button.onClick.AddListener(() => SortClicked?.Invoke(sort));
             }
             mission.Button.onClick.AddListener(() => MissionClicked?.Invoke());
+            for (int i = 0; i < presets.Length; i++) { int k = i; presets[i].Button.onClick.AddListener(() => PresetClicked?.Invoke(k)); }
+            presetSave.Button.onClick.AddListener(() => PresetSaveClicked?.Invoke());
         }
 
         public void Show(TeamPageData d)
@@ -86,6 +92,17 @@ namespace N29.HeroesDawn.Presentation.Hub
             synergies.text = string.Join(System.Environment.NewLine, d.Synergies);
             bool none = d.Synergies.Length == 0;
             if (synergiesNone.activeSelf != none) synergiesNone.SetActive(none);
+            for (int i = 0; i < presets.Length; i++)
+            {
+                bool has = d.PresetLabels != null && i < d.PresetLabels.Length;
+                presets[i].gameObject.SetActive(has);
+                if (!has) continue;
+                presets[i].SetLabel(d.PresetLabels![i]);
+                bool saved = d.PresetSaved != null && i < d.PresetSaved.Length && d.PresetSaved[i];
+                presets[i].SetColors(d.SaveMode ? Theme.Accent : saved ? Theme.Info : Theme.Surface3, d.SaveMode ? Theme.TextOnDark : saved ? Theme.TextDark : Theme.Text);
+            }
+            presetSave.SetLabel(d.SaveLabel ?? "");
+            presetSave.SetColors(d.SaveMode ? Theme.Accent : Theme.Surface3, d.SaveMode ? Theme.TextOnDark : Theme.Text);
             mission.Interactable = d.MissionEnabled;
             mission.DisabledReason = d.MissionHint;
             missionHint.text = d.MissionHint;

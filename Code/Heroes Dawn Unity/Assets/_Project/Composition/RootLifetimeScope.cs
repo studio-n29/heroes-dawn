@@ -111,6 +111,7 @@ namespace N29.HeroesDawn.Composition
 
             // ---- Use cases : QG
             builder.Register<ToggleSquadUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<SquadPresets>(Lifetime.Singleton);
             builder.Register<TrainMemberUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
 
             // ---- Use cases : boutique éphémère

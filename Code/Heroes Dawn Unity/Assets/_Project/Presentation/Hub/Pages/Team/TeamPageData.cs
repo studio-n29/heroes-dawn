@@ -30,5 +30,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string[] Synergies;
         public bool MissionEnabled;
         public string MissionHint;
+        /// <summary>LibellÃ© de chaque emplacement de composition (Â« 1 Â· 3 agents Â», Â« 1 Â· vide Â»).</summary>
+        public string[] PresetLabels;
+        public bool[] PresetSaved;
+        public bool SaveMode;
+        public string SaveLabel;
     }
 }

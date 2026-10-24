@@ -74,6 +74,13 @@ namespace N29.HeroesDawn.Application.Ports
         public List<string> hintsSeen = new List<string>();
     }
 
+    /// <summary>Composition d'équipe enregistrée : les agents de l'escouade (identifiants).</summary>
+    [Serializable]
+    public sealed class SquadPresetSave
+    {
+        public List<string> members = new List<string>();
+    }
+
     /// <summary>Victoires remportées ensemble par deux agents (identifiants triés : a avant b).</summary>
     [Serializable]
     public sealed class LinkSave
@@ -102,6 +109,9 @@ namespace N29.HeroesDawn.Application.Ports
 
         /// <summary>Liens entre agents : victoires remportées ensemble, par paire (voir <see cref="N29.HeroesDawn.Definitions.LinkRules"/>).</summary>
         public List<LinkSave> links = new List<LinkSave>();
+
+        /// <summary>Compositions d'équipe enregistrées (trois emplacements, <see cref="N29.HeroesDawn.Application.Features.Hub.SquadPresets.Slots"/>).</summary>
+        public List<SquadPresetSave> squadPresets = new List<SquadPresetSave>();
 
         // Pass saisonnier
         public string seasonStart = "";
