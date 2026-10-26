@@ -21,11 +21,12 @@ namespace N29.HeroesDawn.Authoring
             => new SkillRecord { id = s.Id.Value, name = name, slot = s.Slot, cost = s.Cost, cooldown = s.Cooldown, target = s.Target, effects = s.Effects.Select(FromDef).ToList() };
 
         public static ItemDef ToDef(ItemRecord i)
-            => new ItemDef(new ItemId(i.id), "items." + i.id + ".name", i.rarity, i.hp, i.atk, i.def, i.spd, i.perk, i.perkValue, i.price);
+            => new ItemDef(new ItemId(i.id), "items." + i.id + ".name", i.rarity, i.hp, i.atk, i.def, i.spd, i.perk, i.perkValue, i.price,
+                           System.Enum.IsDefined(typeof(ItemType), i.type) ? i.type : (ItemType?)null);
 
         public static ItemRecord FromDef(ItemDef i, string name)
             => new ItemRecord { id = i.Id.Value, name = name, rarity = i.Rarity, hp = i.HpPercent, atk = i.AtkPercent, def = i.DefPercent, spd = i.SpdPercent,
-                                perk = i.Perk, perkValue = i.PerkValue, price = i.Price };
+                                perk = i.Perk, perkValue = i.PerkValue, price = i.Price, type = i.Type };
 
         /// <summary>Agent du jeu à partir de sa fiche ; les compétences absentes sont ignorées (la validation les signale).</summary>
         public static MemberDef ToDef(AgentRecord a, IReadOnlyDictionary<string, SkillDef> skills)

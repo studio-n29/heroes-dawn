@@ -164,5 +164,58 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(asset, Is.Not.Null);
             Assert.That(UnityEngine.JsonUtility.FromJson<TextsFile>(asset!.text).texts, Is.Empty);
         }
+
+        // ------------------------------------------------------------------ Catégories (lot B 0.14.0)
+
+        static readonly Dictionary<string, CardNature> SpecNatures = new Dictionary<string, CardNature>
+        {
+            ["card_prism_burst"] = CardNature.Offensive, ["card_shackle"] = CardNature.Offensive, ["card_ember"] = CardNature.Offensive,
+            ["card_storm"] = CardNature.Offensive, ["card_inferno"] = CardNature.Offensive, ["card_bulwark_charge"] = CardNature.Offensive,
+            ["card_mark"] = CardNature.Offensive, ["card_glass_wall"] = CardNature.Defensive, ["card_second_wind"] = CardNature.Support,
+            ["card_regen_field"] = CardNature.Support, ["card_precog"] = CardNature.Support, ["card_time_rift"] = CardNature.Support,
+        };
+
+        static readonly Dictionary<string, ItemType> SpecTypes = new Dictionary<string, ItemType>
+        {
+            ["steel_knuckles"] = ItemType.Weapon, ["titan_gauntlets"] = ItemType.Weapon, ["apex_module"] = ItemType.Weapon,
+            ["kevlar_vest"] = ItemType.Armor, ["riot_shield"] = ItemType.Armor, ["reactive_plating"] = ItemType.Armor, ["phoenix_core"] = ItemType.Armor,
+            ["running_shoes"] = ItemType.Tool, ["adrenaline_patch"] = ItemType.Tool, ["time_shard"] = ItemType.Tool,
+            ["power_gauntlet"] = ItemType.Implant, ["arcane_focus"] = ItemType.Implant,
+        };
+
+        [Test, Description("Vérifie que les 12 cartes et les 12 objets du code ont la nature et le type fixés par la spec du lot B — parce que ces catégories pilotent les filtres et la règle d'équipement")]
+        public void CodeCatalog_HasTheSpecCategories()
+        {
+            var col = PrototypeCollection.Build();
+            Assert.That(col.Cards.ToDictionary(c => c.Id.Value, c => c.Nature), Is.EquivalentTo(SpecNatures));
+            Assert.That(col.Items.ToDictionary(i => i.Id.Value, i => i.Type), Is.EquivalentTo(SpecTypes));
+        }
+
+        [Test, Description("Vérifie que chaque objet de items.json porte un type saisi, égal à celui de la spec — parce qu'un type manquant serait déduit en silence et pourrait changer l'équipement autorisé")]
+        public void ItemsJson_EveryItemHasAnExplicitType()
+        {
+            var asset = UnityEngine.Resources.Load<UnityEngine.TextAsset>(ContentDataLibrary.ResourcesFolder + "/" + ContentDataLibrary.ItemsName);
+            var file = UnityEngine.JsonUtility.FromJson<ItemsFile>(asset.text);
+            Assert.That(file.items, Is.Not.Empty);
+            foreach (var r in file.items)
+            {
+                Assert.That(System.Enum.IsDefined(typeof(ItemType), r.type), Is.True, r.id + " sans type");
+                Assert.That(r.type, Is.EqualTo(SpecTypes[r.id]), r.id);
+            }
+        }
+
+        [Test, Description("Vérifie qu'une fiche d'objet sans champ type reçoit le type déduit (ici Armure), pas la première valeur de l'enum — parce que JsonUtility remet un champ absent à sa valeur par défaut")]
+        public void ItemRecord_WithoutType_GetsTheDeducedType()
+        {
+            var file = UnityEngine.JsonUtility.FromJson<ItemsFile>("{\"items\":[{\"id\":\"x\",\"def\":10}]}");
+            Assert.That(ContentDataConverter.ToDef(file.items[0]).Type, Is.EqualTo(ItemType.Armor));
+        }
+
+        [Test, Description("Vérifie qu'un objet repasse par sa fiche sans perdre son type — parce que l'outil Objets réécrit items.json depuis les définitions")]
+        public void ItemRecord_RoundTrip_KeepsTheType()
+        {
+            var tool = new ItemDef(new Core.ItemId("t"), "t", ItemRarity.Common, atk: 20, type: ItemType.Tool);
+            Assert.That(ContentDataConverter.ToDef(ContentDataConverter.FromDef(tool, "T")).Type, Is.EqualTo(ItemType.Tool));
+        }
     }
 }

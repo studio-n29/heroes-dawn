@@ -46,6 +46,8 @@ namespace N29.HeroesDawn.Authoring
         [Tooltip("Effet spécial : jauge de départ, bouclier d'ouverture ou chances de critique.")] public ItemPerk perk;
         [Tooltip("Valeur de l'effet spécial (en % : jauge, bouclier, critique).")] public int perkValue;
         [Tooltip("Prix en Crédits (0 : pas en vente).")] public int price;
+        /// <summary>-1 tant que rien n'est saisi (JsonUtility garde cette valeur quand le champ manque) : le type est alors déduit.</summary>
+        [Tooltip("Type d'objet : un agent ne porte pas deux objets du même type.")] public ItemType type = (ItemType)(-1);
     }
 
     [Serializable]
