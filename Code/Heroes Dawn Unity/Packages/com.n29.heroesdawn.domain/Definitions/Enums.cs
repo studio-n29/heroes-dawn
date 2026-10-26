@@ -14,6 +14,14 @@ namespace N29.HeroesDawn.Definitions
         PushBack,
         /// <summary>Élan : propulse la cible vers le point d'action (Value = % de la frise) ; à 100 % elle agit aussitôt, avant toute action ennemie.</summary>
         Advance,
+        /// <summary>Vol de vie : le lanceur récupère Value % des dégâts infligés à la cible par cette compétence.</summary>
+        Lifesteal,
+        /// <summary>Purge : retire Value statuts (0 = tous) — négatifs sur un allié, positifs sur un ennemi ; les plus récents d'abord.</summary>
+        Purge,
+        /// <summary>Rebond : un autre ennemi vivant subit le premier effet de dégâts de la compétence à Value % de sa puissance.</summary>
+        Bounce,
+        /// <summary>Exécution : dégâts de la compétence +Value % sur une cible sous le seuil de PV (BalanceConfig.ExecuteThresholdPercent).</summary>
+        Execute,
     }
     /// <summary>Famille d une compétence : Dégâts, Soins, Protection, Boost, Gestion du temps.</summary>
     public enum SkillCategory { Damage, Heal, Protection, Boost, TimeManagement }

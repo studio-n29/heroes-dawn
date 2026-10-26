@@ -41,6 +41,12 @@ namespace N29.HeroesDawn.Domain.Combat
 
     public sealed class MissEvent : CombatEvent { public int Target { get; } public MissEvent(int t, int target) : base(t) { Target = target; } }
     public sealed class HealEvent : CombatEvent { public int Target { get; } public int Amount { get; } public HealEvent(int t, int target, int amount) : base(t) { Target = target; Amount = amount; } }
+    /// <summary>Exécution : les dégâts sur une cible presque vaincue ont reçu leur bonus.</summary>
+    public sealed class ExecutedEvent : CombatEvent { public int Target { get; } public ExecutedEvent(int t, int target) : base(t) { Target = target; } }
+    /// <summary>Rebond : l'effet passe de la cible From à l'ennemi To.</summary>
+    public sealed class BounceEvent : CombatEvent { public int From { get; } public int To { get; } public BounceEvent(int t, int from, int to) : base(t) { From = from; To = to; } }
+    /// <summary>Purge : Count statuts retirés à la cible.</summary>
+    public sealed class PurgedEvent : CombatEvent { public int Target { get; } public int Count { get; } public PurgedEvent(int t, int target, int count) : base(t) { Target = target; Count = count; } }
     public sealed class ShieldAbsorbedEvent : CombatEvent { public int Target { get; } public int Amount { get; } public ShieldAbsorbedEvent(int t, int target, int amount) : base(t) { Target = target; Amount = amount; } }
 
     public sealed class StatusAppliedEvent : CombatEvent

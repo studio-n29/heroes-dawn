@@ -129,13 +129,19 @@ namespace N29.HeroesDawn.Domain.Combat
 
         void ApplyEffects(CombatUnit actor, IReadOnlyList<EffectDef> effects, List<int> targets, List<CombatEvent> output)
         {
+            // Exécution : bonus lu avant la boucle, pour qu'il compte où qu'il soit placé dans la liste.
+            int executeBonus = 0;
+            foreach (var fx in effects) if (fx.Type == EffectType.Execute) executeBonus += fx.Value;
             foreach (var tid in targets)
             {
                 var t = _units[tid];
                 bool missed = false;
+                int dealt = 0; // dégâts infligés à cette cible par la compétence (après bouclier), pour le vol de vie
                 foreach (var fx in effects)
                 {
-                    if (!t.IsAlive || missed) break;
+                    if (missed) break;
+                    // Une cible vaincue ne reçoit plus d'effet ; le vol de vie compte encore le coup qui l'a vaincue.
+                    if (!t.IsAlive && fx.Type != EffectType.Lifesteal) break;
                     if (!_rng.Chance(fx.ChancePercent)) continue;
                     switch (fx.Type)
                     {
@@ -153,7 +159,18 @@ namespace N29.HeroesDawn.Domain.Combat
                             int variance = _rng.Range(-_b.VariancePercent, _b.VariancePercent + 1);
                             int dmg = DamageFormula.Compute(actor.Atk, fx.Value, def, _b.DefK, crit, t.Has(StatusType.Vulnerable), variance, _b);
                             if (marked) RemoveStatus(t, StatusType.Mark, output);
-                            DealDamage(t, dmg, crit, output);
+                            if (executeBonus > 0 && t.Hp * 100 < t.MaxHp * _b.ExecuteThresholdPercent)
+                            {
+                                dmg = dmg * (100 + executeBonus) / 100;
+                                output.Add(new ExecutedEvent(Tick, t.Id));
+                            }
+                            dealt += DealDamage(t, dmg, crit, output);
+                            break;
+                        case EffectType.Lifesteal:
+                            if (dealt <= 0 || !actor.IsAlive) break;
+                            int stolen = Math.Min(dealt * fx.Value / 100, actor.MaxHp - actor.Hp);
+                            actor.Hp += stolen;
+                            output.Add(new HealEvent(Tick, actor.Id, stolen));
                             break;
                         case EffectType.Heal:
                             int heal = t.MaxHp * fx.Value / 100;
@@ -195,7 +212,8 @@ namespace N29.HeroesDawn.Domain.Combat
             }
         }
 
-        void DealDamage(CombatUnit t, int dmg, bool crit, List<CombatEvent> output)
+        /// <summary>Inflige les dégâts (le bouclier absorbe d'abord) ; rend les dégâts retirés aux PV (0 si tout est absorbé).</summary>
+        int DealDamage(CombatUnit t, int dmg, bool crit, List<CombatEvent> output)
         {
             var shield = t.Find(StatusType.Shield);
             if (shield != null)
@@ -206,7 +224,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 if (absorbed > 0) output.Add(new ShieldAbsorbedEvent(Tick, t.Id, absorbed));
                 if (shield.Value <= 0) RemoveStatus(t, StatusType.Shield, output);
             }
-            if (dmg <= 0) return;
+            if (dmg <= 0) return 0;
             t.Hp = Math.Max(0, t.Hp - dmg);
             output.Add(new DamageEvent(Tick, t.Id, dmg, crit));
             if (t.Hp == 0)
@@ -216,6 +234,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 output.Add(new UnitDefeatedEvent(Tick, t.Id));
             }
             else if (crit) InterruptOnCrit(t, output);
+            return dmg;
         }
 
         void ApplyStatus(CombatUnit t, StatusType s, int turns, int value, List<CombatEvent> output)

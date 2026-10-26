@@ -11,6 +11,8 @@ namespace N29.HeroesDawn.Definitions
         public int CritMultiplierPercent { get; set; } = 150;
         public int VariancePercent { get; set; } = 5;
         public int VulnerableBonusPercent { get; set; } = 25;
+        /// <summary>Exécution : bonus de dégâts sur une cible sous ce pourcentage de ses PV max.</summary>
+        public int ExecuteThresholdPercent { get; set; } = 30;
         public int FatiguePerWin { get; set; } = 12;
         public int FatiguePerLossExtra { get; set; } = 15;
         public int FatigueMalusThreshold { get; set; } = 60;
