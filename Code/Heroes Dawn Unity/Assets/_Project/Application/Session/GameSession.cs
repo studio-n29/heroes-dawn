@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
@@ -268,7 +269,10 @@ namespace N29.HeroesDawn.Application.Session
             return p;
         }
 
-        /// <summary>Objets et cartes equipes sauvegardes ; un objet ou une carte inconnu du jeu, en trop ou d'une autre categorie est ignore.</summary>
+        /// <summary>
+        /// Objets et cartes equipes sauvegardes ; un objet ou une carte inconnu du jeu, en trop ou d'une autre categorie est ignore,
+        /// comme un objet d'un type deja porte (il reste dans l'inventaire).
+        /// </summary>
         void LoadEquipment(TeamMember member, MemberSave save)
         {
             var collection = Content.Collection;
@@ -276,7 +280,9 @@ namespace N29.HeroesDawn.Application.Session
                 foreach (var id in save.items)
                 {
                     if (member.Items.Count >= CollectionRules.MaxItems) break;
-                    if (!string.IsNullOrEmpty(id) && collection.HasItem(new ItemId(id))) member.Items.Add(new ItemId(id));
+                    if (string.IsNullOrEmpty(id) || !collection.HasItem(new ItemId(id))) continue;
+                    if (!CollectionRules.CanEquip(collection.Item(new ItemId(id)), member.Items.Select(collection.Item))) continue;
+                    member.Items.Add(new ItemId(id));
                 }
             if (save.cards != null)
                 for (int i = 0; i < save.cards.Count && i < member.Cards.Length; i++)

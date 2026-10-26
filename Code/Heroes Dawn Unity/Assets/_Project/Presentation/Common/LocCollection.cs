@@ -174,6 +174,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["errors.collection_member"] = "Agent introuvable.";
             d["errors.collection_unknown"] = "Objet ou carte inconnu.";
             d["errors.collection_no_slot"] = "Aucun emplacement libre.";
+            d["errors.collection_same_type"] = "Cet agent porte déjà un objet de ce type.";
             d["errors.collection_max_level"] = "Cette carte est déjà au niveau maximum.";
             d["errors.collection_copies"] = "Il manque des exemplaires en doublon.";
             d["errors.preset_empty"] = "Aucune composition enregistrée ici.";

@@ -17,6 +17,7 @@ namespace N29.HeroesDawn.Application.Features.Collection
         public static readonly DomainError UnknownMember = new DomainError("collection.member", "errors.collection_member");
         public static readonly DomainError UnknownThing = new DomainError("collection.unknown", "errors.collection_unknown");
         public static readonly DomainError NoSlot = new DomainError("collection.no_slot", "errors.collection_no_slot");
+        public static readonly DomainError SameItemType = new DomainError("collection.same_type", "errors.collection_same_type");
         public static readonly DomainError NotOwned = new DomainError("collection.not_owned", "errors.collection_not_owned");
         public static readonly DomainError WrongFamily = new DomainError("collection.family", "errors.collection_family");
         public static readonly DomainError NeedFirstCard = new DomainError("collection.first_card", "errors.collection_first_card");
@@ -123,6 +124,7 @@ namespace N29.HeroesDawn.Application.Features.Collection
             if (m == null) return Result.Fail(CollectionErrors.UnknownMember);
             if (!Defs.HasItem(item)) return Result.Fail(CollectionErrors.UnknownThing);
             if (m.Items.Count >= CollectionRules.MaxItems) return Result.Fail(CollectionErrors.NoSlot);
+            if (!CollectionRules.CanEquip(Defs.Item(item), m.Items.Select(Defs.Item))) return Result.Fail(CollectionErrors.SameItemType);
             if (CollectionOps.AvailableItems(Session, item) <= 0) return Result.Fail(CollectionErrors.NotOwned);
             m.Items.Add(item);
             Changed(true);

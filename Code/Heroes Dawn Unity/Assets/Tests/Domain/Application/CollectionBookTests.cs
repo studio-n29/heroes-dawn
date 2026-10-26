@@ -117,6 +117,48 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(restored.Meta.collection.pity, Is.EqualTo(3));
         }
 
+        [Test, Description("Vérifie qu'un agent ne peut pas équiper un 2e objet du même type (deux armures), mais un objet d'un autre type, et que l'objet refusé reste en stock — parce qu'un agent ne porte pas deux objets du même type")]
+        public void EquipItem_RefusesASecondItemOfTheSameType()
+        {
+            var vest = new ItemId("kevlar_vest"); var shield = new ItemId("riot_shield"); var shoes = new ItemId("running_shoes");
+            CollectionOps.AddItem(S, vest); CollectionOps.AddItem(S, shield); CollectionOps.AddItem(S, shoes);
+            _app.Session.Roster.Add(new TeamMember(_app.Session.Content.Member(Ancre), 5));
+            Assert.That(_app.Collection.EquipItem(Ancre, vest).IsSuccess);
+            Assert.That(Code(_app.Collection.EquipItem(Ancre, shield)), Is.EqualTo("collection.same_type"));
+            Assert.That(_app.Collection.EquipItem(Ancre, shoes).IsSuccess);
+            Assert.That(CollectionOps.AvailableItems(S, shield), Is.EqualTo(1));
+        }
+
+        /// <summary>Profil où Verre porte ces objets (le stock contient un exemplaire de chaque objet connu), rechargé dans une session neuve.</summary>
+        GameSession Reload(params string[] worn)
+        {
+            foreach (var id in worn) if (S.Content.Collection.HasItem(new ItemId(id))) CollectionOps.AddItem(S, new ItemId(id));
+            var profile = S.ToProfile(System.DateTime.UtcNow);
+            var save = profile.team.Single(m => m.id == Verre.Value);
+            save.items.Clear(); save.items.AddRange(worn);
+            var restored = new GameSession(TestContent.Build());
+            restored.ApplyProfile(UnityEngine.JsonUtility.FromJson<N29.HeroesDawn.Application.Ports.ProfileData>(UnityEngine.JsonUtility.ToJson(profile)));
+            return restored;
+        }
+
+        [Test, Description("Vérifie qu'une sauvegarde où un agent porte deux armures (et un objet disparu du jeu) se charge avec la première armure seulement, la seconde revenant au stock, et que recharger ne change plus rien — parce que les sauvegardes d'avant la règle doivent être remises en règle sans rien perdre")]
+        public void LoadedSave_WithTwoItemsOfTheSameType_ReturnsTheSecondToTheStock()
+        {
+            var restored = Reload("unknown_item", "kevlar_vest", "riot_shield");
+            Assert.That(restored.Find(Verre)!.Items, Is.EqualTo(new[] { new ItemId("kevlar_vest") }));
+            Assert.That(CollectionOps.AvailableItems(restored, new ItemId("riot_shield")), Is.EqualTo(1));
+            var again = new GameSession(TestContent.Build());
+            again.ApplyProfile(UnityEngine.JsonUtility.FromJson<N29.HeroesDawn.Application.Ports.ProfileData>(UnityEngine.JsonUtility.ToJson(restored.ToProfile(System.DateTime.UtcNow))));
+            Assert.That(again.Find(Verre)!.Items, Is.EqualTo(new[] { new ItemId("kevlar_vest") }));
+        }
+
+        [Test, Description("Vérifie qu'une sauvegarde valide (une arme et une armure) se recharge telle quelle — parce que la remise en règle ne doit toucher que les doublons de type")]
+        public void LoadedSave_Valid_IsUntouched()
+        {
+            var restored = Reload("steel_knuckles", "kevlar_vest");
+            Assert.That(restored.Find(Verre)!.Items, Is.EqualTo(new[] { new ItemId("steel_knuckles"), new ItemId("kevlar_vest") }));
+        }
+
         [Test, Description("Vérifie qu'un profil sans équipement (ancienne sauvegarde) se charge avec des agents sans objet ni carte — parce que les anciennes sauvegardes doivent rester valides")]
         public void OldSaves_LoadWithoutEquipment()
         {
