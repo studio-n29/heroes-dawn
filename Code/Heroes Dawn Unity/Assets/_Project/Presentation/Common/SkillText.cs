@@ -15,6 +15,9 @@ namespace N29.HeroesDawn.Presentation.Common
     /// <summary>Description courte d'une compétence, générée à partir de ses effets (évite 40 textes à maintenir).</summary>
     public static class SkillText
     {
+        /// <summary>Seuil de PV de l'exécution affiché dans les textes (valeur d'équilibrage par défaut).</summary>
+        static readonly int ExecuteThreshold = new BalanceConfig().ExecuteThresholdPercent;
+
         public static string Describe(SkillDef s, SkillOwnerStats? owner = null)
         {
             var sb = new StringBuilder();
@@ -48,6 +51,10 @@ namespace N29.HeroesDawn.Presentation.Common
                     case EffectType.GaugeDelta:
                         yield return fx.Value >= 0 ? Loc.F("fx.gauge_up", fx.Value / 10) : Loc.F("fx.gauge_down", -fx.Value / 10);
                         break;
+                    case EffectType.Lifesteal: yield return Loc.F("fx.lifesteal", fx.Value); break;
+                    case EffectType.Purge: yield return fx.Value <= 0 ? Loc.T("fx.purge_all") : Loc.F("fx.purge", fx.Value); break;
+                    case EffectType.Bounce: yield return Loc.F("fx.bounce", fx.Value); break;
+                    case EffectType.Execute: yield return Loc.F("fx.execute", fx.Value, ExecuteThreshold); break;
                     case EffectType.ApplyStatus:
                         int turns = fx.Duration >= 99 ? 1 : fx.Duration;
                         yield return fx.ChancePercent >= 100

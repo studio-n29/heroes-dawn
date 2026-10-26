@@ -43,6 +43,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["fx.damage_raw"] = "Dégâts {0}"; d["fx.heal_raw"] = "Soin {0} PV"; d["fx.shield_raw"] = "Bouclier {0}";
             d["fx.pushback"] = "Recule la cible de {0} % sur la frise";
             d["fx.advance"] = "Propulse la cible de {0} % vers l'action";
+            d["fx.lifesteal"] = "Vol de vie {0} %";
+            d["fx.purge"] = "Purge ({0})";
+            d["fx.purge_all"] = "Purge totale";
+            d["fx.bounce"] = "Rebond {0} %";
+            d["fx.execute"] = "Exécution +{0} % sous {1} % PV";
             d["combat.pause"] = "II";
             d["combat.pause.title"] = "Pause";
             d["combat.pause.body"] = "Le combat est figé. Reprends quand tu es prêt.";

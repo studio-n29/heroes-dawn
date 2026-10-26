@@ -266,6 +266,61 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Rows[0].Tag, Is.Not.Empty);
             p.Dispose();
         }
+        // ------------------------------------------------------------------ Paliers (lot C1)
+
+        [Test, Description("Vérifie que la description d'une compétence nomme les quatre nouvelles mécaniques (vol de vie, rebond, exécution sous le seuil, purge limitée ou totale) — parce que le joueur doit comprendre chaque palier")]
+        public void SkillText_DescribesTheFourMechanics()
+        {
+            var s = new SkillDef(new SkillId("t"), SkillSlot.A3, 0, TargetRule.SingleEnemy, new[]
+            {
+                new EffectDef(EffectType.Damage, 100), new EffectDef(EffectType.Lifesteal, 20), new EffectDef(EffectType.Bounce, 50),
+                new EffectDef(EffectType.Execute, 30), new EffectDef(EffectType.Purge, 1),
+            });
+            string text = _loc.DescribeSkill(s);
+            Assert.That(text, Does.Contain("Vol de vie 20 %").And.Contain("Rebond 50 %").And.Contain("Exécution +30 % sous 30 % PV").And.Contain("Purge (1)"));
+            var all = new SkillDef(new SkillId("u"), SkillSlot.A3, 0, TargetRule.SingleAlly, new[] { new EffectDef(EffectType.Purge, 0) });
+            Assert.That(_loc.DescribeSkill(all), Does.Contain("Purge totale"));
+        }
+
+        [Test, Description("Vérifie que la fiche d'une carte au niveau 3 montre son palier 3 comme atteint (✓) et les paliers 6 et 10 comme à venir — parce que le joueur doit voir ce que la progression débloque")]
+        public void Grimoire_ShowsReachedAndLockedTiers()
+        {
+            var ember = new CardId("card_ember");
+            CollectionOps.AddCard(_app.Session, ember);
+            CollectionOps.SetCardLevel(_app.Session, ember, 3);
+            var p = Grimoire();
+            string sub = _view.Rows[RowOf("Braise")].Subtitle;
+            Assert.That(sub, Does.Contain("✓ Niv. 3"));
+            Assert.That(sub, Does.Contain("Niv. 6 · Rebond 50 %"));
+            Assert.That(sub, Does.Not.Contain("✓ Niv. 6"));
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie que le bouton Améliorer annonce le palier qu'il va débloquer (niveau 2 → 3 : Brûlure) et rien quand il n'en débloque pas — parce que le joueur doit savoir ce qu'il achète")]
+        public void Grimoire_UpgradeButton_AnnouncesTheTierItUnlocks()
+        {
+            var ember = new CardId("card_ember");
+            _app.Session.Wallet.Add(10000, 0);
+            CollectionOps.AddCard(_app.Session, ember, 5);
+            CollectionOps.SetCardLevel(_app.Session, ember, 2);
+            var p = Grimoire();
+            Assert.That(_view.Rows[RowOf("Braise")].A.Label, Does.Contain("débloque").And.Contain("Brûlure"));
+            p.Dispose();
+            CollectionOps.SetCardLevel(_app.Session, ember, 3);
+            p = Grimoire();
+            Assert.That(_view.Rows[RowOf("Braise")].A.Label, Does.Not.Contain("débloque"));
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie que le badge d'une carte possédée affiche son niveau sur 10 — parce que les cartes montent désormais jusqu'au niveau 10")]
+        public void Grimoire_Badge_ShowsLevelOutOf10()
+        {
+            CollectionOps.AddCard(_app.Session, new CardId("card_ember"));
+            var p = Grimoire();
+            Assert.That(_view.Rows[RowOf("Braise")].Badge, Does.Contain("1/10"));
+            p.Dispose();
+        }
+
         [Test, Description("Vérifie que la tuile de chaque carte et de chaque objet (pas seulement la fiche détaillée) porte la nature ou le type — parce que la grille doit se lire d'un coup d'œil")]
         public void GridTiles_CarryTheNatureAndTheType()
         {

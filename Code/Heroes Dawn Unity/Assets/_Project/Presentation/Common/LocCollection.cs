@@ -133,6 +133,9 @@ namespace N29.HeroesDawn.Presentation.Common
             d["grimoire.card_line"] = "{0} · {1} · {2}";
             d["grimoire.owned_level"] = "×{0} · Niv. {1}/{2}";
             d["grimoire.upgrade"] = "AMÉLIORER ({0} doublon(s) + {1} Cr)";
+            d["grimoire.upgrade_unlocks"] = "→ débloque {0}";
+            d["grimoire.tiers"] = "Paliers";
+            d["grimoire.tier_line"] = "Niv. {0} · {1}";
             d["grimoire.max_level"] = "NIVEAU MAX";
             d["grimoire.upgrade_copies"] = "Il faut {0} exemplaire(s) en doublon.";
             d["grimoire.upgrade_credits"] = "Il manque {0} Crédits.";

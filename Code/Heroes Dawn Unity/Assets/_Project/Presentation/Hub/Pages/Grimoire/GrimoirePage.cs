@@ -103,7 +103,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 int count = CollectionOps.OwnedCards(_session, card.Id);
                 int level = CollectionOps.CardLevel(_session, card.Id);
                 var r = InfoRowData.Basic(CollectionText.CardName(Loc, card),
-                                          CollectionText.NatureChip(Loc, card.Nature) + " · " + CollectionText.CardLine(Loc, card, CollectionText.ReferenceStats(_session), level));
+                                          CollectionText.NatureChip(Loc, card.Nature) + " · " + CollectionText.CardLine(Loc, card, CollectionText.ReferenceStats(_session), level)
+                                          + (card.Tiers.Count > 0 ? "\n" + Loc.T("grimoire.tiers") + "\n" + CollectionText.TierLines(Loc, card, level) : ""));
                 r.Tag = CollectionText.Tag(CollectionText.CardName(Loc, card));
                 r.TagColor = count > 0 ? CollectionText.RarityColor(card.Rarity) : Theme.Surface3;
                 r.Badge = CollectionText.NatureChip(Loc, card.Nature) + " " + (count > 0 ? Loc.F("grimoire.owned_level", count, level, CardLevels.Max) : Loc.T("grimoire.missing"));
@@ -134,7 +135,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             int keep = System.Math.Max(1, CollectionOps.EquippedCards(_session, card.Id));
             string reason = count - copies < keep ? Loc.F("grimoire.upgrade_copies", copies)
                           : _session.Wallet.Credits < credits ? Loc.F("grimoire.upgrade_credits", credits - _session.Wallet.Credits) : "";
-            return RowButtonData.Of(Loc.F("grimoire.upgrade", copies, credits), reason.Length == 0, reason, 1);
+            // L'amélioration fait atteindre un palier : le bouton l'annonce.
+            var tier = card.Tiers.FirstOrDefault(t => t.Level == level + 1);
+            string label = Loc.F("grimoire.upgrade", copies, credits) + (tier != null ? " " + Loc.F("grimoire.upgrade_unlocks", CollectionText.TierEffects(tier)) : "");
+            return RowButtonData.Of(label, reason.Length == 0, reason, 1);
         }
 
         protected override void OnRowButton(int row, int button)
