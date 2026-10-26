@@ -19,7 +19,7 @@ using NUnit.Framework;
 namespace N29.HeroesDawn.Tests.Presentation
 {
     /// <summary>Vue de liste factice : un seul double pour Pass, Boutique, Opérations, Labo et Archives.</summary>
-    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView
+    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView, IFilterBarView
     {
         public event Action<int>? HeaderClicked;
         public event Action<int, int>? RowButtonClicked;
@@ -40,6 +40,10 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void ClickRow(int row, int button = 0) => RowButtonClicked?.Invoke(row, button);
         public void SelectRow(int row) => RowSelected?.Invoke(row);
         public void ClickSide(int row, int button = 0) => SideButtonClicked?.Invoke(row, button);
+        public event Action<int, int>? FilterClicked;
+        public FilterGroupData[] Filters = Array.Empty<FilterGroupData>();
+        public void ShowFilters(FilterGroupData[] groups) => Filters = groups;
+        public void ClickFilter(int group, int option) => FilterClicked?.Invoke(group, option);
     }
 
     public sealed class MetaPagesPresenterTests

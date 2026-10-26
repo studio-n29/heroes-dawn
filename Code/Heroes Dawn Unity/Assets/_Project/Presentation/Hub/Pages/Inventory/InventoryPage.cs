@@ -7,12 +7,13 @@ using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
+using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    public interface IInventoryPageView : IListPageView { }
+    public interface IInventoryPageView : IListPageView, IFilterBarView { }
 
     /// <summary>
     /// Inventaire : les objets possédés (équipements trouvés en combat ou achetés) avec leurs bonus, le nombre d'exemplaires,
@@ -29,6 +30,27 @@ namespace N29.HeroesDawn.Presentation.Hub
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
             _session = session; _nav = nav;
+        }
+
+        /// <summary>Filtre choisi : 0 = tous les types, sinon 1 + le type. Gardé d'un rafraîchissement à l'autre.</summary>
+        int _type;
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+            View.FilterClicked += OnFilter;
+        }
+
+        protected override void OnDispose()
+        {
+            View.FilterClicked -= OnFilter;
+            base.OnDispose();
+        }
+
+        void OnFilter(int group, int option)
+        {
+            _type = option;
+            Refresh();
         }
 
         public override string Title => Loc.T("page.inventory");
@@ -49,8 +71,16 @@ namespace N29.HeroesDawn.Presentation.Hub
                 A = RowButtonData.Of(Loc.T("inventory.team"), true, "", 0),
             });
 
+            View.ShowFilters(new[]
+            {
+                new FilterGroupData
+                {
+                    Labels = new[] { Loc.T("filters.all") }.Concat(System.Enum.GetValues(typeof(ItemType)).Cast<ItemType>().Select(t => CollectionText.ItemTypeName(Loc, t))).ToArray(),
+                    Selected = _type,
+                },
+            });
             var rows = new List<InfoRowData>();
-            foreach (var it in owned)
+            foreach (var it in owned.Where(i => _type == 0 || (int)i.Type == _type - 1))
             {
                 int count = CollectionOps.OwnedItems(_session, it.Id);
                 var wearers = _session.Roster.Where(m => m.Items.Contains(it.Id)).Select(m => Loc.MemberName(m.Def)).ToList();
@@ -63,7 +93,15 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.Art = AgentArt.Item(it.Id.Value);
                 rows.Add(r);
             }
-            if (rows.Count == 0)
+            if (rows.Count == 0 && owned.Count > 0)
+            {
+                // Une pastille : sans elle, la grille prendrait la note pour un titre de section et la masquerait.
+                var none = InfoRowData.Basic(Loc.T("inventory.none_filtered"));
+                none.Tag = "—";
+                none.Dim = true;
+                rows.Add(none);
+            }
+            else if (rows.Count == 0)
             {
                 var none = InfoRowData.Basic(Loc.T("inventory.empty"), Loc.T("inventory.empty_sub"));
                 none.Dim = true;

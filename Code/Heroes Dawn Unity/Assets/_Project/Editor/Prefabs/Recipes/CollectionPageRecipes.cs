@@ -61,6 +61,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             layout.constraintCount = 4;
             layout.childAlignment = TextAnchor.UpperLeft;
 
+            // ---- Barre de filtres : au-dessus de la grille, masquée tant que la page n'a pas de filtres (la grille descend sous elle)
+            var filters = Ui.Rect(rt, "Filters");
+            filters.anchorMin = new Vector2(0, 1);
+            filters.anchorMax = new Vector2(1, 1);
+            filters.pivot = new Vector2(0.5f, 1);
+            filters.sizeDelta = new Vector2(-(DetailW + 14), 0);
+            filters.anchoredPosition = new Vector2(-(DetailW + 14) / 2f, -(ListPageKit.HeaderH + 14));
+
             // ---- Fiche détaillée de la tuile choisie
             var detail = Ui.Panel(rt, "Detail", Theme.Surface, 5f, 8f, false);
             var frame = detail.Frame();
@@ -106,6 +114,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "detailBadge", dBadge);
             ctx.Wire(view, "detailText", dText);
             ctx.WireArray(view, "detailButtons", buttons);
+            ctx.Wire(view, "filterBar", filters);
+            ctx.Wire(view, "gridArea", main);
             return view;
         }
     }

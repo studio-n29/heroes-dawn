@@ -15,7 +15,7 @@ using N29.HeroesDawn.Presentation.Mvp;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    public interface IGrimoirePageView : IListPageView { }
+    public interface IGrimoirePageView : IListPageView, IFilterBarView { }
 
     /// <summary>
     /// Grimoire : toutes les cartes du jeu (possédées ou pas), les boosters en réserve (ouvrir) et l'achat de boosters en PR.
@@ -28,6 +28,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly IModalService _modals;
         readonly List<SkillCardDef> _rows = new List<SkillCardDef>();
         string? _focus;
+        /// <summary>Filtres choisis : 0 = toutes, sinon 1 + la famille / la nature. Gardés d'un rafraîchissement à l'autre.</summary>
+        int _family, _nature;
 
         public GrimoirePagePresenter(IGrimoirePageView view, CollectionBook book, GameSession session, IModalService modals, ILocalization loc,
                                      IToastService toasts, ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet,
@@ -37,6 +39,39 @@ namespace N29.HeroesDawn.Presentation.Hub
             _book = book; _session = session; _modals = modals;
             _focus = nav?.FocusCard;
             if (nav != null) nav.FocusCard = null;
+            // Ouvert sur une carte (depuis la fiche d'un agent) : filtre réglé sur sa famille.
+            var focused = Defs.Cards.FirstOrDefault(c => c.Id.Value == _focus);
+            if (focused != null) _family = 1 + (int)focused.Family;
+        }
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+            View.FilterClicked += OnFilter;
+        }
+
+        protected override void OnDispose()
+        {
+            View.FilterClicked -= OnFilter;
+            base.OnDispose();
+        }
+
+        void OnFilter(int group, int option)
+        {
+            if (group == 0) _family = option; else _nature = option;
+            Refresh();
+        }
+
+        bool Shown(SkillCardDef c) => (_family == 0 || (int)c.Family == _family - 1) && (_nature == 0 || (int)c.Nature == _nature - 1);
+
+        void ShowFilters()
+        {
+            string all = Loc.T("filters.all");
+            View.ShowFilters(new[]
+            {
+                new FilterGroupData { Labels = new[] { all }.Concat(System.Enum.GetValues(typeof(Family)).Cast<Family>().Select(Loc.FamilyName)).ToArray(), Selected = _family },
+                new FilterGroupData { Labels = new[] { all }.Concat(System.Enum.GetValues(typeof(CardNature)).Cast<CardNature>().Select(n => CollectionText.NatureName(Loc, n))).ToArray(), Selected = _nature },
+            });
         }
 
         public override string Title => Loc.T("page.grimoire");
@@ -60,9 +95,10 @@ namespace N29.HeroesDawn.Presentation.Hub
                 B = RowButtonData.Of(Loc.F("grimoire.buy", Booster.PricePr), missing <= 0, Loc.F("grimoire.buy_reason", missing), 1),
             });
 
+            ShowFilters();
             _rows.Clear();
             var rows = new List<InfoRowData>();
-            foreach (var card in Defs.Cards.OrderByDescending(c => CollectionOps.OwnedCards(_session, c.Id) > 0).ThenByDescending(c => c.Rarity).ThenBy(c => c.Family).ThenBy(c => c.Id))
+            foreach (var card in Defs.Cards.Where(Shown).OrderByDescending(c => CollectionOps.OwnedCards(_session, c.Id) > 0).ThenByDescending(c => c.Rarity).ThenBy(c => c.Family).ThenBy(c => c.Id))
             {
                 int count = CollectionOps.OwnedCards(_session, card.Id);
                 int level = CollectionOps.CardLevel(_session, card.Id);
@@ -77,6 +113,14 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.Highlight = _focus != null && card.Id.Value == _focus;
                 rows.Add(r);
                 _rows.Add(card);
+            }
+            if (rows.Count == 0)
+            {
+                // Une pastille : sans elle, la grille prendrait la note pour un titre de section et la masquerait.
+                var none = InfoRowData.Basic(Loc.T("grimoire.none_filtered"));
+                none.Tag = "—";
+                none.Dim = true;
+                rows.Add(none);
             }
             View.ShowRows(rows.ToArray());
             _focus = null;

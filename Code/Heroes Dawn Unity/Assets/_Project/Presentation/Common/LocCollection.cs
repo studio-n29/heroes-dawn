@@ -176,6 +176,9 @@ namespace N29.HeroesDawn.Presentation.Common
             d["errors.collection_no_slot"] = "Aucun emplacement libre.";
             d["errors.collection_same_type"] = "Cet agent porte déjà un objet de ce type.";
             d["equip.type_taken"] = "Type déjà porté";
+            d["filters.all"] = "Toutes";
+            d["grimoire.none_filtered"] = "Aucune carte pour ces filtres.";
+            d["inventory.none_filtered"] = "Aucun objet pour ce filtre.";
             d["card.nature.offensive"] = "Offensive";
             d["card.nature.defensive"] = "Défensive";
             d["card.nature.support"] = "Soutien";

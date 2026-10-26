@@ -178,5 +178,81 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Rows[RowOf("Chaussures de course")].A.Enabled, Is.True);
             p.Dispose();
         }
+        static int Opt(Family f) => 1 + (int)f;
+        static int Opt(CardNature n) => 1 + (int)n;
+        static int Opt(ItemType t) => 1 + (int)t;
+        string[] Titles() => _view.Rows.Select(r => r.Title).ToArray();
+
+        [Test, Description("Vérifie que les filtres du grimoire se combinent (Matière × Défensive : seul le Mur de verre) et que la barre montre l'option choisie de chaque groupe — parce que le joueur doit trouver vite les cartes d'un type de deck")]
+        public void Grimoire_FiltersByFamilyAndNature()
+        {
+            var p = Grimoire();
+            Assert.That(_view.Filters.Length, Is.EqualTo(2));
+            Assert.That(_view.Filters[0].Labels.Length, Is.EqualTo(5));
+            Assert.That(_view.Filters[1].Labels.Length, Is.EqualTo(4));
+            _view.ClickFilter(0, Opt(Family.Matter));
+            _view.ClickFilter(1, Opt(CardNature.Defensive));
+            Assert.That(Titles(), Is.EqualTo(new[] { "Mur de verre" }));
+            Assert.That(_view.Filters[0].Selected, Is.EqualTo(Opt(Family.Matter)));
+            Assert.That(_view.Filters[1].Selected, Is.EqualTo(Opt(CardNature.Defensive)));
+            _view.ClickFilter(0, 0);
+            _view.ClickFilter(1, 0);
+            Assert.That(_view.Rows.Length, Is.EqualTo(_app.Session.Content.Collection.Cards.Count), "« Toutes » partout : toutes les cartes");
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie qu'une combinaison de filtres sans carte (Perception × Défensive) affiche une note grisée au lieu d'une grille vide — parce qu'une page vide ressemble à un bug")]
+        public void Grimoire_EmptyFilter_ShowsANote()
+        {
+            var p = Grimoire();
+            _view.ClickFilter(0, Opt(Family.Perception));
+            _view.ClickFilter(1, Opt(CardNature.Defensive));
+            Assert.That(_view.Rows.Length, Is.EqualTo(1));
+            Assert.That(_view.Rows[0].Dim, Is.True);
+            Assert.That(_view.Rows[0].Title, Is.EqualTo(_loc.T("grimoire.none_filtered")));
+            Assert.That(_view.Rows[0].Tag, Is.Not.Empty, "une ligne grisée sans pastille serait prise pour une section et masquée");
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie que les filtres restent actifs après une action qui rafraîchit la page (achat d'un booster) — parce que le joueur ne doit pas refaire ses filtres à chaque geste")]
+        public void Grimoire_KeepsItsFilters_AfterARefresh()
+        {
+            _app.Session.Wallet.Add(0, 1000);
+            var p = Grimoire();
+            _view.ClickFilter(0, Opt(Family.Elemental));
+            var before = Titles();
+            _view.ClickHeader(1);
+            Assert.That(Titles(), Is.EqualTo(before));
+            Assert.That(_view.Filters[0].Selected, Is.EqualTo(Opt(Family.Elemental)));
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie qu'ouvert sur une carte précise (depuis la fiche d'un agent), le grimoire règle le filtre de famille sur celle de la carte et laisse toutes les natures — parce que le joueur cherche alors une carte pour cet agent")]
+        public void Grimoire_FocusedCard_PresetsItsFamily()
+        {
+            _nav.FocusCard = "card_mark";
+            var p = Start(new GrimoirePagePresenter(_view, _app.Collection, _app.Session, new ModalService(_host), _loc, _toasts,
+                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _nav));
+            Assert.That(_view.Filters[0].Selected, Is.EqualTo(Opt(Family.Perception)));
+            Assert.That(_view.Filters[1].Selected, Is.EqualTo(0));
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie que l'équipement se filtre par type (Armure : seul le gilet kevlar) et qu'un filtre sans objet affiche une note — parce que le type décide de ce qu'un agent peut porter")]
+        public void Inventory_FiltersByType()
+        {
+            CollectionOps.AddItem(_app.Session, new ItemId("kevlar_vest"));
+            CollectionOps.AddItem(_app.Session, new ItemId("steel_knuckles"));
+            var p = Inventory();
+            Assert.That(_view.Filters.Length, Is.EqualTo(1));
+            Assert.That(_view.Filters[0].Labels.Length, Is.EqualTo(5));
+            _view.ClickFilter(0, Opt(ItemType.Armor));
+            Assert.That(Titles(), Is.EqualTo(new[] { "Gilet kevlar" }));
+            _view.ClickFilter(0, Opt(ItemType.Implant));
+            Assert.That(_view.Rows.Length, Is.EqualTo(1));
+            Assert.That(_view.Rows[0].Title, Is.EqualTo(_loc.T("inventory.none_filtered")));
+            Assert.That(_view.Rows[0].Tag, Is.Not.Empty);
+            p.Dispose();
+        }
     }
 }

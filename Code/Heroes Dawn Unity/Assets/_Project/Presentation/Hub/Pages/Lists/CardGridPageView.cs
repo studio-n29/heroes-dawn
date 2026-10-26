@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using TMPro;
@@ -15,7 +16,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// Elle reprend l'interface des pages liste : une tuile par ligne (les lignes de section, sans pastille ni bouton, ne sont pas dessinées),
     /// et les boutons de la fiche sont ceux de la ligne choisie.
     /// </summary>
-    public abstract class CardGridPageView : ViewBase, IListPageView
+    public abstract class CardGridPageView : ViewBase, IListPageView, IFilterBarView
     {
         [SerializeField] TMP_Text headerTitle = null!;
         [SerializeField] TMP_Text headerLine = null!;
@@ -29,6 +30,15 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text detailBadge = null!;
         [SerializeField] TMP_Text detailText = null!;
         [SerializeField] UiButton[] detailButtons = Array.Empty<UiButton>();
+        [Tooltip("Barre de filtres (au-dessus de la grille) ; nulle : page sans filtres.")]
+        [SerializeField] RectTransform? filterBar;
+        [Tooltip("Zone de la grille, descendue sous la barre de filtres quand elle est visible.")]
+        [SerializeField] RectTransform? gridArea;
+
+        const float FilterRowH = 56f, FilterGap = 8f, FilterButtonW = 190f;
+        readonly List<List<UiButton>> _filterButtons = new List<List<UiButton>>();
+        string _filterShape = "";
+        float _gridTop;
 
         readonly List<SheetTileView> _tiles = new List<SheetTileView>();
         readonly List<int> _rowOf = new List<int>();
@@ -40,6 +50,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action<int>? RowSelected;
         public event Action<int, int>? SideButtonClicked;
         public event Action<int>? SideRowSelected;
+        public event Action<int, int>? FilterClicked;
 
         public UiButton HeaderButtonA => headerA;
         public UiButton HeaderButtonB => headerB;
@@ -48,6 +59,8 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         protected virtual void Awake()
         {
+            if (gridArea != null) _gridTop = gridArea.offsetMax.y;
+            if (filterBar != null) filterBar.gameObject.SetActive(false);
             headerA.Button.onClick.AddListener(() => HeaderClicked?.Invoke(0));
             headerB.Button.onClick.AddListener(() => HeaderClicked?.Invoke(1));
             for (int i = 0; i < detailButtons.Length; i++)
@@ -66,6 +79,57 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (bar) { headerBar.Set(d.Progress); headerBar.SetLabel(d.ProgressLabel); }
             Apply(headerA, d.A);
             Apply(headerB, d.B);
+        }
+
+        /// <summary>Un rang de boutons par groupe (l'option choisie en jaune) ; la grille descend sous la barre, qui est masquée sans groupe.</summary>
+        public void ShowFilters(FilterGroupData[] groups)
+        {
+            if (filterBar == null || gridArea == null) return;
+            bool any = groups.Length > 0;
+            filterBar.gameObject.SetActive(any);
+            float h = any ? groups.Length * (FilterRowH + FilterGap) : 0f;
+            filterBar.sizeDelta = new Vector2(filterBar.sizeDelta.x, h);
+            gridArea.offsetMax = new Vector2(gridArea.offsetMax.x, _gridTop - h);
+            string shape = string.Join("|", groups.Select(g => string.Join(",", g.Labels)));
+            if (shape != _filterShape) BuildFilters(groups);
+            _filterShape = shape;
+            for (int g = 0; g < groups.Length && g < _filterButtons.Count; g++)
+                for (int o = 0; o < _filterButtons[g].Count; o++)
+                    _filterButtons[g][o].SetColors(o == groups[g].Selected ? Theme.Primary : Theme.Surface3, o == groups[g].Selected ? Theme.TextDark : Theme.Text);
+        }
+
+        void BuildFilters(FilterGroupData[] groups)
+        {
+            for (int i = filterBar!.childCount - 1; i >= 0; i--) Destroy(filterBar.GetChild(i).gameObject);
+            _filterButtons.Clear();
+            for (int g = 0; g < groups.Length; g++)
+            {
+                var row = new GameObject("Filters" + g, typeof(RectTransform)).GetComponent<RectTransform>();
+                row.SetParent(filterBar, false);
+                row.anchorMin = new Vector2(0, 1); row.anchorMax = new Vector2(1, 1); row.pivot = new Vector2(0.5f, 1);
+                row.sizeDelta = new Vector2(0, FilterRowH);
+                row.anchoredPosition = new Vector2(0, -g * (FilterRowH + FilterGap));
+                var buttons = new List<UiButton>();
+                for (int o = 0; o < groups[g].Labels.Length; o++)
+                {
+                    var b = Instantiate(headerA, row);
+                    b.gameObject.name = "Filter" + o;
+                    b.gameObject.SetActive(true);
+                    var rt = b.Rect;
+                    rt.anchorMin = rt.anchorMax = new Vector2(0, 0.5f);
+                    rt.pivot = new Vector2(0, 0.5f);
+                    rt.sizeDelta = new Vector2(FilterButtonW, FilterRowH);
+                    rt.anchoredPosition = new Vector2(4 + o * (FilterButtonW + 8), 0);
+                    b.SetLabel(groups[g].Labels[o]);
+                    b.Interactable = true;
+                    b.DisabledReason = "";
+                    b.Button.onClick.RemoveAllListeners();
+                    int group = g, option = o;
+                    b.Button.onClick.AddListener(() => FilterClicked?.Invoke(group, option));
+                    buttons.Add(b);
+                }
+                _filterButtons.Add(buttons);
+            }
         }
 
         /// <summary>Pas de colonne de droite sur cette page : la fiche détaillée la remplace.</summary>
