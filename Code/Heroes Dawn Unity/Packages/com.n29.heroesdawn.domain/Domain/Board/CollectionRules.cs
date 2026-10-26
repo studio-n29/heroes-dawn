@@ -121,6 +121,9 @@ namespace N29.HeroesDawn.Domain.Board
         /// <summary>Une carte ne s'équipe que sur un agent de sa catégorie (famille).</summary>
         public static bool CanEquip(SkillCardDef card, MemberDef member) => card.Family == member.Family;
 
+        /// <summary>Un objet ne s'équipe pas sur un agent qui porte déjà un objet du même type.</summary>
+        public static bool CanEquip(ItemDef item, IEnumerable<ItemDef> equipped) => equipped.All(e => e.Type != item.Type);
+
         /// <summary>Graine d'un tirage : joueur, source et compteur, pour qu'un serveur puisse le recalculer.</summary>
         public static ulong Seed(string playerId, string what, int counter)
         {

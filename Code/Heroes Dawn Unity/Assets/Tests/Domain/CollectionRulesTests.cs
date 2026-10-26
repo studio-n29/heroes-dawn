@@ -220,5 +220,44 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(new SkillCardDef(new CardId("a"), "a", Family.Matter, ItemRarity.Common, hit).Nature, Is.EqualTo(CardNature.Offensive));
             Assert.That(new SkillCardDef(new CardId("b"), "b", Family.Matter, ItemRarity.Common, hit, CardNature.Support).Nature, Is.EqualTo(CardNature.Support));
         }
+
+        [Test, Description("Vérifie que le type déduit d'un objet suit d'abord son effet spécial (puissance : implant, critique : arme, bouclier d'ouverture : armure, jauge : outil) — parce que l'effet dit à quoi sert l'objet, même quand une autre stat est plus forte")]
+        public void ItemTypes_Of_UsesThePerkFirst()
+        {
+            Assert.That(ItemTypes.Of(ItemPerk.SkillPower, 0, 4, 0, 0), Is.EqualTo(ItemType.Implant));
+            Assert.That(ItemTypes.Of(ItemPerk.CritChance, 0, 12, 0, 0), Is.EqualTo(ItemType.Weapon));
+            Assert.That(ItemTypes.Of(ItemPerk.OpeningShield, 15, 10, 0, 0), Is.EqualTo(ItemType.Armor), "comme le Cœur de Phénix");
+            Assert.That(ItemTypes.Of(ItemPerk.StartGauge, 0, 0, 0, 8), Is.EqualTo(ItemType.Tool));
+        }
+
+        [Test, Description("Vérifie que, sans effet spécial, le type suit la stat la plus forte (ATQ : arme, PV ou DEF : armure, VIT : outil), avec l'ATQ puis PV/DEF en cas d'égalité — parce que tout objet doit avoir un type sans ambiguïté")]
+        public void ItemTypes_Of_UsesTheStrongestStatWithoutPerk()
+        {
+            Assert.That(ItemTypes.Of(ItemPerk.None, 0, 8, 0, 0), Is.EqualTo(ItemType.Weapon));
+            Assert.That(ItemTypes.Of(ItemPerk.None, 10, 0, 0, 0), Is.EqualTo(ItemType.Armor));
+            Assert.That(ItemTypes.Of(ItemPerk.None, 0, 0, 10, 0), Is.EqualTo(ItemType.Armor));
+            Assert.That(ItemTypes.Of(ItemPerk.None, 0, 0, 0, 6), Is.EqualTo(ItemType.Tool));
+            Assert.That(ItemTypes.Of(ItemPerk.None, 0, 10, 10, 0), Is.EqualTo(ItemType.Weapon), "égalité ATQ / DEF");
+            Assert.That(ItemTypes.Of(ItemPerk.None, 8, 0, 0, 8), Is.EqualTo(ItemType.Armor), "égalité PV / VIT");
+            Assert.That(ItemTypes.Of(ItemPerk.None, 0, 0, 0, 0), Is.EqualTo(ItemType.Weapon), "aucune stat");
+        }
+
+        [Test, Description("Vérifie qu'un objet garde le type saisi et prend le type déduit quand rien n'est saisi — parce que le type est un champ saisi, pré-rempli par la déduction")]
+        public void ItemDef_Type_IsTheGivenOneOrTheDeducedOne()
+        {
+            Assert.That(new ItemDef(new ItemId("a"), "a", ItemRarity.Common, def: 10).Type, Is.EqualTo(ItemType.Armor));
+            Assert.That(new ItemDef(new ItemId("b"), "b", ItemRarity.Common, def: 10, type: ItemType.Tool).Type, Is.EqualTo(ItemType.Tool));
+        }
+
+        [Test, Description("Vérifie qu'un agent ne peut pas porter deux objets du même type, mais deux types différents — parce que les deux emplacements doivent forcer de vrais choix")]
+        public void CanEquip_RefusesASecondItemOfTheSameType()
+        {
+            var armor = new ItemDef(new ItemId("a1"), "a1", ItemRarity.Common, hp: 10);
+            var armor2 = new ItemDef(new ItemId("a2"), "a2", ItemRarity.Common, def: 10);
+            var weapon = new ItemDef(new ItemId("w"), "w", ItemRarity.Common, atk: 8);
+            Assert.That(CollectionRules.CanEquip(armor2, new[] { armor }), Is.False);
+            Assert.That(CollectionRules.CanEquip(armor2, new[] { weapon }), Is.True);
+            Assert.That(CollectionRules.CanEquip(armor2, new ItemDef[0]), Is.True);
+        }
     }
 }

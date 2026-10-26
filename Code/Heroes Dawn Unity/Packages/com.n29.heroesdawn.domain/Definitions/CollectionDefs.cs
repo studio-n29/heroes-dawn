@@ -22,7 +22,28 @@ namespace N29.HeroesDawn.Definitions
         SkillPower,
     }
 
-    /// <summary>Objet équipable (jusqu'à 2 par agent) : bonus de statistiques en % et effet spécial éventuel.</summary>
+    /// <summary>Type d'un objet : un agent ne porte pas deux objets du même type (l'ordre est celui des entiers de items.json).</summary>
+    public enum ItemType { Weapon, Armor, Tool, Implant }
+
+    /// <summary>Type déduit d'un objet : son effet spécial, sinon sa stat la plus forte (égalité : ATQ, puis PV/DEF, puis VIT).</summary>
+    public static class ItemTypes
+    {
+        public static ItemType Of(ItemPerk perk, int hp, int atk, int def, int spd)
+        {
+            switch (perk)
+            {
+                case ItemPerk.SkillPower: return ItemType.Implant;
+                case ItemPerk.CritChance: return ItemType.Weapon;
+                case ItemPerk.OpeningShield: return ItemType.Armor;
+                case ItemPerk.StartGauge: return ItemType.Tool;
+            }
+            int guard = Math.Max(hp, def);
+            if (atk >= guard && atk >= spd) return ItemType.Weapon;
+            return guard >= spd ? ItemType.Armor : ItemType.Tool;
+        }
+    }
+
+    /// <summary>Objet équipable (jusqu'à 2 par agent, de types différents) : bonus de statistiques en % et effet spécial éventuel.</summary>
     public sealed class ItemDef
     {
         public ItemId Id { get; }
@@ -36,12 +57,15 @@ namespace N29.HeroesDawn.Definitions
         public int PerkValue { get; }
         /// <summary>Prix en Crédits en boutique.</summary>
         public int Price { get; }
+        /// <summary>Arme, armure, outil ou implant : saisi, sinon déduit.</summary>
+        public ItemType Type { get; }
 
         public ItemDef(ItemId id, string nameKey, ItemRarity rarity, int hp = 0, int atk = 0, int def = 0, int spd = 0,
-                       ItemPerk perk = ItemPerk.None, int perkValue = 0, int price = 0)
+                       ItemPerk perk = ItemPerk.None, int perkValue = 0, int price = 0, ItemType? type = null)
         {
             Id = id; NameKey = nameKey; Rarity = rarity; HpPercent = hp; AtkPercent = atk; DefPercent = def; SpdPercent = spd;
             Perk = perk; PerkValue = perkValue; Price = price;
+            Type = type ?? ItemTypes.Of(perk, hp, atk, def, spd);
         }
     }
 
