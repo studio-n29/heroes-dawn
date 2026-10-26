@@ -166,6 +166,18 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
+        [Test, Description("Vérifie que la page Équipement d'un agent affiche le type de chaque objet, porté ou en réserve — parce que c'est là que le joueur choisit quoi équiper")]
+        public void Loadout_ShowsTheTypeOfEachItem()
+        {
+            CollectionOps.AddItem(_app.Session, new ItemId("kevlar_vest"));
+            CollectionOps.AddItem(_app.Session, new ItemId("steel_knuckles"));
+            _app.Collection.EquipItem(Verre, new ItemId("kevlar_vest"));
+            var p = Loadout();
+            Assert.That(_view.Rows[RowOf("Gilet kevlar")].Subtitle, Does.Contain(_loc.T("item.type.armor")));
+            Assert.That(_view.Rows[RowOf("Poings d'acier")].Subtitle, Does.Contain(_loc.T("item.type.weapon")));
+            p.Dispose();
+        }
+
         [Test, Description("Vérifie qu'un objet d'un type déjà porté est grisé avec « Type déjà porté », et qu'un objet d'un autre type reste équipable — parce qu'un bouton grisé doit dire pourquoi")]
         public void Loadout_GreysAnItemWhoseTypeIsAlreadyWorn()
         {

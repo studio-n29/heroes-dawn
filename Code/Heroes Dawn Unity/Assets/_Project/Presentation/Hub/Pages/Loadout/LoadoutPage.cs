@@ -161,7 +161,8 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         InfoRowData ItemRow(ItemDef it)
         {
-            var r = InfoRowData.Basic(CollectionText.ItemName(Loc, it), CollectionText.RarityName(Loc, it.Rarity) + " · " + CollectionText.ItemEffects(Loc, it));
+            var r = InfoRowData.Basic(CollectionText.ItemName(Loc, it),
+                                      CollectionText.ItemTypeChip(Loc, it.Type) + " · " + CollectionText.RarityName(Loc, it.Rarity) + " · " + CollectionText.ItemEffects(Loc, it));
             r.Tag = CollectionText.Tag(CollectionText.ItemName(Loc, it));
             r.TagColor = CollectionText.RarityColor(it.Rarity);
             r.Art = AgentArt.Item(it.Id.Value);
