@@ -187,5 +187,38 @@ namespace N29.HeroesDawn.Tests.Domain
             var days = Enumerable.Range(11, 10).Select(d => string.Join(",", CollectionRules.DailyItemOffers(Defs, "2026-10-" + d, 4).Select(i => i.Id.Value))).Distinct().Count();
             Assert.That(days, Is.GreaterThan(3), "les offres changent d'un jour à l'autre");
         }
+
+        // ------------------------------------------------------------------ Catégories (lot B 0.14.0)
+
+        static SkillDef Skill(TargetRule target, params EffectDef[] fx) => new SkillDef(new SkillId("test"), SkillSlot.A3, 5, target, fx);
+
+        [TestCase(EffectType.Damage, 100, StatusType.None, TargetRule.SingleEnemy, CardNature.Offensive)]
+        [TestCase(EffectType.ApplyStatus, 0, StatusType.Bind, TargetRule.SingleEnemy, CardNature.Offensive)]
+        [TestCase(EffectType.PushBack, 25, StatusType.None, TargetRule.AllEnemies, CardNature.Offensive)]
+        [TestCase(EffectType.GaugeDelta, -20, StatusType.None, TargetRule.SingleEnemy, CardNature.Offensive)]
+        [TestCase(EffectType.Shield, 15, StatusType.Shield, TargetRule.AllAllies, CardNature.Defensive)]
+        [TestCase(EffectType.Heal, 35, StatusType.None, TargetRule.SingleAlly, CardNature.Support)]
+        [TestCase(EffectType.ApplyStatus, 0, StatusType.Haste, TargetRule.Self, CardNature.Support)]
+        [TestCase(EffectType.Advance, 50, StatusType.None, TargetRule.SingleAlly, CardNature.Support)]
+        [TestCase(EffectType.GaugeDelta, 20, StatusType.None, TargetRule.AllAllies, CardNature.Support)]
+        [Description("Vérifie que la nature déduite d'une carte suit son effet de base et sa cible (bouclier : défensive ; soin ou aide à un allié : soutien ; action sur l'ennemi : offensive) — parce que cette déduction pré-remplit la nature de chaque carte")]
+        public void CardNatures_Of_FollowsTheBaseEffectAndTarget(EffectType type, int value, StatusType status, TargetRule target, CardNature expected)
+        {
+            Assert.That(CardNatures.Of(Skill(target, new EffectDef(type, value, status, 2))), Is.EqualTo(expected));
+        }
+
+        [Test, Description("Vérifie qu'une compétence sans effet est classée offensive — parce que la déduction doit toujours rendre une nature")]
+        public void CardNatures_Of_NoEffect_IsOffensive()
+        {
+            Assert.That(CardNatures.Of(Skill(TargetRule.SingleEnemy)), Is.EqualTo(CardNature.Offensive));
+        }
+
+        [Test, Description("Vérifie qu'une carte garde la nature saisie, et prend la nature déduite quand rien n'est saisi — parce que la nature est un champ saisi, pré-rempli par la déduction")]
+        public void SkillCardDef_Nature_IsTheGivenOneOrTheDeducedOne()
+        {
+            var hit = Skill(TargetRule.SingleEnemy, new EffectDef(EffectType.Damage, 100));
+            Assert.That(new SkillCardDef(new CardId("a"), "a", Family.Matter, ItemRarity.Common, hit).Nature, Is.EqualTo(CardNature.Offensive));
+            Assert.That(new SkillCardDef(new CardId("b"), "b", Family.Matter, ItemRarity.Common, hit, CardNature.Support).Nature, Is.EqualTo(CardNature.Support));
+        }
     }
 }

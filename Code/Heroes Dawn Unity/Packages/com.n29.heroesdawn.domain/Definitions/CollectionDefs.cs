@@ -45,19 +45,38 @@ namespace N29.HeroesDawn.Definitions
         }
     }
 
+    /// <summary>Nature d'une carte : ce qu'elle fait dans le combat (axe croisé avec la famille, le type de pouvoir).</summary>
+    public enum CardNature { Offensive, Defensive, Support }
+
+    /// <summary>Nature déduite de l'effet de base et de la cible ; pré-remplit la nature saisie de chaque carte.</summary>
+    public static class CardNatures
+    {
+        public static CardNature Of(SkillDef skill)
+        {
+            var fx = skill.BaseEffect;
+            if (fx == null) return CardNature.Offensive;
+            if (fx.Type == EffectType.Shield) return CardNature.Defensive;
+            if (fx.Type == EffectType.Heal) return CardNature.Support;
+            return skill.Target == TargetRule.SingleEnemy || skill.Target == TargetRule.AllEnemies ? CardNature.Offensive : CardNature.Support;
+        }
+    }
+
     /// <summary>Carte du grimoire : une compétence qu'un agent de la catégorie (famille) peut équiper en emplacement 3 ou 4.</summary>
     public sealed class SkillCardDef
     {
         public CardId Id { get; }
         public string NameKey { get; }
-        /// <summary>Catégorie d'agent qui peut l'utiliser.</summary>
+        /// <summary>Catégorie d'agent qui peut l'utiliser (le type de pouvoir de la carte).</summary>
         public Family Family { get; }
         public ItemRarity Rarity { get; }
         public SkillDef Skill { get; }
+        /// <summary>Offensive, défensive ou de soutien : saisie, sinon déduite de l'effet.</summary>
+        public CardNature Nature { get; }
 
-        public SkillCardDef(CardId id, string nameKey, Family family, ItemRarity rarity, SkillDef skill)
+        public SkillCardDef(CardId id, string nameKey, Family family, ItemRarity rarity, SkillDef skill, CardNature? nature = null)
         {
             Id = id; NameKey = nameKey; Family = family; Rarity = rarity; Skill = skill;
+            Nature = nature ?? CardNatures.Of(skill);
         }
     }
 
