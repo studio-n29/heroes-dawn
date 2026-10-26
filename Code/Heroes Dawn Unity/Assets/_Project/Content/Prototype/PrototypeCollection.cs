@@ -17,9 +17,16 @@ namespace N29.HeroesDawn.Content.Prototype
         static EffectDef St(StatusType s, int turns, int chance = 100) => new EffectDef(EffectType.ApplyStatus, 0, s, turns, chance);
         static EffectDef Push(int pct) => new EffectDef(EffectType.PushBack, pct);
         static EffectDef Adv(int pct) => new EffectDef(EffectType.Advance, pct);
+        static EffectDef Steal(int pct) => new EffectDef(EffectType.Lifesteal, pct);
+        static EffectDef Purge(int count) => new EffectDef(EffectType.Purge, count);
+        static EffectDef Bounce(int pct) => new EffectDef(EffectType.Bounce, pct);
+        static EffectDef Exec(int pct) => new EffectDef(EffectType.Execute, pct);
 
-        static SkillCardDef C(string id, Family f, CardNature n, ItemRarity r, int cooldown, TargetRule t, params EffectDef[] fx)
-            => new SkillCardDef(new CardId(id), "cards." + id + ".name", f, r, new SkillDef(new SkillId(id), SkillSlot.A3, cooldown, t, fx), n);
+        /// <summary>Les trois paliers d'une carte : niveaux 3, 6 et 10.</summary>
+        static CardTier[] Tiers(EffectDef l3, EffectDef l6, EffectDef l10) => new[] { new CardTier(3, l3), new CardTier(6, l6), new CardTier(10, l10) };
+
+        static SkillCardDef C(string id, Family f, CardNature n, ItemRarity r, int cooldown, TargetRule t, CardTier[] tiers, params EffectDef[] fx)
+            => new SkillCardDef(new CardId(id), "cards." + id + ".name", f, r, new SkillDef(new SkillId(id), SkillSlot.A3, cooldown, t, fx), n, tiers);
 
         public static CollectionDef Build() => new CollectionDef(
             new List<ItemDef>
@@ -39,18 +46,18 @@ namespace N29.HeroesDawn.Content.Prototype
             },
             new List<SkillCardDef>
             {
-                C("card_glass_wall", Family.Matter, CardNature.Defensive, ItemRarity.Common, 5, TargetRule.AllAllies, Shield(15)),
-                C("card_shackle", Family.Matter, CardNature.Offensive, ItemRarity.Rare, 4, TargetRule.SingleEnemy, St(StatusType.Bind, 2), Push(25)),
-                C("card_prism_burst", Family.Matter, CardNature.Offensive, ItemRarity.Epic, 5, TargetRule.AllEnemies, Dmg(80), St(StatusType.Vulnerable, 2)),
-                C("card_ember", Family.Elemental, CardNature.Offensive, ItemRarity.Common, 5, TargetRule.SingleEnemy, Dmg(140)),
-                C("card_storm", Family.Elemental, CardNature.Offensive, ItemRarity.Rare, 5, TargetRule.AllEnemies, Dmg(70), St(StatusType.Shock, 1, 30)),
-                C("card_inferno", Family.Elemental, CardNature.Offensive, ItemRarity.Epic, 6, TargetRule.AllEnemies, Dmg(110), St(StatusType.Burn, 3)),
-                C("card_second_wind", Family.PhysicalBio, CardNature.Support, ItemRarity.Common, 5, TargetRule.SingleAlly, Heal(35)),
-                C("card_bulwark_charge", Family.PhysicalBio, CardNature.Offensive, ItemRarity.Rare, 5, TargetRule.SingleEnemy, Dmg(120), Push(25)),
-                C("card_regen_field", Family.PhysicalBio, CardNature.Support, ItemRarity.Epic, 6, TargetRule.AllAllies, Heal(20), St(StatusType.Regen, 3)),
-                C("card_mark", Family.Perception, CardNature.Offensive, ItemRarity.Common, 4, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Mark, 99)),
-                C("card_precog", Family.Perception, CardNature.Support, ItemRarity.Rare, 5, TargetRule.SingleAlly, Adv(50), St(StatusType.Haste, 2)),
-                C("card_time_rift", Family.Perception, CardNature.Support, ItemRarity.Legendary, 7, TargetRule.AllAllies, Adv(40), St(StatusType.Haste, 3)),
+                C("card_glass_wall", Family.Matter, CardNature.Defensive, ItemRarity.Common, 5, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Anchor, 1), St(StatusType.Regen, 2)), Shield(15)),
+                C("card_shackle", Family.Matter, CardNature.Offensive, ItemRarity.Rare, 4, TargetRule.SingleEnemy, Tiers(St(StatusType.Vulnerable, 2), Purge(1), St(StatusType.Shock, 1)), St(StatusType.Bind, 2), Push(25)),
+                C("card_prism_burst", Family.Matter, CardNature.Offensive, ItemRarity.Epic, 5, TargetRule.AllEnemies, Tiers(St(StatusType.Corrosion, 2, 30), Exec(30), Purge(1)), Dmg(80), St(StatusType.Vulnerable, 2)),
+                C("card_ember", Family.Elemental, CardNature.Offensive, ItemRarity.Common, 5, TargetRule.SingleEnemy, Tiers(St(StatusType.Burn, 2), Bounce(50), Exec(50)), Dmg(140)),
+                C("card_storm", Family.Elemental, CardNature.Offensive, ItemRarity.Rare, 5, TargetRule.AllEnemies, Tiers(St(StatusType.Blind, 1, 30), Steal(15), St(StatusType.Vulnerable, 2)), Dmg(70), St(StatusType.Shock, 1, 30)),
+                C("card_inferno", Family.Elemental, CardNature.Offensive, ItemRarity.Epic, 6, TargetRule.AllEnemies, Tiers(Steal(10), St(StatusType.Corrosion, 2), Exec(40)), Dmg(110), St(StatusType.Burn, 3)),
+                C("card_second_wind", Family.PhysicalBio, CardNature.Support, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(Purge(0), Shield(10), St(StatusType.Regen, 2)), Heal(35)),
+                C("card_bulwark_charge", Family.PhysicalBio, CardNature.Offensive, ItemRarity.Rare, 5, TargetRule.SingleEnemy, Tiers(Steal(20), Bounce(50), St(StatusType.Vulnerable, 2)), Dmg(120), Push(25)),
+                C("card_regen_field", Family.PhysicalBio, CardNature.Support, ItemRarity.Epic, 6, TargetRule.AllAllies, Tiers(Purge(1), Shield(8), St(StatusType.Haste, 1)), Heal(20), St(StatusType.Regen, 3)),
+                C("card_mark", Family.Perception, CardNature.Offensive, ItemRarity.Common, 4, TargetRule.SingleEnemy, Tiers(Exec(30), Bounce(40), St(StatusType.Blind, 1)), Dmg(100), St(StatusType.Mark, 99)),
+                C("card_precog", Family.Perception, CardNature.Support, ItemRarity.Rare, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Evade, 1), Purge(0), Shield(15)), Adv(50), St(StatusType.Haste, 2)),
+                C("card_time_rift", Family.Perception, CardNature.Support, ItemRarity.Legendary, 7, TargetRule.AllAllies, Tiers(St(StatusType.Regen, 2), Purge(1), St(StatusType.Evade, 1)), Adv(40), St(StatusType.Haste, 3)),
             },
             new List<BoosterDef>
             {

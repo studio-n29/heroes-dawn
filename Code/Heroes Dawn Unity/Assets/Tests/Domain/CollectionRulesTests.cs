@@ -221,6 +221,52 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(new SkillCardDef(new CardId("b"), "b", Family.Matter, ItemRarity.Common, hit, CardNature.Support).Nature, Is.EqualTo(CardNature.Support));
         }
 
+        // ------------------------------------------------------------------ Paliers (lot C1)
+
+        static readonly SkillCardDef[] Catalog = PrototypeCollection.Build().Cards.ToArray();
+
+        [Test, Description("Vérifie que chaque carte du catalogue a exactement trois paliers, aux niveaux 3, 6 et 10, chacun avec au moins un effet — parce que les effets secondaires se débloquent à ces paliers")]
+        public void EveryCard_HasThreeTiers_At3_6_10()
+        {
+            foreach (var c in Catalog)
+            {
+                Assert.That(c.Tiers.Select(t => t.Level), Is.EqualTo(new[] { 3, 6, 10 }), c.Id.Value);
+                Assert.That(c.Tiers.All(t => t.Effects.Count > 0), Is.True, c.Id.Value);
+            }
+        }
+
+        static readonly StatusType[] AllyStatuses = { StatusType.Shield, StatusType.Regen, StatusType.Haste, StatusType.Evade, StatusType.Anchor, StatusType.Taunt };
+
+        [Test, Description("Vérifie qu'aucune carte visant un ennemi ne porte d'effet allié (soin, bouclier, élan, bonus) dans sa base ou ses paliers — parce qu'un effet s'applique aux cibles de la carte et irait renforcer l'ennemi")]
+        public void EnemyCards_CarryNoAllyEffects()
+        {
+            foreach (var c in Catalog.Where(c => c.Skill.Target == TargetRule.SingleEnemy || c.Skill.Target == TargetRule.AllEnemies))
+                foreach (var fx in c.Skill.Effects.Concat(c.Tiers.SelectMany(t => t.Effects)))
+                {
+                    bool ally = fx.Type == EffectType.Heal || fx.Type == EffectType.Shield || fx.Type == EffectType.Advance
+                             || fx.Type == EffectType.ApplyStatus && AllyStatuses.Contains(fx.Status);
+                    Assert.That(ally, Is.False, c.Id.Value + " : " + fx.Type + " " + fx.Status);
+                }
+        }
+
+        [Test, Description("Vérifie que le rebond n'apparaît que sur des cartes qui infligent des dégâts — parce qu'un rebond sans dégâts ne fait rien")]
+        public void Bounce_OnlyOnDamagingCards()
+        {
+            foreach (var c in Catalog.Where(c => c.Tiers.SelectMany(t => t.Effects).Any(e => e.Type == EffectType.Bounce)))
+                Assert.That(c.Skill.Effects.Any(e => e.Type == EffectType.Damage), Is.True, c.Id.Value);
+        }
+
+        [Test, Description("Vérifie quelques paliers de la table de la spec (Braise niv. 6 : rebond 50 % ; Second souffle niv. 3 : purge totale ; Brasier niv. 10 : exécution +40 % ; Mur de verre niv. 6 : Ancrage 1 t) — parce que le contenu doit suivre la table validée")]
+        public void TierTable_MatchesTheSpec()
+        {
+            EffectDef At(string card, int level) => Catalog.Single(c => c.Id.Value == card).Tiers.Single(t => t.Level == level).Effects[0];
+            Assert.That((At("card_ember", 6).Type, At("card_ember", 6).Value), Is.EqualTo((EffectType.Bounce, 50)));
+            Assert.That((At("card_second_wind", 3).Type, At("card_second_wind", 3).Value), Is.EqualTo((EffectType.Purge, 0)));
+            Assert.That((At("card_inferno", 10).Type, At("card_inferno", 10).Value), Is.EqualTo((EffectType.Execute, 40)));
+            var anchor = At("card_glass_wall", 6);
+            Assert.That((anchor.Type, anchor.Status, anchor.Duration), Is.EqualTo((EffectType.ApplyStatus, StatusType.Anchor, 1)));
+        }
+
         [Test, Description("Vérifie que le type déduit d'un objet suit d'abord son effet spécial (puissance : implant, critique : arme, bouclier d'ouverture : armure, jauge : outil) — parce que l'effet dit à quoi sert l'objet, même quand une autre stat est plus forte")]
         public void ItemTypes_Of_UsesThePerkFirst()
         {
