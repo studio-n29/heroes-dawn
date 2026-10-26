@@ -140,31 +140,19 @@ namespace N29.HeroesDawn.Domain.Combat
                 foreach (var fx in effects)
                 {
                     if (missed) break;
-                    // Une cible vaincue ne reçoit plus d'effet ; le vol de vie compte encore le coup qui l'a vaincue.
-                    if (!t.IsAlive && fx.Type != EffectType.Lifesteal) break;
+                    // Une cible vaincue ne reçoit plus d'effet ; le vol de vie et le rebond comptent encore le coup qui l'a vaincue.
+                    if (!t.IsAlive && fx.Type != EffectType.Lifesteal && fx.Type != EffectType.Bounce) break;
                     if (!_rng.Chance(fx.ChancePercent)) continue;
                     switch (fx.Type)
                     {
                         case EffectType.Damage:
-                            if (t.Side != actor.Side && (actor.Has(StatusType.Blind) && !_rng.Chance(50) || t.Has(StatusType.Evade)))
-                            {
-                                RemoveStatus(t, StatusType.Evade, output);
-                                output.Add(new MissEvent(Tick, t.Id));
-                                missed = true;
-                                break;
-                            }
-                            bool marked = t.Has(StatusType.Mark);
-                            bool crit = marked || _rng.Chance(_b.CritBasePercent + actor.CritBonusPercent);
-                            int def = t.Has(StatusType.Corrosion) ? t.Def * 70 / 100 : t.Def;
-                            int variance = _rng.Range(-_b.VariancePercent, _b.VariancePercent + 1);
-                            int dmg = DamageFormula.Compute(actor.Atk, fx.Value, def, _b.DefK, crit, t.Has(StatusType.Vulnerable), variance, _b);
-                            if (marked) RemoveStatus(t, StatusType.Mark, output);
-                            if (executeBonus > 0 && t.Hp * 100 < t.MaxHp * _b.ExecuteThresholdPercent)
-                            {
-                                dmg = dmg * (100 + executeBonus) / 100;
-                                output.Add(new ExecutedEvent(Tick, t.Id));
-                            }
-                            dealt += DealDamage(t, dmg, crit, output);
+                            dealt += HitWithDamage(actor, t, fx.Value, executeBonus, output, out missed);
+                            break;
+                        case EffectType.Bounce:
+                            Bounce(actor, effects, targets, fx.Value, output);
+                            break;
+                        case EffectType.Purge:
+                            Purge(actor, t, fx.Value, output);
                             break;
                         case EffectType.Lifesteal:
                             if (dealt <= 0 || !actor.IsAlive) break;
@@ -210,6 +198,66 @@ namespace N29.HeroesDawn.Domain.Combat
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Un coup de dégâts de puissance <paramref name="power"/> (% ATQ) : raté possible (Aveuglement, Esquive), critique, Marque, Corrosion,
+        /// Vulnérable, bonus d'exécution sous le seuil de PV. Rend les dégâts retirés aux PV.
+        /// </summary>
+        int HitWithDamage(CombatUnit actor, CombatUnit t, int power, int executeBonus, List<CombatEvent> output, out bool missed)
+        {
+            missed = false;
+            if (t.Side != actor.Side && (actor.Has(StatusType.Blind) && !_rng.Chance(50) || t.Has(StatusType.Evade)))
+            {
+                RemoveStatus(t, StatusType.Evade, output);
+                output.Add(new MissEvent(Tick, t.Id));
+                missed = true;
+                return 0;
+            }
+            bool marked = t.Has(StatusType.Mark);
+            bool crit = marked || _rng.Chance(_b.CritBasePercent + actor.CritBonusPercent);
+            int def = t.Has(StatusType.Corrosion) ? t.Def * 70 / 100 : t.Def;
+            int variance = _rng.Range(-_b.VariancePercent, _b.VariancePercent + 1);
+            int dmg = DamageFormula.Compute(actor.Atk, power, def, _b.DefK, crit, t.Has(StatusType.Vulnerable), variance, _b);
+            if (marked) RemoveStatus(t, StatusType.Mark, output);
+            if (executeBonus > 0 && t.Hp * 100 < t.MaxHp * _b.ExecuteThresholdPercent)
+            {
+                dmg = dmg * (100 + executeBonus) / 100;
+                output.Add(new ExecutedEvent(Tick, t.Id));
+            }
+            return DealDamage(t, dmg, crit, output);
+        }
+
+        /// <summary>Rebond : un autre ennemi vivant (hors des cibles) tiré au sort subit le premier effet de dégâts à <paramref name="percent"/> %. Sans candidat ni dégâts : aucun tirage.</summary>
+        void Bounce(CombatUnit actor, IReadOnlyList<EffectDef> effects, List<int> targets, int percent, List<CombatEvent> output)
+        {
+            EffectDef? damage = null;
+            foreach (var e in effects) if (e.Type == EffectType.Damage) { damage = e; break; }
+            if (damage == null) return;
+            var candidates = new List<CombatUnit>();
+            foreach (var u in _units) if (u.Side != actor.Side && u.IsAlive && !targets.Contains(u.Id)) candidates.Add(u);
+            if (candidates.Count == 0) return;
+            var to = candidates[_rng.Range(0, candidates.Count)];
+            output.Add(new BounceEvent(Tick, targets[0], to.Id));
+            HitWithDamage(actor, to, damage.Value * percent / 100, 0, output, out _);
+        }
+
+        static readonly StatusType[] Negative = { StatusType.Burn, StatusType.Freeze, StatusType.Shock, StatusType.Corrosion, StatusType.Blind, StatusType.Vulnerable, StatusType.Bind, StatusType.Mark };
+        static readonly StatusType[] Positive = { StatusType.Shield, StatusType.Regen, StatusType.Haste, StatusType.Evade, StatusType.Anchor, StatusType.Taunt };
+
+        /// <summary>Purge : retire <paramref name="count"/> statuts (0 = tous), les plus récents d'abord — négatifs sur un allié du lanceur, positifs sur un ennemi.</summary>
+        void Purge(CombatUnit actor, CombatUnit t, int count, List<CombatEvent> output)
+        {
+            var kinds = t.Side == actor.Side ? Negative : Positive;
+            int removed = 0;
+            for (int i = t.Statuses.Count - 1; i >= 0 && (count <= 0 || removed < count); i--)
+            {
+                var type = t.Statuses[i].Type;
+                if (System.Array.IndexOf(kinds, type) < 0) continue;
+                RemoveStatus(t, type, output);
+                removed++;
+            }
+            if (removed > 0) output.Add(new PurgedEvent(Tick, t.Id, removed));
         }
 
         /// <summary>Inflige les dégâts (le bouclier absorbe d'abord) ; rend les dégâts retirés aux PV (0 si tout est absorbé).</summary>
