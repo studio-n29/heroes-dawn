@@ -272,16 +272,30 @@ namespace N29.HeroesDawn.Presentation.Combat
             SkillDef? skill = null;
             foreach (var s in _sim!.Unit(su.Actor).Skills) if (s.Id == su.Skill) { skill = s; break; }
             if (skill == null) return;
-            float seconds = View.PlaySkillFx(new SkillFxData
+            _lastFx = new SkillFxData
             {
                 ActorId = su.Actor, TargetIds = su.Targets, Kind = SkillFx.KindOf(skill), Title = _loc.SkillName(skill),
-            }, _session.Content.Balance.CombatResolutionMs / 1000f);
+            };
+            float seconds = View.PlaySkillFx(_lastFx.Value, _session.Content.Balance.CombatResolutionMs / 1000f);
             _pauseLeft = Math.Max(_pauseLeft, seconds);
+        }
+
+        /// <summary>Dernière compétence animée : un rebond rejoue son impact de la première cible vers la seconde.</summary>
+        SkillFxData? _lastFx;
+
+        void PlayBounce(BounceEvent b)
+        {
+            View.Hit(b.To);
+            if (_lastFx == null) return;
+            var fx = _lastFx.Value;
+            fx.ActorId = b.From;
+            fx.TargetIds = new[] { b.To };
+            View.PlaySkillFx(fx, _session.Content.Balance.CombatResolutionMs / 2000f);
         }
 
         void ToastTurnPassed(int unitId) => AddLog(Name(unitId) + " : " + _loc.T("combat.turn_passed"));
 
-        void Play(IReadOnlyList<CombatEvent> events)
+        internal void Play(IReadOnlyList<CombatEvent> events)
         {
             foreach (var e in events)
             {
@@ -317,6 +331,15 @@ namespace N29.HeroesDawn.Presentation.Combat
                     case ShieldAbsorbedEvent sa:
                         View.Float(sa.Target, "(" + sa.Amount + ")", Tone.Shield, 34);
                         _audio.Play(SfxId.Shield);
+                        break;
+                    case ExecutedEvent ex:
+                        View.Float(ex.Target, _loc.T("combat.executed"), Tone.Danger, 56);
+                        break;
+                    case PurgedEvent pu:
+                        View.Float(pu.Target, _loc.T("combat.purged"), Tone.Info, 34);
+                        break;
+                    case BounceEvent bo:
+                        PlayBounce(bo);
                         break;
                     case MissEvent m:
                         View.Float(m.Target, _loc.T("combat.miss"), Tone.Muted, 38);

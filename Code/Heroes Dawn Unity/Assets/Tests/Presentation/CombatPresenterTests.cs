@@ -309,5 +309,27 @@ namespace N29.HeroesDawn.Tests.Presentation
             TickUntil(() => _results.Data != null, 50);
             Assert.That(_results.VerifyText, Is.EqualTo(new LocLocalization().T("combat.verify.skip")));
         }
+
+        // ------------------------------------------------------------------ Mécaniques des cartes (lot C1)
+
+        [Test, Description("Vérifie qu'une exécution affiche « EXÉCUTION ! » et qu'une purge affiche « PURGE » sur la cible — parce que le joueur doit voir ce que le palier de la carte a fait")]
+        public void Combat_ShowsExecuteAndPurge()
+        {
+            _p.Play(new CombatEvent[] { new ExecutedEvent(0, 1), new PurgedEvent(0, 1, 2) });
+            Assert.That(_view.Floats, Does.Contain((1, "EXÉCUTION !")));
+            Assert.That(_view.Floats, Does.Contain((1, "PURGE")));
+        }
+
+        [Test, Description("Vérifie qu'un rebond rejoue l'impact de la compétence lancée, de la première cible vers la seconde — parce que le joueur doit voir le coup passer d'un ennemi à l'autre")]
+        public void Combat_Bounce_PlaysAnImpactOnTheSecondTarget()
+        {
+            Assume.That(_sim.Units.Count, Is.GreaterThanOrEqualTo(3));
+            var skill = _sim.Unit(0).Skills[0];
+            _p.Play(new CombatEvent[] { new SkillUsedEvent(0, 0, skill.Id, new[] { 1 }), new BounceEvent(0, 1, 2) });
+            Assert.That(_view.LastSkillFx, Is.Not.Null);
+            Assert.That(_view.LastSkillFx!.Value.ActorId, Is.EqualTo(1));
+            Assert.That(_view.LastSkillFx.Value.TargetIds, Is.EqualTo(new[] { 2 }));
+            Assert.That(_view.LastSkillFx.Value.Kind, Is.EqualTo(SkillFx.KindOf(skill)));
+        }
     }
 }

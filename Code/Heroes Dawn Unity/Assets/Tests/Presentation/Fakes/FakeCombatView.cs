@@ -48,7 +48,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void ShowLog(IReadOnlyList<string> lines) => Log = lines;
         public IReadOnlyList<BonusChipData> Bonuses = Array.Empty<BonusChipData>();
         public void ShowBonuses(IReadOnlyList<BonusChipData> bonuses) => Bonuses = bonuses;
-        public void Float(int unitId, string text, Tone tone, int size) { }
+        public readonly List<(int Unit, string Text)> Floats = new List<(int Unit, string Text)>();
+        public void Float(int unitId, string text, Tone tone, int size) => Floats.Add((unitId, text));
         public void Hit(int unitId) { }
         public void Act(int unitId) { }
         public (int Slot, int Target)? LastPlayedCard;
