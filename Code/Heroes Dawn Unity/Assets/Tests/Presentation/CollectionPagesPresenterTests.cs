@@ -266,5 +266,16 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Rows[0].Tag, Is.Not.Empty);
             p.Dispose();
         }
+        [Test, Description("Vérifie que la tuile de chaque carte et de chaque objet (pas seulement la fiche détaillée) porte la nature ou le type — parce que la grille doit se lire d'un coup d'œil")]
+        public void GridTiles_CarryTheNatureAndTheType()
+        {
+            var g = Grimoire();
+            Assert.That(_view.Rows[RowOf("Mur de verre")].Badge, Does.Contain(_loc.T("card.nature.defensive")));
+            g.Dispose();
+            CollectionOps.AddItem(_app.Session, new ItemId("kevlar_vest"));
+            var i = Inventory();
+            Assert.That(_view.Rows[RowOf("Gilet kevlar")].Badge, Does.Contain(_loc.T("item.type.armor")));
+            i.Dispose();
+        }
     }
 }

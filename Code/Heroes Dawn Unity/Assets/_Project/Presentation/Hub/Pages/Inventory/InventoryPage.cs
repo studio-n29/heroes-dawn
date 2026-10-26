@@ -89,7 +89,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 var r = InfoRowData.Basic(CollectionText.ItemName(Loc, it), subtitle);
                 r.Tag = CollectionText.Tag(CollectionText.ItemName(Loc, it));
                 r.TagColor = CollectionText.RarityColor(it.Rarity);
-                r.Badge = Loc.F("inventory.count", count);
+                r.Badge = CollectionText.ItemTypeChip(Loc, it.Type) + " " + Loc.F("inventory.count", count);
                 r.Art = AgentArt.Item(it.Id.Value);
                 rows.Add(r);
             }

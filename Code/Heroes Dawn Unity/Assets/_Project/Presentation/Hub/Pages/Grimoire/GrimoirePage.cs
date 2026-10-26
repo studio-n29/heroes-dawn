@@ -106,7 +106,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                                           CollectionText.NatureChip(Loc, card.Nature) + " · " + CollectionText.CardLine(Loc, card, CollectionText.ReferenceStats(_session), level));
                 r.Tag = CollectionText.Tag(CollectionText.CardName(Loc, card));
                 r.TagColor = count > 0 ? CollectionText.RarityColor(card.Rarity) : Theme.Surface3;
-                r.Badge = count > 0 ? Loc.F("grimoire.owned_level", count, level, CardLevels.Max) : Loc.T("grimoire.missing");
+                r.Badge = CollectionText.NatureChip(Loc, card.Nature) + " " + (count > 0 ? Loc.F("grimoire.owned_level", count, level, CardLevels.Max) : Loc.T("grimoire.missing"));
                 if (count > 0) r.A = UpgradeButton(card, level, count);
                 r.Dim = count == 0;
                 r.Art = AgentArt.Card(card.Id.Value);

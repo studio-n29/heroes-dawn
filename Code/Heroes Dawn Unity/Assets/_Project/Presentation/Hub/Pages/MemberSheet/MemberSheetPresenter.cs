@@ -315,7 +315,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (m != null && i < m.Items.Count && defs.HasItem(m.Items[i]))
                 {
                     var it = defs.Item(m.Items[i]);
-                    tiles[i] = new SheetTile { Title = CollectionText.ItemName(_loc, it), Sub = CollectionText.ItemEffects(_loc, it), Art = AgentArt.Item(it.Id.Value), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item };
+                    tiles[i] = new SheetTile { Title = CollectionText.ItemName(_loc, it), Sub = CollectionText.ItemTypeChip(_loc, it.Type) + " · " + CollectionText.ItemEffects(_loc, it), Art = AgentArt.Item(it.Id.Value), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item };
                 }
                 else
                 {
@@ -401,14 +401,16 @@ namespace N29.HeroesDawn.Presentation.Hub
             var options = new List<SheetTile>();
             _pickActions.Clear();
             ItemId? currentId = slot < m.Items.Count ? m.Items[slot] : (ItemId?)null;
-            foreach (var it in defs.Items.OrderByDescending(i => i.Rarity).ThenBy(i => i.Id))
+            // L'objet de l'emplacement visé sera retiré : seul l'autre objet porté peut bloquer le type.
+            var others = m.Items.Where(x => !currentId.HasValue || x != currentId.Value).Select(defs.Item).ToList();
+            // Équipables d'abord : la liste est limitée à 8 tuiles et un objet grisé ne doit pas cacher un objet portable.
+            foreach (var it in defs.Items.OrderBy(i => !CollectionRules.CanEquip(i, others)).ThenByDescending(i => i.Rarity).ThenBy(i => i.Id))
             {
                 int free = CollectionOps.AvailableItems(_game!, it.Id);
                 if (free <= 0) continue;
                 var id = it.Id;
                 string name = CollectionText.ItemName(_loc, it);
-                // L'objet de l'emplacement visé sera retiré : seul l'autre objet porté peut bloquer le type.
-                bool taken = !CollectionRules.CanEquip(it, m.Items.Where(x => !currentId.HasValue || x != currentId.Value).Select(defs.Item));
+                bool taken = !CollectionRules.CanEquip(it, others);
                 options.Add(new SheetTile { Title = name, Sub = taken ? _loc.T("equip.type_taken") : free > 1 ? _loc.F("loadout.copies", free) : CollectionText.ItemEffects(_loc, it),
                                             Art = AgentArt.Item(id.Value), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item, Dim = taken });
                 if (taken) { _pickActions.Add(() => Apply(Result.Fail(CollectionErrors.SameItemType), "loadout.equipped", name)); continue; }

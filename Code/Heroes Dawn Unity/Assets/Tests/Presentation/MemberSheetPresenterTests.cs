@@ -252,5 +252,30 @@ namespace N29.HeroesDawn.Tests.Presentation
             _view.ChoosePicker(shield);
             Assert.That(_app.Session.Find(givre)!.Items, Is.EquivalentTo(new[] { new ItemId("riot_shield"), new ItemId("running_shoes") }));
         }
+        [Test, Description("Vérifie que les emplacements d'objets de la fiche affichent le type de l'objet porté — parce que c'est ce type qui grise les autres objets du même type")]
+        public void ItemSlots_ShowTheWornType()
+        {
+            var givre = new MemberId("givre");
+            N29.HeroesDawn.Application.Features.Collection.CollectionOps.AddItem(_app.Session, new ItemId("kevlar_vest"));
+            _app.Collection.EquipItem(givre, new ItemId("kevlar_vest"));
+            Make("givre", withBook: true);
+            Assert.That(_view.Last.ItemTiles[0].Sub, Does.Contain(_loc.T("item.type.armor")));
+        }
+
+        [Test, Description("Vérifie que, dans le choix d'objet limité à 8 tuiles, les objets équipables passent avant les objets grisés — parce qu'un objet grisé ne doit pas cacher un objet que le joueur peut porter")]
+        public void ItemPicker_ListsEquippableItemsBeforeGreyedOnes()
+        {
+            var givre = new MemberId("givre");
+            foreach (var it in _app.Session.Content.Collection.Items) N29.HeroesDawn.Application.Features.Collection.CollectionOps.AddItem(_app.Session, it.Id);
+            _app.Collection.EquipItem(givre, new ItemId("kevlar_vest"));
+            _app.Collection.EquipItem(givre, new ItemId("running_shoes"));
+            Make("givre", withBook: true);
+            _view.ClickItemTile(1);
+            var options = _view.LastPicker!.Value.Options;
+            int firstDim = System.Array.FindIndex(options, o => o.Dim);
+            int lastFree = System.Array.FindLastIndex(options, o => !o.Dim);
+            Assert.That(firstDim < 0 || lastFree < firstDim, Is.True, "équipables d'abord");
+            Assert.That(options.Count(o => !o.Dim), Is.EqualTo(7), "les 7 objets d'un autre type que l'armure portée restent visibles");
+        }
     }
 }
