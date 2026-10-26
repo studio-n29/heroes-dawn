@@ -32,14 +32,15 @@ namespace N29.HeroesDawn.Tests.Presentation
 
         FakeModalHost _host = null!;
 
-        MemberSheetPresenter Make(string id = "givre", ITrainMemberUseCase train = null, bool fromShop = false)
+        MemberSheetPresenter Make(string id = "givre", ITrainMemberUseCase train = null, bool fromShop = false, bool withBook = false)
         {
             _nav.Open(HubPage.MemberSheet, new MemberId(id), fromShop);
             _host = new FakeModalHost();
             _host.Register<N29.HeroesDawn.Presentation.Popups.IRecruitConfirmPopupView>(() => new FakeRecruitConfirmPopup());
             var flow = new RecruitFlow(new ModalService(_host), _app.Shop.Recruit, _app.Session, _toasts, _loc);
             _p = new MemberSheetPresenter(_view, _nav.Current, _app.Session, train ?? _app.Hub.Train, flow, _nav, _toasts, _loc,
-                                          _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Subscriber<ShopChanged>());
+                                          _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Subscriber<ShopChanged>(),
+                                          withBook ? _app.Session : null, withBook ? _app.Collection : null);
             _view.Show();
             _p.Start();
             return _p;
@@ -227,6 +228,29 @@ namespace N29.HeroesDawn.Tests.Presentation
             _view.ClickPrimary();
             _view.ClickPrimary();
             Assert.That(pending.Calls, Is.EqualTo(1));
+        }
+        [Test, Description("Vérifie que, dans le choix d'objet de la fiche, l'objet de l'emplacement visé ne bloque pas un objet du même type (échange armure contre armure), mais que l'autre objet porté le fait (tuile grisée « Type déjà porté », toast d'erreur au toucher, rien ne change) — parce qu'on doit pouvoir remplacer une armure par une meilleure")]
+        public void ItemPicker_DimsTakenTypes_ButAllowsSwappingTheSameSlot()
+        {
+            var givre = new MemberId("givre");
+            foreach (var id in new[] { "kevlar_vest", "running_shoes", "riot_shield" }) N29.HeroesDawn.Application.Features.Collection.CollectionOps.AddItem(_app.Session, new ItemId(id));
+            _app.Collection.EquipItem(givre, new ItemId("kevlar_vest"));
+            _app.Collection.EquipItem(givre, new ItemId("running_shoes"));
+            Make("givre", withBook: true);
+
+            _view.ClickItemTile(1);
+            int shield = System.Array.FindIndex(_view.LastPicker!.Value.Options, o => o.Title == "Bouclier anti-émeute");
+            Assert.That(_view.LastPicker!.Value.Options[shield].Dim, Is.True);
+            Assert.That(_view.LastPicker!.Value.Options[shield].Sub, Is.EqualTo(_loc.T("equip.type_taken")));
+            _view.ChoosePicker(shield);
+            Assert.That(_toasts.Shown.Last().Text, Is.EqualTo(_loc.T("errors.collection_same_type")));
+            Assert.That(_app.Session.Find(givre)!.Items, Is.EqualTo(new[] { new ItemId("kevlar_vest"), new ItemId("running_shoes") }));
+
+            _view.ClickItemTile(0);
+            shield = System.Array.FindIndex(_view.LastPicker!.Value.Options, o => o.Title == "Bouclier anti-émeute");
+            Assert.That(_view.LastPicker!.Value.Options[shield].Dim, Is.False);
+            _view.ChoosePicker(shield);
+            Assert.That(_app.Session.Find(givre)!.Items, Is.EquivalentTo(new[] { new ItemId("riot_shield"), new ItemId("running_shoes") }));
         }
     }
 }

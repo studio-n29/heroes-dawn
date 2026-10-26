@@ -54,7 +54,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 int count = CollectionOps.OwnedItems(_session, it.Id);
                 var wearers = _session.Roster.Where(m => m.Items.Contains(it.Id)).Select(m => Loc.MemberName(m.Def)).ToList();
-                string subtitle = CollectionText.RarityName(Loc, it.Rarity) + " · " + CollectionText.ItemEffects(Loc, it)
+                string subtitle = CollectionText.ItemTypeChip(Loc, it.Type) + " · " + CollectionText.RarityName(Loc, it.Rarity) + " · " + CollectionText.ItemEffects(Loc, it)
                                   + (wearers.Count > 0 ? "\n" + Loc.F("inventory.worn", string.Join(", ", wearers)) : "");
                 var r = InfoRowData.Basic(CollectionText.ItemName(Loc, it), subtitle);
                 r.Tag = CollectionText.Tag(CollectionText.ItemName(Loc, it));

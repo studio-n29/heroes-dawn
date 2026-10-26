@@ -66,7 +66,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 int count = CollectionOps.OwnedCards(_session, card.Id);
                 int level = CollectionOps.CardLevel(_session, card.Id);
-                var r = InfoRowData.Basic(CollectionText.CardName(Loc, card), CollectionText.CardLine(Loc, card, CollectionText.ReferenceStats(_session), level));
+                var r = InfoRowData.Basic(CollectionText.CardName(Loc, card),
+                                          CollectionText.NatureChip(Loc, card.Nature) + " · " + CollectionText.CardLine(Loc, card, CollectionText.ReferenceStats(_session), level));
                 r.Tag = CollectionText.Tag(CollectionText.CardName(Loc, card));
                 r.TagColor = count > 0 ? CollectionText.RarityColor(card.Rarity) : Theme.Surface3;
                 r.Badge = count > 0 ? Loc.F("grimoire.owned_level", count, level, CardLevels.Max) : Loc.T("grimoire.missing");

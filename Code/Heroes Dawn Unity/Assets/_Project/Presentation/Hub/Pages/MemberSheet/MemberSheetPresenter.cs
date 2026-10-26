@@ -407,8 +407,11 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (free <= 0) continue;
                 var id = it.Id;
                 string name = CollectionText.ItemName(_loc, it);
-                options.Add(new SheetTile { Title = name, Sub = free > 1 ? _loc.F("loadout.copies", free) : CollectionText.ItemEffects(_loc, it),
-                                            Art = AgentArt.Item(id.Value), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item });
+                // L'objet de l'emplacement visé sera retiré : seul l'autre objet porté peut bloquer le type.
+                bool taken = !CollectionRules.CanEquip(it, m.Items.Where(x => !currentId.HasValue || x != currentId.Value).Select(defs.Item));
+                options.Add(new SheetTile { Title = name, Sub = taken ? _loc.T("equip.type_taken") : free > 1 ? _loc.F("loadout.copies", free) : CollectionText.ItemEffects(_loc, it),
+                                            Art = AgentArt.Item(id.Value), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item, Dim = taken });
+                if (taken) { _pickActions.Add(() => Apply(Result.Fail(CollectionErrors.SameItemType), "loadout.equipped", name)); continue; }
                 _pickActions.Add(() =>
                 {
                     // Emplacement occupé : l'objet actuel est retiré avant d'équiper le nouveau (remis en place si l'échange échoue).

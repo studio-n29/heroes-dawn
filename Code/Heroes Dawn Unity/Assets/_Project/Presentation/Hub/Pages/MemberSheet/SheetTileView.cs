@@ -32,7 +32,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (fitter != null) fitter.aspectRatio = t.Art.rect.width / t.Art.rect.height;
             }
             locked.SetActive(t.Kind == SheetTileKind.Locked);
-            title.color = empty ? Theme.TextMuted : Theme.Text;
+            title.color = empty || t.Dim ? Theme.TextMuted : Theme.Text;
+            art.color = t.Dim ? Theme.WithAlpha(Color.white, 0.45f) : Color.white;
+            if (t.Dim) frame.color = Theme.WithAlpha(frame.color, 0.45f);
         }
     }
 }

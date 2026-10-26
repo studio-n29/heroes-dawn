@@ -121,9 +121,10 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (free <= 0) continue;
                 anyItem = true;
                 bool room = m.Items.Count < CollectionRules.MaxItems;
+                bool typeFree = CollectionRules.CanEquip(it, m.Items.Select(Defs.Item));
                 var r = ItemRow(it);
                 r.Badge = free > 1 ? Loc.F("loadout.copies", free) : "";
-                r.A = RowButtonData.Of(Loc.T("loadout.equip"), room, Loc.T("loadout.no_slot_reason"), 0);
+                r.A = RowButtonData.Of(Loc.T("loadout.equip"), room && typeFree, Loc.T(room ? "equip.type_taken" : "loadout.no_slot_reason"), 0);
                 var id = it.Id;
                 rows.Add(r); _a.Add(() => Do(_book.EquipItem(_member, id), "loadout.equipped", CollectionText.ItemName(Loc, it))); _b.Add(null);
             }

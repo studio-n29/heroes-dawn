@@ -175,6 +175,14 @@ namespace N29.HeroesDawn.Presentation.Common
             d["errors.collection_unknown"] = "Objet ou carte inconnu.";
             d["errors.collection_no_slot"] = "Aucun emplacement libre.";
             d["errors.collection_same_type"] = "Cet agent porte déjà un objet de ce type.";
+            d["equip.type_taken"] = "Type déjà porté";
+            d["card.nature.offensive"] = "Offensive";
+            d["card.nature.defensive"] = "Défensive";
+            d["card.nature.support"] = "Soutien";
+            d["item.type.weapon"] = "Arme";
+            d["item.type.armor"] = "Armure";
+            d["item.type.tool"] = "Outil";
+            d["item.type.implant"] = "Implant";
             d["errors.collection_max_level"] = "Cette carte est déjà au niveau maximum.";
             d["errors.collection_copies"] = "Il manque des exemplaires en doublon.";
             d["errors.preset_empty"] = "Aucune composition enregistrée ici.";

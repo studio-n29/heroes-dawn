@@ -143,5 +143,40 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Grimoire));
             p.Dispose();
         }
+        InventoryPagePresenter Inventory() => Start(new InventoryPagePresenter(_view, _app.Session, _loc, _toasts,
+                                                                              _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
+
+        // ------------------------------------------------------------------ Catégories (lot B 0.14.0)
+
+        [Test, Description("Vérifie que chaque carte du grimoire affiche sa nature (Mur de verre : défensive) — parce que la nature aide à construire un deck équilibré")]
+        public void Grimoire_ShowsTheNatureOfEachCard()
+        {
+            var p = Grimoire();
+            Assert.That(_view.Rows[RowOf("Mur de verre")].Subtitle, Does.Contain(_loc.T("card.nature.defensive")));
+            Assert.That(_view.Rows[RowOf("Braise")].Subtitle, Does.Contain(_loc.T("card.nature.offensive")));
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie que chaque objet de l'équipement affiche son type (gilet kevlar : armure) — parce que le type décide de ce qu'un agent peut porter")]
+        public void Inventory_ShowsTheTypeOfEachItem()
+        {
+            CollectionOps.AddItem(_app.Session, new ItemId("kevlar_vest"));
+            var p = Inventory();
+            Assert.That(_view.Rows[RowOf("Gilet kevlar")].Subtitle, Does.Contain(_loc.T("item.type.armor")));
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie qu'un objet d'un type déjà porté est grisé avec « Type déjà porté », et qu'un objet d'un autre type reste équipable — parce qu'un bouton grisé doit dire pourquoi")]
+        public void Loadout_GreysAnItemWhoseTypeIsAlreadyWorn()
+        {
+            foreach (var id in new[] { "kevlar_vest", "riot_shield", "running_shoes" }) CollectionOps.AddItem(_app.Session, new ItemId(id));
+            _app.Collection.EquipItem(Verre, new ItemId("kevlar_vest"));
+            var p = Loadout();
+            var shield = _view.Rows[RowOf("Bouclier anti-émeute")];
+            Assert.That(shield.A.Enabled, Is.False);
+            Assert.That(shield.A.Reason, Is.EqualTo(_loc.T("equip.type_taken")));
+            Assert.That(_view.Rows[RowOf("Chaussures de course")].A.Enabled, Is.True);
+            p.Dispose();
+        }
     }
 }

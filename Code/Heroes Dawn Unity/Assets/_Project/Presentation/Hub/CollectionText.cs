@@ -67,6 +67,19 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Initiale colorée pour la pastille d'une ligne.</summary>
         public static string Tag(string name) => string.IsNullOrEmpty(name) ? "?" : name.Substring(0, 1).ToUpperInvariant();
 
+        public static string NatureName(ILocalization loc, CardNature n) => loc.T("card.nature." + n.ToString().ToLowerInvariant());
+        public static string ItemTypeName(ILocalization loc, ItemType t) => loc.T("item.type." + t.ToString().ToLowerInvariant());
+
+        /// <summary>Pastille colorée de la nature d'une carte (« ● Défensive »), en texte enrichi.</summary>
+        public static string NatureChip(ILocalization loc, CardNature n)
+            => Chip(NatureName(loc, n), n == CardNature.Offensive ? Theme.Danger : n == CardNature.Defensive ? Theme.Info : Theme.Success);
+
+        /// <summary>Pastille colorée du type d'un objet (« ● Armure »), en texte enrichi.</summary>
+        public static string ItemTypeChip(ILocalization loc, ItemType t)
+            => Chip(ItemTypeName(loc, t), t == ItemType.Weapon ? Theme.Danger : t == ItemType.Armor ? Theme.Info : t == ItemType.Tool ? Theme.Primary : Theme.Pr);
+
+        static string Chip(string label, Color color) => "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">● " + label + "</color>";
+
         public static IEnumerable<SkillCardDef> CardsFor(CollectionDef defs, MemberDef member)
             => defs.Cards.Where(c => c.Family == member.Family);
     }

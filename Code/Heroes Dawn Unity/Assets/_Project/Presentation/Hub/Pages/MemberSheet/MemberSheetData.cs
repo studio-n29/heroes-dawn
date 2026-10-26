@@ -21,6 +21,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public Sprite? Art;
         public Color Frame;
         public SheetTileKind Kind;
+        /// <summary>Tuile grisée (ex. objet d'un type déjà porté) : elle reste touchable pour dire pourquoi.</summary>
+        public bool Dim;
     }
 
     /// <summary>Palier de niveau : niveau, statistiques à ce niveau, atteint ou non.</summary>
