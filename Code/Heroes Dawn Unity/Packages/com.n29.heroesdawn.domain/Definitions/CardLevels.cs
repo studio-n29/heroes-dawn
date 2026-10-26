@@ -3,19 +3,22 @@ using System.Collections.Generic;
 namespace N29.HeroesDawn.Definitions
 {
     /// <summary>
-    /// Niveaux des cartes de compétence : une carte en doublon et des Crédits la font monter (niveau 5 au plus).
-    /// Chaque niveau augmente de 15 % les dégâts, soins et boucliers de la carte.
+    /// Niveaux des cartes de compétence : des doublons et des Crédits la font monter (niveau 10 au plus).
+    /// Chaque niveau augmente de 10 % les dégâts, soins et boucliers de base ; les niveaux 3, 6 et 10 débloquent un palier d'effets.
     /// </summary>
     public static class CardLevels
     {
-        public const int Max = 5;
-        public const int PercentPerLevel = 15;
+        public const int Max = 10;
+        public const int PercentPerLevel = 10;
+
+        /// <summary>Niveaux qui débloquent un palier d'effets secondaires.</summary>
+        public static readonly int[] TierLevels = { 3, 6, 10 };
 
         /// <summary>Exemplaires en doublon consommés pour passer du niveau <paramref name="level"/> au suivant.</summary>
-        public static int CopiesToUpgrade(int level) => level;
+        public static int CopiesToUpgrade(int level) => (level + 1) / 2;
 
         /// <summary>Crédits dépensés pour passer du niveau <paramref name="level"/> au suivant.</summary>
-        public static int CreditsToUpgrade(int level) => 250 * level;
+        public static int CreditsToUpgrade(int level) => 200 * level;
 
         /// <summary>Efficacité de la carte à ce niveau, en % (100 au niveau 1).</summary>
         public static int EffectPercent(int level) => 100 + PercentPerLevel * (System.Math.Max(1, level) - 1);
