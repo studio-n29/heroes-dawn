@@ -109,3 +109,6 @@
 | 2026-10-23 | Pause de résolution de 1,3 s après chaque compétence ; animation par famille (11) | Spec `2026-10-23-pause-resolution-animations-design.md` |
 | 2026-10-23 | Nouveau logo (détouré) et nouvelle icône ; illustrations IA reçues rangées dans `03_Art_UI_UX/Illustrations/` et utilisées comme placeholders (cinématique d'intro, key arts, fonds) ; icône Android adaptative | Build `0.10.1` déposée sur le Drive (`_builds`) |
 | 2026-10-23 | Documents de game design réalignés (combat, méta-humains, kits, GDD v3.0, économie, plan Early Access) | Plan EA section 0 |
+| 2026-10-26 | Catégories des cartes : le type de pouvoir est la famille (Matière, Élémentaire, Physique/Bio, Perception) ; pas de sous-types | Spec `2026-10-26-categories-agents-cartes-objets-design.md` |
+| 2026-10-26 | Nature des cartes (Offensive, Défensive, Soutien) saisie par carte, pré-remplie par une déduction depuis l'effet de base | Spec `2026-10-26-categories-agents-cartes-objets-design.md` |
+| 2026-10-26 | Objets : 4 types (Arme, Armure, Outil, Implant) ; un agent ne porte pas deux objets du même type (2 emplacements libres) ; sauvegardes remises en règle au chargement | Spec `2026-10-26-categories-agents-cartes-objets-design.md` |

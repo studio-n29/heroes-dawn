@@ -40,6 +40,8 @@ Au début du jeu, le joueur choisit **Agent D** (New York) ou **Agent M** (Mosco
 Répartition des 30 agents par rareté : **18 Agents, 8 Élites, 4 Légendes**. Par famille : Matière 7, Élémentaire 6, Physique/Bio 8, Perception 9 (déséquilibre à revoir ⚑). Familles, rôles et obtention de chaque agent : `Code/docs/specs/2026-10-22-agents-the-dawn-design.md`.
 
 ## Familles
+La famille est la **catégorie de l'agent** (fondée sur la nature de son pouvoir) et le **type de pouvoir** des cartes du grimoire : une carte ne s'équipe que sur un agent de sa famille.
+
 | Famille | Rôle dominant | Couleur UI | Profils du lore |
 |---|---|---|---|
 | Matière | Contrôle, création | Ambre | Animation de matière, magnétisme, alchimie, transposition, poche dimensionnelle, gravité |

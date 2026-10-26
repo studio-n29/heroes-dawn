@@ -130,6 +130,9 @@ Chaque fonctionnalité doit servir au moins un pilier.
 ### Compétences
 - Chaque agent : **2 compétences de base** propres à lui (A1 légère et gratuite, A2 spéciale payante) ; la **3e place** du combat est une **carte du grimoire**. Détail : `01_Game_Design/06_Kits_Competences.md`.
 - Rattaché à une **famille de pouvoirs** (voir Synergies).
+### Objets et cartes
+- **Cartes du grimoire** : classées par famille (type de pouvoir) × nature (**Offensive**, **Défensive**, **Soutien**) ; nature saisie par carte, pré-remplie d'après l'effet. Détail : `01_Game_Design/06_Kits_Competences.md`.
+- **Objets** : 2 emplacements par agent ; 4 types (**Arme**, **Armure**, **Outil**, **Implant**) ; un agent **ne porte pas deux objets du même type**. Type saisi par objet, déduit à défaut de l'effet spécial puis de la stat la plus forte.
 ### Synergies
 - **Familles** (alignées sur le lore, voir `02_Lore_Narration/02_Profils_Pouvoirs.md`) : **Matière** (ambre), **Élémentaire** (cyan), **Physique / Bio** (rouge), **Perception** (violet).
 - **Bonus passif** : chaque paire de familles dans l'escouade donne à toute l'équipe un bonus permanent de statistique (plafond 30 %).

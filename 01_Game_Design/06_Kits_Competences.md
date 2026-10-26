@@ -19,6 +19,20 @@ Chaque compétence est construite sur le **rôle** de l'agent, plus un **statut 
 ## Cartes du grimoire (3e et 4e places)
 Une carte de la **même famille** que l'agent s'équipe en 3e place (la 2e carte en 4e). Une carte d'une autre famille est refusée. Le coût d une carte est dérivé de sa recharge d origine (40 ou 50). Le catalogue des cartes est dans `Resources` (collection) et se complète avec le grimoire.
 
+### Catégories des cartes
+Une carte se classe sur deux axes : sa **famille** (le type de pouvoir, celle des agents qui peuvent l'équiper) × sa **nature** : **Offensive**, **Défensive** ou **Soutien**. La nature est **saisie par carte** ; à défaut, elle est déduite de l'effet de base et de la cible :
+
+| Effet de base | Cible | Nature |
+|---|---|---|
+| Dégâts | ennemi(s) | Offensive |
+| Statut, recul, jauge | ennemi(s) | Offensive |
+| Bouclier | tout | Défensive |
+| Soin | tout | Soutien |
+| Statut, élan, jauge | allié(s) ou soi | Soutien |
+| aucun effet | — | Offensive |
+
+La catégorie fine (Dégâts, Soins, Protection, Boost, Gestion du temps) reste l'étiquette des animations. Le grimoire affiche la nature de chaque carte et se filtre par famille × nature. Spec : `Code/docs/specs/2026-10-26-categories-agents-cartes-objets-design.md`.
+
 ## Paliers de compétences (niv. 10 / 20 / 30 / 40 / 50) ⚑ — pas encore implémentés
 | Palier | Effet proposé |
 |---|---|
