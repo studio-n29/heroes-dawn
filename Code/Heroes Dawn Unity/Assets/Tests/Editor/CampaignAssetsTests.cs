@@ -30,5 +30,15 @@ namespace N29.HeroesDawn.Tests.Editor
             foreach (var key in new[] { "narration.ny_1_4.n18.after.0", "narration.ny_1_3.n18.before.0", "narration.ny_1_2.n14.after.0" })
                 Assert.That(lib.Texts.ContainsKey(key) && lib.Texts[key].Length > 10, Is.True, key);
         }
+
+        [Test, Description("Vérifie que chaque case Mini-jeu des zones en assets lance une activité qui existe au catalogue — parce qu'une activité supprimée (la pêche) faisait planter la case : le mini-jeu ne se lançait pas et le plateau restait bloqué")]
+        public void BakedCampaign_MiniGameCases_UseExistingActivities()
+        {
+            var content = N29.HeroesDawn.Content.Prototype.PrototypeContent.Build().WithZones(ZoneLibrary.Load().Zones);
+            var missing = content.Zones
+                .SelectMany(z => z.Nodes.Where(n => n.Activity.HasValue && !content.HasActivity(n.Activity.Value)).Select(n => z.Id.Value + "/" + n.Id.Value + " → " + n.Activity!.Value.Value))
+                .ToList();
+            Assert.That(missing, Is.Empty);
+        }
     }
 }
