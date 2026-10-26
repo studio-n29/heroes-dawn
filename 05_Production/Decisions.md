@@ -112,3 +112,6 @@
 | 2026-10-26 | Catégories des cartes : le type de pouvoir est la famille (Matière, Élémentaire, Physique/Bio, Perception) ; pas de sous-types | Spec `2026-10-26-categories-agents-cartes-objets-design.md` |
 | 2026-10-26 | Nature des cartes (Offensive, Défensive, Soutien) saisie par carte, pré-remplie par une déduction depuis l'effet de base | Spec `2026-10-26-categories-agents-cartes-objets-design.md` |
 | 2026-10-26 | Objets : 4 types (Arme, Armure, Outil, Implant) ; un agent ne porte pas deux objets du même type (2 emplacements libres) ; sauvegardes remises en règle au chargement | Spec `2026-10-26-categories-agents-cartes-objets-design.md` |
+| 2026-10-26 | Cartes : 10 niveaux, +10 % par niveau, amélioration à (N+1)/2 doublons et 200 × N Crédits ; niveaux déjà atteints conservés | Spec `2026-10-26-cartes-paliers-mecaniques-design.md` |
+| 2026-10-26 | Paliers de cartes aux niveaux 3, 6 et 10 : des effets secondaires ajoutés à la compétence (non augmentés par le niveau) | Spec `2026-10-26-cartes-paliers-mecaniques-design.md` |
+| 2026-10-26 | Quatre nouvelles mécaniques de combat : vol de vie, purge, rebond, exécution (sous 30 % PV) ; lot C découpé en C1 (moteur) et C2 (36 nouvelles cartes) | Spec `2026-10-26-cartes-paliers-mecaniques-design.md` |

@@ -31,6 +31,20 @@ Une carte se classe sur deux axes : sa **famille** (le type de pouvoir, celle de
 | Statut, élan, jauge | allié(s) ou soi | Soutien |
 | aucun effet | — | Offensive |
 
+### Niveaux et paliers des cartes
+Une carte monte du **niveau 1 au niveau 10** avec des doublons et des Crédits : passer du niveau N au suivant coûte **(N + 1) / 2 doublons** (1, 1, 2, 2, 3, 3, 4, 4, 5 : 25 au total) et **200 × N Crédits** (9 000 au total). Chaque niveau ajoute **+10 %** aux dégâts, soins et boucliers de base (140 % au niveau 5, 190 % au niveau 10).
+
+Aux niveaux **3, 6 et 10**, un **palier** ajoute des effets secondaires à la carte, qui s'appliquent aux mêmes cibles (non augmentés par le niveau). Une carte qui vise un ennemi n'a pas d'effet allié dans ses paliers. Le grimoire montre les paliers atteints (✓) et à venir, et le bouton Améliorer annonce le palier qu'il débloque.
+
+| Mécanique | Effet |
+|---|---|
+| Vol de vie X % | Le lanceur récupère X % des dégâts infligés à la cible (après bouclier), sans dépasser ses PV max |
+| Purge (N) / Purge totale | Retire N statuts (ou tous), les plus récents d'abord : altérations sur un allié, bonus (Bouclier, Régénération, Hâte, Esquive, Ancrage, Provocation) sur un ennemi |
+| Rebond X % | Un autre ennemi vivant, tiré au sort, subit le premier effet de dégâts de la carte à X % |
+| Exécution +X % | Dégâts +X % sur une cible sous 30 % de ses PV max |
+
+Spec : `Code/docs/specs/2026-10-26-cartes-paliers-mecaniques-design.md` (table des paliers des 12 cartes).
+
 La catégorie fine (Dégâts, Soins, Protection, Boost, Gestion du temps) reste l'étiquette des animations. Le grimoire affiche la nature de chaque carte et se filtre par famille × nature. Spec : `Code/docs/specs/2026-10-26-categories-agents-cartes-objets-design.md`.
 
 ## Paliers de compétences (niv. 10 / 20 / 30 / 40 / 50) ⚑ — pas encore implémentés
