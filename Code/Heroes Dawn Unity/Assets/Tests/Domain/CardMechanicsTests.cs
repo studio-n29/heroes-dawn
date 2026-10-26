@@ -158,6 +158,33 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(events.OfType<BounceEvent>().Single().To, Is.EqualTo(2));
         }
 
+        // ------------------------------------------------------------------ Vraies cartes (ordre base puis paliers)
+
+        static SkillDef Real(string card, int level)
+            => CardLevels.SkillAt(N29.HeroesDawn.Content.Prototype.PrototypeCollection.Build().Card(new CardId(card)), level);
+
+        [Test, Description("Vérifie que Braise niveau 10 (dégâts, Brûlure, rebond…) rebondit quand son coup vainc la cible, malgré le statut placé entre les dégâts et le rebond — parce que les paliers s'ajoutent après les effets de base dans les vraies cartes")]
+        public void RealCard_Ember10_BouncesOnAKillingBlow()
+        {
+            var ember = Real("card_ember", 10);
+            Cast(ember.Target, ember.Effects.ToArray(), new[] { "brute", "brute" }, out var events, s => s.Unit(1).Hp = 1);
+            Assert.That(events.OfType<UnitDefeatedEvent>().Any(d => d.Unit == 1), Is.True);
+            Assert.That(events.OfType<BounceEvent>().Single().To, Is.EqualTo(2));
+        }
+
+        [Test, Description("Vérifie que Brasier niveau 3 (dégâts de zone, Brûlure, vol de vie) soigne le lanceur sur un ennemi qu'il vainc — parce que le vol de vie compte le coup fatal même avec un statut entre les deux")]
+        public void RealCard_Inferno3_StealsLifeOnAKillingBlow()
+        {
+            var inferno = Real("card_inferno", 3);
+            Cast(inferno.Target, inferno.Effects.ToArray(), new[] { "brute" }, out var events, s =>
+            {
+                s.Unit(0).Hp = s.Unit(0).MaxHp / 4;
+                s.Unit(1).Hp = 1;
+            });
+            Assert.That(events.OfType<UnitDefeatedEvent>().Any(d => d.Unit == 1), Is.True);
+            Assert.That(HealsOn(events, 0).Single().Amount, Is.GreaterThan(0));
+        }
+
         static string Trace(IEnumerable<CombatEvent> e) => string.Join("|", e.Select(x => x.GetType().Name + ":" + x.Tick));
 
         [Test, Description("Vérifie que le rebond ne fait rien (et ne tire rien au sort) sans autre ennemi ou sans effet de dégâts : la suite du combat est identique à celle d'une compétence sans rebond — parce que le combat doit rester rejouable à l'identique")]

@@ -140,8 +140,9 @@ namespace N29.HeroesDawn.Domain.Combat
                 foreach (var fx in effects)
                 {
                     if (missed) break;
-                    // Une cible vaincue ne reçoit plus d'effet ; le vol de vie et le rebond comptent encore le coup qui l'a vaincue.
-                    if (!t.IsAlive && fx.Type != EffectType.Lifesteal && fx.Type != EffectType.Bounce) break;
+                    // Une cible vaincue ne reçoit plus d'effet (sans tirage au sort) ; le vol de vie et le rebond comptent encore le coup qui l'a
+                    // vaincue, même placés après d'autres effets (les paliers s'ajoutent après les effets de base).
+                    if (!t.IsAlive && fx.Type != EffectType.Lifesteal && fx.Type != EffectType.Bounce) continue;
                     if (!_rng.Chance(fx.ChancePercent)) continue;
                     switch (fx.Type)
                     {
