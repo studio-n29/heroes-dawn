@@ -62,7 +62,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         /// <summary>« Matière · Rare · Dégâts 80 % … » (catégorie, rareté, effets).</summary>
         public static string CardLine(ILocalization loc, SkillCardDef card, SkillOwnerStats? owner = null, int level = 1)
-            => loc.F("grimoire.card_line", loc.FamilyName(card.Family), RarityName(loc, card.Rarity), owner.HasValue ? loc.DescribeSkill(CardLevels.Scale(card.Skill, level), owner.Value.Atk, owner.Value.MaxHp) : loc.DescribeSkill(CardLevels.Scale(card.Skill, level)));
+            => loc.F("grimoire.card_line", loc.FamilyName(card.Family), RarityName(loc, card.Rarity), owner.HasValue ? loc.DescribeSkill(CardLevels.SkillAt(card, level), owner.Value.Atk, owner.Value.MaxHp) : loc.DescribeSkill(CardLevels.SkillAt(card, level)));
 
         /// <summary>Initiale colorée pour la pastille d'une ligne.</summary>
         public static string Tag(string name) => string.IsNullOrEmpty(name) ? "?" : name.Substring(0, 1).ToUpperInvariant();

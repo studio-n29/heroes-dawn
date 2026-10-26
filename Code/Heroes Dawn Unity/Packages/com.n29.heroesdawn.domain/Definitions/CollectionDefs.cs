@@ -96,12 +96,24 @@ namespace N29.HeroesDawn.Definitions
         public SkillDef Skill { get; }
         /// <summary>Offensive, défensive ou de soutien : saisie, sinon déduite de l'effet.</summary>
         public CardNature Nature { get; }
+        /// <summary>Paliers d'effets secondaires (niveaux 3, 6 et 10), dans l'ordre des niveaux ; vide : aucun.</summary>
+        public IReadOnlyList<CardTier> Tiers { get; }
 
-        public SkillCardDef(CardId id, string nameKey, Family family, ItemRarity rarity, SkillDef skill, CardNature? nature = null)
+        public SkillCardDef(CardId id, string nameKey, Family family, ItemRarity rarity, SkillDef skill, CardNature? nature = null, IReadOnlyList<CardTier>? tiers = null)
         {
             Id = id; NameKey = nameKey; Family = family; Rarity = rarity; Skill = skill;
             Nature = nature ?? CardNatures.Of(skill);
+            Tiers = tiers ?? Array.Empty<CardTier>();
         }
+    }
+
+    /// <summary>Palier d'une carte : à partir de ce niveau, ses effets s'ajoutent à la compétence (sans être augmentés par le niveau).</summary>
+    public sealed class CardTier
+    {
+        public int Level { get; }
+        public IReadOnlyList<EffectDef> Effects { get; }
+
+        public CardTier(int level, params EffectDef[] effects) { Level = level; Effects = effects; }
     }
 
     /// <summary>Booster de cartes : nombre de cartes, poids de rareté (Commun, Rare, Épique, Légendaire), carte au moins Rare garantie tous les N boosters.</summary>

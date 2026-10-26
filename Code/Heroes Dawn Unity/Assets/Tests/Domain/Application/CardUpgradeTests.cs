@@ -1,6 +1,8 @@
+using System.Linq;
 using N29.HeroesDawn.Application.Features.Collection;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
+using N29.HeroesDawn.Domain.Combat;
 using NUnit.Framework;
 
 namespace N29.HeroesDawn.Tests.Domain.Application
@@ -91,6 +93,66 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(l3.Effects[0].Value, Is.EqualTo(120));
             Assert.That(l3.Effects[1].ChancePercent, Is.EqualTo(50));
             Assert.That(CardLevels.Scale(skill, 1), Is.SameAs(skill));
+        }
+
+        // ------------------------------------------------------------------ Paliers (lot C1)
+
+        /// <summary>Carte de test Matière : dégâts 100 sur un ennemi ; paliers 3 (Brûlure 2 t), 6 (Bouclier 10 % 2 t), 10 (Vulnérable 2 t).</summary>
+        static SkillCardDef TestCard() => new SkillCardDef(new CardId("card_test"), "cards.card_test.name", Family.Matter, ItemRarity.Common,
+            new SkillDef(new SkillId("card_test"), SkillSlot.A3, 0, TargetRule.SingleEnemy, new[] { new EffectDef(EffectType.Damage, 100) }, 0),
+            tiers: new[]
+            {
+                new CardTier(3, new EffectDef(EffectType.ApplyStatus, 0, StatusType.Burn, 2)),
+                new CardTier(6, new EffectDef(EffectType.Shield, 10, StatusType.Shield, 2)),
+                new CardTier(10, new EffectDef(EffectType.ApplyStatus, 0, StatusType.Vulnerable, 2)),
+            });
+
+        [Test, Description("Vérifie que chaque palier ajoute ses effets à partir de son niveau (3, 6, 10), après les effets de base — parce que les effets secondaires se débloquent à des paliers précis")]
+        public void SkillAt_AddsTierEffectsAtTheirLevel()
+        {
+            var card = TestCard();
+            int Count(int level) => CardLevels.SkillAt(card, level).Effects.Count;
+            Assert.That(new[] { Count(2), Count(3), Count(5), Count(6), Count(9), Count(10) }, Is.EqualTo(new[] { 1, 2, 2, 3, 3, 4 }));
+            Assert.That(CardLevels.SkillAt(card, 10).Effects.Select(e => e.Type),
+                        Is.EqualTo(new[] { EffectType.Damage, EffectType.ApplyStatus, EffectType.Shield, EffectType.ApplyStatus }));
+        }
+
+        [Test, Description("Vérifie que le niveau augmente les effets de base (dégâts 190 au niveau 10) mais pas les effets de palier (bouclier 10 %), et garde l'identité de la compétence — parce que le texte d'un palier doit rester exact")]
+        public void SkillAt_ScalesOnlyTheBaseEffects()
+        {
+            var card = TestCard();
+            var s = CardLevels.SkillAt(card, 10);
+            Assert.That(s.Effects[0].Value, Is.EqualTo(190));
+            Assert.That(s.Effects[2].Value, Is.EqualTo(10));
+            Assert.That(s.Id, Is.EqualTo(card.Skill.Id));
+            Assert.That(s.Slot, Is.EqualTo(card.Skill.Slot));
+            Assert.That(s.Target, Is.EqualTo(card.Skill.Target));
+            Assert.That(s.Cost, Is.EqualTo(card.Skill.Cost));
+        }
+
+        static CombatUnit Verre(int cardLevel, params string[] items)
+        {
+            var c = TestContent.Build();
+            var col = c.Collection;
+            var catalog = c.WithCollection(new CollectionDef(col.Items, col.Cards.Concat(new[] { TestCard() }).ToList(), col.Boosters));
+            var ally = new AllyEntry(new MemberId("verre"), 5, 0, 0, items.Select(i => new ItemId(i)).ToList(), new CardId?[] { new CardId("card_test") }, new[] { cardLevel });
+            var sim = new CombatSimulation(catalog, new CombatSetup(7, CombatRank.Normal, new[] { ally }, new[] { new EnemyEntry(new EnemyId("brute"), 5) }, false));
+            return sim.Unit(0);
+        }
+
+        [Test, Description("Vérifie qu'en combat la carte équipée au niveau 6 a ses deux premiers paliers — parce que le combat doit jouer la carte au niveau atteint")]
+        public void CardInCombat_UsesItsLevelAndTiers()
+        {
+            Assert.That(Verre(6).Skills[2].Effects.Count, Is.EqualTo(3));
+            Assert.That(Verre(2).Skills[2].Effects.Count, Is.EqualTo(1));
+        }
+
+        [Test, Description("Vérifie qu'avec un objet de puissance (+15 %), la carte niveau 6 a ses dégâts augmentés par le niveau puis par l'objet, et son bouclier de palier par l'objet seulement — parce qu'aucune augmentation ne doit être comptée deux fois")]
+        public void CardWithItemSkillPower_ScalesOnce()
+        {
+            var fx = Verre(6, "power_gauntlet").Skills[2].Effects;
+            Assert.That(fx[0].Value, Is.EqualTo(150 * 115 / 100));
+            Assert.That(fx[2].Value, Is.EqualTo(10 * 115 / 100));
         }
     }
 }

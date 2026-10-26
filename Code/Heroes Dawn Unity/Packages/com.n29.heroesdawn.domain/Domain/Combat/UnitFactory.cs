@@ -66,7 +66,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 var card = collection.Card(e.Cards[i]!.Value);
                 if (card.Family != d.Family) return null;
                 int lvl = i < e.CardLevels.Count ? e.CardLevels[i] : 1;
-                return CardLevels.Scale(card.Skill, lvl);
+                return CardLevels.SkillAt(card, lvl);
             }
             var list = new List<SkillDef>(d.Skills);
             var third = Pick(0);

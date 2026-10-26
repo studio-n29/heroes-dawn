@@ -26,6 +26,18 @@ namespace N29.HeroesDawn.Definitions
         /// <summary>La compétence de la carte à ce niveau : dégâts, soins et boucliers augmentés ; les autres effets sont inchangés.</summary>
         public static SkillDef Scale(SkillDef skill, int level) => ScalePercent(skill, EffectPercent(level));
 
+        /// <summary>La compétence de la carte à ce niveau : effets de base augmentés, puis les effets des paliers atteints (non augmentés).</summary>
+        public static SkillDef SkillAt(SkillCardDef card, int level)
+        {
+            var scaled = Scale(card.Skill, level);
+            var extra = new List<EffectDef>();
+            foreach (var t in card.Tiers) if (t.Level <= level) extra.AddRange(t.Effects);
+            if (extra.Count == 0) return scaled;
+            var list = new List<EffectDef>(scaled.Effects);
+            list.AddRange(extra);
+            return new SkillDef(scaled.Id, scaled.Slot, scaled.Cooldown, scaled.Target, list, scaled.Cost);
+        }
+
         /// <summary>La compétence avec dégâts, soins et boucliers à <paramref name="pct"/> % (100 : inchangée).</summary>
         public static SkillDef ScalePercent(SkillDef skill, int pct)
         {
