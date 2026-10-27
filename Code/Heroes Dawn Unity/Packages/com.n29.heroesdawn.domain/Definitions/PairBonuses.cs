@@ -116,6 +116,10 @@ namespace N29.HeroesDawn.Definitions
             return "link.theme." + x.ToString().ToLowerInvariant() + "_" + y.ToString().ToLowerInvariant();
         }
 
+        /// <summary>Additionne les bonus de même type (ordre de première apparition), pour les afficher sans doublon.</summary>
+        public static IEnumerable<PairBonus> Merge(IEnumerable<PairBonus> bonuses) =>
+            bonuses.GroupBy(b => b.Kind).Select(g => new PairBonus(g.Key, g.Sum(b => b.Value)));
+
         /// <summary>Somme des bonus d'un agent, puis plafonds par type.</summary>
         public static PairBonusTotal Total(IEnumerable<PairBonus> bonuses)
         {

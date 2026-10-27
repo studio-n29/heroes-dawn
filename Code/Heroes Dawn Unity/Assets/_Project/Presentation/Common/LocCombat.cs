@@ -40,7 +40,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["link.bonus.DefPercent"] = "DEF +{0} %";
             d["link.bonus.SpdPercent"] = "VIT +{0} %";
             d["link.bonus.CritPercent"] = "Critique +{0} %";
-            d["link.bonus.OpeningShieldPercent"] = "Bouclier d'ouverture {0} %";
+            d["link.bonus.OpeningShieldPercent"] = "Bouclier d'ouverture +{0} %";
             d["link.bonus.StartGaugePercent"] = "Jauge de départ +{0} %";
             d["link.bonus.StartEnergy"] = "Énergie de départ +{0}";
             d["link.bonus.EnergyPerStep"] = "Énergie +{0} par pas";

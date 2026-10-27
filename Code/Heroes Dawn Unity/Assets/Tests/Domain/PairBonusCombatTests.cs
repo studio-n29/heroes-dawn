@@ -111,6 +111,23 @@ namespace N29.HeroesDawn.Tests.Domain
             foreach (var id in tanks) Assert.That(ShieldValue(Unit(s, id)), Is.EqualTo(Unit(s, id).MaxHp * 20 / 100), id);
         }
 
+        [Test, Description("Vérifie que le plafond est calculé agent par agent : A lié à B et à C (niveau 5) est plafonné à 20 %, B et C (une seule paire chacun) restent à 15 % — parce que le plafond ne vaut pas pour toute l'équipe")]
+        public void TheCap_IsPerAgent()
+        {
+            var s = Sim(new[] { "ancre", "rempart", "bastion" }, Link("ancre", "rempart", 5), Link("ancre", "bastion", 5));
+            Assert.That(ShieldValue(Unit(s, "ancre")), Is.EqualTo(Unit(s, "ancre").MaxHp * 20 / 100));
+            Assert.That(ShieldValue(Unit(s, "rempart")), Is.EqualTo(Unit(s, "rempart").MaxHp * 15 / 100));
+            Assert.That(ShieldValue(Unit(s, "bastion")), Is.EqualTo(Unit(s, "bastion").MaxHp * 15 / 100));
+        }
+
+        [Test, Description("Vérifie que Merge additionne les bonus de même type en gardant l'ordre d'apparition — parce que les listes affichées ne doivent pas répéter « ATQ +4 %, ATQ +4 % »")]
+        public void Merge_SumsBonusesOfTheSameKind()
+        {
+            var merged = PairBonusRules.Merge(PairBonusRules.Of(Role.Damage, Role.Damage, 4)).ToList();
+            Assert.That(merged.Select(b => b.Kind), Is.Unique);
+            Assert.That(merged.Single(b => b.Kind == PairBonusKind.AtkPercent).Value, Is.EqualTo(8));
+        }
+
         [Test, Description("Vérifie qu'avec des liens de niveau 1 (ou sans lien), les unités ont exactement les mêmes statistiques, énergie et statuts qu'avant les bonus de paire — parce que le niveau 1 ne change rien et que les simulations existantes restent identiques")]
         public void Level1_ChangesNothing()
         {

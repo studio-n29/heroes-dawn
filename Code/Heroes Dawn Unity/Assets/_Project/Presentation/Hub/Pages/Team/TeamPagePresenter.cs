@@ -132,7 +132,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                     int level = _session.LinkLevel(a.Id, b.Id);
                     if (level < PairBonusRules.MinLevel) continue;
                     yield return _loc.F("team.pair_line", _loc.PairTheme(a.Def.Role, b.Def.Role), _loc.MemberName(a.Def), _loc.MemberName(b.Def), level,
-                                        string.Join(", ", PairBonusRules.Of(a.Def.Role, b.Def.Role, level).Select(_loc.PairBonusText)));
+                                        string.Join(", ", PairBonusRules.Merge(PairBonusRules.Of(a.Def.Role, b.Def.Role, level)).Select(_loc.PairBonusText)));
                 }
         }
 

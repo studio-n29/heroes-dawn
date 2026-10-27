@@ -37,7 +37,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         [TestCase(PairBonusKind.DefPercent, 4, "DEF +4 %")]
         [TestCase(PairBonusKind.SpdPercent, 3, "VIT +3 %")]
         [TestCase(PairBonusKind.CritPercent, 5, "Critique +5 %")]
-        [TestCase(PairBonusKind.OpeningShieldPercent, 8, "Bouclier d'ouverture 8 %")]
+        [TestCase(PairBonusKind.OpeningShieldPercent, 8, "Bouclier d'ouverture +8 %")]
         [TestCase(PairBonusKind.StartGaugePercent, 10, "Jauge de départ +10 %")]
         [TestCase(PairBonusKind.StartEnergy, 10, "Énergie de départ +10")]
         [TestCase(PairBonusKind.EnergyPerStep, 1, "Énergie +1 par pas")]

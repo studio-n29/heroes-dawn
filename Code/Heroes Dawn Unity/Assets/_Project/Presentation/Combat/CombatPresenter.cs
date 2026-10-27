@@ -164,7 +164,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                     int level = sim.Setup.LinkLevel(new MemberId(allies[i].DefId), new MemberId(allies[j].DefId));
                     if (level < PairBonusRules.MinLevel) continue;
                     AddLog(_loc.F("combat.pair", _loc.PairTheme(allies[i].Role, allies[j].Role), Name(allies[i].Id), Name(allies[j].Id), level,
-                                  string.Join(", ", PairBonusRules.Of(allies[i].Role, allies[j].Role, level).Select(_loc.PairBonusText))));
+                                  string.Join(", ", PairBonusRules.Merge(PairBonusRules.Of(allies[i].Role, allies[j].Role, level)).Select(_loc.PairBonusText))));
                 }
             const int MaxChips = 6;
             if (chips.Count > MaxChips)
