@@ -35,19 +35,23 @@ Outil : menu « Heroes Dawn ▸ Setup ▸ Recadrer les illustrations de cartes �
 - Competences/vieil_homme_ruines_cathedrale.jpg
 
 ## Attribuées
+- card_bloodletting → Competences/card_bloodletting.jpg
 - card_borrowed_mask → Competences/card_borrowed_mask.jpg
 - card_camouflage → Competences/card_camouflage.jpg
 - card_chain_lightning → Competences/card_chain_lightning.jpg
 - card_challenge → Competences/card_challenge.jpg
 - card_concrete_rampart → Competences/card_concrete_rampart.jpg
 - card_deep_anchor → Competences/card_deep_anchor.jpg
+- card_fresh_blood → Competences/card_fresh_blood.jpg
 - card_frost_wall → Competences/card_frost_wall.jpg
 - card_glass_shards → Competences/card_glass_shards.jpg
 - card_guard_break → Competences/card_guard_break.jpg
 - card_guiding_echo → Competences/card_guiding_echo.jpg
+- card_healing_molt → Competences/card_healing_molt.jpg
 - card_ice_carapace → Competences/card_ice_carapace.jpg
 - card_living_bastion → Competences/card_living_bastion.jpg
 - card_living_forge → Competences/card_living_forge.jpg
+- card_monolith → Competences/card_monolith.jpg
 - card_neon_halo → Competences/card_neon_halo.jpg
 - card_power_flux → Competences/card_power_flux.jpg
 - card_precise_shot → Competences/card_precise_shot.jpg
