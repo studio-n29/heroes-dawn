@@ -41,6 +41,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public static readonly DomainError MaxLevel = new DomainError("meta.max_level", "errors.max_level");
         public static readonly DomainError PaymentFailed = new DomainError("meta.payment", "errors.meta_payment");
         public static readonly DomainError AlreadyDone = new DomainError("meta.done", "errors.meta_done");
+        public static readonly DomainError NotEnoughScraps = new DomainError("meta.scraps", "errors.not_enough_scraps");
     }
 
     /// <summary>Services communs aux systèmes de méta-progression : session, horloge, sauvegarde, diffusion.</summary>
