@@ -157,6 +157,15 @@ namespace N29.HeroesDawn.Presentation.Combat
                 AddLog(_loc.F("combat.team_effect", _loc.TeamEffect(effect)));
                 chips.Add(new BonusChipData { Name = _loc.T("team_effect." + effect + ".name"), Effect = _loc.T("team_effect." + effect + ".short"), Color = Theme.Success });
             }
+            // Bonus de paire : une ligne du journal par paire d'alliés dont le lien est de niveau 2 ou plus.
+            for (int i = 0; i < allies.Count; i++)
+                for (int j = i + 1; j < allies.Count; j++)
+                {
+                    int level = sim.Setup.LinkLevel(new MemberId(allies[i].DefId), new MemberId(allies[j].DefId));
+                    if (level < PairBonusRules.MinLevel) continue;
+                    AddLog(_loc.F("combat.pair", _loc.PairTheme(allies[i].Role, allies[j].Role), Name(allies[i].Id), Name(allies[j].Id), level,
+                                  string.Join(", ", PairBonusRules.Of(allies[i].Role, allies[j].Role, level).Select(_loc.PairBonusText))));
+                }
             const int MaxChips = 6;
             if (chips.Count > MaxChips)
             {

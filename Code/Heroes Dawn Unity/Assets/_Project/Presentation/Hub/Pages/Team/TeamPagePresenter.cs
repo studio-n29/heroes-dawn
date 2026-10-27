@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Hub;
@@ -121,6 +122,20 @@ namespace N29.HeroesDawn.Presentation.Hub
             Report(_presets.Load(slot), _loc.F("team.preset.loaded", slot + 1));
         }
 
+        /// <summary>Bonus de paire actifs dans l'escouade (liens de niveau 2 et plus) : une ligne par paire.</summary>
+        IEnumerable<string> PairLines(IReadOnlyList<ITeamMemberReadModel> squad)
+        {
+            for (int i = 0; i < squad.Count; i++)
+                for (int j = i + 1; j < squad.Count; j++)
+                {
+                    var a = squad[i]; var b = squad[j];
+                    int level = _session.LinkLevel(a.Id, b.Id);
+                    if (level < PairBonusRules.MinLevel) continue;
+                    yield return _loc.F("team.pair_line", _loc.PairTheme(a.Def.Role, b.Def.Role), _loc.MemberName(a.Def), _loc.MemberName(b.Def), level,
+                                        string.Join(", ", PairBonusRules.Of(a.Def.Role, b.Def.Role, level).Select(_loc.PairBonusText)));
+                }
+        }
+
         void Refresh()
         {
             if (Disposed) return;
@@ -136,7 +151,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 SquadTitle = _loc.F("hub.squad", squad.Count),
                 Squad = squad.Select(m => MemberCards.Slot(m, _loc)).ToArray(),
                 Synergies = synergies.Select(c => _loc.F("team.synergy_line", _loc.SynergyName(c.Synergy), _loc.SynergyEffect(c.Synergy, s.LinkLevel(c.A.Id, c.B.Id)), _loc.MemberName(c.A), _loc.MemberName(c.B)))
-                    .Concat(TeamEffects.Active(squad.Select(m => m.Def.Family).ToList(), squad.Select(m => m.Def.Role).ToList()).Select(_loc.TeamEffect)).ToArray(),
+                    .Concat(TeamEffects.Active(squad.Select(m => m.Def.Family).ToList(), squad.Select(m => m.Def.Role).ToList()).Select(_loc.TeamEffect))
+                    .Concat(PairLines(squad.ToList())).ToArray(),
                 MissionEnabled = !s.SquadExhausted,
                 MissionHint = s.SquadExhausted ? _loc.T("hub.deploy.exhausted") : "",
                 PresetLabels = _presets == null ? new string[0] : Enumerable.Range(0, SquadPresets.Slots)

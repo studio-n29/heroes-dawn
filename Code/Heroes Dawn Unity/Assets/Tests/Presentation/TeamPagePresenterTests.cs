@@ -56,6 +56,32 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_p.Title, Is.EqualTo("Équipe · 4 membres"));
         }
 
+        static void Wins(N29.HeroesDawn.Application.Session.GameSession s, string a, string b, int count)
+        {
+            for (int i = 0; i < count; i++) N29.HeroesDawn.Application.Features.Combat.TeamLinks.RecordVictory(s.Meta, new[] { a, b });
+        }
+
+        [Test, Description("Vérifie que l'écran Équipe liste le bonus de paire d'un lien de niveau 3 entre deux membres de l'escouade (Tank + Dégâts : Rempart et lame, PV +3 % et ATQ +3 %) et rien pour une paire sans lien — parce que le joueur doit voir les bonus de liens actifs de son équipe")]
+        public void Team_ListsActivePairBonuses()
+        {
+            Make();
+            Assert.That(_view.Last.Synergies.Any(c => c.Contains("Rempart et lame")), Is.False, "aucun lien : aucune ligne de paire");
+            Wins(_app.Session, "ancre", "givre", 8);
+            _p.Dispose();
+            Make();
+            var line = _view.Last.Synergies.Single(c => c.Contains("Rempart et lame"));
+            Assert.That(line, Does.Contain("niv. 3").And.Contain("PV +3 %").And.Contain("ATQ +3 %"));
+        }
+
+        [Test, Description("Vérifie qu'un lien de niveau 5 avec un agent hors de l'escouade n'ajoute aucune ligne à l'écran Équipe — parce que les bonus de paire ne comptent que pour les deux agents de l'escouade")]
+        public void Team_NoPairLine_ForAnAgentOutsideTheSquad()
+        {
+            _app.Session.Roster.Add(new N29.HeroesDawn.Application.Session.TeamMember(_app.Session.Content.Member(new MemberId("verre")), 5));
+            Wins(_app.Session, "ancre", "verre", 25);
+            Make();
+            Assert.That(_view.Last.Synergies.Any(c => c.Contains("Étau")), Is.False);
+        }
+
         [Test, Description("Vérifie que le filtre par famille et le tri sont appliqués à la grille — parce que l'écran Équipe filtre et trie (M20 ①②)")]
         public void Filter_And_Sort_Applied()
         {

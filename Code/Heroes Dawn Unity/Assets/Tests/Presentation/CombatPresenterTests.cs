@@ -310,6 +310,32 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_results.VerifyText, Is.EqualTo(new LocLocalization().T("combat.verify.skip")));
         }
 
+        // ------------------------------------------------------------------ Bonus de paire (lot D)
+
+        /// <summary>Nouveau combat de la même zone, après des victoires communes enregistrées, avec son présentateur (journal lu sur la fausse vue).</summary>
+        FakeCombatView CombatLogWithWins(string a, string b, int wins)
+        {
+            for (int i = 0; i < wins; i++) N29.HeroesDawn.Application.Features.Combat.TeamLinks.RecordVictory(_app.Session.Meta, new[] { a, b });
+            var sim = _app.Combat.Begin.ExecuteAsync().GetAwaiter().GetResult().Value;
+            var view = new FakeCombatView();
+            var p = new CombatPresenter(view, _app.Combat.Active, _app.Session, _app.Combat.SetAuto, _app.Combat.Finish, _app.Combat.Verify,
+                                        _app.Combat.ForceWin, _app.Publisher<CombatResultsClosed>(), _app.Publisher<NavigateRequested>(),
+                                        _modals, new FakeToasts(), new LocLocalization(), new FakeFrameClock(), _router);
+            view.Show();
+            p.Start();
+            return view;
+        }
+
+        [Test, Description("Vérifie que le journal de début de combat compte une ligne « LIEN · » par paire de niveau 2 ou plus (Tank + Dégâts niveau 3 : Rempart et lame) et aucune sans lien — parce que le joueur doit voir les bonus de liens actifs au début du combat")]
+        public void Combat_LogsOneLinePerActivePair()
+        {
+            Assert.That(_view.Log.Count(l => l.StartsWith("LIEN ·")), Is.EqualTo(0), "aucun lien");
+            var view = CombatLogWithWins("ancre", "givre", 8);
+            var lines = view.Log.Where(l => l.StartsWith("LIEN ·")).ToList();
+            Assert.That(lines.Count, Is.EqualTo(1));
+            Assert.That(lines[0], Does.Contain("Rempart et lame").And.Contain("niv. 3").And.Contain("PV +3 %"));
+        }
+
         // ------------------------------------------------------------------ Mécaniques des cartes (lot C1)
 
         [Test, Description("Vérifie qu'une exécution affiche « EXÉCUTION ! » et qu'une purge affiche « PURGE » sur la cible — parce que le joueur doit voir ce que le palier de la carte a fait")]

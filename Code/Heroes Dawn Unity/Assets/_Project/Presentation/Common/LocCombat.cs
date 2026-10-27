@@ -45,6 +45,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["link.bonus.StartEnergy"] = "Énergie de départ +{0}";
             d["link.bonus.EnergyPerStep"] = "Énergie +{0} par pas";
             d["link.level"] = "lien niv. {0}";
+            d["team.pair_line"] = "{0} ({1} + {2}, niv. {3}) : {4}";
+            d["combat.pair"] = "LIEN · {0} ({1} + {2}, niv. {3}) : {4}";
             d["link.tier_line"] = "Niv. {0} · {1}";
             d["affinity.next_wins"] = "encore {0} victoire(s)";
             d["affinity.max"] = "lien au maximum";
