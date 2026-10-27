@@ -13,7 +13,29 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// <summary>Textes et couleurs des objets et des cartes : nom, rareté, effets en une ligne.</summary>
     public static class CollectionText
     {
-        public static string ItemName(ILocalization loc, ItemDef item) => loc.T(item.NameKey);
+        /// <summary>Nom d'un objet : celui du catalogue, ou « recette (qualité) » pour un objet fabriqué.</summary>
+        public static string ItemName(ILocalization loc, ItemDef item)
+            => CraftedItems.TryParseNameKey(item.NameKey, out var recipeId, out var quality)
+                ? loc.F("craft.name", loc.T("craft.recipe." + recipeId), QualityName(loc, quality))
+                : loc.T(item.NameKey);
+
+        /// <summary>Qualité d'un objet fabriqué ; null pour un objet du catalogue.</summary>
+        public static CraftQuality? QualityOf(ItemDef item)
+            => CraftedItems.TryParseNameKey(item.NameKey, out _, out var quality) ? quality : (CraftQuality?)null;
+
+        public static string QualityName(ILocalization loc, CraftQuality quality) => loc.T("craft.quality." + quality.ToString().ToLowerInvariant());
+
+        public static Color QualityColor(CraftQuality quality)
+        {
+            switch (quality)
+            {
+                case CraftQuality.Masterwork: return Theme.Primary;
+                case CraftQuality.Superior: return Theme.Perception;
+                case CraftQuality.Fine: return Theme.Info;
+                case CraftQuality.Standard: return Theme.Text;
+                default: return Theme.TextMuted;
+            }
+        }
 
         public static string RarityName(ILocalization loc, ItemRarity r) => loc.T("item.rarity." + r);
 
