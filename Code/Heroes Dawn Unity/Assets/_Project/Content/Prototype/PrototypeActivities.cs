@@ -72,6 +72,10 @@ namespace N29.HeroesDawn.Content.Prototype
             // Ingénierie de secours (2D) : 250 Crédits et 10 PR à la réussite.
             new ActivityDef(new ActivityId("rescue_tool"), ActivityKinds.RescueEngineering, "activities.rescue.name", "activities.rescue.desc",
                             P(("parts", 5), ("distractors", 3), ("attempts", 3)), credits: 250, pr: 10),
+
+            // Infiltration (2D vue de dessus) : 300 Crédits et 10 PR à la réussite.
+            new ActivityDef(new ActivityId("infiltration_camp"), ActivityKinds.Infiltration, "activities.infiltration.name", "activities.infiltration.desc",
+                            P(("time_limit_s", 60), ("guards", 3), ("lives", 3), ("detect_ms", 600)), credits: 300, pr: 10),
         };
     }
 }

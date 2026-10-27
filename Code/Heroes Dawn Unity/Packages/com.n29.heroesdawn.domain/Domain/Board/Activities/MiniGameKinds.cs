@@ -100,4 +100,20 @@ namespace N29.HeroesDawn.Domain.Activities
 
         public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
     }
+
+    /// <summary>« Infiltration » (voir <see cref="Games.InfiltrationGame"/>).</summary>
+    public sealed class InfiltrationKind : IActivityKind
+    {
+        public string Id => ActivityKinds.Infiltration;
+
+        public IReadOnlyList<ParameterDef> Schema { get; } = new[]
+        {
+            new ParameterDef("time_limit_s", 60, 20, 180),
+            new ParameterDef("guards", 3, 1, 8),
+            new ParameterDef("lives", 3, 1, 9),
+            new ParameterDef("detect_ms", 600, 200, 2000),
+        };
+
+        public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
+    }
 }

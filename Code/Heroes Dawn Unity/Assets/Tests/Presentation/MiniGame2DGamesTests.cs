@@ -123,5 +123,18 @@ namespace N29.HeroesDawn.Tests.Presentation
             foreach (var part in RescueEngineeringGame.Vocabulary)
                 Assert.That(_loc.Has("mg2d.rescue.part." + part), Is.True, part);
         }
+
+        [Test, Description("Vérifie qu'« Infiltration » ouvre la fenêtre commune avec une partie de déplacement au joystick, son titre, sa consigne, un bandeau d'alerte, un temps et des vies — parce que c'est le jeu du joystick virtuel")]
+        public void Infiltration_OpensTheCommonWindow_WithTheStick()
+        {
+            var r = Play("infiltration_camp");
+            Assert.That(r.Driver.Game, Is.InstanceOf<InfiltrationGame>());
+            Assert.That(r.Driver.UsesStick, Is.True);
+            Assert.That(r.Title, Is.EqualTo("INFILTRATION"));
+            Assert.That(r.Instructions, Is.EqualTo(_loc.T("mg2d.infiltration.instructions")));
+            Assert.That(r.Driver.Hud.Score, Is.EqualTo("Alerte 0 %"));
+            Assert.That(r.Driver.Hud.TimeLeft, Is.EqualTo(60f));
+            Assert.That(r.Driver.Hud.Lives, Is.EqualTo(3));
+        }
     }
 }

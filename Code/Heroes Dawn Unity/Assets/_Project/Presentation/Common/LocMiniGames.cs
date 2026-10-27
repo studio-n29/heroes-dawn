@@ -83,6 +83,14 @@ namespace N29.HeroesDawn.Presentation.Common
             d["activity.param.parts"] = "Pièces";
             d["activity.param.distractors"] = "Pièces en trop";
             d["activity.param.attempts"] = "Essais";
+
+            // ---- Infiltration
+            d["activities.infiltration.name"] = "Infiltration";
+            d["activities.infiltration.desc"] = "Infiltre-toi dans le camp : évite le champ de vision des gardes et rejoins la sortie.";
+            d["mg2d.infiltration.instructions"] = "Glisse le doigt pour te déplacer. Les cônes jaunes sont le champ de vision des gardes : reste hors de leur vue et rejoins l'anneau vert. Être repéré trop longtemps te renvoie au départ et coûte une vie.";
+            d["mg2d.infiltration.score"] = "Alerte {0} %";
+            d["activity.param.guards"] = "Gardes";
+            d["activity.param.detect_ms"] = "Détection (ms)";
             d["activity.param.hits"] = "Touches à réussir";
         }
     }
