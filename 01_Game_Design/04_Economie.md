@@ -125,4 +125,24 @@ Soit 3 € / 6 € / 10 € pour une tenue ; aucun cosmétique au-delà de 10 �
 | Simulateur de combat | +20 % | 6 000 |
 | Salle de réalité augmentée | +35 % | 15 000 |
 
+## Fabrication d'objets (labo de recherche)
+
+Le labo fabrique des objets avec des **scraps** laissés par les combats gagnés et des **recettes** obtenues sur les Boss et les Élites. Spec : `Code/docs/specs/2026-10-27-labo-fabrication-design.md`.
+
+- **Scraps** : un par type d'objet (arme, armure, outil, implant) et le Noyau, rare et commun à tous. Victoire Facile 1-2, Normal 2-3, Élite et Boss 4-6 scraps d'un type tiré au hasard ; Noyaux : Boss 2, Élite 1 une fois sur deux.
+- **Recettes** : 12 (3 par type). Les 4 Communes sont connues au départ. Drop : Boss 60 %, Élite 25 % (recette inconnue tirée au hasard ; si toutes sont connues : 5 scraps de plus).
+- **Coût** : Commune 6 scraps du type (difficulté 1) ; Rare 12 + 2 Noyaux (difficulté 4) ; Épique 20 + 5 Noyaux (difficulté 7).
+- **Qualité** : Grossier, Standard, Soigné, Supérieur, Chef-d'œuvre (stats ×80, 100, 115, 130, 150 %). Elle dépend de l'écart entre le niveau de compétence de création du type d'objet (1 à 10, +40 × n d'expérience par niveau) et la difficulté de la recette.
+
+| Écart compétence − difficulté | Grossier | Standard | Soigné | Supérieur | Chef-d'œuvre |
+|---|---|---|---|---|---|
+| ≤ −3 | 60 | 35 | 5 | 0 | 0 |
+| −2 à −1 | 35 | 50 | 13 | 2 | 0 |
+| 0 | 15 | 50 | 25 | 9 | 1 |
+| +1 à +2 | 5 | 35 | 35 | 20 | 5 |
+| +3 à +4 | 0 | 15 | 40 | 30 | 15 |
+| ≥ +5 | 0 | 5 | 30 | 40 | 25 |
+
+Stats tirées dans la fourchette de la recette (Commune 8-12 %, Rare 8-14 %, Épique 10-16 % + effet spécial), puis multipliées par la qualité. Fabrication instantanée ; l'objet est un exemplaire unique (équipable comme les autres, 2 emplacements, types différents) et n'entre jamais dans la boutique ni dans les drops d'objets.
+
 Tous ces paramètres sont dans `05_Equilibrage.xlsx` ou à y ajouter lors de l'intégration Remote Config.

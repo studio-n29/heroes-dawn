@@ -98,9 +98,10 @@ Une sauvegarde ancienne (champs absents) se charge sans erreur : compteurs à 0,
 
 ## 4. Interface (minimale, le reste est au lot F)
 
-- Onglet « Atelier » sur la page du labo : barre des 5 scraps ; liste des recettes (coût, difficulté, bouton Fabriquer grisé si scraps insuffisants) ; niveau et barre d'expérience par type.
-- Fenêtre de résultat après fabrication : qualité obtenue et stats tirées.
-- Inventaire et fiches d'agent : repère de qualité (couleur et mot) à côté du nom d'un objet fabriqué.
+- Rangées « Atelier » sous les 4 recherches de la page du labo (écart acté à l'exécution : pas d'onglet) : un titre avec les 5 scraps possédés ; une rangée par compétence (niveau et barre d'expérience) ; une rangée par recette connue (coût, difficulté, probabilités de qualité, bouton Fabriquer grisé si scraps insuffisants).
+- Résultat d'une fabrication : message (toast) avec le nom de l'objet (« Recette (Qualité) »), ses stats et, le cas échéant, la montée de niveau (écart acté : pas de fenêtre dédiée).
+- Inventaire : la qualité est écrite dans le nom et colore l'étiquette de l'objet fabriqué.
+- Fin de combat : ligne des scraps obtenus et de la recette apprise.
 - Textes français dans `Loc` (nouveau fichier de textes dans le même style que `LocCombat`).
 
 ## 5. Erreurs et cas limites
