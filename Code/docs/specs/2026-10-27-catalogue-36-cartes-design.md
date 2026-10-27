@@ -85,15 +85,16 @@ Règles reprises de C1 : une carte qui vise un ennemi ne porte aucun effet alli�
 - `Presentation/Common/LocCollection.cs` : les 36 noms (`skills.<id>`), comme les 12 existants.
 
 ## Illustrations
-- Outil d'éditeur `Editor/Assets/CardArtCropper.cs` (menu « Heroes Dawn ▸ Art ▸ Recadrer les illustrations de cartes », appelable en `-executeMethod`) : pour chaque carte sans image dans `Resources/Illustrations/Cards/`, prend une source du Drive (`03_Art_UI_UX/{Lieux,Personnages,Ennemis_Cryptides}`), la recadre au format des 12 premières, la teinte à la couleur de la famille et l'enregistre en `.jpg` sous `<id>.jpg`.
-- **Une source différente par carte** : les sources sont prises dans l'ordre alphabétique en sautant celles déjà attribuées ; l'attribution est écrite dans `Resources/Illustrations/Cards/SOURCES.md` (une ligne par carte : id → fichier source). Les 12 cartes existantes ne sont pas regénérées.
-- Le cadrage et la teinte reprennent les réglages des 12 images existantes (taille, rapport, intensité) ; vérification à l'œil sur la capture du grimoire.
+- **Sources** : le dépôt ne contient que 41 images uniques, dont environ 22 déjà prises par les 12 cartes et les 10 objets ; l'utilisateur **ajoute de nouvelles images** dans `03_Art_UI_UX/Illustrations/` (n'importe quel sous-dossier). Les 23 images présentes le 2026-10-27 dans ce dossier sont **réservées** (on ne sait pas lesquelles ont servi aux 12 premières cartes) : elles sont listées dans `Resources/Illustrations/Cards/SOURCES.md`, section « Réservées », et l'outil ne les prend pas. Il faut donc **36 nouvelles images** ; l'utilisateur peut retirer de la liste « Réservées » une image qu'il sait libre.
+- Outil d'éditeur `Editor/Assets/CardArtCropper.cs` (menu « Heroes Dawn ▸ Setup ▸ Recadrer les illustrations de cartes », appelable en `-executeMethod N29.HeroesDawn.EditorTools.Assets.CardArtCropper.CropMissingBatch`) : pour chaque carte du catalogue sans image dans `Resources/Illustrations/Cards/`, prend la première source libre (ordre alphabétique du chemin, ni réservée ni déjà attribuée), la recadre au centre en 16:9, la réduit en **640 × 360** (format des 12 premières), la teinte vers la couleur de la famille (`Theme.FamilyColor`, mélange à 30 %) et l'enregistre en `<id>.jpg` (qualité 85). Les images existantes ne sont jamais regénérées.
+- **Une source différente par carte** : chaque attribution est ajoutée à `SOURCES.md`, section « Attribuées » (une ligne par carte : `id → chemin source`). S'il manque des sources, l'outil s'arrête sans rien écrire et indique combien d'images ajouter.
+- Le rendu se vérifie à l'œil sur la capture du grimoire. Seule cette étape attend les nouvelles images ; le reste du lot avance sans elles (une carte sans image affiche l'illustration générique).
 
 ## Tests
 - **Contenu** (`CollectionRulesTests`) : 48 cartes ; par famille 12 cartes, 4 par nature, raretés 5/4/2/1 ; nature saisie = nature déduite pour chaque carte ; règles C1 déjà en place (3 paliers 3/6/10, pas d'effet allié sur une carte ennemie, rebond seulement avec dégâts) vérifiées sur les 48 ; identifiants uniques.
 - **Catégories** (`DesignToolsDataTests.CodeCatalog_HasTheSpecCategories`) : la table des natures passe à 48 entrées.
 - **Textes** : chaque carte a un nom (`skills.<id>` présent).
-- **Illustrations** : chaque carte du catalogue a son image (`AgentArt.Card` trouve `Illustrations/Cards/<id>`) ; `SOURCES.md` n'attribue jamais deux fois la même source.
+- **Illustrations** : l'outil choisit des sources libres, jamais réservées ni en double, et s'arrête s'il en manque (tests sur un dossier temporaire) ; après génération, chaque carte du catalogue a son image (`AgentArt.Card` trouve `Illustrations/Cards/<id>`) et `SOURCES.md` n'attribue jamais deux fois la même source.
 - **Combat** : un combat complet en mode Auto avec des agents équipés de nouvelles cartes de chaque famille se termine et se rejoue à l'identique.
 - **Capture** : grimoire avec le filtre d'une famille, pour vérifier les nouvelles tuiles (illustrations, pastilles).
 
