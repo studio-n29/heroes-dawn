@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Messages;
@@ -24,14 +25,15 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly IFriendsPort _friends;
         readonly HubNavigator _nav;
         readonly ISessionReadModel _session;
+        readonly IModalService _modals;
         readonly List<Action?> _actions = new List<Action?>();
 
         public ProfilePagePresenter(IProfilePageView view, PlayerProfile profile, IFriendsPort friends, HubNavigator nav, ISessionReadModel session,
                                     ILocalization loc, IToastService toasts, ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet,
-                                    ISubscriber<RosterChanged> roster, IClock clock)
+                                    ISubscriber<RosterChanged> roster, IClock clock, IModalService modals)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
-            _profile = profile; _friends = friends; _nav = nav; _session = session;
+            _profile = profile; _friends = friends; _nav = nav; _session = session; _modals = modals;
         }
 
         public override string Title => Loc.T("page.profile");
@@ -100,11 +102,19 @@ namespace N29.HeroesDawn.Presentation.Hub
         protected override void OnHeader(int index)
         {
             if (index == 0) CopyTag();
-            else AddFriendRequested?.Invoke();
+            else AddFriendAsync().Forget();
         }
 
-        /// <summary>Le bouton « Ajouter un ami » a été touché (la saisie est ouverte par l'étape suivante du lot).</summary>
-        public event Action? AddFriendRequested;
+        /// <summary>Ouvre la saisie du tag ; un tag valide s'ajoute à la liste, une erreur s'affiche, annuler ne fait rien.</summary>
+        async UniTaskVoid AddFriendAsync()
+        {
+            var view = await _modals.OpenAsync<IFriendAddPopupView>(Lifetime);
+            string? tag;
+            try { tag = await view.AskAsync(Loc.T("profile.add_title"), Loc.T("profile.add_hint"), Loc.T("profile.add_ok"), Loc.T("ui.cancel"), Lifetime); }
+            finally { _modals.Close(view); }
+            if (tag == null) return;
+            Report(_friends.Add(tag), Loc.T("profile.friend_added"));
+        }
 
         void CopyTag()
         {

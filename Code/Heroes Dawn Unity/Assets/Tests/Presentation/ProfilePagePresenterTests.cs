@@ -38,7 +38,8 @@ namespace N29.HeroesDawn.Tests.Presentation
         ProfilePagePresenter Profile()
         {
             var p = new ProfilePagePresenter(_view, _app.Profile, _app.Friends, _nav, _app.Session, _loc, _toasts, _app.Subscriber<MetaChanged>(),
-                                             _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time);
+                                             _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time,
+                                             new ModalService(new FakeModalHost()));
             _view.Show();
             ((VContainer.Unity.IStartable)p).Start();
             return p;

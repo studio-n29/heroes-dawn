@@ -32,6 +32,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["profile.friend_pending"] = "{0} · en attente de connexion en ligne";
             d["profile.friend_remove"] = "RETIRER";
             d["profile.friend_removed"] = "Ami retiré";
+            d["profile.friend_added"] = "Ami ajouté";
+            d["profile.add_title"] = "AJOUTER UN AMI";
+            d["profile.add_hint"] = "Son tag (Nom#1234)";
+            d["profile.add_ok"] = "AJOUTER";
             d["errors.friends_invalid"] = "Tag invalide : écris le nom, #, puis quatre chiffres (Nom#1234).";
             d["errors.friends_self"] = "C'est ton propre tag.";
             d["errors.friends_duplicate"] = "Cet ami est déjà dans ta liste.";
