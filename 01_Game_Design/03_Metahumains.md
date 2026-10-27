@@ -63,8 +63,29 @@ Les zones de ces règles sont celles de Brooklyn (1.1 à 1.3) en attendant les z
 ## Synergies
 Détail chiffré dans `02_Combat.md` (section « Synergie d'équipe ») :
 1. **Bonus passif de familles** : dix synergies (six croisées, quatre résonances), cumul plafonné à 30 %.
-2. **Liens** : +25 % d'effet passif par niveau de lien (niveaux 2 à 5 à 3, 8, 15, 25 victoires communes).
+2. **Liens** : +25 % d'effet passif par niveau de lien (niveaux 2 à 5 à 3, 8, 15, 25 victoires communes), et des **bonus propres à chaque paire** selon le couple de rôles (voir « Bonus de paire des liens »).
 3. **Effets de composition** : Quatuor (4 familles), Trinité (tank, dégâts, soutien), Double front (2 tanks), Étincelle (2 contrôles).
+
+### Bonus de paire des liens
+En plus de l'amplification des synergies, chaque paire d'agents débloque ses propres bonus aux niveaux de lien 2 à 5, selon le **couple de rôles** des deux agents (15 couples). Ils s'appliquent **aux deux agents de la paire**, seulement quand ils sont dans la même escouade, et se cumulent entre paires dans les plafonds suivants (par agent) : +12 % par statistique, +15 points de critique, bouclier d'ouverture 20 % des PV, jauge de départ +20 %, énergie de départ +20, énergie par pas +1. Chaque niveau **ajoute** un bonus à ceux des niveaux précédents ; au niveau 1, aucun bonus. Mécaniques existantes seules (statistiques, critique, bouclier d'ouverture, jauge de départ, énergie). Valeurs de départ, à ajuster au playtest. Spec : `Code/docs/specs/2026-10-27-liens-bonus-de-paire-design.md`.
+
+| Couple de rôles | Thème | Niv. 2 | Niv. 3 | Niv. 4 | Niv. 5 |
+|---|---|---|---|---|---|
+| Tank + Tank | Double rempart | DEF +4 % | PV +4 % | Bouclier 8 % | Bouclier +7 % |
+| Tank + Dégâts | Rempart et lame | PV +3 % | ATQ +3 % | Énergie de départ +10 | Critique +5 % |
+| Tank + Contrôle | Étau | DEF +3 % | VIT +3 % | Jauge de départ +10 % | Énergie de départ +10 |
+| Tank + Soutien | Veilleurs | PV +4 % | DEF +3 % | Bouclier 8 % | Énergie +1 par pas |
+| Tank + Précision | Garde et regard | DEF +3 % | Critique +4 % | Jauge de départ +10 % | Critique +4 % |
+| Dégâts + Dégâts | Double tranchant | ATQ +4 % | ATQ +4 % | Critique +5 % | Énergie de départ +10 |
+| Dégâts + Contrôle | Marteau et étau | ATQ +3 % | VIT +3 % | Énergie de départ +10 | Jauge de départ +10 % |
+| Dégâts + Soutien | Lame soutenue | ATQ +3 % | PV +3 % | Énergie de départ +10 | Énergie +1 par pas |
+| Dégâts + Précision | Tir croisé | ATQ +3 % | Critique +4 % | Critique +4 % | ATQ +4 % |
+| Contrôle + Contrôle | Tisseurs | VIT +4 % | VIT +4 % | Jauge de départ +10 % | Énergie de départ +10 |
+| Contrôle + Soutien | Sérénité | PV +3 % | VIT +3 % | Énergie de départ +10 | Énergie +1 par pas |
+| Contrôle + Précision | Piège | VIT +3 % | Critique +4 % | Jauge de départ +10 % | Critique +4 % |
+| Soutien + Soutien | Cercle de soin | PV +4 % | PV +4 % | Bouclier 8 % | Énergie +1 par pas |
+| Soutien + Précision | Appui précis | PV +3 % | Critique +4 % | Énergie +1 par pas | Critique +4 % |
+| Précision + Précision | Double regard | Critique +4 % | VIT +3 % | Critique +4 % | Jauge de départ +10 % |
 
 ## Progression
 ### Niveaux (1 → 50)
