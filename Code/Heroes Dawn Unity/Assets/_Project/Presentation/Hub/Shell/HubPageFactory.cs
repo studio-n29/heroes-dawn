@@ -36,6 +36,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             HubPage.Shop => Make<BoutiquePageView, IBoutiquePageView, BoutiquePagePresenter>(location),
             HubPage.Operations => Make<OperationsPageView, IOperationsPageView, OperationsPagePresenter>(location),
             HubPage.Lab => Make<LabPageView, ILabPageView, LabPagePresenter>(location),
+            HubPage.Chapters => Make<ChaptersPageView, IChaptersPageView, ChaptersPagePresenter>(location),
             HubPage.Profile => Make<ProfilePageView, IProfilePageView, ProfilePagePresenter>(location),
             HubPage.Archives => Make<ArchivesPageView, IArchivesPageView, ArchivesPagePresenter>(location),
             HubPage.Loadout => Make<LoadoutPageView, ILoadoutPageView, LoadoutPagePresenter>(location),

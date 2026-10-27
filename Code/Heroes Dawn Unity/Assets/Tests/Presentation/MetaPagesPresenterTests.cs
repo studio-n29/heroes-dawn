@@ -19,7 +19,7 @@ using NUnit.Framework;
 namespace N29.HeroesDawn.Tests.Presentation
 {
     /// <summary>Vue de liste factice : un seul double pour Pass, Boutique, Opérations, Labo et Archives.</summary>
-    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView, IProfilePageView, IFilterBarView
+    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView, IProfilePageView, IChaptersPageView, IFilterBarView
     {
         public event Action<int>? HeaderClicked;
         public event Action<int, int>? RowButtonClicked;
@@ -262,6 +262,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             public event Action<string>? ZoneSelected;
             public event Action? DeployClicked;
             public event Action<string>? LockedTapped;
+            public event Action? ChaptersClicked;
             public CityMapPageData Last;
             public void Show(CityMapPageData d) => Last = d;
             public void Select(string z) => ZoneSelected?.Invoke(z);

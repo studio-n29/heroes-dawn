@@ -30,6 +30,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TextLineView objectiveLinePrefab = null!;
         [SerializeField] TMP_Text rewards = null!;
         [SerializeField] UiButton deploy = null!;
+        [SerializeField] UiButton chapters = null!;
 
         readonly Dictionary<string, UiPolygon> _polygons = new Dictionary<string, UiPolygon>();
         readonly Dictionary<string, TMP_Text> _tags = new Dictionary<string, TMP_Text>();
@@ -42,6 +43,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action<string>? ZoneSelected;
         public event Action? DeployClicked;
         public event Action<string>? LockedTapped;
+        public event Action? ChaptersClicked;
 
         /// <summary>Contrôles pour les tests PlayMode (clics réels).</summary>
         public Button DeployButton => deploy.Button;
@@ -55,6 +57,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         void Awake()
         {
             deploy.Button.onClick.AddListener(() => DeployClicked?.Invoke());
+            chapters.Button.onClick.AddListener(() => ChaptersClicked?.Invoke());
             for (int i = 0; i < rows.Length; i++)
             {
                 int index = i;

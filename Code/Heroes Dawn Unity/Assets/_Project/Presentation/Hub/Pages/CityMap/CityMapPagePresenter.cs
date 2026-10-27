@@ -24,15 +24,17 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISubscriber<RosterChanged> _roster;
         readonly N29.HeroesDawn.Application.Features.World.ChapterBook? _chapters;
         readonly ChapterIntroFlow? _intro;
+        readonly HubNavigator? _nav;
         IDisposable? _subs;
         string _selected;
 
         public CityMapPagePresenter(ICityMapPageView view, ISessionReadModel session, MissionLauncher mission, IToastService toasts,
                                     ILocalization loc, ISubscriber<RosterChanged> roster, N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide? tutorial = null,
-                                    N29.HeroesDawn.Application.Features.World.ChapterBook? chapters = null, ChapterIntroFlow? intro = null)
+                                    N29.HeroesDawn.Application.Features.World.ChapterBook? chapters = null, ChapterIntroFlow? intro = null,
+                                    HubNavigator? nav = null)
             : base(view, null)
         {
-            _session = session; _mission = mission; _toasts = toasts; _loc = loc; _roster = roster; _tutorial = tutorial; _chapters = chapters; _intro = intro;
+            _session = session; _mission = mission; _toasts = toasts; _loc = loc; _roster = roster; _tutorial = tutorial; _chapters = chapters; _intro = intro; _nav = nav;
             _selected = ZoneProgress.Recommended(session).Id.Value;
         }
 
@@ -43,6 +45,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.ZoneSelected += Select;
             View.DeployClicked += Deploy;
             View.LockedTapped += OnLocked;
+            View.ChaptersClicked += OpenChapters;
         }
 
         protected override void OnShown()
@@ -64,6 +67,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.ZoneSelected -= Select;
             View.DeployClicked -= Deploy;
             View.LockedTapped -= OnLocked;
+            View.ChaptersClicked -= OpenChapters;
         }
 
         void Select(string zoneId)
@@ -101,6 +105,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             _chapters!.MarkSeen(chapter.Id);
             _mission.Launch(zone.Id, Lifetime);
         }
+
+        void OpenChapters() => _nav?.Open(HubPage.Chapters);
 
         void OnLocked(string label) => _toasts.Show(_loc.F("map.locked_act", label), ToastKind.Info);
 

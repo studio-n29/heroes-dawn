@@ -8,6 +8,17 @@ namespace N29.HeroesDawn.Presentation.Common
     {
         static partial void ExtendChapters(Dictionary<string, string> d)
         {
+            d["page.chapters"] = "Chapitres";
+            d["chapters.header"] = "CHAPITRES";
+            d["chapters.line"] = "{0} / {1} chapitres terminés";
+            d["chapters.row_sub"] = "{0} · {1}";
+            d["chapters.button"] = "CHAPITRES";
+            d["chapter.relire"] = "RELIRE";
+            d["chapter.soon_reason"] = "Ce chapitre arrive bientôt.";
+            d["chapter.status.Done"] = "Terminé";
+            d["chapter.status.Current"] = "En cours";
+            d["chapter.status.Locked"] = "Verrouillé";
+            d["chapter.status.Soon"] = "Bientôt";
             d["chapter.heading"] = "CHAPITRE {0} · {1}";
             d["chapter.continue"] = "CONTINUER";
 

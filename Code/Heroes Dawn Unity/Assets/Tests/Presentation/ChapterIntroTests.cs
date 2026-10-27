@@ -23,6 +23,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             public event Action<string>? ZoneSelected;
             public event Action? DeployClicked;
             public event Action<string>? LockedTapped;
+            public event Action? ChaptersClicked;
             public CityMapPageData Last;
             public void Show(CityMapPageData d) => Last = d;
             public void Select(string z) => ZoneSelected?.Invoke(z);

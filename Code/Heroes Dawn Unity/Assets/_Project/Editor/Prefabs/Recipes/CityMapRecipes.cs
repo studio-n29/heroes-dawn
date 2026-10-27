@@ -134,7 +134,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var detailFrame = detail.Frame();
             detailFrame.anchorMin = new Vector2(0, 0);
             detailFrame.anchorMax = new Vector2(1, 1);
-            detailFrame.offsetMin = new Vector2(0, 108);
+            detailFrame.offsetMin = new Vector2(0, 214);
             detailFrame.offsetMax = new Vector2(0, -62);
             var title = Ui.Txt(detail.transform, "", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
             title.rectTransform.At(0f, 1f, 18, -8, RightW - 36, 44);
@@ -149,6 +149,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var rewards = Ui.Txt(detail.transform, "", 24, Theme.Success, TextAnchor.MiddleLeft, FontKind.Body, "Rewards");
             rewards.rectTransform.At(0f, 0f, 18, 10, RightW - 36, 34);
 
+            var chapters = Ui.LocBtn(column, "chapters.button", Theme.Surface3, Theme.Text, null!, 34, FontKind.Title, "Chapters");
+            chapters.Rect.At(0.5f, 0f, 0, 108, RightW, 96);
             var deploy = Ui.Btn(column, "", Theme.Danger, Color.white, null!, 54, FontKind.Title, "Deploy");
             deploy.Rect.At(0.5f, 0f, 0, 0, RightW, 96);
             deploy.Label.Inked();
@@ -174,6 +176,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "objectiveLinePrefab", ctx.Asset("Widgets/TextLine.prefab").GetComponent<TextLineView>());
             ctx.Wire(view, "rewards", rewards);
             ctx.Wire(view, "deploy", deploy);
+            ctx.Wire(view, "chapters", chapters);
             return rt.gameObject;
         }
     }

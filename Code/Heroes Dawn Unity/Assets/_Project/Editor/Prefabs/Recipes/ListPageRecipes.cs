@@ -218,6 +218,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ProfilePageView>(ctx, "ProfilePage", 0, false, false).gameObject;
     }
 
+    /// <summary>Page Chapitres : les 8 chapitres de l'histoire, leur statut et « Relire ».</summary>
+    public sealed class ChaptersPageRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Pages/Chapters.prefab";
+        public int Order => 10;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ChaptersPageView>(ctx, "ChaptersPage", 0, false, false).gameObject;
+    }
+
     public sealed class ArchivesPageRecipe : IPrefabRecipe
     {
         public string RelativePath => "Pages/Archives.prefab";
