@@ -111,6 +111,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public Workshop Workshop { get; }
         public LocalFriendsPort Friends { get; }
         public PlayerProfile Profile { get; }
+        public N29.HeroesDawn.Application.Features.World.ChapterBook Chapters { get; }
         public ArchiveBook Archives { get; }
         public MetaTracker Tracker { get; }
         public Boutique Boutique { get; }
@@ -176,6 +177,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Workshop = new Workshop(MetaCtx);
             Friends = new LocalFriendsPort(MetaCtx);
             Profile = new PlayerProfile(MetaCtx, Pass);
+            Chapters = new N29.HeroesDawn.Application.Features.World.ChapterBook(MetaCtx);
             Archives = new ArchiveBook(MetaCtx);
             Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
             Collection = new N29.HeroesDawn.Application.Features.Collection.CollectionBook(MetaCtx, Publisher<RosterChanged>());

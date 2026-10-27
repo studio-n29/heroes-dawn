@@ -190,6 +190,9 @@ namespace N29.HeroesDawn.Application.Ports
         public List<CounterSave> stats = new List<CounterSave>();
         public List<string> friends = new List<string>();
 
+        // Narration (lot G) : chapitres dont l'ouverture a été montrée
+        public List<string> chaptersSeen = new List<string>();
+
         public int GetCounter(List<CounterSave> list, string id)
         {
             foreach (var c in list) if (c.id == id) return c.value;
