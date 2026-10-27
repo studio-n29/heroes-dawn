@@ -32,6 +32,16 @@ namespace N29.HeroesDawn.Presentation.Common
             d["scrap.Implant"] = "Scraps d'implant";
             d["scrap.Core"] = "Noyaux";
             d["errors.not_enough_scraps"] = "Il manque des scraps.";
+            d["lab.workshop"] = "Atelier";
+            d["lab.skill"] = "Fabrication · {0} · niveau {1}/{2}";
+            d["lab.skill.desc"] = "Monte en fabriquant : plus le niveau dépasse la difficulté, meilleure est la qualité.";
+            d["lab.recipe_sub"] = "Coût : {0} · difficulté {1} · {2}";
+            d["lab.odds"] = "{0} {1} %";
+            d["lab.craft"] = "Fabriquer";
+            d["lab.crafted"] = "Fabriqué : {0} ({1})";
+            d["lab.skill_up"] = "Fabrication {0} : niveau {1} !";
+            d["combat.craft_drop"] = "Scraps : {0}";
+            d["combat.craft_recipe"] = "Recette apprise : {0}";
         }
     }
 }

@@ -23,6 +23,21 @@ namespace N29.HeroesDawn.Presentation.Hub
         public static CraftQuality? QualityOf(ItemDef item)
             => CraftedItems.TryParseNameKey(item.NameKey, out _, out var quality) ? quality : (CraftQuality?)null;
 
+        /// <summary>« 6 Scraps d'armure ».</summary>
+        public static string Scrap(ILocalization loc, ScrapKind kind, int count) => count + " " + loc.T("scrap." + kind);
+
+        /// <summary>Ce qu'un combat gagné laisse pour le labo : une ligne de scraps, puis la recette apprise s'il y en a une.</summary>
+        public static string CraftDropLines(ILocalization loc, CraftDrops drops)
+        {
+            var parts = new List<string>();
+            for (int k = 0; k < ScrapKinds.Count && k < drops.Scraps.Count; k++)
+                if (drops.Scraps[k] > 0) parts.Add(Scrap(loc, (ScrapKind)k, drops.Scraps[k]));
+            var lines = new List<string>();
+            if (parts.Count > 0) lines.Add(loc.F("combat.craft_drop", string.Join(", ", parts)));
+            if (drops.NewRecipe != null) lines.Add(loc.F("combat.craft_recipe", loc.T("craft.recipe." + drops.NewRecipe)));
+            return string.Join(System.Environment.NewLine, lines);
+        }
+
         public static string QualityName(ILocalization loc, CraftQuality quality) => loc.T("craft.quality." + quality.ToString().ToLowerInvariant());
 
         public static Color QualityColor(CraftQuality quality)

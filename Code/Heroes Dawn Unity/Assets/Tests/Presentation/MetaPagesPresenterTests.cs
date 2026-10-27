@@ -232,7 +232,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             _app.Session.Wallet.Set(10_000, 0);
             var p = Start(new LabPagePresenter(_view, _app.Lab, _app.Session, _loc, _toasts, _app.Subscriber<MetaChanged>(),
-                                               _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
+                                               _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Workshop));
             _view.ClickRow(0);
             Assert.That(_view.Rows[0].Progress, Is.GreaterThanOrEqualTo(0f));
             Assert.That(_view.Rows[1].A.Enabled, Is.False);

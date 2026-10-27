@@ -706,7 +706,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         }
 
         string DropLine(CombatReport report, ContentCatalog content)
-            => report.Drop.HasValue ? System.Environment.NewLine + _loc.F("combat.drop", _loc.T(content.Collection.Item(report.Drop.Value).NameKey)) : "";
+            => (report.Drop.HasValue ? System.Environment.NewLine + _loc.F("combat.drop", _loc.T(content.Collection.Item(report.Drop.Value).NameKey)) : "")
+               + (report.Crafting.HasValue && N29.HeroesDawn.Presentation.Hub.CollectionText.CraftDropLines(_loc, report.Crafting.Value) is { Length: > 0 } craft ? System.Environment.NewLine + craft : "");
 
         async UniTask ShowResultsAsync(CombatReport report)
         {

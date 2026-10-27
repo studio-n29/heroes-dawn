@@ -54,6 +54,8 @@ namespace N29.HeroesDawn.Application.Features.Meta
 
         GameSession Session => _c.Session;
 
+        public int Scraps(ScrapKind kind) => CraftingOps.Scraps(Session, kind);
+
         static bool CanAfford(GameSession s, RecipeDef r)
             => CraftingOps.Scraps(s, ScrapKinds.For(r.Type)) >= r.ScrapCost && CraftingOps.Scraps(s, ScrapKind.Core) >= r.CoreCost;
 
