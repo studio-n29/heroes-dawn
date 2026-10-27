@@ -21,6 +21,7 @@ namespace N29.HeroesDawn.Content.Prototype
         static EffectDef Purge(int count) => new EffectDef(EffectType.Purge, count);
         static EffectDef Bounce(int pct) => new EffectDef(EffectType.Bounce, pct);
         static EffectDef Exec(int pct) => new EffectDef(EffectType.Execute, pct);
+        static EffectDef Gauge(int points) => new EffectDef(EffectType.GaugeDelta, points);
 
         /// <summary>Les trois paliers d'une carte : niveaux 3, 6 et 10.</summary>
         static CardTier[] Tiers(EffectDef l3, EffectDef l6, EffectDef l10) => new[] { new CardTier(3, l3), new CardTier(6, l6), new CardTier(10, l10) };
@@ -58,6 +59,50 @@ namespace N29.HeroesDawn.Content.Prototype
                 C("card_mark", Family.Perception, CardNature.Offensive, ItemRarity.Common, 4, TargetRule.SingleEnemy, Tiers(Exec(30), Bounce(40), St(StatusType.Blind, 1)), Dmg(100), St(StatusType.Mark, 99)),
                 C("card_precog", Family.Perception, CardNature.Support, ItemRarity.Rare, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Evade, 1), Purge(0), Shield(15)), Adv(50), St(StatusType.Haste, 2)),
                 C("card_time_rift", Family.Perception, CardNature.Support, ItemRarity.Legendary, 7, TargetRule.AllAllies, Tiers(St(StatusType.Regen, 2), Purge(1), St(StatusType.Evade, 1)), Adv(40), St(StatusType.Haste, 3)),
+
+                // ---- Lot C2 : Matière
+                C("card_glass_shards", Family.Matter, CardNature.Offensive, ItemRarity.Common, 4, TargetRule.SingleEnemy, Tiers(Bounce(40), St(StatusType.Corrosion, 2), Exec(30)), Dmg(120), St(StatusType.Vulnerable, 1, 30)),
+                C("card_concrete_rampart", Family.Matter, CardNature.Defensive, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Anchor, 1), Purge(1), St(StatusType.Regen, 2)), Shield(20)),
+                C("card_rivet_armor", Family.Matter, CardNature.Defensive, ItemRarity.Common, 4, TargetRule.Self, Tiers(St(StatusType.Taunt, 1), St(StatusType.Anchor, 1), St(StatusType.Regen, 2)), Shield(25)),
+                C("card_healing_molt", Family.Matter, CardNature.Support, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(Purge(1), St(StatusType.Regen, 2), St(StatusType.Haste, 1)), Heal(30)),
+                C("card_reflecting_prism", Family.Matter, CardNature.Defensive, ItemRarity.Rare, 5, TargetRule.AllAllies, Tiers(St(StatusType.Evade, 1, 30), Purge(1), St(StatusType.Anchor, 1)), Shield(12)),
+                C("card_support_cables", Family.Matter, CardNature.Support, ItemRarity.Rare, 5, TargetRule.SingleAlly, Tiers(Shield(8), Purge(0), St(StatusType.Haste, 1)), Adv(40), St(StatusType.Anchor, 1)),
+                C("card_borrowed_mask", Family.Matter, CardNature.Support, ItemRarity.Rare, 5, TargetRule.Self, Tiers(St(StatusType.Haste, 1), Purge(0), Shield(15)), St(StatusType.Evade, 2)),
+                C("card_living_forge", Family.Matter, CardNature.Support, ItemRarity.Epic, 6, TargetRule.AllAllies, Tiers(St(StatusType.Regen, 2), Purge(1), Shield(10)), Heal(15)),
+                C("card_monolith", Family.Matter, CardNature.Offensive, ItemRarity.Legendary, 7, TargetRule.AllEnemies, Tiers(St(StatusType.Vulnerable, 2), Steal(15), Exec(40)), Dmg(120), St(StatusType.Bind, 1)),
+
+                // ---- Lot C2 : Élémentaire
+                C("card_frost_wall", Family.Elemental, CardNature.Defensive, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(Purge(1), St(StatusType.Anchor, 1), St(StatusType.Regen, 2)), Shield(20)),
+                C("card_steam_shield", Family.Elemental, CardNature.Defensive, ItemRarity.Common, 4, TargetRule.Self, Tiers(St(StatusType.Evade, 1, 30), Purge(1), St(StatusType.Regen, 2)), Shield(25)),
+                C("card_tonic_current", Family.Elemental, CardNature.Support, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Haste, 1), Purge(1), St(StatusType.Regen, 2)), Heal(30)),
+                C("card_soothing_mist", Family.Elemental, CardNature.Support, ItemRarity.Common, 5, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Regen, 2), Shield(8)), Heal(15)),
+                C("card_neon_halo", Family.Elemental, CardNature.Defensive, ItemRarity.Rare, 5, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Evade, 1, 30), St(StatusType.Regen, 2)), Shield(12)),
+                C("card_spark_rush", Family.Elemental, CardNature.Support, ItemRarity.Rare, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Haste, 1), Shield(10), Purge(0)), Adv(50)),
+                C("card_power_flux", Family.Elemental, CardNature.Support, ItemRarity.Rare, 5, TargetRule.AllAllies, Tiers(St(StatusType.Haste, 1), Purge(1), Shield(8)), Gauge(100)),
+                C("card_ice_carapace", Family.Elemental, CardNature.Defensive, ItemRarity.Epic, 6, TargetRule.AllAllies, Tiers(St(StatusType.Anchor, 1), Purge(1), St(StatusType.Regen, 2)), Shield(18)),
+                C("card_chain_lightning", Family.Elemental, CardNature.Offensive, ItemRarity.Legendary, 7, TargetRule.SingleEnemy, Tiers(Bounce(60), St(StatusType.Vulnerable, 2), Exec(50)), Dmg(160), St(StatusType.Shock, 1, 40)),
+
+                // ---- Lot C2 : Physique / Bio
+                C("card_ram_strike", Family.PhysicalBio, CardNature.Offensive, ItemRarity.Common, 4, TargetRule.SingleEnemy, Tiers(St(StatusType.Vulnerable, 1), Steal(15), Bounce(40)), Dmg(110), Push(20)),
+                C("card_steel_skin", Family.PhysicalBio, CardNature.Defensive, ItemRarity.Common, 4, TargetRule.Self, Tiers(St(StatusType.Taunt, 1), St(StatusType.Regen, 2), St(StatusType.Anchor, 1)), Shield(25)),
+                C("card_deep_anchor", Family.PhysicalBio, CardNature.Defensive, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(Purge(1), St(StatusType.Regen, 2), St(StatusType.Haste, 1)), Shield(15), St(StatusType.Anchor, 1)),
+                C("card_fresh_blood", Family.PhysicalBio, CardNature.Support, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Regen, 2), Purge(0), Shield(10)), Heal(30)),
+                C("card_bloodletting", Family.PhysicalBio, CardNature.Offensive, ItemRarity.Rare, 5, TargetRule.SingleEnemy, Tiers(St(StatusType.Corrosion, 2), Exec(30), Bounce(50)), Dmg(120), Steal(20)),
+                C("card_challenge", Family.PhysicalBio, CardNature.Defensive, ItemRarity.Rare, 5, TargetRule.Self, Tiers(St(StatusType.Anchor, 1), St(StatusType.Regen, 2), Purge(0)), Shield(20), St(StatusType.Taunt, 2)),
+                C("card_shared_pulse", Family.PhysicalBio, CardNature.Support, ItemRarity.Rare, 5, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Regen, 2), St(StatusType.Haste, 1)), Heal(18)),
+                C("card_living_bastion", Family.PhysicalBio, CardNature.Defensive, ItemRarity.Epic, 6, TargetRule.AllAllies, Tiers(St(StatusType.Regen, 2), St(StatusType.Anchor, 1), Purge(1)), Shield(18)),
+                C("card_telluric_fist", Family.PhysicalBio, CardNature.Offensive, ItemRarity.Legendary, 7, TargetRule.AllEnemies, Tiers(St(StatusType.Vulnerable, 2), Steal(20), Exec(40)), Dmg(120), Push(25)),
+
+                // ---- Lot C2 : Perception
+                C("card_precise_shot", Family.Perception, CardNature.Offensive, ItemRarity.Common, 4, TargetRule.SingleEnemy, Tiers(Exec(30), St(StatusType.Vulnerable, 1), Bounce(40)), Dmg(130)),
+                C("card_side_step", Family.Perception, CardNature.Defensive, ItemRarity.Common, 4, TargetRule.Self, Tiers(St(StatusType.Haste, 1), Purge(1), St(StatusType.Regen, 2)), Shield(15), St(StatusType.Evade, 1)),
+                C("card_camouflage", Family.Perception, CardNature.Defensive, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Evade, 1, 30), Purge(1), St(StatusType.Haste, 1)), Shield(18)),
+                C("card_guiding_echo", Family.Perception, CardNature.Support, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Haste, 1), Shield(10), Purge(0)), Adv(40)),
+                C("card_guard_break", Family.Perception, CardNature.Offensive, ItemRarity.Rare, 5, TargetRule.SingleEnemy, Tiers(St(StatusType.Mark, 1), Exec(40), Bounce(50)), Dmg(100), Purge(1), St(StatusType.Vulnerable, 2)),
+                C("card_premonition", Family.Perception, CardNature.Defensive, ItemRarity.Rare, 5, TargetRule.AllAllies, Tiers(St(StatusType.Evade, 1, 30), Purge(1), St(StatusType.Haste, 1)), Shield(12)),
+                C("card_shared_watch", Family.Perception, CardNature.Support, ItemRarity.Rare, 5, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Haste, 1), Shield(8)), Gauge(100)),
+                C("card_silent_takedown", Family.Perception, CardNature.Offensive, ItemRarity.Epic, 6, TargetRule.SingleEnemy, Tiers(St(StatusType.Blind, 1), Steal(15), Bounce(60)), Dmg(150), Exec(50)),
+                C("card_time_veil", Family.Perception, CardNature.Defensive, ItemRarity.Epic, 6, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Evade, 1, 30), St(StatusType.Regen, 2)), Shield(15), Adv(20)),
             },
             new List<BoosterDef>
             {

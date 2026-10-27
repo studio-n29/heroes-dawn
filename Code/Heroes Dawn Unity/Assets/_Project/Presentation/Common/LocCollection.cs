@@ -34,6 +34,19 @@ namespace N29.HeroesDawn.Presentation.Common
             d["skills.card_mark"] = "Marque";
             d["skills.card_precog"] = "Précognition";
             d["skills.card_time_rift"] = "Faille temporelle";
+            // Lot C2 : 36 nouvelles cartes
+            d["skills.card_glass_shards"] = "Éclats de verre"; d["skills.card_concrete_rampart"] = "Rempart de béton"; d["skills.card_rivet_armor"] = "Armure de rivets";
+            d["skills.card_healing_molt"] = "Mue réparatrice"; d["skills.card_reflecting_prism"] = "Prisme réfléchissant"; d["skills.card_support_cables"] = "Filins d'appui";
+            d["skills.card_borrowed_mask"] = "Masque d'emprunt"; d["skills.card_living_forge"] = "Forge vivante"; d["skills.card_monolith"] = "Monolithe";
+            d["skills.card_frost_wall"] = "Mur de givre"; d["skills.card_steam_shield"] = "Bouclier de vapeur"; d["skills.card_tonic_current"] = "Courant tonifiant";
+            d["skills.card_soothing_mist"] = "Brume apaisante"; d["skills.card_neon_halo"] = "Halo de néon"; d["skills.card_spark_rush"] = "Étincelle d'élan";
+            d["skills.card_power_flux"] = "Flux électrique"; d["skills.card_ice_carapace"] = "Carapace de glace"; d["skills.card_chain_lightning"] = "Foudre en chaîne";
+            d["skills.card_ram_strike"] = "Coup de bélier"; d["skills.card_steel_skin"] = "Peau d'acier"; d["skills.card_deep_anchor"] = "Ancrage profond";
+            d["skills.card_fresh_blood"] = "Sang neuf"; d["skills.card_bloodletting"] = "Saignée"; d["skills.card_challenge"] = "Défi";
+            d["skills.card_shared_pulse"] = "Pouls partagé"; d["skills.card_living_bastion"] = "Bastion vivant"; d["skills.card_telluric_fist"] = "Poing tellurique";
+            d["skills.card_precise_shot"] = "Tir précis"; d["skills.card_side_step"] = "Pas de côté"; d["skills.card_camouflage"] = "Camouflage";
+            d["skills.card_guiding_echo"] = "Écho guide"; d["skills.card_guard_break"] = "Faille de garde"; d["skills.card_premonition"] = "Prémonition";
+            d["skills.card_shared_watch"] = "Veille partagée"; d["skills.card_silent_takedown"] = "Exécution silencieuse"; d["skills.card_time_veil"] = "Voile temporel";
             d["boosters.booster_standard.name"] = "Booster de cartes";
 
             // Raretés, effets

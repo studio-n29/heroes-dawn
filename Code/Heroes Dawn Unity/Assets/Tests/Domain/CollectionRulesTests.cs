@@ -235,6 +235,64 @@ namespace N29.HeroesDawn.Tests.Domain
             }
         }
 
+        // ------------------------------------------------------------------ Catalogue de 48 cartes (lot C2)
+
+        [Test, Description("Vérifie que le catalogue compte 48 cartes aux identifiants uniques, 12 par famille et 4 par nature dans chaque famille — parce que le deck building demande un vrai choix dans chaque case")]
+        public void Catalog_Has48Cards_12PerFamily_4PerNature()
+        {
+            Assert.That(Catalog.Length, Is.EqualTo(48));
+            Assert.That(Catalog.Select(c => c.Id.Value).Distinct().Count(), Is.EqualTo(48));
+            foreach (Family f in System.Enum.GetValues(typeof(Family)))
+            {
+                var fam = Catalog.Where(c => c.Family == f).ToList();
+                Assert.That(fam.Count, Is.EqualTo(12), f.ToString());
+                foreach (CardNature n in System.Enum.GetValues(typeof(CardNature)))
+                    Assert.That(fam.Count(c => c.Nature == n), Is.EqualTo(4), f + " " + n);
+            }
+        }
+
+        [Test, Description("Vérifie que chaque famille a 5 cartes Communes, 4 Rares, 2 Épiques et 1 Légendaire — parce que la répartition suit les taux des boosters")]
+        public void Catalog_Rarities_Are5_4_2_1_PerFamily()
+        {
+            foreach (Family f in System.Enum.GetValues(typeof(Family)))
+            {
+                var fam = Catalog.Where(c => c.Family == f).ToList();
+                Assert.That(new[] { ItemRarity.Common, ItemRarity.Rare, ItemRarity.Epic, ItemRarity.Legendary }.Select(r => fam.Count(c => c.Rarity == r)),
+                            Is.EqualTo(new[] { 5, 4, 2, 1 }), f.ToString());
+            }
+        }
+
+        [Test, Description("Vérifie que la nature saisie de chaque carte est celle déduite de son effet de base — parce que la spec du catalogue l'exige pour les 48 cartes")]
+        public void EveryCard_NatureEqualsItsDeduction()
+        {
+            foreach (var c in Catalog) Assert.That(c.Nature, Is.EqualTo(CardNatures.Of(c.Skill)), c.Id.Value);
+        }
+
+        [Test, Description("Vérifie qu'aucune carte lancée sur soi ne compte sur un élan ou un gain de jauge — parce que l'élan ignore le lanceur et l'effet serait perdu")]
+        public void SelfCards_UseNoAdvance()
+        {
+            foreach (var c in Catalog.Where(c => c.Skill.Target == TargetRule.Self))
+                Assert.That(c.Skill.Effects.Concat(c.Tiers.SelectMany(t => t.Effects)).Any(e => e.Type == EffectType.Advance || e.Type == EffectType.GaugeDelta),
+                            Is.False, c.Id.Value);
+        }
+
+        [Test, Description("Vérifie quelques lignes de la table de la spec (Foudre en chaîne, Flux électrique, Faille de garde, Armure de rivets) — parce que le contenu doit suivre la table validée")]
+        public void NewCards_MatchTheSpec()
+        {
+            SkillCardDef Card(string id) => Catalog.Single(c => c.Id.Value == id);
+            var chain = Card("card_chain_lightning");
+            Assert.That((chain.Rarity, chain.Skill.Target, chain.Skill.Cooldown), Is.EqualTo((ItemRarity.Legendary, TargetRule.SingleEnemy, 7)));
+            Assert.That(chain.Skill.Effects.Select(e => (e.Type, e.Value, e.Status, e.ChancePercent)),
+                        Is.EqualTo(new[] { (EffectType.Damage, 160, StatusType.None, 100), (EffectType.ApplyStatus, 0, StatusType.Shock, 40) }));
+            Assert.That(chain.Tiers[1].Effects[0].Status, Is.EqualTo(StatusType.Vulnerable));
+            var flux = Card("card_power_flux");
+            Assert.That((flux.Skill.Target, flux.Skill.Effects[0].Type, flux.Skill.Effects[0].Value), Is.EqualTo((TargetRule.AllAllies, EffectType.GaugeDelta, 100)));
+            Assert.That(Card("card_guard_break").Skill.Effects.Select(e => e.Type),
+                        Is.EqualTo(new[] { EffectType.Damage, EffectType.Purge, EffectType.ApplyStatus }));
+            var rivets = Card("card_rivet_armor");
+            Assert.That((rivets.Skill.Target, rivets.Tiers[0].Effects[0].Status), Is.EqualTo((TargetRule.Self, StatusType.Taunt)));
+        }
+
         static readonly StatusType[] AllyStatuses = { StatusType.Shield, StatusType.Regen, StatusType.Haste, StatusType.Evade, StatusType.Anchor, StatusType.Taunt };
 
         [Test, Description("Vérifie qu'aucune carte visant un ennemi ne porte d'effet allié (soin, bouclier, élan, bonus) dans sa base ou ses paliers — parce qu'un effet s'applique aux cibles de la carte et irait renforcer l'ennemi")]

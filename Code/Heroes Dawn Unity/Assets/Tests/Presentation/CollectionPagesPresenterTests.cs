@@ -204,7 +204,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Filters[1].Labels.Length, Is.EqualTo(4));
             _view.ClickFilter(0, Opt(Family.Matter));
             _view.ClickFilter(1, Opt(CardNature.Defensive));
-            Assert.That(Titles(), Is.EqualTo(new[] { "Mur de verre" }));
+            Assert.That(Titles(), Is.EquivalentTo(new[] { "Mur de verre", "Rempart de béton", "Armure de rivets", "Prisme réfléchissant" }));
             Assert.That(_view.Filters[0].Selected, Is.EqualTo(Opt(Family.Matter)));
             Assert.That(_view.Filters[1].Selected, Is.EqualTo(Opt(CardNature.Defensive)));
             _view.ClickFilter(0, 0);
@@ -213,16 +213,18 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie qu'une combinaison de filtres sans carte (Perception × Défensive) affiche une note grisée au lieu d'une grille vide — parce qu'une page vide ressemble à un bug")]
-        public void Grimoire_EmptyFilter_ShowsANote()
+        [Test, Description("Vérifie que chacune des 12 combinaisons famille × nature montre exactement 4 cartes, sans note « aucune carte » — parce que le catalogue de 48 cartes remplit toutes les cases")]
+        public void Grimoire_EveryFamilyAndNature_Shows4Cards()
         {
             var p = Grimoire();
-            _view.ClickFilter(0, Opt(Family.Perception));
-            _view.ClickFilter(1, Opt(CardNature.Defensive));
-            Assert.That(_view.Rows.Length, Is.EqualTo(1));
-            Assert.That(_view.Rows[0].Dim, Is.True);
-            Assert.That(_view.Rows[0].Title, Is.EqualTo(_loc.T("grimoire.none_filtered")));
-            Assert.That(_view.Rows[0].Tag, Is.Not.Empty, "une ligne grisée sans pastille serait prise pour une section et masquée");
+            foreach (Family f in System.Enum.GetValues(typeof(Family)))
+                foreach (CardNature n in System.Enum.GetValues(typeof(CardNature)))
+                {
+                    _view.ClickFilter(0, Opt(f));
+                    _view.ClickFilter(1, Opt(n));
+                    Assert.That(_view.Rows.Length, Is.EqualTo(4), f + " × " + n);
+                    Assert.That(Titles(), Has.None.EqualTo(_loc.T("grimoire.none_filtered")), f + " × " + n);
+                }
             p.Dispose();
         }
 
@@ -267,6 +269,16 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
         // ------------------------------------------------------------------ Paliers (lot C1)
+
+        [Test, Description("Vérifie que chacune des 48 cartes a un nom français (et pas son identifiant) — parce que le grimoire et les boosters affichent ce nom")]
+        public void EveryCard_HasAName()
+        {
+            foreach (var c in N29.HeroesDawn.Content.Prototype.PrototypeCollection.Build().Cards)
+            {
+                Assert.That(_loc.Has("skills." + c.Id.Value), Is.True, c.Id.Value);
+                Assert.That(_loc.T("skills." + c.Id.Value), Is.Not.EqualTo(c.Id.Value), c.Id.Value);
+            }
+        }
 
         [Test, Description("Vérifie que la description d'une compétence nomme les quatre nouvelles mécaniques (vol de vie, rebond, exécution sous le seuil, purge limitée ou totale) — parce que le joueur doit comprendre chaque palier")]
         public void SkillText_DescribesTheFourMechanics()
