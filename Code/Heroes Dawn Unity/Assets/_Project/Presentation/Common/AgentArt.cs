@@ -66,6 +66,15 @@ namespace N29.HeroesDawn.Presentation.Common
         /// <summary>Chemin de ressource de l'icône d'une offre de boutique (<c>Illustrations/Shop/&lt;id&gt;</c>).</summary>
         public static string ShopPath(string id) => "Illustrations/Shop/" + id;
 
+        static readonly Dictionary<string, Sprite?> ChapterCache = new Dictionary<string, Sprite?>();
+
+        /// <summary>Illustration d'ouverture d'un chapitre (<c>Illustrations/Chapters/&lt;id&gt;</c>) ; null si le fichier manque.</summary>
+        public static Sprite? Chapter(string id)
+        {
+            if (!ChapterCache.TryGetValue(id, out var s)) ChapterCache[id] = s = Resources.Load<Sprite>("Illustrations/Chapters/" + id);
+            return s;
+        }
+
         static readonly Dictionary<string, Sprite?> ShopCache = new Dictionary<string, Sprite?>();
 
         /// <summary>Icône SVG d'une offre de boutique (booster, paquets de gemmes, échanges, cadeau) ; null si le fichier manque.</summary>

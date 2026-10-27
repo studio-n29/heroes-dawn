@@ -288,6 +288,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendCombat(d);
             ExtendCrafting(d);
             ExtendProfile(d);
+            ExtendChapters(d);
             ExtendMeta(d);
             ExtendTutorial(d);
             ExtendSettings(d);
@@ -309,6 +310,7 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendCombat(Dictionary<string, string> d);
         static partial void ExtendCrafting(Dictionary<string, string> d);
         static partial void ExtendProfile(Dictionary<string, string> d);
+        static partial void ExtendChapters(Dictionary<string, string> d);
         static partial void ExtendMeta(Dictionary<string, string> d);
         static partial void ExtendTutorial(Dictionary<string, string> d);
         static partial void ExtendSettings(Dictionary<string, string> d);

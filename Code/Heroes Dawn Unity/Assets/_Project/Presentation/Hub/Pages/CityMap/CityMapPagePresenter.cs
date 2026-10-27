@@ -22,14 +22,17 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly IToastService _toasts;
         readonly ILocalization _loc;
         readonly ISubscriber<RosterChanged> _roster;
+        readonly N29.HeroesDawn.Application.Features.World.ChapterBook? _chapters;
+        readonly ChapterIntroFlow? _intro;
         IDisposable? _subs;
         string _selected;
 
         public CityMapPagePresenter(ICityMapPageView view, ISessionReadModel session, MissionLauncher mission, IToastService toasts,
-                                    ILocalization loc, ISubscriber<RosterChanged> roster, N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide? tutorial = null)
+                                    ILocalization loc, ISubscriber<RosterChanged> roster, N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide? tutorial = null,
+                                    N29.HeroesDawn.Application.Features.World.ChapterBook? chapters = null, ChapterIntroFlow? intro = null)
             : base(view, null)
         {
-            _session = session; _mission = mission; _toasts = toasts; _loc = loc; _roster = roster; _tutorial = tutorial;
+            _session = session; _mission = mission; _toasts = toasts; _loc = loc; _roster = roster; _tutorial = tutorial; _chapters = chapters; _intro = intro;
             _selected = ZoneProgress.Recommended(session).Id.Value;
         }
 
@@ -80,6 +83,22 @@ namespace N29.HeroesDawn.Presentation.Hub
                 _toasts.Show(_loc.F("map.locked_zone", ReqNames(zone)), ToastKind.Warning);
                 return;
             }
+            var chapter = N29.HeroesDawn.Definitions.Chapters.OfZone(zone);
+            if (chapter != null && _chapters != null && _intro != null && !_chapters.Seen(chapter.Id))
+            {
+                DeployAfterIntroAsync(zone, chapter).Forget();
+                return;
+            }
+            _mission.Launch(zone.Id, Lifetime);
+        }
+
+        /// <summary>Premier déploiement dans un chapitre : sa fenêtre d'ouverture d'abord (fermée par le bouton ou Retour), puis la zone.</summary>
+        async Cysharp.Threading.Tasks.UniTaskVoid DeployAfterIntroAsync(ZoneDef zone, ChapterDef chapter)
+        {
+            try { await _intro!.ShowAsync(chapter, Lifetime); }
+            catch (OperationCanceledException) { return; }
+            if (Disposed) return;
+            _chapters!.MarkSeen(chapter.Id);
             _mission.Launch(zone.Id, Lifetime);
         }
 

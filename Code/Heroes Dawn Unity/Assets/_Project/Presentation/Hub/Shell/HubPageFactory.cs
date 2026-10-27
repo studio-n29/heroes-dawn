@@ -65,6 +65,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                     b.Register<RecruitFlow>(Lifetime.Scoped);
                     b.Register<QuestLogFlow>(Lifetime.Scoped);
                     b.Register<AffinityFlow>(Lifetime.Scoped);
+                    b.Register<ChapterIntroFlow>(Lifetime.Scoped);
                     b.Register<TPresenter>(Lifetime.Scoped);
                     extra?.Invoke(b);
                 });
