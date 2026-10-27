@@ -43,11 +43,12 @@ namespace N29.HeroesDawn.Tests.PlayMode
         }
 
         /// <summary>Plateau affiché, pion à côté de la case <paramref name="target"/> (1 PM) dans la zone <paramref name="zoneId"/>.</summary>
-        internal static IEnumerator OnBoardNext(ZoneId zoneId, string target)
+        internal static IEnumerator OnBoardNext(ZoneId zoneId, string target, bool prototypeZone = false)
         {
             yield return SignedIn();
             var session = Container.Resolve<GameSession>();
-            var zone = session.Content.Zone(zoneId);
+            // prototypeZone : la zone du code (la potion y est placée) plutôt que celle des assets de la campagne, où elle n'est plus placée.
+            var zone = prototypeZone ? PrototypeContent.Build().Zone(zoneId) : session.Content.Zone(zoneId);
             var from = new BoardGraph(zone).Neighbors(new CaseId(target)).First();
             session.Run = ZoneRun.ForTests(session.Content, zone, 3UL, 1, true, from.Value);
             session.RunZone = zone;
@@ -62,7 +63,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         [UnityTest, Timeout(240000), Description("Vérifie que la potion se joue de bout en bout sur le vrai écran : les ingrédients de la recette ajoutés dans l'ordre avec leur quantité, « Préparer » réussit, la case est résolue et la récompense versée — parce que la potion magique est une activité jouable")]
         public IEnumerator Potion_PlayedWithTheRealScreen_Succeeds()
         {
-            yield return OnBoardNext(PrototypeZones.Zone13, "n06");
+            yield return OnBoardNext(PrototypeZones.Zone13, "n06", prototypeZone: true);
             var session = Container.Resolve<GameSession>();
             int credits = session.Wallet.Credits;
             PlayModeHarness.TapNode(new CaseId("n06"));
@@ -86,7 +87,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         [UnityTest, Timeout(240000), Description("Vérifie qu'une potion ratée jusqu'au dernier essai (mauvaises quantités) inflige le malus de 15 % au patient et laisse la case à rejouer — parce que l'échec pénalise l'agent pour tout le plateau")]
         public IEnumerator Potion_FailedUntilTheLastAttempt_AppliesTheMalus()
         {
-            yield return OnBoardNext(PrototypeZones.Zone13, "n06");
+            yield return OnBoardNext(PrototypeZones.Zone13, "n06", prototypeZone: true);
             var session = Container.Resolve<GameSession>();
             PlayModeHarness.TapNode(new CaseId("n06"));
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<PotionPopupView>() != null);

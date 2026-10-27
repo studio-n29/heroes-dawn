@@ -25,7 +25,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         [UnityTest, Explicit("Captures à la demande"), Timeout(240000), Description("Produit la capture de la potion magique avec deux ingrédients déjà ajoutés — parce que la mise en page du livre et des ingrédients se relit à l'œil")]
         public IEnumerator CapturePotion()
         {
-            yield return ActivityGamesPlayTests.OnBoardNext(PrototypeZones.Zone13, "n06");
+            yield return ActivityGamesPlayTests.OnBoardNext(PrototypeZones.Zone13, "n06", prototypeZone: true);
             var session = ActivityGamesPlayTests.Container.Resolve<GameSession>();
             PlayModeHarness.TapNode(new CaseId("n06"));
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<PotionPopupView>() != null);
