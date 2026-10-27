@@ -237,6 +237,8 @@ namespace N29.HeroesDawn.Presentation.Board
                 WonText = _loc.T("mg2d.won"),
                 LostText = _loc.T("mg2d.lost"),
                 Driver = driver,
+                Background = N29.HeroesDawn.Presentation.Common.MiniGameArt.Background(plan.Def.Kind),
+                BackgroundTint = N29.HeroesDawn.Presentation.Common.MiniGameArt.Tint(plan.Level.Palette),
             };
 
         async UniTask<ActivityResult> PlayHeroGameAsync(ActivityPlan plan, CancellationToken ct)
