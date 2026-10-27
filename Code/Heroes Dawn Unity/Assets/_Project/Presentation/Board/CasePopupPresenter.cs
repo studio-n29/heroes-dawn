@@ -144,6 +144,8 @@ namespace N29.HeroesDawn.Presentation.Board
         /// <summary>Joue l'activité avec sa fenêtre : potion, dialogue, survie, pêche ou arène ; un type sans jeu dédié garde la fenêtre générique.</summary>
         async UniTask<ActivityResult> PlayActivityAsync(ActivityPlan plan, CancellationToken ct)
         {
+            var driver = MiniGameDrivers.Create(plan, _loc);
+            if (driver != null) return await PlayMiniGame2DAsync(plan, driver, ct);
             switch (plan.Def.Kind)
             {
                 case ActivityKinds.Potion when plan.Level.PayloadAs<PotionRecipe>() != null: return await PlayPotionAsync(plan, ct);
@@ -214,6 +216,28 @@ namespace N29.HeroesDawn.Presentation.Board
                 Game = new DialogueGame(plan.Level.PayloadAs<DialogueScript>()!),
                 Text = k => _loc.Has(k) ? _loc.T(k) : k.Substring(k.LastIndexOf('.') + 1),
                 Loc = _loc,
+            };
+
+        async UniTask<ActivityResult> PlayMiniGame2DAsync(ActivityPlan plan, IMiniGameDriver driver, CancellationToken ct)
+        {
+            var request = MiniGame2DRequestFor(plan, driver);
+            var view = await _modals.OpenAsync<IMiniGame2DPopupView>(ct);
+            try { return await view.PlayAsync(request, ct); }
+            finally { driver.Dispose(); _modals.Close(view); }
+        }
+
+        /// <summary>Mini-jeu 2D de la fenêtre commune : titre, consignes (clé « mg2d.&lt;type&gt;.instructions »), textes de début et de fin, pilote et fond.</summary>
+        public MiniGame2DRequest MiniGame2DRequestFor(ActivityPlan plan, IMiniGameDriver driver)
+            => new MiniGame2DRequest
+            {
+                Title = _loc.T(plan.Def.NameKey).ToUpperInvariant(),
+                Instructions = _loc.Or("mg2d." + plan.Def.Kind + ".instructions", plan.Def.DescriptionKey),
+                Start = _loc.T("mg2d.start"),
+                Abandon = _loc.T("mg2d.abandon"),
+                TimeFormat = _loc.T("mg2d.time"),
+                WonText = _loc.T("mg2d.won"),
+                LostText = _loc.T("mg2d.lost"),
+                Driver = driver,
             };
 
         async UniTask<ActivityResult> PlayHeroGameAsync(ActivityPlan plan, CancellationToken ct)

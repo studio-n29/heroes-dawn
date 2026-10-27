@@ -1,0 +1,23 @@
+#nullable enable
+using System;
+using System.Collections.Generic;
+using N29.HeroesDawn.Domain.Activities;
+using N29.HeroesDawn.Presentation.Mvp;
+
+namespace N29.HeroesDawn.Presentation.Activities
+{
+    /// <summary>Table des pilotes de mini-jeux 2D par type d'activité. Un type absent de la table garde la fenêtre d'activité générique.</summary>
+    public static class MiniGameDrivers
+    {
+        static readonly Dictionary<string, Func<ActivityPlan, ILocalization, IMiniGameDriver>> Map =
+            new Dictionary<string, Func<ActivityPlan, ILocalization, IMiniGameDriver>>();
+
+        public static void Register(string kind, Func<ActivityPlan, ILocalization, IMiniGameDriver> factory) => Map[kind] = factory;
+
+        public static void Unregister(string kind) => Map.Remove(kind);
+
+        /// <summary>Le pilote du type de l'activité planifiée, ou null si ce type n'a pas de mini-jeu 2D.</summary>
+        public static IMiniGameDriver? Create(ActivityPlan plan, ILocalization loc)
+            => Map.TryGetValue(plan.Def.Kind, out var f) ? f(plan, loc) : null;
+    }
+}
