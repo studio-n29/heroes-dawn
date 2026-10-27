@@ -185,6 +185,33 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(HealsOn(events, 0).Single().Amount, Is.GreaterThan(0));
         }
 
+        [Test, Description("Vérifie que, pour chaque famille, un combat en mode Auto où deux agents portent au niveau 10 une nouvelle carte offensive et une nouvelle carte d'équipe se termine et se rejoue à l'identique — parce que les 36 cartes doivent jouer sans erreur et rester vérifiables par le serveur")]
+        public void AutoCombat_WithNewCards_EndsAndReplays()
+        {
+            var cards = new Dictionary<Family, string[]>
+            {
+                [Family.Matter] = new[] { "card_glass_shards", "card_healing_molt" },
+                [Family.Elemental] = new[] { "card_chain_lightning", "card_soothing_mist" },
+                [Family.PhysicalBio] = new[] { "card_bloodletting", "card_shared_pulse" },
+                [Family.Perception] = new[] { "card_guard_break", "card_time_veil" },
+            };
+            var c = TestContent.Build();
+            foreach (var kv in cards)
+            {
+                var members = c.Members.Where(m => m.Family == kv.Key).Take(2).ToList();
+                Assume.That(members.Count, Is.EqualTo(2), kv.Key.ToString());
+                var allies = members.Select(m => new AllyEntry(m.Id, 10, 0, 0, null,
+                    new CardId?[] { new CardId(kv.Value[0]), new CardId(kv.Value[1]) }, new[] { 10, 10 })).ToArray();
+                var setup = new CombatSetup(31UL, CombatRank.Normal, allies,
+                    new[] { new EnemyEntry(new EnemyId("brute"), 8), new EnemyEntry(new EnemyId("brute"), 8), new EnemyEntry(new EnemyId("brute"), 8) }, true);
+                var sim = new CombatSimulation(c, setup);
+                int guard = 0;
+                while (!sim.IsOver && guard++ < 40000) sim.Step(1);
+                Assert.That(sim.IsOver, Is.True, kv.Key + " : le combat se termine");
+                Assert.That(CombatReplay.Run(c, setup, sim.InputLog).StateHash, Is.EqualTo(sim.StateHash()), kv.Key + " : rejeu identique");
+            }
+        }
+
         static string Trace(IEnumerable<CombatEvent> e) => string.Join("|", e.Select(x => x.GetType().Name + ":" + x.Tick));
 
         [Test, Description("Vérifie que le rebond ne fait rien (et ne tire rien au sort) sans autre ennemi ou sans effet de dégâts : la suite du combat est identique à celle d'une compétence sans rebond — parce que le combat doit rester rejouable à l'identique")]
