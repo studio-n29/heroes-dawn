@@ -262,6 +262,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             public readonly IToggleSquadUseCase ToggleSquad;
             public readonly ITrainMemberUseCase Train;
             public readonly IHealRosterUseCase Heal;
+            public readonly IHealMemberUseCase HealMember;
             public readonly SquadPresets Presets;
 
             public HubUseCases(TestApp a)
@@ -271,6 +272,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
                 ToggleSquad = new ToggleSquadUseCase(a.Session, a.Save, r);
                 Train = new TrainMemberUseCase(a.Session, a.Save, w, r);
                 Heal = new HealRosterUseCase(a.Session, a.Save, w, r);
+                HealMember = new HealMemberUseCase(a.Session, a.Save, w, r);
                 Presets = new SquadPresets(a.Session, a.Save, r);
             }
         }

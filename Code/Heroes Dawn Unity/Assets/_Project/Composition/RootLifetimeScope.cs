@@ -120,6 +120,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<RerollShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<MarkShopSeenUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<HealRosterUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<HealMemberUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
 
             // ---- Méta-progression : pass, missions, opérations, labo, archives, boutique, réglages
             builder.Register<MetaContext>(Lifetime.Singleton);

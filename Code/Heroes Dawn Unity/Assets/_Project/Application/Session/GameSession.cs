@@ -20,6 +20,8 @@ namespace N29.HeroesDawn.Application.Session
         public const int SquadSize = 4;
         public const int InfirmaryCost = 150;
         public const int InfirmaryReduction = 30;
+        /// <summary>Soin d'un seul agent depuis sa fiche (même réduction de fatigue que l'infirmerie d'équipe).</summary>
+        public const int HealMemberCost = 50;
         public const int BossCredits = 1000;
         public const int ZoneReplayCredits = 300;
         /// <summary>Récupération passive de fatigue (points par minute réelle, hors mission).</summary>
