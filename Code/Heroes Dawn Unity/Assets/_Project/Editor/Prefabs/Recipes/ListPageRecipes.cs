@@ -193,7 +193,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Boutique.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<BoutiquePageView>(ctx, "BoutiquePage", 0, false, false, shopTabs: true).gameObject;
+        public GameObject Build(PrefabContext ctx) => CardGridKit.Build<BoutiquePageView>(ctx, "BoutiquePage", shopTabs: true).gameObject;
     }
 
     public sealed class OperationsPageRecipe : IPrefabRecipe

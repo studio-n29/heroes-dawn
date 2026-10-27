@@ -9,6 +9,8 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendProfile(Dictionary<string, string> d)
         {
             d["page.profile"] = "Profil";
+            d["shop.desc.pack"] = "{0} gemmes premium · {1} (achat simulé)";
+            d["shop.desc.ex_rest"] = "Repos complet pour toute l'équipe";
             d["page.team_care"] = "Équipe et soins";
             d["sheet.heal"] = "Soigner";
             d["hub.heal_member"] = "Soigner · {0} CR";

@@ -27,9 +27,11 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         const float DetailW = 700;
 
-        public static T Build<T>(PrefabContext ctx, string name) where T : CardGridPageView
+        /// <param name="shopTabs">Boutique : les onglets de la boutique sont posés sous l'en-tête et la grille comme la fiche descendent d'autant.</param>
+        public static T Build<T>(PrefabContext ctx, string name, bool shopTabs = false) where T : CardGridPageView
         {
             var rt = ScreenKit.Root(name);
+            float tabsH = shopTabs ? ShopTabsRecipe.Height + 10 : 0f;
 
             // ---- En-tête (même gabarit que les pages liste)
             var header = Ui.Panel(rt, "Header", Theme.Surface, 4f, 6f, false);
@@ -51,7 +53,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             main.anchorMin = Vector2.zero;
             main.anchorMax = Vector2.one;
             main.offsetMin = Vector2.zero;
-            main.offsetMax = new Vector2(-(DetailW + 14), -(ListPageKit.HeaderH + 14));
+            main.offsetMax = new Vector2(-(DetailW + 14), -(ListPageKit.HeaderH + 14 + tabsH));
             var content = Ui.VScroll(main, out _);
             var layout = content.gameObject.AddComponent<GridLayoutGroup>();
             layout.cellSize = new Vector2(246, 140);
@@ -67,7 +69,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             filters.anchorMax = new Vector2(1, 1);
             filters.pivot = new Vector2(0.5f, 1);
             filters.sizeDelta = new Vector2(-(DetailW + 14), 0);
-            filters.anchoredPosition = new Vector2(-(DetailW + 14) / 2f, -(ListPageKit.HeaderH + 14));
+            filters.anchoredPosition = new Vector2(-(DetailW + 14) / 2f, -(ListPageKit.HeaderH + 14 + tabsH));
 
             // ---- Fiche détaillée de la tuile choisie
             var detail = Ui.Panel(rt, "Detail", Theme.Surface, 5f, 8f, false);
@@ -75,8 +77,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             frame.anchorMin = new Vector2(1, 0);
             frame.anchorMax = new Vector2(1, 1);
             frame.pivot = new Vector2(1, 0.5f);
-            frame.sizeDelta = new Vector2(DetailW, -(ListPageKit.HeaderH + 14));
-            frame.anchoredPosition = new Vector2(0, -(ListPageKit.HeaderH + 14) / 2f);
+            frame.sizeDelta = new Vector2(DetailW, -(ListPageKit.HeaderH + 14 + tabsH));
+            frame.anchoredPosition = new Vector2(0, -(ListPageKit.HeaderH + 14 + tabsH) / 2f);
             var holder = Ui.Rect(detail.transform, "ArtHolder");
             holder.At(0f, 1f, 8, -8, DetailW - 26, 190);
             holder.gameObject.AddComponent<RectMask2D>();
@@ -116,6 +118,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.WireArray(view, "detailButtons", buttons);
             ctx.Wire(view, "filterBar", filters);
             ctx.Wire(view, "gridArea", main);
+            if (shopTabs)
+            {
+                var tabs = ctx.Nest<ShopTabsView>("Widgets/ShopTabs.prefab", rt, "ShopTabs");
+                var trt = (RectTransform)tabs.transform;
+                trt.anchorMin = new Vector2(0f, 1f); trt.anchorMax = new Vector2(1f, 1f); trt.pivot = new Vector2(0.5f, 1f);
+                trt.anchoredPosition = new Vector2(0f, -(ListPageKit.HeaderH + 8)); trt.sizeDelta = new Vector2(0f, ShopTabsRecipe.Height);
+                ctx.Wire(view, "shopTabs", tabs);
+            }
             return view;
         }
     }

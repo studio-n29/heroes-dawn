@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Boutique unique (onglets Boosters, Objets, Gemmes et crédits, Cadeau ; l'onglet Héros est la page Recruter).</summary>
-    public sealed class BoutiquePageView : ListPageView, IBoutiquePageView
+    /// <summary>Boutique unique en cartes (onglets Boosters, Objets, Gemmes et crédits, Cadeau ; l'onglet Héros est la page Recruter) : une tuile par offre, achat depuis la fiche à droite.</summary>
+    public sealed class BoutiquePageView : CardGridPageView, IBoutiquePageView
     {
         [SerializeField] ShopTabsView shopTabs = null!;
 
