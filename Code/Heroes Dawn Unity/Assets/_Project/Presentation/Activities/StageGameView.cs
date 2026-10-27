@@ -129,7 +129,6 @@ namespace N29.HeroesDawn.Presentation.Activities
         {
             switch (r.Kind)
             {
-                case StageKind.Survival: return new SurvivalDriver(stage, r.Survival!, r.Loc);
                 default: return new ArenaDriver(stage, r.ArenaFactory!(agent), r.Loc);
             }
         }

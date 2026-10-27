@@ -178,25 +178,37 @@ namespace N29.HeroesDawn.Tests.PlayMode
             while (!task.Status.IsCompleted()) yield return null;
         }
 
-        [UnityTest, Timeout(240000), Description("Vérifie que la survie en neige se joue sur le vrai écran 3D (scène générée, image de la scène affichée, jauge, joystick) : un joueur qui file droit sur l'objet gagne — parce que trouver l'objet est le but")]
-        public IEnumerator Survival_PlayedOnTheRealStage_ReachingTheTargetWins()
+        [UnityTest, Timeout(240000), Description("Vérifie que la survie en neige se joue sur la vraie fenêtre 2D commune : le premier toucher lance la partie, puis un joueur qui pousse le joystick droit vers l'objet gagne — parce que trouver l'objet est le but")]
+        public IEnumerator Survival_PlayedOnTheCommonWindow_ReachingTheTargetWins()
         {
             yield return OnBoardNext(PrototypeContent.Zone11, "n15");
             var plan = PlanOf("survival_snow", new ZoneEnvironment(Biome.Snow, Weather.Snow), ("obstacle_count", 0), ("target_distance_m", 14));
-            var request = CasePresenter().StageRequestFor(plan);
-            var game = request.Survival!;
-            ActivityResult? result = null;
-            StageGameView? view = null;
-            var run = OpenStage(request, v =>
+            var presenter = CasePresenter();
+            var driver = MiniGameDrivers.Create(plan, new N29.HeroesDawn.Presentation.Mvp.LocLocalization())!;
+            var request = presenter.MiniGame2DRequestFor(plan, driver);
+            var host = Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Common.ModalLayer>()!;
+            var view = host.Spawn<IMiniGame2DPopupView>();
+            var task = view.PlayAsync(request, default);
+            var popup = (MiniGame2DPopupView)view;
+            var game = ((N29.HeroesDawn.Domain.Activities.Games.SnowSurvivalMiniGame)driver.Game).Inner;
+            popup.Input.PressAt(new Vector2(0.5f, 0.5f));
+            yield return null;
+            Assert.That(popup.Started, Is.True, "le premier toucher lance la partie");
+            popup.Input.ReleaseNow();
+            yield return null;
+            // Joystick : on pose le doigt au centre et on le pousse vers l'objet, au bout de la portée.
+            var rect = popup.Field.rect;
+            for (int i = 0; i < 3000 && !task.Status.IsCompleted(); i++)
             {
-                view = v;
-                v.StartButton.onClick.Invoke();
-                v.InputOverride = () => new StageInput { Move = new Vector2((game.Target - game.Position).Normalized.X, (game.Target - game.Position).Normalized.Y) };
-            }, r => result = r);
-            while (result == null && run.MoveNext()) yield return run.Current;
-            Assert.That(result!.Value.Success, Is.True);
-            Assert.That(game.Status, Is.EqualTo(GameStatus.Won));
-            Assert.That(view, Is.Not.Null);
+                var dir = (game.Target - game.Position).Normalized;
+                if (!popup.Input.Held) popup.Input.PressAt(new Vector2(0.5f, 0.5f));
+                float reach = MiniGameField.StickRadius;
+                popup.Input.DragTo(new Vector2(0.5f + dir.X * reach, 0.5f + dir.Y * reach * rect.width / rect.height));
+                yield return null;
+            }
+            Assert.That(task.Status.IsCompleted(), Is.True, "la partie se termine");
+            Assert.That(task.GetAwaiter().GetResult().Success, Is.True);
+            Assert.That(game.Status, Is.EqualTo(N29.HeroesDawn.Domain.Activities.Games.GameStatus.Won));
         }
 
         [UnityTest, Timeout(120000), Description("Vérifie que Rempart se joue sur la vraie fenêtre 2D : le premier toucher lance la partie, puis un joueur qui touche les projectiles gagne avant la fin du temps — parce que c'est le mini-jeu du quai de Red Hook")]

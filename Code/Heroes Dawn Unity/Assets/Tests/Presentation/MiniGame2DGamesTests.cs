@@ -136,5 +136,17 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(r.Driver.Hud.TimeLeft, Is.EqualTo(60f));
             Assert.That(r.Driver.Hud.Lives, Is.EqualTo(3));
         }
+
+        [Test, Description("Vérifie que la survie en neige ouvre la fenêtre commune 2D (et plus la fenêtre 3D) avec le joystick, la jauge de survie en pourcentage et le temps — parce que le PDF la demande en 2D vue du dessus")]
+        public void Survival_OpensTheCommonWindow_WithTheStick()
+        {
+            var r = Play("survival_snow");
+            Assert.That(r.Driver.Game, Is.InstanceOf<SnowSurvivalMiniGame>());
+            Assert.That(r.Driver.UsesStick, Is.True);
+            Assert.That(r.Title, Is.EqualTo("SURVIE EN NEIGE"));
+            Assert.That(r.Instructions, Is.EqualTo(_loc.T("mg2d.snow_survival.instructions")));
+            Assert.That(r.Driver.Hud.Score, Is.EqualTo("Survie 100 %"));
+            Assert.That(r.Driver.Hud.TimeLeft, Is.EqualTo(90f));
+        }
     }
 }

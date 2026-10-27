@@ -91,6 +91,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["mg2d.infiltration.score"] = "Alerte {0} %";
             d["activity.param.guards"] = "Gardes";
             d["activity.param.detect_ms"] = "Détection (ms)";
+
+            // ---- Survie en neige (vue de dessus)
+            d["mg2d.snow_survival.instructions"] = "Glisse le doigt pour avancer. La neige est rapide mais froide, l'herbe haute et le sable ralentissent. Recharge ta jauge près d'un totem et trouve l'objet signalé par la flèche dorée.";
+            d["mg2d.survival.score"] = "Survie {0} %";
             d["activity.param.hits"] = "Touches à réussir";
         }
     }

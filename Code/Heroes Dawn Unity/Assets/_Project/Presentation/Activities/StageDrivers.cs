@@ -63,59 +63,6 @@ namespace N29.HeroesDawn.Presentation.Activities
         }
     }
 
-    /// <summary>Survie en neige : le joueur (capsule) traverse le niveau, la caméra le suit, la jauge est la barre du HUD.</summary>
-    public sealed class SurvivalDriver : IStageDriver
-    {
-        readonly ActivityStage _stage;
-        readonly SnowSurvivalGame _game;
-        readonly ILocalization _loc;
-        readonly GameObject _player;
-        bool _abandoned;
-
-        public SurvivalDriver(ActivityStage stage, SnowSurvivalGame game, ILocalization loc)
-        {
-            _stage = stage; _game = game; _loc = loc;
-            var pal = stage.Level.Palette;
-            _player = stage.Spawn(PrimitiveShape.Capsule, ActivityStage.ToColor(pal.Accent), StageUtil.P(game.Position, 0.5f), new Vector3(0.8f, 1f, 0.8f));
-            stage.Spawn(PrimitiveShape.Cylinder, ActivityStage.ToColor(pal.Target), StageUtil.P(game.Target, 4f), new Vector3(0.18f, 8f, 0.18f)); // balise de l'objet
-            stage.Frame(StageUtil.P(game.Position), 17f, 9f);
-        }
-
-        public bool Finished => _game.Status != GameStatus.Running || _abandoned;
-        public ActivityResult Result => _abandoned ? ActivityResult.Lost() : _game.Result();
-
-        public StageHud Hud
-        {
-            get
-            {
-                float dist = Vec2f.Distance(_game.Position, _game.Target);
-                string terrain = _game.Terrain.HasValue ? _loc.T("stage.terrain." + _game.Terrain.Value) : _loc.T("stage.terrain.ground");
-                return new StageHud
-                {
-                    Line1 = _loc.F("stage.survival.time", Mathf.CeilToInt(_game.TimeLeft)),
-                    Line2 = _game.NearTotem ? _loc.T("stage.survival.totem") : _loc.F("stage.survival.target", Mathf.RoundToInt(dist), StageUtil.Compass(_game.Position, _game.Target), terrain),
-                    ShowBar = true,
-                    BarLabel = _loc.T("stage.survival.gauge"),
-                    Bar01 = _game.Gauge / 1000f,
-                    BarColor = _game.Gauge < 250f ? new Color(0.9f, 0.3f, 0.3f) : _game.NearTotem ? new Color(1f, 0.6f, 0.2f) : new Color(0.3f, 0.8f, 1f),
-                    Banner = Finished ? (Result.Success ? _loc.T("stage.won") : _game.Loss == LossReason.Cold ? _loc.T("stage.survival.cold") : _loc.T("stage.lost")) : "",
-                    BannerColor = Result.Success ? new Color(0.4f, 0.9f, 0.5f) : new Color(1f, 0.4f, 0.4f),
-                };
-            }
-        }
-
-        public void Tick(float dt, StageInput input)
-        {
-            _game.Step(dt, new Vec2f(input.Move.x, input.Move.y));
-            _player.transform.localPosition = StageUtil.P(_game.Position, 0.5f);
-            var cam = StageUtil.P(_game.Position);
-            _stage.Frame(cam, 17f, 9f);
-        }
-
-        public void Abandon() => _abandoned = true;
-        public void Dispose() { }
-    }
-
     /// <summary>Arène : l'agent, les ennemis (poursuite, charge annoncée, tir), les projectiles et les effets des compétences.</summary>
     public sealed class ArenaDriver : IStageDriver
     {

@@ -153,7 +153,6 @@ namespace N29.HeroesDawn.Presentation.Board
                 case ActivityKinds.Deflect:
                 case ActivityKinds.RooftopRun:
                     return await PlayHeroGameAsync(plan, ct);
-                case ActivityKinds.SnowSurvival:
                 case ActivityKinds.CombatArena:
                     return await PlayStageAsync(plan, ct);
             }
@@ -286,10 +285,6 @@ namespace N29.HeroesDawn.Presentation.Board
             var r = new StageRequest { Title = _loc.T(plan.Def.NameKey).ToUpperInvariant(), Level = plan.Level, Loc = _loc };
             switch (plan.Def.Kind)
             {
-                case ActivityKinds.SnowSurvival:
-                    r.Kind = StageKind.Survival; r.Instructions = _loc.T("stage.instr.survival");
-                    r.Survival = new SnowSurvivalGame(plan.Level, plan.Parameters);
-                    break;
                 default:
                     r.Kind = StageKind.Arena; r.Instructions = _loc.T("stage.instr.arena") + "\n\n" + _loc.T("stage.choose_agent");
                     var members = _session.Squad.Where(m => !m.Exhausted).ToList();

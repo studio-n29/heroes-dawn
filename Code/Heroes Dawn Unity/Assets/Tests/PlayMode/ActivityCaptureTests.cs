@@ -61,7 +61,6 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return ActivityGamesPlayTests.OnBoardNext(PrototypeContent.Zone11, "n15");
             foreach (var (id, env, name, frames) in new[]
             {
-                ("survival_snow", new ZoneEnvironment(Biome.Snow, Weather.Snow), "09-survie", 140),
                 ("arena_training", new ZoneEnvironment(Biome.City, Weather.Day), "11-arene", 260),
             })
             {
@@ -75,7 +74,6 @@ namespace N29.HeroesDawn.Tests.PlayMode
                     if (request.Kind == StageKind.Arena) v.AgentButtonAt(0).onClick.Invoke(); else v.StartButton.onClick.Invoke();
                     v.InputOverride = () =>
                     {
-                        if (request.Kind == StageKind.Survival) { var g = request.Survival!; var d = (g.Target - g.Position).Normalized; return new StageInput { Move = new Vector2(d.X, d.Y) }; }
                         var a = arena;
                         if (a == null) return default;
                         var near = a.Enemies.Where(e => e.Alive).OrderBy(e => Vec2f.Distance(e.Position, a.Position)).FirstOrDefault();

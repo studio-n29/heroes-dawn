@@ -123,13 +123,10 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(r.Title, Is.EqualTo("COURSE DES TOITS"));
         }
 
-        [Test, Description("Vérifie que la survie en neige et l'arène ouvrent la fenêtre 3D avec la bonne partie, et que l'arène propose les agents de l'escouade avec leur fabrique de partie — parce que l'arène commence par le choix d'un agent")]
-        public void SurvivalAndArena_OpenTheStageWindow()
+        [Test, Description("Vérifie que l'arène ouvre la fenêtre 3D avec la bonne partie et qu'elle propose les agents de l'escouade avec leur fabrique de partie — parce que l'arène commence par le choix d'un agent")]
+        public void Arena_OpensTheStageWindow()
         {
             _stage.Result = ActivityResult.Won();
-            Run(new FakePlanActivity(_app.Session.Content, "survival_snow"));
-            Assert.That(_stage.Request!.Kind, Is.EqualTo(StageKind.Survival));
-            Assert.That(_stage.Request.Survival, Is.Not.Null);
             Run(new FakePlanActivity(_app.Session.Content, "arena_training"));
             var arena = _stage.Request!;
             Assert.That(arena.Kind, Is.EqualTo(StageKind.Arena));

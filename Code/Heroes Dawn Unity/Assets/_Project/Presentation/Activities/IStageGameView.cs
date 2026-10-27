@@ -9,7 +9,7 @@ using N29.HeroesDawn.Presentation.Mvp;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
-    public enum StageKind { Survival, Arena }
+    public enum StageKind { Arena }
 
     /// <summary>Un agent proposé pour l'arène (nom de code, famille et compétences en une ligne).</summary>
     public struct AgentChoice
@@ -25,14 +25,13 @@ namespace N29.HeroesDawn.Presentation.Activities
         public string Title { get; set; } = "";
         public string Instructions { get; set; } = "";
         public ActivityLevel Level { get; set; } = null!;
-        public SnowSurvivalGame? Survival { get; set; }
         /// <summary>Arène : un agent à choisir dans l'escouade, puis la partie est créée pour lui (index dans <see cref="Agents"/>).</summary>
         public IReadOnlyList<AgentChoice> Agents { get; set; } = Array.Empty<AgentChoice>();
         public Func<int, ArenaGame>? ArenaFactory { get; set; }
         public ILocalization Loc { get; set; } = null!;
     }
 
-    /// <summary>Fenêtre d'une activité 3D (survie en neige, pêche, arène de combat) ; renvoie le résultat de la partie.</summary>
+    /// <summary>Fenêtre d'une activité 3D (arène de combat) ; renvoie le résultat de la partie.</summary>
     public interface IStageGameView : IPopupView
     {
         UniTask<ActivityResult> PlayAsync(StageRequest request, CancellationToken ct);
