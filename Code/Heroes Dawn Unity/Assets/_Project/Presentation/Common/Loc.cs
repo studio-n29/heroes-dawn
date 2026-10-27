@@ -304,6 +304,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendEpic(d);
             ExtendCinematic(d);
             ExtendMiniGames(d);
+            ExtendAccount(d);
             return d;
         }
 
@@ -327,6 +328,7 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendEpic(Dictionary<string, string> d);
         static partial void ExtendCinematic(Dictionary<string, string> d);
         static partial void ExtendMiniGames(Dictionary<string, string> d);
+        static partial void ExtendAccount(Dictionary<string, string> d);
 
         public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
         public static bool Has(string key) => Fr.ContainsKey(key);

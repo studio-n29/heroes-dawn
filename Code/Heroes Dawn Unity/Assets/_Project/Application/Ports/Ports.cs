@@ -29,11 +29,22 @@ namespace N29.HeroesDawn.Application.Ports
         void Error(string message);
     }
 
+    /// <summary>Comment un compte a été ouvert.</summary>
+    public enum AuthProvider { Email, Google, Apple }
+
     public sealed class PlayerAccount
     {
         public string PlayerId { get; }
         public string DisplayName { get; }
-        public PlayerAccount(string playerId, string displayName) { PlayerId = playerId; DisplayName = displayName; }
+        public string Email { get; }
+        public AuthProvider Provider { get; }
+        /// <summary>Vrai quand l'inscription a réussi mais que l'adresse e-mail doit encore être confirmée (aucune session ouverte).</summary>
+        public bool NeedsConfirmation { get; }
+
+        public PlayerAccount(string playerId, string displayName, string email = "", AuthProvider provider = AuthProvider.Email, bool needsConfirmation = false)
+        {
+            PlayerId = playerId; DisplayName = displayName; Email = email; Provider = provider; NeedsConfirmation = needsConfirmation;
+        }
     }
 
     /// <summary>Authentification (M1 : simulée ; M2 : UGS Authentication).</summary>
@@ -44,13 +55,20 @@ namespace N29.HeroesDawn.Application.Ports
     }
 
     /// <summary>
-    /// Compte joueur avec e-mail et mot de passe (version 0.9.0 : simulé en local ; la cible est Supabase Auth — voir Backend/README.md).
-    /// Le joueur invité (<see cref="IAuthGateway"/>) peut ensuite rattacher son profil à un compte.
+    /// Compte joueur (e-mail et mot de passe, Google, Apple). Simulé en mémoire par défaut (<c>LocalAccountGateway</c>) ; Supabase Auth quand
+    /// la configuration du projet est présente (voir Backend/README.md). Le joueur invité (<see cref="IAuthGateway"/>) rattache ensuite son profil au compte.
     /// </summary>
     public interface IAccountGateway
     {
         UniTask<Result<PlayerAccount>> SignUpAsync(string email, string password, string displayName, CancellationToken ct);
         UniTask<Result<PlayerAccount>> SignInAsync(string email, string password, CancellationToken ct);
+        /// <summary>Connexion par un fournisseur (navigateur du téléphone puis retour dans l'app).</summary>
+        UniTask<Result<PlayerAccount>> SignInWithProviderAsync(AuthProvider provider, CancellationToken ct);
+        /// <summary>Rouvre la session mémorisée ; succès avec <c>null</c> quand il n'y en a pas (ou plus).</summary>
+        UniTask<Result<PlayerAccount?>> RestoreSessionAsync(CancellationToken ct);
+        UniTask<Result> SignOutAsync(CancellationToken ct);
+        /// <summary>Envoie un e-mail de réinitialisation. Réussit même si l'adresse est inconnue (on ne révèle pas l'existence d'un compte).</summary>
+        UniTask<Result> ResetPasswordAsync(string email, CancellationToken ct);
     }
 
     [Serializable]
