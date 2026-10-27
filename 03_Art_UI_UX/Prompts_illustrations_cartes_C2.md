@@ -1,8 +1,8 @@
-# Illustration prompts — 36 new cards (C2)
+# Illustration prompts — 48 cards (36 new + 12 original)
 
 One block per card: copy the whole block (prompt + negative prompt) and paste it into the generator. Each card has its own character (shown as a silhouette), its own location and its own atmosphere and its own color palette tied to the skill; style and framing are shared.
 
-Save each image as `<card id>.jpg` (id shown in the card title) in `03_Art_UI_UX/Illustrations/Competences/` so it is matched to its card automatically.
+Save each image as `<card id>.jpg` (id shown in the card title) in `03_Art_UI_UX/Illustrations/Competences/` so it is matched to its card automatically. The 36 new cards are already illustrated; for the 12 original cards (last section), the image **replaces** their temporary illustration.
 
 ## Matter (amber accents)
 
@@ -296,6 +296,104 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 
 ```
 silhouette of a woman in a long coat holding an antique pocket watch, a group behind her, a translucent dome of frozen time: raindrops, shards and flames suspended in mid-air, violet clock hands floating, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, ruined observatory with a broken telescope dome and giant clockwork gears, swirling starfield seen through the open dome, timeless twilight, deep indigo, brass gold and starlight white color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+## Original 12 cards — replace the temporary illustrations (same rules: one image per card, saved as <card id>.jpg)
+
+### Mur de verre — `card_glass_wall` · Common · Defensive · Matter
+
+```
+silhouette of a stoic woman in a long coat, hands spread wide, raising a wall of translucent glass panes in front of a huddled crowd, bullets cracking against the panes, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, collapsed shopping mall atrium with a shattered skylight and dead escalators, grey overcast noon with falling ash, smoky glass green, pale blue and silver color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Entrave — `card_shackle` · Rare · Offensive · Matter
+
+```
+silhouette of a gaunt shaven-headed man with broken chains hanging from his wrists, chains of living metal lashing out to wrap and immobilize a charging monster, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned prison cellblock with rusted bars and caged walkways, dim flickering emergency red light, heavy silence, iron grey, rust and blood orange color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Éclat prismatique — `card_prism_burst` · Epic · Offensive · Matter
+
+```
+silhouette of a young woman in a paint-stained apron, arms thrown wide, a prism exploding into shards of spectral light that strike a ring of enemies at once, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, ruined art museum gallery with empty gilded frames and toppled statues, shafts of dusty light falling through a broken roof, spectral magenta, lime green and electric blue color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Braise — `card_ember` · Common · Offensive · Elemental
+
+```
+silhouette of a wiry teenage boy in a hoodie, one cupped hand holding a single glowing ember, hurling a ball of fire straight at the camera, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, burned-out suburban street with charred houses and melted cars, smoky orange dusk, drifting sparks, ember orange, charcoal and deep red color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Tempête — `card_storm` · Rare · Offensive · Elemental
+
+```
+silhouette of a tall woman, long coat flapping, arms raised to the sky, calling down a thunderstorm of lightning bolts that rain on every enemy, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, rooftop helipad of a skyscraper under a raging sky, violent night storm, lightning flashes freezing the scene, storm slate, lightning violet-white and wet black color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Brasier — `card_inferno` · Epic · Offensive · Elemental
+
+```
+silhouette of a hulking man in a heavy firefighter coat, arms spread, unleashing a sea of flames that sweeps across the whole battlefield, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, burning oil refinery with exploding storage tanks and twisted pipes, roaring firestorm, heat distortion shaking the air, inferno crimson, magma yellow and soot violet color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Second souffle — `card_second_wind` · Common · Support · Physical / Bio
+
+```
+silhouette of an exhausted runner bent over with hands on knees, straightening up with a glowing chest, his breath turning into light that flows into a fallen teammate, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, cracked running track of an abandoned stadium with broken floodlights, first light of dawn after a very long night, warm peach, mint green and dawn blue color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Charge du rempart — `card_bulwark_charge` · Rare · Offensive · Physical / Bio
+
+```
+silhouette of a heavily armored man behind a battered tower shield, mid-stride, charging shield-first and hurling enemies backward in a burst of rubble, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, narrow mountain pass blocked by a toppled barricade of logs and wrecks, grey dust and low fog, cold wind, oxblood, bronze and iron color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Champ régénérant — `card_regen_field` · Epic · Support · Physical / Bio
+
+```
+silhouette of a gardener-like figure kneeling with both hands pressed into the soil, glowing living tendrils spreading across the ground and closing the wounds of allies standing in the field, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, ruined rooftop garden of an apartment block, cracked planters and wild vines, warm green mist at golden hour, living green, crimson blossom and amber color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Marque — `card_mark` · Common · Offensive · Perception
+
+```
+silhouette of a hunter in a long coat and wide-brimmed hat, one finger pointing forward, a glowing violet sigil appearing on the back of a huge enemy, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, foggy marshland with rotting wooden docks and drowned wrecks, moonless fog, eerie silence, swamp green, glowing violet sigil and pitch black color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Précognition — `card_precog` · Rare · Support · Perception
+
+```
+silhouette of a young woman with closed eyes, one hand extended, her ghostly afterimage already moving ahead, an ally propelled forward along violet trails to a spot she foresaw, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, empty cinema with torn seats and a cracked projection screen, flickering projector beam full of floating dust, violet, projector white and deep teal color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+
+Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
+```
+
+### Faille temporelle — `card_time_rift` · Legendary · Support · Perception
+
+```
+silhouette of a hooded figure standing before a tear in the sky, arms open, a rift in space showing clock hands and a starfield while allies streak past at impossible speed, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, vast salt flat desert with a lone ruined clock tower, surreal cosmic stillness, light bleeding from the rift, cosmic violet, hot magenta and pale gold color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```

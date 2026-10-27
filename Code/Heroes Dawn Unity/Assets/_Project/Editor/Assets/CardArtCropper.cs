@@ -96,6 +96,17 @@ namespace N29.HeroesDawn.EditorTools.Assets
             return (result, 0);
         }
 
+        /// <summary>
+        /// Cartes à illustrer : celles sans image ; en mode « images nommées seulement », aussi celles dont l'image est provisoire
+        /// (jamais attribuée dans SOURCES.md) quand une image nommée d'après elles apparaît — elle les remplace.
+        /// </summary>
+        public static List<string> CardsToIllustrate(IReadOnlyList<string> allCards, Func<string, bool> hasArt, IReadOnlyList<string> sources, SourcesFile file, bool onlyNamed)
+        {
+            var taken = new HashSet<string>(file.Reserved.Concat(file.Assigned.Values), StringComparer.OrdinalIgnoreCase);
+            var named = new HashSet<string>(sources.Where(s => !taken.Contains(s)).Select(s => Path.GetFileNameWithoutExtension(s)), StringComparer.OrdinalIgnoreCase);
+            return allCards.Where(id => !hasArt(id) || (onlyNamed && !file.Assigned.ContainsKey(id) && named.Contains(id))).ToList();
+        }
+
         /// <summary>Recadrage centré au rapport largeur/hauteur, réduction bilinéaire, puis teinte : Lerp(pixel, pixel × teinte, part).</summary>
         public static Texture2D Crop(Texture2D source, Color tint, int width = 640, int height = 360, float tintAmount = 0.3f)
         {
@@ -144,13 +155,13 @@ namespace N29.HeroesDawn.EditorTools.Assets
             string sourcesPath = Path.Combine(CardsFolder, SourcesName);
             var file = File.Exists(sourcesPath) ? SourcesFile.Parse(File.ReadAllText(sourcesPath)) : new SourcesFile();
             var collection = PrototypeCollection.Build();
-            var missingArt = collection.Cards.Select(c => c.Id.Value).Where(id => !File.Exists(Path.Combine(CardsFolder, id + ".jpg"))).ToList();
             var root = ArtRoot;
             var sources = Directory.Exists(root)
                 ? Directory.GetFiles(root, "*", SearchOption.AllDirectories)
                            .Where(p => Extensions.Contains(Path.GetExtension(p).ToLowerInvariant()))
                            .Select(p => p.Substring(root.Length + 1).Replace('\\', '/')).ToList()
                 : new List<string>();
+            var missingArt = CardsToIllustrate(collection.Cards.Select(c => c.Id.Value).ToList(), id => File.Exists(Path.Combine(CardsFolder, id + ".jpg")), sources, file, onlyNamed);
             var (assignments, missing) = Assign(missingArt, sources, file, onlyNamed);
             if (onlyNamed)
             {

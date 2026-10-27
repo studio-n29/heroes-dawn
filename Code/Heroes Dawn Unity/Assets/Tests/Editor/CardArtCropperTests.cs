@@ -55,6 +55,18 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(assignments, Is.EquivalentTo(new Dictionary<string, string> { ["card_ember"] = "Competences/card_ember.jpg" }));
         }
 
+        [Test, Description("Vérifie qu'en mode « images nommées seulement », une carte déjà illustrée mais jamais attribuée (illustration provisoire d'origine) est refaite quand une image nommée d'après elle apparaît, alors qu'une carte déjà attribuée ou sans image nommée n'est pas touchée — parce que les 12 premières cartes doivent pouvoir recevoir leur vraie illustration")]
+        public void CardsToIllustrate_ReplacesOriginalArtWhenANamedSourceAppears()
+        {
+            var file = new SourcesFile();
+            file.Assigned["card_b"] = "Competences/card_b.jpg";
+            var cards = new[] { "card_a", "card_b", "card_c", "card_d" };
+            var hasArt = new HashSet<string> { "card_a", "card_b", "card_d" };
+            var sources = new[] { "Competences/card_a.jpg", "Competences/card_b.jpg" };
+            Assert.That(CardArtCropper.CardsToIllustrate(cards, id => hasArt.Contains(id), sources, file, onlyNamed: true), Is.EqualTo(new[] { "card_a", "card_c" }));
+            Assert.That(CardArtCropper.CardsToIllustrate(cards, id => hasArt.Contains(id), sources, file, onlyNamed: false), Is.EqualTo(new[] { "card_c" }));
+        }
+
         [Test, Description("Vérifie qu'il n'y a aucune attribution quand les sources libres manquent, avec le nombre de cartes sans source — parce que l'outil doit s'arrêter sans écrire à moitié")]
         public void Assign_StopsWhenSourcesAreMissing()
         {
