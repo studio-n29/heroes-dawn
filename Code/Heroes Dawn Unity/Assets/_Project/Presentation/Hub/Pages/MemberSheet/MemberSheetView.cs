@@ -65,6 +65,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? PickerClosed;
 
         public Button PrimaryButton => primary.Button;
+        public Button DossierButton => dossierButton.Button;
         public Button NextButton => next.Button;
         public Button SkillTileButton(int i) => skillTiles[i].Button;
         public Button ItemTileButton(int i) => itemTiles[i].Button;

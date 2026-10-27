@@ -77,6 +77,20 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
+        [Test, Description("Vérifie qu'un second appui sur Déployer pendant la fenêtre n'en ouvre pas une deuxième et ne lance la zone qu'une fois — parce qu'un double appui ne doit pas empiler deux fenêtres")]
+        public void Deploy_DoubleTap_OpensOneIntroAndLaunchesOnce()
+        {
+            var p = Make();
+            _view.Deploy();
+            _view.Deploy();
+            Assert.That(_popup.Shown, Is.EqualTo(1));
+            _popup.Done.TrySetResult();
+            Assert.That(_popup.Shown, Is.EqualTo(1), "aucune seconde fenêtre n'est ouverte après la première");
+            Assert.That(_app.Session.RunZone!.Id.Value, Is.EqualTo("zone_ny_1_1"));
+            Assert.That(_app.Received<NavigateRequested>().Count(n => n.Target == N29.HeroesDawn.Application.Flow.GameState.Board), Is.EqualTo(1));
+            p.Dispose();
+        }
+
         [Test, Description("Vérifie qu'un chapitre déjà vu ne rouvre pas la fenêtre et que le déploiement a lieu tout de suite — parce que l'ouverture ne s'affiche qu'une fois")]
         public void Deploy_SecondTime_LaunchesDirectly()
         {

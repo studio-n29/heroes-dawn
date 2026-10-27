@@ -25,6 +25,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly N29.HeroesDawn.Application.Features.World.ChapterBook? _chapters;
         readonly ChapterIntroFlow? _intro;
         readonly HubNavigator? _nav;
+        bool _introOpen;
         IDisposable? _subs;
         string _selected;
 
@@ -87,6 +88,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 _toasts.Show(_loc.F("map.locked_zone", ReqNames(zone)), ToastKind.Warning);
                 return;
             }
+            if (_introOpen) return;
             var chapter = N29.HeroesDawn.Definitions.Chapters.OfZone(zone);
             if (chapter != null && _chapters != null && _intro != null && !_chapters.Seen(chapter.Id))
             {
@@ -99,8 +101,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Premier déploiement dans un chapitre : sa fenêtre d'ouverture d'abord (fermée par le bouton ou Retour), puis la zone.</summary>
         async Cysharp.Threading.Tasks.UniTaskVoid DeployAfterIntroAsync(ZoneDef zone, ChapterDef chapter)
         {
+            _introOpen = true;
             try { await _intro!.ShowAsync(chapter, Lifetime); }
             catch (OperationCanceledException) { return; }
+            finally { _introOpen = false; }
             if (Disposed) return;
             _chapters!.MarkSeen(chapter.Id);
             _mission.Launch(zone.Id, Lifetime);

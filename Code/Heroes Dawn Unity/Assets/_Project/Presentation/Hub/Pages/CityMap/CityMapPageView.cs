@@ -47,6 +47,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         /// <summary>Contrôles pour les tests PlayMode (clics réels).</summary>
         public Button DeployButton => deploy.Button;
+        public Button ChaptersButton => chapters.Button;
         public Button? RowButton(int i) => i >= 0 && i < rows.Length ? rows[i].Button : null;
         public Button? PointButton(string zoneId)
         {

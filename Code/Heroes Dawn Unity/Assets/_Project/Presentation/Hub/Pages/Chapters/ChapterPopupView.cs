@@ -48,6 +48,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             text.text = data.Text;
             continueButton.SetLabel(data.Continue);
             art.gameObject.SetActive(data.Art != null);
+            // Sans illustration, le texte remonte à la place de l'image.
+            var textRect = text.rectTransform;
+            textRect.anchoredPosition = new Vector2(textRect.anchoredPosition.x, data.Art != null ? -280f : -30f);
+            textRect.sizeDelta = new Vector2(textRect.sizeDelta.x, data.Art != null ? 250f : 500f);
             if (data.Art != null)
             {
                 art.sprite = data.Art;

@@ -156,6 +156,41 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(File.Exists(Path.Combine(Folder, "85-parametres-support.png")));
         }
 
+        [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit les captures de la narration : page Chapitres, dossier d'un agent et fenêtre d'ouverture d'un chapitre — parce que ces écrans se relisent à l'œil (lot G)")]
+        public IEnumerator CaptureNarration()
+        {
+            yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
+            Container.Resolve<N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide>().Skip();
+            yield return new WaitForSecondsRealtime(0.3f);
+
+            Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
+            yield return CaptureSettled("90-carte-bouton-chapitres");
+            Object.FindAnyObjectByType<CityMapPageView>()!.ChaptersButton.onClick.Invoke();
+            yield return CaptureSettled("91-chapitres");
+            Shell.BackButton.Button.onClick.Invoke();
+            yield return null;
+            Shell.BackButton.Button.onClick.Invoke();
+            yield return null;
+
+            yield return Tab(HubPage.Team);
+            Object.FindAnyObjectByType<TeamPageView>()!.Tiles[0].TapButton.onClick.Invoke();
+            yield return CaptureSettled("92-fiche-bouton-dossier");
+            Object.FindAnyObjectByType<MemberSheetView>()!.DossierButton.onClick.Invoke();
+            yield return CaptureSettled("93-dossier");
+            Shell.BackButton.Button.onClick.Invoke();
+            yield return null;
+            yield return Tab(HubPage.Qg);
+
+            Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
+            yield return null;
+            Object.FindAnyObjectByType<CityMapPageView>()!.DeployButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<ChapterPopupView>() != null);
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return Capture("94-ouverture-chapitre");
+        }
+
         [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit les captures du plateau agrandi : portée avec cases cachées, fiche d'une destination (chemin illuminé, dézoom), fiche d'une case sous le brouillard — parce que la prévisualisation du déplacement se relit à l'œil")]
         public IEnumerator CaptureBoardMove()
         {

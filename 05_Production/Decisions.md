@@ -125,3 +125,6 @@
 | 2026-10-27 | Profil : tag personnel Pseudo#NNNN (4 chiffres déduits de l’identifiant du joueur), amis simulés en local (port IFriendsPort, branchement Supabase au lot I) ; le registre du PDF = registre des agents, Archives par un second bouton | Spec du lot F |
 | 2026-10-27 | Salons : pages Salon d’entraînement, Infirmerie et Salon des agents supprimées ; soin par agent sur la fiche (−30 fatigue, 50 Crédits), soin d’équipe (150 Crédits) sur la page Équipe, carte unique « Équipe et soins » au QG | Spec du lot F |
 | 2026-10-27 | Boutique en cartes : grille à tuiles avec icônes SVG dessinées pour le projet (8 icônes), objets du jour avec leur illustration | Spec du lot F |
+| 2026-10-27 | Cinématique de lancement : narration du PDF en légendes sur 11 plans (S20 retiré), sans voix off ; temps de lecture 1,2 s + 0,35 s par mot ; les voix seront enregistrées plus tard (vo_<plan>.wav) | Spec du lot G |
+| 2026-10-27 | Chapitres : 8 chapitres (NY : Brooklyn, Queens, Harlem, Manhattan ; Moscou : Sergueiv, Kapotnya, Sadovoye Koltso, Place Rouge) indépendants du dessin de la carte ; seul Brooklyn est jouable, les autres « Bientôt » ; ouverture au premier déploiement | Spec du lot G |
+| 2026-10-27 | Dossier d'agent : tout le lore du Markdown sur la fiche (bouton DOSSIER), textes générés dans LocLore.cs par l'outil LoreTextGenerator | Spec du lot G |

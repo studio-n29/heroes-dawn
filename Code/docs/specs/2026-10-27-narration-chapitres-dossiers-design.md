@@ -43,6 +43,7 @@ Le texte exact est celui du PDF, éventuellement raccourci par la mise en forme 
 ### Voix et durée
 
 - Les 12 fichiers `Resources/Cinematic/Voice/vo_*.wav` (et leurs `.meta`) sont supprimés.
+- Écarts actés à l'exécution : la durée totale de la cinématique n'est plus limitée à une minute (60 à 170 s au temps de lecture) ; `CinematicShot.Voice` signifie « le plan a une légende » (S46 en a une) ; le plan S20 reste dans le découpage complet mais sort de la version courte.
 - Sans voix, la légende s'affiche pendant un **temps de lecture** : `max(durée minimale du plan, 1,2 s + 0,35 s × nombre de mots)`, apparition et disparition en fondu. Avec une voix (`vo_<plan>.wav` déposé plus tard), le comportement actuel est conservé : la légende suit la voix et la durée du plan s'adapte.
 - `CinematicPlayer` : le sous-titre est affiché sans attendre le démarrage de la voix quand aucun clip n'existe.
 
@@ -100,7 +101,7 @@ Les chapitres sont indépendants du dessin de la carte (5 quartiers de New York 
 
 ### Source et textes
 
-- Source unique : `02_Lore_Narration/04_Agents_The_Dawn.md`. Champs repris pour chaque agent jouable : **Âge, Sexe, Origine, Lien à la Supernova, Origin Story, Apparence (champ « Visuel »), Pouvoir**. Agent D et Agent M n'ont que Âge, Sexe, Origine, Apparence et Pouvoir (leur fiche n'a pas les autres champs). Les 10 cryptides de Salem sont des ennemis hors effectif : ils n'ont pas de dossier.
+- Source unique : `02_Lore_Narration/04_Agents_The_Dawn.md`. Champs repris pour chaque agent jouable : **Âge, Sexe, Origine, Lien à la Supernova, Origin Story, Apparence (champ « Visuel »), Pouvoir**. Agent D et Agent M ont eux aussi les sept champs dans le Markdown (écart acté : la spec en supposait cinq). Les 10 cryptides de Salem sont des ennemis hors effectif : ils n'ont pas de dossier.
 - Un outil d'éditeur `LoreTextGenerator` (menu *Heroes Dawn ▸ Setup ▸ Générer les textes de lore*) lit le fichier Markdown et écrit `Presentation/Common/LocLore.cs` : une clé `lore.<idAgent>.<champ>` (`age`, `sex`, `origin`, `supernova`, `story`, `look`, `power`) par texte. L'identifiant de l'agent vient du nom (« Brooks, Darius » → `darius_brooks`, accents et ponctuation retirés ; « Okafor, Samuel « Sam » » → `sam_okafor`) et de la liste des agents du jeu (`agents.json`).
 - `LocLore.cs` est un fichier généré et commité ; un test relit le Markdown et vérifie qu'il est à jour.
 
@@ -108,7 +109,7 @@ Les chapitres sont indépendants du dessin de la carte (5 quartiers de New York 
 
 - Un bouton **DOSSIER** sur la fiche (agents possédés comme héros de la boutique) ouvre un panneau défilant sur la colonne de droite avec les sections dans l'ordre : Identité (âge, sexe, origine), Lien à la Supernova, Origin Story, Pouvoir, Apparence. Un bouton Fermer le referme.
 - La courte biographie actuelle de la fiche reste affichée.
-- Les sections sans texte (Agent D et M) sont simplement omises.
+- Une section sans texte est simplement omise.
 
 ## 4. Erreurs et cas limites
 

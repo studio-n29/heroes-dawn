@@ -62,3 +62,9 @@ Puis **astuces contextuelles** non bloquantes à la première rencontre de chaqu
 - **Profil** (dernière tab) : tag personnel `Pseudo#1234` (copiable), pseudo, héros, niveau de pass ; rangées « Registre des agents » et « Archives » ; huit statistiques ; liste d’amis (ajout par tag dans une fenêtre de saisie, bouton Retirer ; amis simulés en local, « en attente de connexion en ligne »).
 - **Boutique** : les onglets Boosters, Objets du jour, Gemmes et crédits et Cadeau affichent des cartes en grille (icône SVG ou illustration d’objet) ; description et bouton d’achat dans la fiche de droite. L’onglet Héros reste la page Recruter.
 - **Fiche d’agent** : bouton Soigner (−30 de fatigue, 50 Crédits) à côté de l’entraînement ; plus de pages Salon ni Infirmerie. Page Équipe : bouton « Soigner toute l’équipe » (150 Crédits). Au QG : une carte « Équipe et soins ».
+
+## Lot G (0.14.0) : narration, chapitres, dossier d'agent
+
+- **Cinématique** : 11 plans, légendes de la narration du PDF au temps de lecture (sans voix pour l'instant ; un `vo_<plan>.wav` déposé est joué).
+- **Chapitres** : 8 chapitres (New York et Moscou). Fenêtre « CHAPITRE n · Titre » au premier déploiement dans une zone du chapitre, une fois ; page Chapitres (statuts Terminé, En cours, Verrouillé, Bientôt, bouton Relire) ouverte par le bouton « Chapitres » de la carte.
+- **Fiche d'agent** : bouton DOSSIER à côté de Soigner : panneau défilant avec l'identité, le lien à la Supernova, l'histoire d'origine, le pouvoir et l'apparence.

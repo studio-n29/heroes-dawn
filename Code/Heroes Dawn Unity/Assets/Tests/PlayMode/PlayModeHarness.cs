@@ -88,6 +88,18 @@ namespace N29.HeroesDawn.Tests.PlayMode
             mission.onClick.Invoke();
             yield return WaitFor(() => Visible<N29.HeroesDawn.Presentation.Hub.CityMapPageView>());
             DeployNow();
+            yield return DismissChapterIntro();
+        }
+
+        /// <summary>Premier déploiement dans un chapitre : la fenêtre d'ouverture s'affiche avant le plateau ; on la ferme par Continuer.</summary>
+        public static IEnumerator DismissChapterIntro()
+        {
+            for (int i = 0; i < 15; i++)
+            {
+                yield return null;
+                var popup = Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Hub.ChapterPopupView>();
+                if (popup != null) { popup.ContinueButton.Button.onClick.Invoke(); yield break; }
+            }
         }
 
         public static void DeployNow() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Hub.CityMapPageView>()!.DeployButton.onClick.Invoke();
