@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Activities;
 using N29.HeroesDawn.Presentation.Mvp;
 
@@ -11,6 +12,11 @@ namespace N29.HeroesDawn.Presentation.Activities
     {
         static readonly Dictionary<string, Func<ActivityPlan, ILocalization, IMiniGameDriver>> Map =
             new Dictionary<string, Func<ActivityPlan, ILocalization, IMiniGameDriver>>();
+
+        static MiniGameDrivers()
+        {
+            Map[ActivityKinds.Rhythm] = (plan, loc) => new RhythmDriver(plan, loc);
+        }
 
         public static void Register(string kind, Func<ActivityPlan, ILocalization, IMiniGameDriver> factory) => Map[kind] = factory;
 

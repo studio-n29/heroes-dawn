@@ -1,0 +1,29 @@
+#nullable enable
+using System.Collections.Generic;
+using N29.HeroesDawn.Definitions;
+
+namespace N29.HeroesDawn.Domain.Activities
+{
+    /// <summary>Les types d'activité des mini-jeux 2D du lot H : la partie vit dans une classe de <c>Games</c>, le niveau généré est vide (comme Rempart).</summary>
+    static class MiniGameLevel
+    {
+        public static ActivityLevel Empty(ActivityContext c)
+            => new ActivityLevel(c.Seed, c.Environment, 0, 0, new LevelPrimitive[0], new LevelMarker[0]);
+    }
+
+    /// <summary>« Le rythme » (voir <see cref="Games.RhythmGame"/>).</summary>
+    public sealed class RhythmKind : IActivityKind
+    {
+        public string Id => ActivityKinds.Rhythm;
+
+        public IReadOnlyList<ParameterDef> Schema { get; } = new[]
+        {
+            new ParameterDef("notes", 24, 8, 60),
+            new ParameterDef("lanes", 3, 3, 4),
+            new ParameterDef("lives", 5, 1, 9),
+            new ParameterDef("speed_percent", 100, 50, 220),
+        };
+
+        public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
+    }
+}

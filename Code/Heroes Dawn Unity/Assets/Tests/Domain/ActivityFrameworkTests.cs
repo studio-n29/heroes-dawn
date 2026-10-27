@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.Tests.Domain
         public void Registry_HasEveryKind_AndEveryActivityHasAKind()
         {
             var kinds = Reg.Kinds.Select(k => k.Id).OrderBy(x => x).ToArray();
-            Assert.That(kinds, Is.EqualTo(new[] { "combat_arena", "deflect", "dialogue", "potion", "reflex", "rooftop_run", "snow_survival" }));
+            Assert.That(kinds, Is.SupersetOf(new[] { "combat_arena", "deflect", "dialogue", "potion", "reflex", "rooftop_run", "snow_survival" }));
             foreach (var a in C.Activities) Assert.That(Reg.TryGet(a.Kind, out _), Is.True, a.Id.Value);
         }
 

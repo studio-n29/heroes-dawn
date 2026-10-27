@@ -48,6 +48,10 @@ namespace N29.HeroesDawn.Content.Prototype
             new ActivityDef(new ActivityId("dialogue_dockers"), ActivityKinds.Dialogue, "activities.dialogue.name", "activities.dialogue.desc",
                             P(("lines", 4), ("choices_per_line", 3), ("required_percent", 60)), credits: 200, pr: 5,
                             failureFollowUp: FollowUpDef.Combat(CombatRank.Easy)),
+
+            // Le rythme (2D) : 5 Crédits par note touchée + 200 Crédits et 8 PR à la réussite.
+            new ActivityDef(new ActivityId("rhythm_rooftop"), ActivityKinds.Rhythm, "activities.rhythm.name", "activities.rhythm.desc",
+                            P(("notes", 24), ("lanes", 3), ("lives", 5), ("speed_percent", 100)), credits: 200, pr: 8, creditsPerScore: 5),
         };
     }
 }

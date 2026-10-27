@@ -13,6 +13,16 @@ namespace N29.HeroesDawn.Presentation.Common
             d["mg2d.time"] = "{0} s";
             d["mg2d.won"] = "<size=140%>RÉUSSI !</size>";
             d["mg2d.lost"] = "<size=140%>ÉCHEC…</size>";
+            d["activity.param.notes"] = "Notes";
+            d["activity.param.lanes"] = "Pistes";
+            d["activity.param.lives"] = "Vies";
+            d["activity.param.speed_percent"] = "Vitesse (%)";
+
+            // ---- Le rythme
+            d["activities.rhythm.name"] = "Le rythme";
+            d["activities.rhythm.desc"] = "Une séquence d'ennemis arrive : touche la bonne piste au bon moment pour les vaincre.";
+            d["mg2d.rhythm.instructions"] = "Les ennemis arrivent sur les pistes : touche la piste quand ils passent la ligne. Les ratés coûtent une vie.";
+            d["mg2d.rhythm.score"] = "Notes {0} / {1}";
         }
     }
 }
