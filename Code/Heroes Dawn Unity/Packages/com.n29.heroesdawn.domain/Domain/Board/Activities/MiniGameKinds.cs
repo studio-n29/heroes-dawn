@@ -85,4 +85,19 @@ namespace N29.HeroesDawn.Domain.Activities
 
         public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
     }
+
+    /// <summary>« Ingénierie de secours » (voir <see cref="Games.RescueEngineeringGame"/>).</summary>
+    public sealed class RescueEngineeringKind : IActivityKind
+    {
+        public string Id => ActivityKinds.RescueEngineering;
+
+        public IReadOnlyList<ParameterDef> Schema { get; } = new[]
+        {
+            new ParameterDef("parts", 5, 3, 8),
+            new ParameterDef("distractors", 3, 0, 6),
+            new ParameterDef("attempts", 3, 1, 9),
+        };
+
+        public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
+    }
 }

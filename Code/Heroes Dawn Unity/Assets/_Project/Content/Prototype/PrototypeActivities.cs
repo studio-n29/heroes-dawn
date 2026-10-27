@@ -68,6 +68,10 @@ namespace N29.HeroesDawn.Content.Prototype
             // Engrenage (2D) : 220 Crédits et 8 PR à la réussite.
             new ActivityDef(new ActivityId("gears_workshop"), ActivityKinds.Gears, "activities.gears.name", "activities.gears.desc",
                             P(("gears", 6), ("moves", 12)), credits: 220, pr: 8),
+
+            // Ingénierie de secours (2D) : 250 Crédits et 10 PR à la réussite.
+            new ActivityDef(new ActivityId("rescue_tool"), ActivityKinds.RescueEngineering, "activities.rescue.name", "activities.rescue.desc",
+                            P(("parts", 5), ("distractors", 3), ("attempts", 3)), credits: 250, pr: 10),
         };
     }
 }

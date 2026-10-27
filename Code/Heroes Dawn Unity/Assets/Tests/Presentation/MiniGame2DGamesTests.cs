@@ -105,5 +105,23 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(r.Driver.Hud.Lives, Is.LessThan(0));
             Assert.That(r.Driver.Hud.TimeLeft, Is.LessThan(0f));
         }
+
+        [Test, Description("Vérifie qu'« Ingénierie de secours » ouvre la fenêtre commune avec une partie d'assemblage, son titre, sa consigne, un bandeau « Pièces x / y » et les essais en vies — parce que c'est le jeu du manuel")]
+        public void Rescue_OpensTheCommonWindow()
+        {
+            var r = Play("rescue_tool");
+            Assert.That(r.Driver.Game, Is.InstanceOf<RescueEngineeringGame>());
+            Assert.That(r.Title, Is.EqualTo("INGÉNIERIE DE SECOURS"));
+            Assert.That(r.Instructions, Is.EqualTo(_loc.T("mg2d.rescue_engineering.instructions")));
+            Assert.That(r.Driver.Hud.Score, Is.EqualTo("Pièces 0 / 5"));
+            Assert.That(r.Driver.Hud.Lives, Is.EqualTo(3));
+        }
+
+        [Test, Description("Vérifie que les 14 pièces de la réserve ont un nom français — parce qu'un identifiant brut s'afficherait sinon sur un bouton")]
+        public void Rescue_EveryPartHasAFrenchName()
+        {
+            foreach (var part in RescueEngineeringGame.Vocabulary)
+                Assert.That(_loc.Has("mg2d.rescue.part." + part), Is.True, part);
+        }
     }
 }

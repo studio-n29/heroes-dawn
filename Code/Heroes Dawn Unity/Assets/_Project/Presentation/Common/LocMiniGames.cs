@@ -52,6 +52,37 @@ namespace N29.HeroesDawn.Presentation.Common
             d["mg2d.gears.score"] = "Engrenages {0} / {1}  ·  Coups {2}";
             d["activity.param.gears"] = "Engrenages";
             d["activity.param.moves"] = "Coups";
+
+            // ---- Ingénierie de secours
+            d["activities.rescue.name"] = "Ingénierie de secours";
+            d["activities.rescue.desc"] = "Il faut fabriquer un outil pour se sortir de là : lis le manuel et assemble les pièces dans le bon ordre.";
+            d["mg2d.rescue_engineering.instructions"] = "Lis le manuel, choisis les pièces dans l'ordre et valide. Les pièces inutiles sont signalées. Un mauvais assemblage coûte un essai.";
+            d["mg2d.rescue.score"] = "Pièces {0} / {1}";
+            d["mg2d.rescue.manual"] = "MANUEL";
+            d["mg2d.rescue.clue.first"] = "{0} se place en premier.";
+            d["mg2d.rescue.clue.last"] = "{0} se place en dernier.";
+            d["mg2d.rescue.clue.after"] = "{0} se place juste après {1}.";
+            d["mg2d.rescue.clue.unused"] = "{0} est inutile : laisse-la de côté.";
+            d["mg2d.rescue.undo"] = "ANNULER";
+            d["mg2d.rescue.submit"] = "VALIDER";
+            d["mg2d.rescue.wrong"] = "Raté : {0} pièce(s) bien placée(s) sur {1}.";
+            d["mg2d.rescue.part.tube"] = "Tube";
+            d["mg2d.rescue.part.spring"] = "Ressort";
+            d["mg2d.rescue.part.handle"] = "Poignée";
+            d["mg2d.rescue.part.hook"] = "Crochet";
+            d["mg2d.rescue.part.rope"] = "Corde";
+            d["mg2d.rescue.part.lens"] = "Lentille";
+            d["mg2d.rescue.part.battery"] = "Pile";
+            d["mg2d.rescue.part.wire"] = "Fil";
+            d["mg2d.rescue.part.blade"] = "Lame";
+            d["mg2d.rescue.part.magnet"] = "Aimant";
+            d["mg2d.rescue.part.pulley"] = "Poulie";
+            d["mg2d.rescue.part.plank"] = "Planche";
+            d["mg2d.rescue.part.bolt"] = "Boulon";
+            d["mg2d.rescue.part.cloth"] = "Chiffon";
+            d["activity.param.parts"] = "Pièces";
+            d["activity.param.distractors"] = "Pièces en trop";
+            d["activity.param.attempts"] = "Essais";
             d["activity.param.hits"] = "Touches à réussir";
         }
     }

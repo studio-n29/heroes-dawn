@@ -79,7 +79,8 @@ namespace N29.HeroesDawn.Domain.Activities
             .Register(new FreeThrowKind())
             .Register(new CratePickKind())
             .Register(new DnaAnalysisKind())
-            .Register(new GearsKind());
+            .Register(new GearsKind())
+            .Register(new RescueEngineeringKind());
     }
 
     /// <summary>Aides de génération : directions entières (pas de trigonométrie : même niveau sur toutes les plateformes).</summary>

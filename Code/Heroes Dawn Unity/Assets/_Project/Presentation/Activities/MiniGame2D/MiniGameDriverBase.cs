@@ -36,6 +36,13 @@ namespace N29.HeroesDawn.Presentation.Activities
             _owned.Clear();
         }
 
+        /// <summary>Confie à la base un composant créé par le pilote (détruit avec les autres à <see cref="Dispose"/>).</summary>
+        protected T Own<T>(T component) where T : Component
+        {
+            _owned.Add(component.gameObject);
+            return component;
+        }
+
         /// <summary>Position d'ancrage (centre de la zone = origine) d'un point normalisé de la zone.</summary>
         protected Vector2 ToField(float x, float y)
         {

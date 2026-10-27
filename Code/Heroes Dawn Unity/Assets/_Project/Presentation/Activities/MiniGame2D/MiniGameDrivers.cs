@@ -20,6 +20,7 @@ namespace N29.HeroesDawn.Presentation.Activities
             Map[ActivityKinds.CratePick] = (plan, loc) => new CratePickDriver(plan, loc);
             Map[ActivityKinds.DnaAnalysis] = (plan, loc) => new DnaDriver(plan, loc);
             Map[ActivityKinds.Gears] = (plan, loc) => new GearsDriver(plan, loc);
+            Map[ActivityKinds.RescueEngineering] = (plan, loc) => new RescueDriver(plan, loc);
         }
 
         public static void Register(string kind, Func<ActivityPlan, ILocalization, IMiniGameDriver> factory) => Map[kind] = factory;
