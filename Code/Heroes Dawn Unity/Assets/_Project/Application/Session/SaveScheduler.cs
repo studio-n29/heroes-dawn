@@ -20,6 +20,8 @@ namespace N29.HeroesDawn.Application.Session
         readonly ILogger _log;
         readonly IPublisher<SaveStateChanged> _saving;
         bool _busy;
+        /// <summary>Prévenu après chaque écriture du profil local (synchronisation cloud) ; une panne en ligne ne gêne jamais la sauvegarde locale.</summary>
+        public Features.Account.ILocalSaveObserver? Observer { get; set; }
         bool _pending;
 
         public SaveScheduler(GameSession session, IProfileGateway profiles, IClock clock, ILogger log, IPublisher<SaveStateChanged> saving)
@@ -29,6 +31,12 @@ namespace N29.HeroesDawn.Application.Session
 
         /// <summary>Demande une sauvegarde (sans attendre).</summary>
         public void RequestSave() => SaveAsync(CancellationToken.None).Forget();
+
+        void NotifyObserver()
+        {
+            try { Observer?.NotifyLocalSaved(); }
+            catch (Exception e) { _log.Error("Synchronisation : " + e.Message); }
+        }
 
         public async UniTask SaveAsync(CancellationToken ct)
         {
@@ -43,6 +51,7 @@ namespace N29.HeroesDawn.Application.Session
                     _pending = false;
                     var data = _session.ToProfile(_clock.UtcNow);
                     await _profiles.SaveAsync(_session.Account.PlayerId, data, ct);
+                    NotifyObserver();
                 } while (_pending && !ct.IsCancellationRequested);
             }
             catch (OperationCanceledException) { }
