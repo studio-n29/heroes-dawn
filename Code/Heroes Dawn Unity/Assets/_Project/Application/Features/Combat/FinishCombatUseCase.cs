@@ -54,6 +54,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
             foreach (var u in sim.Units) if (u.Side == Side.Enemy && u.IsBoss) boss = true;
             int credits = 0;
             ItemId? drop = null;
+            CraftDrops? crafting = null;
             if (victory)
             {
                 credits = boss ? MetaRules.BossCredits
@@ -62,6 +63,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
                 credits = credits * Meta.LabBonuses.CombatCreditsPercent(s.Meta) / 100;
                 s.Wallet.Add(credits, 0);
                 drop = RollDrop(s, pending.Rank, boss);
+                crafting = Meta.CraftingOps.GrantDrops(s, pending.Rank, boss);
             }
 
             var changes = new List<FatigueChange>();
@@ -86,7 +88,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
                 toHq = true;
             }
 
-            var report = new CombatReport(victory, credits, pending.Rank, boss, changes, boardEvents, toHq, drop);
+            var report = new CombatReport(victory, credits, pending.Rank, boss, changes, boardEvents, toHq, drop, crafting);
             _fx.Log.Info($"Combat terminé : {(victory ? "victoire" : "défaite")} en {sim.Tick} ticks, +{credits} Crédits" + (drop.HasValue ? ", objet " + drop.Value.Value : ""));
             _fx.Wallet.PublishWallet(s);
             _roster.PublishRoster();

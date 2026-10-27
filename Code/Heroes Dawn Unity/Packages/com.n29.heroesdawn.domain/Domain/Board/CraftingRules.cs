@@ -62,6 +62,29 @@ namespace N29.HeroesDawn.Domain.Board
             return new CraftedStats(hp, atk, def, spd);
         }
 
+        /// <summary>
+        /// Scraps et recette laissés par une victoire : un type de scraps tiré au hasard (1-2 en Facile, 2-3 en Normal, 4-6 en Élite et Boss),
+        /// des Noyaux (Boss 2, Élite une fois sur deux) et une recette inconnue (Boss 60 %, Élite 25 %) ; sans recette inconnue, 5 scraps de plus.
+        /// </summary>
+        public static CraftDrops RollDrops(IRandom rng, CombatRank rank, bool boss, IReadOnlyList<string> unknownRecipes)
+        {
+            boss |= rank == CombatRank.Boss;
+            bool elite = !boss && rank == CombatRank.Elite;
+            var scraps = new int[ScrapKinds.Count];
+            int kind = rng.Range(0, 4);
+            scraps[kind] = boss || elite ? rng.Range(4, 7) : rank == CombatRank.Normal ? rng.Range(2, 4) : rng.Range(1, 3);
+            if (boss) scraps[(int)ScrapKind.Core] = 2;
+            else if (elite && rng.Chance(50)) scraps[(int)ScrapKind.Core] = 1;
+            string? recipe = null;
+            int recipeChance = boss ? 60 : elite ? 25 : 0;
+            if (recipeChance > 0 && rng.Chance(recipeChance))
+            {
+                if (unknownRecipes.Count > 0) recipe = unknownRecipes[rng.Range(0, unknownRecipes.Count)];
+                else scraps[kind] += 5;
+            }
+            return new CraftDrops(scraps, recipe);
+        }
+
         /// <summary>Expérience totale nécessaire pour atteindre un niveau (40 × n pour passer du niveau n au suivant).</summary>
         public static int XpForLevel(int level) => 20 * level * (level - 1);
 

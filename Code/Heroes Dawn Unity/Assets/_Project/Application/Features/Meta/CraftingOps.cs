@@ -52,6 +52,18 @@ namespace N29.HeroesDawn.Application.Features.Meta
 
         public static int Skill(GameSession s, ItemType type) => CraftingRules.SkillLevel(Xp(s, type));
 
+        /// <summary>Tire et verse les scraps d'une victoire, et apprend la recette obtenue (déterministe selon le joueur et le nombre de tirages).</summary>
+        public static CraftDrops GrantDrops(GameSession s, CombatRank rank, bool boss)
+        {
+            var unknown = Recipes.All.Where(r => !Knows(s, r.Id)).Select(r => r.Id).ToList();
+            var rng = new Core.Pcg32(CollectionRules.Seed(s.Account?.PlayerId ?? "local", "scrap", s.Meta.scrapDrops++));
+            var drops = CraftingRules.RollDrops(rng, rank, boss, unknown);
+            for (int k = 0; k < ScrapKinds.Count; k++)
+                if (drops.Scraps[k] > 0) AddScraps(s, (ScrapKind)k, drops.Scraps[k]);
+            if (drops.NewRecipe != null) Learn(s, drops.NewRecipe);
+            return drops;
+        }
+
         // ---- Objets fabriqués
         /// <summary>Crée l'exemplaire <c>crafted_N</c> : l'enregistre dans le catalogue de la session, dans la sauvegarde et dans l'inventaire.</summary>
         public static ItemDef AddCrafted(GameSession s, RecipeDef recipe, CraftQuality quality, CraftedStats stats)

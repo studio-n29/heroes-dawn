@@ -31,11 +31,13 @@ namespace N29.HeroesDawn.Application.Features.Combat
         public bool ReturnedToHq { get; }
         /// <summary>Objet laissé par ce combat gagné (aucun : null).</summary>
         public ItemId? Drop { get; }
+        /// <summary>Scraps et recette laissés par ce combat gagné pour le labo (défaite : null).</summary>
+        public CraftDrops? Crafting { get; }
 
         public CombatReport(bool victory, int credits, CombatRank rank, bool boss, IReadOnlyList<FatigueChange> fatigue,
-                            IReadOnlyList<BoardEvent> boardEvents, bool returnedToHq, ItemId? drop = null)
+                            IReadOnlyList<BoardEvent> boardEvents, bool returnedToHq, ItemId? drop = null, CraftDrops? crafting = null)
         {
-            Victory = victory; Credits = credits; Rank = rank; Boss = boss; Fatigue = fatigue; BoardEvents = boardEvents; ReturnedToHq = returnedToHq; Drop = drop;
+            Victory = victory; Credits = credits; Rank = rank; Boss = boss; Fatigue = fatigue; BoardEvents = boardEvents; ReturnedToHq = returnedToHq; Drop = drop; Crafting = crafting;
         }
     }
 }

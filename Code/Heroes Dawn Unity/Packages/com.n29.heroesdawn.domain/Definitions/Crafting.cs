@@ -52,6 +52,14 @@ namespace N29.HeroesDawn.Definitions
         public CraftedStats(int hp, int atk, int def, int spd) { Hp = hp; Atk = atk; Def = def; Spd = spd; }
     }
 
+    /// <summary>Ce qu'un combat gagné laisse pour le labo : scraps par <see cref="ScrapKind"/> (5 entiers) et recette apprise éventuelle.</summary>
+    public readonly struct CraftDrops
+    {
+        public IReadOnlyList<int> Scraps { get; }
+        public string? NewRecipe { get; }
+        public CraftDrops(IReadOnlyList<int> scraps, string? newRecipe) { Scraps = scraps; NewRecipe = newRecipe; }
+    }
+
     public enum RecipeStatKind { Hp, Atk, Def, Spd }
 
     /// <summary>Une statistique d'une recette et la fourchette (en %) dans laquelle elle est tirée.</summary>

@@ -118,5 +118,21 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(s.Meta.crafted, Is.Empty);
             Assert.That(CraftingOps.Scraps(s, ScrapKind.Weapon), Is.EqualTo(0));
         }
+
+        [Test, Description("Vérifie que GrantDrops ajoute les scraps tirés, apprend la recette obtenue et fait avancer le compteur de tirages — parce que le tirage dépend du joueur et du nombre de tirages")]
+        public void GrantDrops_UpdatesTheSave()
+        {
+            int learned = 0;
+            for (int i = 1; i <= 20; i++)
+            {
+                var d = CraftingOps.GrantDrops(S, CombatRank.Boss, true);
+                Assert.That(S.Meta.scrapDrops, Is.EqualTo(i));
+                if (d.NewRecipe != null) { learned++; Assert.That(CraftingOps.Knows(S, d.NewRecipe), Is.True); }
+            }
+            Assert.That(learned, Is.GreaterThan(0));
+            Assert.That(CraftingOps.Scraps(S, ScrapKind.Core), Is.EqualTo(40), "2 Noyaux par boss");
+            int types = Enumerable.Range(0, 4).Sum(k => CraftingOps.Scraps(S, (ScrapKind)k));
+            Assert.That(types, Is.GreaterThanOrEqualTo(20 * 4));
+        }
     }
 }
