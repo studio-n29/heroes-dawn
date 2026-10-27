@@ -38,13 +38,44 @@ namespace N29.HeroesDawn.Tests.Presentation
         TeamPagePresenter Make(IToggleSquadUseCase toggle = null)
         {
             var mission = new MissionLauncher(_app.Zone.Start, PrototypeContent.Zone11, _app.Publisher<NavigateRequested>(), _toasts, _loc);
-            _p = new TeamPagePresenter(_view, _app.Session, toggle ?? _app.Hub.ToggleSquad, mission, _nav, _state, _toasts, _loc, _app.Subscriber<RosterChanged>());
+            _p = new TeamPagePresenter(_view, _app.Session, toggle ?? _app.Hub.ToggleSquad, mission, _nav, _state, _toasts, _loc, _app.Subscriber<RosterChanged>(), healAll: _app.Hub.Heal);
             _view.Show();
             _p.Start();
             return _p;
         }
 
         MemberTileData Tile(string id) => _view.Last.Members.Single(m => m.Id == new MemberId(id));
+
+        [Test, Description("Vérifie que le bouton Soigner toute l'équipe est grisé sans fatigue ou sans Crédits (avec sa raison) et actif sinon — parce que le soin collectif reste sur la page Équipe")]
+        public void HealAll_ButtonStates()
+        {
+            Make();
+            foreach (var m in _app.Session.Roster) m.Fatigue = 0;
+            _app.Session.Wallet.Set(1000, 0);
+            _view.ClickFilter(0);
+            Assert.That(_view.Last.HealAllEnabled, Is.False);
+            Assert.That(_view.Last.HealAllReason, Is.EqualTo(_loc.T("qg.infirmary.none")));
+            _app.Session.Roster[0].Fatigue = 60;
+            _app.Session.Wallet.Set(MetaRules.InfirmaryCost - 1, 0);
+            _view.ClickFilter(0);
+            Assert.That(_view.Last.HealAllEnabled, Is.False);
+            Assert.That(_view.Last.HealAllReason, Is.EqualTo(_loc.F("hub.train.missing", 1)));
+            _app.Session.Wallet.Set(1000, 0);
+            _view.ClickFilter(0);
+            Assert.That(_view.Last.HealAllEnabled, Is.True);
+            Assert.That(_view.Last.HealAllLabel, Does.Contain(MetaRules.InfirmaryCost.ToString()));
+        }
+
+        [Test, Description("Vérifie qu'un clic sur Soigner toute l'équipe retire 30 points de fatigue à chaque agent et dépense 150 Crédits — parce que c'est le soin collectif existant")]
+        public void HealAll_Click_HealsEveryone()
+        {
+            Make();
+            foreach (var m in _app.Session.Roster) m.Fatigue = 60;
+            _app.Session.Wallet.Set(1000, 0);
+            _view.ClickHealAll();
+            Assert.That(_app.Session.Roster.All(m => m.Fatigue == 60 - MetaRules.InfirmaryReduction), Is.True);
+            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(1000 - MetaRules.InfirmaryCost));
+        }
 
         [Test, Description("Vérifie que la grille montre tous les membres avec leur appartenance à l'escouade, et le titre leur nombre — parce que l'écran Équipe compose l'escouade (M20)")]
         public void Grid_ShowsAllMembers_WithInSquadFlag()

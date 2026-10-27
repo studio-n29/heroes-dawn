@@ -28,6 +28,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string SquadTitle;
         public SquadSlotData[] Squad;
         public string[] Synergies;
+        public bool HealAllEnabled;
+        public string HealAllLabel;
+        public string HealAllReason;
         public bool MissionEnabled;
         public string MissionHint;
         /// <summary>Libellé de chaque emplacement de composition (« 1 · 3 agents », « 1 · vide »).</summary>

@@ -9,6 +9,9 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendProfile(Dictionary<string, string> d)
         {
             d["page.profile"] = "Profil";
+            d["sheet.heal"] = "Soigner";
+            d["hub.heal_member"] = "Soigner · {0} CR";
+            d["hub.healed_member"] = "{0} est soigné.";
             d["profile.header_line"] = "{0} · {1} · niveau de pass {2}";
             d["profile.copy"] = "COPIER MON TAG";
             d["profile.copied"] = "Tag copié";

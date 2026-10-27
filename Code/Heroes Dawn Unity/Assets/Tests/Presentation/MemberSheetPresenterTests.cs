@@ -40,7 +40,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             var flow = new RecruitFlow(new ModalService(_host), _app.Shop.Recruit, _app.Session, _toasts, _loc);
             _p = new MemberSheetPresenter(_view, _nav.Current, _app.Session, train ?? _app.Hub.Train, flow, _nav, _toasts, _loc,
                                           _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Subscriber<ShopChanged>(),
-                                          withBook ? _app.Session : null, withBook ? _app.Collection : null);
+                                          withBook ? _app.Session : null, withBook ? _app.Collection : null, heal: _app.Hub.HealMember);
             _view.Show();
             _p.Start();
             return _p;
@@ -76,7 +76,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_nav.Current.Member, Is.EqualTo(new MemberId("echo")));
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.MemberSheet));
             Assert.That(changes, Is.Zero, "aucune page recréée");
-            _view.ClickRoom(HubPage.Salon);
+            _view.ClickLoadout();
             _nav.Back();
             Assert.That(_nav.Current.Member, Is.EqualTo(new MemberId("echo")));
         }
@@ -111,7 +111,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Last.Owned, Is.False);
             Assert.That(_view.Last.PrimaryLabel, Is.EqualTo(_loc.F("hub.recruit", cost)));
             Assert.That(_view.Last.PrimaryEnabled, Is.True);
-            Assert.That(_view.Last.ShowArrows || _view.Last.ShowRooms, Is.False);
+            Assert.That(_view.Last.ShowArrows || _view.Last.ShowHeal, Is.False);
             _view.ClickPrimary();
             ((FakeRecruitConfirmPopup)_host.Spawned.Last()).Answer(true);
             Assert.That(_app.Session.Owns(offer), Is.True);
@@ -148,7 +148,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(d.Synergies.Length, Is.EqualTo(4));
             Assert.That(d.Synergies.Any(c => c.StartsWith("Point faible")), Is.True);
             Assert.That(d.Owned, Is.True);
-            Assert.That(d.ShowArrows && d.ShowRooms, Is.True);
+            Assert.That(d.ShowArrows && d.ShowHeal, Is.True);
         }
 
         [Test, Description("Vérifie que les flèches parcourent l'effectif en boucle — parce que la fiche permet de passer d'un membre à l'autre (M21 ①)")]
@@ -195,15 +195,47 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Last.PrimaryLabel, Is.EqualTo(_loc.T("hub.train.max")));
         }
 
-        [Test, Description("Vérifie que les raccourcis ouvrent le Salon et l'Infirmerie — parce que la fiche y mène directement (M21)")]
-        public void Shortcuts_OpenSalonAndInfirmary()
+        [Test, Description("Vérifie que le bouton Soigner est grisé sans fatigue (raison « rien à soigner »), grisé avec la raison du manque de Crédits, puis actif avec son prix — parce que la fiche porte maintenant l'infirmerie")]
+        public void Heal_ButtonStates()
         {
             Make();
-            _view.ClickRoom(HubPage.Salon);
-            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Salon));
-            _nav.Back();
-            _view.ClickRoom(HubPage.Infirmary);
-            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Infirmary));
+            var m = _app.Session.Find(new MemberId("givre"))!;
+            m.Fatigue = 0;
+            _app.Session.Wallet.Set(500, 0);
+            _view.ClickNext(); _view.ClickPrevious();
+            Assert.That(_view.Last.ShowHeal, Is.True);
+            Assert.That(_view.Last.HealEnabled, Is.False);
+            Assert.That(_view.Last.HealReason, Is.EqualTo(_loc.T("qg.infirmary.none")));
+            m.Fatigue = 50;
+            _app.Session.Wallet.Set(Application.Session.MetaRules.HealMemberCost - 1, 0);
+            _view.ClickNext(); _view.ClickPrevious();
+            Assert.That(_view.Last.HealEnabled, Is.False);
+            Assert.That(_view.Last.HealReason, Is.EqualTo(_loc.F("hub.train.missing", 1)));
+            _app.Session.Wallet.Set(500, 0);
+            _view.ClickNext(); _view.ClickPrevious();
+            Assert.That(_view.Last.HealEnabled, Is.True);
+            Assert.That(_view.Last.HealLabel, Does.Contain(Application.Session.MetaRules.HealMemberCost.ToString()));
+        }
+
+        [Test, Description("Vérifie qu'un clic sur Soigner dépense 50 Crédits, retire 30 de fatigue, rafraîchit la fiche et affiche un message — parce que le soin se fait depuis la carte de l'agent")]
+        public void Heal_SpendsAndRefreshes()
+        {
+            Make();
+            var m = _app.Session.Find(new MemberId("givre"))!;
+            m.Fatigue = 50;
+            _app.Session.Wallet.Set(500, 0);
+            _view.ClickHeal();
+            Assert.That(m.Fatigue, Is.EqualTo(50 - Application.Session.MetaRules.InfirmaryReduction));
+            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(500 - Application.Session.MetaRules.HealMemberCost));
+            Assert.That(_view.Last.Fatigue, Is.EqualTo(m.Fatigue));
+            Assert.That(_toasts.Shown.Any(t => t.Kind == ToastKind.Reward && t.Text.Contains(_loc.MemberName(m.Def))), Is.True);
+        }
+
+        [Test, Description("Vérifie que la fiche n'a plus de raccourcis vers les salles (l'événement RoomClicked n'existe plus) et que les deux pages sont retirées de l'énumération des pages — parce que tout se passe sur la carte de l'agent")]
+        public void Sheet_HasNoRoomShortcuts()
+        {
+            Assert.That(typeof(IMemberSheetView).GetEvent("RoomClicked"), Is.Null);
+            Assert.That(typeof(MemberSheetData).GetField("ShowRooms"), Is.Null);
         }
 
         [Test, Description("Vérifie qu'une fiche détruite pendant un entraînement n'appelle plus la vue ni les toasts — parce que la page peut être quittée à tout moment (Review Focus 3)")]

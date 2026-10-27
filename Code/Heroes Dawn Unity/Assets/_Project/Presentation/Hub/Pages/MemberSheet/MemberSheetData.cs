@@ -59,7 +59,11 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Pourquoi l'action principale est grisée (« Il manque 400 CR ») ; vide sinon.</summary>
         public string PrimaryReason;
         public bool ShowArrows;
-        public bool ShowRooms;
+        /// <summary>Bouton Soigner (membre possédé) : libellé avec le prix, état et raison s'il est grisé.</summary>
+        public bool ShowHeal;
+        public string HealLabel;
+        public bool HealEnabled;
+        public string HealReason;
         /// <summary>Bouton Equipement : libelle avec les emplacements remplis ; cache sur la fiche d un heros de la boutique.</summary>
         public string LoadoutLabel;
         public bool ShowLoadout;

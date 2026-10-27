@@ -37,6 +37,8 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action? MissionClicked;
         public event Action<int>? PresetClicked;
         public event Action? PresetSaveClicked;
+        public event Action? HealAllClicked;
+        public void ClickHealAll() => HealAllClicked?.Invoke();
         public void ClickPreset(int i) => PresetClicked?.Invoke(i);
         public void ClickPresetSave() => PresetSaveClicked?.Invoke();
         public readonly List<TeamPageData> Shown = new List<TeamPageData>();
@@ -54,7 +56,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action? PreviousClicked;
         public event Action? NextClicked;
         public event Action? PrimaryClicked;
-        public event Action<HubPage>? RoomClicked;
+        public event Action? HealClicked;
         public event Action? LoadoutClicked;
         public event Action? AffinityClicked;
         public void ClickAffinity() => AffinityClicked?.Invoke();
@@ -77,7 +79,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void ClickPrevious() => PreviousClicked?.Invoke();
         public void ClickNext() => NextClicked?.Invoke();
         public void ClickPrimary() => PrimaryClicked?.Invoke();
-        public void ClickRoom(HubPage p) => RoomClicked?.Invoke(p);
+        public void ClickHeal() => HealClicked?.Invoke();
         public void ClickLoadout() => LoadoutClicked?.Invoke();
     }
 

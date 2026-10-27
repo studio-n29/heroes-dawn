@@ -26,17 +26,19 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISubscriber<RosterChanged> _roster;
         readonly TeamViewState _state;
         readonly SquadPresets? _presets;
+        readonly IHealRosterUseCase? _healAll;
         bool _saveMode;
         readonly PageAction _action;
         readonly IToastService _toasts;
         IDisposable? _subs;
 
         public TeamPagePresenter(ITeamPageView view, ISessionReadModel session, IToggleSquadUseCase toggle, MissionLauncher mission,
-                                 HubNavigator nav, TeamViewState state, IToastService toasts, ILocalization loc, ISubscriber<RosterChanged> roster, SquadPresets? presets = null)
+                                 HubNavigator nav, TeamViewState state, IToastService toasts, ILocalization loc, ISubscriber<RosterChanged> roster, SquadPresets? presets = null,
+                                 IHealRosterUseCase? healAll = null)
             : base(view, null)
         {
             _session = session; _toggle = toggle; _mission = mission; _nav = nav; _loc = loc; _roster = roster;
-            _state = state; _presets = presets; _toasts = toasts;
+            _state = state; _presets = presets; _toasts = toasts; _healAll = healAll;
             _action = new PageAction(toasts, loc);
         }
 
@@ -49,6 +51,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.MemberTapped += OpenSheet;
             View.SquadToggled += Toggle;
             View.MissionClicked += Launch;
+            View.HealAllClicked += HealAll;
             View.PresetClicked += OnPreset;
             View.PresetSaveClicked += OnPresetSave;
         }
@@ -74,6 +77,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.MemberTapped -= OpenSheet;
             View.SquadToggled -= Toggle;
             View.MissionClicked -= Launch;
+            View.HealAllClicked -= HealAll;
             View.PresetClicked -= OnPreset;
             View.PresetSaveClicked -= OnPresetSave;
         }
@@ -95,6 +99,20 @@ namespace N29.HeroesDawn.Presentation.Hub
         void Toggle(MemberId id) => _action.Run(ct => _toggle.ExecuteAsync(id, ct), Lifetime);
 
         void Launch() => _nav.Open(HubPage.CityMap);
+
+        /// <summary>Pourquoi « Soigner toute l'équipe » est grisé (aucune fatigue, Crédits manquants) ; vide s'il est possible.</summary>
+        string HealAllReason(ISessionReadModel s)
+        {
+            if (!s.Roster.Any(m => m.Fatigue > 0)) return _loc.T("qg.infirmary.none");
+            int missing = MetaRules.InfirmaryCost - s.Wallet.Credits;
+            return missing > 0 ? _loc.F("hub.train.missing", missing) : "";
+        }
+
+        void HealAll()
+        {
+            if (_healAll == null) return;
+            _action.Run(ct => _healAll.ExecuteAsync(ct), Lifetime, () => _toasts.Show(_loc.T("hub.healed"), ToastKind.Reward));
+        }
 
         void Report(Result r, string ok)
         {
@@ -153,6 +171,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Synergies = synergies.Select(c => _loc.F("team.synergy_line", _loc.SynergyName(c.Synergy), _loc.SynergyEffect(c.Synergy, s.LinkLevel(c.A.Id, c.B.Id)), _loc.MemberName(c.A), _loc.MemberName(c.B)))
                     .Concat(TeamEffects.Active(squad.Select(m => m.Def.Family).ToList(), squad.Select(m => m.Def.Role).ToList()).Select(_loc.TeamEffect))
                     .Concat(PairLines(squad.ToList())).ToArray(),
+                HealAllLabel = _loc.F("hub.heal", MetaRules.InfirmaryCost + " CR"),
+                HealAllEnabled = HealAllReason(s).Length == 0 && _healAll != null,
+                HealAllReason = HealAllReason(s),
                 MissionEnabled = !s.SquadExhausted,
                 MissionHint = s.SquadExhausted ? _loc.T("hub.deploy.exhausted") : "",
                 PresetLabels = _presets == null ? new string[0] : Enumerable.Range(0, SquadPresets.Slots)

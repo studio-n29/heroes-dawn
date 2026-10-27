@@ -31,6 +31,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         readonly ISessionReadModel _session;
         readonly ITrainMemberUseCase _train;
+        readonly IHealMemberUseCase? _heal;
         readonly RecruitFlow _recruit;
         readonly HubNavigator _nav;
         readonly IToastService _toasts;
@@ -53,11 +54,12 @@ namespace N29.HeroesDawn.Presentation.Hub
         public MemberSheetPresenter(IMemberSheetView view, HubLocation location, ISessionReadModel session, ITrainMemberUseCase train,
                                     RecruitFlow recruit, HubNavigator nav, IToastService toasts, ILocalization loc,
                                     ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, ISubscriber<ShopChanged> shop,
-                                    GameSession? game = null, CollectionBook? book = null, TutorialGuide? tutorial = null, AffinityFlow? affinity = null)
+                                    GameSession? game = null, CollectionBook? book = null, TutorialGuide? tutorial = null, AffinityFlow? affinity = null,
+                                    IHealMemberUseCase? heal = null)
             : base(view, null)
         {
             _session = session; _train = train; _recruit = recruit; _nav = nav; _toasts = toasts; _loc = loc;
-            _wallet = wallet; _roster = roster; _shop = shop; _game = game; _book = book; _tutorial = tutorial; _affinity = affinity;
+            _wallet = wallet; _roster = roster; _shop = shop; _game = game; _book = book; _tutorial = tutorial; _affinity = affinity; _heal = heal;
             _member = location.Member ?? throw new ArgumentException("Fiche sans membre", nameof(location));
             _fromShop = location.FromShop;
             _action = new PageAction(toasts, loc);
@@ -70,7 +72,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.PreviousClicked += Previous;
             View.NextClicked += Next;
             View.PrimaryClicked += Primary;
-            View.RoomClicked += OpenRoom;
+            View.HealClicked += Heal;
             View.LoadoutClicked += OpenLoadout;
             View.AffinityClicked += OpenAffinity;
             View.SkillTileClicked += OnSkillTile;
@@ -104,7 +106,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.PreviousClicked -= Previous;
             View.NextClicked -= Next;
             View.PrimaryClicked -= Primary;
-            View.RoomClicked -= OpenRoom;
+            View.HealClicked -= Heal;
             View.LoadoutClicked -= OpenLoadout;
             View.AffinityClicked -= OpenAffinity;
             View.SkillTileClicked -= OnSkillTile;
@@ -129,7 +131,17 @@ namespace N29.HeroesDawn.Presentation.Hub
             Refresh();
         }
 
-        void OpenRoom(HubPage page) => _nav.Open(page);
+        void Heal()
+        {
+            if (_heal == null) return;
+            var id = _member;
+            _action.Run(ct => _heal.ExecuteAsync(id, ct), Lifetime, () =>
+            {
+                var m = _session.Roster.FirstOrDefault(x => x.Id == id);
+                if (m != null) _toasts.Show(_loc.F("hub.healed_member", _loc.MemberName(m.Def)), ToastKind.Reward);
+                Refresh();
+            });
+        }
 
         void OpenLoadout() => _nav.Open(HubPage.Loadout, _member);
 
@@ -209,7 +221,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             d.PrimaryEnabled = !max && missing <= 0;
             d.PrimaryReason = !max && missing > 0 ? _loc.F("hub.train.missing", missing) : "";
             d.ShowArrows = _session.Roster.Count > 1;
-            d.ShowRooms = true;
+            d.ShowHeal = _heal != null;
+            d.HealLabel = _loc.F("hub.heal_member", MetaRules.HealMemberCost);
+            d.HealEnabled = m.Fatigue > 0 && _session.Wallet.Credits >= MetaRules.HealMemberCost;
+            d.HealReason = m.Fatigue <= 0 ? _loc.T("qg.infirmary.none") : _session.Wallet.Credits < MetaRules.HealMemberCost ? _loc.F("hub.train.missing", MetaRules.HealMemberCost - _session.Wallet.Credits) : "";
             d.ShowLoadout = true;
             d.LoadoutLabel = _loc.F("sheet.loadout_counts", m.Items.Count, 2, m.Cards.Count(c => c.HasValue), 2);
             View.Show(d);

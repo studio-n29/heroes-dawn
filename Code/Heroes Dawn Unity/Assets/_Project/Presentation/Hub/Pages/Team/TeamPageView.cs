@@ -24,6 +24,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text synergies = null!;
         [SerializeField] GameObject synergiesNone = null!;
         [SerializeField] UiButton mission = null!;
+        [SerializeField] UiButton healAll = null!;
         [SerializeField] UiButton[] presets = Array.Empty<UiButton>();
         [SerializeField] UiButton presetSave = null!;
         [SerializeField] TMP_Text missionHint = null!;
@@ -39,6 +40,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action<MemberId>? MemberTapped;
         public event Action<MemberId>? SquadToggled;
         public event Action? MissionClicked;
+        public event Action? HealAllClicked;
         public event Action<int>? PresetClicked;
         public event Action? PresetSaveClicked;
 
@@ -58,6 +60,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 sorts[i].Button.onClick.AddListener(() => SortClicked?.Invoke(sort));
             }
             mission.Button.onClick.AddListener(() => MissionClicked?.Invoke());
+            healAll.Button.onClick.AddListener(() => HealAllClicked?.Invoke());
             for (int i = 0; i < presets.Length; i++) { int k = i; presets[i].Button.onClick.AddListener(() => PresetClicked?.Invoke(k)); }
             presetSave.Button.onClick.AddListener(() => PresetSaveClicked?.Invoke());
         }
@@ -103,6 +106,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             presetSave.SetLabel(d.SaveLabel ?? "");
             presetSave.SetColors(d.SaveMode ? Theme.Accent : Theme.Surface3, d.SaveMode ? Theme.TextOnDark : Theme.Text);
+            healAll.SetLabel(d.HealAllLabel ?? "");
+            healAll.Interactable = d.HealAllEnabled;
+            healAll.DisabledReason = d.HealAllReason;
             mission.Interactable = d.MissionEnabled;
             mission.DisabledReason = d.MissionHint;
             missionHint.text = d.MissionHint;

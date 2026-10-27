@@ -34,8 +34,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] Button affinityButton = null!;
         [SerializeField] UiButton previous = null!;
         [SerializeField] UiButton next = null!;
-        [SerializeField] UiButton salon = null!;
-        [SerializeField] UiButton infirmary = null!;
+        [SerializeField] UiButton heal = null!;
         [SerializeField] UiButton loadout = null!;
         [SerializeField] UiButton primary = null!;
         [SerializeField] TMP_Text primaryReason = null!;
@@ -49,7 +48,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? PreviousClicked;
         public event Action? NextClicked;
         public event Action? PrimaryClicked;
-        public event Action<HubPage>? RoomClicked;
+        public event Action? HealClicked;
         public event Action? LoadoutClicked;
         public event Action? AffinityClicked;
         public event Action<int>? SkillTileClicked;
@@ -69,8 +68,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             previous.Button.onClick.AddListener(() => PreviousClicked?.Invoke());
             next.Button.onClick.AddListener(() => NextClicked?.Invoke());
             primary.Button.onClick.AddListener(() => PrimaryClicked?.Invoke());
-            salon.Button.onClick.AddListener(() => RoomClicked?.Invoke(HubPage.Salon));
-            infirmary.Button.onClick.AddListener(() => RoomClicked?.Invoke(HubPage.Infirmary));
+            heal.Button.onClick.AddListener(() => HealClicked?.Invoke());
             loadout.Button.onClick.AddListener(() => LoadoutClicked?.Invoke());
             affinityButton.onClick.AddListener(() => AffinityClicked?.Invoke());
             for (int i = 0; i < skillTiles.Length; i++) { int k = i; skillTiles[i].Button.onClick.AddListener(() => SkillTileClicked?.Invoke(k)); }
@@ -134,8 +132,13 @@ namespace N29.HeroesDawn.Presentation.Hub
 
             SetActive(previous, d.ShowArrows);
             SetActive(next, d.ShowArrows);
-            SetActive(salon, d.ShowRooms);
-            SetActive(infirmary, d.ShowRooms);
+            SetActive(heal, d.ShowHeal);
+            if (d.ShowHeal)
+            {
+                heal.SetLabel(d.HealLabel);
+                heal.Interactable = d.HealEnabled;
+                heal.DisabledReason = d.HealReason;
+            }
             SetActive(loadout, d.ShowLoadout);
             if (d.ShowLoadout) loadout.SetLabel(d.LoadoutLabel);
             primary.SetLabel(d.PrimaryLabel);

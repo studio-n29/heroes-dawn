@@ -13,6 +13,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         event Action<MemberId> MemberTapped;
         event Action<MemberId> SquadToggled;
         event Action MissionClicked;
+        /// <summary>Bouton « Soigner toute l'équipe » touché.</summary>
+        event Action HealAllClicked;
         /// <summary>Emplacement de composition touché (0 à 2) : charge la composition, ou l'enregistre en mode sauvegarde.</summary>
         event Action<int> PresetClicked;
         /// <summary>Bouton « Sauver » touché : le prochain emplacement touché enregistre l'escouade.</summary>

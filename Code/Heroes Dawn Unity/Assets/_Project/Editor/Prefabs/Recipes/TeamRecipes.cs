@@ -119,9 +119,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             squadRow.HLayout(12, 0, TextAnchor.UpperCenter);
             Ui.LocTxt(side.transform, "team.synergies", 28, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "SynergiesTitle").rectTransform.At(0f, 1f, 22, -232, 520, 38);
             var synergies = Ui.Txt(side.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Synergies");
-            synergies.rectTransform.Stretch(22, 196, 22, 290);
+            synergies.rectTransform.Stretch(22, 196, 22, 372);
             var none = Ui.LocTxt(side.transform, "team.synergies.none", 22, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "SynergiesNone");
-            none.rectTransform.Stretch(22, 196, 22, 290);
+            none.rectTransform.Stretch(22, 196, 22, 372);
             none.gameObject.SetActive(false);
             // ---- Compositions d equipe : trois emplacements + Sauver
             var presetRow = Ui.Rect(side.transform, "Presets").At(0.5f, 0f, 0, 176, 536, 96);
@@ -135,6 +135,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             }
             var presetSave = Ui.Btn(presetRow, "", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "PresetSave");
             presetSave.Rect.Pref(150, 96);
+            var healAll = Ui.Btn(side.transform, "", Theme.Surface3, Theme.Text, null!, 28, FontKind.Title, "HealAll");
+            healAll.Rect.At(0.5f, 0f, 0, 282, 536, 76);
             var hint = Ui.Txt(side.transform, "", 22, Theme.Fatigue, TextAnchor.MiddleCenter, FontKind.Body, "MissionHint");
             hint.rectTransform.At(0.5f, 0f, 0, 140, 520, 30);
             RecipeKit.Mark(side.Frame(), TutorialTarget.TeamSquad);
@@ -153,6 +155,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "synergies", synergies);
             ctx.Wire(view, "synergiesNone", none.gameObject);
             ctx.Wire(view, "mission", mission);
+            ctx.Wire(view, "healAll", healAll);
             ctx.WireArray(view, "presets", presets);
             ctx.Wire(view, "presetSave", presetSave);
             ctx.Wire(view, "missionHint", hint);
@@ -283,10 +286,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var affinityButton = affinityFill.Frame().gameObject.AddComponent<Button>();
             affinityButton.transition = Selectable.Transition.None;
 
-            var salon = Ui.LocBtn(rt, "sheet.salon", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Salon");
-            salon.Rect.At(0f, 0f, RightX, 0, 200, 96);
-            var infirmary = Ui.LocBtn(rt, "sheet.infirmary", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Infirmary");
-            infirmary.Rect.At(0f, 0f, RightX + 208, 0, 200, 96);
+            var heal = Ui.LocBtn(rt, "sheet.heal", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Heal");
+            heal.Rect.At(0f, 0f, RightX, 0, 408, 96);
             var loadout = Ui.LocBtn(rt, "sheet.loadout", Theme.Info, Theme.TextDark, null!, 22, FontKind.Title, "Loadout");
             loadout.Rect.At(0f, 0f, RightX + 416, 0, 200, 96);
 
@@ -334,8 +335,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "affinityButton", affinityButton);
             ctx.Wire(view, "previous", previous);
             ctx.Wire(view, "next", next);
-            ctx.Wire(view, "salon", salon);
-            ctx.Wire(view, "infirmary", infirmary);
+            ctx.Wire(view, "heal", heal);
             ctx.Wire(view, "loadout", loadout);
             ctx.Wire(view, "primary", primary);
             ctx.Wire(view, "primaryReason", reason);
