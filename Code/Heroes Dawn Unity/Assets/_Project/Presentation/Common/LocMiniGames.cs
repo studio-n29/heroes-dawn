@@ -44,6 +44,14 @@ namespace N29.HeroesDawn.Presentation.Common
             d["mg2d.dna_analysis.instructions"] = "Touche les molécules vertes qui pulsent pour les retirer. Toucher un nœud sain coûte une vie.";
             d["mg2d.dna.score"] = "Parasites {0} / {1}";
             d["activity.param.parasites"] = "Parasites";
+
+            // ---- Engrenage
+            d["activities.gears.name"] = "Engrenage";
+            d["activities.gears.desc"] = "Plusieurs engrenages sont bloqués : choisis le sens de rotation de chacun pour remettre tout le mécanisme en marche.";
+            d["mg2d.gears.instructions"] = "Touche un engrenage pour inverser son sens. Deux engrenages en contact tournent en sens contraires. Remets tout le mécanisme en marche depuis le moteur doré avant d'épuiser tes coups.";
+            d["mg2d.gears.score"] = "Engrenages {0} / {1}  ·  Coups {2}";
+            d["activity.param.gears"] = "Engrenages";
+            d["activity.param.moves"] = "Coups";
             d["activity.param.hits"] = "Touches à réussir";
         }
     }

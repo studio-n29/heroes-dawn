@@ -71,4 +71,18 @@ namespace N29.HeroesDawn.Domain.Activities
 
         public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
     }
+
+    /// <summary>« Engrenage » (voir <see cref="Games.GearsGame"/>).</summary>
+    public sealed class GearsKind : IActivityKind
+    {
+        public string Id => ActivityKinds.Gears;
+
+        public IReadOnlyList<ParameterDef> Schema { get; } = new[]
+        {
+            new ParameterDef("gears", 6, 3, 12),
+            new ParameterDef("moves", 12, 4, 40),
+        };
+
+        public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
+    }
 }

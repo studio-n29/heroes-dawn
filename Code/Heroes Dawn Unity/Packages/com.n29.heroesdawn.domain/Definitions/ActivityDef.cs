@@ -125,5 +125,6 @@ namespace N29.HeroesDawn.Definitions
         public const string FreeThrow = "free_throw";
         public const string CratePick = "crate_pick";
         public const string DnaAnalysis = "dna_analysis";
+        public const string Gears = "gears";
     }
 }

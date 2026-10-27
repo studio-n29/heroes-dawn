@@ -93,5 +93,17 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(r.Driver.Hud.TimeLeft, Is.EqualTo(45f));
             Assert.That(r.Driver.Hud.Lives, Is.EqualTo(3));
         }
+
+        [Test, Description("Vérifie qu'« Engrenage » ouvre la fenêtre commune avec une partie d'engrenages, son titre, sa consigne et un bandeau qui donne les engrenages entraînés et les coups restants, sans vies ni minuteur — parce que seuls les coups comptent")]
+        public void Gears_OpensTheCommonWindow()
+        {
+            var r = Play("gears_workshop");
+            Assert.That(r.Driver.Game, Is.InstanceOf<GearsGame>());
+            Assert.That(r.Title, Is.EqualTo("ENGRENAGE"));
+            Assert.That(r.Instructions, Is.EqualTo(_loc.T("mg2d.gears.instructions")));
+            Assert.That(r.Driver.Hud.Score, Does.Contain("/ 6").And.Contain("Coups"));
+            Assert.That(r.Driver.Hud.Lives, Is.LessThan(0));
+            Assert.That(r.Driver.Hud.TimeLeft, Is.LessThan(0f));
+        }
     }
 }

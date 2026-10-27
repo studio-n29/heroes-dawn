@@ -64,6 +64,10 @@ namespace N29.HeroesDawn.Content.Prototype
             // Analyse ADN (2D) : 10 Crédits par parasite retiré + 200 Crédits et 6 PR à la réussite.
             new ActivityDef(new ActivityId("dna_lab"), ActivityKinds.DnaAnalysis, "activities.dna.name", "activities.dna.desc",
                             P(("time_limit_s", 45), ("parasites", 6), ("lives", 3)), credits: 200, pr: 6, creditsPerScore: 10),
+
+            // Engrenage (2D) : 220 Crédits et 8 PR à la réussite.
+            new ActivityDef(new ActivityId("gears_workshop"), ActivityKinds.Gears, "activities.gears.name", "activities.gears.desc",
+                            P(("gears", 6), ("moves", 12)), credits: 220, pr: 8),
         };
     }
 }
