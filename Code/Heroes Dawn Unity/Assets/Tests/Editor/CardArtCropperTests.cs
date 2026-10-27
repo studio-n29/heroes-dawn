@@ -46,6 +46,15 @@ namespace N29.HeroesDawn.Tests.Editor
             }));
         }
 
+        [Test, Description("Vérifie qu'en mode « images nommées seulement », seules les cartes qui ont une image nommée d'après elles reçoivent une source, sans erreur pour les autres et sans prendre une source non nommée — parce qu'on illustre d'abord les cartes dont l'image existe")]
+        public void Assign_OnlyNamed_SkipsTheOtherCardsWithoutFailing()
+        {
+            var (assignments, missing) = CardArtCropper.Assign(new[] { "card_monolith", "card_ember", "card_mark" },
+                new[] { "Competences/aaa_unnamed.jpg", "Competences/card_ember.jpg" }, new SourcesFile(), onlyNamed: true);
+            Assert.That(missing, Is.EqualTo(0));
+            Assert.That(assignments, Is.EquivalentTo(new Dictionary<string, string> { ["card_ember"] = "Competences/card_ember.jpg" }));
+        }
+
         [Test, Description("Vérifie qu'il n'y a aucune attribution quand les sources libres manquent, avec le nombre de cartes sans source — parce que l'outil doit s'arrêter sans écrire à moitié")]
         public void Assign_StopsWhenSourcesAreMissing()
         {
@@ -86,6 +95,19 @@ namespace N29.HeroesDawn.Tests.Editor
                 Assert.That(saved.Assigned, Is.EquivalentTo(new Dictionary<string, string> { ["card_one"] = "a_ok.png" }));
             }
             finally { System.IO.Directory.Delete(dir, true); }
+        }
+
+        [Test, Description("Vérifie que chaque carte inscrite dans SOURCES.md a bien son image dans Resources, que deux cartes n'ont jamais la même source et qu'aucune source réservée n'est attribuée — parce que chaque carte doit avoir une illustration différente")]
+        public void IllustratedCards_HaveTheirImage_AndUniqueSources()
+        {
+            var asset = UnityEngine.Resources.Load<UnityEngine.TextAsset>("Illustrations/Cards/SOURCES");
+            Assert.That(asset, Is.Not.Null, "SOURCES.md doit être dans Resources (extension .md : TextAsset)");
+            var file = SourcesFile.Parse(asset!.text);
+            Assert.That(file.Assigned, Is.Not.Empty);
+            foreach (var id in file.Assigned.Keys)
+                Assert.That(UnityEngine.Resources.Load<UnityEngine.Sprite>("Illustrations/Cards/" + id), Is.Not.Null, id);
+            Assert.That(file.Assigned.Values.Distinct(System.StringComparer.OrdinalIgnoreCase).Count(), Is.EqualTo(file.Assigned.Count));
+            Assert.That(file.Assigned.Values.Intersect(file.Reserved, System.StringComparer.OrdinalIgnoreCase), Is.Empty);
         }
 
         static Texture2D Solid(int w, int h, Color c)

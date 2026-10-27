@@ -72,7 +72,8 @@ namespace N29.HeroesDawn.EditorTools.Assets
         /// Une source libre (ni réservée ni attribuée, dans l'ordre des chemins) par carte, dans l'ordre des cartes ;
         /// s'il en manque, aucune attribution et le nombre de cartes restées sans source.
         /// </summary>
-        public static (Dictionary<string, string> Assignments, int Missing) Assign(IReadOnlyList<string> cardsWithoutArt, IReadOnlyList<string> sources, SourcesFile file)
+        public static (Dictionary<string, string> Assignments, int Missing) Assign(IReadOnlyList<string> cardsWithoutArt, IReadOnlyList<string> sources, SourcesFile file,
+                                                                                    bool onlyNamed = false)
         {
             var taken = new HashSet<string>(file.Reserved.Concat(file.Assigned.Values), StringComparer.OrdinalIgnoreCase);
             var free = sources.Where(s => !taken.Contains(s)).Distinct(StringComparer.OrdinalIgnoreCase)
@@ -86,6 +87,8 @@ namespace N29.HeroesDawn.EditorTools.Assets
                 result[card] = named;
                 free.Remove(named);
             }
+            // Images nommées seulement : les cartes sans image nommée restent sans illustration, sans erreur.
+            if (onlyNamed) return (result, 0);
             var rest = cardsWithoutArt.Where(c => !result.ContainsKey(c)).ToList();
             int missing = Math.Max(0, rest.Count - free.Count);
             if (missing > 0) return (new Dictionary<string, string>(), missing);
@@ -117,17 +120,26 @@ namespace N29.HeroesDawn.EditorTools.Assets
         }
 
         [MenuItem("Heroes Dawn/Setup/Recadrer les illustrations de cartes")]
-        public static void CropMissing() => Run();
+        public static void CropMissing() => Run(false);
+
+        [MenuItem("Heroes Dawn/Setup/Recadrer les illustrations de cartes (images nommées seulement)")]
+        public static void CropNamed() => Run(true);
 
         /// <summary>Ligne de commande (-executeMethod) : sort avec le code 1 s'il manque des sources.</summary>
         public static void CropMissingBatch()
         {
-            if (!Run()) EditorApplication.Exit(1);
+            if (!Run(false)) EditorApplication.Exit(1);
+        }
+
+        /// <summary>Ligne de commande (-executeMethod) : seules les images nommées d'après une carte sont traitées ; les autres cartes restent à faire.</summary>
+        public static void CropNamedBatch()
+        {
+            if (!Run(true)) EditorApplication.Exit(1);
         }
 
         static string ArtRoot => Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "..", "..", "..", "03_Art_UI_UX", "Illustrations"));
 
-        static bool Run()
+        static bool Run(bool onlyNamed)
         {
             string sourcesPath = Path.Combine(CardsFolder, SourcesName);
             var file = File.Exists(sourcesPath) ? SourcesFile.Parse(File.ReadAllText(sourcesPath)) : new SourcesFile();
@@ -139,7 +151,12 @@ namespace N29.HeroesDawn.EditorTools.Assets
                            .Where(p => Extensions.Contains(Path.GetExtension(p).ToLowerInvariant()))
                            .Select(p => p.Substring(root.Length + 1).Replace('\\', '/')).ToList()
                 : new List<string>();
-            var (assignments, missing) = Assign(missingArt, sources, file);
+            var (assignments, missing) = Assign(missingArt, sources, file, onlyNamed);
+            if (onlyNamed)
+            {
+                var without = missingArt.Where(id => !assignments.ContainsKey(id)).ToList();
+                if (without.Count > 0) Debug.Log("[Heroes Dawn] Illustrations de cartes : " + without.Count + " carte(s) restent sans image : " + string.Join(", ", without));
+            }
             if (missing > 0)
             {
                 Debug.LogError("[Heroes Dawn] Illustrations de cartes : il manque " + missing + " image(s) source libre(s) dans 03_Art_UI_UX/Illustrations/ (" + missingArt.Count + " carte(s) à illustrer).");
