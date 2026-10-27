@@ -14,6 +14,8 @@ namespace N29.HeroesDawn.Presentation.Account
         /// <summary>« Se connecter » pour un invité, l'e-mail du compte pour un joueur connecté.</summary>
         string ButtonLabel { get; }
         UniTask RunAsync(CancellationToken ct);
+        /// <summary>Au lancement : rouvre la session mémorisée et synchronise, sans bruit (une panne réseau est ignorée ; un choix nécessaire s'ouvre).</summary>
+        UniTask RestoreAsync(CancellationToken ct);
         UniTask SignOutAsync(CancellationToken ct);
         UniTask SyncNowAsync(CancellationToken ct);
     }
@@ -56,6 +58,14 @@ namespace N29.HeroesDawn.Presentation.Account
             finally { _modals.Close(view); }
             if (outcome == null) return;
             await ShowOutcomeAsync(outcome, ct);
+        }
+
+        public async UniTask RestoreAsync(CancellationToken ct)
+        {
+            var r = await _account.RestoreAsync(ct);
+            if (r.IsFailure || r.Value == null) return;   // pas de session, ou serveur injoignable : on reste comme on est
+            if (r.Value.Status == LinkStatus.Uploaded) return;   // seule cette machine a avancé : rien à dire
+            await ShowOutcomeAsync(r.Value, ct);
         }
 
         async UniTask ShowOutcomeAsync(LinkOutcome outcome, CancellationToken ct)

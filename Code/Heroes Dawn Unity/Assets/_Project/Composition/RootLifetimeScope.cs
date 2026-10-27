@@ -16,6 +16,7 @@ using N29.HeroesDawn.Content.Prototype;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Infrastructure.Platform;
 using N29.HeroesDawn.Infrastructure.Simulated;
+using N29.HeroesDawn.Infrastructure.Supabase;
 using N29.HeroesDawn.Presentation;
 using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Common;
@@ -78,9 +79,20 @@ namespace N29.HeroesDawn.Composition
             builder.Register<IClock, SystemClock>(Lifetime.Singleton);
             builder.Register<ISeedProvider>(_ => new LocalSeedProvider(), Lifetime.Singleton);
             builder.Register<IAuthGateway>(_ => new FakeAuthGateway(), Lifetime.Singleton);
-            builder.Register<IAccountGateway>(_ => new LocalAccountGateway(), Lifetime.Singleton); // Supabase Auth plus tard
             builder.Register<IProfileGateway>(_ => new LocalProfileGateway(), Lifetime.Singleton);
-            builder.Register<ICloudProfileGateway>(_ => new FakeCloudProfileGateway(), Lifetime.Singleton);   // Supabase quand la configuration est présente (tâche 7)
+            // Compte et sauvegarde cloud : Supabase quand Resources/Supabase/supabase.json est valide, sinon les simulateurs en mémoire.
+            if (AccountBackend.Choose(SupabaseConfig.Load()) == AccountBackendKind.Supabase)
+            {
+                var supabase = SupabaseConfig.Load()!;
+                builder.Register<SupabaseAccountGateway>(c => new SupabaseAccountGateway(supabase, new UnityWebRequestHttp(), new PlayerPrefsTokenStore(), c.Resolve<IClock>(),
+                                                          c.Resolve<ILogger>(), new UnityBrowserOpener(), new UnityRedirectInbox()), Lifetime.Singleton).As<IAccountGateway>().AsSelf();
+                builder.Register<ICloudProfileGateway>(c => new SupabaseCloudProfileGateway(supabase, new UnityWebRequestHttp(), c.Resolve<SupabaseAccountGateway>()), Lifetime.Singleton);
+            }
+            else
+            {
+                builder.Register<IAccountGateway>(_ => new LocalAccountGateway(), Lifetime.Singleton);
+                builder.Register<ICloudProfileGateway>(_ => new FakeCloudProfileGateway(), Lifetime.Singleton);
+            }
             builder.Register<ICloudSyncStateStore>(_ => new PlayerPrefsSyncStateStore(), Lifetime.Singleton);
             builder.Register<IProgressBackupStore>(_ => new FileProgressBackupStore(), Lifetime.Singleton);
             builder.Register<ICombatVerifier>(_ => new LocalCombatVerifier(content), Lifetime.Singleton);
@@ -96,6 +108,7 @@ namespace N29.HeroesDawn.Composition
                 c.Resolve<ICloudProfileGateway>(), c.Resolve<ICloudSyncStateStore>(), c.Resolve<GameSession>(), c.Resolve<IClock>(), c.Resolve<ILogger>(), null, c.Resolve<SaveScheduler>()), Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.Account.AccountLink>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Presentation.Account.IAccountFlow, N29.HeroesDawn.Presentation.Account.AccountFlow>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<N29.HeroesDawn.Presentation.Account.AccountLifecycle>();
 
             // ---- Use cases : compte
             builder.Register<SignInAsGuestUseCase>(Lifetime.Singleton).AsImplementedInterfaces();

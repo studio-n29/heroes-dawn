@@ -20,6 +20,9 @@ namespace N29.HeroesDawn.Tests.PlayMode
                    {
                        b.RegisterInstance<IProfileGateway>(profiles);
                        b.RegisterInstance<IAuthGateway>(auth);
+                       // Jamais de vrai réseau en test : compte et sauvegarde cloud simulés, même si la configuration Supabase du jeu est présente.
+                       b.RegisterInstance<IAccountGateway>(new N29.HeroesDawn.Infrastructure.Simulated.LocalAccountGateway(0));
+                       b.RegisterInstance<ICloudProfileGateway>(new N29.HeroesDawn.Infrastructure.Simulated.FakeCloudProfileGateway());
                        if (!withIntro) b.RegisterInstance<IOnboardingFlow>(new SkippedOnboarding()); // la première connexion a ses propres tests
                    }))
             {

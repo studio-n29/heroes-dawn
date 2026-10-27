@@ -60,6 +60,21 @@ namespace N29.HeroesDawn.Presentation.Login
             RunAccountAsync().Forget();
         }
 
+        /// <summary>Après la connexion invité : rouvre le compte mémorisé et synchronise, sans bloquer l'entrée dans le jeu.</summary>
+        void RestoreAccount()
+        {
+            if (_account == null) return;
+            RestoreAccountAsync().Forget();
+        }
+
+        async UniTaskVoid RestoreAccountAsync()
+        {
+            try { await _account!.RestoreAsync(Lifetime); }
+            catch (OperationCanceledException) { }
+            catch (Exception e) { _log.Error("Compte : " + e.Message); }
+            if (!Disposed) View.SetAccountLabel(_account!.ButtonLabel);
+        }
+
         async UniTaskVoid RunAccountAsync()
         {
             try { await _account!.RunAsync(Lifetime); }
@@ -109,6 +124,7 @@ namespace N29.HeroesDawn.Presentation.Login
                 _toasts.Show(_loc.F(report.NewProfile ? "login.welcome_new" : "login.welcome_back", name), ToastKind.Info);
                 if (report.FatigueRecovered > 0) _toasts.Show(_loc.F("login.recovered", report.FatigueRecovered), ToastKind.Reward);
                 _navigate.Publish(new NavigateRequested(GameState.Hub));
+                RestoreAccount();
             }
             catch (OperationCanceledException) { }
             catch (Exception e)

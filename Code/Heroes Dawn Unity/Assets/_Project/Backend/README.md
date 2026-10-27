@@ -24,8 +24,24 @@ Contrôles prévus au M2 :
 
 Après chaque modification du tableur : *Heroes Dawn ▸ Équilibrage ▸ Importer*, puis redéployer `balance.rc`.
 
-## Comptes joueurs : Supabase (à brancher)
-Le jeu passe par le port `IAccountGateway` (`SignUpAsync`, `SignInAsync`) ; en 0.9.0 il est joué par `LocalAccountGateway` (comptes en mémoire). Pour brancher Supabase Auth :
-1. Créer le projet Supabase du studio et fournir l'URL et la clé `anon` (jamais la clé `service_role` dans le client).
-2. Écrire `SupabaseAccountGateway : IAccountGateway` (API REST `/auth/v1/signup` et `/auth/v1/token?grant_type=password`) et l'enregistrer à la place de `LocalAccountGateway` dans `RootLifetimeScope`.
-3. Ajouter l'écran e-mail / mot de passe sur l'écran titre (la première connexion en invité reste possible : pseudo et campagne sont déjà dans le profil).
+## Comptes joueurs et sauvegarde cloud : Supabase
+
+Le jeu passe par deux ports : `IAccountGateway` (e-mail, Google, Apple, session, déconnexion) et `ICloudProfileGateway` (profil en ligne). Quand `Assets/_Project/Resources/Supabase/supabase.json` est valide, ce sont les adaptateurs Supabase (`Infrastructure/Supabase`) ; sinon les simulateurs en mémoire (éditeur sans réseau, tests). Les tests n'appellent **jamais** le vrai Supabase.
+
+**Projet utilisé** : N29 HQ (`ulwbghlrglwccozbdlvr`, eu-central-1). Les tables `hq_vault` et `hq_vault_history` appartiennent à un autre outil et ne sont jamais touchées : toutes les tables du jeu ont le préfixe `hd_`.
+
+### Fichier de configuration
+`Resources/Supabase/supabase.json` : `url`, `anonKey` (clé publique par conception, rôle `anon`), `redirectUrl` (`heroesdawn://auth`). **Jamais** la clé `service_role` dans le dépôt ni dans le jeu (un test le vérifie).
+
+### Base de données
+Migration `Supabase/001_hd_profiles.sql` (appliquée sur N29 HQ le 2026-10-28) : table `hd_profiles` (une ligne par joueur : `user_id`, `profile` jsonb, `schema_version`, `updated_at` posée par le serveur), sécurité par ligne (le joueur ne lit, n'insère et ne modifie que sa ligne ; aucune suppression), profil limité à 512 Ko. L'écriture est conditionnelle sur `updated_at` : si le compte a changé depuis la dernière lecture, rien n'est écrasé et le joueur choisit quelle progression garder (l'autre est gardée dans une sauvegarde de secours sur l'appareil).
+
+### À régler dans le tableau de bord Supabase (Authentication)
+1. **Providers ▸ Google** : activer, renseigner l'identifiant et le secret du client OAuth créé dans la console Google Cloud (type « Application Web » ; URI de redirection autorisée : l'adresse de rappel indiquée par Supabase, `https://ulwbghlrglwccozbdlvr.supabase.co/auth/v1/callback`).
+2. **Providers ▸ Apple** : activer, renseigner le Services ID, l'identifiant d'équipe, l'identifiant de clé et la clé privée (.p8) du compte développeur Apple ; mêmes adresses de rappel.
+3. **URL Configuration ▸ Redirect URLs** : ajouter `heroesdawn://auth`.
+4. **Providers ▸ Email** : décider si la confirmation d'adresse est obligatoire (le jeu gère les deux : message « E-mail de confirmation envoyé » si elle l'est).
+5. Recommandé : **activer la protection contre les mots de passe compromis** (Authentication ▸ Attack Protection ; le conseiller de sécurité de Supabase la signale désactivée sur ce projet).
+6. Côté appareil : enregistrer le schéma de lien `heroesdawn` (Android : filtre d'intention ; iOS : URL scheme) dans les réglages de build avant de tester Google et Apple sur un vrai téléphone.
+
+Le guide de recette `Code/docs/recette-compte.md` liste les vérifications à faire sur appareil.

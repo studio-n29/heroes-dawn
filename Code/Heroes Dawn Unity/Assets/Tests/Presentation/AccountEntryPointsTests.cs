@@ -27,7 +27,8 @@ namespace N29.HeroesDawn.Tests.Presentation
         sealed class FakeFlow : IAccountFlow
         {
             public string ButtonLabel { get; set; } = "SE CONNECTER";
-            public int Runs, SignOuts, Syncs;
+            public int Runs, SignOuts, Syncs, Restores;
+            public UniTask RestoreAsync(CancellationToken ct) { Restores++; return UniTask.CompletedTask; }
             public UniTaskCompletionSource? Open;
             public async UniTask RunAsync(CancellationToken ct) { Runs++; if (Open != null) await Open.Task; }
             public UniTask SignOutAsync(CancellationToken ct) { SignOuts++; return UniTask.CompletedTask; }
@@ -74,6 +75,34 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(view.AccountLabel, Is.EqualTo("moi@exemple.fr"));
             view.ClickAccount();
             Assert.That(flow.Runs, Is.EqualTo(2), "rouvrable une fois fermé");
+        }
+
+        [Test, Description("Vérifie que la session du compte est restaurée une fois après une connexion invité réussie — parce que le joueur ne doit pas se reconnecter à chaque lancement")]
+        public void Login_RestoresTheAccount_AfterASuccessfulGuestSignIn()
+        {
+            var (_, view, flow) = MakeLogin();
+            view.ClickPlay();
+            Assert.That(flow.Restores, Is.EqualTo(1));
+        }
+
+        [Test, Description("Vérifie que la session du compte n'est pas restaurée quand la connexion invité échoue — parce qu'il n'y a alors pas de profil local auquel rattacher le compte")]
+        public void Login_DoesNotRestoreTheAccount_WhenTheGuestSignInFails()
+        {
+            var app = new TestApp();
+            var view = new FakeLoginView();
+            var flow = new FakeFlow();
+            var failing = new FailingSignIn();
+            var p = new LoginPresenter(view, failing, app.Session, app.Publisher<NavigateRequested>(), new FakeToasts(), _loc, app.Logger, account: flow);
+            view.Show();
+            p.Start();
+            view.ClickPlay();
+            Assert.That(flow.Restores, Is.EqualTo(0));
+        }
+
+        sealed class FailingSignIn : ISignInAsGuestUseCase
+        {
+            public UniTask<Result<SignInReport>> ExecuteAsync(CancellationToken ct = default)
+                => UniTask.FromResult(Result<SignInReport>.Fail(new DomainError("auth.network", "errors.network")));
         }
 
         // ------------------------------------------------------------------ Profil
