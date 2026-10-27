@@ -23,6 +23,14 @@ namespace N29.HeroesDawn.Presentation.Common
             d["activities.rhythm.desc"] = "Une séquence d'ennemis arrive : touche la bonne piste au bon moment pour les vaincre.";
             d["mg2d.rhythm.instructions"] = "Les ennemis arrivent sur les pistes : touche la piste quand ils passent la ligne. Les ratés coûtent une vie.";
             d["mg2d.rhythm.score"] = "Notes {0} / {1}";
+
+            // ---- Tir franc
+            d["activities.freethrow.name"] = "Tir franc";
+            d["activities.freethrow.desc"] = "Maintiens pour remplir la jauge de puissance, relâche quand elle atteint la cible.";
+            d["mg2d.free_throw.instructions"] = "Maintiens pour remplir la jauge, relâche quand le curseur est dans la zone verte : plus la cible est loin, plus il faut de puissance.";
+            d["mg2d.freethrow.score"] = "Touches {0} / {1}";
+            d["activity.param.throws"] = "Lancers";
+            d["activity.param.hits"] = "Touches à réussir";
         }
     }
 }

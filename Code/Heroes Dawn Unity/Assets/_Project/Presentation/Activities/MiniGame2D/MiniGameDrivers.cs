@@ -16,6 +16,7 @@ namespace N29.HeroesDawn.Presentation.Activities
         static MiniGameDrivers()
         {
             Map[ActivityKinds.Rhythm] = (plan, loc) => new RhythmDriver(plan, loc);
+            Map[ActivityKinds.FreeThrow] = (plan, loc) => new FreeThrowDriver(plan, loc);
         }
 
         public static void Register(string kind, Func<ActivityPlan, ILocalization, IMiniGameDriver> factory) => Map[kind] = factory;

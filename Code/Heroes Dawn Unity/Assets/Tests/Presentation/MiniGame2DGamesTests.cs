@@ -59,5 +59,16 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(r.Driver.Hud.TimeLeft, Is.LessThan(0f));
             Assert.That(r.Driver.Hud.Lives, Is.EqualTo(5));
         }
+
+        [Test, Description("Vérifie que « Tir franc » ouvre la fenêtre commune avec une partie de tir, son titre, sa consigne et un bandeau « Touches x / y » avec les lancers restants — parce que c'est un jeu à maintenir et relâcher")]
+        public void FreeThrow_OpensTheCommonWindow()
+        {
+            var r = Play("free_throw_court");
+            Assert.That(r.Driver.Game, Is.InstanceOf<FreeThrowGame>());
+            Assert.That(r.Title, Is.EqualTo("TIR FRANC"));
+            Assert.That(r.Instructions, Is.EqualTo(_loc.T("mg2d.free_throw.instructions")));
+            Assert.That(r.Driver.Hud.Score, Is.EqualTo("Touches 0 / 3"));
+            Assert.That(r.Driver.Hud.Lives, Is.EqualTo(5));
+        }
     }
 }

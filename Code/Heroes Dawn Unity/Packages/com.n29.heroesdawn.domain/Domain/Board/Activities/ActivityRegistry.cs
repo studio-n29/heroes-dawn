@@ -75,7 +75,8 @@ namespace N29.HeroesDawn.Domain.Activities
             .Register(new DeflectKind())
             .Register(new RooftopRunKind())
             .Register(new DialogueKind())
-            .Register(new RhythmKind());
+            .Register(new RhythmKind())
+            .Register(new FreeThrowKind());
     }
 
     /// <summary>Aides de génération : directions entières (pas de trigonométrie : même niveau sur toutes les plateformes).</summary>

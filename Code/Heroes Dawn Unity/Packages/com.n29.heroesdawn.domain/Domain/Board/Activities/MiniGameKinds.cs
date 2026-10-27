@@ -26,4 +26,19 @@ namespace N29.HeroesDawn.Domain.Activities
 
         public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
     }
+
+    /// <summary>« Tir franc » (voir <see cref="Games.FreeThrowGame"/>).</summary>
+    public sealed class FreeThrowKind : IActivityKind
+    {
+        public string Id => ActivityKinds.FreeThrow;
+
+        public IReadOnlyList<ParameterDef> Schema { get; } = new[]
+        {
+            new ParameterDef("throws", 5, 2, 12),
+            new ParameterDef("hits", 3, 1, 8),
+            new ParameterDef("speed_percent", 100, 50, 220),
+        };
+
+        public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
+    }
 }

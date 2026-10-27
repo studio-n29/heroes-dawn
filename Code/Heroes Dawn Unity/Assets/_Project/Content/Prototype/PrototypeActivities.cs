@@ -52,6 +52,10 @@ namespace N29.HeroesDawn.Content.Prototype
             // Le rythme (2D) : 5 Crédits par note touchée + 200 Crédits et 8 PR à la réussite.
             new ActivityDef(new ActivityId("rhythm_rooftop"), ActivityKinds.Rhythm, "activities.rhythm.name", "activities.rhythm.desc",
                             P(("notes", 24), ("lanes", 3), ("lives", 5), ("speed_percent", 100)), credits: 200, pr: 8, creditsPerScore: 5),
+
+            // Tir franc (2D) : 10 Crédits par cible touchée + 180 Crédits et 6 PR à la réussite.
+            new ActivityDef(new ActivityId("free_throw_court"), ActivityKinds.FreeThrow, "activities.freethrow.name", "activities.freethrow.desc",
+                            P(("throws", 5), ("hits", 3), ("speed_percent", 100)), credits: 180, pr: 6, creditsPerScore: 10),
         };
     }
 }
