@@ -53,6 +53,9 @@ namespace N29.HeroesDawn.Infrastructure.Supabase
 
         long NowUnix => new DateTimeOffset(_clock.UtcNow).ToUnixTimeSeconds();
 
+        /// <summary>Identifiant (UUID) du joueur connecté, ou <c>null</c> sans session.</summary>
+        public string? UserId => _tokens.Load()?.UserId;
+
         // ------------------------------------------------------------------ Inscription et connexion
 
         public async UniTask<Result<PlayerAccount>> SignUpAsync(string email, string password, string displayName, CancellationToken ct)
