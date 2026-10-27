@@ -128,3 +128,6 @@
 | 2026-10-27 | Cinématique de lancement : narration du PDF en légendes sur 11 plans (S20 retiré), sans voix off ; temps de lecture 1,2 s + 0,35 s par mot ; les voix seront enregistrées plus tard (vo_<plan>.wav) | Spec du lot G |
 | 2026-10-27 | Chapitres : 8 chapitres (NY : Brooklyn, Queens, Harlem, Manhattan ; Moscou : Sergueiv, Kapotnya, Sadovoye Koltso, Place Rouge) indépendants du dessin de la carte ; seul Brooklyn est jouable, les autres « Bientôt » ; ouverture au premier déploiement | Spec du lot G |
 | 2026-10-27 | Dossier d'agent : tout le lore du Markdown sur la fiche (bouton DOSSIER), textes générés dans LocLore.cs par l'outil LoreTextGenerator | Spec du lot G |
+| 2026-10-27 | Lot H : 7 nouveaux mini-jeux 2D (Analyse ADN, Infiltration, Engrenage, Le rythme, Tir franc, Ingénierie de secours, Caisse au choix) + survie en neige refaite en 2D vue du dessus ; le dialogue reste inchangé | Spec du lot H |
+| 2026-10-27 | Les 9 jeux du PDF sont placés dans les 4 zones de Brooklyn (une case chacun) ; Potion, Rempart et Course des toits ne sont plus placés dans la campagne mais restent jouables par le code | Spec du lot H |
+| 2026-10-27 | Fonds des mini-jeux : SVG dessinés dans le dépôt, rasterisés en PNG 1280×640 par Edge sans interface, recolorés par l'environnement du plateau | Spec du lot H |

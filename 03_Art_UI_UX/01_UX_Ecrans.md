@@ -68,3 +68,21 @@ Puis **astuces contextuelles** non bloquantes à la première rencontre de chaqu
 - **Cinématique** : 11 plans, légendes de la narration du PDF au temps de lecture (sans voix pour l'instant ; un `vo_<plan>.wav` déposé est joué).
 - **Chapitres** : 8 chapitres (New York et Moscou). Fenêtre « CHAPITRE n · Titre » au premier déploiement dans une zone du chapitre, une fois ; page Chapitres (statuts Terminé, En cours, Verrouillé, Bientôt, bouton Relire) ouverte par le bouton « Chapitres » de la carte.
 - **Fiche d'agent** : bouton DOSSIER à côté de Soigner : panneau défilant avec l'identité, le lien à la Supernova, l'histoire d'origine, le pouvoir et l'apparence.
+
+## Lot H (0.14.0) : mini-jeux 2D
+
+Une seule fenêtre commune (`Popups/MiniGame2DPopup`) : titre, bandeau score / temps / vies, grande zone tactile avec un fond illustré teinté par l'environnement, joystick flottant (Infiltration, Survie en neige), Abandonner. Le premier appui lance la partie ; fin de partie, abandon et annulation rendent toujours la main.
+
+| Jeu | Commande | Placement (Brooklyn) |
+|---|---|---|
+| Analyse ADN | toucher les molécules vertes qui pulsent | 1.1 (n08) |
+| Le rythme | toucher la piste quand l'ennemi passe la ligne | 1.1 (n15) |
+| Choix des cartes (dialogue) | inchangé | 1.1 (n21) |
+| Caisse au choix | maintenir pour charger, relâcher sur la bonne caisse | 1.2 (n06) |
+| Engrenage | toucher un engrenage pour inverser son sens | 1.2 (n13) |
+| Tir franc | maintenir pour la puissance, relâcher pour lancer | 1.3 (n06) |
+| Infiltration | joystick, éviter les cônes de vision | 1.3 (n11) |
+| Ingénierie de secours | manuel d'indices, pièces à assembler dans l'ordre | 1.4 (n06) |
+| Survie en neige (vue de dessus) | joystick, jauge de survie, totems | 1.4 (n11) |
+
+Fonds : un SVG source par jeu (`Art/MiniGames`), rasterisé en PNG (`Resources/MiniGames`) par Heroes Dawn ▸ Setup ▸ Générer les fonds de mini-jeux.

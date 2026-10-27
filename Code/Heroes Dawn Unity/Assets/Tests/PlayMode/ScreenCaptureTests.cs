@@ -10,6 +10,9 @@ using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Composition;
 using N29.HeroesDawn.Content.Prototype;
+using N29.HeroesDawn.Definitions;
+using N29.HeroesDawn.Presentation.Activities;
+using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Board;
 using N29.HeroesDawn.Presentation.Combat;
@@ -189,6 +192,51 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<ChapterPopupView>() != null);
             yield return new WaitForSecondsRealtime(0.6f);
             yield return Capture("94-ouverture-chapitre");
+        }
+
+        [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit une capture en cours de partie de chacun des mini-jeux 2D du lot H (fenêtre commune, fond, éléments de jeu, joystick, panneau de l'ingénierie) — parce que ces écrans se relisent à l'œil")]
+        public IEnumerator CaptureMiniGames()
+        {
+            yield return ActivityGamesPlayTests.OnBoardNext(PrototypeContent.Zone11, "n15");
+            var loc = new N29.HeroesDawn.Presentation.Mvp.LocLocalization();
+            var host = Object.FindAnyObjectByType<ModalLayer>()!;
+            foreach (var (id, env, name) in new[]
+            {
+                ("dna_lab", new ZoneEnvironment(Biome.Industrial, Weather.Day), "95-minijeu-adn"),
+                ("infiltration_camp", new ZoneEnvironment(Biome.Forest, Weather.Night), "96-minijeu-infiltration"),
+                ("gears_workshop", new ZoneEnvironment(Biome.Industrial, Weather.Day), "97-minijeu-engrenage"),
+                ("survival_snow", new ZoneEnvironment(Biome.Snow, Weather.Snow), "98-minijeu-survie"),
+                ("rhythm_rooftop", new ZoneEnvironment(Biome.City, Weather.Night), "99-minijeu-rythme"),
+                ("free_throw_court", new ZoneEnvironment(Biome.City, Weather.Day), "100-minijeu-tir-franc"),
+                ("rescue_tool", new ZoneEnvironment(Biome.Industrial, Weather.Day), "101-minijeu-ingenierie"),
+                ("crate_pick_depot", new ZoneEnvironment(Biome.Harbor, Weather.Day), "102-minijeu-caisses"),
+            })
+            {
+                var plan = ActivityGamesPlayTests.PlanOf(id, env);
+                var driver = MiniGameDrivers.Create(plan, loc)!;
+                var request = ActivityGamesPlayTests.CasePresenter().MiniGame2DRequestFor(plan, driver);
+                var view = host.Spawn<IMiniGame2DPopupView>();
+                var task = view.PlayAsync(request, default);
+                var popup = (MiniGame2DPopupView)view;
+                popup.Input.PressAt(new Vector2(0.5f, 0.5f));
+                yield return null;
+                popup.Input.ReleaseNow();
+                if (driver.UsesStick) { popup.Input.PressAt(new Vector2(0.5f, 0.5f)); popup.Input.DragTo(new Vector2(0.58f, 0.5f)); }
+                if (driver.Game is N29.HeroesDawn.Domain.Activities.Games.RescueEngineeringGame rescue)
+                {
+                    var panel = popup.GetComponentInChildren<RescuePanelView>(true);
+                    yield return null;
+                    for (int i = 0; i < 2; i++) panel.PoolButton(System.Linq.Enumerable.ToList(rescue.Pool).IndexOf(rescue.Solution[i])).Button.onClick.Invoke();
+                }
+                yield return new WaitForSecondsRealtime(id == "rhythm_rooftop" ? 2.6f : 0.8f);
+                yield return Capture(name);
+                popup.Input.ReleaseNow();
+                popup.AbandonButton.Button.onClick.Invoke();
+                while (!task.Status.IsCompleted()) yield return null;
+                Object.Destroy(popup.gameObject);
+                yield return null;
+            }
+            Assert.That(File.Exists(Path.Combine(Folder, "102-minijeu-caisses.png")));
         }
 
         [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit les captures du plateau agrandi : portée avec cases cachées, fiche d'une destination (chemin illuminé, dézoom), fiche d'une case sous le brouillard — parce que la prévisualisation du déplacement se relit à l'œil")]

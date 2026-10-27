@@ -51,6 +51,14 @@ Gains : une `ActivityDef` par jeu dans `PrototypeActivities`, avec Crédits et P
 
 Les 9 jeux (7 nouveaux, survie en neige, dialogue) sont répartis sur les cases mini-jeu des 4 zones (`zone_ny_1_1` à `zone_ny_1_4`), au moins 2 par zone, les plus simples en début de zone et les plus durs en fin. Les zones sont modifiées par le générateur de zones existant (outil de level design), pas à la main. Les tests de campagne (`BrooklynCampaignTests`, `CampaignAssetsTests`) continuent de valider les zones. La zone tutoriel n'est pas modifiée.
 
+## 4 bis. Écarts actés à l'exécution
+
+- **Engrenage** : pas de vies ; les coups restants (`GearsGame.MovesLeft`) sont dans le bandeau (« Engrenages x / y · Coups n »). `IMiniGame.Lives` vaut -1.
+- **Fonds** : SVG au format 1280 × 640 (rapport 2:1 de la zone de jeu) et non 1280 × 720 ; rasterisés par Edge sans interface (`MiniGameBackgroundBaker`), pas de paquet `com.unity.vectorgraphics`.
+- **Interface par prefab** : la règle du projet (aucun écran construit par code, test `NoCodeBuiltScreensTests`) impose que le panneau d'Ingénierie de secours (manuel, pièces, emplacements, Annuler, Valider) soit dans le prefab `MiniGame2DPopup` (`RescuePanelView`) ; le pilote ne fait que le remplir. Les autres jeux dessinent des images simples (`Img`), comme Rempart.
+- **Campagne** : Potion, Rempart et Course des toits ne sont plus placés (restent jouables par le code et les tests) ; les tests PlayMode de la potion utilisent la zone du code (`prototypeZone: true`).
+- **Placement** : la case Ressource n06 de la zone 1.2 est devenue la case Mini-jeu « Caisse au choix » (la zone 1.2 n'avait qu'une case Mini-jeu).
+
 ## 5. Tests
 
 - **EditMode** : par jeu, victoire, défaite, bornes des paramètres, déterminisme à graine égale, niveau toujours solvable (engrenages, ingénierie, ADN, infiltration), abandon ; schéma des paramètres de chaque type ; les 9 jeux sont placés dans les zones et chaque type est enregistré ; `CasePopupPresenter` lance chaque type via un faux écran ; textes présents pour chaque jeu.
