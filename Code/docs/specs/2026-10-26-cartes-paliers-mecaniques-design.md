@@ -53,7 +53,7 @@ Les effets restent appliqués **cible par cible, dans l'ordre de la liste**, cha
 
 ## Présentation
 - **Textes** (`Loc.DescribeSkill` et clés associées) : « Vol de vie {0} % », « Purge ({0}) », « Purge totale », « Rebond {0} % », « Exécution +{0} % sous {1} % PV ».
-- **Grimoire** : badge « Niv. x/10 » ; dans la fiche détaillée, bloc **Paliers** : palier atteint en couleur précédé de « ✓ », palier à venir grisé, ex. « ✓ Niv. 3 · Brûlure 2 t » / « Niv. 6 · Rebond 50 % ». Bouton Améliorer avec les nouveaux coûts ; s'il fait atteindre un palier, il l'annonce : « Améliorer → débloque Rebond 50 % ». Ouverture de booster inchangée (carte au niveau 1).
+- **Grimoire** : badge « Niv. x/10 » ; dans la fiche détaillée, bloc **Paliers** : palier atteint en couleur précédé de « ● », palier à venir grisé, ex. « ● Niv. 3 · Brûlure 2 t » / « Niv. 6 · Rebond 50 % ». Bouton Améliorer avec les nouveaux coûts ; s'il fait atteindre un palier, il l'annonce : « Améliorer → débloque Rebond 50 % ». Ouverture de booster inchangée (carte au niveau 1).
 - **Combat** : `BounceEvent` → éclat de la 1re cible vers la 2e avec l'impact de la famille de la carte, puis le chiffre de dégâts ; `ExecutedEvent` → onomatopée « EXÉCUTION ! » (style des onomatopées existantes) ; `PurgedEvent` → texte flottant « PURGE », les icônes de statut retirées disparaissent comme à l'expiration ; vol de vie → chiffre de soin habituel sur le lanceur.
 
 ## Documentation

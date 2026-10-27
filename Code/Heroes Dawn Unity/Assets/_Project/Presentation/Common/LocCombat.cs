@@ -45,6 +45,9 @@ namespace N29.HeroesDawn.Presentation.Common
             d["link.bonus.StartEnergy"] = "Énergie de départ +{0}";
             d["link.bonus.EnergyPerStep"] = "Énergie +{0} par pas";
             d["link.level"] = "lien niv. {0}";
+            d["link.tier_line"] = "Niv. {0} · {1}";
+            d["affinity.next_wins"] = "encore {0} victoire(s)";
+            d["affinity.max"] = "lien au maximum";
             d["team_effect.Quartet.name"] = "Quatuor";
             d["team_effect.Quartet.text"] = "4 familles différentes, +10 % de critique";
             d["team_effect.Trinity.name"] = "Trinité";

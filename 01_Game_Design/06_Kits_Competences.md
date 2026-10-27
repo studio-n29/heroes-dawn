@@ -37,7 +37,7 @@ Une carte se classe sur deux axes : sa **famille** (le type de pouvoir, celle de
 ### Niveaux et paliers des cartes
 Une carte monte du **niveau 1 au niveau 10** avec des doublons et des Crédits : passer du niveau N au suivant coûte **(N + 1) / 2 doublons** (1, 1, 2, 2, 3, 3, 4, 4, 5 : 25 au total) et **200 × N Crédits** (9 000 au total). Chaque niveau ajoute **+10 %** aux dégâts, soins et boucliers de base (140 % au niveau 5, 190 % au niveau 10).
 
-Aux niveaux **3, 6 et 10**, un **palier** ajoute des effets secondaires à la carte, qui s'appliquent aux mêmes cibles (non augmentés par le niveau). Une carte qui vise un ennemi n'a pas d'effet allié dans ses paliers. Le grimoire montre les paliers atteints (✓) et à venir, et le bouton Améliorer annonce le palier qu'il débloque.
+Aux niveaux **3, 6 et 10**, un **palier** ajoute des effets secondaires à la carte, qui s'appliquent aux mêmes cibles (non augmentés par le niveau). Une carte qui vise un ennemi n'a pas d'effet allié dans ses paliers. Le grimoire montre les paliers atteints (●) et à venir, et le bouton Améliorer annonce le palier qu'il débloque.
 
 | Mécanique | Effet |
 |---|---|

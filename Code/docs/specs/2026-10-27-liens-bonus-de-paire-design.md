@@ -48,7 +48,7 @@ Unités : statistiques, critique, bouclier (% des PV max, 2 tours) et jauge de d
 - Journal de combat : une ligne par paire active (niveau ≥ 2) au début du combat, après les lignes de synergie et d'effets d'équipe.
 
 ## Interface
-- **Fenêtre d'affinités** (`AffinityFlow.Build`) : chaque ligne montre le thème du couple de rôles et ses 4 bonus : débloqués précédés de « ✓ » en couleur, à venir grisés avec leur niveau ; victoires restantes avant le niveau suivant (« encore N victoires »).
+- **Fenêtre d'affinités** (`AffinityFlow.Build`) : chaque ligne montre le thème du couple de rôles et ses 4 bonus : débloqués précédés de « ● » en couleur, à venir grisés avec leur niveau ; victoires restantes avant le niveau suivant (« encore N victoires »).
 - **Écran Équipe** : sous les synergies, un bloc « Liens » listant les paires de l'escouade de niveau 2+ : thème, deux noms, niveau, bonus actifs.
 - Textes : 15 thèmes (`link.theme.*`), 9 libellés de bonus, lignes d'interface et de journal.
 
@@ -61,6 +61,6 @@ Effets réactifs propres à une paire (« quand l'un tombe… »), duos nommés 
 ## Tests
 - **Domaine** (`PairBonusRulesTests`) : table (15 couples × niveaux 1 à 5, rien au niveau 1, cumul des niveaux), ordre des rôles indifférent, chaque plafond, niveau hors bornes borné.
 - **Combat** : pour chaque brique (statistique, critique, bouclier, jauge, énergie de départ, énergie par pas), appliquée aux **deux** agents de la paire et **pas** à un troisième ; rien si l'un des deux n'est pas dans l'escouade ; un agent dans trois paires cumule puis plafonne ; une simulation avec liens niveau 5 se rejoue à l'identique (`CombatReplay`) ; niveau 1 = résultats identiques à l'existant.
-- **Présentation** : fenêtre d'affinités (✓ et à venir, victoires restantes), écran Équipe, journal de combat.
+- **Présentation** : fenêtre d'affinités (● et à venir, victoires restantes), écran Équipe, journal de combat.
 - **Sauvegarde** : un profil existant (avec ou sans liens) se charge sans changement ; les niveaux de lien sont conservés.
 - **Capture** : fenêtre d'affinités d'un agent avec des liens de niveaux 2 à 5, vérifiée à l'œil.

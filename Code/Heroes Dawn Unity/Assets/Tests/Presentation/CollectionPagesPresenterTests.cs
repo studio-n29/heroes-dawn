@@ -294,7 +294,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_loc.DescribeSkill(all), Does.Contain("Purge totale"));
         }
 
-        [Test, Description("Vérifie que la fiche d'une carte au niveau 3 montre son palier 3 comme atteint (✓) et les paliers 6 et 10 comme à venir — parce que le joueur doit voir ce que la progression débloque")]
+        [Test, Description("Vérifie que la fiche d'une carte au niveau 3 montre son palier 3 comme atteint (●) et les paliers 6 et 10 comme à venir — parce que le joueur doit voir ce que la progression débloque")]
         public void Grimoire_ShowsReachedAndLockedTiers()
         {
             var ember = new CardId("card_ember");
@@ -302,9 +302,9 @@ namespace N29.HeroesDawn.Tests.Presentation
             CollectionOps.SetCardLevel(_app.Session, ember, 3);
             var p = Grimoire();
             string sub = _view.Rows[RowOf("Braise")].Subtitle;
-            Assert.That(sub, Does.Contain("✓ Niv. 3"));
+            Assert.That(sub, Does.Contain("● Niv. 3"));
             Assert.That(sub, Does.Contain("Niv. 6 · Rebond 50 %"));
-            Assert.That(sub, Does.Not.Contain("✓ Niv. 6"));
+            Assert.That(sub, Does.Not.Contain("● Niv. 6"));
             p.Dispose();
         }
 

@@ -13,6 +13,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Le bonus du duo (« Point faible : +4 % Attaque »), ou « Aucune synergie ».</summary>
         public string Bonus;
         public bool HasBonus;
+        /// <summary>Thème de la paire (couple de rôles), ses quatre paliers (● atteints, grisés à venir) et les victoires restantes ; texte enrichi multi-ligne.</summary>
+        public string Pair;
     }
 
     public struct AffinityPopupData

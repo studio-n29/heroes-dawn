@@ -142,11 +142,11 @@
 
 **Interfaces:**
 - Consumes: `SkillCardDef.Tiers`, `CardLevels.TierLevels`, `SkillAt`.
-- Produces: `CollectionText.TierLines(loc, card, level)` → texte enrichi, une ligne par palier : atteint = « ✓ » + `grimoire.tier_line` en `Theme.Success` ; à venir = `grimoire.tier_line` en `Theme.TextMuted`.
+- Produces: `CollectionText.TierLines(loc, card, level)` → texte enrichi, une ligne par palier : atteint = « ● » + `grimoire.tier_line` en `Theme.Success` ; à venir = `grimoire.tier_line` en `Theme.TextMuted`.
 
 - [ ] **Step 1: Write the failing tests**
   - `SkillText_DescribesTheFourMechanics` : `Loc.DescribeSkill` d'une compétence `[Damage 100, Lifesteal 20, Bounce 50, Execute 30, Purge 1]` contient « Vol de vie 20 % », « Rebond 50 % », « Exécution +30 % sous 30 % PV », « Purge (1) » ; `Purge 0` → « Purge totale ».
-  - `Grimoire_ShowsReachedAndLockedTiers` : card_ember possédée au niveau 3 → le sous-titre contient « ✓ Niv. 3 » et « Niv. 6 · Rebond 50 % » sans « ✓ » devant.
+  - `Grimoire_ShowsReachedAndLockedTiers` : card_ember possédée au niveau 3 → le sous-titre contient « ● Niv. 3 » et « Niv. 6 · Rebond 50 % » sans « ● » devant.
   - `Grimoire_UpgradeButton_AnnouncesTheTierItUnlocks` : card_ember au niveau 2 avec assez de doublons et de Crédits → libellé du bouton A contient « débloque » et « Brûlure » ; au niveau 3 → ne contient pas « débloque ».
   - `Grimoire_Badge_ShowsLevelOutOf10` : badge d'une carte possédée contient « 1/10 ».
 - [ ] **Step 2: Run** — Expected: FAIL.

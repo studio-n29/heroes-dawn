@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using System.Linq;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Collection;
@@ -115,6 +116,25 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return new WaitForSecondsRealtime(0.6f);
             yield return ScreenCaptureTests.Capture("63-booster-resume");
             popup.ContinueButton.onClick.Invoke();
+        }
+
+        [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit la capture de la fenêtre d'affinités d'un agent avec des liens de niveaux 1 à 5 (thème du couple de rôles, paliers cochés, victoires restantes) — parce que cette mise en page se relit à l'œil")]
+        public IEnumerator CaptureTheAffinityPopup()
+        {
+            yield return SignedIn();
+            var c = ActivityGamesPlayTests.Container;
+            var session = c.Resolve<GameSession>();
+            var me = session.Roster[0];
+            var others = session.Content.Members.Where(m => m.Id != me.Def.Id).Take(4).ToList();
+            foreach (var m in others) session.Roster.Add(new TeamMember(m, 5));
+            int[] wins = { 2, 3, 8, 15, 25 };
+            for (int i = 0; i < others.Count; i++)
+                for (int w = 0; w < wins[i + 1]; w++) N29.HeroesDawn.Application.Features.Combat.TeamLinks.RecordVictory(session.Meta, new[] { me.Def.Id.Value, others[i].Id.Value });
+            var flow = new AffinityFlow(session, c.Resolve<N29.HeroesDawn.Presentation.Mvp.IModalService>(), new N29.HeroesDawn.Presentation.Mvp.LocLocalization());
+            flow.OpenAsync(me.Def.Id, System.Threading.CancellationToken.None).Forget();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<AffinityPopupView>() != null, 120);
+            yield return new WaitForSecondsRealtime(0.8f);
+            yield return ScreenCaptureTests.Capture("64-affinites");
         }
 
         [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures de la fiche d'agent, de l'équipement, du grimoire, de la boutique d'objets et du combat avec une 4e compétence — parce que ces écrans se relisent à l'œil")]

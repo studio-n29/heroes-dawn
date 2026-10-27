@@ -105,12 +105,12 @@
 
 **Interfaces:**
 - Consumes: `PairBonusRules.At/ThemeKey`, `ILocalization.PairTheme/PairBonusText`, `LinkRules.WinsToNext`.
-- Produces: `AffinityRowData.Pair` (`string`, texte enrichi multi-ligne : thème, puis une ligne par niveau 2 à 5, « ✓ Niv. N · bonus » en `Theme.Success` si atteint, « Niv. N · bonus » en `Theme.TextMuted` sinon, puis « encore N victoire(s) » ou « lien au maximum »).
+- Produces: `AffinityRowData.Pair` (`string`, texte enrichi multi-ligne : thème, puis une ligne par niveau 2 à 5, « ● Niv. N · bonus » en `Theme.Success` si atteint, « Niv. N · bonus » en `Theme.TextMuted` sinon, puis « encore N victoire(s) » ou « lien au maximum »).
 
 - [ ] **Step 1: Write the failing tests** (`AffinityFlowTests`) :
-  - `Row_ShowsThePairThemeAndTiers` : Verre (Contrôle/…) et un agent de rôle connu avec 8 victoires communes (niveau 3) → `Pair` contient le nom du thème du couple de rôles, « ✓ Niv. 2 » et « ✓ Niv. 3 », contient « Niv. 4 » sans « ✓ » devant, et « encore 7 victoire(s) » (15 − 8).
-  - `Row_AtMaxLevel_SaysSo` : 25 victoires → « lien au maximum », quatre « ✓ ».
-  - `Row_WithNoLink_ListsAllTiersAsUpcoming` : 0 victoire → aucun « ✓ », « encore 3 victoire(s) ».
+  - `Row_ShowsThePairThemeAndTiers` : Verre (Contrôle/…) et un agent de rôle connu avec 8 victoires communes (niveau 3) → `Pair` contient le nom du thème du couple de rôles, « ● Niv. 2 » et « ● Niv. 3 », contient « Niv. 4 » sans « ● » devant, et « encore 7 victoire(s) » (15 − 8).
+  - `Row_AtMaxLevel_SaysSo` : 25 victoires → « lien au maximum », quatre « ● ».
+  - `Row_WithNoLink_ListsAllTiersAsUpcoming` : 0 victoire → aucun « ● », « encore 3 victoire(s) ».
   - `Row_ForAnAgentRemovedFromTheGame_DoesNotThrow` : (Review Focus) un lien sauvegardé vers un identifiant inconnu n'apparaît pas et ne lève rien.
 - [ ] **Step 2: Run** `-testFilter N29.HeroesDawn.Tests.Presentation.AffinityFlowTests` — Expected: FAIL.
 - [ ] **Step 3: Implement** `Pair` dans `AffinityFlow.Row` (les 4 niveaux via `PairBonusRules.At`), le champ et l'affichage dans `AffinityRowView`, la recette (hauteur de ligne augmentée pour 6 lignes de texte ; `ctx.Wire(view, "pairText", pair)`), puis régénérer les deux prefabs : `-executeMethod N29.HeroesDawn.EditorTools.Prefabs.PrefabGenerator.GenerateAllBatch -quit -overwrite Widgets/AffinityRow.prefab,Popups/AffinityPopup.prefab` ; `git status` ne doit lister que ces deux prefabs côté `Prefabs/`.

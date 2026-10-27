@@ -70,13 +70,13 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Effets d'un palier en une ligne (« Rebond 50 % », « Brûlure 2 t + Purge (1) »).</summary>
         public static string TierEffects(CardTier tier) => string.Join(" + ", SkillText.Effects(tier.Effects));
 
-        /// <summary>Paliers d'une carte, un par ligne : atteint en vert précédé de « ✓ », à venir grisé.</summary>
+        /// <summary>Paliers d'une carte, un par ligne : atteint en vert précédé de « ● », à venir grisé.</summary>
         public static string TierLines(ILocalization loc, SkillCardDef card, int level)
             => string.Join("\n", card.Tiers.Select(t =>
             {
                 bool reached = t.Level <= level;
                 string line = loc.F("grimoire.tier_line", t.Level, TierEffects(t));
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(reached ? Theme.Success : Theme.TextMuted) + ">" + (reached ? "✓ " : "") + line + "</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(reached ? Theme.Success : Theme.TextMuted) + ">" + (reached ? "● " : "") + line + "</color>";
             }));
 
         public static string NatureName(ILocalization loc, CardNature n) => loc.T("card.nature." + n.ToString().ToLowerInvariant());

@@ -12,6 +12,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text agentName = null!;
         [SerializeField] TMP_Text link = null!;
         [SerializeField] TMP_Text bonus = null!;
+        [SerializeField] TMP_Text pairText = null!;
 
         public AffinityRowData Data { get; private set; }
 
@@ -23,6 +24,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             link.text = d.Link;
             bonus.text = d.Bonus;
             bonus.color = d.HasBonus ? Theme.Success : Theme.TextMuted;
+            pairText.text = d.Pair;
         }
     }
 }
