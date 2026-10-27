@@ -97,6 +97,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(r.IsSuccess, Is.True);
             Assert.That(r.Value.LeveledUp, Is.False);
             Assert.That(CraftingOps.Skill(s, ItemType.Armor), Is.EqualTo(CraftingRules.MaxSkill));
+            Assert.That(CraftingOps.Xp(s, ItemType.Armor), Is.EqualTo(CraftingRules.XpForLevel(CraftingRules.MaxSkill)), "l'expérience s'arrête au palier du niveau 10");
             var view = _app.Workshop.Skills().Single(v => v.Type == ItemType.Armor);
             Assert.That((view.Level, view.Maxed), Is.EqualTo((CraftingRules.MaxSkill, true)));
         }

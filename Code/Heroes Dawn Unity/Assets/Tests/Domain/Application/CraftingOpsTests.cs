@@ -119,6 +119,17 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(CraftingOps.Scraps(s, ScrapKind.Weapon), Is.EqualTo(0));
         }
 
+        [Test, Description("Vérifie qu'un compteur craftedNext en retard sur les objets enregistrés est remonté au chargement — parce que deux objets ne doivent jamais partager un identifiant, même avec une sauvegarde incohérente")]
+        public void RegisterSaved_RaisesALateCounter()
+        {
+            Craft(); Craft();
+            S.Meta.craftedNext = 0;
+            CraftingOps.RegisterSaved(S);
+            Assert.That(S.Meta.craftedNext, Is.EqualTo(2));
+            Assert.That(Craft().Id.Value, Is.EqualTo("crafted_3"));
+            Assert.That(S.Meta.crafted.Select(c => c.id), Is.Unique);
+        }
+
         [Test, Description("Vérifie que GrantDrops ajoute les scraps tirés, apprend la recette obtenue et fait avancer le compteur de tirages — parce que le tirage dépend du joueur et du nombre de tirages")]
         public void GrantDrops_UpdatesTheSave()
         {

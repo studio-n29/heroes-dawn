@@ -165,7 +165,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                                       CollectionText.ItemTypeChip(Loc, it.Type) + " · " + CollectionText.RarityName(Loc, it.Rarity) + " · " + CollectionText.ItemEffects(Loc, it));
             r.Tag = CollectionText.Tag(CollectionText.ItemName(Loc, it));
             r.TagColor = CollectionText.RarityColor(it.Rarity);
-            r.Art = AgentArt.Item(it.Id.Value);
+            r.Art = AgentArt.Item(CollectionText.ArtId(it, Defs));
             return r;
         }
 

@@ -35,6 +35,19 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_loc.T("scrap.Core"), Is.EqualTo("Noyaux"));
         }
 
+        [Test, Description("Vérifie qu'un objet fabriqué emprunte l'illustration d'un objet du catalogue de même type (et qu'un objet du catalogue garde la sienne) — parce que les objets fabriqués n'ont pas d'illustration propre")]
+        public void ArtId_OfACraftedItem_IsACatalogueItemOfTheSameType()
+        {
+            var c = N29.HeroesDawn.Content.Prototype.PrototypeCollection.Build();
+            var crafted = Crafted("patch_vest", CraftQuality.Fine);
+            string art = CollectionText.ArtId(crafted, c);
+            Assert.That(c.HasItem(new ItemId(art)), Is.True);
+            Assert.That(c.Item(new ItemId(art)).Type, Is.EqualTo(ItemType.Armor));
+            Assert.That(art, Does.Not.StartWith(CraftedItems.IdPrefix));
+            var plain = c.Items[0];
+            Assert.That(CollectionText.ArtId(plain, c), Is.EqualTo(plain.Id.Value));
+        }
+
         [Test, Description("Vérifie que les cinq qualités ont cinq couleurs distinctes et que la qualité se lit sur l'objet — parce que la couleur de l'étiquette distingue les objets fabriqués")]
         public void QualityColor_DiffersByTier_AndQualityIsReadFromTheItem()
         {

@@ -19,6 +19,14 @@ namespace N29.HeroesDawn.Presentation.Hub
                 ? loc.F("craft.name", loc.T("craft.recipe." + recipeId), QualityName(loc, quality))
                 : loc.T(item.NameKey);
 
+        /// <summary>Identifiant dont on charge l'illustration : celui de l'objet, ou pour un objet fabriqué (sans illustration propre) le premier objet du catalogue de même type.</summary>
+        public static string ArtId(ItemDef item, CollectionDef defs)
+        {
+            if (!item.Id.Value.StartsWith(CraftedItems.IdPrefix)) return item.Id.Value;
+            var same = defs.Items.Where(i => i.Type == item.Type).OrderBy(i => i.Id.Value).FirstOrDefault();
+            return same != null ? same.Id.Value : item.Id.Value;
+        }
+
         /// <summary>Qualité d'un objet fabriqué ; null pour un objet du catalogue.</summary>
         public static CraftQuality? QualityOf(ItemDef item)
             => CraftedItems.TryParseNameKey(item.NameKey, out _, out var quality) ? quality : (CraftQuality?)null;

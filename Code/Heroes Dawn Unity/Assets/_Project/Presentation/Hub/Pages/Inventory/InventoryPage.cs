@@ -92,7 +92,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 var quality = CollectionText.QualityOf(it);
                 r.TagColor = quality.HasValue ? CollectionText.QualityColor(quality.Value) : CollectionText.RarityColor(it.Rarity);
                 r.Badge = CollectionText.ItemTypeChip(Loc, it.Type) + " " + Loc.F("inventory.count", count);
-                r.Art = AgentArt.Item(it.Id.Value);
+                r.Art = AgentArt.Item(CollectionText.ArtId(it, defs));
                 rows.Add(r);
             }
             if (rows.Count == 0 && owned.Count > 0)

@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         // ---- Compétence de création, un niveau par type d'objet
         public static int Xp(GameSession s, ItemType type) => Get(s.Meta.craftXp, type.ToString());
 
-        public static void AddXp(GameSession s, ItemType type, int xp) => Set(s.Meta.craftXp, type.ToString(), Xp(s, type) + xp);
+        public static void AddXp(GameSession s, ItemType type, int xp) => Set(s.Meta.craftXp, type.ToString(), Math.Min(CraftingRules.XpForLevel(CraftingRules.MaxSkill), Xp(s, type) + xp));
 
         public static int Skill(GameSession s, ItemType type) => CraftingRules.SkillLevel(Xp(s, type));
 
@@ -80,6 +80,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
         /// <summary>Après le chargement d'un profil : le catalogue ne garde que les objets fabriqués de CE profil (un identifiant resté d'un profil précédent disparaît).</summary>
         public static void RegisterSaved(GameSession s)
         {
+            foreach (var c in s.Meta.crafted)
+                if (c.id.StartsWith(CraftedItems.IdPrefix) && int.TryParse(c.id.Substring(CraftedItems.IdPrefix.Length), out int n))
+                    s.Meta.craftedNext = Math.Max(s.Meta.craftedNext, n);
             var collection = s.Content.Collection;
             if (ReferenceEquals(collection, CollectionDef.Empty)) return;
             collection.ClearCrafted();

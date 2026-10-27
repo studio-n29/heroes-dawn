@@ -81,7 +81,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public Result<CraftOutcome> Craft(string recipeId)
         {
             var recipe = Definitions.Recipes.Find(recipeId);
-            if (recipe == null || !CraftingOps.Knows(Session, recipeId)) return Result<CraftOutcome>.Fail(MetaErrors.Unknown);
+            if (recipe == null || !CraftingOps.Knows(Session, recipeId) || ReferenceEquals(Session.Content.Collection, CollectionDef.Empty)) return Result<CraftOutcome>.Fail(MetaErrors.Unknown);
             if (!CanAfford(Session, recipe)) return Result<CraftOutcome>.Fail(MetaErrors.NotEnoughScraps);
 
             CraftingOps.TrySpendScraps(Session, ScrapKinds.For(recipe.Type), recipe.ScrapCost);

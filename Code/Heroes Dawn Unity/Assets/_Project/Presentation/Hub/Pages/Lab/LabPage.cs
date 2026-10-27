@@ -103,6 +103,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 rows.Add(r);
             }
             _recipes = _workshop.Recipes();
+            _firstRecipeRow = rows.Count;
             foreach (var v in _recipes)
             {
                 string name = Loc.T(v.Recipe.NameKey);
@@ -131,15 +132,15 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (row < 0) return;
             if (row >= ResearchLab.Techs.Count)
             {
-                int recipe = row - FirstRecipeRow;
+                int recipe = row - _firstRecipeRow;
                 if (recipe >= 0 && recipe < _recipes.Count) Craft(_recipes[recipe].Recipe.Id);
                 return;
             }
             Report(_lab.Start(ResearchLab.Techs[row].Id), Loc.T("lab.started"));
         }
 
-        // Les recherches, le titre de l'atelier puis les 4 compétences précèdent les recettes.
-        static int FirstRecipeRow => ResearchLab.Techs.Count + 1 + 4;
+        // Rangée de la première recette, relevée au rendu (après les recherches, le titre de l'atelier et les compétences).
+        int _firstRecipeRow = int.MaxValue;
 
         void Craft(string recipeId)
         {

@@ -315,7 +315,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (m != null && i < m.Items.Count && defs.HasItem(m.Items[i]))
                 {
                     var it = defs.Item(m.Items[i]);
-                    tiles[i] = new SheetTile { Title = CollectionText.ItemName(_loc, it), Sub = CollectionText.ItemTypeChip(_loc, it.Type) + " · " + CollectionText.ItemEffects(_loc, it), Art = AgentArt.Item(it.Id.Value), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item };
+                    tiles[i] = new SheetTile { Title = CollectionText.ItemName(_loc, it), Sub = CollectionText.ItemTypeChip(_loc, it.Type) + " · " + CollectionText.ItemEffects(_loc, it), Art = AgentArt.Item(CollectionText.ArtId(it, defs)), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item };
                 }
                 else
                 {
@@ -412,7 +412,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 string name = CollectionText.ItemName(_loc, it);
                 bool taken = !CollectionRules.CanEquip(it, others);
                 options.Add(new SheetTile { Title = name, Sub = taken ? _loc.T("equip.type_taken") : free > 1 ? _loc.F("loadout.copies", free) : CollectionText.ItemEffects(_loc, it),
-                                            Art = AgentArt.Item(id.Value), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item, Dim = taken });
+                                            Art = AgentArt.Item(CollectionText.ArtId(it, defs)), Frame = CollectionText.RarityColor(it.Rarity), Kind = SheetTileKind.Item, Dim = taken });
                 if (taken) { _pickActions.Add(() => Apply(Result.Fail(CollectionErrors.SameItemType), "loadout.equipped", name)); continue; }
                 _pickActions.Add(() =>
                 {
