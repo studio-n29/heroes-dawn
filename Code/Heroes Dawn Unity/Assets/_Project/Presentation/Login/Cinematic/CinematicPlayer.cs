@@ -185,9 +185,9 @@ namespace N29.HeroesDawn.Presentation.Login
 
             var voiceClip = shot.Voice ? Resources.Load<AudioClip>("Cinematic/Voice/vo_" + shot.Id) : null;
             float voiceLen = voiceClip != null ? voiceClip.length : 0f;
-            float voiceStart = 0.4f;
-            slot.Duration = Mathf.Max(shot.Seconds, voiceStart + voiceLen + 0.4f);
+            float voiceStart = CinematicTiming.VoiceStart;
             string subtitle = shot.Voice ? Loc.T("cinematic.vo." + shot.Id) : "";
+            slot.Duration = CinematicTiming.ShotSeconds(shot.Seconds, voiceLen, subtitle);
             ApplyMusic(shot, mainTheme);
 
             // Entrée dans le plan.
@@ -237,7 +237,7 @@ namespace N29.HeroesDawn.Presentation.Login
                 if (shot.FadeOut && left < 0.9f) _fade.color = new Color(0f, 0f, 0f, 1f - Mathf.Clamp01(left / 0.9f));
 
                 Tick(slot, prev, dt, true);
-                UpdateText(shot, elapsed, voiceStarted, voiceLen, voiceStart, subtitle, titleStart);
+                UpdateText(shot, elapsed, voiceLen, slot.Duration, subtitle, titleStart);
                 UpdateBeds(dt, voiceStarted && _voice.isPlaying);
                 await UniTask.Yield(PlayerLoopTiming.Update, ct);
             }
@@ -428,14 +428,13 @@ namespace N29.HeroesDawn.Presentation.Login
 
         // ---------------------------------------------------------------- Textes
 
-        void UpdateText(CinematicShot shot, float t, bool voiceStarted, float voiceLen, float voiceStart, string subtitle, float titleStart)
+        void UpdateText(CinematicShot shot, float t, float voiceLen, float shotSeconds, string subtitle, float titleStart)
         {
-            // Sous-titre : visible pendant la voix.
+            // Légende : suit la voix si elle existe, sinon le temps de lecture.
             float a = 0f;
-            if (voiceStarted && !string.IsNullOrEmpty(subtitle))
+            if (!string.IsNullOrEmpty(subtitle))
             {
-                float local = t - voiceStart;
-                a = Mathf.Clamp01(local / 0.3f) * Mathf.Clamp01((voiceLen + 0.4f - local) / 0.4f);
+                a = CinematicTiming.SubtitleAlpha(t, voiceLen, shotSeconds);
                 if (_subtitle.text != subtitle) _subtitle.text = subtitle;
             }
             _subtitle.color = new Color(1f, 1f, 1f, a);

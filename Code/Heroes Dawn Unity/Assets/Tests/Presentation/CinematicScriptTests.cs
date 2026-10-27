@@ -11,10 +11,10 @@ namespace N29.HeroesDawn.Tests.Presentation
     {
         static IReadOnlyList<CinematicShot> Shots => CinematicScript.Shots;
 
-        [Test, Description("Vérifie que la version courte garde 12 plans du découpage, dans l ordre du document, de S01 à S46 — parce que la cinématique doit condenser l histoire sans la réordonner")]
+        [Test, Description("Vérifie que la version courte garde 11 plans du découpage, dans l ordre du document, de S01 à S46 — parce que la cinématique doit condenser l histoire sans la réordonner")]
         public void Shots_AreTheCondensedCut()
         {
-            Assert.That(Shots.Select(s => s.Id), Is.EqualTo(new[] { "S01", "S02", "S10", "S11", "S15", "S20", "S24", "S33", "S37", "S41", "S44", "S46" }));
+            Assert.That(Shots.Select(s => s.Id), Is.EqualTo(new[] { "S01", "S02", "S10", "S11", "S15", "S24", "S33", "S37", "S41", "S44", "S46" }));
         }
 
         [Test, Description("Vérifie que chaque illustration citée par un plan existe dans Resources/Cinematic/Art — parce qu'un plan sans image jouerait un écran noir")]
@@ -24,34 +24,45 @@ namespace N29.HeroesDawn.Tests.Presentation
             foreach (var key in keys) Assert.That(Resources.Load<Sprite>("Cinematic/Art/" + key), Is.Not.Null, "illustration manquante : " + key);
         }
 
-        [Test, Description("Vérifie que chaque plan parlé a sa voix off enregistrée et son sous-titre, et chaque effet sonore son fichier — parce que la cinématique se cale sur la voix et ne doit rien laisser muet par erreur")]
+        [Test, Description("Vérifie que chaque plan a sa légende (la voix off est facultative) et chaque effet sonore son fichier, et chaque effet sonore son fichier — parce que la cinématique se cale sur la voix et ne doit rien laisser muet par erreur")]
         public void EveryVoiceAndSfx_Exists()
         {
             foreach (var shot in Shots)
             {
-                if (shot.Voice)
-                {
-                    Assert.That(Resources.Load<AudioClip>("Cinematic/Voice/vo_" + shot.Id), Is.Not.Null, "voix manquante : " + shot.Id);
-                    Assert.That(Loc.Has("cinematic.vo." + shot.Id), Is.True, "sous-titre manquant : " + shot.Id);
-                }
+                if (shot.Voice) Assert.That(Loc.T("cinematic.vo." + shot.Id), Is.Not.Empty.And.Not.StartWith("cinematic.vo"), "sous-titre manquant : " + shot.Id);
                 if (shot.Sfx != null) Assert.That(Resources.Load<AudioClip>("Cinematic/Audio/" + shot.Sfx), Is.Not.Null, "son manquant : " + shot.Sfx);
             }
             foreach (var bed in new[] { "mus_cold", "mus_war", "mus_piano" }) Assert.That(Resources.Load<AudioClip>("Cinematic/Audio/" + bed), Is.Not.Null, bed);
         }
 
-        [Test, Description("Vérifie que les plans muets du document (S04, S40, S46) n'ont pas de voix et que la liste des voix correspond aux plans parlés — parce que le silence est un choix de montage, pas un oubli")]
-        public void SilentShots_AreTheDocumentedOnes()
+        [Test, Description("Vérifie que tous les plans ont une légende (aucun plan muet) et que la liste des plans à légende correspond au script — parce que la narration du PDF couvre toute la cinématique, voix ou non")]
+        public void NoShotIsSilent()
         {
-            var silent = Shots.Where(s => !s.Voice).Select(s => s.Id);
-            Assert.That(silent, Is.EqualTo(new[] { "S46" }));
-            Assert.That(Loc.CinematicVoiceIds, Is.EquivalentTo(Shots.Where(s => s.Voice).Select(s => s.Id)));
+            Assert.That(Shots.Where(s => !s.Voice), Is.Empty);
+            Assert.That(Loc.CinematicVoiceIds, Is.EquivalentTo(Shots.Select(s => s.Id)));
         }
 
-        [Test, Description("Vérifie que la durée réelle (voix comprise) reste sous la minute — parce que la cinématique est un condensé de l histoire, pas un film")]
-        public void TotalDuration_StaysUnderAMinute()
+        [Test, Description("Vérifie qu'aucun fichier de voix off ne reste dans les ressources (les anciennes voix disaient l'ancien texte) — parce que la cinématique doit marcher sans voix, et jouer une voix dès qu'un vo_<plan> est déposé")]
+        public void NoVoiceFilesRemain()
         {
-            float total = Shots.Sum(s => Mathf.Max(s.Seconds, s.Voice ? 0.8f + Resources.Load<AudioClip>("Cinematic/Voice/vo_" + s.Id).length : 0f));
-            Assert.That(total, Is.InRange(40f, 57f));
+            foreach (var shot in Shots) Assert.That(Resources.Load<AudioClip>("Cinematic/Voice/vo_" + shot.Id), Is.Null, shot.Id);
+        }
+
+        [Test, Description("Vérifie que la durée totale au temps de lecture (sans voix) reste entre 60 et 170 secondes — parce que la narration du PDF est longue mais la cinématique reste un condensé")]
+        public void TotalDuration_FollowsTheReadingTime()
+        {
+            float total = Shots.Sum(s => CinematicTiming.ShotSeconds(s.Seconds, 0f, Loc.T("cinematic.vo." + s.Id)));
+            Assert.That(total, Is.InRange(60f, 170f));
+        }
+
+        [Test, Description("Vérifie que chaque légende fait de 3 à 45 mots — parce qu'une légende trop longue déborde de l'écran")]
+        public void NoCaptionIsEmptyOrTooLong()
+        {
+            foreach (var s in Shots)
+            {
+                int words = CinematicTiming.Words(Loc.T("cinematic.vo." + s.Id));
+                Assert.That(words, Is.InRange(3, 45), s.Id);
+            }
         }
 
         [Test, Description("Vérifie que les poses de caméra restent dans l'image (échelle ≥ 1, point regardé entre 0 et 1) et que les lueurs sont placées dans l'image — parce qu'un cadrage hors image montrerait du noir")]

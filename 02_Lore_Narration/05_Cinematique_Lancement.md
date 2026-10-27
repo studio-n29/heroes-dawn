@@ -656,3 +656,25 @@ a golden four-pointed star of fire igniting in darkness, faceted golden light ra
 - **Rayner au Vatican puis à Paris** : la cinématique suit ton récit (touchée au Vatican, présente à Paris). Le mot « mortellement » est retiré de la narration pour rester cohérent.
 - **Volkov et Orik** : Orik est montré comme un visage d'emprunt qui se fissure sur celui de Volkov. Si Orik est simplement Volkov vieilli, S20 et S22 sont à ajuster.
 - **S45** : les deux agents sont montrés de dos, sans visage, pour qu'ils restent génériques avant le choix du joueur.
+
+---
+
+## 8. Narration du PDF « N29 HQ » (version courte du jeu, 0.14.0)
+
+La version courte du jeu (11 plans : S01, S02, S10, S11, S15, S24, S33, S37, S41, S44, S46) affiche la narration du PDF en légendes. Les voix off sont à enregistrer plus tard : déposer un fichier `Assets/_Project/Resources/Cinematic/Voice/vo_<plan>.wav` suffit, le jeu le joue et cale la légende et la durée du plan sur la voix. Sans fichier, la légende reste le temps de la lire (1,2 s + 0,35 s par mot).
+
+| Plan | Légende (et texte à enregistrer) |
+|---|---|
+| S01 | Chaque aube naît de la nuit. |
+| S02 | Pendant la Guerre froide, l'Amérique a utilisé les recherches d'un généticien pour créer une arme aussi efficace que la bombe atomique, sans la fin du monde. |
+| S10 | Après plusieurs essais ratés, le monde a découvert l'Apex Unit : des humains génétiquement modifiés, aux pouvoirs extraordinaires, qui ont mis fin à la Guerre froide en quelques mois. |
+| S11 | Une longue fausse paix a suivi, où l'Apex Unit était l'étendard d'une justice manipulatrice, fondée sur le rapport de force. |
+| S15 | Jusqu'en 2026, où un jeune homme a réveillé ses pouvoirs enfouis : le premier méta-humain naturel de l'histoire. |
+| S24 | Avec son éveil, le monde a été entraîné dans une bataille contre une créature biblique, alors au rang de légende : Mephisto. |
+| S33 | À Paris, Mephisto s'est opposé à l'Apex Unit et a ouvert une brèche entre les mondes, qui allait tout anéantir… |
+| S37 | … jusqu'à ce que le jeune homme apparaisse, déploie ses ailes et se sacrifie dans ce qu'on appellera La Supernova. |
+| S41 | Ses radiations, disparues dans la brèche avec Mephisto, ont altéré l'ADN d'une grande partie de l'humanité : une vague de méta-humains sans précédent est née. |
+| S44 | Aujourd'hui, cinq ans plus tard, les méta-humains cherchent leur place, tandis que l'Apex Unit a laissé la place à The Dawn. |
+| S46 | Le monde est partagé entre acceptation, contrôle et anéantissement de ces nouveaux humains. |
+
+Le plan S20 (Orik Kovvolt) n'est plus dans la version courte : le récit du PDF ne le mentionne pas. Les 46 plans du découpage complet restent valables pour une version longue.

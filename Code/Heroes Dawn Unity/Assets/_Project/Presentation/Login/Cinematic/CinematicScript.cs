@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.Presentation.Login
         /// <summary>Plans retenus pour la version courte (moins d une minute) et leur durée minimale en secondes.</summary>
         static readonly (string Id, float Seconds)[] Kept =
         {
-            ("S01", 3f), ("S02", 4f), ("S10", 4f), ("S11", 4f), ("S15", 4f), ("S20", 4f), ("S24", 3.5f), ("S33", 3.5f), ("S37", 3.5f), ("S41", 4.5f), ("S44", 4.5f), ("S46", 3.5f),
+            ("S01", 3f), ("S02", 4f), ("S10", 4f), ("S11", 4f), ("S15", 4f), ("S24", 3.5f), ("S33", 3.5f), ("S37", 3.5f), ("S41", 4.5f), ("S44", 4.5f), ("S46", 3.5f),
         };
 
         static IReadOnlyList<CinematicShot> Condense(IReadOnlyList<CinematicShot> all)
@@ -133,7 +133,7 @@ namespace N29.HeroesDawn.Presentation.Login
             new CinematicShot { Id = "S44", Seconds = 6, Art = "nyc", From = P(1.5f, 0.25f, 0.65f), To = P(1.0f, 0.5f, 0.5f), Grade = CinematicGrade.Dawn, Fx = CinematicFx.Rays | CinematicFx.Embers | CinematicFx.GoldSparks, In = CinematicIn.GoldBurn,
                 Glows = new[] { new CinematicGlow(0.69f, 0.47f, 520, Gold, 1.2f) } },
             new CinematicShot { Id = "S45", Seconds = 5, Art = "nyc", From = P(1.0f, 0.5f, 0.55f), To = P(1.4f, 0.22f, 0.58f), Grade = CinematicGrade.Dawn, Fx = CinematicFx.Dust | CinematicFx.Rays },
-            new CinematicShot { Id = "S46", Seconds = 6, Proc = CinematicProc.Star, Voice = false, In = CinematicIn.GoldBurn, Fx = CinematicFx.Embers | CinematicFx.GoldSparks, Sfx = "sfx_resonance", SfxAt = 0.2f, SfxVolume = 0.9f, Logo = true },
+            new CinematicShot { Id = "S46", Seconds = 6, Proc = CinematicProc.Star, In = CinematicIn.GoldBurn, Fx = CinematicFx.Embers | CinematicFx.GoldSparks, Sfx = "sfx_resonance", SfxAt = 0.2f, SfxVolume = 0.9f, Logo = true },
         };
     }
 }
