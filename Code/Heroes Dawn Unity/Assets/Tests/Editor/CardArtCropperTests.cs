@@ -49,6 +49,31 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That((assignments.Count, missing), Is.EqualTo((0, 0)));
         }
 
+        [Test, Description("Vérifie qu'une source illisible n'est ni recadrée ni attribuée, et que les images déjà créées sont bien inscrites dans SOURCES.md avant l'erreur — parce qu'un échec en cours de route ne doit ni perdre la trace d'une source ni graver une image cassée")]
+        public void Generate_RecordsEachImage_AndRejectsUnreadableSources()
+        {
+            string dir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "hd_cropper_" + System.Guid.NewGuid().ToString("N"));
+            string src = System.IO.Path.Combine(dir, "src"), outDir = System.IO.Path.Combine(dir, "out");
+            System.IO.Directory.CreateDirectory(src);
+            System.IO.Directory.CreateDirectory(outDir);
+            try
+            {
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(src, "a_ok.png"), Solid(64, 36, Color.gray).EncodeToPNG());
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(src, "b_broken.jpg"), new byte[] { 1, 2, 3, 4 });
+                string sourcesPath = System.IO.Path.Combine(outDir, "SOURCES.md");
+                var file = new SourcesFile();
+                var assignments = new Dictionary<string, string> { ["card_one"] = "a_ok.png", ["card_two"] = "b_broken.jpg" };
+                UnityEngine.TestTools.LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex("source illisible.*b_broken"));
+                bool ok = CardArtCropper.Generate(assignments, src, outDir, file, sourcesPath, id => Color.white);
+                Assert.That(ok, Is.False);
+                Assert.That(System.IO.File.Exists(System.IO.Path.Combine(outDir, "card_one.jpg")), Is.True);
+                Assert.That(System.IO.File.Exists(System.IO.Path.Combine(outDir, "card_two.jpg")), Is.False);
+                var saved = SourcesFile.Parse(System.IO.File.ReadAllText(sourcesPath));
+                Assert.That(saved.Assigned, Is.EquivalentTo(new Dictionary<string, string> { ["card_one"] = "a_ok.png" }));
+            }
+            finally { System.IO.Directory.Delete(dir, true); }
+        }
+
         static Texture2D Solid(int w, int h, Color c)
         {
             var t = new Texture2D(w, h, TextureFormat.RGBA32, false);

@@ -136,21 +136,50 @@ namespace N29.HeroesDawn.EditorTools.Assets
                 Debug.LogError("[Heroes Dawn] Illustrations de cartes : il manque " + missing + " image(s) source libre(s) dans 03_Art_UI_UX/Illustrations/ (" + missingArt.Count + " carte(s) à illustrer).");
                 return false;
             }
+            bool ok = Generate(assignments, root, CardsFolder, file, sourcesPath, id => Theme.FamilyColor(collection.Card(new Core.CardId(id)).Family));
+            AssetDatabase.Refresh();
+            Debug.Log("[Heroes Dawn] Illustrations de cartes : " + file.Assigned.Count(kv => assignments.ContainsKey(kv.Key)) + " créée(s) sur " + assignments.Count + ".");
+            return ok;
+        }
+
+        /// <summary>
+        /// Crée l'image de chaque carte depuis sa source et inscrit l'attribution dans SOURCES.md aussitôt après (une erreur en cours de route
+        /// ne perd aucune trace). Une source illisible n'est ni recadrée ni attribuée. Rend faux si au moins une image n'a pas pu être créée.
+        /// </summary>
+        public static bool Generate(IReadOnlyDictionary<string, string> assignments, string sourceRoot, string outFolder, SourcesFile file,
+                                    string sourcesPath, Func<string, Color> tintOf)
+        {
+            bool ok = true;
             foreach (var kv in assignments)
             {
-                var card = collection.Card(new Core.CardId(kv.Key));
                 var src = new Texture2D(2, 2);
-                src.LoadImage(File.ReadAllBytes(Path.Combine(root, kv.Value)));
-                var cropped = Crop(src, Theme.FamilyColor(card.Family));
-                File.WriteAllBytes(Path.Combine(CardsFolder, kv.Key + ".jpg"), cropped.EncodeToJPG(85));
-                UnityEngine.Object.DestroyImmediate(src);
-                UnityEngine.Object.DestroyImmediate(cropped);
-                file.Assigned[kv.Key] = kv.Value;
+                Texture2D? cropped = null;
+                try
+                {
+                    if (!src.LoadImage(File.ReadAllBytes(Path.Combine(sourceRoot, kv.Value))))
+                    {
+                        Debug.LogError("[Heroes Dawn] Illustrations de cartes : source illisible « " + kv.Value + " » (carte " + kv.Key + ") ; rien n'est créé.");
+                        ok = false;
+                        continue;
+                    }
+                    src.wrapMode = TextureWrapMode.Clamp;
+                    cropped = Crop(src, tintOf(kv.Key));
+                    File.WriteAllBytes(Path.Combine(outFolder, kv.Key + ".jpg"), cropped.EncodeToJPG(85));
+                    file.Assigned[kv.Key] = kv.Value;
+                    File.WriteAllText(sourcesPath, file.Write());
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("[Heroes Dawn] Illustrations de cartes : échec pour " + kv.Key + " (" + kv.Value + ") : " + e.Message);
+                    ok = false;
+                }
+                finally
+                {
+                    UnityEngine.Object.DestroyImmediate(src);
+                    if (cropped != null) UnityEngine.Object.DestroyImmediate(cropped);
+                }
             }
-            File.WriteAllText(sourcesPath, file.Write());
-            AssetDatabase.Refresh();
-            Debug.Log("[Heroes Dawn] Illustrations de cartes : " + assignments.Count + " créée(s).");
-            return true;
+            return ok;
         }
     }
 }

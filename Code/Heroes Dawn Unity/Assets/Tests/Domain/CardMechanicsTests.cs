@@ -212,6 +212,31 @@ namespace N29.HeroesDawn.Tests.Domain
             }
         }
 
+        [Test, Description("Vérifie que chacune des 48 cartes, équipée en carte 1 (3e place) au niveau 10 par un agent de sa famille, est bien lancée par l'IA en mode Auto, sans erreur — parce que chaque liste d'effets doit réellement tourner dans le moteur")]
+        public void AutoMode_CastsEveryCard()
+        {
+            var c = TestContent.Build();
+            var never = new List<string>();
+            foreach (var card in c.Collection.Cards)
+            {
+                var member = c.Members.First(m => m.Family == card.Family);
+                var ally = new AllyEntry(member.Id, 10, 0, 0, null, new CardId?[] { card.Id }, new[] { 10 });
+                var setup = new CombatSetup(17UL, CombatRank.Normal, new[] { ally },
+                    new[] { new EnemyEntry(new EnemyId("brute"), 8), new EnemyEntry(new EnemyId("brute"), 8) }, true);
+                var sim = new CombatSimulation(c, setup);
+                sim.Unit(0).Energy = sim.Unit(0).MaxEnergy; // énergie pleine : les Légendaires (70) sont lançables avant la fin d'un combat court
+                bool cast = false;
+                int steps = 0, maxEnergy = 0;
+                for (; steps < 20000 && !cast && !sim.IsOver; steps++)
+                {
+                    cast = sim.Step(1).OfType<SkillUsedEvent>().Any(e => e.Actor == 0 && e.Skill.Value == card.Id.Value);
+                    maxEnergy = Math.Max(maxEnergy, sim.Unit(0).Energy);
+                }
+                if (!cast) never.Add(card.Id.Value + " (coût " + card.Skill.Cost + ", énergie max " + maxEnergy + ", " + steps + " pas, fini " + sim.IsOver + ")");
+            }
+            Assert.That(never, Is.Empty);
+        }
+
         static string Trace(IEnumerable<CombatEvent> e) => string.Join("|", e.Select(x => x.GetType().Name + ":" + x.Tick));
 
         [Test, Description("Vérifie que le rebond ne fait rien (et ne tire rien au sort) sans autre ennemi ou sans effet de dégâts : la suite du combat est identique à celle d'une compétence sans rebond — parce que le combat doit rester rejouable à l'identique")]
