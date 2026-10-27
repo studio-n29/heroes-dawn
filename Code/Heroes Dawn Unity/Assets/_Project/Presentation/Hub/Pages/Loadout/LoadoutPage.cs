@@ -115,7 +115,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             // ---- Réserve d'objets
             Section("loadout.stock_items");
             bool anyItem = false;
-            foreach (var it in Defs.Items.OrderByDescending(i => i.Rarity).ThenBy(i => i.Id))
+            foreach (var it in Defs.AllItems.OrderByDescending(i => i.Rarity).ThenBy(i => i.Id))
             {
                 int free = CollectionOps.AvailableItems(_session, it.Id);
                 if (free <= 0) continue;

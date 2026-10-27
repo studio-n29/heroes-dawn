@@ -42,6 +42,16 @@ namespace N29.HeroesDawn.Definitions
         }
     }
 
+    /// <summary>Statistiques tirées pour un objet fabriqué, en % (0 : la recette n'en donne pas).</summary>
+    public readonly struct CraftedStats
+    {
+        public int Hp { get; }
+        public int Atk { get; }
+        public int Def { get; }
+        public int Spd { get; }
+        public CraftedStats(int hp, int atk, int def, int spd) { Hp = hp; Atk = atk; Def = def; Spd = spd; }
+    }
+
     public enum RecipeStatKind { Hp, Atk, Def, Spd }
 
     /// <summary>Une statistique d'une recette et la fourchette (en %) dans laquelle elle est tirée.</summary>

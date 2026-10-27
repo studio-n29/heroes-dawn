@@ -404,7 +404,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             // L'objet de l'emplacement visé sera retiré : seul l'autre objet porté peut bloquer le type.
             var others = m.Items.Where(x => !currentId.HasValue || x != currentId.Value).Select(defs.Item).ToList();
             // Équipables d'abord : la liste est limitée à 8 tuiles et un objet grisé ne doit pas cacher un objet portable.
-            foreach (var it in defs.Items.OrderBy(i => !CollectionRules.CanEquip(i, others)).ThenByDescending(i => i.Rarity).ThenBy(i => i.Id))
+            foreach (var it in defs.AllItems.OrderBy(i => !CollectionRules.CanEquip(i, others)).ThenByDescending(i => i.Rarity).ThenBy(i => i.Id))
             {
                 int free = CollectionOps.AvailableItems(_game!, it.Id);
                 if (free <= 0) continue;

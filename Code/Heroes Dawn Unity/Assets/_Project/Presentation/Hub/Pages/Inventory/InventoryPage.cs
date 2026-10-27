@@ -58,16 +58,17 @@ namespace N29.HeroesDawn.Presentation.Hub
         protected override void Render()
         {
             var defs = _session.Content.Collection;
-            var owned = defs.Items.Where(i => CollectionOps.OwnedItems(_session, i.Id) > 0)
+            var owned = defs.AllItems.Where(i => CollectionOps.OwnedItems(_session, i.Id) > 0)
                                   .OrderByDescending(i => i.Rarity).ThenBy(i => i.Id).ToList();
             int total = owned.Sum(i => CollectionOps.OwnedItems(_session, i.Id));
+            int catalogOwned = owned.Count(i => !i.Id.Value.StartsWith(CraftedItems.IdPrefix));
             int equipped = _session.Roster.Sum(m => m.Items.Count);
             View.ShowHeader(new ListHeaderData
             {
                 Title = Loc.T("inventory.header"),
                 Line = Loc.F("inventory.line", total, equipped),
-                Progress = defs.Items.Count == 0 ? -1f : owned.Count / (float)defs.Items.Count,
-                ProgressLabel = owned.Count + " / " + defs.Items.Count,
+                Progress = defs.Items.Count == 0 ? -1f : catalogOwned / (float)defs.Items.Count,
+                ProgressLabel = catalogOwned + " / " + defs.Items.Count,
                 A = RowButtonData.Of(Loc.T("inventory.team"), true, "", 0),
             });
 

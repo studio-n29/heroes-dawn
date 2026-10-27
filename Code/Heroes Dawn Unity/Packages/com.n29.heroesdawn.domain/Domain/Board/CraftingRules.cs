@@ -6,16 +6,6 @@ using N29.HeroesDawn.Definitions;
 
 namespace N29.HeroesDawn.Domain.Board
 {
-    /// <summary>Statistiques tirées pour un objet fabriqué, en % (0 : la recette n'en donne pas).</summary>
-    public readonly struct CraftedStats
-    {
-        public int Hp { get; }
-        public int Atk { get; }
-        public int Def { get; }
-        public int Spd { get; }
-        public CraftedStats(int hp, int atk, int def, int spd) { Hp = hp; Atk = atk; Def = def; Spd = spd; }
-    }
-
     /// <summary>Tirage de la qualité et des statistiques des objets fabriqués, et progression de la compétence de création.</summary>
     public static class CraftingRules
     {

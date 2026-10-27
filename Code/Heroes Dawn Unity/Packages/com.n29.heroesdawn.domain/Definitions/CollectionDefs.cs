@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using N29.HeroesDawn.Core;
 
 namespace N29.HeroesDawn.Definitions
@@ -157,10 +158,34 @@ namespace N29.HeroesDawn.Definitions
             foreach (var b in boosters) _boosters.Add(b.Id, b);
         }
 
-        public bool HasItem(ItemId id) => _items.ContainsKey(id);
+        readonly Dictionary<ItemId, ItemDef> _craftedById = new Dictionary<ItemId, ItemDef>();
+        readonly List<ItemDef> _crafted = new List<ItemDef>();
+
+        /// <summary>Objets fabriqués au labo (exemplaires uniques), à part du catalogue : ni la boutique ni les drops ne les voient.</summary>
+        public IReadOnlyList<ItemDef> Crafted => _crafted;
+
+        /// <summary>Le catalogue puis les objets fabriqués : tout ce qui peut être possédé ou équipé.</summary>
+        public IReadOnlyList<ItemDef> AllItems => _crafted.Count == 0 ? Items : Items.Concat(_crafted).ToList();
+
+        /// <summary>Enregistre un objet fabriqué (même identifiant : remplacé). Refusé sur <see cref="Empty"/>, partagée par tout le jeu.</summary>
+        public void Register(ItemDef item)
+        {
+            if (ReferenceEquals(this, Empty)) throw new InvalidOperationException("CollectionDef.Empty est partagée : elle n'accepte aucun objet fabriqué.");
+            if (_craftedById.TryGetValue(item.Id, out var old)) _crafted.Remove(old);
+            _craftedById[item.Id] = item;
+            _crafted.Add(item);
+        }
+
+        public void ClearCrafted()
+        {
+            _craftedById.Clear();
+            _crafted.Clear();
+        }
+
+        public bool HasItem(ItemId id) => _items.ContainsKey(id) || _craftedById.ContainsKey(id);
         public bool HasCard(CardId id) => _cards.ContainsKey(id);
         public bool HasBooster(string id) => _boosters.ContainsKey(id);
-        public ItemDef Item(ItemId id) => _items[id];
+        public ItemDef Item(ItemId id) => _items.TryGetValue(id, out var item) ? item : _craftedById[id];
         public SkillCardDef Card(CardId id) => _cards[id];
         public BoosterDef Booster(string id) => _boosters[id];
     }
