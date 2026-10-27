@@ -13,7 +13,7 @@ namespace N29.HeroesDawn.Application.Features.Account
     /// un seul envoi à la fois, vidage immédiat à la fermeture, réessais à 5, 20 puis 60 s après un échec. L'écriture est conditionnelle sur la date lue :
     /// si le compte a changé, l'envoi s'arrête (<see cref="ConflictDetected"/>) et rien n'est écrasé. Un échec réseau ne gêne jamais la sauvegarde locale.
     /// </summary>
-    public sealed class CloudSyncService : ILocalSaveObserver
+    public sealed class CloudSync : ILocalSaveObserver
     {
         public static readonly TimeSpan Interval = TimeSpan.FromSeconds(20);
         static readonly TimeSpan[] RetryDelays = { TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(60) };
@@ -32,7 +32,7 @@ namespace N29.HeroesDawn.Application.Features.Account
         bool _uploading;
         DateTime? _lastUpload;
 
-        public CloudSyncService(ICloudProfileGateway cloud, ICloudSyncStateStore state, GameSession session, IClock clock, ILogger log,
+        public CloudSync(ICloudProfileGateway cloud, ICloudSyncStateStore state, GameSession session, IClock clock, ILogger log,
                                 Func<TimeSpan, CancellationToken, UniTask>? delay = null, SaveScheduler? save = null)
         {
             _cloud = cloud; _state = state; _session = session; _clock = clock; _log = log;

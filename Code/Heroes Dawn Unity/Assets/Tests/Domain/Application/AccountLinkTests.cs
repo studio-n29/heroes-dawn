@@ -13,7 +13,7 @@ using NUnit.Framework;
 namespace N29.HeroesDawn.Tests.Domain.Application
 {
     /// <summary>Rattachement d'un invité à un compte, choix de progression, session et déconnexion (lot I).</summary>
-    public sealed class AccountServiceTests
+    public sealed class AccountLinkTests
     {
         static readonly CancellationToken Ct = CancellationToken.None;
 
@@ -23,8 +23,8 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         LocalAccountGateway _accounts = null!;
         MemorySyncStateStore _state = null!;
         MemoryProgressBackupStore _backups = null!;
-        CloudSyncService _sync = null!;
-        AccountService _svc = null!;
+        CloudSync _sync = null!;
+        AccountLink _svc = null!;
 
         [SetUp]
         public void SetUp()
@@ -37,8 +37,8 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             _accounts = new LocalAccountGateway(0);
             _state = new MemorySyncStateStore();
             _backups = new MemoryProgressBackupStore();
-            _sync = new CloudSyncService(_cloud, _state, _app.Session, _clock, _app.Logger, (t, ct) => { _clock.Advance(t); return UniTask.CompletedTask; }, _app.Save);
-            _svc = new AccountService(_accounts, _cloud, _app.Session, _app.Save, _sync, _state, _backups, _clock, _app.Logger,
+            _sync = new CloudSync(_cloud, _state, _app.Session, _clock, _app.Logger, (t, ct) => { _clock.Advance(t); return UniTask.CompletedTask; }, _app.Save);
+            _svc = new AccountLink(_accounts, _cloud, _app.Session, _app.Save, _sync, _state, _backups, _clock, _app.Logger,
                                       _app.Publisher<WalletChanged>(), _app.Publisher<RosterChanged>());
         }
 
@@ -194,7 +194,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public void SignUp_NeedingConfirmation_StaysGuest()
         {
             var gateway = new ConfirmingAccounts();
-            var svc = new AccountService(gateway, _cloud, _app.Session, _app.Save, _sync, _state, _backups, _clock, _app.Logger,
+            var svc = new AccountLink(gateway, _cloud, _app.Session, _app.Save, _sync, _state, _backups, _clock, _app.Logger,
                                          _app.Publisher<WalletChanged>(), _app.Publisher<RosterChanged>());
             var r = svc.SignUpAsync("moi@exemple.fr", "motdepasse1", "Moi", Ct).GetAwaiter().GetResult();
             Assert.That(r.IsSuccess, Is.True);
@@ -245,7 +245,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             _accounts.SignUpAsync("moi@exemple.fr", "motdepasse1", "Moi", Ct).GetAwaiter().GetResult();
             GiveLocalProgress(5);
             var gated = new GatedAccounts(_accounts);
-            var svc = new AccountService(gated, _cloud, _app.Session, _app.Save, _sync, _state, _backups, _clock, _app.Logger,
+            var svc = new AccountLink(gated, _cloud, _app.Session, _app.Save, _sync, _state, _backups, _clock, _app.Logger,
                                          _app.Publisher<WalletChanged>(), _app.Publisher<RosterChanged>());
             var first = svc.SignInAsync("moi@exemple.fr", "motdepasse1", Ct);
             var second = svc.SignInAsync("moi@exemple.fr", "motdepasse1", Ct);

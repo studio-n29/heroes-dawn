@@ -15,13 +15,13 @@ namespace N29.HeroesDawn.Application.Features.Account
     /// session restaurée au lancement, déconnexion. Règle d'or : rien n'est jamais écrasé sans qu'une sauvegarde de secours de l'autre version existe,
     /// et une version du compte plus récente que celle du jeu n'est jamais appliquée.
     /// </summary>
-    public sealed class AccountService
+    public sealed class AccountLink
     {
         readonly IAccountGateway _accounts;
         readonly ICloudProfileGateway _cloud;
         readonly GameSession _session;
         readonly SaveScheduler _save;
-        readonly CloudSyncService _sync;
+        readonly CloudSync _sync;
         readonly ICloudSyncStateStore _state;
         readonly IProgressBackupStore _backups;
         readonly IClock _clock;
@@ -33,7 +33,7 @@ namespace N29.HeroesDawn.Application.Features.Account
         string _pendingAuthKey = "";
         CloudProfile? _pendingCloud;
 
-        public AccountService(IAccountGateway accounts, ICloudProfileGateway cloud, GameSession session, SaveScheduler save, CloudSyncService sync,
+        public AccountLink(IAccountGateway accounts, ICloudProfileGateway cloud, GameSession session, SaveScheduler save, CloudSync sync,
                               ICloudSyncStateStore state, IProgressBackupStore backups, IClock clock, ILogger log,
                               IPublisher<WalletChanged> wallet, IPublisher<RosterChanged> roster)
         {

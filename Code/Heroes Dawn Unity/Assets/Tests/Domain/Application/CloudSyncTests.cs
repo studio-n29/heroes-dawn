@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace N29.HeroesDawn.Tests.Domain.Application
 {
     /// <summary>Envoi différé du profil vers le cloud : regroupement, un envoi à la fois, vidage, conflit, réessais, hors ligne.</summary>
-    public sealed class CloudSyncServiceTests
+    public sealed class CloudSyncTests
     {
         static readonly CancellationToken Ct = CancellationToken.None;
 
@@ -43,7 +43,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         FixedClock _clock = null!;
         SpyCloud _cloud = null!;
         MemorySyncStateStore _state = null!;
-        CloudSyncService _sync = null!;
+        CloudSync _sync = null!;
         List<TimeSpan> _waits = null!;
         UniTaskCompletionSource? _delayGate;
 
@@ -57,7 +57,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             _state = new MemorySyncStateStore();
             _waits = new List<TimeSpan>();
             _delayGate = null;
-            _sync = new CloudSyncService(_cloud, _state, _app.Session, _clock, _app.Logger, Delay, _app.Save);
+            _sync = new CloudSync(_cloud, _state, _app.Session, _clock, _app.Logger, Delay, _app.Save);
         }
 
         UniTask Delay(TimeSpan t, CancellationToken ct)
