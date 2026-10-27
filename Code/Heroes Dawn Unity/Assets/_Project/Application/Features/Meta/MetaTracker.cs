@@ -36,6 +36,8 @@ namespace N29.HeroesDawn.Application.Features.Meta
         readonly IPublisher<MetaRewardEarned> _earned;
         IDisposable? _subs;
         int _levelSum, _count, _credits;
+        // Sauvegarde vue au dernier instantané : une autre instance (profil effacé ou rechargé) repart de zéro sans compter de gain.
+        N29.HeroesDawn.Application.Ports.MetaSave? _metaSeen;
         bool _armed;
 
         public MetaTracker(MetaContext context, DailyMissions daily, PassProgress pass, SecondaryObjectives secondary, QuestLog quests,
@@ -66,6 +68,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
             _levelSum = 0;
             foreach (var m in _c.Session.Roster) _levelSum += m.Level;
             _credits = _c.Session.Wallet.Credits;
+            _metaSeen = _c.Meta;
         }
 
         void OnState(GameStateChanged s)
@@ -77,6 +80,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         void OnCombat(CombatFinished f)
         {
             Stats.Add(_c.Meta, f.Report.Victory ? Stats.CombatsWon : Stats.CombatsLost, 1);
+            _c.Touch(MetaArea.Profile);
             if (!f.Report.Victory) return;
             _daily.Record(DailyKind.WinCombats);
             if (_c.Session.RunZone != null) _quests.RecordCombatWon(_c.Session.RunZone.Id.Value);
@@ -116,7 +120,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
 
         void OnWallet(WalletChanged w)
         {
-            if (!_armed) { _credits = w.Credits; return; }
+            if (!_armed || !ReferenceEquals(_metaSeen, _c.Meta)) { _credits = w.Credits; _metaSeen = _c.Meta; return; }
             int delta = w.Credits - _credits;
             _credits = w.Credits;
             if (delta > 0) Stats.Add(_c.Meta, Stats.CreditsEarned, delta);

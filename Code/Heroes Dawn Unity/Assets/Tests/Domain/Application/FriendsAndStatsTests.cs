@@ -98,6 +98,21 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(Stats.Get(m, Stats.CreditsEarned), Is.EqualTo(5300));
         }
 
+        [Test, Description("Vérifie qu'effacer la sauvegarde depuis le hub ne compte pas les Crédits de départ du profil neuf comme « gagnés » — parce que la réinitialisation remet un portefeuille sans rien gagner")]
+        public void Tracker_ResetProgress_DoesNotCountTheStartingCredits()
+        {
+            _app.Tracker.Start();
+            _app.Publisher<GameStateChanged>().Publish(new GameStateChanged(GameState.Login, GameState.Hub));
+            _app.Session.Wallet.Set(150, 0);
+            _app.Publisher<WalletChanged>().Publish(new WalletChanged(150, 0));
+            _app.Session.ResetToNewProfile();
+            _app.Publisher<WalletChanged>().Publish(new WalletChanged(_app.Session.Wallet.Credits, _app.Session.Wallet.Pr));
+            Assert.That(Stats.Get(_app.Session.Meta, Stats.CreditsEarned), Is.EqualTo(0));
+            _app.Session.Wallet.Add(300, 0);
+            _app.Publisher<WalletChanged>().Publish(new WalletChanged(_app.Session.Wallet.Credits, _app.Session.Wallet.Pr));
+            Assert.That(Stats.Get(_app.Session.Meta, Stats.CreditsEarned), Is.EqualTo(300), "les gains suivants comptent de nouveau");
+        }
+
         [Test, Description("Vérifie que rien n'est compté avant l'entrée dans le hub — parce que le contenu du profil chargé ne doit pas gonfler les statistiques")]
         public void Tracker_CountsNothing_BeforeTheHub()
         {

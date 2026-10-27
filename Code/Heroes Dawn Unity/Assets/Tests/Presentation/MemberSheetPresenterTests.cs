@@ -205,7 +205,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _view.ClickNext(); _view.ClickPrevious();
             Assert.That(_view.Last.ShowHeal, Is.True);
             Assert.That(_view.Last.HealEnabled, Is.False);
-            Assert.That(_view.Last.HealReason, Is.EqualTo(_loc.T("qg.infirmary.none")));
+            Assert.That(_view.Last.HealReason, Is.EqualTo(_loc.T("sheet.heal.none")));
             m.Fatigue = 50;
             _app.Session.Wallet.Set(Application.Session.MetaRules.HealMemberCost - 1, 0);
             _view.ClickNext(); _view.ClickPrevious();

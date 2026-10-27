@@ -63,7 +63,6 @@ namespace N29.HeroesDawn.Presentation.Common
         /// <summary>Illustration temporaire d une carte (recadrage de l art du Drive, teinté par catégorie) ; à défaut un visuel de capacité.</summary>
         public static Sprite? Card(string id) => Load("Illustrations/Cards/" + id, 3000, id) ?? Ability(id);
 
-        /// <summary>Illustration temporaire d un objet (recadrage de l art du Drive, teinté par statistique) ; null si elle manque.</summary>
         /// <summary>Chemin de ressource de l'icône d'une offre de boutique (<c>Illustrations/Shop/&lt;id&gt;</c>).</summary>
         public static string ShopPath(string id) => "Illustrations/Shop/" + id;
 
@@ -72,10 +71,11 @@ namespace N29.HeroesDawn.Presentation.Common
         /// <summary>Icône SVG d'une offre de boutique (booster, paquets de gemmes, échanges, cadeau) ; null si le fichier manque.</summary>
         public static Sprite? Shop(string id)
         {
-            if (!ShopCache.TryGetValue(id, out var s) || s == null) ShopCache[id] = s = Resources.Load<Sprite>(ShopPath(id));
+            if (!ShopCache.TryGetValue(id, out var s)) ShopCache[id] = s = Resources.Load<Sprite>(ShopPath(id));
             return s;
         }
 
+        /// <summary>Illustration temporaire d un objet (recadrage de l art du Drive, teinté par statistique) ; null si elle manque.</summary>
         public static Sprite? Item(string id) => Load("Illustrations/Items/" + id, 4000, id);
 
         static Sprite? Load(string path, int cacheBase, string id)

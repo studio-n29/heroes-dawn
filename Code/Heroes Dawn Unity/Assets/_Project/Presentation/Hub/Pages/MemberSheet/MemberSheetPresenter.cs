@@ -224,7 +224,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             d.ShowHeal = _heal != null;
             d.HealLabel = _loc.F("hub.heal_member", MetaRules.HealMemberCost);
             d.HealEnabled = m.Fatigue > 0 && _session.Wallet.Credits >= MetaRules.HealMemberCost;
-            d.HealReason = m.Fatigue <= 0 ? _loc.T("qg.infirmary.none") : _session.Wallet.Credits < MetaRules.HealMemberCost ? _loc.F("hub.train.missing", MetaRules.HealMemberCost - _session.Wallet.Credits) : "";
+            d.HealReason = m.Fatigue <= 0 ? _loc.T("sheet.heal.none") : _session.Wallet.Credits < MetaRules.HealMemberCost ? _loc.F("hub.train.missing", MetaRules.HealMemberCost - _session.Wallet.Credits) : "";
             d.ShowLoadout = true;
             d.LoadoutLabel = _loc.F("sheet.loadout_counts", m.Items.Count, 2, m.Cards.Count(c => c.HasValue), 2);
             View.Show(d);

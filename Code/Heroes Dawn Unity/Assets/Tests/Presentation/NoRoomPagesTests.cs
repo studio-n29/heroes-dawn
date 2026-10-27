@@ -31,6 +31,15 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(offenders, Is.Empty, string.Join(", ", offenders));
         }
 
+        [Test, Description("Vérifie qu'aucun texte d'aide ne renvoie vers l'Infirmerie supprimée et que le bouton d'équipe dit « Soigner l'équipe » — parce que les soins passent par la fiche d'agent et la page Équipe")]
+        public void Texts_NoLongerSendToTheInfirmary()
+        {
+            var loc = new LocLocalization();
+            foreach (var key in new[] { "tutorial.hint.fatigue", "hub.deploy.exhausted", "hub.healed", "tutorial.hint.infirmary" })
+                Assert.That(loc.T(key), Does.Not.Contain("nfirmerie"), key);
+            Assert.That(loc.F("hub.heal", "150 CR"), Does.Contain("ÉQUIPE").And.Contain("150 CR"));
+        }
+
         [Test, Description("Vérifie que l'astuce « infirmerie » du tutoriel se déclenche à l'ouverture de la page Équipe quand un agent est fatigué — parce que le soin se fait maintenant depuis les agents")]
         public void Tutorial_InfirmaryHint_PointsToTheTeamPage()
         {

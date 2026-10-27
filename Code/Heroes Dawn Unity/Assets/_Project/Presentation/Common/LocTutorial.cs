@@ -55,7 +55,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["tutorial.hint.minigame"] = "Un mini-jeu : réussis-le pour gagner des Crédits et des PR, et valider certains objectifs.";
             d["tutorial.hint.rest"] = "Une case Repos : l'équipe y retire de la fatigue.";
             d["tutorial.hint.defeat"] = "Une défaite fait reculer l'équipe d'une case et la fatigue davantage. Repose-la au QG.";
-            d["tutorial.hint.fatigue"] = "Un héros très fatigué perd en puissance. Passe par l'Infirmerie pour le soigner.";
+            d["tutorial.hint.fatigue"] = "Un héros très fatigué perd en puissance. Soigne-le depuis sa fiche ou depuis la page Équipe.";
             d["tutorial.hint.zone_done"] = "Zone sécurisée ! Tu peux la rejouer pour des Crédits, ou ouvrir la suivante sur la carte.";
             d["tutorial.hint.recruit"] = "Trois héros sont proposés chaque jour, les Légendes sont rares. Ils coûtent des PR.";
             d["tutorial.hint.infirmary"] = "Un de tes héros est fatigué : tu peux le soigner pour quelques Crédits depuis sa fiche (ou toute l'équipe depuis la page Équipe).";

@@ -13,6 +13,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["shop.desc.ex_rest"] = "Repos complet pour toute l'équipe";
             d["page.team_care"] = "Équipe et soins";
             d["sheet.heal"] = "Soigner";
+            d["sheet.heal.none"] = "Cet agent est en forme";
             d["hub.heal_member"] = "Soigner · {0} CR";
             d["hub.healed_member"] = "{0} est soigné.";
             d["profile.header_line"] = "{0} · {1} · niveau de pass {2}";

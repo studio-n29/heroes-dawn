@@ -45,9 +45,9 @@ namespace N29.HeroesDawn.Presentation.Common
             ["hub.train"] = "ENTRAÎNER · {0}",
             ["hub.train.max"] = "NIVEAU MAX",
             ["hub.recruit"] = "RECRUTER · {0} PR",
-            ["hub.heal"] = "INFIRMERIE · -30 % · {0}",
+            ["hub.heal"] = "SOIGNER L'ÉQUIPE · {0}",
             ["hub.deploy"] = "DÉPLOYER",
-            ["hub.deploy.exhausted"] = "Escouade épuisée : passe par l'infirmerie.",
+            ["hub.deploy.exhausted"] = "Escouade épuisée : soigne tes agents depuis leur fiche ou la page Équipe.",
             ["hub.zone.done"] = "Zone sécurisée — rejouable (récompense réduite)",
             ["hub.zone.new"] = "3 objectifs · brouillard de guerre · Élite : Brick",
             ["hub.logout"] = "Déconnexion",
@@ -118,7 +118,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["wip.settings_notifications.title"] = "Les notifications", ["wip.settings_notifications.planned"] = "Un interrupteur par type de notification et des heures calmes.",
             ["wip.settings_controls.title"] = "Les contrôles", ["wip.settings_controls.planned"] = "Raccourcis clavier modifiables et réglages de la caméra du plateau (PC).",
             ["hub.trained"] = "{0} passe niveau {1} !",
-            ["hub.healed"] = "L'infirmerie a remis l'équipe sur pied.",
+            ["hub.healed"] = "Toute l'équipe a été soignée.",
             ["hub.stats"] = "PV {0} · ATQ {1} · DÉF {2} · VIT {3}",
 
             // --- Plateau ---
