@@ -45,6 +45,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? PresetSaveClicked;
 
         public Button MissionButton => mission.Button;
+        public UiButton HealAllButton => healAll;
         public IReadOnlyList<MemberTileView> Tiles => _tiles;
 
         void Awake()

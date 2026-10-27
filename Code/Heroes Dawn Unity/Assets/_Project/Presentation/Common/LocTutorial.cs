@@ -58,7 +58,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["tutorial.hint.fatigue"] = "Un héros très fatigué perd en puissance. Passe par l'Infirmerie pour le soigner.";
             d["tutorial.hint.zone_done"] = "Zone sécurisée ! Tu peux la rejouer pour des Crédits, ou ouvrir la suivante sur la carte.";
             d["tutorial.hint.recruit"] = "Trois héros sont proposés chaque jour, les Légendes sont rares. Ils coûtent des PR.";
-            d["tutorial.hint.infirmary"] = "Un de tes héros est fatigué : l'Infirmerie le remet sur pied pour quelques Crédits.";
+            d["tutorial.hint.infirmary"] = "Un de tes héros est fatigué : tu peux le soigner pour quelques Crédits depuis sa fiche (ou toute l'équipe depuis la page Équipe).";
             d["tutorial.hint.timeline"] = "La frise va de 100 à 0 : à 0, c est le tour de l unité et tout le monde attend. Un ennemi qui entre en zone rouge annonce son attaque : un contrôle (Entrave, Choc, Gel) ou un critique l'interrompt.";
         }
     }

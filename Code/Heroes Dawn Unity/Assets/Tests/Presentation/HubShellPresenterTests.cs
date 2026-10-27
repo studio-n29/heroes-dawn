@@ -56,14 +56,14 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void StackedPage_ShowsBackButton_TabDoesNot()
         {
             Assert.That(_view.Last.ShowBack, Is.False);
-            _nav.Open(HubPage.Salon);
+            _nav.Open(HubPage.Lab);
             Assert.That(_view.Last.ShowBack, Is.True);
         }
 
         [Test, Description("Vérifie que l'onglet actif est celui de la base de la pile — parce qu'une pièce ouverte depuis le QG garde l'onglet QG actif (M11)")]
         public void ActiveTab_IsHighlighted()
         {
-            _nav.Open(HubPage.Salon);
+            _nav.Open(HubPage.Lab);
             var active = _view.Last.Tabs.Where(t => t.Active).Select(t => t.Page).ToArray();
             Assert.That(active, Is.EqualTo(new[] { HubPage.Qg }));
             Assert.That(_view.Last.Tabs.Select(t => t.Page), Is.EqualTo(HubNavigator.Tabs));
@@ -156,7 +156,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que le bouton Retour de la barre haute fait comme Retour — parce que le bouton, Échap et le geste Android font la même chose (maquettes §1)")]
         public void BackButton_PopsStackedPage()
         {
-            _nav.Open(HubPage.Infirmary);
+            _nav.Open(HubPage.Lab);
             _view.ClickBack();
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Qg));
         }

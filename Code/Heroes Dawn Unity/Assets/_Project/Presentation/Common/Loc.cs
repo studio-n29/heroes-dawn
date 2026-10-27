@@ -66,7 +66,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["nav.back"] = "RETOUR", ["nav.settings"] = "RÉGLAGES",
             ["hub.quit.title"] = "Quitter le jeu ?", ["hub.quit.body"] = "Ta progression est sauvegardée.", ["hub.quit.ok"] = "Quitter",
             ["page.qg"] = "QG · Section New York", ["page.team"] = "Équipe · {0} membres", ["page.team_one"] = "Équipe · 1 membre", ["page.recruit"] = "Recrutement",
-            ["page.pass"] = "Pass · Saison 1", ["page.shop"] = "Boutique", ["page.salon"] = "Salon d'entraînement", ["page.infirmary"] = "Infirmerie",
+            ["page.pass"] = "Pass · Saison 1", ["page.shop"] = "Boutique",
             ["page.operations"] = "Salle des opérations", ["page.lab"] = "Labo de recherche", ["page.archives"] = "Archives",
             ["page.settings"] = "Paramètres", ["page.member_sheet"] = "Fiche de membre",
             // --- QG (M10) ---
@@ -84,12 +84,9 @@ namespace N29.HeroesDawn.Presentation.Common
             ["team.synergies"] = "SYNERGIES DE L'ESCOUADE", ["team.synergies.none"] = "Aucune synergie : mélange les familles.", ["team.synergy_line"] = "{0} · {1} · {2} + {3}",
             ["team.mission"] = "PRÉPARER UNE MISSION",
             ["sheet.skills"] = "COMPÉTENCES", ["sheet.synergies"] = "SYNERGIES DE LA FAMILLE", ["sheet.synergy_line"] = "{0} · {1} · avec {2}",
-            ["sheet.previous"] = "PRÉC.", ["sheet.next"] = "SUIV.", ["sheet.salon"] = "SALON", ["sheet.infirmary"] = "INFIRMERIE",
+            ["sheet.previous"] = "PRÉC.", ["sheet.next"] = "SUIV.",
             ["hub.train.missing"] = "Il manque {0} CR",
             // --- Salon, Infirmerie, Paramètres ---
-            ["salon.simple"] = "Version simple : l'entraînement est immédiat. Les séances longues arriveront avec le Salon complet.",
-            ["infirmary.simple"] = "Version simple : un soin pour toute l'équipe, -30 % de fatigue chacun.",
-            ["infirmary.band.fit"] = "EN FORME", ["infirmary.band.tired"] = "FATIGUÉ", ["infirmary.band.exhausted"] = "ÉPUISÉ",
             ["settings.account"] = "COMPTE", ["settings.audio"] = "AUDIO", ["settings.graphics"] = "GRAPHISMES",
             ["settings.accessibility"] = "ACCESSIBILITÉ", ["settings.notifications"] = "NOTIFICATIONS", ["settings.controls"] = "CONTRÔLES",
             ["settings.player"] = "{0} · {1}", ["settings.logout"] = "SE DÉCONNECTER", ["settings.reset"] = "EFFACER LA SAUVEGARDE",

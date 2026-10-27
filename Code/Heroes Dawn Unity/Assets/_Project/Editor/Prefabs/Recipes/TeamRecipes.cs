@@ -119,9 +119,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             squadRow.HLayout(12, 0, TextAnchor.UpperCenter);
             Ui.LocTxt(side.transform, "team.synergies", 28, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "SynergiesTitle").rectTransform.At(0f, 1f, 22, -232, 520, 38);
             var synergies = Ui.Txt(side.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Synergies");
-            synergies.rectTransform.Stretch(22, 196, 22, 372);
+            synergies.rectTransform.Stretch(22, 196, 22, 392);
             var none = Ui.LocTxt(side.transform, "team.synergies.none", 22, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "SynergiesNone");
-            none.rectTransform.Stretch(22, 196, 22, 372);
+            none.rectTransform.Stretch(22, 196, 22, 392);
             none.gameObject.SetActive(false);
             // ---- Compositions d equipe : trois emplacements + Sauver
             var presetRow = Ui.Rect(side.transform, "Presets").At(0.5f, 0f, 0, 176, 536, 96);
@@ -136,7 +136,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var presetSave = Ui.Btn(presetRow, "", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "PresetSave");
             presetSave.Rect.Pref(150, 96);
             var healAll = Ui.Btn(side.transform, "", Theme.Surface3, Theme.Text, null!, 28, FontKind.Title, "HealAll");
-            healAll.Rect.At(0.5f, 0f, 0, 282, 536, 76);
+            healAll.Rect.At(0.5f, 0f, 0, 282, 536, 96);
             var hint = Ui.Txt(side.transform, "", 22, Theme.Fatigue, TextAnchor.MiddleCenter, FontKind.Body, "MissionHint");
             hint.rectTransform.At(0.5f, 0f, 0, 140, 520, 30);
             RecipeKit.Mark(side.Frame(), TutorialTarget.TeamSquad);

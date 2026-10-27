@@ -22,7 +22,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que toucher un onglet remplace la pile par cet onglet — parce qu'un menu = un onglet, sans empiler l'historique (maquettes §1)")]
         public void SelectTab_ReplacesStack()
         {
-            _nav.Open(HubPage.Salon);
+            _nav.Open(HubPage.Lab);
             _nav.SelectTab(HubPage.Team);
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Team));
             Assert.That(_nav.Stack.Count, Is.EqualTo(1));
@@ -32,15 +32,15 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie qu'ouvrir une pièce l'empile au-dessus de l'onglet courant — parce que Retour doit ramener d'où l'on vient")]
         public void Open_Room_PushesAboveCurrentTab()
         {
-            _nav.Open(HubPage.Infirmary);
-            Assert.That(_nav.Stack.Select(l => l.Page), Is.EqualTo(new[] { HubPage.Qg, HubPage.Infirmary }));
+            _nav.Open(HubPage.Lab);
+            Assert.That(_nav.Stack.Select(l => l.Page), Is.EqualTo(new[] { HubPage.Qg, HubPage.Lab }));
             Assert.That(_nav.IsOnTab, Is.False);
         }
 
         [Test, Description("Vérifie que Retour depuis une pièce ouverte au QG revient au QG — parce que pièce → QG (maquettes §1)")]
         public void Back_FromRoomOpenedOnQg_PopsToQg()
         {
-            _nav.Open(HubPage.Salon);
+            _nav.Open(HubPage.Lab);
             Assert.That(_nav.Back(), Is.EqualTo(BackOutcome.Popped));
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Qg));
         }
@@ -50,7 +50,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             _nav.SelectTab(HubPage.Team);
             _nav.Open(HubPage.MemberSheet, new MemberId("givre"));
-            _nav.Open(HubPage.Salon);
+            _nav.Open(HubPage.Lab);
             _nav.Back();
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.MemberSheet));
             Assert.That(_nav.Current.Member, Is.EqualTo(new MemberId("givre")));
@@ -93,8 +93,8 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie qu'ouvrir deux fois la même page ne l'empile pas deux fois — parce qu'un double toucher ne doit pas dupliquer la page (Review Focus 1)")]
         public void Open_SamePageTwice_DoesNotDuplicate()
         {
-            _nav.Open(HubPage.Salon);
-            _nav.Open(HubPage.Salon);
+            _nav.Open(HubPage.Lab);
+            _nav.Open(HubPage.Lab);
             Assert.That(_nav.Stack.Count, Is.EqualTo(2));
             Assert.That(_changes.Count, Is.EqualTo(1));
         }

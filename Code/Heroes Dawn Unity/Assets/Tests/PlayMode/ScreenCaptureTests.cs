@@ -106,10 +106,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Shell.BackButton.Button.onClick.Invoke();
             yield return null;
 
-            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Salon)!.onClick.Invoke();
-            yield return CaptureSettled("11-salon");
+            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Lab)!.onClick.Invoke();
+            yield return CaptureSettled("11-labo");
             Shell.BackButton.Button.onClick.Invoke();
-            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Salon)!.onClick.Invoke();
+            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Lab)!.onClick.Invoke();
 
             yield return Tab(HubPage.Team);
             yield return CaptureSettled("20-equipe");

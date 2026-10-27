@@ -132,14 +132,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             RefreshChrome();
         }
 
-        /// <summary>Astuces à la première rencontre : boutique, infirmerie avec un membre fatigué, fatigue élevée au QG.</summary>
+        /// <summary>Astuces à la première rencontre : boutique, soins avec un membre fatigué (page Équipe), fatigue élevée au QG.</summary>
         void OfferHints(HubLocation location)
         {
             if (_tutorial == null) return;
             if (location.Page == HubPage.Recruit) _tutorial.Hint("recruit");
             bool tired = false, exhausting = false;
             foreach (var m in _session.Roster) { if (m.Fatigue > 0) tired = true; if (m.Fatigue >= 60) exhausting = true; }
-            if (location.Page == HubPage.Infirmary && tired) _tutorial.Hint("infirmary");
+            if (location.Page == HubPage.Team && tired) _tutorial.Hint("infirmary");
             if (location.Page == HubPage.Qg && exhausting) _tutorial.Hint("fatigue");
         }
 

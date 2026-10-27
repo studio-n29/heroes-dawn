@@ -135,7 +135,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 Rooms = new[]
                 {
-                    new RoomCardData { Page = HubPage.Salon, Title = _loc.T("page.salon"), Info = SalonInfo(toTrain, tired), Badge = tired > 0 ? tired : 0, Art = AgentArt.For(firstAgent) },
+                    new RoomCardData { Page = HubPage.Team, Title = _loc.T("page.team_care"), Info = SalonInfo(toTrain, tired), Badge = tired > 0 ? tired : 0, Art = AgentArt.For(firstAgent) },
                     new RoomCardData { Page = HubPage.Lab, Title = _loc.T("page.lab"), Info = LabInfo(), Badge = _meta.LabBadge, Art = AgentArt.Environment(1) },
                     new RoomCardData { Page = HubPage.Operations, Title = _loc.T("page.operations"), Info = OperationsInfo(), Badge = _meta.OperationsBadge, Art = AgentArt.Environment(2) },
                     new RoomCardData { Page = HubPage.Grimoire, Title = _loc.T("page.grimoire"), Info = GrimoireInfo(), Art = AgentArt.Card(firstCard) },

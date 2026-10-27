@@ -78,16 +78,16 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator Room_OpenFromQg_BackReturnsToQg()
         {
             yield return OnHub();
-            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Salon)!.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<LoungePageView>());
-            Assert.That(PlayModeHarness.Visible<LoungePageView>(), Is.True);
+            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Lab)!.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<LabPageView>());
+            Assert.That(PlayModeHarness.Visible<LabPageView>(), Is.True);
             Assert.That(Shell.BackButton.gameObject.activeSelf, Is.True);
             Shell.BackButton.Button.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>());
             Assert.That(PlayModeHarness.Visible<QgPageView>(), Is.True);
 
-            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Salon)!.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<LoungePageView>());
+            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Lab)!.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<LabPageView>());
             Assert.That(Router.Dispatch(), Is.True);
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>());
             Assert.That(PlayModeHarness.Visible<QgPageView>(), Is.True);
@@ -138,9 +138,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator DisabledButton_RepeatedTaps_NoDrift()
         {
             yield return OnHub();
-            Object.FindAnyObjectByType<QgPageView>()!.RoomButton(HubPage.Salon)!.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<LoungePageView>());
-            var heal = Object.FindAnyObjectByType<LoungePageView>()!.HeaderButtonA;
+            yield return Tab(HubPage.Team);
+            var heal = Object.FindAnyObjectByType<TeamPageView>()!.HealAllButton;
             Assert.That(heal.Interactable, Is.False, "aucune fatigue : soin grisé");
             var origin = heal.Rect.anchoredPosition;
             for (int i = 0; i < 4; i++)
