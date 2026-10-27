@@ -28,6 +28,7 @@ namespace N29.HeroesDawn.Infrastructure.Supabase
         [Serializable] sealed class PasswordBody { public string email = ""; public string password = ""; }
         [Serializable] sealed class RefreshBody { public string refresh_token = ""; }
         [Serializable] sealed class RecoverBody { public string email = ""; }
+        [Serializable] sealed class PkceBody { public string auth_code = ""; public string code_verifier = ""; }
 
         readonly SupabaseConfig _config;
         readonly ISupabaseHttp _http;
@@ -38,10 +39,16 @@ namespace N29.HeroesDawn.Infrastructure.Supabase
         UniTaskCompletionSource<Result<PlayerAccount>>? _pendingSignIn;
         string _pendingSignInKey = "";
         UniTaskCompletionSource<Result<string>>? _pendingRefresh;
+        readonly IBrowserOpener? _browser;
+        readonly IAuthRedirectInbox? _inbox;
+        readonly TimeSpan _oauthTimeout;
+        bool _oauthPending;
 
-        public SupabaseAccountGateway(SupabaseConfig config, ISupabaseHttp http, ISupabaseTokenStore tokens, IClock clock, ILogger? log = null)
+        public SupabaseAccountGateway(SupabaseConfig config, ISupabaseHttp http, ISupabaseTokenStore tokens, IClock clock, ILogger? log = null,
+                                      IBrowserOpener? browser = null, IAuthRedirectInbox? inbox = null, TimeSpan? oauthTimeout = null)
         {
             _config = config; _http = http; _tokens = tokens; _clock = clock; _log = log;
+            _browser = browser; _inbox = inbox; _oauthTimeout = oauthTimeout ?? TimeSpan.FromMinutes(5);
         }
 
         long NowUnix => new DateTimeOffset(_clock.UtcNow).ToUnixTimeSeconds();
@@ -101,9 +108,41 @@ namespace N29.HeroesDawn.Infrastructure.Supabase
             return Result<PlayerAccount>.Ok(session.ToAccount());
         }
 
-        /// <summary>Remplacé à la tâche 3 par le flux OAuth (navigateur + PKCE).</summary>
-        public UniTask<Result<PlayerAccount>> SignInWithProviderAsync(AuthProvider provider, CancellationToken ct)
-            => UniTask.FromResult(Result<PlayerAccount>.Fail(new DomainError("account.oauth", "errors.account_oauth")));
+        /// <summary>
+        /// Google ou Apple : ouvre le navigateur sur l'adresse d'autorisation (PKCE), attend le retour par lien profond (au plus <c>oauthTimeout</c>),
+        /// puis échange le code contre une session. Un seul flux à la fois ; l'annulation par le joueur est propagée.
+        /// </summary>
+        public async UniTask<Result<PlayerAccount>> SignInWithProviderAsync(AuthProvider provider, CancellationToken ct)
+        {
+            var failed = new DomainError("account.oauth", "errors.account_oauth");
+            if (provider == AuthProvider.Email || _browser == null || _inbox == null || _oauthPending) return Result<PlayerAccount>.Fail(failed);
+            _oauthPending = true;
+            try
+            {
+                var (verifier, challenge) = Pkce.Create();
+                using var wait = CancellationTokenSource.CreateLinkedTokenSource(ct);
+                wait.CancelAfter(_oauthTimeout);
+                _browser.Open(OAuthFlow.AuthorizeUrl(_config, provider, challenge));
+                string? redirect = await _inbox.WaitForRedirectAsync(_config.RedirectUrl, wait.Token);
+                ct.ThrowIfCancellationRequested();   // annulé par le joueur : pas une erreur
+                string? code = redirect == null ? null : OAuthFlow.CodeFrom(redirect, _config.RedirectUrl);
+                if (code == null)
+                {
+                    _log?.Info("Compte : connexion par fournisseur annulée ou échouée");
+                    return Result<PlayerAccount>.Fail(failed);
+                }
+                var body = JsonUtility.ToJson(new PkceBody { auth_code = code, code_verifier = verifier });
+                var r = await _http.SendAsync("POST", _config.Url + "/auth/v1/token?grant_type=pkce", Headers(), body, ct);
+                if (r.NetworkError || r.Status >= 500) return Result<PlayerAccount>.Fail(SupabaseErrors.Network());
+                if (!r.IsSuccess) return Result<PlayerAccount>.Fail(failed);
+                var session = ReadSession(r.Body);
+                if (session == null) return Result<PlayerAccount>.Fail(failed);
+                _tokens.Save(session);
+                _log?.Info("Compte : connexion par fournisseur réussie");
+                return Result<PlayerAccount>.Ok(session.ToAccount());
+            }
+            finally { _oauthPending = false; }
+        }
 
         // ------------------------------------------------------------------ Session
 
