@@ -131,6 +131,11 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("40-pass");
             yield return Tab(HubPage.Shop);
             yield return CaptureSettled("50-boutique");
+            foreach (var shopTab in new[] { (ShopTab.Boosters, "50b-boutique-boosters"), (ShopTab.Items, "50c-boutique-objets"), (ShopTab.Gems, "50d-boutique-gemmes"), (ShopTab.Gift, "50e-boutique-cadeau") })
+            {
+                Object.FindAnyObjectByType<ShopTabsView>()!.Tab((int)shopTab.Item1).Button.onClick.Invoke();
+                yield return CaptureSettled(shopTab.Item2);
+            }
             yield return Tab(HubPage.Qg);
             yield return null;
             foreach (var room in new[] { (HubPage.Operations, "13-operations"), (HubPage.Lab, "14-labo"), (HubPage.Grimoire, "16-grimoire"), (HubPage.Inventory, "17-inventaire") })
@@ -140,7 +145,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 Shell.BackButton.Button.onClick.Invoke();
                 yield return null;
             }
-            yield return Tab(HubPage.Archives);
+            yield return Tab(HubPage.Profile);
             yield return CaptureSettled("15-profil");
             Shell.SettingsButton.Button.onClick.Invoke();
             yield return CaptureSettled("80-parametres-audio");

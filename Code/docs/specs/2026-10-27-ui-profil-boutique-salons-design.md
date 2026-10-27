@@ -23,7 +23,7 @@ Hors lot : comptes Supabase, amis en ligne, notifications push (lot I) ; narrati
 ### Navigation
 
 - `HubNavigator.Tabs` remplace `HubPage.Archives` par un nouveau `HubPage.Profile` (même position, dernière tab). Libellé « Profil » (clé `nav.profile`, déjà utilisée pour cette tab).
-- Les Archives restent une page ouverte par le bouton « Registre » du Profil. Le badge des Archives (`MetaOverview.ArchivesBadge`) s'affiche sur l'onglet Profil.
+- Le « Registre » du PDF est le registre des agents (`HubPage.Agents`) ; les Archives restent une page ouverte par un second bouton du Profil. Le badge des Archives (`MetaOverview.ArchivesBadge`) s’affiche sur l’onglet Profil.
 
 ### Page `ProfilePage` (`Presentation/Hub/Pages/Profile/`)
 
@@ -33,7 +33,7 @@ Page de type liste (`ListPagePresenter`), rafraîchie par `MetaChanged`, `Wallet
 - **Tag** : `Pseudo#NNNN`. `NNNN` = 4 chiffres (0000 à 9999) déduits de l'identifiant du joueur par un hachage stable (le même identifiant donne toujours le même tag). Bouton « Copier mon tag » : copie dans le presse-papiers.
 - **Statistiques** (rangées) : combats gagnés ; combats perdus ; zones validées ; agents possédés ; plus haut niveau d'agent ; meilleur lien (victoires ensemble de la paire la plus avancée) ; objets fabriqués ; Crédits gagnés au total.
 - **Amis** : titre de section, une rangée par ami (nom, tag, état « en attente de connexion en ligne »), bouton Retirer ; bouton « Ajouter un ami » qui ouvre une saisie de tag.
-- **Boutons** : « Registre » ouvre `HubPage.Archives` ; les Paramètres restent accessibles par le bouton existant du bandeau.
+- **Navigation** : deux rangées « Registre des agents » (→ `HubPage.Agents`) et « Archives » (→ `HubPage.Archives`), dans l’ordre navigation, statistiques, section Amis, amis ; les Paramètres restent accessibles par le bouton existant du bandeau.
 
 ### Statistiques : stockage
 
@@ -59,7 +59,7 @@ Page de type liste (`ListPagePresenter`), rafraîchie par `MetaChanged`, `Wallet
 - **Cas d'usage** `IHealMemberUseCase` / `HealMemberUseCase(MemberId)` : dépense `MetaRules.HealMemberCost` (50), retire `MetaRules.InfirmaryReduction` (30) de fatigue à l'agent, publie le changement de Crédits et d'effectif, demande une sauvegarde. Erreurs : agent inconnu, rien à soigner (`HubErrors.NothingToHeal`), Crédits insuffisants.
 - **Page Équipe** : bouton « Soigner toute l'équipe » (cas d'usage existant `IHealRosterUseCase`, 150 Crédits).
 - **Suppressions** : `HubPage.Salon`, `HubPage.Infirmary`, les présentateurs et vues `LoungePage`, `SalonPage`, `InfirmaryPage`, `MemberRowView`, leurs prefabs et recettes de génération, leurs textes et leurs tests. `HubPageFactory` et `HubShellPresenter` (astuce du tutoriel « infirmerie ») sont mis à jour.
-- **QG** : les cartes « Entraînement » et « Soins » ouvrent la liste des agents (`HubPage.Agents`) avec un filtre déjà choisi (agents qui peuvent progresser ; agents fatigués). Si ces filtres n'existent pas, ils sont ajoutés à la liste.
+- **QG** : une seule carte « Équipe et soins » (écart acté à l’exécution) ouvre l’onglet Équipe (`HubPage.Team`, déjà triable par fatigue) ; son badge compte les agents fatigués. Aucun nouveau filtre.
 - **Tutoriel** : les astuces qui nomment l'infirmerie ou le salon renvoient à la fiche d'agent.
 
 ## 4. Erreurs et cas limites

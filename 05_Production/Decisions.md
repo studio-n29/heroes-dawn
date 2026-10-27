@@ -122,3 +122,6 @@
 | 2026-10-27 | Labo : les objets fabriqués (scraps + recettes) sont des exemplaires uniques à stats tirées et qualité, rangés à part des objets de boutique et de drops ; fabrication instantanée | Spec `2026-10-27-labo-fabrication-design.md` ; décisions du lot E |
 | 2026-10-27 | Fabrication : un niveau de compétence de création par type d'objet (1 à 10) ; la qualité (5 paliers) dépend de l'écart niveau − difficulté de la recette | Spec du lot E |
 | 2026-10-27 | Interface du lot E : rangées Atelier sur la page du labo et message de résultat, au lieu d'un onglet et d'une fenêtre dédiés (le lot F refera l'interface) | Plan du lot E, tâche 8 |
+| 2026-10-27 | Profil : tag personnel Pseudo#NNNN (4 chiffres déduits de l’identifiant du joueur), amis simulés en local (port IFriendsPort, branchement Supabase au lot I) ; le registre du PDF = registre des agents, Archives par un second bouton | Spec du lot F |
+| 2026-10-27 | Salons : pages Salon d’entraînement, Infirmerie et Salon des agents supprimées ; soin par agent sur la fiche (−30 fatigue, 50 Crédits), soin d’équipe (150 Crédits) sur la page Équipe, carte unique « Équipe et soins » au QG | Spec du lot F |
+| 2026-10-27 | Boutique en cartes : grille à tuiles avec icônes SVG dessinées pour le projet (8 icônes), objets du jour avec leur illustration | Spec du lot F |
