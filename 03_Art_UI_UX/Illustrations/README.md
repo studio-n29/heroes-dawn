@@ -50,3 +50,10 @@ Visuels de référence et **placeholders** : le jeu les utilise tant que les ill
 - **Cinématique d'introduction** (`Resources/Intro/intro_01` à `intro_09`, 16:9) : 1 Paris, 2 armure sombre (recadrée), 3 héros à cape rouge, 4 Eda à l'auréole, 5 Eda face aux démons, 6 dôme d'énergie (recadré), 7 ruines au clair de lune, 8 laboratoire de Rayner, 9 key art de l'équipe.
 - **Fond de l'interface** : key art sans logo (paysage) et dôme d'énergie bleu (portrait).
 - Les portraits d'agents, icônes de compétences et fonds de zones restent à produire (voir `../04_Pipeline_Illustrations_IA.md`).
+
+## Illustrations des agents (mise à jour du 2026-10-28)
+
+- **Agents jouables (32)** : un fichier par agent, nommé par son identifiant (`darius_brooks.jpg`, `sam_okafor.jpg`, `agent_d.jpg`…). Originaux en 1672 × 941 dans `Agents/` ; copie de jeu en 1280 × 720 dans `Code/Heroes Dawn Unity/Assets/_Project/Resources/Illustrations/Agents/`, chargée par `AgentArt.For(id)`.
+- **Moscou** (placée d'après le lore, sans nom de fichier d'origine) : Alchimiste dans la brume violette = Céleste Moreau ; Ascension astrale = Haruto Nakamura ; Conductrice des ondes violettes = Zofia Kowalczyk ; Effondrement gravitationnel = Eero Nieminen ; Héros blindé contre le char = Sam Okafor ; Héroïne des eaux = Astrid Hallström ; Héroïne dorée dans l'opéra = Anna Petrov ; Impératrice de glace = Yelena Ivanova ; Maître des marées écarlates = Mateo Vasquez ; Maître du Temps = Odile Ferrand.
+- **Cryptides de Salem (9 sur 10)** dans `Ennemis_Cryptides/` (originaux) et `Resources/Illustrations/Cryptides/` (jeu) : S1 Kraken (Monstre abyssal), S2 Mante, S3 Caprin (Guerrier cornu), S4 Phalène (Créature astrale), S5 Famine (Monstre des bois gelés), S6 Pied-Grand (Colosse de pierre), S7 Lupin (Loup-garou), S9 Pierre (Gargouille), S10 Suceur (Bête à crocs). **S8 Diable (Jersey Devil) reste à illustrer.** Ces images ne sont pas encore affichées en jeu.
+- Les personnages non jouables (Rayner, figurants) gardent les illustrations génériques `Characters/char_NN`.

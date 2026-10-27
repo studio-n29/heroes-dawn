@@ -5,29 +5,32 @@ using UnityEngine;
 namespace N29.HeroesDawn.Presentation.Common
 {
     /// <summary>
-    /// Illustrations des agents (Resources/Illustrations/Characters) et décors (Environment). L'attribution agent → illustration est une
-    /// table à éditer ci-dessous : les agents sans entrée reçoivent une illustration stable (déduite de leur identifiant) en attendant leur art.
+    /// Illustrations des agents et décors. Chaque agent jouable a son illustration dans <c>Resources/Illustrations/Agents/&lt;id&gt;</c> (1280 × 720) ;
+    /// les personnages sans illustration propre (Rayner, figurants) gardent une des illustrations génériques de <c>Resources/Illustrations/Characters</c>
+    /// (table ci-dessous, ou choix stable déduit de l'identifiant).
     /// </summary>
     public static class AgentArt
     {
         public const int CharacterCount = 19;
         public const int EnvironmentCount = 3;
 
+        /// <summary>Illustrations génériques des personnages non jouables (les agents jouables ont la leur, voir <see cref="For"/>).</summary>
         static readonly Dictionary<string, int> Table = new Dictionary<string, int>
         {
-            ["agent_d"] = 7, ["agent_m"] = 14, ["darius_brooks"] = 16, ["mei_lin_chen"] = 8, ["freya_lindqvist"] = 3,
-            ["kwame_abara"] = 4, ["giulia_rossi"] = 2, ["lucas_mendes"] = 10, ["rin_takeda"] = 11, ["amara_hughes"] = 15,
-            ["ilona_varga"] = 12, ["fatou_diallo"] = 9, ["clement_lefevre"] = 13, ["youssef_haddad"] = 6, ["sam_okafor"] = 1,
-            // Personnages non jouables.
             ["rayner"] = 3,
         };
 
+        static readonly Dictionary<string, Sprite?> OwnCache = new Dictionary<string, Sprite?>();
+
         static readonly Dictionary<int, Sprite?> Cache = new Dictionary<int, Sprite?>();
 
-        /// <summary>Illustration d'un agent (ou d'un personnage nommé) ; null si la ressource manque.</summary>
+        /// <summary>Illustration d'un agent (la sienne) ou d'un personnage nommé (générique) ; null si l'identifiant est vide.</summary>
         public static Sprite? For(string id)
         {
             if (string.IsNullOrEmpty(id)) return null;
+            if (!OwnCache.TryGetValue(id, out var own))
+                OwnCache[id] = own = Resources.Load<Sprite>("Illustrations/Agents/" + id);
+            if (own != null) return own;
             if (!Table.TryGetValue(id, out int n)) n = 1 + Mathf.Abs(StableHash(id)) % CharacterCount;
             return Character(n);
         }
