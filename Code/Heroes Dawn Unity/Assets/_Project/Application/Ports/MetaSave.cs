@@ -100,6 +100,16 @@ namespace N29.HeroesDawn.Application.Ports
         public int wins;
     }
 
+    /// <summary>Un objet fabriqué au labo : sa recette, sa qualité (<see cref="N29.HeroesDawn.Definitions.CraftQuality"/>) et les statistiques tirées (en %).</summary>
+    [Serializable]
+    public sealed class CraftedItemSave
+    {
+        public string id = "";
+        public string recipeId = "";
+        public int quality;
+        public int hp, atk, def, spd;
+    }
+
     /// <summary>Première connexion : cinématique d introduction vue, pseudo choisi, campagne choisie.</summary>
     [Serializable]
     public sealed class OnboardingSave
@@ -163,6 +173,18 @@ namespace N29.HeroesDawn.Application.Ports
 
         // Objets, grimoire, boosters
         public CollectionSave collection = new CollectionSave();
+
+        // Fabrication au labo (lot E) : scraps, recettes apprises (hors recettes de départ), expérience par type d'objet, objets fabriqués
+        /// <summary>Scraps possédés (nom de <see cref="N29.HeroesDawn.Definitions.ScrapKind"/>, nombre).</summary>
+        public List<CounterSave> scraps = new List<CounterSave>();
+        public List<string> recipes = new List<string>();
+        /// <summary>Expérience de création (nom de <see cref="N29.HeroesDawn.Definitions.ItemType"/>, expérience totale).</summary>
+        public List<CounterSave> craftXp = new List<CounterSave>();
+        public List<CraftedItemSave> crafted = new List<CraftedItemSave>();
+        /// <summary>Nombre d'objets fabriqués : numéro du prochain exemplaire et graine de chaque fabrication.</summary>
+        public int craftedNext;
+        /// <summary>Nombre de tirages de scraps après combat : fait varier la graine de chacun.</summary>
+        public int scrapDrops;
 
         public int GetCounter(List<CounterSave> list, string id)
         {

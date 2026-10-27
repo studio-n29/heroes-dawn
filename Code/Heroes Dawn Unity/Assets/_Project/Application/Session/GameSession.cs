@@ -181,6 +181,7 @@ namespace N29.HeroesDawn.Application.Session
             AutoCombat = false;
             Shop.Clear();
             Meta = new MetaSave();
+            Features.Meta.CraftingOps.RegisterSaved(this);
             Wallet.SetGems(Meta.gems);
             Wallet.Set(MetaRules.StartCredits, MetaRules.StartPr);
             foreach (var id in Content.StarterTeam)
@@ -203,6 +204,7 @@ namespace N29.HeroesDawn.Application.Session
             if (data.completedZones != null) foreach (var z in data.completedZones) CompletedZones.Add(z);
             AutoCombat = data.autoCombat;
             Meta = data.meta ?? new MetaSave();
+            Features.Meta.CraftingOps.RegisterSaved(this);
             Wallet.SetGems(Meta.gems);
             Roster.Clear();
             if (data.team != null)
