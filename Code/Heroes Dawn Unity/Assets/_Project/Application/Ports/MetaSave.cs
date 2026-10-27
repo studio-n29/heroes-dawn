@@ -186,6 +186,10 @@ namespace N29.HeroesDawn.Application.Ports
         /// <summary>Nombre de tirages de scraps après combat : fait varier la graine de chacun.</summary>
         public int scrapDrops;
 
+        // Profil (lot F) : compteurs de statistiques (combatsWon, combatsLost, creditsEarned) et tags des amis (liste simulée locale)
+        public List<CounterSave> stats = new List<CounterSave>();
+        public List<string> friends = new List<string>();
+
         public int GetCounter(List<CounterSave> list, string id)
         {
             foreach (var c in list) if (c.id == id) return c.value;

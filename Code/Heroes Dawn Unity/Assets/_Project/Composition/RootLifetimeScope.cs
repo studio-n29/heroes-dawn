@@ -131,6 +131,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<Expeditions>(Lifetime.Singleton);
             builder.Register<ResearchLab>(Lifetime.Singleton);
             builder.Register<Workshop>(Lifetime.Singleton);
+            builder.Register<LocalFriendsPort>(Lifetime.Singleton).As<N29.HeroesDawn.Application.Ports.IFriendsPort>();
             builder.Register<ArchiveBook>(Lifetime.Singleton);
             builder.Register<Boutique>(Lifetime.Singleton);
             builder.Register<Application.Features.Collection.CollectionBook>(Lifetime.Singleton);

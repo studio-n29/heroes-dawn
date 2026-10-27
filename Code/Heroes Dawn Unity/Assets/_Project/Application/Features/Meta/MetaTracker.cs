@@ -76,6 +76,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
 
         void OnCombat(CombatFinished f)
         {
+            Stats.Add(_c.Meta, f.Report.Victory ? Stats.CombatsWon : Stats.CombatsLost, 1);
             if (!f.Report.Victory) return;
             _daily.Record(DailyKind.WinCombats);
             if (_c.Session.RunZone != null) _quests.RecordCombatWon(_c.Session.RunZone.Id.Value);
@@ -118,6 +119,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
             if (!_armed) { _credits = w.Credits; return; }
             int delta = w.Credits - _credits;
             _credits = w.Credits;
+            if (delta > 0) Stats.Add(_c.Meta, Stats.CreditsEarned, delta);
             if (delta > 0 && !_c.Granting) _daily.Record(DailyKind.EarnCredits, delta);
         }
 
