@@ -110,6 +110,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public ResearchLab Lab { get; }
         public Workshop Workshop { get; }
         public LocalFriendsPort Friends { get; }
+        public PlayerProfile Profile { get; }
         public ArchiveBook Archives { get; }
         public MetaTracker Tracker { get; }
         public Boutique Boutique { get; }
@@ -174,6 +175,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Lab = new ResearchLab(MetaCtx);
             Workshop = new Workshop(MetaCtx);
             Friends = new LocalFriendsPort(MetaCtx);
+            Profile = new PlayerProfile(MetaCtx, Pass);
             Archives = new ArchiveBook(MetaCtx);
             Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
             Collection = new N29.HeroesDawn.Application.Features.Collection.CollectionBook(MetaCtx, Publisher<RosterChanged>());
