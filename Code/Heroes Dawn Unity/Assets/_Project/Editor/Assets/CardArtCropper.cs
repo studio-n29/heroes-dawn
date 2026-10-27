@@ -77,10 +77,19 @@ namespace N29.HeroesDawn.EditorTools.Assets
             var taken = new HashSet<string>(file.Reserved.Concat(file.Assigned.Values), StringComparer.OrdinalIgnoreCase);
             var free = sources.Where(s => !taken.Contains(s)).Distinct(StringComparer.OrdinalIgnoreCase)
                               .OrderBy(s => s, StringComparer.OrdinalIgnoreCase).ToList();
-            int missing = Math.Max(0, cardsWithoutArt.Count - free.Count);
             var result = new Dictionary<string, string>();
-            if (missing > 0) return (result, missing);
-            for (int i = 0; i < cardsWithoutArt.Count; i++) result[cardsWithoutArt[i]] = free[i];
+            // D'abord les sources nommées d'après une carte (« card_monolith.jpg »), quel que soit leur dossier.
+            foreach (var card in cardsWithoutArt)
+            {
+                var named = free.FirstOrDefault(s => string.Equals(Path.GetFileNameWithoutExtension(s), card, StringComparison.OrdinalIgnoreCase));
+                if (named == null) continue;
+                result[card] = named;
+                free.Remove(named);
+            }
+            var rest = cardsWithoutArt.Where(c => !result.ContainsKey(c)).ToList();
+            int missing = Math.Max(0, rest.Count - free.Count);
+            if (missing > 0) return (new Dictionary<string, string>(), missing);
+            for (int i = 0; i < rest.Count; i++) result[rest[i]] = free[i];
             return (result, 0);
         }
 

@@ -32,6 +32,20 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(assignments, Is.EquivalentTo(new Dictionary<string, string> { ["y"] = "c.jpg", ["z"] = "d.jpg" }));
         }
 
+        [Test, Description("Vérifie qu'une source nommée d'après une carte (card_monolith.jpg, dans n'importe quel dossier, casse indifférente) revient à cette carte avant l'attribution par ordre alphabétique — parce que l'utilisateur génère chaque image pour une carte précise")]
+        public void Assign_GivesANamedSourceToItsCard()
+        {
+            // Par ordre alphabétique seul, card_monolith (1re carte) recevrait aaa_first.jpg.
+            var (assignments, missing) = CardArtCropper.Assign(new[] { "card_monolith", "card_ember" },
+                new[] { "Competences/aaa_first.jpg", "Competences/CARD_MONOLITH.png" }, new SourcesFile());
+            Assert.That(missing, Is.EqualTo(0));
+            Assert.That(assignments, Is.EquivalentTo(new Dictionary<string, string>
+            {
+                ["card_monolith"] = "Competences/CARD_MONOLITH.png",
+                ["card_ember"] = "Competences/aaa_first.jpg",
+            }));
+        }
+
         [Test, Description("Vérifie qu'il n'y a aucune attribution quand les sources libres manquent, avec le nombre de cartes sans source — parce que l'outil doit s'arrêter sans écrire à moitié")]
         public void Assign_StopsWhenSourcesAreMissing()
         {
