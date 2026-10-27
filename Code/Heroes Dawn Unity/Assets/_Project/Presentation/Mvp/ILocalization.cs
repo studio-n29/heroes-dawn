@@ -21,6 +21,10 @@ namespace N29.HeroesDawn.Presentation.Mvp
         string SynergyEffect(SynergyDef s, int linkLevel);
         /// <summary>Nom et effet d un effet unique de composition d équipe.</summary>
         string TeamEffect(TeamEffectKind kind);
+        /// <summary>Nom du thème d'une paire d'agents, d'après le couple de leurs rôles (« Rempart et lame »).</summary>
+        string PairTheme(Role a, Role b);
+        /// <summary>Un bonus de paire en une ligne (« PV +4 % », « Bouclier d'ouverture 8 % »).</summary>
+        string PairBonusText(PairBonus bonus);
         string StatusName(StatusType s);
         string FamilyName(Family f);
         string RoleName(Role r);
