@@ -1,6 +1,6 @@
 # Illustration prompts — 36 new cards (C2)
 
-One block per card: copy the whole block (prompt + negative prompt) and paste it into the generator. Each card has its own location; style and color palette are the same for every card.
+One block per card: copy the whole block (prompt + negative prompt) and paste it into the generator. Each card has its own character (shown as a silhouette), its own location and its own atmosphere; style, color palette and framing are shared.
 
 Save each image as `<card id>.jpg` (id shown in the card title) in `03_Art_UI_UX/Illustrations/Competences/` so it is matched to its card automatically.
 
@@ -9,7 +9,7 @@ Save each image as `<card id>.jpg` (id shown in the card title) in `03_Art_UI_UX
 ### Éclats de verre — `card_glass_shards` · Common · Offensive
 
 ```
-a metahuman woman thrusting her open hand forward, a spray of razor-sharp amber glass shards bursting toward the camera, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, shattered glass skyscraper lobby with collapsed curtain walls, broken window panes hanging from twisted frames, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+backlit silhouette of a slender young woman with a long scarf and cropped jacket, thrusting her open hand forward, a spray of razor-sharp amber glass shards bursting toward the camera, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, shattered glass skyscraper lobby, broken window panes hanging from twisted frames, cold blue dawn light piercing through the broken windows, glittering dust, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -17,7 +17,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Rempart de béton — `card_concrete_rampart` · Common · Defensive
 
 ```
-a female warrior in faceted stone armor standing in front of a wounded ally while a slab of concrete erupts from the cracked ground, golden dust hanging in the air, faint amber glow in the fractures, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, half-built highway overpass on a construction site, rebar sticking out of broken pillars, abandoned cranes, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a broad-shouldered woman in faceted stone armor, seen from behind, shielding a wounded ally as a slab of concrete erupts from the cracked ground, faint amber glow in the fractures, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, half-built highway overpass on a construction site, rebar sticking out of broken pillars, abandoned cranes, thick brown dust storm at dusk, sun reduced to a pale disc, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -25,7 +25,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Armure de rivets — `card_rivet_armor` · Common · Defensive
 
 ```
-a towering man whose body is being covered by steel plates that rivet themselves onto him, amber sparks flying at every rivet, defiant stare, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, derelict shipyard dry dock with a rusting hull under steel scaffolding, hanging chains, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+hulking bald dockworker silhouette with massive forearms, steel plates riveting themselves onto his body, amber sparks bursting at every rivet, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, derelict shipyard dry dock, rusting hull under steel scaffolding, hanging chains, heavy night fog cut by the beam of a lighthouse, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -33,7 +33,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Mue réparatrice — `card_healing_molt` · Common · Support
 
 ```
-tight close-up of a hand resting on a wounded shoulder, the skin knitting itself back together in glowing amber facets that peel away like shed skin, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, makeshift field hospital in a looted pharmacy, overturned shelves, flickering emergency light, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+two kneeling silhouettes, an elderly medic with round glasses tending a young courier, the wound knitting itself back together in glowing amber facets that peel away like shed skin, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, makeshift field hospital in a looted pharmacy, overturned shelves, warm candlelight in a dark room, quiet intimate mood, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -41,7 +41,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Prisme réfléchissant — `card_reflecting_prism` · Rare · Defensive
 
 ```
-a female knight in cracked crystal armor with translucent crystal wings, spreading a dome of amber prisms over her team that refracts the light, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, gothic cathedral nave with shattered stained-glass windows, colored glass shards floating in the air, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a knight with translucent crystal wings, arms spread wide, raising a dome of amber prisms over a small group, light refracting into beams, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, gothic cathedral nave with shattered stained-glass windows, colored shards floating in the air, thunderstorm outside, lightning flashes through the windows, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -49,7 +49,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Filins d'appui — `card_support_cables` · Rare · Support
 
 ```
-steel cables catapulting a hero across a gap, glowing amber tension lines, vertiginous high-angle view, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, collapsed suspension bridge over a dark river, snapped suspension cables, broken deck slabs, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+lean acrobat silhouette in a hooded jumpsuit, mid-flight, catapulted across a gap by glowing amber steel cables, vertiginous high-angle view, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, collapsed suspension bridge over a dark river, snapped cables, broken deck slabs, howling wind and driving rain, river mist below, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -57,7 +57,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Masque d'emprunt — `card_borrowed_mask` · Rare · Support
 
 ```
-a face fracturing into amber facets and reassembling into someone else, half transformed, several different reflections around it, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned theater dressing room with cracked vanity mirrors, scattered masks and costumes, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+androgynous silhouette in a long coat, face half hidden in shadow, its features fracturing into amber facets and reassembling into someone else, several different reflections around it, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned theater dressing room with cracked vanity mirrors, scattered masks and costumes, flickering bare bulbs, uneasy theatrical spotlight, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -65,7 +65,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Forge vivante — `card_living_forge` · Epic · Support
 
 ```
-a figure with arms of molten metal mending the armor and wounds of the team around them, rivers of liquid gold and spiraling sparks, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, cavernous abandoned steel foundry, giant crucibles, molten metal channels on the floor, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+stocky bearded smith silhouette with arms of molten metal, mending the armor of three crouching allies, spiraling sparks around them, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, cavernous abandoned steel foundry, giant crucibles, molten metal channels on the floor, scorching heat haze, orange glow against deep black, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -73,7 +73,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Monolithe — `card_monolith` · Legendary · Offensive
 
 ```
-a colossal monolith of stone and steel tearing out of the ground, amber cracks radiating out to enemies pinned to the floor, monumental scale, tiny heroic silhouette at its base, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, vast ceremonial plaza of a ruined government district, toppled statues and broken columns, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+tiny lone silhouette of a cloaked figure with a raised fist at the base of the scene, a colossal monolith of stone and steel tearing out of the ground, amber cracks radiating out to enemies pinned to the floor, monumental scale, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, vast ceremonial plaza of a ruined government district, toppled statues and broken columns, eclipse sky, dim corona light, eerie stillness, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -83,7 +83,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Mur de givre — `card_frost_wall` · Common · Defensive
 
 ```
-a spiked wall of ice bursting up between an ally and a volley of projectiles, frost racing across the ground, cold cyan breath in the air, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, snow-covered avenue blocked by abandoned yellow taxis, frozen traffic lights, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a teenage girl in an oversized parka, a spiked wall of ice bursting up between her and a volley of projectiles, frost racing across the ground, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, snow-covered avenue blocked by abandoned taxis, frozen traffic lights, blizzard at night, swirling snowflakes, cold cyan breath, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -91,7 +91,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Bouclier de vapeur — `card_steam_shield` · Common · Defensive
 
 ```
-a metahuman half hidden in a whirling shield of white and cyan steam that deflects incoming impacts, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, flooded subway tunnel with ruptured steam pipes, emergency lights reflected in black water, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a tall man in a gas mask and work overalls, half hidden in a whirling shield of white and cyan steam that deflects incoming impacts, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, flooded subway tunnel with ruptured steam pipes, black water, red emergency strobes reflected in water, claustrophobic, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -99,7 +99,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Courant tonifiant — `card_tonic_current` · Common · Support
 
 ```
-soft cyan electric filaments linking two hands and running through the body of a wounded fighter, wounds closing as glowing points of light, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned power substation control room, dead monitors, tangled cables, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a young engineer with a tool belt, kneeling, soft cyan electric filaments running from her hands into a collapsed comrade, wounds closing as points of light, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned power substation control room, dead monitors, tangled cables, total blackout lit only by the electric glow, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -107,7 +107,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Brume apaisante — `card_soothing_mist` · Common · Support
 
 ```
-a bluish cyan mist slowly settling over the team, suspended droplets glittering like stars, calm faces, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, overgrown botanical greenhouse with broken glass roof, wild vines and dripping water, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a barefoot monk-like figure with a staff, a bluish cyan mist slowly settling over resting allies, droplets glittering like stars, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, overgrown botanical greenhouse with a broken glass roof, wild vines, soft rain at twilight, serene and calm, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -115,7 +115,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Halo de néon — `card_neon_halo` · Rare · Defensive
 
 ```
-a heroine raising her arms and projecting a ring of cyan neon light above her team, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, rain-soaked night market alley full of broken neon signs and sizzling cables, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a punk woman with a mohawk and studded jacket, arms raised, projecting a ring of cyan neon light above her crew, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, night market alley full of broken neon signs and sizzling cables, pouring rain, wet reflections, cyberpunk night, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -123,7 +123,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Étincelle d'élan — `card_spark_rush` · Rare · Support
 
 ```
-a hero launched forward in a trail of cyan electric sparks, silhouette stretched by speed, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, elevated train line with a derailed carriage, sparking overhead catenary wires, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a lanky sprinter in a track jacket, stretched by speed, launched forward in a trail of cyan electric sparks, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, elevated train line with a derailed carriage, sparking overhead wires, golden hour backlight, long dramatic shadows, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -131,7 +131,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Flux électrique — `card_power_flux` · Rare · Support
 
 ```
-a man with a halo of blue lightning emerging from collapsed rubble, releasing an electric wave that rushes toward his allies, dust and debris lifted by the discharge, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, collapsed underground data center, toppled server racks, exposed fiber cables, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a young man with braided hair and a crackling halo of blue lightning, emerging from collapsed rubble and releasing an electric wave toward his allies, debris lifted by the discharge, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, collapsed underground data center, toppled server racks, exposed fiber cables, billowing dust lit from within by orange fire, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -139,7 +139,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Carapace de glace — `card_ice_carapace` · Epic · Defensive
 
 ```
-a colossal beast bristling with ice crystals roaring at the sky while plates of cyan ice form around the team, swirling frost vortex, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, frozen harbor with ice-locked cargo ships and toppled shipping containers, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a colossal wolf-like beast bristling with ice crystals, small human figures sheltering beneath it, roaring at the sky while plates of cyan ice form around the group, swirling frost vortex, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, frozen harbor with ice-locked cargo ships and toppled containers, polar night with a faint aurora overhead, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -147,7 +147,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Foudre en chaîne — `card_chain_lightning` · Legendary · Offensive
 
 ```
-a grizzled veteran with glowing eyes unleashing a bolt of lightning that leaps from enemy to enemy, blinding cyan and white electric arcs, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, futuristic Moscow avenue with brutalist towers and a dark onion-domed silhouette on the horizon, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a grizzled old soldier with a buzz cut and glowing eyes, unleashing a bolt of lightning that leaps from enemy to enemy, blinding cyan and white arcs, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, futuristic Moscow avenue with brutalist towers and onion domes on the horizon, sulfur-yellow storm clouds, crackling static in the air, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -157,7 +157,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Coup de bélier — `card_ram_strike` · Common · Offensive
 
 ```
-a massive brute charging shoulder-first through a brick wall in a cloud of debris, crimson shockwave, an enemy hurled backward, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, narrow Brooklyn street lined with old brick warehouses and fire escapes, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a massive brute in a hoodie, head down, charging shoulder-first through a brick wall in an explosion of debris, an enemy hurled backward, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, narrow Brooklyn street lined with old brick warehouses and fire escapes, harsh noon haze, sun glare through smoke, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -165,7 +165,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Peau d'acier — `card_steel_skin` · Common · Defensive
 
 ```
-bullets flattening against the skin of a metahuman turned metallic and streaked with crimson reflections, he keeps walking forward with a provocative stare, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned military checkpoint with sandbags, concrete barriers and burnt-out armored vehicles, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a shirtless boxer with metallic skin catching crimson reflections, walking forward through a hail of bullets that flatten against him, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned military checkpoint with sandbags and burnt-out armored vehicles, searchlights sweeping a dark night, tracer fire, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -173,7 +173,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Ancrage profond — `card_deep_anchor` · Common · Defensive
 
 ```
-roots of muscle and stone growing from the feet of a hero and plunging into the ground to hold an ally steady against a storm of debris, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, storm-battered seawall promenade with crashing waves and bent lampposts, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a short, stout woman in a heavy raincoat, feet planted, roots of muscle and stone growing from her feet into the ground, holding an ally steady, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, storm-battered seawall promenade with bent lampposts, hurricane winds, giant waves crashing, grey-green storm light, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -181,7 +181,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Sang neuf — `card_fresh_blood` · Common · Support
 
 ```
-threads of crimson light flowing between two joined wrists, veins glowing under the skin, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, underground clinic in a parking garage, hanging IV bags, improvised hospital beds, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouettes of two kneeling figures, a nurse in a torn uniform holding a soldier's wrist, threads of crimson light flowing between their joined wrists, veins glowing, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, underground clinic in a parking garage, hanging IV bags, improvised beds, cold fluorescent tubes flickering, sterile green tint, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -189,7 +189,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Saignée — `card_bloodletting` · Rare · Offensive
 
 ```
-a female fighter with glowing red claws slashing an enemy, wisps of luminous blood flowing up her arm and closing her own wounds, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned slaughterhouse with hanging chains, steel hooks and stained tiles, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a feral woman with wild hair and glowing red claws, crouched, slashing an enemy, wisps of luminous blood flowing up her arm and closing her own wounds, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned slaughterhouse with hanging chains and steel hooks, single swinging bulb, horror mood, deep shadows, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -197,7 +197,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Défi — `card_challenge` · Rare · Defensive
 
 ```
-a tank with bandaged fists slamming them together, a crimson aura drawing every enemy gaze toward him, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, ruined boxing arena with a collapsed ring, torn ropes and empty broken stands, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a huge wrestler with bandaged fists, chest out, slamming his fists together, a crimson aura drawing every enemy toward him, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, ruined boxing arena with a collapsed ring and empty broken stands, single overhead spotlight cutting through cigarette-like smoke, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -205,7 +205,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Pouls partagé — `card_shared_pulse` · Rare · Support
 
 ```
-a concentric crimson wave pulsing from the glowing heart of a healer and passing through each ally, the heartbeat visible as a ripple in the air, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, gutted hospital atrium with collapsed upper floors and dangling lights, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a healer in a long hooded robe, hand on her chest, a concentric crimson wave pulsing from her glowing heart through a circle of allies, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, gutted hospital atrium with collapsed upper floors and dangling lights, beams of moonlight through the broken roof, floating ash, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -213,7 +213,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Bastion vivant — `card_living_bastion` · Epic · Defensive
 
 ```
-a giantess with skin of stone and flesh spreading her body like a rampart in front of the team, glowing crimson scars, enemies shattering against her, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, breached medieval-style city gate fortified with car wrecks and scrap metal, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a giantess with skin of stone and flesh, arms spread like a wall, protecting a small crowd behind her as enemies shatter against her, glowing crimson scars, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, breached city gate fortified with car wrecks and scrap metal, sunset siege, burning arrows of light, embers in the wind, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -221,7 +221,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Poing tellurique — `card_telluric_fist` · Legendary · Offensive
 
 ```
-a fist slamming into the asphalt and blowing out a crater in a shockwave, road slabs, cars and enemies thrown into the air, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, multi-lane highway interchange with buckling concrete ramps, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a towering man in a torn trench coat, fist driven into the ground, blowing out a crater in a shockwave, road slabs, cars and enemies thrown into the air, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, multi-lane highway interchange with buckling concrete ramps, earthquake dust cloud, sky turned blood red, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -231,7 +231,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Tir précis — `card_precise_shot` · Common · Offensive
 
 ```
-extreme close-up of a sniper woman’s eye, violet pupil with a glowing targeting reticle, the bullet path drawing a perfect line toward a distant target, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, top of a ruined clock tower overlooking the city skyline, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a sniper lying prone with a long rifle, scarf flapping, a glowing violet targeting reticle and a perfectly straight bullet trail toward a distant target, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, top of a ruined clock tower overlooking the skyline, blue hour, first city lights, crisp clear air, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -239,7 +239,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Pas de côté — `card_side_step` · Common · Defensive
 
 ```
-an agent stepping aside and leaving several frozen violet afterimages behind him, a projectile passing through a ghost image without touching him, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, deserted train station concourse with a broken departure board and scattered luggage, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a nimble agent in a suit and tie, stepping aside and leaving several frozen violet afterimages, a projectile passing through a ghost image, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, deserted train station concourse with a broken departure board and scattered luggage, slanted morning light through tall windows, floating dust, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -247,7 +247,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Camouflage — `card_camouflage` · Common · Defensive
 
 ```
-the silhouette of an ally dissolving into the background like frosted glass with violet facets, only the eyes remaining sharp, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, dark alley covered in torn posters and graffiti, dripping gutters, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a child in a hoodie dissolving like frosted glass with violet facets, only the outline remaining visible as a patrol passes by, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, dark alley covered in torn posters and graffiti, dripping gutters, drizzle under a single sodium streetlamp, orange halo, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -255,7 +255,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Écho guide — `card_guiding_echo` · Common · Support
 
 ```
-concentric violet sound waves revealing the pitch-black surroundings and tracing a glowing path that an ally sprints along, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, pitch-black underground catacombs with stacked bones and narrow passages, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a blind man with a cane, head tilted, and a runner sprinting past him, concentric violet sound waves revealing the darkness and tracing a glowing path for the runner, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, underground catacombs with stacked bones and narrow passages, absolute darkness, the waves as the only light source, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -263,7 +263,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Faille de garde — `card_guard_break` · Rare · Offensive
 
 ```
-an agent’s vision overlaying an armored enemy with a web of violet cracks converging on a weak point, an instant before the strike, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned dojo with torn paper walls and a cracked wooden floor, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a martial artist with a topknot facing an armored giant, a web of violet cracks converging on the giant's weak point, an instant before the strike, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, abandoned dojo with torn paper walls and a cracked wooden floor, falling cherry petals at dusk, tense silence, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -271,7 +271,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Prémonition — `card_premonition` · Rare · Defensive
 
 ```
-a grey-haired old man sitting on stone steps, violet visions of the future layered over the sky around him, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, ruined cathedral at sunset overgrown with red ivy, collapsed arches, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a grey-haired old man sitting on stone steps, violet visions of the future layered over the sky around him, faint ghostly figures, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, ruined cathedral overgrown with red ivy, collapsed arches, sunset with god rays through the arches, melancholic, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -279,7 +279,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Veille partagée — `card_shared_watch` · Rare · Support
 
 ```
-several agents standing back to back, their gazes linked by threads of violet light covering the sleeping city, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, rooftop water towers and antennas high above a dark city grid, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouettes of three agents of different heights standing back to back, their gazes linked by threads of violet light covering the city below, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, rooftop water towers and antennas high above a dark city grid, starry night with a huge full moon behind them, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -287,7 +287,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Exécution silencieuse — `card_silent_takedown` · Epic · Offensive
 
 ```
-a hooded figure appearing behind an enemy in a violet flash, blade already lowered, the scene frozen in absolute silence under the rain, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, flooded parking garage at night, rain pouring through the broken ceiling, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a hooded assassin with a short blade, appearing behind an unaware guard, a violet flash marking the strike, the scene frozen in absolute silence, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, flooded parking garage at night, rain pouring through the broken ceiling, heavy downpour, cold violet reflections, noir mood, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
@@ -295,7 +295,7 @@ Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deforme
 ### Voile temporel — `card_time_veil` · Epic · Defensive
 
 ```
-a translucent dome of frozen time surrounding the team: raindrops, shards and flames suspended in mid-air, violet clock hands floating around them, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on faces, clothing and rocks, cel-shaded lighting with soft painterly texture, ruined observatory with a broken telescope dome and giant clockwork gears, blood red, burgundy, purple color palette, sinister atmosphere, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
+silhouette of a woman in a long coat holding an antique pocket watch, a group behind her, a translucent dome of frozen time: raindrops, shards and flames suspended in mid-air, violet clock hands floating, stylized semi-3D animated cinematic still, low-poly faceted shading with visible polygonal facets on figures, clothing and rocks, cel-shaded lighting with soft painterly texture, ruined observatory with a broken telescope dome and giant clockwork gears, swirling starfield seen through the open dome, timeless twilight, blood red, burgundy, purple color palette, desaturated dark shadows, dramatic rim light, dynamic camera angle (low angle or tight close-up), shallow depth of field, cinematic 16:9 framing, graphic novel animation quality
 
 Negative prompt: photorealistic, 3D render, plastic skin, extra fingers, deformed hands, blurry face, asymmetrical eyes, text, watermark, logo, cartoon chibi, pastel colors, bright daylight, cape covering face
 ```
