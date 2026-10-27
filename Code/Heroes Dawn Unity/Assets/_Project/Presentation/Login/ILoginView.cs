@@ -8,6 +8,9 @@ namespace N29.HeroesDawn.Presentation.Login
     public interface ILoginView : IView
     {
         event Action? PlayClicked;
+        /// <summary>Bouton « Se connecter » (compte joueur).</summary>
+        event Action? AccountClicked;
+        void SetAccountLabel(string label);
         void SetBusy(bool busy, string status);
         void PlayIntro();
     }

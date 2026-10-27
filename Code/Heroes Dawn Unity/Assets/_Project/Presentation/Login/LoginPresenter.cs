@@ -6,6 +6,7 @@ using N29.HeroesDawn.Application.Features.Auth;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Session;
+using N29.HeroesDawn.Presentation.Account;
 using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Mvp;
 using AppLogger = N29.HeroesDawn.Application.Ports.ILogger;
@@ -26,23 +27,56 @@ namespace N29.HeroesDawn.Presentation.Login
         readonly AppLogger _log;
         readonly IAudioService _audio;
         readonly IOnboardingFlow? _onboarding;
+        readonly IAccountFlow? _account;
+        bool _accountOpen;
         readonly BusyGate _gate = new BusyGate();
 
         public LoginPresenter(ILoginView view, ISignInAsGuestUseCase signIn, ISessionReadModel session, IPublisher<NavigateRequested> navigate,
-                              IToastService toasts, ILocalization loc, AppLogger log, IAudioService? audio = null, IOnboardingFlow? onboarding = null) : base(view, null)
+                              IToastService toasts, ILocalization loc, AppLogger log, IAudioService? audio = null, IOnboardingFlow? onboarding = null, IAccountFlow? account = null) : base(view, null)
         {
             _signIn = signIn; _session = session; _navigate = navigate; _toasts = toasts; _loc = loc; _log = log;
             _audio = audio ?? NullAudioService.Instance;
             _onboarding = onboarding;
+            _account = account;
         }
 
-        protected override void OnStart() => View.PlayClicked += Play;
-        protected override void OnDispose() => View.PlayClicked -= Play;
+        protected override void OnStart()
+        {
+            View.PlayClicked += Play;
+            View.AccountClicked += OpenAccount;
+        }
+
+        protected override void OnDispose()
+        {
+            View.PlayClicked -= Play;
+            View.AccountClicked -= OpenAccount;
+        }
+
+        /// <summary>Ouvre le parcours Compte ; un seul à la fois. Le libellé du bouton suit l'état (« Se connecter » ou l'e-mail du compte).</summary>
+        void OpenAccount()
+        {
+            if (_account == null || _accountOpen) return;
+            _accountOpen = true;
+            RunAccountAsync().Forget();
+        }
+
+        async UniTaskVoid RunAccountAsync()
+        {
+            try { await _account!.RunAsync(Lifetime); }
+            catch (OperationCanceledException) { }
+            catch (Exception e) { _log.Error("Compte : " + e.Message); }
+            finally
+            {
+                _accountOpen = false;
+                if (!Disposed) View.SetAccountLabel(_account!.ButtonLabel);
+            }
+        }
 
         protected override void OnShown()
         {
             _gate.Exit();
             View.SetBusy(false, "");
+            if (_account != null) View.SetAccountLabel(_account.ButtonLabel);
             View.PlayIntro();
         }
 

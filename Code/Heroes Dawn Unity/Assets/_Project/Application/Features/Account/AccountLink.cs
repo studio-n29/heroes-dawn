@@ -49,7 +49,7 @@ namespace N29.HeroesDawn.Application.Features.Account
         public LinkOutcome? PendingChoice { get; private set; }
         public DateTime? LastSyncUtc => _state.Load() is { LastSyncUtcTicks: > 0 } s ? new DateTime(s.LastSyncUtcTicks, DateTimeKind.Utc) : (DateTime?)null;
 
-        /// <summary>Levé quand un choix de progression devient nécessaire (au rattachement ou à la suite d'un conflit de synchronisation).</summary>
+        /// <summary>Levé quand un conflit de synchronisation rend un choix de progression nécessaire (le rattachement, lui, rend son résultat à l'appelant).</summary>
         public event Action<LinkOutcome>? ChoiceRequired;
 
         // ------------------------------------------------------------------ Connexion
@@ -137,7 +137,6 @@ namespace N29.HeroesDawn.Application.Features.Account
             _pendingCloud = cloud;
             var outcome = new LinkOutcome(LinkStatus.NeedsChoice, ProfileSummary.Of(local), ProfileSummary.Of(cloud.Profile));
             PendingChoice = outcome;
-            ChoiceRequired?.Invoke(outcome);
             return Result<LinkOutcome?>.Ok(outcome);
         }
 
@@ -199,7 +198,8 @@ namespace N29.HeroesDawn.Application.Features.Account
             {
                 var got = await _cloud.GetAsync(CancellationToken.None);
                 if (got.IsFailure || got.Value == null) return;
-                Ask(_session.ToProfile(_clock.UtcNow), got.Value);
+                var asked = Ask(_session.ToProfile(_clock.UtcNow), got.Value);
+                ChoiceRequired?.Invoke(asked.Value!);   // seul le conflit de synchronisation le lève : le rattachement rend son résultat à l'appelant
             }
             catch (Exception e) { _log.Error("Conflit de synchronisation : " + e.Message); }
         }

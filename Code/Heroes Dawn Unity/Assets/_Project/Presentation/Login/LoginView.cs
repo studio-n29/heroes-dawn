@@ -15,13 +15,25 @@ namespace N29.HeroesDawn.Presentation.Login
         [SerializeField] TMP_Text status = null!;
         [SerializeField] RectTransform spinner = null!;
         [SerializeField] RectTransform logo = null!;
+        [SerializeField] UiButton account = null!;
 
         public event Action? PlayClicked;
+        public event Action? AccountClicked;
 
         /// <summary>Bouton Jouer (tests PlayMode : clic réel).</summary>
         public Button PlayButton => play.Button;
 
-        void Awake() => play.Button.onClick.AddListener(() => PlayClicked?.Invoke());
+        /// <summary>Bouton « Se connecter » (tests PlayMode : clic réel).</summary>
+        public Button AccountButton => account.Button;
+        public string AccountLabel => account.Label.text;
+
+        void Awake()
+        {
+            play.Button.onClick.AddListener(() => PlayClicked?.Invoke());
+            account.Button.onClick.AddListener(() => AccountClicked?.Invoke());
+        }
+
+        public void SetAccountLabel(string label) => account.SetLabel(label);
 
         void Update()
         {

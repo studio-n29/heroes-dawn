@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
+using N29.HeroesDawn.Application.Features.Account;
 using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
+using N29.HeroesDawn.Presentation.Account;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
@@ -27,13 +29,18 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISessionReadModel _session;
         readonly IModalService _modals;
         readonly List<Action?> _actions = new List<Action?>();
+        readonly List<Action?> _actionsB = new List<Action?>();
+        readonly AccountLink? _account;
+        readonly IAccountFlow? _accountFlow;
 
         public ProfilePagePresenter(IProfilePageView view, PlayerProfile profile, IFriendsPort friends, HubNavigator nav, ISessionReadModel session,
                                     ILocalization loc, IToastService toasts, ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet,
-                                    ISubscriber<RosterChanged> roster, IClock clock, IModalService modals)
+                                    ISubscriber<RosterChanged> roster, IClock clock, IModalService modals,
+                                    AccountLink? account = null, IAccountFlow? accountFlow = null)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
             _profile = profile; _friends = friends; _nav = nav; _session = session; _modals = modals;
+            _account = account; _accountFlow = accountFlow;
         }
 
         public override string Title => Loc.T("page.profile");
@@ -50,8 +57,11 @@ namespace N29.HeroesDawn.Presentation.Hub
             });
 
             _actions.Clear();
+            _actionsB.Clear();
             var rows = new List<InfoRowData>();
-            void Add(InfoRowData row, Action? action) { rows.Add(row); _actions.Add(action); }
+            void Add(InfoRowData row, Action? action, Action? actionB = null) { rows.Add(row); _actions.Add(action); _actionsB.Add(actionB); }
+
+            if (_account != null && _accountFlow != null) AddAccountRow(Add);
 
             Add(NavRow("profile.registry", "profile.registry.sub", "R"), () => _nav.Open(HubPage.Agents));
             Add(NavRow("profile.archives", "profile.archives.sub", "A"), () => _nav.Open(HubPage.Archives));
@@ -90,6 +100,37 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.ShowRows(rows.ToArray());
         }
 
+        /// <summary>Bandeau « Compte » : invité (Lier mon compte) ou connecté (e-mail, fournisseur, dernière synchronisation, Synchroniser, Se déconnecter).</summary>
+        void AddAccountRow(Action<InfoRowData, Action?, Action?> add)
+        {
+            var cloud = _account!.Cloud;
+            if (cloud == null)
+            {
+                var guest = InfoRowData.Basic(Loc.T("profile.account.guest"), Loc.T("profile.account.guest_sub"));
+                guest.Tag = "C";
+                guest.TagColor = Theme.Info;
+                guest.A = RowButtonData.Of(Loc.T("profile.account.link"), true, "", 0);
+                add(guest, () => RunAccountAsync(() => _accountFlow!.RunAsync(Lifetime)).Forget(), null);
+                return;
+            }
+            string provider = Loc.T("account.provider." + cloud.Provider.ToString().ToLowerInvariant());
+            var last = _account.LastSyncUtc;
+            string when = last.HasValue ? last.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : Loc.T("profile.account.never");
+            var row = InfoRowData.Basic(Loc.F("profile.account.connected", string.IsNullOrEmpty(cloud.Email) ? cloud.DisplayName : cloud.Email), Loc.F("profile.account.connected_sub", provider, when));
+            row.Tag = "C";
+            row.TagColor = Theme.Success;
+            row.A = RowButtonData.Of(Loc.T("profile.account.sync"), true, "", 0);
+            row.B = RowButtonData.Of(Loc.T("profile.account.signout"), true, "", 1);
+            add(row, () => RunAccountAsync(() => _accountFlow!.SyncNowAsync(Lifetime)).Forget(), () => RunAccountAsync(() => _accountFlow!.SignOutAsync(Lifetime)).Forget());
+        }
+
+        async UniTaskVoid RunAccountAsync(Func<UniTask> action)
+        {
+            try { await action(); }
+            catch (OperationCanceledException) { return; }
+            if (!Disposed) Render();
+        }
+
         InfoRowData NavRow(string titleKey, string subKey, string tag)
         {
             var r = InfoRowData.Basic(Loc.T(titleKey), Loc.T(subKey));
@@ -124,7 +165,8 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         protected override void OnRowButton(int row, int button)
         {
-            if (row >= 0 && row < _actions.Count) _actions[row]?.Invoke();
+            var list = button == 1 ? _actionsB : _actions;
+            if (row >= 0 && row < list.Count) list[row]?.Invoke();
         }
     }
 }

@@ -52,6 +52,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             pulse.Amplitude = 0.04f;
             pulse.Speed = 3.5f;
 
+            var account = Ui.LocBtn(rt, "login.account", Theme.Surface3, Theme.Text, null!, 34, FontKind.Title, "Account");
+            account.Rect.At(1f, 0f, -40, 130, 460, 96);
+
             var status = Ui.Txt(rt, "", 30, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Body, "Status");
             status.rectTransform.At(0.5f, 0f, 0, 60, 1200, 44);
 
@@ -73,6 +76,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "status", status);
             ctx.Wire(view, "spinner", spinner);
             ctx.Wire(view, "logo", logo);
+            ctx.Wire(view, "account", account);
             return rt.gameObject;
         }
     }
