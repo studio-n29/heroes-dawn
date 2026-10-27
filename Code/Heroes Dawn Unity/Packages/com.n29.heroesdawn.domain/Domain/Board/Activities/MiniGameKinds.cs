@@ -41,4 +41,19 @@ namespace N29.HeroesDawn.Domain.Activities
 
         public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
     }
+
+    /// <summary>« Caisse au choix » (voir <see cref="Games.CratePickGame"/>).</summary>
+    public sealed class CratePickKind : IActivityKind
+    {
+        public string Id => ActivityKinds.CratePick;
+
+        public IReadOnlyList<ParameterDef> Schema { get; } = new[]
+        {
+            new ParameterDef("rounds", 3, 1, 8),
+            new ParameterDef("lives", 3, 1, 9),
+            new ParameterDef("speed_percent", 100, 50, 220),
+        };
+
+        public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
+    }
 }

@@ -70,5 +70,16 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(r.Driver.Hud.Score, Is.EqualTo("Touches 0 / 3"));
             Assert.That(r.Driver.Hud.Lives, Is.EqualTo(5));
         }
+
+        [Test, Description("Vérifie que « Caisse au choix » ouvre la fenêtre commune avec une partie de caisses, son titre, sa consigne et un bandeau « Caisses x / y » avec les vies — parce que c'est le jeu du curseur ping-pong")]
+        public void CratePick_OpensTheCommonWindow()
+        {
+            var r = Play("crate_pick_depot");
+            Assert.That(r.Driver.Game, Is.InstanceOf<CratePickGame>());
+            Assert.That(r.Title, Is.EqualTo("CAISSE AU CHOIX"));
+            Assert.That(r.Instructions, Is.EqualTo(_loc.T("mg2d.crate_pick.instructions")));
+            Assert.That(r.Driver.Hud.Score, Is.EqualTo("Caisses 0 / 3"));
+            Assert.That(r.Driver.Hud.Lives, Is.EqualTo(3));
+        }
     }
 }

@@ -30,6 +30,13 @@ namespace N29.HeroesDawn.Presentation.Common
             d["mg2d.free_throw.instructions"] = "Maintiens pour remplir la jauge, relâche quand le curseur est dans la zone verte : plus la cible est loin, plus il faut de puissance.";
             d["mg2d.freethrow.score"] = "Touches {0} / {1}";
             d["activity.param.throws"] = "Lancers";
+
+            // ---- Caisse au choix
+            d["activities.cratepick.name"] = "Caisse au choix";
+            d["activities.cratepick.desc"] = "Trois caisses scellées : retiens celle qui brille, puis frappe-la au bon moment.";
+            d["mg2d.crate_pick.instructions"] = "Retiens la caisse qui brille. Maintiens pour charger, relâche quand le curseur est au-dessus de la bonne caisse. Une erreur coûte une vie.";
+            d["mg2d.cratepick.score"] = "Caisses {0} / {1}";
+            d["activity.param.rounds"] = "Manches";
             d["activity.param.hits"] = "Touches à réussir";
         }
     }

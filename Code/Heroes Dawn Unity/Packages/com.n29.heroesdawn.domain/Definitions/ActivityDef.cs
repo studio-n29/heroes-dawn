@@ -123,5 +123,6 @@ namespace N29.HeroesDawn.Definitions
         // Mini-jeux 2D du lot H (0.14.0)
         public const string Rhythm = "rhythm";
         public const string FreeThrow = "free_throw";
+        public const string CratePick = "crate_pick";
     }
 }
