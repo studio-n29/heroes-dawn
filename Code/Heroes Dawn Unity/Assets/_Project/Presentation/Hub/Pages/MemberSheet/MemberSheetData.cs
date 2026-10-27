@@ -60,6 +60,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string PrimaryReason;
         public bool ShowArrows;
         /// <summary>Bouton Soigner (membre possédé) : libellé avec le prix, état et raison s'il est grisé.</summary>
+        /// <summary>Bouton Dossier : affiché seulement si l'agent a du lore.</summary>
+        public bool ShowDossierButton;
+        public string DossierButtonLabel;
         public bool ShowHeal;
         public string HealLabel;
         public bool HealEnabled;

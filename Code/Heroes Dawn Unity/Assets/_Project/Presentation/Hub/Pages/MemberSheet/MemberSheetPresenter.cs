@@ -73,6 +73,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.NextClicked += Next;
             View.PrimaryClicked += Primary;
             View.HealClicked += Heal;
+            View.DossierClicked += OpenDossier;
+            View.DossierClosed += CloseDossier;
             View.LoadoutClicked += OpenLoadout;
             View.AffinityClicked += OpenAffinity;
             View.SkillTileClicked += OnSkillTile;
@@ -107,6 +109,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.NextClicked -= Next;
             View.PrimaryClicked -= Primary;
             View.HealClicked -= Heal;
+            View.DossierClicked -= OpenDossier;
+            View.DossierClosed -= CloseDossier;
             View.LoadoutClicked -= OpenLoadout;
             View.AffinityClicked -= OpenAffinity;
             View.SkillTileClicked -= OnSkillTile;
@@ -128,8 +132,18 @@ namespace N29.HeroesDawn.Presentation.Hub
             for (int k = 0; k < roster.Count; k++) if (roster[k].Id == _member) { i = k; break; }
             _member = roster[((i + delta) % roster.Count + roster.Count) % roster.Count].Id;
             _nav.ReplaceCurrent(new HubLocation(HubPage.MemberSheet, _member));
+            View.HideDossier();
             Refresh();
         }
+
+        void OpenDossier()
+        {
+            var sections = DossierText.Sections(_loc, _member.Value);
+            if (sections.Count == 0) return;
+            View.ShowDossier(new DossierData(_loc.T("dossier.button"), sections.ToArray(), _loc.T("dossier.close")));
+        }
+
+        void CloseDossier() => View.HideDossier();
 
         void Heal()
         {
@@ -268,6 +282,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             d.ItemTiles = ItemTiles(m);
             d.Affinity = Affinity(def);
             d.AffinityTitle = _loc.T("sheet.affinity");
+            d.ShowDossierButton = DossierText.Sections(_loc, def.Id.Value).Count > 0;
+            d.DossierButtonLabel = _loc.T("dossier.button");
             return d;
         }
 

@@ -35,6 +35,11 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UiButton previous = null!;
         [SerializeField] UiButton next = null!;
         [SerializeField] UiButton heal = null!;
+        [SerializeField] UiButton dossierButton = null!;
+        [SerializeField] GameObject dossierRoot = null!;
+        [SerializeField] TMP_Text dossierTitle = null!;
+        [SerializeField] TMP_Text dossierText = null!;
+        [SerializeField] UiButton dossierClose = null!;
         [SerializeField] UiButton loadout = null!;
         [SerializeField] UiButton primary = null!;
         [SerializeField] TMP_Text primaryReason = null!;
@@ -49,6 +54,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? NextClicked;
         public event Action? PrimaryClicked;
         public event Action? HealClicked;
+        public event Action? DossierClicked;
+        public event Action? DossierClosed;
         public event Action? LoadoutClicked;
         public event Action? AffinityClicked;
         public event Action<int>? SkillTileClicked;
@@ -69,6 +76,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             next.Button.onClick.AddListener(() => NextClicked?.Invoke());
             primary.Button.onClick.AddListener(() => PrimaryClicked?.Invoke());
             heal.Button.onClick.AddListener(() => HealClicked?.Invoke());
+            dossierButton.Button.onClick.AddListener(() => DossierClicked?.Invoke());
+            dossierClose.Button.onClick.AddListener(() => DossierClosed?.Invoke());
+            dossierRoot.SetActive(false);
             loadout.Button.onClick.AddListener(() => LoadoutClicked?.Invoke());
             affinityButton.onClick.AddListener(() => AffinityClicked?.Invoke());
             for (int i = 0; i < skillTiles.Length; i++) { int k = i; skillTiles[i].Button.onClick.AddListener(() => SkillTileClicked?.Invoke(k)); }
@@ -132,6 +142,8 @@ namespace N29.HeroesDawn.Presentation.Hub
 
             SetActive(previous, d.ShowArrows);
             SetActive(next, d.ShowArrows);
+            SetActive(dossierButton, d.ShowDossierButton);
+            if (d.ShowDossierButton) dossierButton.SetLabel(d.DossierButtonLabel);
             SetActive(heal, d.ShowHeal);
             if (d.ShowHeal)
             {
@@ -146,6 +158,22 @@ namespace N29.HeroesDawn.Presentation.Hub
             primary.DisabledReason = d.PrimaryReason;
             primaryReason.text = d.PrimaryReason;
         }
+
+        public void ShowDossier(DossierData d)
+        {
+            dossierTitle.text = d.Title;
+            var sb = new System.Text.StringBuilder();
+            foreach (var section in d.Sections)
+            {
+                if (sb.Length > 0) sb.Append("\n\n");
+                sb.Append("<color=#FFCF33><b>").Append(section.Title.ToUpperInvariant()).Append("</b></color>\n").Append(section.Text);
+            }
+            dossierText.text = sb.ToString();
+            dossierClose.SetLabel(d.Close);
+            dossierRoot.SetActive(true);
+        }
+
+        public void HideDossier() => dossierRoot.SetActive(false);
 
         public void ShowPicker(PickerData d)
         {

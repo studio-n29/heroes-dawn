@@ -57,6 +57,13 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action? NextClicked;
         public event Action? PrimaryClicked;
         public event Action? HealClicked;
+        public event Action? DossierClicked;
+        public event Action? DossierClosed;
+        public DossierData? LastDossier;
+        public void ShowDossier(DossierData d) => LastDossier = d;
+        public void HideDossier() => LastDossier = null;
+        public void ClickDossier() => DossierClicked?.Invoke();
+        public void CloseDossier() { DossierClosed?.Invoke(); }
         public event Action? LoadoutClicked;
         public event Action? AffinityClicked;
         public void ClickAffinity() => AffinityClicked?.Invoke();

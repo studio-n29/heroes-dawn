@@ -8,6 +8,13 @@ namespace N29.HeroesDawn.Presentation.Common
     {
         static partial void ExtendChapters(Dictionary<string, string> d)
         {
+            d["dossier.button"] = "DOSSIER";
+            d["dossier.close"] = "FERMER";
+            d["dossier.identity"] = "Identité";
+            d["dossier.supernova"] = "Lien à la Supernova";
+            d["dossier.story"] = "Histoire d'origine";
+            d["dossier.power"] = "Pouvoir";
+            d["dossier.look"] = "Apparence";
             d["page.chapters"] = "Chapitres";
             d["chapters.header"] = "CHAPITRES";
             d["chapters.line"] = "{0} / {1} chapitres terminés";

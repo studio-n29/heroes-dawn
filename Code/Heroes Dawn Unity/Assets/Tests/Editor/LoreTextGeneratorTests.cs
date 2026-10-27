@@ -80,15 +80,14 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(actual, Is.EqualTo(expected));
         }
 
-        [Test, Description("Vérifie que chacun des 32 agents jouables a ses textes (âge, sexe, origine, apparence, pouvoir ; plus lien à la Supernova et histoire d'origine pour les 30 numérotés), sans texte vide — parce que la fiche affiche le dossier complet")]
+        [Test, Description("Vérifie que chacun des 32 agents jouables a ses textes (âge, sexe, origine, lien à la Supernova, histoire d'origine, apparence, pouvoir), sans texte vide — parce que la fiche affiche le dossier complet")]
         public void EveryPlayableAgent_HasItsDossier()
         {
             var ids = PlayableAgentIds();
             Assert.That(ids.Count, Is.EqualTo(32));
             foreach (var id in ids)
             {
-                var fields = new List<string> { "age", "sex", "origin", "look", "power" };
-                if (id != "agent_d" && id != "agent_m") fields.AddRange(new[] { "supernova", "story" });
+                var fields = new List<string> { "age", "sex", "origin", "supernova", "story", "look", "power" };
                 foreach (var f in fields)
                 {
                     string key = "lore." + id + "." + f;

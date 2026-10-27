@@ -286,8 +286,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var affinityButton = affinityFill.Frame().gameObject.AddComponent<Button>();
             affinityButton.transition = Selectable.Transition.None;
 
-            var heal = Ui.LocBtn(rt, "sheet.heal", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Heal");
-            heal.Rect.At(0f, 0f, RightX, 0, 408, 96);
+            var heal = Ui.LocBtn(rt, "sheet.heal", Theme.Surface3, Theme.Text, null!, 22, FontKind.Title, "Heal");
+            heal.Rect.At(0f, 0f, RightX, 0, 250, 96);
+            var dossierButton = Ui.LocBtn(rt, "dossier.button", Theme.Primary, Theme.TextDark, null!, 22, FontKind.Title, "Dossier");
+            dossierButton.Rect.At(0f, 0f, RightX + 258, 0, 150, 96);
             var loadout = Ui.LocBtn(rt, "sheet.loadout", Theme.Info, Theme.TextDark, null!, 22, FontKind.Title, "Loadout");
             loadout.Rect.At(0f, 0f, RightX + 416, 0, 200, 96);
 
@@ -313,6 +315,32 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
                 if (i == 0) RecipeKit.Mark(t, TutorialTarget.SheetPick);
             }
 
+            // ---- Dossier de lore (recouvre la colonne de droite, au-dessus de la rangée de boutons)
+            var dossierFill = Ui.Panel(rt, "Dossier", Theme.Surface, 5f, 10f, true);
+            var dossierFrame = dossierFill.Frame();
+            dossierFrame.anchorMin = new Vector2(0, 0);
+            dossierFrame.anchorMax = new Vector2(0, 1);
+            dossierFrame.pivot = new Vector2(0, 0.5f);
+            dossierFrame.anchoredPosition = new Vector2(RightX, 54);
+            dossierFrame.sizeDelta = new Vector2(RightW, -108);
+            var dossierTitle = Ui.Txt(dossierFill.transform, "", 32, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "DossierTitle");
+            dossierTitle.rectTransform.At(0f, 1f, 18, -8, RightW - 160, 52);
+            dossierTitle.AutoSize(32);
+            var dossierClose = Ui.LocBtn(dossierFill.transform, "dossier.close", Theme.Surface3, Theme.Text, null!, 22, FontKind.Title, "DossierClose");
+            dossierClose.Rect.At(1f, 1f, -8, -4, 140, 96);
+            var scrollArea = Ui.Rect(dossierFill.transform, "Scroll");
+            scrollArea.anchorMin = Vector2.zero;
+            scrollArea.anchorMax = Vector2.one;
+            scrollArea.offsetMin = new Vector2(14, 14);
+            scrollArea.offsetMax = new Vector2(-14, -108);
+            var dossierContent = Ui.VScroll(scrollArea, out _);
+            dossierContent.VLayout(8, 0, TextAnchor.UpperLeft);
+            var dossierLayout = dossierContent.GetComponent<VerticalLayoutGroup>();
+            dossierLayout.childControlHeight = true;
+            dossierLayout.childForceExpandHeight = false;
+            var dossierText = Ui.Txt(dossierContent, "", 24, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "DossierText");
+            dossierFrame.gameObject.SetActive(false);
+
             pickerFrame.gameObject.SetActive(false);
             var view = rt.gameObject.AddComponent<MemberSheetView>();
             ScreenKit.WireFade(ctx, view);
@@ -336,6 +364,11 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "previous", previous);
             ctx.Wire(view, "next", next);
             ctx.Wire(view, "heal", heal);
+            ctx.Wire(view, "dossierButton", dossierButton);
+            ctx.Wire(view, "dossierRoot", dossierFrame.gameObject);
+            ctx.Wire(view, "dossierTitle", dossierTitle);
+            ctx.Wire(view, "dossierText", dossierText);
+            ctx.Wire(view, "dossierClose", dossierClose);
             ctx.Wire(view, "loadout", loadout);
             ctx.Wire(view, "primary", primary);
             ctx.Wire(view, "primaryReason", reason);

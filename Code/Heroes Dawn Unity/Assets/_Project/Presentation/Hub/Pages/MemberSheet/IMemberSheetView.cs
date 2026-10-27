@@ -12,6 +12,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         event Action PrimaryClicked;
         /// <summary>Bouton Soigner touché : soigne cet agent.</summary>
         event Action HealClicked;
+        /// <summary>Bouton Dossier touché : ouvre le panneau de lore de l'agent.</summary>
+        event Action DossierClicked;
+        /// <summary>Bouton Fermer du dossier touché.</summary>
+        event Action DossierClosed;
         /// <summary>Equipement : objets et cartes de l agent.</summary>
         event Action LoadoutClicked;
         /// <summary>Zone des affinités touchée : ouvre le pop-up avec tous les agents.</summary>
@@ -25,6 +29,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         event Action PickerRemoved;
         event Action PickerClosed;
         void Show(MemberSheetData data);
+        void ShowDossier(DossierData data);
+        void HideDossier();
         void ShowPicker(PickerData data);
         void HidePicker();
     }
