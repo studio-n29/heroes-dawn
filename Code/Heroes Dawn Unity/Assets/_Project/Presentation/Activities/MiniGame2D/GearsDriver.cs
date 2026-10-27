@@ -45,6 +45,7 @@ namespace N29.HeroesDawn.Presentation.Activities
                 _rings[i] = Img("Ring" + i, Sprites.Ring, Theme.Accent, Vector2.one);
                 _gears[i] = Img("Gear" + i, Sprites.Burst, Theme.Danger, Vector2.one);
             }
+            Tick(0f, default);   // mise en page avant le début : rien d'empilé au centre sous la consigne
         }
 
         public override void Tick(float dt, MiniGameInput input)
@@ -57,9 +58,8 @@ namespace N29.HeroesDawn.Presentation.Activities
                 foreach (var g in _game.Gears)
                 {
                     if (Vector2.Distance(CenterOf(g), tap) > Cell * 0.5f) continue;
-                    int before = _game.MovesLeft;
                     if (_game.Toggle(g.Id)) Sparks(CenterOf(g), Theme.Accent, 6);
-                    else if (!g.Motor || before >= 0) ShakeField();
+                    else if (!g.Motor) ShakeField();
                     break;
                 }
             }

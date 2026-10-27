@@ -37,8 +37,9 @@ namespace N29.HeroesDawn.Presentation.Activities
         UniTaskCompletionSource<ActivityResult>? _done;
         bool _started, _finished;
 
-        public bool Cancelable => false;
-        public void RequestCancel() { }
+        /// <summary>Retour (bouton matériel, Échap) pendant la partie = Abandonner : on peut toujours sortir.</summary>
+        public bool Cancelable => _driver != null && !_finished;
+        public void RequestCancel() => OnAbandon();
 
         public RectTransform Field => field;
         public UiButton AbandonButton => abandon;
@@ -82,9 +83,10 @@ namespace N29.HeroesDawn.Presentation.Activities
             Tween.Fade(group, 1f, 0.15f);
             Tween.PopIn(window, 0.26f);
             _done = new UniTaskCompletionSource<ActivityResult>();
-            ct.Register(() => _done.TrySetCanceled());
+            var registration = ct.Register(() => _done.TrySetCanceled());
             Refresh();
-            return await _done.Task;
+            try { return await _done.Task; }
+            finally { registration.Dispose(); }
         }
 
         void OnAbandon()

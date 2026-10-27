@@ -61,7 +61,8 @@ namespace N29.HeroesDawn.Tests.Domain
         public void WrongPower_Misses_AndConsumesAThrow()
         {
             var g = new FreeThrowGame(2, P());
-            g.BeginCharge();                       // jauge à 0 : trop faible pour une cible à 0,3 ou plus
+            g.BeginCharge();
+            g.Step(0.16f);                         // jauge à ~0,19 : trop faible pour une cible à 0,3 ou plus
             Assert.That(g.Release(), Is.False);
             Assert.That(g.Score, Is.EqualTo(0));
             Assert.That(g.ThrowsLeft, Is.EqualTo(4));
@@ -81,7 +82,7 @@ namespace N29.HeroesDawn.Tests.Domain
         public void ThrowsExhausted_Loses()
         {
             var g = new FreeThrowGame(9, P(throws: 3, hits: 2));
-            for (int i = 0; i < 3; i++) { g.BeginCharge(); g.Release(); }
+            for (int i = 0; i < 3; i++) { g.BeginCharge(); g.Step(0.16f); g.Release(); }
             Assert.That(g.Status, Is.EqualTo(GameStatus.Lost));
             Assert.That(g.ThrowsLeft, Is.EqualTo(0));
         }
@@ -98,6 +99,22 @@ namespace N29.HeroesDawn.Tests.Domain
             g.Release();
             g.BeginCharge();
             Assert.That(g.Gauge, Is.EqualTo(0f));
+        }
+
+        [Test, Description("Vérifie qu'un toucher bref (relâchement avant 0,15 s de charge) annule la charge sans consommer de lancer ni marquer — parce qu'un joueur qui n'a pas lu « maintiens » ne doit pas perdre la partie en trois touchers")]
+        public void Release_BelowMinCharge_CancelsWithoutConsumingAThrow()
+        {
+            var g = new FreeThrowGame(2, P());
+            for (int i = 0; i < 5; i++)
+            {
+                g.BeginCharge();
+                g.Step(0.05f);
+                Assert.That(g.Release(), Is.False);
+                Assert.That(g.Charging, Is.False, "la charge est annulée");
+            }
+            Assert.That(g.ThrowsLeft, Is.EqualTo(5));
+            Assert.That(g.Status, Is.EqualTo(GameStatus.Running));
+            Assert.That(g.Score, Is.EqualTo(0));
         }
 
         [Test, Description("Vérifie que la jauge reste dans [0, 1] et fait l'aller-retour — parce que la puissance ne peut pas sortir de l'échelle")]

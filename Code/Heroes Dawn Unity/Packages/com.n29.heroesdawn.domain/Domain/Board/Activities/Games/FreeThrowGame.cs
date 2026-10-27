@@ -12,9 +12,13 @@ namespace N29.HeroesDawn.Domain.Activities.Games
     /// </summary>
     public sealed class FreeThrowGame : IMiniGame
     {
+        /// <summary>Durée minimale de charge (secondes) : en dessous, le relâchement annule la charge sans consommer de lancer.</summary>
+        public const float MinChargeSeconds = 0.15f;
+
         readonly IRandom _rng;
         readonly float _speed;
         float _dir = 1f;
+        float _chargeTime;
 
         public GameStatus Status { get; private set; } = GameStatus.Running;
         public bool Charging { get; private set; }
@@ -53,22 +57,25 @@ namespace N29.HeroesDawn.Domain.Activities.Games
             Charging = true;
             Gauge = 0f;
             _dir = 1f;
+            _chargeTime = 0f;
         }
 
         public void Step(float dt)
         {
             if (Status != GameStatus.Running || !Charging) return;
+            _chargeTime += dt;
             Gauge += _dir * _speed * dt;
             if (Gauge >= 1f) { Gauge = 2f - Gauge; _dir = -1f; }
             else if (Gauge <= 0f) { Gauge = -Gauge; _dir = 1f; }
             Gauge = Math.Max(0f, Math.Min(1f, Gauge));
         }
 
-        /// <summary>Lance à la puissance courante ; vrai si la cible est touchée. Sans charge en cours, ne fait rien.</summary>
+        /// <summary>Lance à la puissance courante ; vrai si la cible est touchée. Sans charge en cours, ne fait rien ; une charge plus courte que <see cref="MinChargeSeconds"/> est annulée sans lancer.</summary>
         public bool Release()
         {
             if (Status != GameStatus.Running || !Charging) return false;
             Charging = false;
+            if (_chargeTime < MinChargeSeconds) return false;   // simple toucher : charge annulée, aucun lancer consommé
             LastPower = Gauge;
             LastHit = Math.Abs(Gauge - TargetCenter) <= TargetHalfWidth;
             ThrowsLeft--;

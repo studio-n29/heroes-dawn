@@ -76,7 +76,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(g.Press(first.Lane), Is.EqualTo(RhythmHit.None), "bien trop tôt");
             while (g.Song < first.Time) g.Step(0.01f);
             int wrongLane = (first.Lane + 1) % g.Lanes;
-            if (g.Notes.Any(n => n.Lane == wrongLane && System.Math.Abs(n.Time - first.Time) <= RhythmGame.GoodWindow)) Assert.Pass("une autre note occupe la piste voisine");
+            Assert.That(g.Notes.Any(n => n.Lane == wrongLane && System.Math.Abs(n.Time - first.Time) <= RhythmGame.GoodWindow), Is.False, "les notes sont espacées de plus que la fenêtre : aucune note voisine à cet instant");
             Assert.That(g.Press(wrongLane), Is.EqualTo(RhythmHit.None));
             Assert.That(g.Score, Is.EqualTo(0));
             Assert.That(g.Lives, Is.EqualTo(5));

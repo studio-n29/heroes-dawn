@@ -62,7 +62,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["mg2d.rescue.clue.first"] = "{0} se place en premier.";
             d["mg2d.rescue.clue.last"] = "{0} se place en dernier.";
             d["mg2d.rescue.clue.after"] = "{0} se place juste après {1}.";
-            d["mg2d.rescue.clue.unused"] = "{0} est inutile : laisse-la de côté.";
+            d["mg2d.rescue.clue.unused"] = "Pièce inutile : {0}.";
             d["mg2d.rescue.undo"] = "ANNULER";
             d["mg2d.rescue.submit"] = "VALIDER";
             d["mg2d.rescue.wrong"] = "Raté : {0} pièce(s) bien placée(s) sur {1}.";

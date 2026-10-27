@@ -54,6 +54,7 @@ namespace N29.HeroesDawn.Presentation.Activities
             _barBack = Img("BarBack", null, new Color(0f, 0f, 0f, 0.5f), new Vector2(80, 12));
             _barFill = Img("BarFill", null, Theme.Danger, new Vector2(80, 12));
             Layout();
+            Tick(0f, default);   // gardes et rayons à leur place avant le début
         }
 
         void Layout()

@@ -32,6 +32,19 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(session.Run!.Phase, Is.EqualTo(ZoneRunPhase.AwaitingRoll), "le plateau est rendu au joueur après l'abandon");
         }
 
+        [UnityTest, Timeout(240000), Description("Vérifie que le bouton Retour (TryCancelTop du service de fenêtres) ferme un mini-jeu en cours comme un abandon et rend le plateau — parce que Retour doit toujours permettre de sortir")]
+        public IEnumerator BackButton_ClosesTheMiniGame()
+        {
+            yield return ActivityGamesPlayTests.OnBoardNext(new ZoneId("zone_ny_1_2"), "n13");
+            var session = ActivityGamesPlayTests.Container.Resolve<GameSession>();
+            PlayModeHarness.TapNode(new CaseId("n13"));
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<MiniGame2DPopupView>() != null, 600);
+            var modals = Object.FindAnyObjectByType<N29.HeroesDawn.Composition.BoardLifetimeScope>()!.Container.Resolve<N29.HeroesDawn.Presentation.Mvp.IModalService>();
+            Assert.That(modals.TryCancelTop(), Is.True, "la fenêtre accepte Retour");
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<MiniGame2DPopupView>() == null && session.Run!.Phase == ZoneRunPhase.AwaitingRoll, 900);
+            Assert.That(session.Run!.Phase, Is.EqualTo(ZoneRunPhase.AwaitingRoll));
+        }
+
         [UnityTest, Timeout(240000), Description("Vérifie que la case Engrenage de la zone 1.2 (jeu au toucher) ouvre la vraie fenêtre commune avec la partie d'engrenages, et qu'Abandonner rend le plateau sans le bloquer — parce que c'était le bug du playtest")]
         public IEnumerator Gears_OnZone12_OpensAndCloses() => OpenAndAbandon("zone_ny_1_2", "n13", typeof(GearsGame));
 

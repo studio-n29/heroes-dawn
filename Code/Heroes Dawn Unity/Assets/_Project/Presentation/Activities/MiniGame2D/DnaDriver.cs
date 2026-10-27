@@ -39,6 +39,7 @@ namespace N29.HeroesDawn.Presentation.Activities
             for (int i = 0; i < _links.Length; i++) _links[i] = Img("Link" + i, null, new Color(1f, 1f, 1f, 0.35f), new Vector2(10, 6));
             _nodes = new Image[n];
             for (int i = 0; i < n; i++) _nodes[i] = Img("Node" + i, Sprites.Circle, Healthy, Vector2.one * 60f);
+            Tick(0f, default);   // mise en page avant le début
         }
 
         Vector2 PosOf(int i) => ToField(_game.Nodes[i].X, _game.Nodes[i].Y);

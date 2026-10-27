@@ -64,6 +64,7 @@ namespace N29.HeroesDawn.Presentation.Activities
             _barBack = Img("BarBack", null, new Color(0f, 0f, 0f, 0.55f), new Vector2(400, 22));
             _barFill = Img("BarFill", null, Theme.Info, new Vector2(400, 22));
             _ = core;
+            Tick(0f, default);   // mise en page avant le début
         }
 
         Item AddItem(Sprite? sprite, Color color, Vec2f center, Vec2f size)

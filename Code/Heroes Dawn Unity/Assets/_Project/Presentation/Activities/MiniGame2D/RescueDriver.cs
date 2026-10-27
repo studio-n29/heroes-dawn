@@ -17,6 +17,7 @@ namespace N29.HeroesDawn.Presentation.Activities
         readonly RescueEngineeringGame _game;
         readonly ILocalization _loc;
         RescuePanelView? _panel;
+        bool _armed;
 
         public RescueDriver(ActivityPlan plan, ILocalization loc)
         {
@@ -83,9 +84,10 @@ namespace N29.HeroesDawn.Presentation.Activities
         void SetInteractable(bool on)
         {
             var p = _panel!;
-            for (int i = 0; i < _game.Pool.Count; i++) p.PoolButton(i).Interactable = on;
-            p.Undo.Interactable = on;
-            p.Submit.Interactable = on;
+            // Avant le début, les boutons ne captent pas le toucher : le premier appui, où qu'il tombe, lance la partie.
+            for (int i = 0; i < _game.Pool.Count; i++) { p.PoolButton(i).Interactable = on; p.PoolButton(i).Fill.raycastTarget = on; }
+            p.Undo.Interactable = on; p.Undo.Fill.raycastTarget = on;
+            p.Submit.Interactable = on; p.Submit.Fill.raycastTarget = on;
         }
 
         void RefreshSlots()
@@ -99,6 +101,7 @@ namespace N29.HeroesDawn.Presentation.Activities
         {
             var p = _panel;
             if (p == null) return;
+            if (!_armed) { _armed = true; SetInteractable(true); }
             bool running = _game.Status == GameStatus.Running;
             for (int i = 0; i < _game.Pool.Count; i++)
                 p.PoolButton(i).Interactable = running && !_game.Chosen.Contains(_game.Pool[i]) && _game.Chosen.Count < _game.Target;
