@@ -45,6 +45,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         HubNavigator _nav = null!;
         GameSession _session = null!;
         MemberSheetPresenter _p = null!;
+        FakeToasts _toasts = null!;
 
         MemberSheetPresenter Sheet(string agentId, bool owned = true)
         {
@@ -56,11 +57,11 @@ namespace N29.HeroesDawn.Tests.Presentation
             _view = new FakeMemberSheetView();
             _nav = new HubNavigator();
             _nav.Open(HubPage.MemberSheet, new MemberId(agentId));
-            var toasts = new FakeToasts();
+            _toasts = new FakeToasts(); var toasts = _toasts;
             var host = new FakeModalHost();
             var flow = new RecruitFlow(new ModalService(host), _app.Shop.Recruit, _session, toasts, _loc);
             _p = new MemberSheetPresenter(_view, _nav.Current, _session, _app.Hub.Train, flow, _nav, toasts, _loc, _app.Subscriber<WalletChanged>(),
-                                          _app.Subscriber<RosterChanged>(), _app.Subscriber<ShopChanged>(), heal: _app.Hub.HealMember);
+                                          _app.Subscriber<RosterChanged>(), _app.Subscriber<ShopChanged>(), heal: new N29.HeroesDawn.Application.Features.Hub.HealMemberUseCase(_session, _app.Save, _app.Publisher<WalletChanged>(), _app.Publisher<RosterChanged>()));
             _view.Show();
             _p.Start();
             return _p;
@@ -99,16 +100,18 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que le soin fonctionne comme avant après avoir ouvert le dossier — parce que le panneau ne doit pas casser la fiche")]
+        [Test, Description("Vérifie qu'avec le dossier ouvert un clic sur Soigner retire la fatigue, débite les Crédits et affiche le message de soin, et que le dossier reste ouvert — parce que le panneau ne doit pas casser la fiche")]
         public void Dossier_DoesNotBreakHeal()
         {
             var p = Sheet("darius_brooks");
             _view.ClickDossier();
             var m = _session.Find(new MemberId("darius_brooks"))!;
-            m.Fatigue = 40;
+            m.Fatigue = 50;
             _session.Wallet.Set(500, 0);
-            _app.Session.Wallet.Set(500, 0);
             _view.ClickHeal();
+            Assert.That(m.Fatigue, Is.EqualTo(50 - N29.HeroesDawn.Application.Session.MetaRules.InfirmaryReduction));
+            Assert.That(_session.Wallet.Credits, Is.EqualTo(500 - N29.HeroesDawn.Application.Session.MetaRules.HealMemberCost));
+            Assert.That(_toasts.Shown.Any(t => t.Kind == ToastKind.Reward), Is.True, "le message de soin s'affiche");
             Assert.That(_view.LastDossier, Is.Not.Null, "le dossier reste ouvert pendant le soin");
             p.Dispose();
         }

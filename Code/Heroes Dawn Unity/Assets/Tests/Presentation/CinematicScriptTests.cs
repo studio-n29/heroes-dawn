@@ -80,6 +80,14 @@ namespace N29.HeroesDawn.Tests.Presentation
             }
         }
 
+        [Test, Description("Vérifie que la légende du plan S41 garde le sens du PDF (c'est le jeune homme qui disparaît dans la brèche, pas les radiations) et que S10 mentionne l'URSS annoncée par le titre du plan suivant — parce que la narration ne doit pas changer de sens ni laisser un titre sans explication")]
+        public void Captions_KeepThePdfMeaning()
+        {
+            var loc = new N29.HeroesDawn.Presentation.Mvp.LocLocalization();
+            Assert.That(loc.T("cinematic.vo.S41"), Does.Contain("du jeune homme, disparu dans la brèche"));
+            Assert.That(loc.T("cinematic.vo.S10"), Does.Contain("URSS"));
+        }
+
         [Test, Description("Vérifie que les titres d époque du montage (1973, URSS, 2026) sont posés sur les bons plans — parce que le document les place au début de chaque séquence")]
         public void EraTitles_AreOnTheDocumentedShots()
         {
