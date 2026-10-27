@@ -45,9 +45,10 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var alone = Sim(new[] { "ancre" }).Unit(0).MaxHp;
             var level1 = Sim(new[] { "ancre", "seve" }).Unit(0).MaxHp;          // +4 % de PV
-            var level5 = Sim(new[] { "ancre", "seve" }, new LinkEntry(new MemberId("ancre"), new MemberId("seve"), 5)).Unit(0).MaxHp; // +8 %
+            // +8 % de la synergie amplifiée, +4 % de PV du bonus de paire Tank + Soutien (niveau 2 du lien, lot D)
+            var level5 = Sim(new[] { "ancre", "seve" }, new LinkEntry(new MemberId("ancre"), new MemberId("seve"), 5)).Unit(0).MaxHp;
             Assert.That(level1, Is.EqualTo(alone * 104 / 100).Within(2));
-            Assert.That(level5, Is.EqualTo(alone * 108 / 100).Within(2));
+            Assert.That(level5, Is.EqualTo(alone * 112 / 100).Within(2));
         }
 
         [Test, Description("Vérifie la détection des quatre effets de composition : quatre familles, tank + dégâts + soutien, deux tanks, deux contrôles — parce que chaque composition doit déclencher son effet unique")]

@@ -22,11 +22,12 @@ namespace N29.HeroesDawn.Domain.Combat
             return 1000 - b.FatigueMalusMaxPercent * 10 * over / span;
         }
 
-        public static CombatUnit Ally(int id, MemberDef d, AllyEntry e, BalanceConfig b, CollectionDef? collection = null, SynergyBonus synergy = default)
+        public static CombatUnit Ally(int id, MemberDef d, AllyEntry e, BalanceConfig b, CollectionDef? collection = null, SynergyBonus synergy = default, PairBonusTotal pair = default)
         {
             int f = FatigueMultiplierPermille(e.FatiguePercent, b);
             var tiers = LevelTiers.BonusAt(e.Level); // paliers de niveau : bonus passifs de l agent
-            int hpP = synergy.Hp + tiers.Hp, atkP = synergy.Atk + tiers.Atk, defP = synergy.Def + tiers.Def, spdP = synergy.Spd + tiers.Spd, crit = 0, startGauge = 0, shield = 0, skillPower = 0; // la synergie d équipe est permanente
+            int hpP = synergy.Hp + tiers.Hp + pair.Hp, atkP = synergy.Atk + tiers.Atk + pair.Atk, defP = synergy.Def + tiers.Def + pair.Def, spdP = synergy.Spd + tiers.Spd + pair.Spd,
+                crit = pair.Crit, startGauge = pair.StartGauge, shield = pair.OpeningShield, skillPower = 0; // la synergie d équipe est permanente ; les bonus de paire aussi
             if (collection != null)
                 foreach (var itemId in e.Items)
                 {
@@ -46,7 +47,8 @@ namespace N29.HeroesDawn.Domain.Combat
                                       S(d.BaseStats.Hp, hpP), S(d.BaseStats.Atk, atkP), S(d.BaseStats.Def, defP), d.BaseStats.Spd * (100 + spdP) / 100,
                                       b.TimelinePoints, EmpoweredSkills(SkillsWithCards(d, e, collection), skillPower));
             unit.MaxEnergy = b.EnergyMax;
-            unit.Energy = System.Math.Min(b.EnergyMax, b.EnergyStart);
+            unit.Energy = System.Math.Min(b.EnergyMax, b.EnergyStart + pair.StartEnergy);
+            unit.EnergyRegenBonus = pair.EnergyPerStep;
             unit.CritBonusPercent = crit;
             unit.StartPointBonus = startGauge * b.TimelinePoints / 100;
             if (shield > 0) unit.Statuses.Add(new StatusInstance(StatusType.Shield, 2, unit.MaxHp * shield / 100));

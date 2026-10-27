@@ -39,7 +39,8 @@ namespace N29.HeroesDawn.Domain.Combat
             var activeSynergies = SynergyRules.Active(families, c.Synergies);
             var synergy = SynergyRules.Total(System.Linq.Enumerable.Select(activeSynergies,
                 s => (s.Synergy, setup.LinkLevel(setup.Allies[s.A].Member, setup.Allies[s.B].Member))));
-            foreach (var a in setup.Allies) _units.Add(UnitFactory.Ally(id++, c.Member(a.Member), a, _b, c.Collection, synergy));
+            for (int i = 0; i < setup.Allies.Count; i++)
+                _units.Add(UnitFactory.Ally(id++, c.Member(setup.Allies[i].Member), setup.Allies[i], _b, c.Collection, synergy, PairBonusOf(c, setup, i)));
             var roles = new List<Role>();
             foreach (var a in setup.Allies) roles.Add(c.Member(a.Member).Role);
             ApplyTeamEffects(TeamEffects.Active(families, roles));
@@ -52,6 +53,20 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         public CombatUnit Unit(int id) => _units[id];
+
+        /// <summary>Bonus de paire d'un allié : ceux de chacune de ses paires dans l'escouade (niveau de lien 2 et plus), plafonnés.</summary>
+        static PairBonusTotal PairBonusOf(ContentCatalog c, CombatSetup setup, int index)
+        {
+            var me = c.Member(setup.Allies[index].Member);
+            var bonuses = new List<PairBonus>();
+            for (int j = 0; j < setup.Allies.Count; j++)
+            {
+                if (j == index) continue;
+                var other = c.Member(setup.Allies[j].Member);
+                bonuses.AddRange(PairBonusRules.Of(me.Role, other.Role, setup.LinkLevel(me.Id, other.Id)));
+            }
+            return PairBonusRules.Total(bonuses);
+        }
 
         /// <summary>Effets uniques de la composition d équipe, appliqués à chaque allié au début du combat.</summary>
         void ApplyTeamEffects(IReadOnlyList<TeamEffectKind> effects)
