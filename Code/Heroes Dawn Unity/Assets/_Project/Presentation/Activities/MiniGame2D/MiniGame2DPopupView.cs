@@ -29,6 +29,7 @@ namespace N29.HeroesDawn.Presentation.Activities
         [SerializeField] CanvasGroup group = null!;
         [SerializeField] RectTransform stickRing = null!;
         [SerializeField] RectTransform stickKnob = null!;
+        [SerializeField] RescuePanelView rescuePanel = null!;
 
         MiniGame2DRequest? _request;
         IMiniGameDriver? _driver;
@@ -67,6 +68,10 @@ namespace N29.HeroesDawn.Presentation.Activities
             abandon.SetLabel(r.Abandon);
             backgroundImage.sprite = r.Background;
             backgroundImage.color = r.Background != null ? r.BackgroundTint : new Color(0f, 0f, 0f, 0f);
+            // Un pilote qui a besoin d'un panneau du prefab (Ingénierie de secours) le reçoit avant de construire ; sinon le panneau reste masqué.
+            var panelUser = _driver as IRescuePanelUser;
+            rescuePanel.gameObject.SetActive(panelUser != null);
+            panelUser?.Bind(rescuePanel);
             _driver.Build(field);
             overlay.gameObject.SetActive(true);
             overlay.text = r.Instructions + "\n\n<size=70%><color=#FFCF33>" + r.Start + "</color></size>";

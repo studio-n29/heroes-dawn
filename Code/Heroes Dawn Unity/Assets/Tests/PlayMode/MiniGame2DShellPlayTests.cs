@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Content.Prototype;
@@ -147,6 +148,37 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(driver.Ups, Is.EqualTo(upsBefore + 1), "la sortie de la zone émet un relâchement");
             Assert.That(driver.Last.Stick, Is.EqualTo(Vector2.zero), "joystick nul au repos");
             popup.AbandonButton.Button.onClick.Invoke();
+        }
+
+        [UnityTest, Timeout(240000), Description("Vérifie que l'ingénierie de secours se joue sur la vraie fenêtre : le panneau du prefab est affiché, les pièces choisies dans l'ordre du manuel puis Valider donnent la victoire, et une mauvaise séquence coûte un essai — parce que ce jeu repose sur des boutons du prefab")]
+        public IEnumerator Rescue_PlayedOnTheRealPanel_RightSequenceWins()
+        {
+            yield return ActivityGamesPlayTests.OnBoardNext(PrototypeContent.Zone11, "n15");
+            var plan = ActivityGamesPlayTests.PlanOf("rescue_tool", new N29.HeroesDawn.Definitions.ZoneEnvironment(N29.HeroesDawn.Definitions.Biome.Industrial, N29.HeroesDawn.Definitions.Weather.Day));
+            var driver = MiniGameDrivers.Create(plan, new N29.HeroesDawn.Presentation.Mvp.LocLocalization())!;
+            var request = ActivityGamesPlayTests.CasePresenter().MiniGame2DRequestFor(plan, driver);
+            var host = UnityEngine.Object.FindAnyObjectByType<ModalLayer>()!;
+            var view = host.Spawn<IMiniGame2DPopupView>();
+            var task = view.PlayAsync(request, default);
+            var popup = (MiniGame2DPopupView)view;
+            var game = (RescueEngineeringGame)driver.Game;
+            var panel = popup.GetComponentInChildren<RescuePanelView>(true);
+            Assert.That(panel.gameObject.activeInHierarchy, Is.True, "le panneau est affiché pour ce jeu");
+            popup.Input.PressAt(new Vector2(0.5f, 0.5f));
+            yield return null;
+            popup.Input.ReleaseNow();
+            yield return null; yield return null;
+            // Mauvaise séquence d'abord : un essai de moins.
+            foreach (var part in game.Solution.Reverse()) panel.PoolButton(game.Pool.ToList().IndexOf(part)).Button.onClick.Invoke();
+            yield return null;
+            panel.Submit.Button.onClick.Invoke();
+            Assert.That(game.AttemptsLeft, Is.EqualTo(2));
+            yield return null;
+            foreach (var part in game.Solution) panel.PoolButton(game.Pool.ToList().IndexOf(part)).Button.onClick.Invoke();
+            yield return null;
+            panel.Submit.Button.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => task.Status.IsCompleted());
+            Assert.That(task.GetAwaiter().GetResult().Success, Is.True);
         }
     }
 }
