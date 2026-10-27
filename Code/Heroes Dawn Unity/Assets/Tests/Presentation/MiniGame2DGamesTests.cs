@@ -81,5 +81,17 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(r.Driver.Hud.Score, Is.EqualTo("Caisses 0 / 3"));
             Assert.That(r.Driver.Hud.Lives, Is.EqualTo(3));
         }
+
+        [Test, Description("Vérifie qu'« Analyse ADN » ouvre la fenêtre commune avec une partie de brin, son titre, sa consigne, un bandeau « Parasites x / y », un temps et des vies — parce que c'est le jeu des nœuds 2D")]
+        public void Dna_OpensTheCommonWindow()
+        {
+            var r = Play("dna_lab");
+            Assert.That(r.Driver.Game, Is.InstanceOf<DnaAnalysisGame>());
+            Assert.That(r.Title, Is.EqualTo("ANALYSE ADN"));
+            Assert.That(r.Instructions, Is.EqualTo(_loc.T("mg2d.dna_analysis.instructions")));
+            Assert.That(r.Driver.Hud.Score, Is.EqualTo("Parasites 0 / 6"));
+            Assert.That(r.Driver.Hud.TimeLeft, Is.EqualTo(45f));
+            Assert.That(r.Driver.Hud.Lives, Is.EqualTo(3));
+        }
     }
 }

@@ -37,6 +37,13 @@ namespace N29.HeroesDawn.Presentation.Common
             d["mg2d.crate_pick.instructions"] = "Retiens la caisse qui brille. Maintiens pour charger, relâche quand le curseur est au-dessus de la bonne caisse. Une erreur coûte une vie.";
             d["mg2d.cratepick.score"] = "Caisses {0} / {1}";
             d["activity.param.rounds"] = "Manches";
+
+            // ---- Analyse ADN
+            d["activities.dna.name"] = "Analyse ADN";
+            d["activities.dna.desc"] = "Un brin d'ADN est sous le microscope : retire les molécules parasites sans toucher les nœuds sains.";
+            d["mg2d.dna_analysis.instructions"] = "Touche les molécules vertes qui pulsent pour les retirer. Toucher un nœud sain coûte une vie.";
+            d["mg2d.dna.score"] = "Parasites {0} / {1}";
+            d["activity.param.parasites"] = "Parasites";
             d["activity.param.hits"] = "Touches à réussir";
         }
     }

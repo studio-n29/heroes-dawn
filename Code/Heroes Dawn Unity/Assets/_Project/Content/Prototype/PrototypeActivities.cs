@@ -60,6 +60,10 @@ namespace N29.HeroesDawn.Content.Prototype
             // Caisse au choix (2D) : 15 Crédits par caisse trouvée + 220 Crédits et 8 PR à la réussite.
             new ActivityDef(new ActivityId("crate_pick_depot"), ActivityKinds.CratePick, "activities.cratepick.name", "activities.cratepick.desc",
                             P(("rounds", 3), ("lives", 3), ("speed_percent", 100)), credits: 220, pr: 8, creditsPerScore: 15),
+
+            // Analyse ADN (2D) : 10 Crédits par parasite retiré + 200 Crédits et 6 PR à la réussite.
+            new ActivityDef(new ActivityId("dna_lab"), ActivityKinds.DnaAnalysis, "activities.dna.name", "activities.dna.desc",
+                            P(("time_limit_s", 45), ("parasites", 6), ("lives", 3)), credits: 200, pr: 6, creditsPerScore: 10),
         };
     }
 }

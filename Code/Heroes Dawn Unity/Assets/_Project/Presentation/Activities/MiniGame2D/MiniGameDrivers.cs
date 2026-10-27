@@ -18,6 +18,7 @@ namespace N29.HeroesDawn.Presentation.Activities
             Map[ActivityKinds.Rhythm] = (plan, loc) => new RhythmDriver(plan, loc);
             Map[ActivityKinds.FreeThrow] = (plan, loc) => new FreeThrowDriver(plan, loc);
             Map[ActivityKinds.CratePick] = (plan, loc) => new CratePickDriver(plan, loc);
+            Map[ActivityKinds.DnaAnalysis] = (plan, loc) => new DnaDriver(plan, loc);
         }
 
         public static void Register(string kind, Func<ActivityPlan, ILocalization, IMiniGameDriver> factory) => Map[kind] = factory;

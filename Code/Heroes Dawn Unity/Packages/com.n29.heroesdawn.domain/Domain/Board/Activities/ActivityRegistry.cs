@@ -77,7 +77,8 @@ namespace N29.HeroesDawn.Domain.Activities
             .Register(new DialogueKind())
             .Register(new RhythmKind())
             .Register(new FreeThrowKind())
-            .Register(new CratePickKind());
+            .Register(new CratePickKind())
+            .Register(new DnaAnalysisKind());
     }
 
     /// <summary>Aides de génération : directions entières (pas de trigonométrie : même niveau sur toutes les plateformes).</summary>

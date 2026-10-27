@@ -56,4 +56,19 @@ namespace N29.HeroesDawn.Domain.Activities
 
         public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
     }
+
+    /// <summary>« Analyse ADN » (voir <see cref="Games.DnaAnalysisGame"/>).</summary>
+    public sealed class DnaAnalysisKind : IActivityKind
+    {
+        public string Id => ActivityKinds.DnaAnalysis;
+
+        public IReadOnlyList<ParameterDef> Schema { get; } = new[]
+        {
+            new ParameterDef("time_limit_s", 45, 15, 120),
+            new ParameterDef("parasites", 6, 3, 16),
+            new ParameterDef("lives", 3, 1, 9),
+        };
+
+        public ActivityLevel Generate(ActivityContext c) => MiniGameLevel.Empty(c);
+    }
 }
