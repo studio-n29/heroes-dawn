@@ -178,7 +178,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (page == HubPage.Shop && shop.Day.Length > 0 && shop.SeenDay != shop.Day) return "N";
             if (_meta == null) return "";
             if (page == HubPage.Pass) { int n = _meta.PassBadge; return n > 0 ? n.ToString() : ""; }
-            if (page == HubPage.Archives) { int n = _meta.ArchivesBadge; return n > 0 ? n.ToString() : ""; }
+            if (page == HubPage.Profile) { int n = _meta.ArchivesBadge; return n > 0 ? n.ToString() : ""; }
             if (page == HubPage.Shop) return _meta.ShopBadge > 0 ? "!" : "";
             return "";
         }
@@ -189,7 +189,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             HubPage.Team => "nav.team",
             HubPage.Recruit => "nav.recruit",
             HubPage.Pass => "nav.pass",
-            HubPage.Archives => "nav.profile",
+            HubPage.Profile => "nav.profile",
             _ => "nav.shop",
         };
 

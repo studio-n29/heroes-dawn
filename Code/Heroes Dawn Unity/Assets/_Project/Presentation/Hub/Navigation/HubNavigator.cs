@@ -11,7 +11,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// </summary>
     public sealed class HubNavigator
     {
-        public static readonly HubPage[] Tabs = { HubPage.Qg, HubPage.Team, HubPage.Recruit, HubPage.Pass, HubPage.Shop, HubPage.Archives };
+        public static readonly HubPage[] Tabs = { HubPage.Qg, HubPage.Team, HubPage.Recruit, HubPage.Pass, HubPage.Shop, HubPage.Profile };
 
         readonly List<HubLocation> _stack = new List<HubLocation> { new HubLocation(HubPage.Qg) };
 

@@ -210,6 +210,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx) => ListPageKit.Build<LabPageView>(ctx, "LabPage", 0, false, false).gameObject;
     }
 
+    /// <summary>Profil du joueur : tag, accès au registre et aux archives, statistiques, amis.</summary>
+    public sealed class ProfilePageRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Pages/Profile.prefab";
+        public int Order => 10;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ProfilePageView>(ctx, "ProfilePage", 0, false, false).gameObject;
+    }
+
     public sealed class ArchivesPageRecipe : IPrefabRecipe
     {
         public string RelativePath => "Pages/Archives.prefab";
