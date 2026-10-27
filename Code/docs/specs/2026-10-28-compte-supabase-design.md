@@ -53,6 +53,15 @@ Tous les écrans viennent de prefabs générés (règle du projet : aucun écran
 - **Déconnexion** : après confirmation, le joueur reste en invité sur l'appareil avec sa progression actuelle, qui n'est plus synchronisée ; les jetons sont effacés.
 - **Hors ligne** : le jeu continue avec le profil local ; la synchronisation reprend à la reconnexion.
 
+## 4 bis. Écarts actés à l'exécution
+
+- **OAuth** : pas de paramètre `state` personnalisé. Le vérificateur PKCE, gardé par le jeu, lie déjà le code à la demande ; un `state` exigerait un lien de retour avec caractère générique dans Supabase. Un retour sans code, avec une erreur ou sur un autre lien est refusé.
+- **Noms** : la couche Application interdit les classes « *Service » (test `DependencyGuardTests`) : `AccountService` devient `AccountLink` et `CloudSyncService` devient `CloudSync`.
+- **Résultat de rattachement** : trois états (`Uploaded`, `Pulled`, `NeedsChoice`) ; « déjà synchronisé » est un envoi simple (`Uploaded`).
+- **Clé publique** : la clé `anon` héritée (JWT, rôle `anon`) est dans `supabase.json` plutôt que la clé `publishable`, pour que le test de configuration vérifie son rôle ; à migrer si Supabase la désactive.
+- **Tests sans réseau** : `PlayModeHarness.Boot` force les simulateurs de compte et de cloud ; aucun test n'atteint le vrai Supabase.
+- **Choix de progression** : Retour ne fait rien, le choix reste en attente (`AccountLink.PendingChoice`) et un conflit détecté par la synchronisation le rouvre.
+
 ## 5. Synchronisation
 
 - Au lancement (après restauration de session) : lecture de la ligne du joueur.

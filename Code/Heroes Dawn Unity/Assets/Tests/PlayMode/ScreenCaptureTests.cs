@@ -239,6 +239,57 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(File.Exists(Path.Combine(Folder, "102-minijeu-caisses.png")));
         }
 
+        [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures du compte : titre avec le bouton, fenêtre Compte (connexion, erreur, création), choix de progression, profil invité et connecté — parce que ces écrans se relisent à l'œil (lot I)")]
+        public IEnumerator CaptureAccount()
+        {
+            PlayerPrefs.DeleteKey("hd.cloud.sync_state");
+            yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
+            yield return CaptureSettled("110-titre-compte");
+            Object.FindAnyObjectByType<LoginView>()!.AccountButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Account.AccountPopupView>() != null);
+            var popup = Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Account.AccountPopupView>()!;
+            yield return CaptureSettled("111-compte-connexion");
+            popup.EmailField.text = "pas-une-adresse";
+            popup.PasswordField.text = "motdepasse1";
+            popup.SubmitButton.Button.onClick.Invoke();
+            yield return CaptureSettled("112-compte-erreur");
+            popup.TabSignUpButton.Button.onClick.Invoke();
+            popup.EmailField.text = "moi@exemple.fr";
+            popup.NameField.text = "Moi";
+            yield return CaptureSettled("113-compte-creation");
+            popup.CloseButton.Button.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Account.AccountPopupView>() == null);
+
+            var host = Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Common.ModalLayer>()!;
+            var choice = host.Spawn<N29.HeroesDawn.Presentation.Account.IProgressChoicePopupView>();
+            _ = choice.AskAsync(new N29.HeroesDawn.Presentation.Account.ProgressChoiceData
+            {
+                Title = Loc.T("account.choice.title"), Hint = Loc.T("account.choice.hint"), KeepDevice = Loc.T("account.choice.keep_device"),
+                KeepAccount = Loc.T("account.choice.keep_account"), Later = Loc.T("account.choice.later"),
+                Device = new N29.HeroesDawn.Presentation.Account.ProgressCardData { Header = Loc.T("account.choice.device"), Summary = Loc.F("account.choice.summary", 5, 123, 2, "28/10/2026 21:10") },
+                Account = new N29.HeroesDawn.Presentation.Account.ProgressCardData { Header = Loc.T("account.choice.account"), Summary = Loc.F("account.choice.summary", 9, 777, 4, "27/10/2026 18:42") },
+            }, default);
+            yield return CaptureSettled("114-choix-progression");
+            ((Component)choice).GetComponent<N29.HeroesDawn.Presentation.Account.ProgressChoicePopupView>().LaterButton.Button.onClick.Invoke();
+            yield return null;
+            Object.Destroy(((Component)choice).gameObject);   // fenêtre créée à la main pour la capture : elle ne passe pas par le service de modales
+            yield return null;
+
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
+            Container.Resolve<N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide>().Skip();
+            yield return new WaitForSecondsRealtime(0.3f);
+            yield return Tab(HubPage.Profile);
+            yield return CaptureSettled("115-profil-invite");
+            var link = Container.Resolve<N29.HeroesDawn.Application.Features.Account.AccountLink>();
+            var task = link.SignUpAsync("moi@exemple.fr", "motdepasse1", "Moi", default);
+            yield return PlayModeHarness.WaitFor(() => task.Status.IsCompleted(), 600);
+            Container.Resolve<MessagePipe.IPublisher<N29.HeroesDawn.Application.Features.Meta.MetaChanged>>().Publish(default);
+            yield return CaptureSettled("116-profil-connecte");
+            PlayerPrefs.DeleteKey("hd.cloud.sync_state");
+            Assert.That(File.Exists(Path.Combine(Folder, "116-profil-connecte.png")));
+        }
+
         [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit les captures du plateau agrandi : portée avec cases cachées, fiche d'une destination (chemin illuminé, dézoom), fiche d'une case sous le brouillard — parce que la prévisualisation du déplacement se relit à l'œil")]
         public IEnumerator CaptureBoardMove()
         {
