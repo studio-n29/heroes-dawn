@@ -15,6 +15,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["errors.account_rate_limit"] = "Trop d'essais : réessaie dans un instant.";
             d["errors.account_oauth"] = "La connexion a échoué ou a été annulée.";
             d["errors.account_session"] = "Ta session a expiré : reconnecte-toi.";
+            d["errors.account_nochoice"] = "Aucun choix de progression n'est en attente.";
             d["errors.account_cloud"] = "La sauvegarde en ligne est indisponible pour le moment.";
             d["errors.account_schema"] = "Ta sauvegarde en ligne vient d'une version plus récente du jeu : mets le jeu à jour.";
 
@@ -42,9 +43,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["account.reset_sent"] = "Si un compte existe pour cette adresse, un e-mail vient d'être envoyé.";
 
             // Résultats du parcours
+            d["account.connected"] = "Connecté. Ta progression sera rattachée au compte quand tu lanceras la partie.";
             d["account.linked"] = "Compte lié : ta progression est sauvegardée en ligne.";
             d["account.pulled"] = "Progression du compte récupérée.";
-            d["account.choice_later"] = "Rien n'a été modifié. Tu pourras choisir plus tard depuis ton profil.";
+            d["account.choice_later"] = "Rien n'a été modifié. Tu pourras choisir plus tard avec « Synchroniser » dans ton profil.";
             d["account.signed_out"] = "Déconnecté : tu continues en invité avec cette progression.";
             d["account.sync_done"] = "Progression synchronisée.";
             d["account.signout.title"] = "Se déconnecter ?";

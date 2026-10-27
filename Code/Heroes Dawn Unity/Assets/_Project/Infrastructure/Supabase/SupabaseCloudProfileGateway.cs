@@ -35,11 +35,12 @@ namespace N29.HeroesDawn.Infrastructure.Supabase
 
         public async UniTask<Result<CloudProfile?>> GetAsync(CancellationToken ct)
         {
-            var token = await _accounts.AccessTokenAsync(ct);
-            if (token.IsFailure) return Result<CloudProfile?>.Fail(token.Error!);
-            var r = await _http.SendAsync("GET", _config.Url + "/rest/v1/hd_profiles?select=profile,schema_version,updated_at&limit=1", Headers(token.Value), null, ct);
-            if (!r.IsSuccess) return Result<CloudProfile?>.Fail(Failure(r));
-            var rows = ParseRows(r.Body);
+            string? uid = _accounts.UserId;
+            if (string.IsNullOrEmpty(uid)) return Result<CloudProfile?>.Fail(SupabaseErrors.Session());
+            var sent = await SendAuthorizedAsync("GET", _config.Url + "/rest/v1/hd_profiles?select=profile,schema_version,updated_at&user_id=eq." + Uri.EscapeDataString(uid) + "&limit=1", null, false, ct);
+            if (sent.Error != null) return Result<CloudProfile?>.Fail(sent.Error);
+            if (!sent.Response.IsSuccess) return Result<CloudProfile?>.Fail(Failure(sent.Response));
+            var rows = ParseRows(sent.Response.Body);
             if (rows == null) return Result<CloudProfile?>.Fail(CloudError());
             if (rows.Length == 0) return Result<CloudProfile?>.Ok(null);
             var row = rows[0];
@@ -51,40 +52,64 @@ namespace N29.HeroesDawn.Infrastructure.Supabase
         {
             string profileJson = JsonUtility.ToJson(profile);
             if (Encoding.UTF8.GetByteCount(profileJson) > MaxProfileBytes) return Result<CloudWriteResult>.Fail(CloudError());
-            var token = await _accounts.AccessTokenAsync(ct);
-            if (token.IsFailure) return Result<CloudWriteResult>.Fail(token.Error!);
             string? userId = _accounts.UserId;
             if (string.IsNullOrEmpty(userId)) return Result<CloudWriteResult>.Fail(SupabaseErrors.Session());
 
-            var headers = Headers(token.Value);
-            headers["Prefer"] = "return=representation";
-            HttpResult r;
+            Authorized sent;
             if (expectedUpdatedAt == null)
             {
                 string body = "{\"user_id\":\"" + userId + "\",\"profile\":" + profileJson + ",\"schema_version\":" + profile.schemaVersion + "}";
-                r = await _http.SendAsync("POST", _config.Url + "/rest/v1/hd_profiles", headers, body, ct);
-                if (!r.NetworkError && r.Status == 409) return Result<CloudWriteResult>.Ok(new CloudWriteResult(CloudWriteStatus.Conflict, ""));
+                sent = await SendAuthorizedAsync("POST", _config.Url + "/rest/v1/hd_profiles", body, true, ct);
+                if (sent.Error == null && !sent.Response.NetworkError && sent.Response.Status == 409) return Result<CloudWriteResult>.Ok(new CloudWriteResult(CloudWriteStatus.Conflict, ""));
             }
             else
             {
                 string url = _config.Url + "/rest/v1/hd_profiles?user_id=eq." + userId + "&updated_at=eq." + Uri.EscapeDataString(expectedUpdatedAt);
                 string body = "{\"profile\":" + profileJson + ",\"schema_version\":" + profile.schemaVersion + "}";
-                r = await _http.SendAsync("PATCH", url, headers, body, ct);
+                sent = await SendAuthorizedAsync("PATCH", url, body, true, ct);
             }
-            if (!r.IsSuccess) return Result<CloudWriteResult>.Fail(Failure(r));
-            var rows = ParseRows(r.Body);
+            if (sent.Error != null) return Result<CloudWriteResult>.Fail(sent.Error);
+            if (!sent.Response.IsSuccess) return Result<CloudWriteResult>.Fail(Failure(sent.Response));
+            var rows = ParseRows(sent.Response.Body);
             if (rows == null) return Result<CloudWriteResult>.Fail(CloudError());
             if (rows.Length == 0) return Result<CloudWriteResult>.Ok(new CloudWriteResult(CloudWriteStatus.Conflict, ""));   // aucune ligne touchée : la date a changé
             if (string.IsNullOrEmpty(rows[0].updated_at)) return Result<CloudWriteResult>.Fail(CloudError());
             return Result<CloudWriteResult>.Ok(new CloudWriteResult(CloudWriteStatus.Ok, rows[0].updated_at));
         }
 
-        Dictionary<string, string> Headers(string accessToken) => new Dictionary<string, string>
+        readonly struct Authorized
         {
-            ["apikey"] = _config.AnonKey,
-            ["Authorization"] = "Bearer " + accessToken,
-            ["Content-Type"] = "application/json",
-        };
+            public readonly HttpResult Response;
+            public readonly DomainError? Error;
+            public Authorized(HttpResult response, DomainError? error) { Response = response; Error = error; }
+        }
+
+        /// <summary>Envoie avec le jeton du joueur ; un 401 (jeton refusé alors qu'il semblait valide) déclenche un seul renouvellement puis un seul nouvel essai.</summary>
+        async UniTask<Authorized> SendAuthorizedAsync(string method, string url, string? body, bool wantRepresentation, CancellationToken ct)
+        {
+            var token = await _accounts.AccessTokenAsync(ct);
+            if (token.IsFailure) return new Authorized(null!, token.Error!);
+            var r = await _http.SendAsync(method, url, Headers(token.Value, wantRepresentation), body, ct);
+            if (!r.NetworkError && r.Status == 401)
+            {
+                var again = await _accounts.ForceRefreshAsync(ct);
+                if (again.IsFailure) return new Authorized(null!, again.Error!);
+                r = await _http.SendAsync(method, url, Headers(again.Value, wantRepresentation), body, ct);
+            }
+            return new Authorized(r, null);
+        }
+
+        Dictionary<string, string> Headers(string accessToken, bool wantRepresentation)
+        {
+            var h = new Dictionary<string, string>
+            {
+                ["apikey"] = _config.AnonKey,
+                ["Authorization"] = "Bearer " + accessToken,
+                ["Content-Type"] = "application/json",
+            };
+            if (wantRepresentation) h["Prefer"] = "return=representation";
+            return h;
+        }
 
         static DomainError Failure(HttpResult r) => !r.NetworkError && (r.Status == 401 || r.Status == 403) ? SupabaseErrors.Session() : CloudError();
 

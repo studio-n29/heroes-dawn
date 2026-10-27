@@ -23,6 +23,7 @@ namespace N29.HeroesDawn.Presentation.Account
         AccountMode _mode = AccountMode.SignIn;
         bool _busy;
         CancellationToken _ct;
+        CancellationTokenSource? _requests;
 
         public AccountPopupController(IAccountPopupView view, AccountLink account, ILocalization loc)
         {
@@ -31,7 +32,8 @@ namespace N29.HeroesDawn.Presentation.Account
 
         public UniTask<LinkOutcome?> RunAsync(CancellationToken ct)
         {
-            _ct = ct;
+            _requests = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            _ct = _requests.Token;   // fermer la fenêtre annule la requête en cours
             _view.ModeChanged += OnMode;
             _view.SubmitClicked += OnSubmit;
             _view.ProviderClicked += OnProvider;
@@ -63,7 +65,11 @@ namespace N29.HeroesDawn.Presentation.Account
             }
         }
 
-        void OnClose() => _done.TrySetResult(null);
+        void OnClose()
+        {
+            _requests?.Cancel();
+            _done.TrySetResult(null);
+        }
 
         void OnMode(AccountMode mode)
         {

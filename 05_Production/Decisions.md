@@ -131,3 +131,6 @@
 | 2026-10-27 | Lot H : 7 nouveaux mini-jeux 2D (Analyse ADN, Infiltration, Engrenage, Le rythme, Tir franc, Ingénierie de secours, Caisse au choix) + survie en neige refaite en 2D vue du dessus ; le dialogue reste inchangé | Spec du lot H |
 | 2026-10-27 | Les 9 jeux du PDF sont placés dans les 4 zones de Brooklyn (une case chacun) ; Potion, Rempart et Course des toits ne sont plus placés dans la campagne mais restent jouables par le code | Spec du lot H |
 | 2026-10-27 | Fonds des mini-jeux : SVG dessinés dans le dépôt, rasterisés en PNG 1280×640 par Edge sans interface, recolorés par l'environnement du plateau | Spec du lot H |
+| 2026-10-28 | Lot I : compte Supabase (e-mail, Google, Apple) et sauvegarde cloud du profil complet sur le projet N29 HQ (table hd_profiles, sécurité par ligne) ; notifications push dans un lot suivant | Spec du lot I |
+| 2026-10-28 | Conflit entre appareil et compte : jamais d'écrasement sans choix du joueur et sans sauvegarde de secours de l'autre version ; écriture conditionnelle sur la date serveur | Spec du lot I |
+| 2026-10-28 | Connexion Google et Apple par le navigateur (OAuth PKCE, lien heroesdawn://auth) sans SDK natif ; fournisseurs à configurer dans le tableau de bord Supabase | Spec du lot I |

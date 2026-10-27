@@ -82,7 +82,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(outcome.Status, Is.EqualTo(LinkStatus.Pulled));
             Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(777));
             Assert.That(_app.Session.CompletedZones.Count, Is.EqualTo(3));
-            Assert.That(_backups.Saved, Is.Empty, "rien n'a été écrasé : pas de sauvegarde de secours");
+            Assert.That(_backups.Saved.Single().Reason, Is.EqualTo("local"), "le profil local, même neuf, est mis de côté avant d'être remplacé");
         }
 
         [Test, Description("Vérifie que si l'appareil et le compte ont chacun de la progression et que ce n'est pas la première synchronisation inconnue, rien n'est écrit et le joueur doit choisir — parce qu'on ne devine jamais quelle partie garder")]

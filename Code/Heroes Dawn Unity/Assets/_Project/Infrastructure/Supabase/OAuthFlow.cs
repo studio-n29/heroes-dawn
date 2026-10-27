@@ -63,8 +63,6 @@ namespace N29.HeroesDawn.Infrastructure.Supabase
             using var registration = ct.Register(() => source.TrySetResult(null));
             try
             {
-                string launch = UnityEngine.Application.absoluteURL;
-                if (!string.IsNullOrEmpty(launch)) OnLink(launch);   // l'app a pu être relancée par le lien lui-même
                 return await source.Task;
             }
             finally { UnityEngine.Application.deepLinkActivated -= OnLink; }

@@ -161,11 +161,16 @@ namespace N29.HeroesDawn.Infrastructure.Supabase
         }
 
         /// <summary>Le jeton d'accès valide (rafraîchi s'il expire dans moins d'une minute), pour les appels connectés.</summary>
-        public async UniTask<Result<string>> AccessTokenAsync(CancellationToken ct)
+        public UniTask<Result<string>> AccessTokenAsync(CancellationToken ct) => TokenAsync(false, ct);
+
+        /// <summary>Renouvelle le jeton même s'il semble valide (le serveur vient de le refuser : horloge de l'appareil décalée, jeton révoqué).</summary>
+        public UniTask<Result<string>> ForceRefreshAsync(CancellationToken ct) => TokenAsync(true, ct);
+
+        async UniTask<Result<string>> TokenAsync(bool force, CancellationToken ct)
         {
             var stored = _tokens.Load();
             if (stored == null) return Result<string>.Fail(SupabaseErrors.Session());
-            if (stored.ExpiresAtUnix - NowUnix > RefreshMarginSeconds) return Result<string>.Ok(stored.AccessToken);
+            if (!force && stored.ExpiresAtUnix - NowUnix > RefreshMarginSeconds) return Result<string>.Ok(stored.AccessToken);
             if (_pendingRefresh != null) return await _pendingRefresh.Task;
             var source = new UniTaskCompletionSource<Result<string>>();
             _pendingRefresh = source;
@@ -183,7 +188,7 @@ namespace N29.HeroesDawn.Infrastructure.Supabase
         {
             var body = JsonUtility.ToJson(new RefreshBody { refresh_token = stored.RefreshToken });
             var r = await _http.SendAsync("POST", _config.Url + "/auth/v1/token?grant_type=refresh_token", Headers(), body, ct);
-            if (r.NetworkError || r.Status >= 500) return Result<string>.Fail(SupabaseErrors.Network());
+            if (r.NetworkError || r.Status >= 500 || r.Status == 429 || r.Status == 408) return Result<string>.Fail(SupabaseErrors.Network());   // panne passagère : la session est gardée
             if (!r.IsSuccess)
             {
                 _tokens.Clear();

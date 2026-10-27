@@ -9,8 +9,8 @@ namespace N29.HeroesDawn.Application.Features.Account
     /// <summary>Choix du joueur quand l'appareil et le compte ont chacun de la progression.</summary>
     public enum ChoiceKind { KeepDevice, KeepAccount }
 
-    /// <summary>Résultat d'un rattachement : profil local envoyé, profil du compte récupéré, ou choix à faire (rien n'est écrit).</summary>
-    public enum LinkStatus { Uploaded, Pulled, NeedsChoice }
+    /// <summary>Résultat d'un rattachement : profil local envoyé, profil du compte récupéré, choix à faire (rien n'est écrit), ou connecté sans profil local encore chargé (écran titre : le rattachement a lieu après « Jouer »).</summary>
+    public enum LinkStatus { Uploaded, Pulled, NeedsChoice, Connected }
 
     /// <summary>Les chiffres montrés dans le choix de progression : niveau le plus haut, Crédits, zones terminées, dernière partie.</summary>
     public sealed class ProfileSummary

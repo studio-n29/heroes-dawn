@@ -86,3 +86,11 @@ Une seule fenêtre commune (`Popups/MiniGame2DPopup`) : titre, bandeau score / t
 | Survie en neige (vue de dessus) | joystick, jauge de survie, totems | 1.4 (n11) |
 
 Fonds : un SVG source par jeu (`Art/MiniGames`), rasterisé en PNG (`Resources/MiniGames`) par Heroes Dawn ▸ Setup ▸ Générer les fonds de mini-jeux.
+
+## Lot I (0.14.0) : compte et sauvegarde cloud
+
+- **Écran titre** : « Jouer » (invité) et, en bas à droite, « Se connecter » (devient l'e-mail du compte une fois connecté).
+- **Fenêtre Compte** : onglets Connexion / Créer un compte ; e-mail, mot de passe, pseudo (création) ; « Continuer avec Google » et « Continuer avec Apple » ; « Mot de passe oublié ? » ; erreurs en français sous les champs ; voile d'attente pendant la requête.
+- **Choix de progression** : deux cartes (cet appareil, le compte) avec niveau, Crédits, zones et date ; « Garder cet appareil », « Garder le compte », « Plus tard » (Retour = rien n'est écrit). L'autre version est gardée dans une sauvegarde de secours.
+- **Profil** : rangée « Compte » en tête. Invité : « Lier mon compte ». Connecté : e-mail, fournisseur, dernière synchronisation, « Synchroniser », « Se déconnecter » (confirmation).
+- **Synchronisation** : au lancement, à chaque sauvegarde (au plus un envoi toutes les 20 s), à la mise en arrière-plan et à la fermeture ; hors ligne, le jeu continue et réessaie.

@@ -43,7 +43,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(r.Value!.Profile.credits, Is.EqualTo(77));
             Assert.That(r.Value.UpdatedAt, Is.EqualTo("2026-10-28T12:00:00.123456+00:00"));
             var req = _http.Requests.Single();
-            Assert.That((req.Method, req.Url), Is.EqualTo(("GET", Url + "/rest/v1/hd_profiles?select=profile,schema_version,updated_at&limit=1")));
+            Assert.That((req.Method, req.Url), Is.EqualTo(("GET", Url + "/rest/v1/hd_profiles?select=profile,schema_version,updated_at&user_id=eq.11111111-2222-3333-4444-555555555555&limit=1")));
             Assert.That(req.Headers["apikey"], Is.EqualTo("cle-anon"));
             Assert.That(req.Headers["Authorization"], Is.EqualTo("Bearer JETON"));
         }
@@ -113,12 +113,30 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public void NoSession_And401_ReturnSessionError()
         {
             _http.Enqueue(401, "{\"message\":\"JWT expired\"}");
+            _http.Enqueue(400, "{\"error\":\"invalid_grant\",\"error_description\":\"Invalid Refresh Token\"}");   // le renouvellement est refusé aussi
             Assert.That(_cloud.GetAsync(Ct).GetAwaiter().GetResult().Error!.LocKey, Is.EqualTo("errors.account_session"));
             _tokens.Clear();
             int before = _http.Requests.Count;
             Assert.That(_cloud.GetAsync(Ct).GetAwaiter().GetResult().Error!.LocKey, Is.EqualTo("errors.account_session"));
             Assert.That(_cloud.UpsertAsync(Profile(), null, Ct).GetAwaiter().GetResult().Error!.LocKey, Is.EqualTo("errors.account_session"));
             Assert.That(_http.Requests.Count, Is.EqualTo(before));
+        }
+
+        [Test, Description("Vérifie qu'un 401 sur un jeton qui semblait valide déclenche un renouvellement puis un seul nouvel essai, et que la session est gardée si le serveur d'authentification est indisponible (429) — parce qu'une horloge décalée ou une panne passagère ne doit pas déconnecter le joueur")]
+        public void A401_RefreshesOnce_AndRetries_SessionKeptOn429()
+        {
+            _http.Enqueue(401, "{\"message\":\"JWT expired\"}");
+            _http.Enqueue(200, "{\"access_token\":\"ACCESS-2\",\"refresh_token\":\"R2\",\"expires_in\":3600,\"expires_at\":4102444800,\"user\":{\"id\":\"11111111-2222-3333-4444-555555555555\",\"email\":\"moi@exemple.fr\",\"app_metadata\":{\"provider\":\"email\"},\"user_metadata\":{\"display_name\":\"Moi\"}}}");
+            _http.Enqueue(200, "[" + Row(77) + "]");
+            var r = _cloud.GetAsync(Ct).GetAwaiter().GetResult();
+            Assert.That(r.IsSuccess, Is.True);
+            Assert.That(_http.Requests.Count, Is.EqualTo(3));
+            Assert.That(_http.Requests[2].Headers["Authorization"], Is.EqualTo("Bearer ACCESS-2"));
+
+            _http.Enqueue(401, "{}");
+            _http.Enqueue(429, "{}");
+            Assert.That(_cloud.GetAsync(Ct).GetAwaiter().GetResult().Error!.LocKey, Is.EqualTo("errors.account_network"));
+            Assert.That(_tokens.Load(), Is.Not.Null, "la session est gardée");
         }
 
         [Test, Description("Vérifie qu'un profil de plus de 512 Ko est refusé avant tout envoi — parce que la base refuserait de toute façon cette ligne et qu'il vaut mieux ne rien envoyer")]

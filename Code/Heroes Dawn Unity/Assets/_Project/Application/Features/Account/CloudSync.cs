@@ -29,7 +29,8 @@ namespace N29.HeroesDawn.Application.Features.Account
         bool _active;
         bool _dirty;
         bool _running;
-        bool _uploading;
+        int _generation;
+        UniTaskCompletionSource<bool>? _inflight;
         DateTime? _lastUpload;
 
         public CloudSync(ICloudProfileGateway cloud, ICloudSyncStateStore state, GameSession session, IClock clock, ILogger log,
@@ -44,10 +45,15 @@ namespace N29.HeroesDawn.Application.Features.Account
         public bool IsPaused { get; private set; }
         public bool IsActive => _active;
         public event Action? ConflictDetected;
+        /// <summary>Levé quand le compte refuse la session (jeton expiré, non renouvelable) : les envois sont arrêtés et le joueur redevient invité.</summary>
+        public event Action? SessionLost;
+
+        static DomainError SessionError => new DomainError("account.session", "errors.account_session");
 
         /// <summary>Active l'envoi : <paramref name="expectedUpdatedAt"/> est la dernière date d'écriture connue du compte.</summary>
         public void Start(string expectedUpdatedAt)
         {
+            _generation++;
             _expected = expectedUpdatedAt;
             _active = true;
             IsPaused = false;
@@ -55,17 +61,24 @@ namespace N29.HeroesDawn.Application.Features.Account
 
         public void Stop()
         {
+            _generation++;   // un envoi encore en vol est périmé : son résultat sera ignoré
             _active = false;
             IsPaused = false;
             _dirty = false;
             _expected = null;
+            _lastUpload = null;
         }
 
         public void NotifyLocalSaved()
         {
             if (!_active || IsPaused) return;
             _dirty = true;
-            if (_running) return;
+            if (_running || _inflight != null) return;   // l'envoi en cours relance la boucle s'il reste du travail
+            StartLoop();
+        }
+
+        void StartLoop()
+        {
             _running = true;
             RunAsync().Forget();
         }
@@ -85,7 +98,7 @@ namespace N29.HeroesDawn.Application.Features.Account
                     }
                     var r = await UploadOnceAsync(CancellationToken.None);
                     if (r.IsSuccess) { retry = 0; continue; }
-                    if (retry >= RetryDelays.Length) break;   // on attend la prochaine sauvegarde locale
+                    if (!_active || retry >= RetryDelays.Length) break;   // session perdue, ou on attend la prochaine sauvegarde locale
                     await _delay(RetryDelays[retry], CancellationToken.None);
                     retry++;
                 }
@@ -94,28 +107,39 @@ namespace N29.HeroesDawn.Application.Features.Account
             finally { _running = false; }
         }
 
-        /// <summary>Envoie tout de suite (fermeture, arrière-plan, « Synchroniser »), sans attendre l'intervalle.</summary>
+        /// <summary>Envoie tout de suite (fermeture, arrière-plan, « Synchroniser »), sans attendre l'intervalle. Échoue sans synchronisation active : on ne dit jamais « synchronisé » quand rien n'est parti.</summary>
         public async UniTask<Result> FlushAsync(CancellationToken ct)
         {
-            if (!_active || IsPaused) return Result.Ok();
-            while (_uploading) await UniTask.Yield();   // l'envoi en cours finit d'abord
+            if (!_active) return Result.Fail(SessionError);
+            if (IsPaused) return Result.Ok();
+            if (_inflight != null) await _inflight.Task;   // l'envoi en cours finit d'abord
+            if (!_active) return Result.Fail(SessionError);
+            if (IsPaused) return Result.Ok();
             if (!_dirty && _lastUpload.HasValue) return Result.Ok();
             return await UploadOnceAsync(ct);
         }
 
         async UniTask<Result> UploadOnceAsync(CancellationToken ct)
         {
-            if (_uploading) return Result.Ok();
-            _uploading = true;
+            if (_inflight != null) { await _inflight.Task; return Result.Ok(); }
+            var done = new UniTaskCompletionSource<bool>();
+            _inflight = done;
+            int generation = _generation;
             try
             {
                 _dirty = false;   // les modifications arrivées pendant l'envoi le remettront à vrai
                 var profile = _session.ToProfile(_clock.UtcNow);
                 var result = await _cloud.UpsertAsync(profile, _expected, ct);
+                if (generation != _generation) return Result.Ok();   // déconnexion ou nouveau compte pendant l'envoi : résultat périmé
                 if (result.IsFailure)
                 {
                     _dirty = true;
                     _log.Warn("Synchronisation : envoi impossible (" + result.Error!.Code + ")");
+                    if (result.Error!.LocKey == SessionError.LocKey)
+                    {
+                        Stop();
+                        SessionLost?.Invoke();
+                    }
                     return Result.Fail(result.Error!);
                 }
                 if (result.Value.Status == CloudWriteStatus.Conflict)
@@ -134,7 +158,12 @@ namespace N29.HeroesDawn.Application.Features.Account
                 _state.Save(saved);
                 return Result.Ok();
             }
-            finally { _uploading = false; }
+            finally
+            {
+                _inflight = null;
+                done.TrySetResult(true);
+                if (_dirty && _active && !IsPaused && !_running && generation == _generation) StartLoop();   // une sauvegarde est arrivée pendant l'envoi
+            }
         }
     }
 }

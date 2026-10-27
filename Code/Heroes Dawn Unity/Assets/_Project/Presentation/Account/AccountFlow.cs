@@ -64,7 +64,7 @@ namespace N29.HeroesDawn.Presentation.Account
         {
             var r = await _account.RestoreAsync(ct);
             if (r.IsFailure || r.Value == null) return;   // pas de session, ou serveur injoignable : on reste comme on est
-            if (r.Value.Status == LinkStatus.Uploaded) return;   // seule cette machine a avancé : rien à dire
+            if (r.Value.Status == LinkStatus.Uploaded || r.Value.Status == LinkStatus.Connected) return;   // seule cette machine a avancé : rien à dire
             await ShowOutcomeAsync(r.Value, ct);
         }
 
@@ -72,6 +72,7 @@ namespace N29.HeroesDawn.Presentation.Account
         {
             switch (outcome.Status)
             {
+                case LinkStatus.Connected: _toasts.Show(_loc.T("account.connected"), ToastKind.Reward); break;
                 case LinkStatus.Uploaded: _toasts.Show(_loc.T("account.linked"), ToastKind.Reward); break;
                 case LinkStatus.Pulled: _toasts.Show(_loc.T("account.pulled"), ToastKind.Reward); break;
                 case LinkStatus.NeedsChoice: await ChooseAsync(outcome, ct); break;
@@ -130,7 +131,9 @@ namespace N29.HeroesDawn.Presentation.Account
         public async UniTask SyncNowAsync(CancellationToken ct)
         {
             var r = await _account.SyncNowAsync(ct);
-            _toasts.Show(r.IsFailure ? _loc.Error(r.Error!) : _loc.T("account.sync_done"), r.IsFailure ? ToastKind.Error : ToastKind.Reward);
+            if (r.IsFailure) { _toasts.Show(_loc.Error(r.Error!), ToastKind.Error); return; }
+            if (r.Value is { Status: LinkStatus.NeedsChoice } pending) { await ChooseAsync(pending, ct); return; }
+            _toasts.Show(_loc.T("account.sync_done"), ToastKind.Reward);
         }
     }
 }

@@ -18,6 +18,6 @@ namespace N29.HeroesDawn.Infrastructure.Simulated
     public sealed class MemoryProgressBackupStore : IProgressBackupStore
     {
         public readonly List<(string Reason, ProfileData Profile)> Saved = new List<(string Reason, ProfileData Profile)>();
-        public void Save(string reason, ProfileData profile, DateTime utcNow) => Saved.Add((reason, profile));
+        public void Save(string reason, ProfileData profile, DateTime utcNow) => Saved.Add((reason, UnityEngine.JsonUtility.FromJson<ProfileData>(UnityEngine.JsonUtility.ToJson(profile))));   // copie : ToProfile partage des objets avec la session
     }
 }
