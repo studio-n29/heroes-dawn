@@ -19,6 +19,9 @@ Chaque compétence est construite sur le **rôle** de l'agent, plus un **statut 
 ## Cartes du grimoire (3e et 4e places)
 Une carte de la **même famille** que l'agent s'équipe en 3e place (la 2e carte en 4e). Une carte d'une autre famille est refusée. Le coût d une carte est dérivé de sa recharge d origine (40 ou 50). Le catalogue des cartes est dans `Resources` (collection) et se complète avec le grimoire.
 
+### Catalogue
+**48 cartes** : **12 par famille**, dont **4 par nature** (Offensive, Défensive, Soutien), et par famille **5 Communes, 4 Rares, 2 Épiques, 1 Légendaire** (taux des boosters 70 / 22 / 7 / 1). Chaque carte a 3 paliers (niveaux 3, 6, 10). Table complète des 36 cartes ajoutées, gabarits de puissance par rareté et règles de contenu : `Code/docs/specs/2026-10-27-catalogue-36-cartes-design.md`. Illustrations temporaires : recadrages teintés de l'art du Drive, une source par carte (`Resources/Illustrations/Cards/SOURCES.md`).
+
 ### Catégories des cartes
 Une carte se classe sur deux axes : sa **famille** (le type de pouvoir, celle des agents qui peuvent l'équiper) × sa **nature** : **Offensive**, **Défensive** ou **Soutien**. La nature est **saisie par carte** ; à défaut, elle est déduite de l'effet de base et de la cible :
 

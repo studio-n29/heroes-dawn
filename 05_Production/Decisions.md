@@ -115,3 +115,4 @@
 | 2026-10-26 | Cartes : 10 niveaux, +10 % par niveau, amélioration à (N+1)/2 doublons et 200 × N Crédits ; niveaux déjà atteints conservés | Spec `2026-10-26-cartes-paliers-mecaniques-design.md` |
 | 2026-10-26 | Paliers de cartes aux niveaux 3, 6 et 10 : des effets secondaires ajoutés à la compétence (non augmentés par le niveau) | Spec `2026-10-26-cartes-paliers-mecaniques-design.md` |
 | 2026-10-26 | Quatre nouvelles mécaniques de combat : vol de vie, purge, rebond, exécution (sous 30 % PV) ; lot C découpé en C1 (moteur) et C2 (36 nouvelles cartes) | Spec `2026-10-26-cartes-paliers-mecaniques-design.md` |
+| 2026-10-27 | Catalogue de 48 cartes : 12 par famille, 4 par nature, raretés 5/4/2/1 par famille ; illustrations par recadrage teinté du Drive, une source différente par carte (36 nouvelles images à fournir, les 23 actuelles réservées) | Spec `2026-10-27-catalogue-36-cartes-design.md` |
