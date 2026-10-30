@@ -59,10 +59,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var dim = Ui.Img(root, "Dim", Theme.Navy, null, true);
             dim.rectTransform.Stretch();
 
-            // ---- Cinématique : le lecteur construit ses couches au lancement ; le prefab ne porte que le toucher et « Passer »
+            // ---- Cinématique : le lecteur construit ses couches au lancement (vidéos et voix off) ; le prefab ne porte que le toucher et « Passer »
             var cinematic = Ui.Rect(root, "Cinematic");
             cinematic.Stretch();
-            var player = cinematic.gameObject.AddComponent<CinematicPlayer>();
+            var player = cinematic.gameObject.AddComponent<CinematicVideoPlayer>();
             var tap = Ui.Img(cinematic, "Tap", new Color(0, 0, 0, 0), null, true);
             tap.rectTransform.Stretch();
             var tapButton = tap.gameObject.AddComponent<Button>();
@@ -71,7 +71,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             nav.mode = Navigation.Mode.None;
             tapButton.navigation = nav;
             var skip = Ui.LocBtn(cinematic, "intro.skip", Theme.WithAlpha(Theme.Navy, 0.7f), Theme.TextOnDark, null!, 30, FontKind.Title, "Skip");
-            skip.Rect.At(1f, 1f, -40, -40, 260, 96);
+            skip.Rect.At(1f, 1f, -20, -16, 170, 64);
+            skip.Rect.pivot = Vector2.one;
+            skip.Label.fontSize = 24f;
 
             // ---- Campagne
             var campaignStage = Ui.Rect(root, "Campaign");

@@ -14,7 +14,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
     public static class PlayModeHarness
     {
         /// <summary>Charge Boot avec les doubles injectés dans le scope racine, puis attend l'écran de connexion.</summary>
-        public static IEnumerator Boot(MemoryProfileGateway profiles, InstantAuthGateway auth, bool withIntro = false)
+        public static IEnumerator Boot(MemoryProfileGateway profiles, InstantAuthGateway auth, bool withIntro = false, bool skipLaunch = true)
         {
             using (LifetimeScope.Enqueue(b =>
                    {
@@ -29,7 +29,17 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 SceneManager.LoadScene("Boot", LoadSceneMode.Single);
                 yield return null; // la scène se charge (Awake des scopes) pendant que les doubles sont en file
             }
-            for (int i = 0; i < 300 && !Visible<LoginView>(); i++) yield return null;
+            for (int i = 0; i < 1200 && !Visible<LoginView>(); i++)
+            {
+                var launch = Object.FindAnyObjectByType<IntroPopupView>();
+                if (launch != null && launch.Current == IntroPopupView.Stage.Cinematic)
+                {
+                    if (!skipLaunch) yield break;
+                    launch.SkipButton.onClick.Invoke();
+                }
+                yield return null;
+            }
+            NUnit.Framework.Assert.That(Visible<LoginView>(), NUnit.Framework.Is.True, "connexion après la cinématique de lancement");
         }
 
         /// <summary>Barre de ressources de la coque du hub (compte ses affichages : diagnostic des abonnements).</summary>

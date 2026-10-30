@@ -39,8 +39,6 @@ namespace N29.HeroesDawn.Presentation.Login
             var view = await _modals.OpenAsync<IIntroPopupView>(ct);
             try
             {
-                await view.PlayCinematicAsync(CinematicScript.Shots, new IntroCinematicTexts { Skip = _loc.T("intro.skip") }, SetMainTheme, ct);
-                SetMainTheme(1f);
                 string campaign = await view.ChooseCampaignAsync(new ChooseCampaignData
                 {
                     Title = _loc.T("onboarding.campaign.title"),

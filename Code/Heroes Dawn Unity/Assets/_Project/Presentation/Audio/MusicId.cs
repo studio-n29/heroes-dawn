@@ -12,5 +12,6 @@ namespace N29.HeroesDawn.Presentation.Audio
         Board = 3,
         Combat = 4,
         Boss = 5,
+        Cinematic = 6,
     }
 }

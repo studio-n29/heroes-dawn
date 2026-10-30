@@ -31,14 +31,12 @@ namespace N29.HeroesDawn.Tests.Presentation
 
         FakeIntroPopup Popup => (FakeIntroPopup)_host.Spawned.Single();
 
-        [Test, Description("Vérifie que la cinématique montre les 11 plans de la version courte, dans l ordre, et qu elle coupe le thème principal du jeu — parce que le flux doit jouer le document de cinématique de bout en bout")]
-        public void Cinematic_PlaysTheCondensedCut()
+        [Test, Description("Vérifie que la première connexion commence au choix du personnage, la cinématique étant déjà passée au lancement")]
+        public void Onboarding_StartsWithCampaignSelection()
         {
             _flow.RunIfNeededAsync(default).Forget();
-            Assert.That(Popup.Shots!.Count, Is.EqualTo(11));
-            Assert.That(Popup.Shots[0].Id, Is.EqualTo("S01"));
-            Assert.That(Popup.Shots[10].Id, Is.EqualTo("S46"));
-            Assert.That(Popup.MainTheme, Is.Not.Null, "le thème principal est piloté par la cinématique");
+            Assert.That(Popup.MainTheme, Is.Null);
+            Assert.That(Popup.Campaigns, Is.Not.Null);
         }
 
         [Test, Description("Vérifie que les deux personnages sont proposés, Agent D disponible et Agent M en création — parce que les zones de Moscou ne sont pas encore créées")]

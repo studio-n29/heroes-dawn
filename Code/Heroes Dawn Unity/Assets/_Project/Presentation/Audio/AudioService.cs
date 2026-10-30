@@ -248,6 +248,8 @@ namespace N29.HeroesDawn.Presentation.Audio
             var d = _decks[_active];
             var m = d.Music;
             if (m == null || d.Stopping) return;
+            // The launch score plays once, including its complete ending.
+            if (m.Id == MusicId.Cinematic) return;
             var clip = d.Source.clip;
             if (clip == null) return;
             float end = clip.length - m.Tracks[d.Track].TrimEnd - m.TrackCrossfade;
