@@ -19,7 +19,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public static void WireFade(PrefabContext ctx, ViewBase view) => ctx.Wire(view, "fadeGroup", view.GetComponent<CanvasGroup>());
 
-        /// <summary>Fond commun : ciel pastel (dégradé haut → bas), lueur pêche à l'horizon et skyline en bas.</summary>
+        /// <summary>Fond commun : fond nuit (dégradé + vignettage). Les couleurs reçues, héritées du ciel pastel, sont ignorées.</summary>
         public static void Backdrop(RectTransform rt, Color top, Color bottom)
         {
             Ui.Img(rt, "Backdrop", bottom, null, true).rectTransform.Stretch();

@@ -11,6 +11,7 @@ namespace N29.HeroesDawn.Tests.Editor
         public void Theme_TextOnSurfaces_MeetsContrast()
         {
             foreach (var bg in new[] { Theme.Surface, Theme.Surface2, Theme.Surface3, Theme.Background })
+            {
                 Assert.That(ThemeContrast.Ratio(Theme.Text, bg), Is.GreaterThanOrEqualTo(4.5f), "Text sur " + bg);
             foreach (var bg in new[] { Theme.Surface, Theme.Surface3, Theme.Background })
                 Assert.That(ThemeContrast.Ratio(Theme.TextMuted, bg), Is.GreaterThanOrEqualTo(4.5f), "TextMuted sur " + bg);

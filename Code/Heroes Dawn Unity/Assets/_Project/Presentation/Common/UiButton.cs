@@ -17,6 +17,7 @@ namespace N29.HeroesDawn.Presentation.Common
         [SerializeField] TMP_Text label;
         [SerializeField] Color _bg;
         [SerializeField] Color _fg;
+        [SerializeField, Mvp.OptionalRef] GameObject halo;
         [Tooltip("Son joué au clic (None : muet).")]
         [SerializeField] SfxId clickSound = SfxId.UiClick;
         UiSoundRelay _relay;
@@ -26,9 +27,9 @@ namespace N29.HeroesDawn.Presentation.Common
         public TMP_Text Label => label;
         public RectTransform Rect => (RectTransform)transform;
 
-        public void Init(Button b, Image fillImage, TMP_Text text, Color bg, Color fg)
+        public void Init(Button b, Image fillImage, TMP_Text text, Color bg, Color fg, GameObject haloObject = null)
         {
-            button = b; fill = fillImage; label = text; _bg = bg; _fg = fg;
+            button = b; fill = fillImage; label = text; _bg = bg; _fg = fg; halo = haloObject;
             ApplyState();
         }
 

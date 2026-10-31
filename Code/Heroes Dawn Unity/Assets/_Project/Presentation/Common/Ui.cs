@@ -8,6 +8,9 @@ namespace N29.HeroesDawn.Presentation.Common
 {
     public enum FontKind { Title, Body, Regular }
 
+    /// <summary>Variante d'un panneau de verre : liseré discret, néon plein avec halo (état actif) ou corail.</summary>
+    public enum PanelVariant { Glass, Active, Accent }
+
     /// <summary>
     /// Fabrique d'éléments uGUI construits par code (aucun prefab requis).
     /// Style « HUD pastel » (spec 2026-10-12, référence : Marvel's Spider-Man) : panneaux de verre givré à coins coupés,
@@ -128,7 +131,8 @@ namespace N29.HeroesDawn.Presentation.Common
         /// Case de BD : contour noir (épaisseur <paramref name="border"/>), fond coloré, ombre portée.
         /// Renvoie le fond intérieur ; son parent (le contour) est le RectTransform à placer.
         /// </summary>
-        public static Image Panel(Transform parent, string name, Color fill, float border = 4f, float shadow = 8f, bool raycast = true)
+        public static Image Panel(Transform parent, string name, Color fill, float border = 4f, float shadow = 8f, bool raycast = true,
+                                  PanelVariant variant = PanelVariant.Glass)
         {
             // Style Mo.Co : contour sombre épais (3 à 6 px), aplat plein, liseré clair en haut et une seule ombre portée.
             var frame = Img(parent, name, Theme.Outline, Sprites.Panel, raycast);
@@ -148,6 +152,30 @@ namespace N29.HeroesDawn.Presentation.Common
             hrt.offsetMin = new Vector2(12f, -12f);
             hrt.offsetMax = new Vector2(-12f, -5f);
             return inner;
+        }
+
+        static void AddShadow(Graphic g, Vector2 distance, float alpha)
+        {
+            var s = g.gameObject.AddComponent<Shadow>();
+            s.effectColor = Theme.WithAlpha(Theme.Shadow, alpha);
+            s.effectDistance = distance;
+        }
+
+        /// <summary>Matériau d'interface généré (Resources/UI/Materials) ; null s'il n'existe pas encore (le rendu retombe sur le matériau par défaut).</summary>
+        public static Material UiMaterial(string name) => Resources.Load<Material>("UI/Materials/" + name);
+
+        /// <summary>Fond nuit plein cadre (dégradé Night vers NightBottom + vignettage), sans capter les touchers : fond par défaut des écrans.</summary>
+        public static Image NightBackdrop(Transform parent, string name = "Backdrop")
+        {
+            var root = Img(parent, name, Theme.NightBottom);
+            root.rectTransform.Stretch();
+            // VerticalGradient est opaque en haut : Night recouvre progressivement NightBottom.
+            Img(root.transform, "Gradient", Theme.Night, Sprites.VerticalGradient).rectTransform.Stretch();
+            var vignette = Img(root.transform, "Vignette", Theme.Night);
+            vignette.rectTransform.Stretch();
+            var mat = UiMaterial("UiBackdrop");
+            if (mat != null) vignette.material = mat;
+            return root;
         }
 
         /// <summary>Barre d'accent verticale (4 px) sur le bord gauche d'un panneau : signature du HUD. Corail par défaut.</summary>
@@ -199,8 +227,8 @@ namespace N29.HeroesDawn.Presentation.Common
         }
 
         /// <summary>
-        /// Contour noir « lettrage de couverture » : matériau encré partagé pour un texte TMP (l'épaisseur est celle du matériau),
-        /// contour + ombre uGUI pour un autre graphique.
+        /// Lettrage à ombre douce : matériau encré partagé pour un texte TMP (l'ombre est celle du matériau),
+        /// ombre uGUI pour un autre graphique.
         /// </summary>
         public static T Inked<T>(this T g, float size = 2.5f) where T : Graphic
         {
@@ -278,6 +306,8 @@ namespace N29.HeroesDawn.Presentation.Common
             frt.anchorMax = Vector2.one;
             frt.offsetMin = Vector2.zero;
             frt.offsetMax = Vector2.zero;
+            var glow = Img(f.transform, "Glow", Theme.WithAlpha(fill, 0.35f), Sprites.PanelSmall);
+            glow.rectTransform.Stretch(-2, -2, -2, -2);
             TMP_Text label = null;
             if (withLabel)
             {
@@ -286,7 +316,7 @@ namespace N29.HeroesDawn.Presentation.Common
                 label.Inked(1.5f);
             }
             var bar = bg.gameObject.AddComponent<UiBar>();
-            bar.Init(frt, f, label);
+            bar.Init(frt, f, label, glow);
             return bar;
         }
 

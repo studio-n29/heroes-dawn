@@ -1,10 +1,10 @@
-// Habillage « comics » posé sur les illustrations de fond : vignettage + trame de points (demi-teinte) qui grossit vers les bords.
+// Vignettage sombre posé sur les fonds (thème sombre néon, sans trame de points).
 Shader "HD/UI/Backdrop"
 {
     Properties
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
-        _Color ("Tint", Color) = (0,0,0,1)
+        _Color ("Tint", Color) = (0.043,0.063,0.125,1)
         _StencilComp ("Stencil Comparison", Float) = 8
         _Stencil ("Stencil ID", Float) = 0
         _StencilOp ("Stencil Operation", Float) = 0
@@ -12,8 +12,6 @@ Shader "HD/UI/Backdrop"
         _StencilReadMask ("Stencil Read Mask", Float) = 255
         _ColorMask ("Color Mask", Float) = 15
         _Vignette ("Vignette strength", Range(0,1)) = 0.55
-        _Dots ("Dots per screen height", Float) = 54
-        _DotStrength ("Dot strength", Range(0,1)) = 0.5
     }
     SubShader
     {
@@ -38,7 +36,7 @@ Shader "HD/UI/Backdrop"
 
             fixed4 _Color;
             float4 _ClipRect;
-            float _Vignette, _Dots, _DotStrength;
+            float _Vignette;
 
             v2f vert(appdata_t v)
             {
@@ -58,14 +56,7 @@ Shader "HD/UI/Backdrop"
                 float2 c = uv - 0.5;
                 float edge = saturate(dot(c, c) * 3.2);          // 0 au centre, ~1 dans les coins
                 float vignette = edge * _Vignette;
-                float aspect = _ScreenParams.x / _ScreenParams.y;
-                float2 grid = float2(uv.x * aspect, uv.y) * _Dots;
-                // Trame en quinconce, inclinée à 45 degrés.
-                float2 r = float2(grid.x + grid.y, grid.x - grid.y) * 0.7071;
-                float2 g = frac(r) - 0.5;
-                float radius = edge * 0.55;
-                float dots = smoothstep(radius, radius - 0.12, length(g)) * edge * _DotStrength;
-                float a = saturate(vignette + dots);
+                float a = saturate(vignette);
                 fixed4 color = fixed4(IN.color.rgb, a * IN.color.a);
                 #ifdef UNITY_UI_CLIP_RECT
                 color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);

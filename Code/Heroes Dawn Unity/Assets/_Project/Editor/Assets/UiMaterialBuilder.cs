@@ -19,6 +19,8 @@ namespace N29.HeroesDawn.EditorTools.Assets
             ("UiHatch", "HD/UI/Hatch"),
             ("UiShine", "HD/UI/Shine"),
             ("UiBackdrop", "HD/UI/Backdrop"),
+            ("UiNeonEdge", "HD/UI/NeonEdge"),
+            ("UiGlassSheen", "HD/UI/GlassSheen"),
         };
 
         [MenuItem("Heroes Dawn/Setup/Générer les matériaux d'interface")]

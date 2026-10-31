@@ -1,3 +1,4 @@
+using System;
 using N29.HeroesDawn.Definitions;
 using UnityEngine;
 
@@ -73,9 +74,9 @@ namespace N29.HeroesDawn.Presentation.Common
         {
             switch (r)
             {
-                case Rarity.Legend: return Hex(0xF5C542);
-                case Rarity.Elite: return Hex(0xA9B4CC);
-                default: return Hex(0xC9976A);
+                case Rarity.Legend: return Hex(0xFFD24A);
+                case Rarity.Elite: return Hex(0xC3CCE6);
+                default: return Hex(0xD9A066);
             }
         }
 
@@ -83,19 +84,19 @@ namespace N29.HeroesDawn.Presentation.Common
         {
             switch (t)
             {
-                case CaseType.Entry: return Soft(0x5B6478);
+                case CaseType.Entry: return Hex(0x6B7690);
                 case CaseType.Combat:
-                    return rank == CombatRank.Easy ? Soft(0xE88A4D) : rank == CombatRank.Normal ? Soft(0xE5484D) : Soft(0xA8232B);
-                case CaseType.MiniGame: return Soft(0x3BC7F2);
-                case CaseType.Narrative: return Soft(0x9B6BF2);
-                case CaseType.Resource: return Soft(0xF2C23B);
-                case CaseType.Rest: return Soft(0x4CC96B);
-                default: return Soft(0x3A4152);
+                    return rank == CombatRank.Easy ? Hex(0xFF8F45) : rank == CombatRank.Normal ? Hex(0xFF4D55) : Hex(0xC0262F);
+                case CaseType.MiniGame: return Hex(0x3BC7F2);
+                case CaseType.Narrative: return Hex(0xA878FF);
+                case CaseType.Resource: return Hex(0xFFD23B);
+                case CaseType.Rest: return Hex(0x4CE06B);
+                default: return Hex(0x4A5370);
             }
         }
 
         public static Color FatigueColor(int fatigue)
-            => fatigue >= 100 ? Danger : fatigue > 60 ? Fatigue : Hex(0x8FD16B);
+            => fatigue >= 100 ? Danger : fatigue > 60 ? Fatigue : Hex(0x7BE06B);
 
         public static Color WithAlpha(Color c, float a) => new Color(c.r, c.g, c.b, a);
 
