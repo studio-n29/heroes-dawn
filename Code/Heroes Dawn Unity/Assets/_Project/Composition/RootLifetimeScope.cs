@@ -193,7 +193,8 @@ namespace N29.HeroesDawn.Composition
             builder.Register<IPopupHost>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return new AudiblePopupHost(ui.Modals, c.Resolve<IAudioService>()); }, Lifetime.Singleton);
             builder.Register<IToastService>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return new AudibleToastService(ui.Toasts, c.Resolve<IAudioService>()); }, Lifetime.Singleton);
             builder.Register<IModalService, ModalService>(Lifetime.Singleton);
-            builder.Register<ILocalization, LocLocalization>(Lifetime.Singleton);
+            // La langue des textes suit le réglage enregistré dans le profil (lu à chaque affichage).
+            builder.Register<ILocalization>(c => { var session = c.Resolve<GameSession>(); Loc.BindLanguage(() => session.Meta.settings.language); return new LocLocalization(); }, Lifetime.Singleton);
             builder.Register<IBackInput, InputSystemBackInput>(Lifetime.Singleton);
             builder.RegisterEntryPoint<BackButtonRouter>().AsSelf();
             builder.RegisterEntryPoint<ToastRelay>();

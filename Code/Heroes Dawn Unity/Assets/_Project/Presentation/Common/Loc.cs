@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
@@ -330,7 +331,20 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendMiniGames(Dictionary<string, string> d);
         static partial void ExtendAccount(Dictionary<string, string> d);
 
-        public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
+        static Func<string> _language = () => "fr";
+
+        /// <summary>Relie la langue des textes au profil (réglage « Langue des textes »). Sans liaison, le jeu reste en français.</summary>
+        public static void BindLanguage(Func<string> language) => _language = language ?? (() => "fr");
+
+        /// <summary>Langue active : « en » si le joueur l'a choisie, sinon français. Une clé sans traduction anglaise reprend le français.</summary>
+        public static string Language => _language() == "en" ? "en" : "fr";
+
+        public static string T(string key)
+        {
+            if (Language == "en" && En.TryGetValue(key, out var e)) return e;
+            return Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
+        }
+
         public static bool Has(string key) => Fr.ContainsKey(key);
 
         /// <summary>Toutes les clés de texte connues (outil de narration).</summary>
