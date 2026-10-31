@@ -1,0 +1,103 @@
+#nullable enable
+using System.Collections.Generic;
+
+namespace N29.HeroesDawn.Presentation.Common
+{
+    /// <summary>
+    /// Textes anglais (L1 de la 0.15.0). Couverture : coque du QG, connexion, boutique, réglages (langue, audio, graphismes, accessibilité).
+    /// Une clé absente de ce dictionnaire reprend le texte français : les autres écrans se traduisent par lots.
+    /// </summary>
+    public static partial class Loc
+    {
+        static readonly Dictionary<string, string> En = new Dictionary<string, string>
+        {
+            // --- Général ---
+            ["game.tagline"] = "New York still holds. For how long?",
+            ["ui.ok"] = "OK", ["ui.cancel"] = "Cancel", ["ui.confirm"] = "Confirm", ["ui.continue"] = "Continue",
+            ["ui.close"] = "Close", ["ui.back"] = "Back", ["ui.credits"] = "Credits",
+            ["ui.level"] = "Lv. {0}", ["ui.fatigue"] = "Fatigue {0} %", ["ui.saving"] = "Saving…",
+
+            // --- Connexion ---
+            ["login.play"] = "PLAY AS GUEST",
+            ["login.connecting"] = "Connecting to N29 servers…",
+            ["login.loading"] = "Loading profile…",
+            ["login.reset"] = "Erase local save",
+            ["login.reset.title"] = "Erase save?",
+            ["login.reset.body"] = "Your local progress will be deleted. The guest profile will start from scratch.",
+            ["login.welcome_new"] = "Welcome, {0}! Your squad is waiting at HQ.",
+            ["login.welcome_back"] = "Welcome back, {0}!",
+            ["login.fail_network"] = "Connection impossible (simulated network)",
+
+            // --- QG ---
+            ["hub.title"] = "HQ — RED HOOK",
+            ["hub.tab.team"] = "TEAM",
+            ["hub.tab.recruit"] = "SHOP",
+            ["hub.ops"] = "OPERATIONS ROOM",
+            ["hub.squad.in"] = "IN SQUAD",
+            ["hub.squad.add"] = "ADD",
+            ["hub.deploy"] = "DEPLOY",
+            ["hub.logout"] = "Log out",
+            ["hub.quit.title"] = "Quit the game?",
+            ["hub.quit.body"] = "Your progress is saved.",
+            ["hub.quit.ok"] = "Quit",
+
+            // --- Coque du hub ---
+            ["nav.qg"] = "HQ", ["nav.team"] = "TEAM", ["nav.recruit"] = "RECRUIT", ["nav.pass"] = "PASS", ["nav.shop"] = "SHOP",
+            ["nav.back"] = "BACK", ["nav.settings"] = "SETTINGS",
+            ["page.qg"] = "HQ · New York Section",
+            ["page.team"] = "Team · {0} members", ["page.team_one"] = "Team · 1 member",
+            ["page.recruit"] = "Recruitment",
+            ["page.pass"] = "Pass · Season 1", ["page.shop"] = "Shop",
+            ["page.operations"] = "Operations room", ["page.lab"] = "Research lab", ["page.archives"] = "Archives",
+            ["page.settings"] = "Settings", ["page.member_sheet"] = "Member sheet",
+
+            // --- Boutique éphémère ---
+            ["shop.title"] = "Ephemeral shop · 3 heroes a day",
+            ["shop.countdown.h"] = "New heroes in {0} h {1:00}",
+            ["shop.countdown.m"] = "New heroes in {0} min",
+            ["shop.reroll.free"] = "REROLL · FREE",
+            ["shop.reroll.cost"] = "REROLL · {0} CR",
+            ["shop.reroll.confirm.title"] = "Reroll the shop?",
+            ["shop.reroll.confirm.body"] = "3 new heroes for {0} Credits.",
+            ["shop.recruited"] = "RECRUITED",
+            ["shop.empty"] = "New York collection complete!",
+
+            // --- Paramètres ---
+            ["settings.cat.Audio"] = "AUDIO",
+            ["settings.cat.Graphics"] = "GRAPHICS",
+            ["settings.cat.Accessibility"] = "ACCESSIBILITY",
+            ["settings.cat.Language"] = "LANGUAGE",
+            ["settings.cat.Notifications"] = "NOTIFICATIONS",
+            ["settings.cat.Controls"] = "CONTROLS",
+            ["settings.cat.Account"] = "ACCOUNT",
+            ["settings.cat.Support"] = "SUPPORT & HELP",
+            ["settings.reset_category"] = "RESET",
+            ["settings.on"] = "ON",
+            ["settings.off"] = "OFF",
+            ["settings.master"] = "Master volume",
+            ["settings.music"] = "Music",
+            ["settings.sfx"] = "Effects",
+            ["settings.voice"] = "Voice",
+            ["settings.mute_bg"] = "Mute in background",
+            ["settings.quality"] = "Graphics quality",
+            ["settings.quality.0"] = "AUTO",
+            ["settings.quality.1"] = "LOW",
+            ["settings.quality.2"] = "MEDIUM",
+            ["settings.quality.3"] = "HIGH",
+            ["settings.fps60"] = "60 frames per second",
+            ["settings.battery"] = "Battery saver",
+            ["settings.full_fx"] = "Full combat effects",
+            ["settings.flashes"] = "Reduce flashes",
+            ["settings.shakes"] = "Reduce shakes",
+            ["settings.subtitles"] = "Subtitles",
+            ["settings.lang.texts"] = "Text language",
+            ["settings.lang.fr"] = "Français",
+            ["settings.lang.voice"] = "Voice language",
+            ["settings.lang.en"] = "English",
+            ["settings.lang.more"] = "English, Spanish, Portuguese, German",
+        };
+
+        /// <summary>Clés traduites en anglais (contrôlées par les tests de langue).</summary>
+        public static IEnumerable<string> EnglishKeys() => En.Keys;
+    }
+}

@@ -196,8 +196,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                     Toggle("settings.subtitles", () => s.subtitles, v => s.subtitles = v);
                     break;
                 case SettingsCategory.Language:
-                    Add(SettingRowData.Info(_loc.T("settings.lang.texts"), _loc.T("settings.lang.fr")));
-                    Add(SettingRowData.Info(_loc.T("settings.lang.voice"), _loc.T("settings.lang.en")));
+                    Add(new SettingRowData { Label = _loc.T("settings.lang.texts"), Kind = SettingKind.Stepper, Value = _loc.T(s.language == "en" ? "settings.lang.en" : "settings.lang.fr") },
+                        _ => _settings.Update(x => x.language = x.language == "en" ? "fr" : "en"));
+                    Add(SettingRowData.Info(_loc.T("settings.lang.voice"), _loc.T("wip.soon")));
                     Add(SettingRowData.Info(_loc.T("settings.lang.more"), _loc.T("wip.soon")));
                     break;
                 case SettingsCategory.Notifications:

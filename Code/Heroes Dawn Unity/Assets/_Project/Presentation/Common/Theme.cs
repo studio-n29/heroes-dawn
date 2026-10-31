@@ -24,6 +24,11 @@ namespace N29.HeroesDawn.Presentation.Common
         public static readonly Color Glow = Hex(0xFFE27A);
         /// <summary>Jaune vif des cases accessibles sur le plateau (contour animé).</summary>
         public static readonly Color Reach = Hex(0xFFD23F);
+        /// <summary>Jetons repris par l'interface issue de la branche DA néon (fond nuit et ombres) ; ajoutés au merge du 2026-10-31 pour la compilation.</summary>
+        public static readonly Color Night = Hex(0x0B1020);
+        public static readonly Color NightBottom = Hex(0x1A1033);
+        /// <summary>Noir des ombres ; l'appelant module l'alpha.</summary>
+        public static readonly Color Shadow = Color.black;
 
         // ---- Noms historiques ---------------------------------------------------------------------------------
         public static readonly Color Primary = Accent;
