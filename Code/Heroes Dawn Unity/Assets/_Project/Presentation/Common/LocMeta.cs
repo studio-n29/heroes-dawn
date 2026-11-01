@@ -133,7 +133,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["ops.claimed"] = "Expédition terminée : {0}";
 
             // --- Labo
-            d["page.lab"] = "Labo de recherche";
+            d["page.lab"] = "Atelier de fabrication";
             d["lab.title"] = "RECHERCHES";
             d["lab.idle"] = "Aucune recherche en cours.";
             d["lab.running"] = "En cours : {0} · {1}";

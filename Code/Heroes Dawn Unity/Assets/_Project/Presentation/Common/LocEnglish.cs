@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["page.team"] = "Team · {0} members", ["page.team_one"] = "Team · 1 member",
             ["page.recruit"] = "Recruitment",
             ["page.pass"] = "Pass · Season 1", ["page.shop"] = "Shop",
-            ["page.operations"] = "Operations room", ["page.lab"] = "Research lab", ["page.archives"] = "Archives",
+            ["page.operations"] = "Operations room", ["page.lab"] = "Crafting workshop", ["page.archives"] = "Archives",
             ["page.settings"] = "Settings", ["page.member_sheet"] = "Member sheet",
 
             // --- Boutique éphémère ---

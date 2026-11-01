@@ -73,7 +73,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["hub.quit.title"] = "Quitter le jeu ?", ["hub.quit.body"] = "Ta progression est sauvegardée.", ["hub.quit.ok"] = "Quitter",
             ["page.qg"] = "QG · Section New York", ["page.team"] = "Équipe · {0} membres", ["page.team_one"] = "Équipe · 1 membre", ["page.recruit"] = "Recrutement",
             ["page.pass"] = "Pass · Saison 1", ["page.shop"] = "Boutique",
-            ["page.operations"] = "Salle des opérations", ["page.lab"] = "Labo de recherche", ["page.archives"] = "Archives",
+            ["page.operations"] = "Salle des opérations", ["page.lab"] = "Atelier de fabrication", ["page.archives"] = "Archives",
             ["page.settings"] = "Paramètres", ["page.member_sheet"] = "Fiche de membre",
             // --- QG (M10) ---
             ["qg.rooms"] = "LES PIÈCES DU QG", ["qg.daily"] = "MISSIONS DU JOUR", ["qg.daily.body"] = "Trois missions par jour pour faire avancer le pass.",
