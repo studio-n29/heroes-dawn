@@ -33,6 +33,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (d.Art != null) { var fit = art.GetComponent<UnityEngine.UI.AspectRatioFitter>(); if (fit != null) fit.aspectRatio = d.Art.rect.width / d.Art.rect.height; }
             info.text = d.Info;
             state.text = d.State;
+            button.Interactable = !d.Locked;
             bool soon = d.WipId != null;
             if (wip.gameObject.activeSelf != soon) wip.gameObject.SetActive(soon);
             if (soon) wip.FeatureId = d.WipId!;

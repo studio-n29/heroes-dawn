@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Meta;
+using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Features.World;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
@@ -31,15 +32,18 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISubscriber<MetaChanged> _metaChanged;
         readonly QuestLogFlow? _quests;
         readonly IModalService? _modals;
+        readonly PlayerSettings? _settings;
+        readonly TutorialGuide? _tutorial;
         IDisposable? _subs;
         int _lastStamp = -1;
 
         public QgPagePresenter(IQgPageView view, ISessionReadModel session, HubNavigator nav, MissionLauncher mission, IClock clock,
                                ILocalization loc, MetaOverview meta, ISubscriber<RosterChanged> roster, ISubscriber<MetaChanged> metaChanged,
-                               QuestLogFlow? quests = null, IModalService? modals = null)
+                               QuestLogFlow? quests = null, IModalService? modals = null, PlayerSettings? settings = null, TutorialGuide? tutorial = null)
             : base(view, null)
         {
             _session = session; _nav = nav; _mission = mission; _clock = clock; _loc = loc; _meta = meta; _roster = roster; _metaChanged = metaChanged; _quests = quests; _modals = modals;
+            _settings = settings; _tutorial = tutorial;
         }
 
         public string Title => _loc.T("page.qg");
@@ -188,9 +192,30 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Renseigne l'état de chaque pièce : « NOUVEAU » si elle a une pastille (quelque chose à faire), sinon « ACCESSIBLE ».</summary>
         RoomCardData[] Stated(RoomCardData[] rooms)
         {
+            bool tutorialDone = _tutorial == null || !_tutorial.Active;
+            bool unlockAll = _settings != null && _settings.Current.unlockAll;
             for (int i = 0; i < rooms.Length; i++)
-                rooms[i].State = _loc.T(rooms[i].Badge > 0 ? "qg.state.new" : "qg.state.open");
+            {
+                var room = rooms[i];
+                string? reason = QgRoomLocks.Reason(room.Page, _session, tutorialDone, unlockAll);
+                if (reason != null)
+                {
+                    room.Locked = true;
+                    room.State = _loc.T("qg.state.locked");
+                    room.Info = LockText(reason);
+                }
+                else room.State = _loc.T(room.Badge > 0 ? "qg.state.new" : "qg.state.open");
+                rooms[i] = room;
+            }
             return rooms;
+        }
+
+        /// <summary>Condition affichée sur une pièce verrouillée : le tutoriel, ou le chapitre à valider.</summary>
+        string LockText(string reason)
+        {
+            if (reason == "tutorial") return _loc.T("qg.lock.tutorial");
+            var zone = _session.Content.Zones.FirstOrDefault(z => z.Id.Value == reason);
+            return _loc.F("qg.lock.zone", zone != null ? zone.Code : reason);
         }
 
         string OperationsInfo()

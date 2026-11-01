@@ -68,6 +68,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["inventory.sort.count"] = "Quantité";
             d["qg.main.line"] = "{0} · {1} / {2} zones validées";
             d["grimoire.search"] = "Rechercher une carte";
+            d["qg.state.locked"] = "VERROUILLÉ";
+            d["qg.lock.tutorial"] = "Termine le tutoriel";
+            d["qg.lock.zone"] = "Termine le chapitre {0}";
+            d["settings.unlock_all"] = "Tout débloquer (test)";
+            d["settings.unlock_all.hint"] = "Ouvre toutes les pièces du QG, sans tutoriel ni chapitre.";
             d["qg.state.new"] = "NOUVEAU";
             d["qg.state.open"] = "ACCESSIBLE";
             d["qg.ops.running"] = "{0} expédition(s) en cours";

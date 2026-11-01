@@ -55,6 +55,8 @@ namespace N29.HeroesDawn.Application.Ports
     {
         public int master = 100, music = 80, sfx = 100, voice = 100;
         public bool muteInBackground = true;
+        /// <summary>Test : débloque toutes les pièces du QG, sans condition de tutoriel ni de chapitre.</summary>
+        public bool unlockAll;
         /// <summary>0 = auto, 1 = bas, 2 = moyen, 3 = haut.</summary>
         public int quality;
         public bool fps60 = true;

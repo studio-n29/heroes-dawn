@@ -255,6 +255,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         void BuildSupport()
         {
             var a = _session.Account;
+            // Test : déverrouille toutes les pièces du QG (à retirer avant la sortie).
+            Toggle("settings.unlock_all", () => _settings.Current.unlockAll, v => _settings.Current.unlockAll = v, "settings.unlock_all.hint");
             Add(new SettingRowData { Label = _loc.T("settings.tutorial"), Kind = SettingKind.Button, Value = _loc.T("settings.tutorial.btn"), Hint = _loc.T("settings.tutorial.hint") }, _ => ReplayTutorial());
             Add(SettingRowData.Info(_loc.T("settings.player_id"), a != null ? a.PlayerId : "—"));
             Add(new SettingRowData { Label = _loc.T("settings.copy_id"), Kind = SettingKind.Button, Value = _loc.T("settings.copy_id.btn") }, _ =>

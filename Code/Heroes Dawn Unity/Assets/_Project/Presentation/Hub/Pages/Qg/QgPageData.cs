@@ -12,6 +12,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string Info;
         /// <summary>État affiché : « NOUVEAU » s'il y a quelque chose à faire, sinon « ACCESSIBLE ».</summary>
         public string State;
+        /// <summary>Pièce verrouillée (tutoriel ou chapitre pas encore atteint) : non touchable, l'objectif devient la condition.</summary>
+        public bool Locked;
         public string? WipId;
         /// <summary>Pastille de notification (0 : aucune).</summary>
         public int Badge;

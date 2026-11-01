@@ -47,6 +47,10 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que le QG montre cinq pièces illustrées (labo, opérations, grimoire, inventaire, registre) et pas les Archives, déplacées dans Profil — parce que le QG est simplifié")]
         public void Rooms_AreFiveAndNoArchives()
         {
+            // Labo et Opérations s'ouvrent après les chapitres 1.2 et 1.3 : on les valide pour voir leur objectif.
+            _app.Session.CompletedZones.Add("zone_ny_1_1");
+            _app.Session.CompletedZones.Add("zone_ny_1_2");
+            _app.Session.CompletedZones.Add("zone_ny_1_3");
             Make();
             Assert.That(_view.Last.Rooms.Select(r => r.Page).ToArray(),
                         Is.EqualTo(new[] { HubPage.Lab, HubPage.Operations, HubPage.Grimoire, HubPage.Inventory, HubPage.Agents }));
@@ -68,8 +72,10 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             Make();
             var loc = new LocLocalization();
-            foreach (var r in _view.Last.Rooms)
+            foreach (var r in _view.Last.Rooms.Where(r => !r.Locked))
                 Assert.That(r.State, Is.EqualTo(loc.T(r.Badge > 0 ? "qg.state.new" : "qg.state.open")), r.Page.ToString());
+            foreach (var r in _view.Last.Rooms.Where(r => r.Locked))
+                Assert.That(r.State, Is.EqualTo(loc.T("qg.state.locked")), r.Page.ToString());
         }
 
         [Test, Description("Vérifie que le QG ne montre plus les missions du jour (réservées au Pass) mais les activités du jour, et l'objectif secondaire en icône — parce que la quête principale et les quêtes secondaires sont séparées")]
