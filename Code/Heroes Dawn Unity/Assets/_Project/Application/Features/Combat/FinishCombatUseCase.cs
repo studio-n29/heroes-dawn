@@ -88,6 +88,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
                 toHq = true;
             }
 
+            Meta.Stats.RecordCombat(s.Meta, sim);
             var report = new CombatReport(victory, credits, pending.Rank, boss, changes, boardEvents, toHq, drop, crafting);
             _fx.Log.Info($"Combat terminé : {(victory ? "victoire" : "défaite")} en {sim.Tick} ticks, +{credits} Crédits" + (drop.HasValue ? ", objet " + drop.Value.Value : ""));
             _fx.Wallet.PublishWallet(s);

@@ -14,10 +14,10 @@ namespace N29.HeroesDawn.Tests.Presentation
     /// <summary>Page Profil : tag, statistiques, amis, accès au registre et aux archives (lot F de la 0.14.0).</summary>
     public sealed class ProfilePagePresenterTests
     {
-        // Deux rangées de navigation, huit statistiques, le titre de la section Amis, puis les amis.
-        // Lignes : registre, archives, dernier succès, huit statistiques, titre des amis.
-        const int NavRows = 3, StatRows = 8, FirstFriendRow = NavRows + StatRows + 1;
-        static readonly string[] StatKeys = { "combatsWon", "combatsLost", "zones", "agents", "topLevel", "bestLink", "crafted", "credits" };
+        // Lignes : registre, archives, dernier succès, dix statistiques, deux rubriques de favoris (titre et ligne vide chacune
+        // tant qu'il n'y a pas de combat), titre des amis, puis les amis.
+        const int NavRows = 3, StatRows = 10, FavRows = 4, FirstFriendRow = NavRows + StatRows + FavRows + 1;
+        static readonly string[] StatKeys = { "combatsWon", "combatsLost", "zones", "agents", "topLevel", "bestLink", "crafted", "credits", "tiles", "enemies" };
 
         TestApp _app = null!;
         FakeListView _view = null!;
@@ -46,7 +46,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             return p;
         }
 
-        [Test, Description("Vérifie que l'en-tête montre le tag du joueur et que les huit statistiques portent leur valeur — parce que le Profil résume la progression")]
+        [Test, Description("Vérifie que l'en-tête montre le tag du joueur et que les dix statistiques portent leur valeur — parce que le Profil résume la progression")]
         public void Header_ShowsTheTagAndStats()
         {
             Stats.Add(_app.Session.Meta, Stats.CreditsEarned, 4200);

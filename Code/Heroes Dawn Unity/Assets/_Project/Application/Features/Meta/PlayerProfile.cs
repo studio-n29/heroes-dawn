@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.Linq;
 using N29.HeroesDawn.Application.Features.Combat;
 
@@ -7,12 +8,18 @@ namespace N29.HeroesDawn.Application.Features.Meta
     /// <summary>Statistiques de jeu affichées sur la page Profil.</summary>
     public readonly struct ProfileStats
     {
-        public readonly int CombatsWon, CombatsLost, ZonesCleared, Agents, TopAgentLevel, BestLinkWins, CraftedItems, CreditsEarned;
+        public readonly int CombatsWon, CombatsLost, ZonesCleared, Agents, TopAgentLevel, BestLinkWins, CraftedItems, CreditsEarned, Tiles, Enemies;
+        /// <summary>Agents les plus utilisés en combat (identifiants, du plus au moins utilisé).</summary>
+        public readonly IReadOnlyList<string> FavoriteAgents;
+        /// <summary>Cartes de compétence les plus utilisées en combat (identifiants, du plus au moins utilisé).</summary>
+        public readonly IReadOnlyList<string> FavoriteSkills;
 
-        public ProfileStats(int combatsWon, int combatsLost, int zonesCleared, int agents, int topAgentLevel, int bestLinkWins, int craftedItems, int creditsEarned)
+        public ProfileStats(int combatsWon, int combatsLost, int zonesCleared, int agents, int topAgentLevel, int bestLinkWins, int craftedItems, int creditsEarned,
+                            int tiles, int enemies, IReadOnlyList<string> favoriteAgents, IReadOnlyList<string> favoriteSkills)
         {
             CombatsWon = combatsWon; CombatsLost = combatsLost; ZonesCleared = zonesCleared; Agents = agents;
             TopAgentLevel = topAgentLevel; BestLinkWins = bestLinkWins; CraftedItems = craftedItems; CreditsEarned = creditsEarned;
+            Tiles = tiles; Enemies = enemies; FavoriteAgents = favoriteAgents; FavoriteSkills = favoriteSkills;
         }
     }
 
@@ -43,7 +50,10 @@ namespace N29.HeroesDawn.Application.Features.Meta
                 Features.Meta.Stats.Get(meta, Features.Meta.Stats.CombatsWon), Features.Meta.Stats.Get(meta, Features.Meta.Stats.CombatsLost),
                 _c.Session.CompletedZones.Count, roster.Count, roster.Count == 0 ? 0 : roster.Max(m => m.Level),
                 meta.links.Count == 0 ? 0 : meta.links.Max(l => l.wins), meta.crafted.Count,
-                Features.Meta.Stats.Get(meta, Features.Meta.Stats.CreditsEarned));
+                Features.Meta.Stats.Get(meta, Features.Meta.Stats.CreditsEarned),
+                Features.Meta.Stats.Get(meta, Features.Meta.Stats.Tiles), Features.Meta.Stats.Get(meta, Features.Meta.Stats.Enemies),
+                Features.Meta.Stats.Favorites(meta, Features.Meta.Stats.AgentUsePrefix, Features.Meta.Stats.FavoriteCount),
+                Features.Meta.Stats.Favorites(meta, Features.Meta.Stats.SkillUsePrefix, Features.Meta.Stats.FavoriteCount));
         }
     }
 }

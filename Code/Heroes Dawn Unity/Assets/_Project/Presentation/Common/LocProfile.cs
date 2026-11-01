@@ -33,6 +33,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["profile.stat.bestLink"] = "Meilleur lien (victoires ensemble)";
             d["profile.stat.crafted"] = "Objets fabriqués";
             d["profile.stat.credits"] = "Crédits gagnés";
+            d["profile.stat.tiles"] = "Cases traversées";
+            d["profile.stat.enemies"] = "Ennemis battus";
+            d["profile.fav_agents"] = "AGENTS FAVORIS";
+            d["profile.fav_skills"] = "CARTES FAVORITES";
+            d["profile.fav_none"] = "Pas encore de combat";
             d["profile.friends"] = "AMIS";
             d["profile.friends_empty"] = "Aucun ami pour l'instant";
             d["profile.friends_empty_sub"] = "Ajoute un ami avec son tag (Nom#1234). Les amis en ligne arrivent avec le compte.";

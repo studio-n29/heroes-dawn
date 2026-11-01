@@ -83,8 +83,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             Add(lastRow, () => { _achievementsOpen = true; Refresh(); });
 
             var s = _profile.Stats();
-            var values = new[] { s.CombatsWon, s.CombatsLost, s.ZonesCleared, s.Agents, s.TopAgentLevel, s.BestLinkWins, s.CraftedItems, s.CreditsEarned };
-            var keys = new[] { "combatsWon", "combatsLost", "zones", "agents", "topLevel", "bestLink", "crafted", "credits" };
+            var values = new[] { s.CombatsWon, s.CombatsLost, s.ZonesCleared, s.Agents, s.TopAgentLevel, s.BestLinkWins, s.CraftedItems, s.CreditsEarned, s.Tiles, s.Enemies };
+            var keys = new[] { "combatsWon", "combatsLost", "zones", "agents", "topLevel", "bestLink", "crafted", "credits", "tiles", "enemies" };
             for (int i = 0; i < keys.Length; i++)
             {
                 var r = InfoRowData.Basic(Loc.T("profile.stat." + keys[i]));
@@ -92,6 +92,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.TagColor = Theme.Info;
                 Add(r, null);
             }
+
+            AddFavorites(Add, "profile.fav_agents", s.FavoriteAgents, MemberName);
+            AddFavorites(Add, "profile.fav_skills", s.FavoriteSkills, SkillName);
 
             var section = InfoRowData.Basic(Loc.T("profile.friends"));
             section.Dim = true;
@@ -114,6 +117,41 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Add(r, () => { _friends.Remove(friend.Tag); Toasts.Show(Loc.T("profile.friend_removed"), ToastKind.Reward); });
             }
             View.ShowRows(rows.ToArray());
+        }
+
+        /// <summary>Une rubrique de favoris : son titre, puis les trois plus utilisés en combat (ou une ligne estompée s'il n'y en a pas encore).</summary>
+        void AddFavorites(Action<InfoRowData, Action?, Action?> add, string titleKey, IReadOnlyList<string> ids, Func<string, string> name)
+        {
+            var title = InfoRowData.Basic(Loc.T(titleKey));
+            title.Dim = true;
+            add(title, null, null);
+            if (ids.Count == 0)
+            {
+                var none = InfoRowData.Basic(Loc.T("profile.fav_none"));
+                none.Dim = true;
+                add(none, null, null);
+                return;
+            }
+            for (int i = 0; i < ids.Count; i++)
+            {
+                var r = InfoRowData.Basic(name(ids[i]));
+                r.Tag = (i + 1).ToString();
+                r.TagColor = Theme.Info;
+                add(r, null, null);
+            }
+        }
+
+        string MemberName(string id)
+        {
+            foreach (var m in _session.Content.Members) if (m.Id.Value == id) return Loc.MemberName(m);
+            return id;
+        }
+
+        string SkillName(string id)
+        {
+            foreach (var m in _session.Content.Members)
+                foreach (var s in m.Skills) if (s.Id.Value == id) return Loc.SkillName(s);
+            return id;
         }
 
         /// <summary>Bandeau « Compte » : invité (Lier mon compte) ou connecté (e-mail, fournisseur, dernière synchronisation, Synchroniser, Se déconnecter).</summary>
