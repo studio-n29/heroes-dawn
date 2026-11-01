@@ -62,6 +62,8 @@ namespace N29.HeroesDawn.Presentation.Common
             ["shop.reroll.confirm.body"] = "3 nouveaux héros pour {0} Crédits.",
             ["shop.recruited"] = "RECRUTÉ",
             ["shop.empty"] = "Collection de New York complète !",
+            ["shop.cat.gems"] = "GEMMES", ["shop.cat.gems_sub"] = "Paquets de gemmes à l'achat",
+            ["shop.cat.exchange"] = "ÉCHANGES", ["shop.cat.exchange_sub"] = "Transformer des gemmes en crédits ou en PR",
             ["shop.scrap_lot"] = "{0} × {1}", ["shop.scrap_sold"] = "ACHETÉ",
             ["shop.scrap.confirm.title"] = "Acheter ce lot ?", ["shop.scrap.confirm.body"] = "{0} Crédits seront débités.",
             // --- Coque du hub ---

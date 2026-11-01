@@ -120,8 +120,19 @@ namespace N29.HeroesDawn.Presentation.Hub
             });
         }
 
+        /// <summary>Titre de catégorie (sans bouton) : sépare les paquets achetés des échanges de gemmes.</summary>
+        void AddSection(List<InfoRowData> rows, string title, string subtitle, string art)
+        {
+            var r = InfoRowData.Basic(title, subtitle);
+            r.Tag = "§"; r.TagColor = Theme.Primary;
+            r.Art = AgentArt.Shop(art);
+            r.Highlight = true;
+            Add(rows, r, null);
+        }
+
         void AddGems(List<InfoRowData> rows)
         {
+            AddSection(rows, Loc.T("shop.cat.gems"), Loc.T("shop.cat.gems_sub"), "gems_medium");
             foreach (var p in Boutique.Packs)
             {
                 var pack = p;
@@ -131,6 +142,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.A = RowButtonData.Of(p.PriceText, !_buying, "", 0);
                 Add(rows, r, () => BuyAsync(pack).Forget());
             }
+            AddSection(rows, Loc.T("shop.cat.exchange"), Loc.T("shop.cat.exchange_sub"), "exchange_credits");
             foreach (var e in Boutique.Exchanges)
             {
                 var ex = e;

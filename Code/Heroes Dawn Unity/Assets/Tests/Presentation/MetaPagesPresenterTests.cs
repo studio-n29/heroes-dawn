@@ -157,7 +157,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.ShopTabShown, Is.EqualTo((int)ShopTab.Boosters), "les héros ont leur page : on retombe sur les boosters");
             Assert.That(_view.Rows.Length, Is.EqualTo(2), "stock + achat");
             _view.ClickShopTab((int)ShopTab.Gems);
-            Assert.That(_view.Rows.Length, Is.EqualTo(Boutique.Packs.Count + Boutique.Exchanges.Count));
+            Assert.That(_view.Rows.Length, Is.EqualTo(Boutique.Packs.Count + Boutique.Exchanges.Count + 2), "deux titres de catégorie : gemmes et échanges");
             _view.ClickShopTab((int)ShopTab.Heroes);
             Assert.That(nav.Current.Page, Is.EqualTo(HubPage.Recruit));
             p.Dispose();
