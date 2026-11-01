@@ -99,11 +99,23 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var rt = ScreenKit.Root("QgPage");
             RecipeKit.Mark(rt, TutorialTarget.QgPage);
 
-            // ---- Pièces
+            // ---- Quête principale : bandeau compact en haut (touché, il lance la mission comme le bouton MISSION)
+            var banner = Ui.Panel(rt, "MainBanner", Theme.Surface, 5f, 10f, true);
+            banner.Frame().At(0.5f, 1f, 0, 0, LeftW + RightW + 25, 96);
+            var bannerTitle = Ui.Txt(banner.transform, "", 28, Theme.Primary, TextAnchor.UpperLeft, FontKind.Title, "BannerTitle");
+            bannerTitle.rectTransform.At(0f, 1f, 24, -12, 1000, 36);
+            bannerTitle.Inked();
+            var bannerLine = Ui.Txt(banner.transform, "", 26, Theme.Text, TextAnchor.LowerLeft, FontKind.Body, "BannerLine");
+            bannerLine.rectTransform.At(0f, 0f, 24, 10, 1200, 34);
+            var bannerButton = banner.Frame().gameObject.AddComponent<Button>();
+            bannerButton.targetGraphic = banner;
+            bannerButton.transition = Selectable.Transition.None;
+
+            // ---- Pièces (sous le bandeau)
             var roomsTitle = Ui.LocTxt(rt, "qg.rooms", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "RoomsTitle");
-            roomsTitle.rectTransform.At(0f, 1f, 0, 0, LeftW, 46);
+            roomsTitle.rectTransform.At(0f, 1f, 0, -112, LeftW, 46);
             roomsTitle.Inked();
-            var grid = Ui.Rect(rt, "Rooms").At(0f, 1f, 0, -52, LeftW, 356);
+            var grid = Ui.Rect(rt, "Rooms").At(0f, 1f, 0, -164, LeftW, 356);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
             layout.cellSize = new Vector2(350, 168);
             layout.spacing = new Vector2(25, 20);
@@ -133,7 +145,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             // ---- Missions du jour (à venir)
             var daily = Ui.Panel(rt, "Daily", Theme.Surface, 5f, 10f, true);
-            daily.Frame().At(1f, 1f, 0, 0, RightW, 300);
+            daily.Frame().At(1f, 1f, 0, -112, RightW, 300);
             Ui.LocTxt(daily.transform, "qg.daily", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title").rectTransform.At(0f, 1f, 22, -14, 540, 46);
             var dailyBody = Ui.Txt(daily.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Body");
             dailyBody.rectTransform.Stretch(22, 12, 22, 62);
@@ -149,7 +161,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             dailyBadge.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
 
             // ---- Alertes : deux icônes (boutique, objectif secondaire) ; le détail s'ouvre dans un pop-up
-            var alertRow = Ui.Rect(rt, "Alerts").At(1f, 1f, 0, -316, RightW, 108);
+            var alertRow = Ui.Rect(rt, "Alerts").At(1f, 1f, 0, -428, RightW, 108);
             alertRow.HLayout(20, 0, TextAnchor.MiddleRight);
             var shopIcon = AlertIcon(alertRow, "ShopAlert", "B", Theme.Pr, out var shopBadgeText);
             var secondaryIcon = AlertIcon(alertRow, "SecondaryAlert", "!", Theme.Fatigue, out var secondaryDotText);
@@ -186,6 +198,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "mission", mission);
             ctx.Wire(view, "missionSub", sub);
             ctx.Wire(view, "missionHint", hint);
+            ctx.Wire(view, "banner", bannerButton);
+            ctx.Wire(view, "bannerTitle", bannerTitle);
+            ctx.Wire(view, "bannerLine", bannerLine);
             return rt.gameObject;
         }
     }

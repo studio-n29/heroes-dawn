@@ -34,6 +34,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string FilText;
         /// <summary>Quêtes secondaires à réclamer (vide : aucune).</summary>
         public string QuestsBadge;
+        /// <summary>Titre du bandeau de quête principale (ex. « QUÊTES PRINCIPALES · BROOKLYN »).</summary>
+        public string MainTitle;
         public string MissionTitle;
         public string MissionSub;
         public bool MissionEnabled;

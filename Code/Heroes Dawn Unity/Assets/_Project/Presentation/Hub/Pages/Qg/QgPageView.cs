@@ -28,6 +28,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UiButton mission = null!;
         [SerializeField] TMP_Text missionSub = null!;
         [SerializeField] TMP_Text missionHint = null!;
+        /// <summary>Bandeau compact de la quête principale (en haut) : touché, il lance la mission comme le bouton MISSION.</summary>
+        [SerializeField] Button banner = null!;
+        [SerializeField] TMP_Text bannerTitle = null!;
+        [SerializeField] TMP_Text bannerLine = null!;
 
         readonly HubPage[] _pages = new HubPage[8];
         bool _cascaded;
@@ -60,6 +64,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 rooms[i].Clicked += () => RoomClicked?.Invoke(_pages[index]);
             }
             mission.Button.onClick.AddListener(() => MissionClicked?.Invoke());
+            banner.onClick.AddListener(() => MissionClicked?.Invoke());
             dailyCard.onClick.AddListener(() => DailyClicked?.Invoke());
             secondaryCard.onClick.AddListener(() => SecondaryClicked?.Invoke());
             shopAlertButton.onClick.AddListener(() => ShopAlertClicked?.Invoke());
@@ -92,6 +97,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             mission.DisabledReason = d.MissionHint;
             missionSub.text = d.MissionSub;
             missionHint.text = d.MissionHint;
+            bannerTitle.text = d.MainTitle;
+            bannerLine.text = d.MissionSub;
+            banner.interactable = d.MissionEnabled;
             _cascaded = true;
         }
     }

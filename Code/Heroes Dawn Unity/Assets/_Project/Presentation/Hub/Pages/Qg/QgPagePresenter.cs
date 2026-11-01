@@ -148,6 +148,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 FilSpeaker = _loc.T("qg.fil.speaker"),
                 FilText = done ? _loc.T("qg.fil.done") : _loc.Or("qg.fil." + zone.Id.Value, "qg.fil.done"),
                 QuestsBadge = _meta.QuestsBadge > 0 ? _meta.QuestsBadge.ToString() : "",
+                MainTitle = _loc.T("quests.main"),
                 MissionTitle = _loc.T("qg.mission"),
                 MissionSub = MainQuestLine(_loc.T(zone.NameKey)),
                 MissionEnabled = !s.SquadExhausted,
