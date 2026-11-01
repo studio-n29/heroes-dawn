@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -15,7 +16,11 @@ using N29.HeroesDawn.Presentation.Mvp;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    public interface IGrimoirePageView : IListPageView, IFilterBarView { }
+    public interface IGrimoirePageView : IListPageView, IFilterBarView
+    {
+        /// <summary>Texte de recherche tapé (filtre les cartes par nom).</summary>
+        event Action<string> SearchChanged;
+    }
 
     /// <summary>
     /// Grimoire : toutes les cartes du jeu (possédées ou pas), les boosters en réserve (ouvrir) et l'achat de boosters en PR.
@@ -30,6 +35,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         string? _focus;
         /// <summary>Filtres choisis : 0 = toutes, sinon 1 + la famille / la nature. Gardés d'un rafraîchissement à l'autre.</summary>
         int _family, _nature;
+        /// <summary>Recherche par nom (vide : toutes les cartes). Gardée d'un rafraîchissement à l'autre.</summary>
+        string _query = "";
 
         public GrimoirePagePresenter(IGrimoirePageView view, CollectionBook book, GameSession session, IModalService modals, ILocalization loc,
                                      IToastService toasts, ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet,
@@ -48,11 +55,13 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             base.OnStart();
             View.FilterClicked += OnFilter;
+            View.SearchChanged += OnSearch;
         }
 
         protected override void OnDispose()
         {
             View.FilterClicked -= OnFilter;
+            View.SearchChanged -= OnSearch;
             base.OnDispose();
         }
 
@@ -62,7 +71,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             Refresh();
         }
 
-        bool Shown(SkillCardDef c) => (_family == 0 || (int)c.Family == _family - 1) && (_nature == 0 || (int)c.Nature == _nature - 1);
+        void OnSearch(string query)
+        {
+            _query = query ?? "";
+            Refresh();
+        }
+
+        bool Shown(SkillCardDef c) => (_family == 0 || (int)c.Family == _family - 1) && (_nature == 0 || (int)c.Nature == _nature - 1)
+                                      && (_query.Length == 0 || CollectionText.CardName(Loc, c).IndexOf(_query, System.StringComparison.OrdinalIgnoreCase) >= 0);
 
         void ShowFilters()
         {

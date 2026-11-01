@@ -67,6 +67,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["inventory.sort.name"] = "Nom";
             d["inventory.sort.count"] = "Quantité";
             d["qg.main.line"] = "{0} · {1} / {2} zones validées";
+            d["grimoire.search"] = "Rechercher une carte";
             d["qg.state.new"] = "NOUVEAU";
             d["qg.state.open"] = "ACCESSIBLE";
             d["qg.ops.running"] = "{0} expédition(s) en cours";

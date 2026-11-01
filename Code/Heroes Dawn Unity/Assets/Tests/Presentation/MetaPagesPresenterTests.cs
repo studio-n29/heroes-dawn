@@ -21,6 +21,8 @@ namespace N29.HeroesDawn.Tests.Presentation
     /// <summary>Vue de liste factice : un seul double pour Pass, Boutique, Opérations, Labo et Archives.</summary>
     public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView, IProfilePageView, IChaptersPageView, IFilterBarView
     {
+        public event Action<string>? SearchChanged;
+        public void Search(string query) => SearchChanged?.Invoke(query);
         public event Action<int>? HeaderClicked;
         public event Action<int, int>? RowButtonClicked;
         public event Action<int>? RowSelected;

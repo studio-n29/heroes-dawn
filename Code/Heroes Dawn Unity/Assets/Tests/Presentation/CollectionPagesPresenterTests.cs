@@ -153,6 +153,20 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
+        [Test, Description("Vérifie que la recherche du grimoire ne garde que les cartes dont le nom contient le texte, sans tenir compte de la casse, et que la vider rend toutes les cartes — parce que retrouver une carte parmi toutes demande une recherche (L3 : grimoire)")]
+        public void Grimoire_SearchFiltersByName_IgnoresCase()
+        {
+            var p = Grimoire();
+            int all = _view.Rows.Length;
+            _view.Search("BRAISE");
+            Assert.That(_view.Rows.Length, Is.GreaterThan(0));
+            Assert.That(_view.Rows.Length, Is.LessThan(all));
+            Assert.That(Titles().All(t => t.IndexOf("braise", System.StringComparison.OrdinalIgnoreCase) >= 0), Is.True);
+            _view.Search("");
+            Assert.That(_view.Rows.Length, Is.EqualTo(all));
+            p.Dispose();
+        }
+
         // ------------------------------------------------------------------ Catégories (lot B 0.14.0)
 
         [Test, Description("Vérifie que chaque carte du grimoire affiche sa nature (Mur de verre : défensive) — parce que la nature aide à construire un deck équilibré")]
