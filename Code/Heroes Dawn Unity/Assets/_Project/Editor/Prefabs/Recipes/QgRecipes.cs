@@ -115,13 +115,13 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var roomsTitle = Ui.LocTxt(rt, "qg.rooms", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "RoomsTitle");
             roomsTitle.rectTransform.At(0f, 1f, 0, -112, LeftW, 46);
             roomsTitle.Inked();
-            // Zone utile sous le bandeau : 730 px environ. Pièces (2 rangées de 140) + fil (250) tiennent sans chevauchement.
-            var grid = Ui.Rect(rt, "Rooms").At(0f, 1f, 0, -164, LeftW, 296);
+            // Pièces en cartes verticales, rangées à l'horizontale : cinq colonnes de 207 sur 1100, hauteur 400 sous le titre.
+            var grid = Ui.Rect(rt, "Rooms").At(0f, 1f, 0, -164, LeftW, 400);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(350, 140);
-            layout.spacing = new Vector2(25, 16);
+            layout.cellSize = new Vector2(207, 400);
+            layout.spacing = new Vector2(16, 0);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            layout.constraintCount = 3;
+            layout.constraintCount = 5;
             var rooms = new List<Object>();
             for (int i = 0; i < 5; i++) rooms.Add(ctx.Nest<RoomCardView>("Widgets/RoomCard.prefab", grid, "Room" + i)); // cinq pièces : le doublon Équipe est retiré (L3)
 
