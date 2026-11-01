@@ -123,6 +123,15 @@ namespace N29.HeroesDawn.Presentation.Common
             ["settings.lang.voice"] = "Voice language",
             ["settings.lang.en"] = "English",
             ["settings.lang.more"] = "English, Spanish, Portuguese, German",
+
+            // --- Dialogues et entrée en combat (L7) ---
+            ["narration.skip"] = "SKIP",
+            ["narration.next"] = "▼ Tap to continue",
+            ["narration.next_btn"] = "NEXT",
+            ["narration.auto"] = "AUTO",
+            ["combat.intro.skip"] = "SKIP",
+            ["combat.intro.allies"] = "YOUR SQUAD",
+            ["combat.intro.enemies"] = "ENEMIES",
         };
 
         /// <summary>Clés traduites en anglais (contrôlées par les tests de langue).</summary>

@@ -16,6 +16,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
         /// <summary>Charge Boot avec les doubles injectés dans le scope racine, puis attend l'écran de connexion.</summary>
         public static IEnumerator Boot(MemoryProfileGateway profiles, InstantAuthGateway auth, bool withIntro = false, bool skipLaunch = true)
         {
+            // Les bandeaux d'entrée en combat ont leur propre test ; ailleurs, le combat démarre sans les attendre.
+            N29.HeroesDawn.Application.Features.Meta.CombatIntros.DefaultEnabled = false;
             using (LifetimeScope.Enqueue(b =>
                    {
                        b.RegisterInstance<IProfileGateway>(profiles);
