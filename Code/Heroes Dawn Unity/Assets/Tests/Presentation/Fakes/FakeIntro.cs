@@ -11,10 +11,10 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
     public sealed class FakeIntroPopup : FakePopup, IIntroPopupView
     {
         UniTaskCompletionSource? _cinematic;
-        UniTaskCompletionSource<string>? _campaign;
+        UniTaskCompletionSource<CharacterChoice>? _character;
 
         public System.Action<float>? MainTheme { get; private set; }
-        public ChooseCampaignData? Campaigns { get; private set; }
+        public ChooseCharacterData? Character { get; private set; }
 
         public UniTask PlayCinematicAsync(IntroCinematicTexts texts, System.Action<float>? mainTheme, CancellationToken ct)
         {
@@ -23,15 +23,15 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
             return _cinematic.Task;
         }
 
-        public UniTask<string> ChooseCampaignAsync(ChooseCampaignData data, CancellationToken ct)
+        public UniTask<CharacterChoice> ChooseCharacterAsync(ChooseCharacterData data, CancellationToken ct)
         {
-            Campaigns = data;
-            _campaign = new UniTaskCompletionSource<string>();
-            return _campaign.Task;
+            Character = data;
+            _character = new UniTaskCompletionSource<CharacterChoice>();
+            return _character.Task;
         }
 
         public void FinishCinematic() => _cinematic?.TrySetResult();
 
-        public void Choose(string id) => _campaign?.TrySetResult(id);
+        public void Choose(string name, string avatar) => _character?.TrySetResult(new CharacterChoice(name, avatar));
     }
 }
