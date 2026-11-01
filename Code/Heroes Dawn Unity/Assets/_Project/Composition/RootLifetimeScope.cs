@@ -162,6 +162,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<PlayerSettings>(Lifetime.Singleton);
             builder.Register<MetaOverview>(Lifetime.Singleton);
             builder.Register<TutorialGuide>(Lifetime.Singleton);
+            builder.Register<CombatIntros>(Lifetime.Singleton);
             builder.Register<OnboardingGuide>(Lifetime.Singleton);
             builder.Register<OnboardingFlow>(Lifetime.Singleton).As<IOnboardingFlow>();
             builder.Register<MetaTracker>(Lifetime.Singleton);

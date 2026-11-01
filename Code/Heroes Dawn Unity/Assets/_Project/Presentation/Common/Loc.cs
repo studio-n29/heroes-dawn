@@ -172,6 +172,8 @@ namespace N29.HeroesDawn.Presentation.Common
             ["combat.debug_win"] = "DEBUG : GAGNER",
             ["combat.miss"] = "RATÉ", ["combat.crit"] = "CRITIQUE !", ["combat.skip"] = "SONNÉ",
             ["combat.rank"] = "Combat {0}",
+            ["combat.intro.skip"] = "PASSER", ["combat.intro.allies"] = "TON ÉQUIPE", ["combat.intro.enemies"] = "ENNEMIS",
+            ["combat.intro.boss_sub"] = "BOSS · {0}",
             ["combat.cost"] = "coût {0}",
 
             // --- Cases ---

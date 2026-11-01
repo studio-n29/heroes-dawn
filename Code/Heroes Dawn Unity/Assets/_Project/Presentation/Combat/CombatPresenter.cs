@@ -7,6 +7,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Combat;
+using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
@@ -42,6 +43,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         readonly IFrameClock _clock;
         readonly IAudioService _audio;
         readonly TutorialGuide? _tutorial;
+        readonly CombatIntros? _intros;
 
         CombatSimulation? _sim;
         readonly Dictionary<int, string> _names = new Dictionary<int, string>();
@@ -71,9 +73,10 @@ namespace N29.HeroesDawn.Presentation.Combat
                                IFinishCombatUseCase finish, IVerifyCombatUseCase verify, IForceCombatWinUseCase forceWin,
                                IPublisher<CombatResultsClosed> closed, IPublisher<NavigateRequested> navigate, IModalService modals,
                                IToastService toasts, ILocalization loc, IFrameClock clock, BackButtonRouter router,
-                               IAudioService? audio = null, TutorialGuide? tutorial = null)
+                               IAudioService? audio = null, TutorialGuide? tutorial = null, CombatIntros? intros = null)
             : base(view, router)
         {
+            _intros = intros;
             _combat = combat; _session = session; _setAuto = setAuto; _finish = finish; _verify = verify; _forceWin = forceWin;
             _closed = closed; _navigate = navigate; _modals = modals; _toasts = toasts; _loc = loc; _clock = clock;
             _audio = audio ?? NullAudioService.Instance;
@@ -138,6 +141,40 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.ShowBanner(_loc.T("combat.rank").Replace("{0}", "").Trim().ToUpperInvariant() + " !", Tone.Primary);
             LogSynergies(sim);
             _tutorial?.Hint("auto");
+            if (_intros != null && _intros.Enabled) PlayIntroAsync(sim).Forget();
+        }
+
+        /// <summary>
+        /// Entrée en combat : un bandeau par combattant (agents à gauche, ennemis à droite). La boucle de combat attend la fermeture de la fenêtre ;
+        /// une introduction déjà vue est abrégée, et un toucher ou « Passer » la ferme.
+        /// </summary>
+        async UniTaskVoid PlayIntroAsync(CombatSimulation sim)
+        {
+            var intros = _intros!;
+            string key = CombatIntros.KeyOf(sim.Units.Where(u => u.Side == Side.Enemy).Select(u => u.DefId));
+            CombatIntroFighter Fighter(CombatUnit u)
+            {
+                string name = _names.TryGetValue(u.Id, out var n) ? n : u.DefId;
+                string role = _loc.RoleName(u.Role);
+                return new CombatIntroFighter(name.ToUpperInvariant(), u.IsBoss ? _loc.F("combat.intro.boss_sub", role) : role,
+                                              new PortraitData(name, u.Family, u.IsBoss, u.Side == Side.Ally ? AgentArt.For(u.DefId) : null));
+            }
+            var data = new CombatIntroData
+            {
+                AllyTitle = _loc.T("combat.intro.allies"),
+                EnemyTitle = _loc.T("combat.intro.enemies"),
+                Allies = sim.Units.Where(u => u.Side == Side.Ally).Select(Fighter).ToList(),
+                Enemies = sim.Units.Where(u => u.Side == Side.Enemy && u.IsAlive).Select(Fighter).ToList(),
+                Repeat = intros.Seen(key),
+            };
+            try
+            {
+                var view = await _modals.OpenAsync<ICombatIntroView>(Lifetime);
+                try { await view.PlayAsync(data, Lifetime); }
+                finally { _modals.Close(view); }
+            }
+            catch (OperationCanceledException) { return; }
+            intros.MarkSeen(key);
         }
 
         /// <summary>Synergies d'équipe actives (bonus permanents) : une ligne du journal par paire, au début du combat.</summary>
