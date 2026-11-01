@@ -63,6 +63,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["shop.empty"] = "New York collection complete!",
             ["shop.cat.gems"] = "GEMS", ["shop.cat.gems_sub"] = "Gem packs for purchase",
             ["shop.cat.exchange"] = "EXCHANGES", ["shop.cat.exchange_sub"] = "Turn gems into credits or PR",
+            ["power.tier"] = "POWER {0} / 5",
             ["shop.scrap_lot"] = "{0} × {1}", ["shop.scrap_sold"] = "BOUGHT",
             ["shop.scrap.confirm.title"] = "Buy this lot?", ["shop.scrap.confirm.body"] = "{0} Credits will be spent.",
             ["scrap.Weapon"] = "Weapon scraps", ["scrap.Armor"] = "Armor scraps", ["scrap.Tool"] = "Tool scraps",
