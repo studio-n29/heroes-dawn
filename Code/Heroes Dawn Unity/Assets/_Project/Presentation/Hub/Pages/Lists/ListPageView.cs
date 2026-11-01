@@ -134,6 +134,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
         }
 
+        /// <summary>Sélection d'une rangée, comme un toucher (utilisé par les pages qui la simulent en test).</summary>
+        protected void RaiseRowSelected(int row) => RowSelected?.Invoke(row);
+
         public void ShowRows(InfoRowData[] data)
         {
             Fill(_main, rows, data, (r, b) => RowButtonClicked?.Invoke(r, b), r => RowSelected?.Invoke(r), !_cascaded);
