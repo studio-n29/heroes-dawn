@@ -105,7 +105,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             layout.constraintCount = 3;
             var rooms = new List<Object>();
-            for (int i = 0; i < 6; i++) rooms.Add(ctx.Nest<RoomCardView>("Widgets/RoomCard.prefab", grid, "Room" + i));
+            for (int i = 0; i < 5; i++) rooms.Add(ctx.Nest<RoomCardView>("Widgets/RoomCard.prefab", grid, "Room" + i)); // cinq pièces : le doublon Équipe est retiré (L3)
 
             // ---- Fil du QG
             var fil = Ui.Panel(rt, "Fil", Theme.Surface, 5f, 10f, true);

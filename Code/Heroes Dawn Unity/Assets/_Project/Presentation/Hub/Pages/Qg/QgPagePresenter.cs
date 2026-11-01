@@ -122,20 +122,16 @@ namespace N29.HeroesDawn.Presentation.Hub
             var now = _clock.LocalNow;
             var zone = ZoneProgress.Recommended(s);
             bool done = ZoneProgress.StatusOf(s, zone) == ZoneStatus.Done;
-            int toTrain = s.Roster.Count(m => m.Level < MetaRules.MaxLevel);
-            int tired = s.Roster.Count(m => m.Fatigue > 0);
             var secondary = _meta.Secondary.Active;
             _lastStamp = Stamp(now, secondary.HasValue);
             var activities = _meta.Quests.Activities();
             int claimable = activities.Count(a => a.Claimable);
-            var firstAgent = s.Roster.Count > 0 ? s.Roster[0].Def.Id.Value : s.Route.HeroId;
             var firstCard = s.Content.Collection.Cards.Count > 0 ? s.Content.Collection.Cards[0].Id.Value : "card";
             var firstItem = s.Content.Collection.Items.Count > 0 ? s.Content.Collection.Items[0].Id.Value : "item";
             View.Show(new QgPageData
             {
                 Rooms = new[]
                 {
-                    new RoomCardData { Page = HubPage.Team, Title = _loc.T("page.team_care"), Info = SalonInfo(toTrain, tired), Badge = tired > 0 ? tired : 0, Art = AgentArt.For(firstAgent) },
                     new RoomCardData { Page = HubPage.Lab, Title = _loc.T("page.lab"), Info = LabInfo(), Badge = _meta.LabBadge, Art = AgentArt.Environment(1) },
                     new RoomCardData { Page = HubPage.Operations, Title = _loc.T("page.operations"), Info = OperationsInfo(), Badge = _meta.OperationsBadge, Art = AgentArt.Environment(2) },
                     new RoomCardData { Page = HubPage.Grimoire, Title = _loc.T("page.grimoire"), Info = GrimoireInfo(), Art = AgentArt.Card(firstCard) },
@@ -165,9 +161,6 @@ namespace N29.HeroesDawn.Presentation.Hub
             string name = zone != null ? _loc.T(zone.NameKey.Replace(".name", ".short")) : a.ZoneId;
             return a.Kind == ActivityKind.WinCombats ? _loc.F("qg.activity.wins", a.Target, name) : _loc.F("qg.activity.clear", name);
         }
-
-        string SalonInfo(int toTrain, int tired)
-            => tired > 0 ? Count("qg.infirmary", tired) : Count("qg.salon", toTrain);
 
         string SecondaryLine(SecondaryView v)
         {
