@@ -14,6 +14,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UnityEngine.UI.Image art = null!;
         [SerializeField] TMP_Text title = null!;
         [SerializeField] TMP_Text info = null!;
+        [SerializeField] TMP_Text state = null!;
         [SerializeField] WipMark wip = null!;
         [SerializeField] GameObject badge = null!;
         [SerializeField] TMP_Text badgeText = null!;
@@ -31,6 +32,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             art.enabled = d.Art != null;
             if (d.Art != null) { var fit = art.GetComponent<UnityEngine.UI.AspectRatioFitter>(); if (fit != null) fit.aspectRatio = d.Art.rect.width / d.Art.rect.height; }
             info.text = d.Info;
+            state.text = d.State;
             bool soon = d.WipId != null;
             if (wip.gameObject.activeSelf != soon) wip.gameObject.SetActive(soon);
             if (soon) wip.FeatureId = d.WipId!;

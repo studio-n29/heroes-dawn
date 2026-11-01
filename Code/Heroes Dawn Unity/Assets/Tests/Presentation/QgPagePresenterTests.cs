@@ -53,6 +53,15 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(Room(HubPage.Lab).Info, Is.EqualTo(new LocLocalization().T("qg.lab.idle")));
         }
 
+        [Test, Description("Vérifie que chaque pièce affiche son état : NOUVEAU si elle a une pastille (quelque chose à faire), sinon ACCESSIBLE — parce que l'état dit au joueur où aller sans lire l'objectif")]
+        public void Rooms_ShowNewWhenBadged_OpenOtherwise()
+        {
+            Make();
+            var loc = new LocLocalization();
+            foreach (var r in _view.Last.Rooms)
+                Assert.That(r.State, Is.EqualTo(loc.T(r.Badge > 0 ? "qg.state.new" : "qg.state.open")), r.Page.ToString());
+        }
+
         [Test, Description("Vérifie que le QG ne montre plus les missions du jour (réservées au Pass) mais les activités du jour, et l'objectif secondaire en icône — parce que la quête principale et les quêtes secondaires sont séparées")]
         public void Activities_ReplaceDailyMissions_AndSecondaryIsAnIcon()
         {

@@ -63,6 +63,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["qg.daily.claimable"] = "{0} à récupérer";
 
             d["qg.ops.ready"] = "{0} expédition(s) de retour !";
+            d["qg.state.new"] = "NOUVEAU";
+            d["qg.state.open"] = "ACCESSIBLE";
             d["qg.ops.running"] = "{0} expédition(s) en cours";
             d["qg.ops.idle"] = "Envoie des membres en expédition";
             d["qg.lab.ready"] = "Recherche terminée !";

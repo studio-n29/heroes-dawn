@@ -8,7 +8,10 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         public HubPage Page;
         public string Title;
+        /// <summary>Objectif de la pièce (ce qu'on y fait).</summary>
         public string Info;
+        /// <summary>État affiché : « NOUVEAU » s'il y a quelque chose à faire, sinon « ACCESSIBLE ».</summary>
+        public string State;
         public string? WipId;
         /// <summary>Pastille de notification (0 : aucune).</summary>
         public int Badge;

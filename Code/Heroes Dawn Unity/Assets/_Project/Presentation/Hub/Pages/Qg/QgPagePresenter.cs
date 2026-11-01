@@ -130,14 +130,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             var firstItem = s.Content.Collection.Items.Count > 0 ? s.Content.Collection.Items[0].Id.Value : "item";
             View.Show(new QgPageData
             {
-                Rooms = new[]
+                Rooms = Stated(new[]
                 {
                     new RoomCardData { Page = HubPage.Lab, Title = _loc.T("page.lab"), Info = LabInfo(), Badge = _meta.LabBadge, Art = AgentArt.Environment(1) },
                     new RoomCardData { Page = HubPage.Operations, Title = _loc.T("page.operations"), Info = OperationsInfo(), Badge = _meta.OperationsBadge, Art = AgentArt.Environment(2) },
                     new RoomCardData { Page = HubPage.Grimoire, Title = _loc.T("page.grimoire"), Info = GrimoireInfo(), Art = AgentArt.Card(firstCard) },
                     new RoomCardData { Page = HubPage.Inventory, Title = _loc.T("page.inventory"), Info = _loc.F("qg.inventory.info", _session.OwnedItemCount), Art = AgentArt.Item(firstItem) },
                     new RoomCardData { Page = HubPage.Agents, Title = _loc.T("page.agents"), Info = _loc.F("qg.agents.info", s.Roster.Count, s.Content.Members.Count), Art = AgentArt.For(s.Route.HeroId) },
-                },
+                }),
                 DailyLines = activities.Count == 0 ? new[] { _loc.T("activity.empty") }
                            : activities.Select(a => _loc.F("qg.activity.line", ActivityText(a), a.Claimed ? _loc.T("quests.state.done") : a.Progress + " / " + a.Target)).ToArray(),
                 DailyBadge = claimable > 0 ? claimable.ToString() : "",
@@ -174,6 +174,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             var defs = _session.Content.Collection;
             int owned = _session.OwnedCardKinds;
             return _loc.F("qg.grimoire.info", owned, defs.Cards.Count);
+        }
+
+        /// <summary>Renseigne l'état de chaque pièce : « NOUVEAU » si elle a une pastille (quelque chose à faire), sinon « ACCESSIBLE ».</summary>
+        RoomCardData[] Stated(RoomCardData[] rooms)
+        {
+            for (int i = 0; i < rooms.Length; i++)
+                rooms[i].State = _loc.T(rooms[i].Badge > 0 ? "qg.state.new" : "qg.state.open");
+            return rooms;
         }
 
         string OperationsInfo()

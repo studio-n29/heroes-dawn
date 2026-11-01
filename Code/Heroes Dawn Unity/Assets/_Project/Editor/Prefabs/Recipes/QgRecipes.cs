@@ -35,6 +35,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             title.Inked();
             var info = Ui.Txt(button.Fill.transform, "", 24, Theme.Text, TextAnchor.LowerLeft, FontKind.Body, "Info");
             info.rectTransform.Stretch(18, 12, 18, 96);
+            // État (accessible ou nouveau) : étiquette en haut à droite, l'objectif reste en bas.
+            var state = Ui.Txt(button.Fill.transform, "", 22, Theme.Primary, TextAnchor.UpperRight, FontKind.Title, "State");
+            state.rectTransform.Stretch(18, 12, 18, 96);
+            state.Inked();
             var wip = ctx.Nest<WipMark>("Widgets/WipMark.prefab", root, "Wip");
             ((RectTransform)wip.transform).Stretch();
             var band = (RectTransform)wip.transform.Find("Band");
@@ -52,6 +56,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "art", art);
             ctx.Wire(view, "title", title);
             ctx.Wire(view, "info", info);
+            ctx.Wire(view, "state", state);
             ctx.Wire(view, "wip", wip);
             ctx.Wire(view, "badge", badgeImg.gameObject);
             ctx.Wire(view, "badgeText", badgeText);
