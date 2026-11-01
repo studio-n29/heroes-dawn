@@ -111,5 +111,18 @@ namespace N29.HeroesDawn.Domain.Combat
     }
 
 
+    /// <summary>
+    /// Un boss franchit un seuil de PV et entre dans une nouvelle phase. <c>Phase</c> : numéro de la phase ouverte (2 pour la première bascule),
+    /// <c>PhaseCount</c> : nombre total de phases du combat ; <c>NameKey</c> : nom de la phase.
+    /// </summary>
+    public sealed class BossPhaseChangedEvent : CombatEvent
+    {
+        public int Unit { get; }
+        public int Phase { get; }
+        public int PhaseCount { get; }
+        public string NameKey { get; }
+        public BossPhaseChangedEvent(int t, int unit, int phase, int phaseCount, string nameKey) : base(t) { Unit = unit; Phase = phase; PhaseCount = phaseCount; NameKey = nameKey; }
+    }
+
     public sealed class CombatEndedEvent : CombatEvent { public bool Victory { get; } public CombatEndedEvent(int t, bool victory) : base(t) { Victory = victory; } }
 }

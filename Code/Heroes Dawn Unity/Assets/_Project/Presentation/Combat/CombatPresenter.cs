@@ -427,6 +427,15 @@ namespace N29.HeroesDawn.Presentation.Combat
                         View.Float(ad.Unit, _loc.F("combat.advanced", ad.Percent), Tone.Success, 34);
                         if (ad.Ready) { View.Act(ad.Unit); AddLog(Name(ad.Unit) + " : " + _loc.T("combat.propelled")); }
                         break;
+                    case BossPhaseChangedEvent bp:
+                        // Télégraphie : annonce au centre, nom de la phase sur le boss, coup sur sa carte, puis la frise attend que le joueur lise.
+                        View.ShowBanner(_loc.F("combat.boss.phase_banner", bp.Phase), Tone.Danger);
+                        View.Float(bp.Unit, _loc.T(bp.NameKey).ToUpperInvariant(), Tone.Danger, 44);
+                        View.Hit(bp.Unit);
+                        AddLog(Name(bp.Unit) + " : " + _loc.F("combat.boss.phase_log", bp.Phase, bp.PhaseCount, _loc.T(bp.NameKey)));
+                        _pauseLeft = Math.Max(_pauseLeft, BossPhasePauseSeconds);
+                        _bossPhaseChanged = true;
+                        break;
                     case WaveStartedEvent ws:
                         BuildUnits(_sim!);
                         _firstRefresh = true;
@@ -512,6 +521,29 @@ namespace N29.HeroesDawn.Presentation.Combat
                        : targetAllies ? _loc.T("combat.choose_ally")
                        : manual && _selected < 0 ? _loc.T("combat.waiting") : "");
             RefreshTopBar();
+            RefreshBoss(sim);
+        }
+
+        /// <summary>Durée du gel de la frise quand un boss change de phase : le temps de lire l'annonce.</summary>
+        const float BossPhasePauseSeconds = 1.4f;
+        bool _bossPhaseChanged;
+
+        /// <summary>Barre de vie élargie du premier boss vivant (nom, phase, PV, seuils) ; masquée sans boss. Le changement de phase est télégraphié une fois.</summary>
+        void RefreshBoss(CombatSimulation sim)
+        {
+            CombatUnit? boss = null;
+            foreach (var u in sim.Units) if (u.Side == Side.Enemy && u.IsBoss && u.IsAlive) { boss = u; break; }
+            if (boss == null) { View.ShowBoss(null); return; }
+            string phase = "";
+            if (boss.Phases.Count > 0)
+            {
+                phase = _loc.F("combat.boss.phase", boss.PhaseReached + 1, boss.Phases.Count + 1);
+                if (boss.PhaseReached > 0) phase += " · " + _loc.T(boss.Phases[boss.PhaseReached - 1].NameKey).ToUpperInvariant();
+            }
+            var marks = new List<float>(boss.Phases.Count);
+            foreach (var p in boss.Phases) marks.Add(p.ThresholdPercent / 100f);
+            View.ShowBoss(new BossBarData(Name(boss.Id).ToUpperInvariant(), phase, boss.MaxHp == 0 ? 0f : boss.Hp / (float)boss.MaxHp, boss.Hp + " / " + boss.MaxHp, marks), _bossPhaseChanged);
+            _bossPhaseChanged = false;
         }
 
         /// <summary>Les quatre icônes de compétence d'un agent : 1 et 2 propres à l'agent, 3 lourde, 4 réservée aux cartes du grimoire.</summary>

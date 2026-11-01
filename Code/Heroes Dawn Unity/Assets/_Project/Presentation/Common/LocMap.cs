@@ -60,6 +60,14 @@ namespace N29.HeroesDawn.Presentation.Common
             d["qg.fil.zone_ny_1_3"] = "Crocodile a pris Coney Island en otage : c'est un piège. Évacue les civils, brise le piège de ses hommes et affronte-le.";
             d["qg.fil.zone_ny_1_4"] = "L'AMIF a quadrillé Brooklyn. Perce son cordon, coupe son réseau de surveillance et tiens le pont : Rayner a un atout à jouer.";
 
+            // Phases des boss (L8) : nom de la phase, annoncé quand le boss franchit un seuil de PV.
+            d["enemies.brick.phase2"] = "Cuirasse fendue"; d["enemies.brick.phase3"] = "Rage de granit";
+            d["enemies.bridge_titan.phase2"] = "Pont ébranlé"; d["enemies.bridge_titan.phase3"] = "Titan déchaîné";
+            d["enemies.crocodile.phase2"] = "Écailles durcies"; d["enemies.crocodile.phase3"] = "Fureur du caïman";
+            d["combat.boss.phase"] = "PHASE {0}/{1}";
+            d["combat.boss.phase_banner"] = "PHASE {0} !";
+            d["combat.boss.phase_log"] = "phase {0}/{1} : {2}";
+
             d["enemies.sniper.name"] = "Tireur d'élite";
             d["enemies.canal_chief.name"] = "Lieutenant de Crocodile";
             d["enemies.bridge_titan.name"] = "TITAN DE L'AMIF";

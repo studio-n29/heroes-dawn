@@ -24,6 +24,12 @@ namespace N29.HeroesDawn.Content.Prototype
         static EnemyDef E(string id, Role r, Family f, StatBlock st, bool boss, params SkillDef[] skills)
             => new EnemyDef(new EnemyId(id), "enemies." + id + ".name", r, f, st, skills, boss);
 
+        /// <summary>Palier de boss : sous <paramref name="pct"/> % de PV, bonus permanents de force, de défense et de vitesse (en %).</summary>
+        static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd) => new BossPhaseDef(pct, nameKey, atk, def, spd);
+
+        static EnemyDef Phased(EnemyDef d, params BossPhaseDef[] phases)
+            => new EnemyDef(d.Id, d.NameKey, d.Role, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases);
+
         /// <summary>Ennemis ajoutés aux zones 1.2 et 1.3.</summary>
         public static IEnumerable<EnemyDef> Enemies()
         {
@@ -34,15 +40,17 @@ namespace N29.HeroesDawn.Content.Prototype
                 S("canal_chief_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110)),
                 S("canal_chief_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(80), St(StatusType.Corrosion, 2, 40)),
                 S("canal_chief_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(20)));
-            yield return E("bridge_titan", Role.Tank, Family.PhysicalBio, new StatBlock(5600, 120, 140, 95), true,
+            yield return Phased(E("bridge_titan", Role.Tank, Family.PhysicalBio, new StatBlock(5600, 120, 140, 95), true,
                 S("bridge_titan_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(125)),
                 S("bridge_titan_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(12)),
-                S("bridge_titan_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(95), St(StatusType.Shock, 1, 35)));
+                S("bridge_titan_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(95), St(StatusType.Shock, 1, 35))),
+                Phase(66, "enemies.bridge_titan.phase2", 10, 0, 5), Phase(33, "enemies.bridge_titan.phase3", 25, -10, 10));
             // Crocodile (Antonio Kribelchi), mafieux méta-humain : boss de Coney Island. Morsure, coup de queue, cuirasse d'écailles.
-            yield return E("crocodile", Role.Damage, Family.PhysicalBio, new StatBlock(5200, 135, 120, 100), true,
+            yield return Phased(E("crocodile", Role.Damage, Family.PhysicalBio, new StatBlock(5200, 135, 120, 100), true,
                 S("crocodile_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(130)),
                 S("crocodile_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(90), St(StatusType.Shock, 1, 30)),
-                S("crocodile_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(25), St(StatusType.Taunt, 1)));
+                S("crocodile_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(25), St(StatusType.Taunt, 1))),
+                Phase(66, "enemies.crocodile.phase2", 10, 0, 5), Phase(33, "enemies.crocodile.phase3", 25, -10, 10));
             // Troupes de l'AMIF (zone 1.4) : soldat, tireur, capitaine.
             yield return E("amif_trooper", Role.Damage, Family.Matter, new StatBlock(1300, 120, 70, 105), false,
                 S("amif_trooper_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100)),
