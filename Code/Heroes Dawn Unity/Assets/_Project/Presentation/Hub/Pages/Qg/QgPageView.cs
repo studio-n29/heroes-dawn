@@ -25,10 +25,6 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] Button shopAlertButton = null!;
         [SerializeField] TMP_Text shopAlertBadge = null!;
         [SerializeField] GameObject secondaryDot = null!;
-        [SerializeField] TMP_Text filSpeaker = null!;
-        [SerializeField] TMP_Text filText = null!;
-        [SerializeField] Button filCard = null!;
-        [SerializeField] TMP_Text questsBadge = null!;
         [SerializeField] UiButton mission = null!;
         [SerializeField] TMP_Text missionSub = null!;
         [SerializeField] TMP_Text missionHint = null!;
@@ -50,9 +46,6 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Bouton MISSION (tests PlayMode : clic réel).</summary>
         public Button MissionButton => mission.Button;
 
-        /// <summary>Carte « suivi des quêtes » (tests PlayMode : clic réel).</summary>
-        public Button QuestsCard => filCard;
-
         /// <summary>Bouton d'une pièce (tests PlayMode), selon le dernier affichage.</summary>
         public Button? RoomButton(HubPage page)
         {
@@ -69,11 +62,11 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             mission.Button.onClick.AddListener(() => MissionClicked?.Invoke());
             banner.onClick.AddListener(() => MissionClicked?.Invoke());
+            dailyDrawer.SetActive(false); // fermé au départ : seul le bandeau est visible
             dailyCard.onClick.AddListener(() => dailyDrawer.SetActive(true));
             dailyClose.onClick.AddListener(() => dailyDrawer.SetActive(false));
             secondaryCard.onClick.AddListener(() => SecondaryClicked?.Invoke());
             shopAlertButton.onClick.AddListener(() => ShopAlertClicked?.Invoke());
-            filCard.onClick.AddListener(() => QuestsClicked?.Invoke());
         }
 
         public void Show(QgPageData d)
@@ -94,10 +87,6 @@ namespace N29.HeroesDawn.Presentation.Hub
             secondaryDot.SetActive(d.SecondaryActive);
             shopAlertBadge.text = d.ShopAlertBadge;
             shopAlertBadge.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(d.ShopAlertBadge));
-            filSpeaker.text = d.FilSpeaker;
-            filText.text = d.FilText;
-            questsBadge.text = d.QuestsBadge;
-            questsBadge.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(d.QuestsBadge));
             mission.SetLabel(d.MissionTitle);
             mission.Interactable = d.MissionEnabled;
             mission.DisabledReason = d.MissionHint;

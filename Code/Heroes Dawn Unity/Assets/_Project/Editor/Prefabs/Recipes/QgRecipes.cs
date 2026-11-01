@@ -115,42 +115,24 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var roomsTitle = Ui.LocTxt(rt, "qg.rooms", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "RoomsTitle");
             roomsTitle.rectTransform.At(0f, 1f, 0, -112, LeftW, 46);
             roomsTitle.Inked();
-            var grid = Ui.Rect(rt, "Rooms").At(0f, 1f, 0, -164, LeftW, 356);
+            // Pièces en cartes verticales, rangées à l'horizontale : cinq colonnes de 207 sur 1100, hauteur 400 sous le titre.
+            var grid = Ui.Rect(rt, "Rooms").At(0f, 1f, 0, -164, LeftW, 400);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(350, 168);
-            layout.spacing = new Vector2(25, 20);
+            layout.cellSize = new Vector2(207, 400);
+            layout.spacing = new Vector2(16, 0);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            layout.constraintCount = 3;
+            layout.constraintCount = 5;
             var rooms = new List<Object>();
             for (int i = 0; i < 5; i++) rooms.Add(ctx.Nest<RoomCardView>("Widgets/RoomCard.prefab", grid, "Room" + i)); // cinq pièces : le doublon Équipe est retiré (L3)
-
-            // ---- Fil du QG
-            var fil = Ui.Panel(rt, "Fil", Theme.Surface, 5f, 10f, true);
-            fil.Frame().At(0f, 0f, 0, 0, LeftW, 250);
-            Ui.LocTxt(fil.transform, "qg.fil", 26, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Title, "FilTitle").rectTransform.At(0f, 1f, 24, -14, 600, 34);
-            var speaker = Ui.Txt(fil.transform, "", 40, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Speaker");
-            speaker.rectTransform.At(0f, 1f, 24, -52, 600, 50);
-            speaker.Inked();
-            var filText = Ui.Txt(fil.transform, "", 28, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Text");
-            filText.rectTransform.Stretch(24, 16, 24, 104);
-            var filButton = fil.Frame().gameObject.AddComponent<Button>();
-            filButton.targetGraphic = fil;
-            filButton.transition = Selectable.Transition.None;
-            Ui.LocTxt(fil.transform, "qg.fil.open", 24, Theme.Primary, TextAnchor.MiddleRight, FontKind.Title, "OpenHint").rectTransform.At(1f, 0f, -24, 14, 520, 32);
-            var filBadge = Ui.Img(fil.Frame(), "Badge", Theme.Danger, Sprites.Circle);
-            filBadge.rectTransform.At(1f, 1f, -10, -10, 44, 44);
-            var filBadgeText = Ui.Txt(filBadge.transform, "", 26, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Text");
-            filBadgeText.rectTransform.Stretch();
-            filBadge.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
 
             // ---- Activités du jour : bandeau avec leur nombre ; un toucher ouvre le panneau latéral (fermé par défaut)
             var daily = Ui.Panel(rt, "Daily", Theme.Surface, 5f, 10f, true);
             daily.Frame().At(1f, 1f, 0, -112, RightW, 96);
-            Ui.LocTxt(daily.transform, "qg.daily", 30, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title").rectTransform.At(0f, 0.5f, 22, 0, 300, 46);
-            var dailyCount = Ui.Txt(daily.transform, "", 30, Theme.Text, TextAnchor.MiddleRight, FontKind.Title, "Count");
-            dailyCount.rectTransform.At(1f, 0.5f, -70, 0, 360, 46);
+            Ui.LocTxt(daily.transform, "qg.daily", 30, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title").rectTransform.At(0f, 1f, 22, -10, 540, 40);
+            var dailyCount = Ui.Txt(daily.transform, "", 26, Theme.Text, TextAnchor.LowerLeft, FontKind.Title, "Count");
+            dailyCount.rectTransform.At(0f, 0f, 22, 10, 540, 36);
             var drawer = Ui.Panel(rt, "DailyDrawer", Theme.Surface, 5f, 10f, true);
-            drawer.Frame().At(1f, 1f, 0, -112, RightW, 700);
+            drawer.Frame().At(1f, 1f, 0, -112, RightW, 600);
             Ui.LocTxt(drawer.transform, "qg.daily", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "DrawerTitle").rectTransform.At(0f, 1f, 22, -14, 380, 46);
             var close = Ui.LocBtn(drawer.transform, "nav.back", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Close");
             close.Rect.At(1f, 1f, -14, -14, 160, 64);
@@ -158,7 +140,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             dailyBody.rectTransform.Stretch(22, 90, 22, 22);
             dailyBody.fontSize = 24;
             dailyBody.lineSpacing = 8;
-            drawer.gameObject.SetActive(false);
+            drawer.Frame().gameObject.SetActive(false); // Ui.Panel renvoie la surface : on masque le cadre entier
             var dailyButton = daily.Frame().gameObject.AddComponent<Button>();
             dailyButton.targetGraphic = daily;
             dailyButton.transition = Selectable.Transition.None;
@@ -169,7 +151,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             dailyBadge.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
 
             // ---- Alertes : deux icônes (boutique, objectif secondaire) ; le détail s'ouvre dans un pop-up
-            var alertRow = Ui.Rect(rt, "Alerts").At(1f, 1f, 0, -428, RightW, 108);
+            var alertRow = Ui.Rect(rt, "Alerts").At(1f, 1f, 0, -224, RightW, 108);
             alertRow.HLayout(20, 0, TextAnchor.MiddleRight);
             var shopIcon = AlertIcon(alertRow, "ShopAlert", "B", Theme.Pr, out var shopBadgeText);
             var secondaryIcon = AlertIcon(alertRow, "SecondaryAlert", "!", Theme.Fatigue, out var secondaryDotText);
@@ -195,18 +177,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "dailyCard", dailyButton);
             ctx.Wire(view, "dailyBody", dailyBody);
             ctx.Wire(view, "dailyCount", dailyCount);
-            ctx.Wire(view, "dailyDrawer", drawer.gameObject);
+            ctx.Wire(view, "dailyDrawer", drawer.Frame().gameObject);
             ctx.Wire(view, "dailyClose", close.Button);
-            drawer.transform.SetAsLastSibling(); // le panneau passe au-dessus des alertes
+            drawer.Frame().SetAsLastSibling(); // le panneau passe au-dessus des alertes
             ctx.Wire(view, "dailyBadge", dailyBadgeText);
             ctx.Wire(view, "secondaryCard", secondaryButton);
             ctx.Wire(view, "shopAlertButton", shopAlertButton);
             ctx.Wire(view, "shopAlertBadge", shopBadgeText);
             ctx.Wire(view, "secondaryDot", secondaryDot);
-            ctx.Wire(view, "filSpeaker", speaker);
-            ctx.Wire(view, "filText", filText);
-            ctx.Wire(view, "filCard", filButton);
-            ctx.Wire(view, "questsBadge", filBadgeText);
             ctx.Wire(view, "mission", mission);
             ctx.Wire(view, "missionSub", sub);
             ctx.Wire(view, "missionHint", hint);
