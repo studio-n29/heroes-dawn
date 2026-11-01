@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["page.team"] = "Team · {0} members", ["page.team_one"] = "Team · 1 member",
             ["page.recruit"] = "Recruitment",
             ["page.pass"] = "Pass · Season 1", ["page.shop"] = "Shop",
-            ["page.operations"] = "Operations room", ["page.lab"] = "Research lab", ["page.archives"] = "Archives",
+            ["page.operations"] = "Operations room", ["page.lab"] = "Crafting workshop", ["page.archives"] = "Archives",
             ["page.settings"] = "Settings", ["page.member_sheet"] = "Member sheet",
 
             // --- Boutique éphémère ---
@@ -67,7 +67,9 @@ namespace N29.HeroesDawn.Presentation.Common
             ["qg.state.new"] = "NEW", ["qg.state.open"] = "OPEN",
             ["qg.main.line"] = "{0} · {1} / {2} zones cleared",
             ["grimoire.search"] = "Search a card",
-            ["qg.daily.banner"] = "{0} activity(ies) today", ["qg.state.locked"] = "LOCKED", ["qg.lock.tutorial"] = "Finish the tutorial", ["qg.lock.zone"] = "Clear chapter {0}",
+            ["lab.side.none"] = "Pick a recipe", ["lab.state.ok"] = "Crafting possible.", ["lab.state.missing"] = "Not enough components.",
+            ["lab.provenance"] = "Scraps: daily shop lots and combat loot.", ["lab.have"] = "Owned: {0}", ["lab.missing"] = "Missing {0}",
+            ["qg.daily.banner"] = "{0} activity(ies) today",["qg.state.locked"] = "LOCKED", ["qg.lock.tutorial"] = "Finish the tutorial", ["qg.lock.zone"] = "Clear chapter {0}",
             ["settings.unlock_all"] = "Unlock everything (test)", ["settings.unlock_all.hint"] = "Opens every QG room, without tutorial or chapter.",
             ["inventory.sort.rarity"] = "Rarity", ["inventory.sort.name"] = "Name", ["inventory.sort.count"] = "Quantity",
             ["shop.scrap_lot"] = "{0} × {1}", ["shop.scrap_sold"] = "BOUGHT",
