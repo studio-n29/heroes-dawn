@@ -42,6 +42,32 @@ namespace N29.HeroesDawn.Application.Features.Meta
         /// <summary>Succès du joueur (progression, déblocage, jour).</summary>
         public Achievements Achievements() => new Achievements(_c, this);
 
+        /// <summary>Rang affiché sur la carte, d'après le niveau de pass (clé de localisation).</summary>
+        public string RankKey => ProfileRank.KeyFor(PassLevel);
+
+        /// <summary>Avatar de la carte : un des six de la galerie.</summary>
+        public string Avatar => PlayerAvatars.Resolve(_c.Meta.onboarding.avatar);
+
+        /// <summary>Change l'avatar pour le suivant de la galerie.</summary>
+        public void CycleAvatar()
+        {
+            var gallery = PlayerAvatars.Gallery;
+            int i = 0;
+            for (int k = 0; k < gallery.Count; k++) if (gallery[k] == Avatar) i = k;
+            _c.Meta.onboarding.avatar = gallery[(i + 1) % gallery.Count];
+            _c.Touch(MetaArea.Profile);
+        }
+
+        /// <summary>Fond de la carte de profil.</summary>
+        public string Background => ProfileBackgrounds.Resolve(_c.Meta.profileBackground);
+
+        /// <summary>Passe au fond suivant de la carte de profil.</summary>
+        public void CycleBackground()
+        {
+            _c.Meta.profileBackground = ProfileBackgrounds.Next(_c.Meta.profileBackground);
+            _c.Touch(MetaArea.Profile);
+        }
+
         public ProfileStats Stats()
         {
             var meta = _c.Meta;

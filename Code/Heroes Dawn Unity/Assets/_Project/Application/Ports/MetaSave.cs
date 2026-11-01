@@ -200,6 +200,9 @@ namespace N29.HeroesDawn.Application.Ports
         /// <summary>Succès débloqués, avec le jour de la première constatation.</summary>
         public List<AchievementSave> achievements = new List<AchievementSave>();
 
+        /// <summary>Fond de la carte de profil (voir <see cref="N29.HeroesDawn.Application.Features.Meta.ProfileBackgrounds"/>) ; vide : premier fond.</summary>
+        public string profileBackground = "";
+
         // Narration (lot G) : chapitres dont l'ouverture a été montrée
         public List<string> chaptersSeen = new List<string>();
 

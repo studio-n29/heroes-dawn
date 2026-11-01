@@ -82,6 +82,17 @@ namespace N29.HeroesDawn.Presentation.Hub
             lastRow.A = RowButtonData.Of(Loc.T("profile.open"), true, "", 0);
             Add(lastRow, () => { _achievementsOpen = true; Refresh(); });
 
+            // Carte de profil : rang d'après le pass, avatar de la galerie (un appui passe au suivant), fond (idem).
+            Add(InfoRowData.Basic(Loc.T("profile.rank"), Loc.T(_profile.RankKey)), null);
+            var avatarRow = InfoRowData.Basic(Loc.T("profile.avatar"), Loc.F("profile.avatar_value", _profile.Avatar.Replace("avatar_", "")));
+            avatarRow.Tag = "+";
+            avatarRow.TagColor = Theme.Info;
+            Add(avatarRow, () => { _profile.CycleAvatar(); Refresh(); });
+            var backgroundRow = InfoRowData.Basic(Loc.T("profile.background"), Loc.T("profile.background." + _profile.Background));
+            backgroundRow.Tag = "+";
+            backgroundRow.TagColor = Theme.Info;
+            Add(backgroundRow, () => { _profile.CycleBackground(); Refresh(); });
+
             var s = _profile.Stats();
             var values = new[] { s.CombatsWon, s.CombatsLost, s.ZonesCleared, s.Agents, s.TopAgentLevel, s.BestLinkWins, s.CraftedItems, s.CreditsEarned, s.Tiles, s.Enemies };
             var keys = new[] { "combatsWon", "combatsLost", "zones", "agents", "topLevel", "bestLink", "crafted", "credits", "tiles", "enemies" };

@@ -33,6 +33,17 @@ namespace N29.HeroesDawn.Presentation.Common
             d["profile.stat.bestLink"] = "Meilleur lien (victoires ensemble)";
             d["profile.stat.crafted"] = "Objets fabriqués";
             d["profile.stat.credits"] = "Crédits gagnés";
+            d["profile.rank"] = "Rang";
+            d["profile.rank.recruit"] = "Recrue";
+            d["profile.rank.agent"] = "Agent";
+            d["profile.rank.veteran"] = "Vétéran";
+            d["profile.rank.chief"] = "Chef d'unité";
+            d["profile.avatar"] = "Avatar";
+            d["profile.avatar_value"] = "Avatar n° {0} (appuie pour changer)";
+            d["profile.background"] = "Fond de carte";
+            d["profile.background.night"] = "Nuit";
+            d["profile.background.dawn"] = "Aube";
+            d["profile.background.steel"] = "Acier";
             d["profile.stat.tiles"] = "Cases traversées";
             d["profile.stat.enemies"] = "Ennemis battus";
             d["profile.fav_agents"] = "AGENTS FAVORIS";

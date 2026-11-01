@@ -14,9 +14,9 @@ namespace N29.HeroesDawn.Tests.Presentation
     /// <summary>Page Profil : tag, statistiques, amis, accès au registre et aux archives (lot F de la 0.14.0).</summary>
     public sealed class ProfilePagePresenterTests
     {
-        // Lignes : registre, archives, dernier succès, dix statistiques, deux rubriques de favoris (titre et ligne vide chacune
-        // tant qu'il n'y a pas de combat), titre des amis, puis les amis.
-        const int NavRows = 3, StatRows = 10, FavRows = 4, FirstFriendRow = NavRows + StatRows + FavRows + 1;
+        // Lignes : registre, archives, dernier succès, trois lignes de carte (rang, avatar, fond), dix statistiques, deux rubriques de favoris
+        // (titre et ligne vide chacune tant qu'il n'y a pas de combat), titre des amis, puis les amis.
+        const int NavRows = 6, StatRows = 10, FavRows = 4, FirstFriendRow = NavRows + StatRows + FavRows + 1;
         static readonly string[] StatKeys = { "combatsWon", "combatsLost", "zones", "agents", "topLevel", "bestLink", "crafted", "credits", "tiles", "enemies" };
 
         TestApp _app = null!;
