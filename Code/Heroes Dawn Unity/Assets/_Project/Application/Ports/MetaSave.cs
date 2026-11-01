@@ -125,6 +125,8 @@ namespace N29.HeroesDawn.Application.Ports
         public string campaign = "";
         /// <summary>Parcours choisi : Agent D ou Agent M (vide : Agent D par défaut).</summary>
         public string hero = "";
+        /// <summary>Avatar du personnage créé par le joueur (identifiant de la galerie ; vide : premier avatar).</summary>
+        public string avatar = "";
     }
 
     /// <summary>Tout ce qui dépasse le noyau (équipe, ressources, boutique de recrutement) : pass, missions, opérations, labo, archives…</summary>
