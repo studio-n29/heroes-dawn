@@ -66,6 +66,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["inventory.sort.rarity"] = "Rareté";
             d["inventory.sort.name"] = "Nom";
             d["inventory.sort.count"] = "Quantité";
+            d["qg.main.line"] = "{0} · {1} / {2} zones validées";
             d["qg.state.new"] = "NOUVEAU";
             d["qg.state.open"] = "ACCESSIBLE";
             d["qg.ops.running"] = "{0} expédition(s) en cours";

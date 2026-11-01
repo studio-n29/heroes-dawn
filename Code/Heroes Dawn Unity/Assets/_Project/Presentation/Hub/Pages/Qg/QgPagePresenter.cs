@@ -149,7 +149,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 FilText = done ? _loc.T("qg.fil.done") : _loc.Or("qg.fil." + zone.Id.Value, "qg.fil.done"),
                 QuestsBadge = _meta.QuestsBadge > 0 ? _meta.QuestsBadge.ToString() : "",
                 MissionTitle = _loc.T("qg.mission"),
-                MissionSub = _loc.T(zone.NameKey),
+                MissionSub = MainQuestLine(_loc.T(zone.NameKey)),
                 MissionEnabled = !s.SquadExhausted,
                 MissionHint = s.SquadExhausted ? _loc.T("hub.deploy.exhausted") : "",
             });
@@ -174,6 +174,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             var defs = _session.Content.Collection;
             int owned = _session.OwnedCardKinds;
             return _loc.F("qg.grimoire.info", owned, defs.Cards.Count);
+        }
+
+        /// <summary>Quête principale : la zone à jouer, et combien de zones de Brooklyn sont déjà validées (« 2 / 6 zones »).</summary>
+        string MainQuestLine(string zoneName)
+        {
+            var main = _meta.Quests.Main();
+            int done = main.Count(m => m.Status == ZoneStatus.Done);
+            return _loc.F("qg.main.line", zoneName, done, main.Count);
         }
 
         /// <summary>Renseigne l'état de chaque pièce : « NOUVEAU » si elle a une pastille (quelque chose à faire), sinon « ACCESSIBLE ».</summary>

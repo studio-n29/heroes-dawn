@@ -65,6 +65,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["shop.cat.exchange"] = "EXCHANGES", ["shop.cat.exchange_sub"] = "Turn gems into credits or PR",
             ["power.tier"] = "POWER {0} / 5",
             ["qg.state.new"] = "NEW", ["qg.state.open"] = "OPEN",
+            ["qg.main.line"] = "{0} · {1} / {2} zones cleared",
             ["inventory.sort.rarity"] = "Rarity", ["inventory.sort.name"] = "Name", ["inventory.sort.count"] = "Quantity",
             ["shop.scrap_lot"] = "{0} × {1}", ["shop.scrap_sold"] = "BOUGHT",
             ["shop.scrap.confirm.title"] = "Buy this lot?", ["shop.scrap.confirm.body"] = "{0} Credits will be spent.",

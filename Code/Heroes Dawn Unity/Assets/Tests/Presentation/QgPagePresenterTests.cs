@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using N29.HeroesDawn.Application.Features.World;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Content.Prototype;
@@ -51,6 +52,15 @@ namespace N29.HeroesDawn.Tests.Presentation
                         Is.EqualTo(new[] { HubPage.Lab, HubPage.Operations, HubPage.Grimoire, HubPage.Inventory, HubPage.Agents }));
             Assert.That(Room(HubPage.Operations).Info, Is.EqualTo(new LocLocalization().T("qg.ops.idle")));
             Assert.That(Room(HubPage.Lab).Info, Is.EqualTo(new LocLocalization().T("qg.lab.idle")));
+        }
+
+        [Test, Description("Vérifie que la quête principale affiche la zone à jouer et le nombre de zones validées sur le total — parce que le joueur doit savoir où il en est sans ouvrir le journal")]
+        public void MainQuest_ShowsZoneAndZonesCleared()
+        {
+            Make();
+            var loc = new LocLocalization();
+            var main = _app.Quests.Main();
+            Assert.That(_view.Last.MissionSub, Is.EqualTo(loc.F("qg.main.line", loc.T(ZoneProgress.Recommended(_app.Session).NameKey), 0, main.Count)));
         }
 
         [Test, Description("Vérifie que chaque pièce affiche son état : NOUVEAU si elle a une pastille (quelque chose à faire), sinon ACCESSIBLE — parce que l'état dit au joueur où aller sans lire l'objectif")]
