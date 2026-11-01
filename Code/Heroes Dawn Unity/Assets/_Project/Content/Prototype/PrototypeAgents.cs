@@ -171,10 +171,28 @@ namespace N29.HeroesDawn.Content.Prototype
             };
         }
 
+        /// <summary>
+        /// Puissance de chaque agent, de 1 (pouvoirs basiques, aucune menace) à 5 (pouvoirs surpuissants, menace apocalyptique).
+        /// Première proposition à ajuster après essais ; sans entrée, l'agent est au niveau 1.
+        /// </summary>
+        static readonly Dictionary<string, int> PowerTiers = new Dictionary<string, int>
+        {
+            ["agent_d"] = 4, ["agent_m"] = 3,
+            ["darius_brooks"] = 2, ["mei_lin_chen"] = 2, ["freya_lindqvist"] = 2, ["kwame_abara"] = 2,
+            ["giulia_rossi"] = 2, ["lucas_mendes"] = 2, ["rin_takeda"] = 2, ["amara_hughes"] = 1,
+            ["ilona_varga"] = 2, ["fatou_diallo"] = 2, ["clement_lefevre"] = 3, ["youssef_haddad"] = 3,
+            ["severine_morel"] = 1, ["sam_okafor"] = 2, ["astrid_hallstrom"] = 3, ["celeste_moreau"] = 2,
+            ["haruto_nakamura"] = 2, ["yelena_ivanova"] = 4, ["noah_kaplan"] = 1, ["tunde_oyelaran"] = 1,
+            ["victor_sorel"] = 4, ["odile_ferrand"] = 4, ["louis_dubois"] = 3, ["marco_bellini"] = 4,
+            ["zofia_kowalczyk"] = 3, ["mateo_vasquez"] = 3, ["ada_okonkwo"] = 4, ["eero_nieminen"] = 5,
+            ["ji_hoon_park"] = 2, ["anna_petrov"] = 2,
+        };
+
         public static IEnumerable<MemberDef> Members(System.Func<Role, Rarity, StatBlock> stats)
         {
             foreach (var e in Roster)
-                yield return new MemberDef(new MemberId(e.Id), "members." + e.Id + ".name", e.Family, e.Role, e.Rarity, stats(e.Role, e.Rarity), Kit(e), e.ShopZone, e.Unlock);
+                yield return new MemberDef(new MemberId(e.Id), "members." + e.Id + ".name", e.Family, e.Role, e.Rarity, stats(e.Role, e.Rarity), Kit(e), e.ShopZone, e.Unlock,
+                                           PowerTiers.TryGetValue(e.Id, out var tier) ? tier : 1);
         }
     }
 }

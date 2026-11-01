@@ -8,7 +8,12 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         public HubPage Page;
         public string Title;
+        /// <summary>Objectif de la pièce (ce qu'on y fait).</summary>
         public string Info;
+        /// <summary>État affiché : « NOUVEAU » s'il y a quelque chose à faire, sinon « ACCESSIBLE ».</summary>
+        public string State;
+        /// <summary>Pièce verrouillée (tutoriel ou chapitre pas encore atteint) : non touchable, l'objectif devient la condition.</summary>
+        public bool Locked;
         public string? WipId;
         /// <summary>Pastille de notification (0 : aucune).</summary>
         public int Badge;
@@ -22,6 +27,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public RoomCardData[] Rooms;
         public string[] DailyLines;
         public string DailyBadge;
+        /// <summary>Bandeau des activités du jour (« 3 activités aujourd'hui »).</summary>
+        public string DailyBanner;
         public string SecondaryText;
         public bool SecondaryActive;
         public string ShopAlert;
@@ -31,6 +38,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string FilText;
         /// <summary>Quêtes secondaires à réclamer (vide : aucune).</summary>
         public string QuestsBadge;
+        /// <summary>Titre du bandeau de quête principale (ex. « QUÊTES PRINCIPALES · BROOKLYN »).</summary>
+        public string MainTitle;
         public string MissionTitle;
         public string MissionSub;
         public bool MissionEnabled;

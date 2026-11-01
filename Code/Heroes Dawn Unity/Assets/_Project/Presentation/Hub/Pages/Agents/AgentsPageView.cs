@@ -1,6 +1,6 @@
 #nullable enable
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Registre des agents : les 30 agents de la ville et la façon d'obtenir chacun (liste à une colonne).</summary>
-    public sealed class AgentsPageView : ListPageView, IAgentsPageView { }
+    /// <summary>Registre des agents : les agents de la ville en cartes verticales (portrait, puissance, état et façon d'obtenir chacun).</summary>
+    public sealed class AgentsPageView : CardGridPageView, IAgentsPageView { }
 }
