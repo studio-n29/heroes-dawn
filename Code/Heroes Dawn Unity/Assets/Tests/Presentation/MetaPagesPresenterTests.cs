@@ -129,7 +129,8 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        static int BoutiqueRow(string exchangeId) => Boutique.Packs.Count + Boutique.Exchanges.ToList().FindIndex(e => e.Id == exchangeId);
+        // Lignes : titre Gemmes, paquets, titre Échanges, échanges.
+        static int BoutiqueRow(string exchangeId) => 1 + Boutique.Packs.Count + 1 + Boutique.Exchanges.ToList().FindIndex(e => e.Id == exchangeId);
 
         [Test, Description("Vérifie que l'achat d'un paquet de Gemmes passe par une confirmation qui précise que le paiement est simulé, puis ajoute les Gemmes — parce qu'aucun argent réel ne doit être suggéré")]
         public void Boutique_PackPurchase_ConfirmsThenGrantsGems()
@@ -137,7 +138,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
                                                     _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator { ShopTab = ShopTab.Gems }));
             int gems = _app.Session.Wallet.Gems;
-            _view.ClickRow(0);
+            _view.ClickRow(1, 0); // ligne 0 : titre de la catégorie Gemmes
             var popup = (FakeConfirmPopup)_host.Spawned.Single();
             Assert.That(popup.Asked!.Value.Body, Does.Contain("simulé"));
             popup.Answer(true);
