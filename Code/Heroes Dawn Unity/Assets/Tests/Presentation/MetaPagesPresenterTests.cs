@@ -149,16 +149,13 @@ namespace N29.HeroesDawn.Tests.Presentation
             => Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
                                                _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, nav));
 
-        [Test, Description("Vérifie que la boutique affiche un onglet à la fois (boosters, objets, gemmes, cadeau), que changer d'onglet change les lignes et mémorise l'onglet, et que l'onglet Héros ouvre la page Recruter — parce que la boutique est unique, à onglets")]
+        [Test, Description("Vérifie que la boutique affiche un onglet à la fois (boosters, gemmes, cadeau), que changer d'onglet change les lignes et mémorise l'onglet, et que l'onglet Héros ouvre la page Recruter — parce que la boutique est unique, à onglets")]
         public void Boutique_Tabs_SwitchTheRows_AndHeroesGoToRecruit()
         {
             var nav = new HubNavigator();
             var p = NewBoutique(nav);
             Assert.That(_view.ShopTabShown, Is.EqualTo((int)ShopTab.Boosters), "les héros ont leur page : on retombe sur les boosters");
             Assert.That(_view.Rows.Length, Is.EqualTo(2), "stock + achat");
-            _view.ClickShopTab((int)ShopTab.Items);
-            Assert.That(nav.ShopTab, Is.EqualTo(ShopTab.Items));
-            Assert.That(_view.Rows.Length, Is.EqualTo(CollectionBook.ItemOfferCount));
             _view.ClickShopTab((int)ShopTab.Gems);
             Assert.That(_view.Rows.Length, Is.EqualTo(Boutique.Packs.Count + Boutique.Exchanges.Count));
             _view.ClickShopTab((int)ShopTab.Gift);

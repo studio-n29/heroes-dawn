@@ -94,7 +94,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             session.Wallet.Set(5000, 600);
             CollectionOps.AddBooster(session, BoosterDef.StandardId, 2);
             var nav = Object.FindAnyObjectByType<N29.HeroesDawn.Composition.HubLifetimeScope>()!.Container.Resolve<HubNavigator>();
-            foreach (var tab in new[] { ShopTab.Boosters, ShopTab.Items, ShopTab.Gems, ShopTab.Gift })
+            foreach (var tab in new[] { ShopTab.Boosters, ShopTab.Gems, ShopTab.Gift })
             {
                 nav.SelectShopTab(tab);
                 yield return new WaitForSecondsRealtime(0.7f);

@@ -123,20 +123,13 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que la Boutique propose les objets du jour et un booster : l'achat d'un objet débite les Crédits et le bouton passe à « VENDU » — parce que la boutique d'objets tourne chaque jour")]
-        public void Boutique_SellsDailyItems_AndABooster()
+        [Test, Description("Vérifie que la Boutique vend un booster et que l'achat l'ajoute au stock — parce que la vente directe d'objets est retirée de la boutique (0.15)")]
+        public void Boutique_SellsABooster()
         {
             _app.Session.Wallet.Set(50000, 500);
-            _nav.ShopTab = ShopTab.Items;
+            _nav.ShopTab = ShopTab.Boosters;
             var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
                                                     _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, _nav));
-            Assert.That(_view.Rows.Length, Is.EqualTo(CollectionBook.ItemOfferCount), "4 objets du jour");
-            var price = _app.Collection.ItemOffers()[0].Item.Price;
-            int credits = _app.Session.Wallet.Credits;
-            _view.ClickRow(0);
-            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(credits - price));
-            Assert.That(_view.Rows[0].A.Label, Is.EqualTo("VENDU"));
-            _view.ClickShopTab((int)ShopTab.Boosters);
             _view.ClickRow(1);
             Assert.That(CollectionOps.Boosters(_app.Session, BoosterDef.StandardId), Is.EqualTo(1));
             _view.ClickHeader(1);

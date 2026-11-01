@@ -16,12 +16,22 @@ namespace N29.HeroesDawn.Presentation.Hub
         public bool Halo;
     }
 
+    /// <summary>Lot de scraps de la boutique du jour : texte du bouton (quantité, nom, prix) et disponibilité.</summary>
+    public struct RecruitScrapState
+    {
+        public int Slot;
+        public string Text;
+        public bool Enabled;
+    }
+
     /// <summary>Tout ce qu'affiche la page Recruter.</summary>
     public struct RecruitPageData
     {
         public string Rule;
         public string Countdown;
         public RecruitCardState[] Cards;
+        /// <summary>Lots de scraps du jour (six au plus), sous les cartes.</summary>
+        public RecruitScrapState[] Scraps;
         /// <summary>« Collection de New York complète ! » quand il n'y a plus rien à tirer ; vide sinon.</summary>
         public string EmptyText;
         public string RerollLabel;

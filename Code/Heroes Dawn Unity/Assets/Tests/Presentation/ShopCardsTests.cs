@@ -35,7 +35,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             return p;
         }
 
-        [Test, Description("Vérifie que chaque offre des onglets Boosters, Gemmes et crédits et Cadeau porte une description et une illustration de boutique, et chaque objet du jour une description — parce que la boutique est faite de cartes avec icône et texte")]
+        [Test, Description("Vérifie que chaque offre des onglets Boosters, Gemmes et crédits et Cadeau porte une description et une illustration de boutique — parce que la boutique est faite de cartes avec icône et texte")]
         public void Rows_HaveADescription_AndAnIllustration()
         {
             foreach (var tab in new[] { ShopTab.Boosters, ShopTab.Gems, ShopTab.Gift })
@@ -49,10 +49,6 @@ namespace N29.HeroesDawn.Tests.Presentation
                 }
                 p.Dispose();
             }
-            var items = Shop(ShopTab.Items);
-            Assert.That(_view.Rows.Length, Is.GreaterThan(0));
-            Assert.That(_view.Rows.All(r => r.Subtitle.Length > 0), Is.True);
-            items.Dispose();
         }
 
         [Test, Description("Vérifie que l'en-tête de la boutique n'affiche plus le texte « achats simulés » — parce que l'écran doit rester léger")]

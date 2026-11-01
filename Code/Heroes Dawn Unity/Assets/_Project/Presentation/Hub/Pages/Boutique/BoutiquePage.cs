@@ -86,7 +86,6 @@ namespace N29.HeroesDawn.Presentation.Hub
             switch (Tab)
             {
                 case ShopTab.Boosters: AddBoosters(rows); break;
-                case ShopTab.Items: AddItems(rows); break;
                 case ShopTab.Gems: AddGems(rows); break;
                 default: AddGift(rows, gift); break;
             }
@@ -120,28 +119,6 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 if (Report(_collection.BuyBooster(N29.HeroesDawn.Definitions.BoosterDef.StandardId), Loc.T("grimoire.bought"))) Refresh();
             });
-        }
-
-        void AddItems(List<InfoRowData> rows)
-        {
-            var offers = _collection.ItemOffers();
-            for (int i = 0; i < offers.Count; i++)
-            {
-                int index = i;
-                var it = offers[i].Item;
-                var r = InfoRowData.Basic(CollectionText.ItemName(Loc, it), CollectionText.RarityName(Loc, it.Rarity) + " · " + CollectionText.ItemEffects(Loc, it));
-                r.Tag = CollectionText.Tag(CollectionText.ItemName(Loc, it));
-                r.TagColor = CollectionText.RarityColor(it.Rarity);
-                r.Art = AgentArt.Item(CollectionText.ArtId(it, _session.Content.Collection));
-                int lacking = it.Price - _session.Wallet.Credits;
-                r.A = offers[i].Bought ? RowButtonData.Of(Loc.T("shop.item_sold"), false, "", 3)
-                                       : RowButtonData.Of(Loc.F("shop.item_price", it.Price), lacking <= 0, Loc.F("shop.item_missing", lacking), 0);
-                r.Dim = offers[i].Bought;
-                Add(rows, r, () =>
-                {
-                    if (Report(_collection.BuyItem(index), Loc.F("shop.item_bought", CollectionText.ItemName(Loc, it)))) Refresh();
-                });
-            }
         }
 
         void AddGems(List<InfoRowData> rows)

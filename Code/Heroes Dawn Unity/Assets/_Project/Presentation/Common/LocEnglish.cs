@@ -61,6 +61,10 @@ namespace N29.HeroesDawn.Presentation.Common
             ["shop.reroll.confirm.body"] = "3 new heroes for {0} Credits.",
             ["shop.recruited"] = "RECRUITED",
             ["shop.empty"] = "New York collection complete!",
+            ["shop.scrap_lot"] = "{0} × {1}", ["shop.scrap_sold"] = "BOUGHT",
+            ["shop.scrap.confirm.title"] = "Buy this lot?", ["shop.scrap.confirm.body"] = "{0} Credits will be spent.",
+            ["scrap.Weapon"] = "Weapon scraps", ["scrap.Armor"] = "Armor scraps", ["scrap.Tool"] = "Tool scraps",
+            ["scrap.Implant"] = "Implant scraps", ["scrap.Core"] = "Cores",
 
             // --- Paramètres ---
             ["settings.cat.Audio"] = "AUDIO",

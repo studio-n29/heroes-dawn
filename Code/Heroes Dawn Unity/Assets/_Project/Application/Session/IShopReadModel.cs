@@ -13,5 +13,7 @@ namespace N29.HeroesDawn.Application.Session
         /// <summary>Dernier jour de boutique vu sur l'onglet Recruter ; différent de <see cref="Day"/> = badge « N ».</summary>
         string SeenDay { get; }
         IReadOnlyList<ShopOffer> Offers { get; }
+        /// <summary>Lots de scraps du jour (même tirage que les héros, renouvelé avec lui).</summary>
+        IReadOnlyList<ShopScrapOffer> Scraps { get; }
     }
 }

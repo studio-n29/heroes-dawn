@@ -5,6 +5,11 @@ namespace N29.HeroesDawn.Domain.Shop
 {
     public static class ShopRules
     {
+        /// <summary>Boutique du jour : nombre de lots de scraps proposés, quantité par lot et prix en Crédits (à équilibrer).</summary>
+        public const int ScrapLotsPerDay = 6;
+        public const int ScrapLotCount = 3;
+        public const int ScrapLotPrice = 150;
+
         /// <summary>Coût du prochain renouvellement : le premier du jour est gratuit, puis Cost1..Cost4 (le dernier sert de plafond).</summary>
         public static int RerollCost(int rerollsToday, BalanceConfig b)
         {
