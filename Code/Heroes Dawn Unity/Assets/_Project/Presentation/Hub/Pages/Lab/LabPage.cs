@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    public interface ILabPageView : IListPageView { }
+    public interface ILabPageView : IListPageView, IFilterBarView { }
 
     public sealed class LabPagePresenter : ListPagePresenter<ILabPageView>
     {
@@ -34,6 +34,52 @@ namespace N29.HeroesDawn.Presentation.Hub
         public override string Title => Loc.T("page.lab");
         protected override bool HasTimers => true;
 
+        /// <summary>Filtres des recettes : catégorie (0 = toutes, sinon 1 + le type d'objet) et qualité possible (0 = toutes, sinon 1 + la qualité).</summary>
+        int _category, _quality;
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+            View.FilterClicked += OnFilter;
+        }
+
+        protected override void OnDispose()
+        {
+            View.FilterClicked -= OnFilter;
+            base.OnDispose();
+        }
+
+        void OnFilter(int group, int option)
+        {
+            if (group == 0) _category = option; else _quality = option;
+            _selected = 0;
+            Refresh();
+        }
+
+        /// <summary>Recettes connues, filtrées par catégorie et par qualité possible.</summary>
+        IReadOnlyList<RecipeView> FilteredRecipes() => _workshop.Recipes()
+            .Where(v => _category == 0 || (int)v.Recipe.Type == _category - 1)
+            .Where(v => _quality == 0 || (_quality - 1 < v.Odds.Count && v.Odds[_quality - 1] > 0))
+            .ToList();
+
+        void ShowFilters()
+        {
+            string all = Loc.T("filters.all");
+            View.ShowFilters(new[]
+            {
+                new FilterGroupData
+                {
+                    Labels = new[] { all }.Concat(System.Enum.GetValues(typeof(ItemType)).Cast<ItemType>().Select(t => CollectionText.ItemTypeName(Loc, t))).ToArray(),
+                    Selected = _category,
+                },
+                new FilterGroupData
+                {
+                    Labels = new[] { all }.Concat(System.Enum.GetValues(typeof(CraftQuality)).Cast<CraftQuality>().Select(q => CollectionText.QualityName(Loc, q))).ToArray(),
+                    Selected = _quality,
+                },
+            });
+        }
+
         protected override void OnPageShown() => Finish();
 
         void Finish()
@@ -45,11 +91,15 @@ namespace N29.HeroesDawn.Presentation.Hub
         protected override void Render()
         {
             Finish();
+            _recipes = FilteredRecipes();
+            if (_selected >= _recipes.Count) _selected = 0;
+            ShowFilters();
             var views = _lab.Views();
             var active = views.FirstOrDefault(v => v.Active);
             View.ShowHeader(new ListHeaderData
             {
-                Title = Loc.T("lab.title"),
+                // Centre de l'écran : l'objet choisi (la qualité et les matériaux sont dans le panneau de droite).
+                Title = _selected >= 0 && _selected < _recipes.Count ? Loc.T(_recipes[_selected].Recipe.NameKey) : Loc.T("lab.title"),
                 Line = active.Tech != null ? Loc.F("lab.running", Loc.T("lab." + active.Tech.Id), MetaFormat.Duration(active.Left)) : Loc.T("lab.idle"),
                 Progress = -1f,
                 A = active.Tech != null
@@ -107,7 +157,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 if (v.Odds[q] <= 0) continue;
                 var c = (CraftQuality)q;
-                string line = Loc.F("lab.odds", CollectionText.QualityName(Loc, c), v.Odds[q]);
+                // Pastille de qualité : initiale de la qualité (C, R, E, L), dans sa couleur.
+                string line = "[" + c.ToString().Substring(0, 1) + "] " + Loc.F("lab.odds", CollectionText.QualityName(Loc, c), v.Odds[q]);
                 quality.Add("<color=#" + ColorUtility.ToHtmlStringRGB(CollectionText.QualityColor(c)) + ">" + line + "</color>");
             }
             View.ShowSide(new ListSideData
@@ -134,7 +185,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             int recipe = row - _firstRecipeRow;
             if (recipe < 0 || recipe >= _recipes.Count) return;
             _selected = recipe;
-            ShowSide();
+            Refresh(); // recalcule les matériaux possédés avant d'afficher le panneau
         }
 
         protected override void OnSideButton(int row, int button)
@@ -159,7 +210,6 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (!s.Maxed) { r.Progress = Mathf.Clamp01(s.XpInLevel / (float)s.XpToNext); r.ProgressLabel = s.XpInLevel + " / " + s.XpToNext; }
                 rows.Add(r);
             }
-            _recipes = _workshop.Recipes();
             _firstRecipeRow = rows.Count;
             foreach (var v in _recipes)
             {

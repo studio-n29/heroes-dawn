@@ -117,6 +117,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             mainArea.offsetMin = Vector2.zero;
             float tabsH = shopTabs ? ShopTabsRecipe.Height + 10 : 0f;
             mainArea.offsetMax = new Vector2(-(sideWidth > 0 ? sideWidth + 24 : 0), -(HeaderH + 14 + tabsH));
+            // Barre de filtres sous l'en-tête, comme sur la grille : hauteur 0 tant que la page n'a pas de groupe.
+            float shift = sideWidth > 0 ? sideWidth + 24 : 0f;
+            var filters = Ui.Rect(rt, "Filters");
+            filters.anchorMin = new Vector2(0, 1);
+            filters.anchorMax = new Vector2(1, 1);
+            filters.pivot = new Vector2(0.5f, 1);
+            filters.sizeDelta = new Vector2(-shift, 0);
+            filters.anchoredPosition = new Vector2(-shift / 2f, -(HeaderH + 14 + tabsH));
             var rows = Ui.VScroll(mainArea, out _);
             rows.VLayout(10, 0, TextAnchor.UpperCenter);
             rows.GetComponent<VerticalLayoutGroup>().childControlHeight = true;
@@ -131,6 +139,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "headerA", a);
             ctx.Wire(view, "headerB", b);
             ctx.Wire(view, "rows", rows);
+            ctx.Wire(view, "filterBar", filters);
+            ctx.Wire(view, "listArea", mainArea);
             ctx.Wire(view, "rowPrefab", ctx.Asset("Widgets/InfoRow.prefab").GetComponent<InfoRowView>());
             if (shopTabs)
             {

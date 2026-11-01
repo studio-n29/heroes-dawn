@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Feedback;
 using N29.HeroesDawn.Presentation.Mvp;
@@ -14,8 +15,9 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// Base des pages « liste » : en-tête (titre, ligne, barre, 2 boutons), liste de lignes défilante, colonne de droite optionnelle.
     /// Les lignes sont recyclées ; chaque page concrète est un prefab distinct (sous-classe vide) pour être retrouvée par type.
     /// </summary>
-    public abstract class ListPageView : ViewBase, IListPageView
+    public abstract class ListPageView : ViewBase, IListPageView, IFilterBarView
     {
+        const float FilterRowH = 56f, FilterGap = 8f, FilterButtonW = 190f;
         [SerializeField] TMP_Text headerTitle = null!;
         [SerializeField] TMP_Text headerLine = null!;
         [SerializeField] UiBar headerBar = null!;
@@ -27,6 +29,15 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField, OptionalRef] TMP_Text? sideTitle;
         [SerializeField, OptionalRef] RectTransform? sideRows;
         [SerializeField, OptionalRef] TMP_Text? sideText;
+        /// <summary>Barre de filtres sous l'en-tête (masquée sans groupe) et zone de la liste qui descend sous elle.</summary>
+        [SerializeField, OptionalRef] RectTransform? filterBar;
+        [SerializeField, OptionalRef] RectTransform? listArea;
+
+        readonly List<List<UiButton>> _filterButtons = new List<List<UiButton>>();
+        string _filterShape = "";
+        float _listTop;
+
+        public event Action<int, int>? FilterClicked;
 
         readonly List<InfoRowView> _main = new List<InfoRowView>();
         readonly List<InfoRowView> _side = new List<InfoRowView>();
@@ -69,6 +80,58 @@ namespace N29.HeroesDawn.Presentation.Hub
             b.SetColors(bg, d.Style == 2 || d.Style == 3 ? Theme.Text : Theme.TextDark);
             b.Interactable = d.Enabled;
             b.DisabledReason = d.Reason;
+        }
+
+        /// <summary>Un rang de boutons par groupe (l'option choisie en jaune) ; la liste descend sous la barre, masquée sans groupe.</summary>
+        public void ShowFilters(FilterGroupData[] groups)
+        {
+            if (filterBar == null || listArea == null) return;
+            if (_listTop == 0f) _listTop = listArea.offsetMax.y;
+            bool any = groups.Length > 0;
+            filterBar.gameObject.SetActive(any);
+            float h = any ? groups.Length * (FilterRowH + FilterGap) : 0f;
+            filterBar.sizeDelta = new Vector2(filterBar.sizeDelta.x, h);
+            listArea.offsetMax = new Vector2(listArea.offsetMax.x, _listTop - h);
+            string shape = string.Join("|", groups.Select(g => string.Join(",", g.Labels)));
+            if (shape != _filterShape) BuildFilters(groups);
+            _filterShape = shape;
+            for (int g = 0; g < groups.Length && g < _filterButtons.Count; g++)
+                for (int o = 0; o < _filterButtons[g].Count; o++)
+                    _filterButtons[g][o].SetColors(o == groups[g].Selected ? Theme.Primary : Theme.Surface3, o == groups[g].Selected ? Theme.TextDark : Theme.Text);
+        }
+
+        void BuildFilters(FilterGroupData[] groups)
+        {
+            for (int i = filterBar!.childCount - 1; i >= 0; i--) Destroy(filterBar.GetChild(i).gameObject);
+            _filterButtons.Clear();
+            for (int g = 0; g < groups.Length; g++)
+            {
+                var row = new GameObject("Filters" + g, typeof(RectTransform)).GetComponent<RectTransform>();
+                row.SetParent(filterBar, false);
+                row.anchorMin = new Vector2(0, 1); row.anchorMax = new Vector2(1, 1); row.pivot = new Vector2(0.5f, 1);
+                row.sizeDelta = new Vector2(0, FilterRowH);
+                row.anchoredPosition = new Vector2(0, -g * (FilterRowH + FilterGap));
+                var buttons = new List<UiButton>();
+                for (int o = 0; o < groups[g].Labels.Length; o++)
+                {
+                    var b = Instantiate(headerA, row);
+                    b.gameObject.name = "Filter" + o;
+                    b.gameObject.SetActive(true);
+                    var rt = b.Rect;
+                    rt.anchorMin = rt.anchorMax = new Vector2(0, 0.5f);
+                    rt.pivot = new Vector2(0, 0.5f);
+                    rt.sizeDelta = new Vector2(FilterButtonW, FilterRowH);
+                    rt.anchoredPosition = new Vector2(4 + o * (FilterButtonW + 8), 0);
+                    b.SetLabel(groups[g].Labels[o]);
+                    b.Interactable = true;
+                    b.DisabledReason = "";
+                    b.Button.onClick.RemoveAllListeners();
+                    int group = g, option = o;
+                    b.Button.onClick.AddListener(() => FilterClicked?.Invoke(group, option));
+                    buttons.Add(b);
+                }
+                _filterButtons.Add(buttons);
+            }
         }
 
         public void ShowRows(InfoRowData[] data)
