@@ -67,6 +67,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["qg.state.new"] = "NEW", ["qg.state.open"] = "OPEN",
             ["qg.main.line"] = "{0} · {1} / {2} zones cleared",
             ["grimoire.search"] = "Search a card",
+            ["onboarding.name.invalid"] = "The name must be 1 to 20 characters long.",
             ["profile.tag_guest"] = "Create an account to get your tag", ["profile.tag_guest_reason"] = "Available after creating an account",
             ["profile.last_achievement"] = "Last achievement", ["profile.no_achievement"] = "No achievement yet",
             ["ach.title"] = "ACHIEVEMENTS", ["ach.line"] = "{0} / {1} unlocked", ["ach.back"] = "BACK", ["ach.progress"] = "{0} / {1}",
