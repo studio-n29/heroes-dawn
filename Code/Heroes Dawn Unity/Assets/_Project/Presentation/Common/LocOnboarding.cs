@@ -15,9 +15,9 @@ namespace N29.HeroesDawn.Presentation.Common
             d["onboarding.character.confirm"] = "COMMENCER";
             d["onboarding.campaign.unavailable"] = "Ce parcours n est pas encore disponible.";
             d["campaign.agent_d.name"] = "AGENT D";
-            d["campaign.agent_d.desc"] = "Illustrateur de rue à Harlem : ce qu il imagine devient réel. Tu diriges l unité à travers lui, sans qu il combatte. Parcours : New York, Paris, Moscou, puis Salem. Première recrue : Darius Brooks.";
+            d["campaign.agent_d.desc"] = "Illustrateur de rue à Harlem : ce qu il imagine devient réel. Tu diriges l unité à travers lui, sans qu il combatte. Parcours : New York, Paris, Moscou, puis Salem. Mentor de l unité.";
             d["campaign.agent_m.name"] = "AGENT M";
-            d["campaign.agent_m.desc"] = "Restauratrice de fresques à Moscou : elle voit le passé, le présent et le futur. Tu diriges l unité à travers elle, sans qu elle combatte. Parcours : Moscou, Paris, New York, puis Salem. Première recrue : Sam Okafor.";
+            d["campaign.agent_m.desc"] = "Restauratrice de fresques à Moscou : elle voit le passé, le présent et le futur. Tu diriges l unité à travers elle, sans qu elle combatte. Parcours : Moscou, Paris, New York, puis Salem. Mentor de l unité.";
 
             d["errors.account_email"] = "Adresse e-mail invalide.";
             d["errors.account_password"] = "Mot de passe trop court (8 caractères minimum).";

@@ -44,7 +44,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(session.Meta.onboarding.avatar, Is.EqualTo("avatar_2"));
             Assert.That(session.Meta.onboarding.campaign, Is.EqualTo("new_york"));
             Assert.That(session.Meta.onboarding.hero, Is.EqualTo("agent_d"));
-            Assert.That(session.Roster.Select(m => m.Id.Value), Is.EqualTo(new[] { "darius_brooks" }));
+            Assert.That(session.Roster.Select(m => m.Id.Value), Is.EqualTo(new[] { "giulia_rossi", "ilona_varga", "lucas_mendes" }), "trois recrues de la boutique, mentors absents");
             Assert.That(Object.FindAnyObjectByType<IntroPopupView>(), Is.Null, "la popup est fermée");
         }
 
