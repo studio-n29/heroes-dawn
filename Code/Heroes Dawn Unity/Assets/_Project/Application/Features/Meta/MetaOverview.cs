@@ -19,11 +19,8 @@ namespace N29.HeroesDawn.Application.Features.Meta
             Pass = pass; Daily = daily; Secondary = secondary; Operations = operations; Lab = lab; Archives = archives; Boutique = boutique; Quests = quests;
         }
 
-        /// <summary>Récompenses à récupérer dans le pass ou les missions du jour.</summary>
-        public int PassBadge => Pass.ClaimableCount() + Daily.ClaimableCount();
-
-        /// <summary>1 si le cadeau du jour n'est pas pris.</summary>
-        public int ShopBadge => Boutique.DailyGiftAvailable ? 1 : 0;
+        /// <summary>Récompenses à récupérer dans le pass, les missions du jour ou le cadeau du jour (réclamable dans le Pass).</summary>
+        public int PassBadge => Pass.ClaimableCount() + Daily.ClaimableCount() + (Boutique.DailyGiftAvailable ? 1 : 0);
 
         public int OperationsBadge => Operations.ReadyCount();
         public int LabBadge => Lab.IsReady ? 1 : 0;

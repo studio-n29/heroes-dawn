@@ -72,13 +72,13 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             _actions.Clear();
             View.ShowShopTab((int)Tab);
-            bool gift = _shop.DailyGiftAvailable;
             View.ShowHeader(new ListHeaderData
             {
                 Title = Loc.F("shop.gems", _session.Wallet.Gems),
                 Line = "",
                 Progress = -1f,
-                A = RowButtonData.Of(gift ? Loc.F("shop.gift", MetaFormat.RewardText(Boutique.DailyGift, Loc)) : Loc.T("shop.gift_done"), gift, Loc.T("shop.gift_done_reason"), 0),
+                // Le cadeau du jour se réclame dans le Pass (L2 de la 0.15.0).
+                A = RowButtonData.Of(Loc.T("nav.pass"), true, "", 0),
                 B = RowButtonData.Of(Loc.T("shop.grimoire"), true, "", 3),
             });
 
@@ -86,8 +86,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             switch (Tab)
             {
                 case ShopTab.Boosters: AddBoosters(rows); break;
-                case ShopTab.Gems: AddGems(rows); break;
-                default: AddGift(rows, gift); break;
+                default: AddGems(rows); break;
             }
             View.ShowRows(rows.ToArray());
         }
@@ -146,28 +145,15 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
         }
 
-        void AddGift(List<InfoRowData> rows, bool available)
-        {
-            var r = InfoRowData.Basic(Loc.T("shop.gift_title"), MetaFormat.RewardText(Boutique.DailyGift, Loc));
-            r.Tag = "+"; r.TagColor = Theme.Credits;
-            r.Art = AgentArt.Shop("gift");
-            r.Highlight = available;
-            r.Dim = !available;
-            r.A = RowButtonData.Of(available ? Loc.T("shop.gift_claim") : Loc.T("shop.gift_done"), available, Loc.T("shop.gift_done_reason"), 0);
-            Add(rows, r, ClaimGift);
-        }
-
         /// <summary>Icône d'un paquet de gemmes selon sa taille.</summary>
         static string PackArt(string packId) => packId == "gems_100" ? "gems_small" : packId == "gems_550" ? "gems_medium" : "gems_large";
 
         static string ExchangeArt(string id) => id == "ex_pr" ? "exchange_pr" : id == "ex_rest" ? "exchange_rest" : "exchange_credits";
 
-        void ClaimGift() => Report(_shop.ClaimDailyGift(), "shop.gift_taken");
-
         protected override void OnHeader(int index)
         {
-            if (index == 1) { _nav.Open(HubPage.Grimoire); return; }
-            ClaimGift();
+            if (index == 0) { _nav.Open(HubPage.Pass); return; }
+            _nav.Open(HubPage.Grimoire);
         }
 
         protected override void OnRowButton(int row, int button)

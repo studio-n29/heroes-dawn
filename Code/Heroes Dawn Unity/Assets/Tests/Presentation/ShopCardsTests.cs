@@ -38,7 +38,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que chaque offre des onglets Boosters, Gemmes et crédits et Cadeau porte une description et une illustration de boutique — parce que la boutique est faite de cartes avec icône et texte")]
         public void Rows_HaveADescription_AndAnIllustration()
         {
-            foreach (var tab in new[] { ShopTab.Boosters, ShopTab.Gems, ShopTab.Gift })
+            foreach (var tab in new[] { ShopTab.Boosters, ShopTab.Gems })
             {
                 var p = Shop(tab);
                 Assert.That(_view.Rows.Length, Is.GreaterThan(0), tab.ToString());

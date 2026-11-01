@@ -22,7 +22,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var h = root.HLayout(10, 0, TextAnchor.MiddleLeft);
             h.childForceExpandWidth = true;
             h.childControlWidth = true;
-            string[] keys = { "shop.tab.heroes", "shop.tab.boosters", "shop.tab.gems", "shop.tab.gift" };
+            string[] keys = { "shop.tab.heroes", "shop.tab.boosters", "shop.tab.gems" };
             var tabs = new Object[keys.Length];
             for (int i = 0; i < keys.Length; i++)
             {
