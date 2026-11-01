@@ -75,6 +75,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             intro.SkipButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<LoginView>());
             Assert.That(PlayModeHarness.Visible<LoginView>(), Is.True);
+            // Le popup se ferme par un fondu : on attend qu'il soit détruit (course avec l'affichage du login).
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<IntroPopupView>() == null);
             Assert.That(Object.FindAnyObjectByType<IntroPopupView>(), Is.Null);
         }
         [Test, Description("Vérifie que le compte local accepte l'inscription puis la connexion, refuse un mot de passe faux, un e-mail déjà pris et des saisies invalides — parce qu'il joue le rôle de Supabase Auth en attendant le vrai serveur")]
