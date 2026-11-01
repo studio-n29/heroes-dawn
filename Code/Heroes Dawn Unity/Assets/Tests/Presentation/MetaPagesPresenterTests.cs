@@ -71,7 +71,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             return p;
         }
 
-        PassPagePresenter Pass() => Start(new PassPagePresenter(_view, _app.Pass, _app.Daily, _loc, _toasts, _app.Subscriber<MetaChanged>(),
+        PassPagePresenter Pass() => Start(new PassPagePresenter(_view, _app.Pass, _app.Daily, _app.Boutique, _loc, _toasts, _app.Subscriber<MetaChanged>(),
                                                                _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
 
         [Test, Description("Vérifie que le pass affiche 30 niveaux, que la récompense gratuite d'un niveau atteint se prend d'un toucher et passe à « PRIS » — parce que c'est le geste central du pass (M40)")]
@@ -102,13 +102,13 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void Pass_SideShowsDailyMissions_ClaimWhenDone()
         {
             Pass();
-            Assert.That(_view.Side.Rows.Length, Is.EqualTo(3));
-            Assert.That(_view.Side.Rows[0].A.Enabled, Is.False);
+            Assert.That(_view.Side.Rows.Length, Is.EqualTo(4), "le cadeau du jour, puis les trois missions");
+            Assert.That(_view.Side.Rows[1].A.Enabled, Is.False);
             var m = _app.Daily.Today()[0];
             _app.Daily.Record(m.Template.Kind, m.Template.Target);
-            Assert.That(_view.Side.Rows[0].A.Enabled, Is.True, "la page se rafraîchit toute seule");
-            _view.ClickSide(0);
-            Assert.That(_view.Side.Rows[0].A.Label, Is.EqualTo(_loc.T("pass.taken")));
+            Assert.That(_view.Side.Rows[1].A.Enabled, Is.True, "la page se rafraîchit toute seule");
+            _view.ClickSide(1);
+            Assert.That(_view.Side.Rows[1].A.Label, Is.EqualTo(_loc.T("pass.taken")));
         }
 
         [Test, Description("Vérifie que l'échange de Gemmes contre des Crédits est grisé sans Gemmes, avec la raison, puis se fait quand on en a — parce qu'un bouton grisé doit dire pourquoi")]
@@ -158,21 +158,23 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Rows.Length, Is.EqualTo(2), "stock + achat");
             _view.ClickShopTab((int)ShopTab.Gems);
             Assert.That(_view.Rows.Length, Is.EqualTo(Boutique.Packs.Count + Boutique.Exchanges.Count));
-            _view.ClickShopTab((int)ShopTab.Gift);
-            Assert.That(_view.Rows.Length, Is.EqualTo(1));
             _view.ClickShopTab((int)ShopTab.Heroes);
             Assert.That(nav.Current.Page, Is.EqualTo(HubPage.Recruit));
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que l'onglet Cadeau récupère le cadeau du jour et grise la ligne ensuite — parce que le cadeau se prend une fois par jour")]
-        public void Boutique_GiftTab_ClaimsOncePerDay()
+        [Test, Description("Vérifie que le cadeau du jour se réclame dans le Pass, une fois par jour, et que la boutique ouvre le Pass — parce que le cadeau a quitté la boutique (0.15)")]
+        public void DailyGift_ClaimedInPass_OncePerDay_AndShopLinksToPass()
         {
-            var p = NewBoutique(new HubNavigator { ShopTab = ShopTab.Gift });
-            Assert.That(_view.Rows[0].A.Enabled, Is.True);
-            _view.ClickRow(0);
-            Assert.That(_view.Rows[0].A.Enabled, Is.False);
+            var nav = new HubNavigator();
+            var p = NewBoutique(nav);
+            _view.ClickHeader(0);
+            Assert.That(nav.Current.Page, Is.EqualTo(HubPage.Pass));
             p.Dispose();
+            Pass();
+            Assert.That(_view.Side.Rows[0].A.Enabled, Is.True);
+            _view.ClickSide(0);
+            Assert.That(_view.Side.Rows[0].A.Enabled, Is.False);
         }
 
         [Test, Description("Vérifie qu'« Ouvrir » est grisé sans booster, que l'achat en ajoute un, et qu'ouvrir montre la popup animée avec autant de cartes que le booster en contient puis consomme le booster — parce que l'ouverture est un moment à part")]
@@ -195,18 +197,15 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que le cadeau du jour se prend une fois par jour — parce qu'il donne une raison de revenir")]
-        public void Boutique_DailyGift_OncePerDay()
+        [Test, Description("Vérifie que le cadeau du jour se reprend le lendemain dans le Pass — parce qu'il donne une raison de revenir")]
+        public void DailyGift_ComesBackNextDay()
         {
-            var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
-                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator()));
-            Assert.That(_view.Header.A.Enabled, Is.True);
-            _view.ClickHeader(0);
-            Assert.That(_view.Header.A.Enabled, Is.False);
+            Pass();
+            _view.ClickSide(0);
+            Assert.That(_view.Side.Rows[0].A.Enabled, Is.False);
             _app.Time.LocalNow = _app.Time.LocalNow.AddDays(1);
             _app.MetaCtx.Touch(MetaArea.Boutique);
-            Assert.That(_view.Header.A.Enabled, Is.True);
-            p.Dispose();
+            Assert.That(_view.Side.Rows[0].A.Enabled, Is.True);
         }
 
         [Test, Description("Vérifie que la page Opérations propose les trois durées, grise celles qui manquent de membres libres et lance l'expédition choisie — parce que l'envoi est le geste principal de la salle")]
