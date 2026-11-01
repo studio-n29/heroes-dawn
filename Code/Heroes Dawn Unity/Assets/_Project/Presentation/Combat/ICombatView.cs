@@ -34,6 +34,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         void ShowTopBar(CombatTopBarData data);
         void SetHint(string hint);
         void ShowBanner(string text, Tone tone);
+        /// <summary>Barre de vie élargie du boss (null : aucun boss en vie) ; <paramref name="phaseChanged"/> déclenche la télégraphie du changement de phase.</summary>
+        void ShowBoss(BossBarData? data, bool phaseChanged = false);
         void ShowLog(IReadOnlyList<string> lines);
         /// <summary>Bonus actifs de l'équipe (synergies et effets de composition), en pastilles sous les alliés.</summary>
         void ShowBonuses(IReadOnlyList<BonusChipData> bonuses);

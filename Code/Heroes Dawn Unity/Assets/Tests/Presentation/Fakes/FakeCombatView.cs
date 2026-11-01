@@ -44,7 +44,12 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void ShowTimeline(TimelineData data) => Timeline = data;
         public void ShowTopBar(CombatTopBarData data) => TopBar = data;
         public void SetHint(string hint) => Hint = hint;
-        public void ShowBanner(string text, Tone tone) { }
+        public readonly List<(string Text, Tone Tone)> Banners = new List<(string Text, Tone Tone)>();
+        public void ShowBanner(string text, Tone tone) => Banners.Add((text, tone));
+        /// <summary>Dernière barre de boss affichée (null : aucun boss en vie) et nombre de télégraphies de changement de phase.</summary>
+        public BossBarData? Boss;
+        public int BossPhaseFlashes;
+        public void ShowBoss(BossBarData? data, bool phaseChanged = false) { Boss = data; if (phaseChanged) BossPhaseFlashes++; }
         public void ShowLog(IReadOnlyList<string> lines) => Log = lines;
         public IReadOnlyList<BonusChipData> Bonuses = Array.Empty<BonusChipData>();
         public void ShowBonuses(IReadOnlyList<BonusChipData> bonuses) => Bonuses = bonuses;

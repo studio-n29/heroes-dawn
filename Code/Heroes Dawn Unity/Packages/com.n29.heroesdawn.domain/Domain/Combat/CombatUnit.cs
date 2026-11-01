@@ -40,6 +40,11 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Avance de depart sur la frise donnee par les objets (en points).</summary>
         public int StartPointBonus { get; set; }
 
+        /// <summary>Phases du boss (seuils de PV décroissants) ; vide pour les autres unités.</summary>
+        public IReadOnlyList<BossPhaseDef> Phases { get; set; } = System.Array.Empty<BossPhaseDef>();
+        /// <summary>Nombre de phases déjà ouvertes (0 : la première phase est encore en cours).</summary>
+        public int PhaseReached { get; set; }
+
         /// <summary>Vrai tant que l unite n a pas rattrape sa canalisation (point negatif).</summary>
         public bool IsChannelling => Point < 0;
 
