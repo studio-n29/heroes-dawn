@@ -145,6 +145,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 DailyLines = activities.Count == 0 ? new[] { _loc.T("activity.empty") }
                            : activities.Select(a => _loc.F("qg.activity.line", ActivityText(a), a.Claimed ? _loc.T("quests.state.done") : a.Progress + " / " + a.Target)).ToArray(),
                 DailyBadge = claimable > 0 ? claimable.ToString() : "",
+                DailyBanner = _loc.F("qg.daily.banner", activities.Count),
                 SecondaryText = secondary.HasValue ? SecondaryLine(secondary.Value) : _loc.T("qg.secondary.none"),
                 SecondaryActive = secondary.HasValue,
                 ShopAlertBadge = s.Shop.Day.Length > 0 && s.Shop.SeenDay != s.Shop.Day ? "N" : "",

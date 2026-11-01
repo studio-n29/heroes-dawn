@@ -67,7 +67,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["qg.state.new"] = "NEW", ["qg.state.open"] = "OPEN",
             ["qg.main.line"] = "{0} · {1} / {2} zones cleared",
             ["grimoire.search"] = "Search a card",
-            ["qg.state.locked"] = "LOCKED", ["qg.lock.tutorial"] = "Finish the tutorial", ["qg.lock.zone"] = "Clear chapter {0}",
+            ["qg.daily.banner"] = "{0} activity(ies) today", ["qg.state.locked"] = "LOCKED", ["qg.lock.tutorial"] = "Finish the tutorial", ["qg.lock.zone"] = "Clear chapter {0}",
             ["settings.unlock_all"] = "Unlock everything (test)", ["settings.unlock_all.hint"] = "Opens every QG room, without tutorial or chapter.",
             ["inventory.sort.rarity"] = "Rarity", ["inventory.sort.name"] = "Name", ["inventory.sort.count"] = "Quantity",
             ["shop.scrap_lot"] = "{0} × {1}", ["shop.scrap_sold"] = "BOUGHT",

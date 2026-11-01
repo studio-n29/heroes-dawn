@@ -17,6 +17,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] Button dailyCard = null!;
         [SerializeField] TMP_Text dailyBody = null!;
         [SerializeField] TMP_Text dailyBadge = null!;
+        /// <summary>Bandeau « n activités aujourd'hui » ; le panneau latéral (dailyDrawer) en donne le détail.</summary>
+        [SerializeField] TMP_Text dailyCount = null!;
+        [SerializeField] GameObject dailyDrawer = null!;
+        [SerializeField] Button dailyClose = null!;
         [SerializeField] Button secondaryCard = null!;
         [SerializeField] Button shopAlertButton = null!;
         [SerializeField] TMP_Text shopAlertBadge = null!;
@@ -65,7 +69,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             mission.Button.onClick.AddListener(() => MissionClicked?.Invoke());
             banner.onClick.AddListener(() => MissionClicked?.Invoke());
-            dailyCard.onClick.AddListener(() => DailyClicked?.Invoke());
+            dailyCard.onClick.AddListener(() => dailyDrawer.SetActive(true));
+            dailyClose.onClick.AddListener(() => dailyDrawer.SetActive(false));
             secondaryCard.onClick.AddListener(() => SecondaryClicked?.Invoke());
             shopAlertButton.onClick.AddListener(() => ShopAlertClicked?.Invoke());
             filCard.onClick.AddListener(() => QuestsClicked?.Invoke());
@@ -83,6 +88,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (!_cascaded) Fx.PopInAfter(rooms[i].transform, Stagger.DelayFor(i));
             }
             dailyBody.text = string.Join("\n", d.DailyLines);
+            dailyCount.text = d.DailyBanner;
             dailyBadge.text = d.DailyBadge;
             dailyBadge.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(d.DailyBadge));
             secondaryDot.SetActive(d.SecondaryActive);

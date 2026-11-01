@@ -143,14 +143,22 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             filBadgeText.rectTransform.Stretch();
             filBadge.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
 
-            // ---- Missions du jour (à venir)
+            // ---- Activités du jour : bandeau avec leur nombre ; un toucher ouvre le panneau latéral (fermé par défaut)
             var daily = Ui.Panel(rt, "Daily", Theme.Surface, 5f, 10f, true);
-            daily.Frame().At(1f, 1f, 0, -112, RightW, 300);
-            Ui.LocTxt(daily.transform, "qg.daily", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title").rectTransform.At(0f, 1f, 22, -14, 540, 46);
-            var dailyBody = Ui.Txt(daily.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Body");
-            dailyBody.rectTransform.Stretch(22, 12, 22, 62);
+            daily.Frame().At(1f, 1f, 0, -112, RightW, 96);
+            Ui.LocTxt(daily.transform, "qg.daily", 30, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title").rectTransform.At(0f, 0.5f, 22, 0, 300, 46);
+            var dailyCount = Ui.Txt(daily.transform, "", 30, Theme.Text, TextAnchor.MiddleRight, FontKind.Title, "Count");
+            dailyCount.rectTransform.At(1f, 0.5f, -70, 0, 360, 46);
+            var drawer = Ui.Panel(rt, "DailyDrawer", Theme.Surface, 5f, 10f, true);
+            drawer.Frame().At(1f, 1f, 0, -112, RightW, 700);
+            Ui.LocTxt(drawer.transform, "qg.daily", 34, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "DrawerTitle").rectTransform.At(0f, 1f, 22, -14, 380, 46);
+            var close = Ui.LocBtn(drawer.transform, "nav.back", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Close");
+            close.Rect.At(1f, 1f, -14, -14, 160, 64);
+            var dailyBody = Ui.Txt(drawer.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Body");
+            dailyBody.rectTransform.Stretch(22, 90, 22, 22);
             dailyBody.fontSize = 24;
             dailyBody.lineSpacing = 8;
+            drawer.gameObject.SetActive(false);
             var dailyButton = daily.Frame().gameObject.AddComponent<Button>();
             dailyButton.targetGraphic = daily;
             dailyButton.transition = Selectable.Transition.None;
@@ -186,6 +194,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.WireArray(view, "rooms", rooms);
             ctx.Wire(view, "dailyCard", dailyButton);
             ctx.Wire(view, "dailyBody", dailyBody);
+            ctx.Wire(view, "dailyCount", dailyCount);
+            ctx.Wire(view, "dailyDrawer", drawer.gameObject);
+            ctx.Wire(view, "dailyClose", close.Button);
+            drawer.transform.SetAsLastSibling(); // le panneau passe au-dessus des alertes
             ctx.Wire(view, "dailyBadge", dailyBadgeText);
             ctx.Wire(view, "secondaryCard", secondaryButton);
             ctx.Wire(view, "shopAlertButton", shopAlertButton);

@@ -27,6 +27,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public RoomCardData[] Rooms;
         public string[] DailyLines;
         public string DailyBadge;
+        /// <summary>Bandeau des activités du jour (« 3 activités aujourd'hui »).</summary>
+        public string DailyBanner;
         public string SecondaryText;
         public bool SecondaryActive;
         public string ShopAlert;

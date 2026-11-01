@@ -69,6 +69,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["qg.main.line"] = "{0} · {1} / {2} zones validées";
             d["grimoire.search"] = "Rechercher une carte";
             d["qg.state.locked"] = "VERROUILLÉ";
+            d["qg.daily.banner"] = "{0} activité(s) aujourd'hui";
             d["qg.lock.tutorial"] = "Termine le tutoriel";
             d["qg.lock.zone"] = "Termine le chapitre {0}";
             d["settings.unlock_all"] = "Tout débloquer (test)";
