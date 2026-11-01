@@ -139,6 +139,20 @@ namespace N29.HeroesDawn.Tests.Presentation
         InventoryPagePresenter Inventory() => Start(new InventoryPagePresenter(_view, _app.Session, _loc, _toasts,
                                                                               _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
 
+        [Test, Description("Vérifie que l'inventaire se trie par nom quand on choisit « Nom » dans la seconde rangée de filtres, et que le tri par défaut reste « Rareté » — parce que retrouver un objet demande un tri (L3 : inventaire)")]
+        public void Inventory_SortByName_IsAlphabetical_AndRarityIsTheDefault()
+        {
+            CollectionOps.AddItem(_app.Session, new ItemId("steel_knuckles"));
+            CollectionOps.AddItem(_app.Session, new ItemId("kevlar_vest"));
+            var p = Inventory();
+            Assert.That(_view.Filters[1].Selected, Is.EqualTo(0), "tri par défaut : rareté");
+            _view.ClickFilter(1, 1);
+            var byName = Titles();
+            Assert.That(byName.Length, Is.GreaterThan(1));
+            Assert.That(byName, Is.Ordered.Ascending);
+            p.Dispose();
+        }
+
         // ------------------------------------------------------------------ Catégories (lot B 0.14.0)
 
         [Test, Description("Vérifie que chaque carte du grimoire affiche sa nature (Mur de verre : défensive) — parce que la nature aide à construire un deck équilibré")]
@@ -251,7 +265,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             CollectionOps.AddItem(_app.Session, new ItemId("kevlar_vest"));
             CollectionOps.AddItem(_app.Session, new ItemId("steel_knuckles"));
             var p = Inventory();
-            Assert.That(_view.Filters.Length, Is.EqualTo(1));
+            Assert.That(_view.Filters.Length, Is.EqualTo(2), "type, puis tri");
             Assert.That(_view.Filters[0].Labels.Length, Is.EqualTo(5));
             _view.ClickFilter(0, Opt(ItemType.Armor));
             Assert.That(Titles(), Is.EqualTo(new[] { "Gilet kevlar" }));
