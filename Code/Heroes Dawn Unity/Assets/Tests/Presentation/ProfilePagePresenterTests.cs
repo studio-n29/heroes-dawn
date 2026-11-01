@@ -15,7 +15,8 @@ namespace N29.HeroesDawn.Tests.Presentation
     public sealed class ProfilePagePresenterTests
     {
         // Deux rangées de navigation, huit statistiques, le titre de la section Amis, puis les amis.
-        const int NavRows = 2, StatRows = 8, FirstFriendRow = NavRows + StatRows + 1;
+        // Lignes : registre, archives, dernier succès, huit statistiques, titre des amis.
+        const int NavRows = 3, StatRows = 8, FirstFriendRow = NavRows + StatRows + 1;
         static readonly string[] StatKeys = { "combatsWon", "combatsLost", "zones", "agents", "topLevel", "bestLink", "crafted", "credits" };
 
         TestApp _app = null!;

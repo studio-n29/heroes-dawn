@@ -32,6 +32,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
 
         public int PassLevel => _pass.Level;
 
+        /// <summary>Succès du joueur (progression, déblocage, jour).</summary>
+        public Achievements Achievements() => new Achievements(_c, this);
+
         public ProfileStats Stats()
         {
             var meta = _c.Meta;

@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Account;
@@ -45,8 +46,12 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public override string Title => Loc.T("page.profile");
 
+        /// <summary>Vrai quand la liste complète des succès est ouverte (depuis le dernier succès).</summary>
+        bool _achievementsOpen;
+
         protected override void Render()
         {
+            if (_achievementsOpen) { RenderAchievements(); return; }
             View.ShowHeader(new ListHeaderData
             {
                 Title = _profile.Tag,
@@ -65,6 +70,15 @@ namespace N29.HeroesDawn.Presentation.Hub
 
             Add(NavRow("profile.registry", "profile.registry.sub", "R"), () => _nav.Open(HubPage.Agents));
             Add(NavRow("profile.archives", "profile.archives.sub", "A"), () => _nav.Open(HubPage.Archives));
+
+            // Dernier succès débloqué : un appui ouvre la liste complète.
+            var last = _profile.Achievements().Last();
+            var lastRow = InfoRowData.Basic(Loc.T("profile.last_achievement"),
+                last.HasValue ? Loc.T(last.Value.Def.NameKey) + " · " + last.Value.UnlockedDay : Loc.T("profile.no_achievement"));
+            lastRow.Tag = "A";
+            lastRow.TagColor = Theme.Primary;
+            lastRow.A = RowButtonData.Of(Loc.T("profile.open"), true, "", 0);
+            Add(lastRow, () => { _achievementsOpen = true; Refresh(); });
 
             var s = _profile.Stats();
             var values = new[] { s.CombatsWon, s.CombatsLost, s.ZonesCleared, s.Agents, s.TopAgentLevel, s.BestLinkWins, s.CraftedItems, s.CreditsEarned };
@@ -142,8 +156,41 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         protected override void OnHeader(int index)
         {
+            if (_achievementsOpen) { _achievementsOpen = false; Refresh(); return; }
             if (index == 0) CopyTag();
             else AddFriendAsync().Forget();
+        }
+
+        /// <summary>Liste complète des succès : débloqué (avec son jour) ou verrouillé (avec la progression).</summary>
+        void RenderAchievements()
+        {
+            var list = _profile.Achievements().List();
+            int done = list.Count(a => a.Unlocked);
+            View.ShowHeader(new ListHeaderData
+            {
+                Title = Loc.T("ach.title"),
+                Line = Loc.F("ach.line", done, list.Count),
+                Progress = list.Count == 0 ? -1f : done / (float)list.Count,
+                ProgressLabel = done + " / " + list.Count,
+                A = RowButtonData.Of(Loc.T("ach.back"), true, "", 0),
+            });
+            _actions.Clear();
+            _actionsB.Clear();
+            var rows = new List<InfoRowData>();
+            foreach (var a in list)
+            {
+                var r = InfoRowData.Basic(Loc.T(a.Def.NameKey), Loc.T(a.Def.DescKey));
+                r.Tag = a.Unlocked ? "OK" : "--";
+                r.TagColor = a.Unlocked ? Theme.Success : Theme.Surface3;
+                r.Badge = a.Unlocked ? a.UnlockedDay : Loc.F("ach.progress", a.Progress, a.Def.Target);
+                r.Progress = a.Def.Target == 0 ? -1f : a.Progress / (float)a.Def.Target;
+                r.ProgressLabel = a.Progress + " / " + a.Def.Target;
+                r.Dim = !a.Unlocked;
+                rows.Add(r);
+                _actions.Add(null);
+                _actionsB.Add(null);
+            }
+            View.ShowRows(rows.ToArray());
         }
 
         /// <summary>Ouvre la saisie du tag ; un tag valide s'ajoute à la liste, une erreur s'affiche, annuler ne fait rien.</summary>

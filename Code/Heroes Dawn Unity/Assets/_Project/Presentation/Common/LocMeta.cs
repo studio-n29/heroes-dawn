@@ -134,6 +134,21 @@ namespace N29.HeroesDawn.Presentation.Common
 
             // --- Labo
             d["page.lab"] = "Atelier de fabrication";
+            d["profile.last_achievement"] = "Dernier succès";
+            d["profile.no_achievement"] = "Aucun succès pour l'instant";
+            d["ach.title"] = "SUCCÈS";
+            d["ach.line"] = "{0} / {1} débloqués";
+            d["ach.back"] = "RETOUR";
+            d["ach.progress"] = "{0} / {1}";
+            d["ach.first_win.name"] = "Premier combat gagné"; d["ach.first_win.desc"] = "Gagne un combat.";
+            d["ach.wins_10.name"] = "Vétéran"; d["ach.wins_10.desc"] = "Gagne 10 combats.";
+            d["ach.wins_50.name"] = "Légende de rue"; d["ach.wins_50.desc"] = "Gagne 50 combats.";
+            d["ach.zone_1.name"] = "Premier quartier"; d["ach.zone_1.desc"] = "Valide une zone.";
+            d["ach.zone_4.name"] = "Tour de Brooklyn"; d["ach.zone_4.desc"] = "Valide 4 zones.";
+            d["ach.agents_5.name"] = "Petit cercle"; d["ach.agents_5.desc"] = "Ajoute 5 agents à ton équipe.";
+            d["ach.agents_15.name"] = "Grand réseau"; d["ach.agents_15.desc"] = "Ajoute 15 agents à ton équipe.";
+            d["ach.craft_1.name"] = "Premier bricolage"; d["ach.craft_1.desc"] = "Fabrique un objet.";
+            d["ach.friend_1.name"] = "Premier allié"; d["ach.friend_1.desc"] = "Ajoute un ami.";
             d["lab.side.none"] = "Choisis une recette";
             d["lab.state.ok"] = "Fabrication possible.";
             d["lab.state.missing"] = "Composants insuffisants.";

@@ -93,6 +93,10 @@ namespace N29.HeroesDawn.Application.Ports
         public List<string> members = new List<string>();
     }
 
+    /// <summary>Succès débloqué : identifiant et jour de la première constatation (aaaa-mm-jj).</summary>
+    [Serializable]
+    public sealed class AchievementSave { public string id = ""; public string day = ""; }
+
     /// <summary>Victoires remportées ensemble par deux agents (identifiants triés : a avant b).</summary>
     [Serializable]
     public sealed class LinkSave
@@ -191,6 +195,8 @@ namespace N29.HeroesDawn.Application.Ports
         // Profil (lot F) : compteurs de statistiques (combatsWon, combatsLost, creditsEarned) et tags des amis (liste simulée locale)
         public List<CounterSave> stats = new List<CounterSave>();
         public List<string> friends = new List<string>();
+        /// <summary>Succès débloqués, avec le jour de la première constatation.</summary>
+        public List<AchievementSave> achievements = new List<AchievementSave>();
 
         // Narration (lot G) : chapitres dont l'ouverture a été montrée
         public List<string> chaptersSeen = new List<string>();
