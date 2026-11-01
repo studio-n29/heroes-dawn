@@ -143,7 +143,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Agents.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<AgentsPageView>(ctx, "AgentsPage", 0, false, false).gameObject;
+        public GameObject Build(PrefabContext ctx) => CardGridKit.Build<AgentsPageView>(ctx, "AgentsPage").gameObject;
     }
 
     /// <summary>Page Grimoire : la collection de cartes en grille, l'ouverture des boosters.</summary>
