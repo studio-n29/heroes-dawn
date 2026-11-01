@@ -101,11 +101,20 @@ namespace N29.HeroesDawn.Presentation.Hub
             var craft = InfoRowData.Basic(Loc.T("lab.craft"), "");
             craft.A = RowButtonData.Of(Loc.T("lab.craft"), v.CanAfford, Loc.T("errors.not_enough_scraps"), 0);
             rows.Add(craft);
+            // Qualités possibles : chaque ligne dans la couleur de sa qualité (commun, rare, épique, légendaire).
+            var quality = new List<string>();
+            for (int q = 0; q < v.Odds.Count; q++)
+            {
+                if (v.Odds[q] <= 0) continue;
+                var c = (CraftQuality)q;
+                string line = Loc.F("lab.odds", CollectionText.QualityName(Loc, c), v.Odds[q]);
+                quality.Add("<color=#" + ColorUtility.ToHtmlStringRGB(CollectionText.QualityColor(c)) + ">" + line + "</color>");
+            }
             View.ShowSide(new ListSideData
             {
                 Title = Loc.T(v.Recipe.NameKey),
                 Rows = rows.ToArray(),
-                Text = Loc.T(v.CanAfford ? "lab.state.ok" : "lab.state.missing") + "\n" + Loc.T("lab.provenance"),
+                Text = Loc.T(v.CanAfford ? "lab.state.ok" : "lab.state.missing") + "\n" + string.Join("\n", quality) + "\n" + Loc.T("lab.provenance"),
             });
         }
 
