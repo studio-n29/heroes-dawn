@@ -207,7 +207,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Lab.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<LabPageView>(ctx, "LabPage", 0, false, false).gameObject;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<LabPageView>(ctx, "LabPage", 560, true, true).gameObject;
     }
 
     /// <summary>Profil du joueur : tag, accès au registre et aux archives, statistiques, amis.</summary>

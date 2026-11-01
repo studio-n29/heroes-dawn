@@ -84,6 +84,54 @@ namespace N29.HeroesDawn.Presentation.Hub
             var all = new List<InfoRowData>(rows);
             AddWorkshopRows(all);
             View.ShowRows(all.ToArray());
+            ShowSide();
+        }
+
+        /// <summary>Panneau de droite : la recette choisie, ses matériaux (possédés et manquants), l'état et le bouton Fabriquer.</summary>
+        void ShowSide()
+        {
+            if (_selected < 0 || _selected >= _recipes.Count)
+            {
+                View.ShowSide(new ListSideData { Title = Loc.T("lab.side.none"), Rows = new InfoRowData[0], Text = "" });
+                return;
+            }
+            var v = _recipes[_selected];
+            var rows = new List<InfoRowData> { MaterialRow(ScrapKinds.For(v.Recipe.Type), v.Recipe.ScrapCost) };
+            if (v.Recipe.CoreCost > 0) rows.Add(MaterialRow(ScrapKind.Core, v.Recipe.CoreCost));
+            var craft = InfoRowData.Basic(Loc.T("lab.craft"), "");
+            craft.A = RowButtonData.Of(Loc.T("lab.craft"), v.CanAfford, Loc.T("errors.not_enough_scraps"), 0);
+            rows.Add(craft);
+            View.ShowSide(new ListSideData
+            {
+                Title = Loc.T(v.Recipe.NameKey),
+                Rows = rows.ToArray(),
+                Text = Loc.T(v.CanAfford ? "lab.state.ok" : "lab.state.missing") + "\n" + Loc.T("lab.provenance"),
+            });
+        }
+
+        /// <summary>Une matière : ce qu'on possède, ou ce qui manque pour fabriquer.</summary>
+        InfoRowData MaterialRow(ScrapKind kind, int need)
+        {
+            int have = _workshop.Scraps(kind);
+            bool enough = have >= need;
+            var r = InfoRowData.Basic(CollectionText.Scrap(Loc, kind, need), enough ? Loc.F("lab.have", have) : Loc.F("lab.missing", need - have));
+            r.Tag = enough ? "OK" : "KO";
+            r.TagColor = enough ? Theme.Success : Theme.Danger;
+            return r;
+        }
+
+        protected override void OnRowSelected(int row)
+        {
+            int recipe = row - _firstRecipeRow;
+            if (recipe < 0 || recipe >= _recipes.Count) return;
+            _selected = recipe;
+            ShowSide();
+        }
+
+        protected override void OnSideButton(int row, int button)
+        {
+            if (_selected < 0 || _selected >= _recipes.Count) return;
+            Craft(_recipes[_selected].Recipe.Id);
         }
 
         /// <summary>Atelier : titre (avec les scraps), une rangée par compétence de création, une par recette connue.</summary>
@@ -141,6 +189,9 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         // Rangée de la première recette, relevée au rendu (après les recherches, le titre de l'atelier et les compétences).
         int _firstRecipeRow = int.MaxValue;
+
+        /// <summary>Recette affichée dans le panneau de droite (index dans les recettes connues).</summary>
+        int _selected;
 
         void Craft(string recipeId)
         {

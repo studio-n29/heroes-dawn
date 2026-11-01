@@ -134,6 +134,12 @@ namespace N29.HeroesDawn.Presentation.Common
 
             // --- Labo
             d["page.lab"] = "Atelier de fabrication";
+            d["lab.side.none"] = "Choisis une recette";
+            d["lab.state.ok"] = "Fabrication possible.";
+            d["lab.state.missing"] = "Composants insuffisants.";
+            d["lab.provenance"] = "Scraps : lots de la boutique du jour et butin des combats.";
+            d["lab.have"] = "Possédé : {0}";
+            d["lab.missing"] = "Manque {0}";
             d["lab.title"] = "RECHERCHES";
             d["lab.idle"] = "Aucune recherche en cours.";
             d["lab.running"] = "En cours : {0} · {1}";
