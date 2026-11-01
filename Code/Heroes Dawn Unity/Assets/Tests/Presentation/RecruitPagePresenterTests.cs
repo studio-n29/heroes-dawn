@@ -45,8 +45,9 @@ namespace N29.HeroesDawn.Tests.Presentation
         RecruitPagePresenter Make()
         {
             var flow = new RecruitFlow(_modals, _app.Shop.Recruit, _app.Session, _toasts, _loc);
-            _p = new RecruitPagePresenter(_view, _app.Session, _app.Shop.Open, _app.Shop.Reroll, _app.Shop.MarkSeen, flow, _nav, _app.Time,
-                                          _modals, _toasts, _loc, _app.Subscriber<ShopChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>());
+            _p = new RecruitPagePresenter(_view, _app.Session, _app.Shop.Open, _app.Shop.Reroll, _app.Shop.BuyScrap, _app.Shop.MarkSeen, flow, _nav,
+                                          _app.Time, _modals, _toasts, _loc, _app.Subscriber<ShopChanged>(), _app.Subscriber<WalletChanged>(),
+                                          _app.Subscriber<RosterChanged>());
             _view.Show();
             _p.Start();
             return _p;
@@ -100,6 +101,19 @@ namespace N29.HeroesDawn.Tests.Presentation
             _app.Session.Wallet.Set(0, 100);
             _app.Publisher<WalletChanged>().Publish(new WalletChanged(0, 100));
             Assert.That(_view.Last.Cards.All(c => !c.Affordable), Is.True);
+        }
+
+        [Test, Description("Vérifie que la page Recruter montre les lots de scraps du jour et que chacun n'est achetable qu'avec assez de Crédits — parce que les scraps se gagnent dans la boutique, pas en combat seulement")]
+        public void ScrapLots_ShownSix_AffordableOnlyWithCredits()
+        {
+            _app.Session.Wallet.Set(0, 5000);
+            Make();
+            Assert.That(_view.Last.Scraps.Length, Is.GreaterThan(0));
+            Assert.That(_view.Last.Scraps.Length, Is.EqualTo(_app.Session.Shop.Scraps.Count));
+            Assert.That(_view.Last.Scraps.All(s => !s.Enabled), Is.True, "sans Crédits, aucun lot n'est achetable");
+            _app.Session.Wallet.Set(100000, 5000);
+            _app.Publisher<WalletChanged>().Publish(new WalletChanged(100000, 5000));
+            Assert.That(_view.Last.Scraps.All(s => s.Enabled), Is.True);
         }
 
         [Test, Description("Vérifie qu'ouvrir la page marque la boutique du jour comme vue — parce que le badge « N » disparaît une fois la boutique consultée (spec §5)")]

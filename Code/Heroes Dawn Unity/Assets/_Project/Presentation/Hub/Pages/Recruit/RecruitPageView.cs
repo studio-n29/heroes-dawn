@@ -17,6 +17,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] ShopCardView[] cards = Array.Empty<ShopCardView>();
         [SerializeField] TMP_Text empty = null!;
         [SerializeField] TMP_Text progress = null!;
+        [SerializeField] UiButton[] scraps = Array.Empty<UiButton>();
         [SerializeField] UiButton reroll = null!;
         [SerializeField] UiButton registry = null!;
         [SerializeField] ShopTabsView shopTabs = null!;
@@ -24,10 +25,12 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly int[] _slots = new int[8];
         readonly Core.MemberId[] _ids = new Core.MemberId[8];
         readonly bool[] _shown = new bool[8];
+        readonly int[] _scrapSlots = new int[6];
 
         public event Action<int>? CardTapped;
         public event Action<int>? RecruitClicked;
         public event Action? RerollClicked;
+        public event Action<int>? ScrapClicked;
         public event Action? RegistryClicked;
         public event Action<int>? ShopTabClicked;
 
@@ -43,6 +46,11 @@ namespace N29.HeroesDawn.Presentation.Hub
                 int index = i;
                 cards[i].Tapped += () => CardTapped?.Invoke(_slots[index]);
                 cards[i].RecruitClicked += () => RecruitClicked?.Invoke(_slots[index]);
+            }
+            for (int i = 0; i < scraps.Length; i++)
+            {
+                int index = i;
+                scraps[i].Button.onClick.AddListener(() => ScrapClicked?.Invoke(_scrapSlots[index]));
             }
             reroll.Button.onClick.AddListener(() => RerollClicked?.Invoke());
             registry.Button.onClick.AddListener(() => RegistryClicked?.Invoke());
@@ -70,6 +78,15 @@ namespace N29.HeroesDawn.Presentation.Hub
                 else if (changed) Fx.FlipIn(cards[i].transform, Stagger.DelayFor(i, 0.08f));
                 _ids[i] = id;
                 _shown[i] = true;
+            }
+            for (int i = 0; i < scraps.Length; i++)
+            {
+                bool has = i < d.Scraps.Length;
+                if (scraps[i].gameObject.activeSelf != has) scraps[i].gameObject.SetActive(has);
+                if (!has) continue;
+                _scrapSlots[i] = d.Scraps[i].Slot;
+                scraps[i].SetLabel(d.Scraps[i].Text);
+                scraps[i].Interactable = d.Scraps[i].Enabled;
             }
             empty.text = d.EmptyText;
             bool none = d.Cards.Length == 0;

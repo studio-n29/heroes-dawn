@@ -10,6 +10,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         event Action<int> CardTapped;
         event Action<int> RecruitClicked;
         event Action RerollClicked;
+        /// <summary>Lot de scraps touché (index dans la boutique du jour).</summary>
+        event Action<int> ScrapClicked;
         /// <summary>Registre des agents : comment obtenir chacun des 30 agents.</summary>
         event Action RegistryClicked;
         /// <summary>Onglet de la boutique touché (index de <see cref="ShopTab"/>).</summary>

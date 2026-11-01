@@ -62,6 +62,8 @@ namespace N29.HeroesDawn.Presentation.Common
             ["shop.reroll.confirm.body"] = "3 nouveaux héros pour {0} Crédits.",
             ["shop.recruited"] = "RECRUTÉ",
             ["shop.empty"] = "Collection de New York complète !",
+            ["shop.scrap_lot"] = "{0} × {1}", ["shop.scrap_sold"] = "ACHETÉ",
+            ["shop.scrap.confirm.title"] = "Acheter ce lot ?", ["shop.scrap.confirm.body"] = "{0} Crédits seront débités.",
             // --- Coque du hub ---
             ["nav.qg"] = "QG", ["nav.team"] = "ÉQUIPE", ["nav.recruit"] = "RECRUTER", ["nav.pass"] = "PASS", ["nav.shop"] = "BOUTIQUE",
             ["nav.back"] = "RETOUR", ["nav.settings"] = "RÉGLAGES",
