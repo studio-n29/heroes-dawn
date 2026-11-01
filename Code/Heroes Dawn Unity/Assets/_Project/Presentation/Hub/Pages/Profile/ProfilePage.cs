@@ -52,13 +52,15 @@ namespace N29.HeroesDawn.Presentation.Hub
         protected override void Render()
         {
             if (_achievementsOpen) { RenderAchievements(); return; }
+            // Le tag (qui permet d'être trouvé) n'existe qu'avec un compte : en hors ligne, il est remplacé par une invitation.
+            bool connected = IsConnected;
             View.ShowHeader(new ListHeaderData
             {
-                Title = _profile.Tag,
+                Title = connected ? _profile.Tag : Loc.T("profile.tag_guest"),
                 Line = Loc.F("profile.header_line", _profile.Pseudo, _session.Route.HeroName, _profile.PassLevel),
                 Progress = -1f,
-                A = RowButtonData.Of(Loc.T("profile.copy"), true, "", 0),
-                B = RowButtonData.Of(Loc.T("profile.add"), true, "", 1),
+                A = RowButtonData.Of(Loc.T("profile.copy"), connected, Loc.T("profile.tag_guest_reason"), 0),
+                B = RowButtonData.Of(Loc.T("profile.add"), connected, Loc.T("profile.tag_guest_reason"), 1),
             });
 
             _actions.Clear();
@@ -157,9 +159,13 @@ namespace N29.HeroesDawn.Presentation.Hub
         protected override void OnHeader(int index)
         {
             if (_achievementsOpen) { _achievementsOpen = false; Refresh(); return; }
+            if (!IsConnected) return; // hors ligne : pas de tag à copier, pas d'ami à ajouter
             if (index == 0) CopyTag();
             else AddFriendAsync().Forget();
         }
+
+        /// <summary>Compte créé ou lié : seul cas où le joueur a un tag partageable.</summary>
+        bool IsConnected => _account?.State == AccountState.Connected;
 
         /// <summary>Liste complète des succès : débloqué (avec son jour) ou verrouillé (avec la progression).</summary>
         void RenderAchievements()

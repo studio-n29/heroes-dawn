@@ -134,6 +134,8 @@ namespace N29.HeroesDawn.Presentation.Common
 
             // --- Labo
             d["page.lab"] = "Atelier de fabrication";
+            d["profile.tag_guest"] = "Crée un compte pour obtenir ton tag";
+            d["profile.tag_guest_reason"] = "Disponible après création de compte";
             d["profile.last_achievement"] = "Dernier succès";
             d["profile.no_achievement"] = "Aucun succès pour l'instant";
             d["ach.title"] = "SUCCÈS";
