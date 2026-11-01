@@ -54,6 +54,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["profile.friends_empty_sub"] = "Ajoute un ami avec son tag (Nom#1234). Les amis en ligne arrivent avec le compte.";
             d["profile.friend_pending"] = "{0} · en attente de connexion en ligne";
             d["profile.friend_remove"] = "RETIRER";
+            d["profile.friend_copy"] = "COPIER";
             d["profile.friend_removed"] = "Ami retiré";
             d["profile.friend_added"] = "Ami ajouté";
             d["profile.add_title"] = "AJOUTER UN AMI";

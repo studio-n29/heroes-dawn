@@ -61,6 +61,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Progress = -1f,
                 A = RowButtonData.Of(Loc.T("profile.copy"), connected, Loc.T("profile.tag_guest_reason"), 0),
                 B = RowButtonData.Of(Loc.T("profile.add"), connected, Loc.T("profile.tag_guest_reason"), 1),
+                HeaderTint = BackdropTint(_profile.Background),
             });
 
             _actions.Clear();
@@ -125,10 +126,20 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.Tag = CollectionText.Tag(friend.Name);
                 r.TagColor = Theme.Perception;
                 r.A = RowButtonData.Of(Loc.T("profile.friend_remove"), true, "", 3);
-                Add(r, () => { _friends.Remove(friend.Tag); Toasts.Show(Loc.T("profile.friend_removed"), ToastKind.Reward); });
+                r.B = RowButtonData.Of(Loc.T("profile.friend_copy"), true, "", 0);
+                Add(r, () => { _friends.Remove(friend.Tag); Toasts.Show(Loc.T("profile.friend_removed"), ToastKind.Reward); },
+                    () => { GUIUtility.systemCopyBuffer = friend.Tag; Toasts.Show(Loc.T("profile.copied"), ToastKind.Reward); });
             }
             View.ShowRows(rows.ToArray());
         }
+
+        /// <summary>Couleur du bandeau d'en-tête pour un fond de carte (les trois fonds de <see cref="ProfileBackgrounds"/>).</summary>
+        static Color BackdropTint(string background) => background switch
+        {
+            ProfileBackgrounds.Dawn => new Color(0.55f, 0.27f, 0.42f),
+            ProfileBackgrounds.Steel => new Color(0.24f, 0.33f, 0.40f),
+            _ => Theme.SkyBottom,
+        };
 
         /// <summary>Une rubrique de favoris : son titre, puis les trois plus utilisés en combat (ou une ligne estompée s'il n'y en a pas encore).</summary>
         void AddFavorites(Action<InfoRowData, Action?, Action?> add, string titleKey, IReadOnlyList<string> ids, Func<string, string> name)
@@ -228,6 +239,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Progress = list.Count == 0 ? -1f : done / (float)list.Count,
                 ProgressLabel = done + " / " + list.Count,
                 A = RowButtonData.Of(Loc.T("ach.back"), true, "", 0),
+                HeaderTint = BackdropTint(_profile.Background),
             });
             _actions.Clear();
             _actionsB.Clear();

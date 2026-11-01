@@ -91,6 +91,17 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
+        [Test, Description("Vérifie que le bouton Copier d'un ami confirme par un message et garde l'ami dans la liste — parce que copier le tag d'un ami ne doit pas le retirer")]
+        public void Friends_CopyButton_ToastsAndKeepsTheFriend()
+        {
+            _app.Friends.Add("Mara#0007");
+            var p = Profile();
+            _view.ClickRow(FirstFriendRow, 1);
+            Assert.That(_toasts.Shown, Has.Some.Matches<(string Text, ToastKind Kind)>(t => t.Text == _loc.T("profile.copied")));
+            Assert.That(_app.Friends.Friends().Select(f => f.Tag), Is.EqualTo(new[] { "Mara#0007" }));
+            p.Dispose();
+        }
+
         [Test, Description("Vérifie que sans ami la page affiche une rangée estompée d'invitation — parce qu'une liste vide doit dire quoi faire")]
         public void EmptyFriends_ShowsAHint()
         {
