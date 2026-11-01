@@ -36,6 +36,8 @@ namespace N29.HeroesDawn.Presentation.Account
         event Action<AccountForm>? SubmitClicked;
         event Action<AuthProvider>? ProviderClicked;
         event Action<string>? ForgotClicked;
+        /// <summary>« Annuler » du voile d'attente : interrompt la requête en cours sans fermer la fenêtre.</summary>
+        event Action? CancelClicked;
         event Action? CloseClicked;
 
         void Show(AccountPopupData data);

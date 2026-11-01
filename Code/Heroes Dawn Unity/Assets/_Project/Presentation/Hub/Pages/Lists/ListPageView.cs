@@ -21,6 +21,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text headerTitle = null!;
         [SerializeField] TMP_Text headerLine = null!;
         [SerializeField] UiBar headerBar = null!;
+        [SerializeField, OptionalRef] Image? headerPanel;
         [SerializeField] UiButton headerA = null!;
         [SerializeField] UiButton headerB = null!;
         [SerializeField] RectTransform rows = null!;
@@ -67,6 +68,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             bool bar = d.Progress >= 0f;
             headerBar.gameObject.SetActive(bar);
             if (bar) { headerBar.Set(d.Progress); headerBar.SetLabel(d.ProgressLabel); }
+            if (headerPanel != null && d.HeaderTint.HasValue) headerPanel.color = Theme.WithAlpha(d.HeaderTint.Value, 0.9f);
             Apply(headerA, d.A);
             Apply(headerB, d.B);
         }

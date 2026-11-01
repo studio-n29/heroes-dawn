@@ -24,6 +24,7 @@ namespace N29.HeroesDawn.Presentation.Account
         bool _busy;
         CancellationToken _ct;
         CancellationTokenSource? _requests;
+        CancellationTokenSource? _request;
 
         public AccountPopupController(IAccountPopupView view, AccountLink account, ILocalization loc)
         {
@@ -38,6 +39,7 @@ namespace N29.HeroesDawn.Presentation.Account
             _view.SubmitClicked += OnSubmit;
             _view.ProviderClicked += OnProvider;
             _view.ForgotClicked += OnForgot;
+            _view.CancelClicked += OnCancelRequest;
             _view.CloseClicked += OnClose;
             ct.Register(() => _done.TrySetCanceled());
             _view.Show(new AccountPopupData
@@ -61,6 +63,7 @@ namespace N29.HeroesDawn.Presentation.Account
                 _view.SubmitClicked -= OnSubmit;
                 _view.ProviderClicked -= OnProvider;
                 _view.ForgotClicked -= OnForgot;
+                _view.CancelClicked -= OnCancelRequest;
                 _view.CloseClicked -= OnClose;
             }
         }
@@ -103,16 +106,28 @@ namespace N29.HeroesDawn.Presentation.Account
             if (_busy) return;
             var error = Validate(form);
             if (error != null) { _view.ShowMessage(error, true); return; }
+            var token = BeginRequest();
             RunAsync(_mode == AccountMode.SignUp
-                ? _account.SignUpAsync(form.Email, form.Password, form.DisplayName.Trim(), _ct)
-                : _account.SignInAsync(form.Email, form.Password, _ct)).Forget();
+                ? _account.SignUpAsync(form.Email, form.Password, form.DisplayName.Trim(), token)
+                : _account.SignInAsync(form.Email, form.Password, token)).Forget();
         }
 
         void OnProvider(AuthProvider provider)
         {
             if (_busy) return;
-            RunAsync(_account.SignInWithProviderAsync(provider, _ct)).Forget();
+            RunAsync(_account.SignInWithProviderAsync(provider, BeginRequest())).Forget();
         }
+
+        /// <summary>Nouvelle requête : son jeton est annulé par « Annuler » ou par la fermeture de la fenêtre.</summary>
+        CancellationToken BeginRequest()
+        {
+            _request?.Dispose();
+            _request = CancellationTokenSource.CreateLinkedTokenSource(_ct);
+            return _request.Token;
+        }
+
+        /// <summary>« Annuler » du voile d'attente : interrompt la requête en cours, la fenêtre reste ouverte.</summary>
+        void OnCancelRequest() => _request?.Cancel();
 
         async UniTaskVoid RunAsync(UniTask<Result<LinkOutcome?>> operation)
         {
@@ -125,7 +140,12 @@ namespace N29.HeroesDawn.Presentation.Account
                 if (result.Value == null) { _view.ShowMessage(_loc.T("account.confirm_sent"), false); return; }   // adresse à confirmer : la fenêtre reste ouverte
                 _done.TrySetResult(result.Value);
             }
-            catch (OperationCanceledException) { _done.TrySetResult(null); }
+            catch (OperationCanceledException)
+            {
+                // Fermer la fenêtre termine l'attente ; « Annuler » laisse la fenêtre ouverte pour un nouvel essai.
+                if (_ct.IsCancellationRequested) _done.TrySetResult(null);
+                else _view.ShowMessage(_loc.T("account.cancelled"), false);
+            }
             finally
             {
                 _busy = false;
@@ -137,19 +157,22 @@ namespace N29.HeroesDawn.Presentation.Account
         {
             if (_busy) return;
             if (!LooksLikeEmail(email)) { _view.ShowMessage(_loc.T("account.error.email"), true); return; }
-            ForgotAsync(email.Trim()).Forget();
+            ForgotAsync(email.Trim(), BeginRequest()).Forget();
         }
 
-        async UniTaskVoid ForgotAsync(string email)
+        async UniTaskVoid ForgotAsync(string email, CancellationToken token)
         {
             _busy = true;
             _view.SetBusy(true, _loc.T("account.busy"));
             try
             {
-                var r = await _account.ResetPasswordAsync(email, _ct);
+                var r = await _account.ResetPasswordAsync(email, token);
                 _view.ShowMessage(r.IsFailure ? _loc.Error(r.Error!) : _loc.T("account.reset_sent"), r.IsFailure);
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException)
+            {
+                if (!_ct.IsCancellationRequested) _view.ShowMessage(_loc.T("account.cancelled"), false);
+            }
             finally { _busy = false; _view.SetBusy(false, ""); }
         }
     }

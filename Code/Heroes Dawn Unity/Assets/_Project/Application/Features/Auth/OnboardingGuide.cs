@@ -78,6 +78,28 @@ namespace N29.HeroesDawn.Application.Features.Auth
             return null;
         }
 
+        /// <summary>
+        /// Première connexion, nouveau parcours : le joueur crée son personnage (nom et avatar). Agent D et Agent M sont ses mentors :
+        /// le parcours d'histoire part de Agent D, et ses mentors ne sont pas dans l'équipe de départ.
+        /// Renvoie une clé d'erreur si le nom est vide ou trop long, sinon null.
+        /// </summary>
+        public string? CreateCharacter(string name, string avatar)
+        {
+            string clean = (name ?? "").Trim();
+            if (clean.Length == 0 || clean.Length > PlayerTag.MaxNameLength) return "onboarding.name.invalid";
+            var route = StoryRoutes.For(StoryRoutes.AgentD);
+            Save.pseudo = clean;
+            Save.avatar = PlayerAvatars.Resolve(avatar);
+            Save.campaign = route.ActCities[0];
+            Save.hero = route.Id;
+            if (AllExist(route.StarterTeam)) _c.Session.StartWithTeam(route.StarterTeam);
+            GrantStarterItem();
+            Save.done = true;
+            ApplyPseudo();
+            _c.Touch(MetaArea.Onboarding);
+            return null;
+        }
+
         /// <summary>Un objet courant offert au départ : le tutoriel apprend à l'équiper sur la recrue.</summary>
         void GrantStarterItem()
         {

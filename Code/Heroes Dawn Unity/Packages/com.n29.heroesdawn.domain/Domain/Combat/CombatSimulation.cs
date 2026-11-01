@@ -16,7 +16,10 @@ namespace N29.HeroesDawn.Domain.Combat
         readonly BalanceConfig _b;
         readonly IRandom _rng;
         readonly List<CombatUnit> _units = new List<CombatUnit>();
+        readonly List<CombatEvent> _log = new List<CombatEvent>();
 
+        /// <summary>Tous les événements produits depuis le début du combat, dans l'ordre (statistiques du profil : ennemis battus, favoris).</summary>
+        public IReadOnlyList<CombatEvent> Log => _log;
         public CombatSetup Setup { get; }
         public int Tick { get; private set; }
         /// <summary>Ticks de temps actif : n'avance pas pendant l'attente d'une action (pause globale).</summary>
@@ -98,6 +101,7 @@ namespace N29.HeroesDawn.Domain.Combat
         {
             var output = new List<CombatEvent>();
             for (int i = 0; i < ticks && !IsOver; i++) StepOne(output);
+            _log.AddRange(output);
             return output;
         }
 
@@ -158,6 +162,7 @@ namespace N29.HeroesDawn.Domain.Combat
             ProcessCommands(output);
             ActReadyUnits(output);
             CheckEnd(output);
+            _log.AddRange(output);
             return output;
         }
 

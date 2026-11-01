@@ -37,6 +37,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["account.forgot"] = "Mot de passe oublié ?";
             d["account.close"] = "Fermer";
             d["account.busy"] = "Connexion en cours…";
+            d["account.cancel"] = "ANNULER";
+            d["account.cancelled"] = "Demande annulée. Tu peux réessayer.";
             d["account.error.email"] = "Adresse e-mail invalide.";
             d["account.error.name"] = "Le pseudo doit faire de 3 à 16 caractères.";
             d["account.confirm_sent"] = "E-mail de confirmation envoyé : clique sur le lien puis reviens te connecter.";

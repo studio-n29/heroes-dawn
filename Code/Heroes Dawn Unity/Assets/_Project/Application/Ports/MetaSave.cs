@@ -93,6 +93,10 @@ namespace N29.HeroesDawn.Application.Ports
         public List<string> members = new List<string>();
     }
 
+    /// <summary>Succès débloqué : identifiant et jour de la première constatation (aaaa-mm-jj).</summary>
+    [Serializable]
+    public sealed class AchievementSave { public string id = ""; public string day = ""; }
+
     /// <summary>Victoires remportées ensemble par deux agents (identifiants triés : a avant b).</summary>
     [Serializable]
     public sealed class LinkSave
@@ -121,6 +125,8 @@ namespace N29.HeroesDawn.Application.Ports
         public string campaign = "";
         /// <summary>Parcours choisi : Agent D ou Agent M (vide : Agent D par défaut).</summary>
         public string hero = "";
+        /// <summary>Avatar du personnage créé par le joueur (identifiant de la galerie ; vide : premier avatar).</summary>
+        public string avatar = "";
     }
 
     /// <summary>Tout ce qui dépasse le noyau (équipe, ressources, boutique de recrutement) : pass, missions, opérations, labo, archives…</summary>
@@ -191,6 +197,11 @@ namespace N29.HeroesDawn.Application.Ports
         // Profil (lot F) : compteurs de statistiques (combatsWon, combatsLost, creditsEarned) et tags des amis (liste simulée locale)
         public List<CounterSave> stats = new List<CounterSave>();
         public List<string> friends = new List<string>();
+        /// <summary>Succès débloqués, avec le jour de la première constatation.</summary>
+        public List<AchievementSave> achievements = new List<AchievementSave>();
+
+        /// <summary>Fond de la carte de profil (voir <see cref="N29.HeroesDawn.Application.Features.Meta.ProfileBackgrounds"/>) ; vide : premier fond.</summary>
+        public string profileBackground = "";
 
         // Narration (lot G) : chapitres dont l'ouverture a été montrée
         public List<string> chaptersSeen = new List<string>();

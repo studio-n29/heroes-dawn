@@ -90,7 +90,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public const float HeaderH = 150;
 
-        public static T Build<T>(PrefabContext ctx, string name, float sideWidth, bool sideRows, bool sideText, bool shopTabs = false) where T : ListPageView
+        public static T Build<T>(PrefabContext ctx, string name, float sideWidth, bool sideRows, bool sideText, bool shopTabs = false, bool tintedHeader = false) where T : ListPageView
         {
             var rt = ScreenKit.Root(name);
 
@@ -136,6 +136,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "headerTitle", title);
             ctx.Wire(view, "headerLine", line);
             ctx.Wire(view, "headerBar", bar);
+            if (tintedHeader) ctx.Wire(view, "headerPanel", header);
             ctx.Wire(view, "headerA", a);
             ctx.Wire(view, "headerB", b);
             ctx.Wire(view, "rows", rows);
@@ -225,7 +226,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Profile.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ProfilePageView>(ctx, "ProfilePage", 0, false, false).gameObject;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ProfilePageView>(ctx, "ProfilePage", 0, false, false, false, true).gameObject;
     }
 
     /// <summary>Page Chapitres : les 8 chapitres de l'histoire, leur statut et « Relire ».</summary>

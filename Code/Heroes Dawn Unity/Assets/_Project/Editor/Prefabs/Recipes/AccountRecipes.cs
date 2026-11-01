@@ -53,6 +53,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var busyText = Ui.Txt(busy.transform, "", 40, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "BusyText");
             busyText.rectTransform.Stretch(40, 40, 40, 40);
             busyText.Inked();
+            var busyCancel = Ui.LocBtn(busy.transform, "account.cancel", Theme.Surface3, Theme.Text, null!, 34, FontKind.Title, "Cancel");
+            busyCancel.Rect.At(0.5f, 0f, 0, 90, 340, 96);
             busy.gameObject.SetActive(false);
 
             var view = root.gameObject.AddComponent<AccountPopupView>();
@@ -74,6 +76,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "close", close);
             ctx.Wire(view, "busyOverlay", busy.gameObject);
             ctx.Wire(view, "busyText", busyText);
+            ctx.Wire(view, "busyCancel", busyCancel);
             ctx.Wire(view, "window", window);
             ctx.Wire(view, "group", group);
             return root.gameObject;
@@ -83,7 +86,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         static (TMP_InputField Field, TMP_Text Hint) InputBox(Transform parent, string name, float y, bool password)
         {
             var box = Ui.Img(parent, name, Theme.Surface3, Sprites.Panel, true);
-            box.rectTransform.At(0f, 1f, 0, y, 1028, 90);
+            box.rectTransform.At(0f, 1f, 0, y, 1028, 96);
             var viewport = Ui.Rect(box.transform, "Viewport").Stretch(20, 8, 20, 8);
             viewport.gameObject.AddComponent<RectMask2D>();
             var text = Ui.Txt(viewport, "", 36, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "Text");

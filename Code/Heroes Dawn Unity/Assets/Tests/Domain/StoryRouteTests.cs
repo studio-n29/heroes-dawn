@@ -37,7 +37,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(StoryRoutes.For("inconnu"), Is.SameAs(StoryRoutes.D));
         }
 
-        [Test, Description("Vérifie que les deux personnages joueurs existent, ne sont jamais en boutique et que l'équipe de départ de chaque parcours est une seule recrue du catalogue dont son personnage — parce qu'un agent manquant laisserait l'équipe vide")]
+        [Test, Description("Vérifie que les deux personnages joueurs existent, ne sont jamais en boutique et que l'équipe de départ de chaque parcours est faite de trois recrues de la boutique, sans son personnage — parce qu'un agent manquant laisserait l'équipe vide")]
         public void Heroes_AreInTheRosterButNeverInTheShop()
         {
             foreach (var route in StoryRoutes.All)
@@ -45,7 +45,8 @@ namespace N29.HeroesDawn.Tests.Domain
                 var hero = C.Member(new MemberId(route.HeroId));
                 Assert.That(hero.Unlock!.Kind, Is.EqualTo(UnlockKind.Hero), route.Id);
                 Assert.That(hero.InShop, Is.False, route.Id);
-                Assert.That(route.StarterTeam.Count, Is.EqualTo(1), route.Id + " : une seule recrue au départ");
+                Assert.That(route.StarterTeam.Count, Is.EqualTo(3), route.Id + " : trois recrues au départ");
+                Assert.That(route.StarterTeam.All(id => C.Member(new MemberId(id)).InShop), Is.True, route.Id + " : les recrues viennent de la boutique");
                 Assert.That(route.StarterTeam, Does.Not.Contain(route.HeroId), route.Id + " : le personnage joueur est un avatar hors effectif");
                 Assert.That(route.HeroName, Is.Not.Empty, route.Id);
                 Assert.That(route.StarterTeam.All(id => C.Members.Any(m => m.Id.Value == id)), Is.True, route.Id);

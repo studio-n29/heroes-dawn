@@ -8,7 +8,7 @@ using N29.HeroesDawn.Presentation.Mvp;
 namespace N29.HeroesDawn.Presentation.Login
 {
     /// <summary>
-    /// Première connexion (popup plein écran) en deux temps : cinématique de lancement, choix du personnage joueur.
+    /// Première connexion (popup plein écran) en deux temps : cinématique de lancement, création du personnage joueur (nom et avatar).
     /// Chaque étape se termine quand le joueur agit (toucher, « Passer », « Commencer »).
     /// </summary>
     public interface IIntroPopupView : IPopupView
@@ -19,7 +19,7 @@ namespace N29.HeroesDawn.Presentation.Login
         /// </summary>
         UniTask PlayCinematicAsync(IntroCinematicTexts texts, Action<float>? mainTheme, CancellationToken ct);
 
-        /// <summary>Propose les campagnes ; seules celles qui sont disponibles se choisissent. Renvoie l'identifiant choisi.</summary>
-        UniTask<string> ChooseCampaignAsync(ChooseCampaignData data, CancellationToken ct);
+        /// <summary>Demande le nom et l'avatar du personnage ; se termine quand le nom est valide et « Commencer » touché.</summary>
+        UniTask<CharacterChoice> ChooseCharacterAsync(ChooseCharacterData data, CancellationToken ct);
     }
 }
