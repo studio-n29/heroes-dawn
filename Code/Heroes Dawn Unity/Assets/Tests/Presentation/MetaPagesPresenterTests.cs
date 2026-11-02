@@ -211,18 +211,74 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Side.Rows[0].A.Enabled, Is.True);
         }
 
-        [Test, Description("Vérifie que la page Opérations propose les trois durées, grise celles qui manquent de membres libres et lance l'expédition choisie — parce que l'envoi est le geste principal de la salle")]
-        public void Operations_EmptySlot_StartsChosenExpedition()
+        OperationsPagePresenter Operations()
+            => Start(new OperationsPagePresenter(_view, _app.Operations, _app.Session, new ModalService(_host), _loc, _toasts, _app.Subscriber<MetaChanged>(),
+                                                 _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
+
+        void AddFree(params string[] ids)
         {
-            _app.Session.Roster.Add(new TeamMember(_app.Session.Content.Member(new MemberId("etincelle")), 8));
-            var p = Start(new OperationsPagePresenter(_view, _app.Operations, _app.Session, _loc, _toasts, _app.Subscriber<MetaChanged>(),
-                                                      _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
+            foreach (var id in ids) _app.Session.Roster.Add(new TeamMember(_app.Session.Content.Member(new MemberId(id)), 8));
+        }
+
+        [Test, Description("Vérifie que la page Opérations liste les trois missions avec difficulté, durée et gains, et que la fiche de la mission choisie propose les agents — parce que le joueur compare avant de choisir")]
+        public void Operations_ListsMissions_SheetShowsAgents()
+        {
+            AddFree("etincelle", "arc");
+            var p = Operations();
             Assert.That(_view.Rows.Length, Is.EqualTo(3));
-            Assert.That(_view.Rows[0].A.Enabled, Is.True, "patrouille : 1 membre");
-            Assert.That(_view.Rows[0].B.Enabled, Is.False, "reconnaissance : 2 membres");
-            _view.ClickRow(0, 0);
-            Assert.That(_app.Operations.SlotViews()[0].Running, Is.True);
-            Assert.That(_view.Rows[0].A.Label, Does.Contain(_loc.F("ops.speed", 3).Split(' ')[0]));
+            Assert.That(_view.Rows[1].Subtitle, Does.Contain(_loc.T("ops.difficulty.2")).And.Contain("1 h").And.Contain("700 CR"));
+            Assert.That(_view.Side.Title, Is.EqualTo(_loc.T("ops.patrol")), "la première mission est choisie au départ");
+            _view.SelectRow(1);
+            Assert.That(_view.Side.Title, Is.EqualTo(_loc.T("ops.recon")));
+            Assert.That(_view.Side.Rows.Length, Is.EqualTo(4), "résumé, deux agents, ligne d'équipe");
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie qu'on choisit les agents, que le bouton Lancer ne s'allume qu'avec l'équipe complète et que la mission part après confirmation — parce que l'affectation est le geste principal de la salle")]
+        public void Operations_PickAgents_LaunchesAfterConfirm()
+        {
+            AddFree("etincelle", "arc");
+            var p = Operations();
+            _view.SelectRow(1); // reconnaissance : 2 agents
+            int go = _view.Side.Rows.Length - 1;
+            Assert.That(_view.Side.Rows[go].A.Enabled, Is.False, "personne choisi");
+            _view.ClickSide(1);
+            Assert.That(_view.Side.Rows[go].A.Enabled, Is.False, "un seul sur deux");
+            _view.ClickSide(2);
+            Assert.That(_view.Side.Rows[go].A.Enabled, Is.True);
+            _view.ClickSide(go);
+            var ask = (FakeConfirmPopup)_host.Spawned.Last();
+            Assert.That(_app.Operations.SlotOf("recon"), Is.EqualTo(-1), "rien ne part avant la confirmation");
+            ask.Answer(true);
+            Assert.That(_app.Operations.SlotOf("recon"), Is.EqualTo(0));
+            Assert.That(_view.Rows[1].A.Label, Does.Contain(_loc.F("ops.speed", 12).Split(' ')[0]));
+            Assert.That(_toasts.Shown.Last().Text, Is.EqualTo(_loc.T("ops.started")));
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie qu'un refus à la confirmation ne lance rien, qu'un agent en mission n'est pas sélectionnable et qu'on récupère le résultat au retour — parce que les agents occupés restent indisponibles jusqu'à la fin")]
+        public void Operations_Cancel_BusyAgentsLocked_ClaimAtReturn()
+        {
+            AddFree("etincelle", "arc");
+            var p = Operations();
+            _view.ClickSide(1);
+            _view.ClickSide(_view.Side.Rows.Length - 1);
+            ((FakeConfirmPopup)_host.Spawned.Last()).Answer(false);
+            Assert.That(_app.Operations.SlotOf("patrol"), Is.EqualTo(-1));
+            _view.ClickSide(_view.Side.Rows.Length - 1);
+            ((FakeConfirmPopup)_host.Spawned.Last()).Answer(true);
+            Assert.That(_app.Operations.SlotOf("patrol"), Is.EqualTo(0));
+            _view.SelectRow(1);
+            var busy = _view.Side.Rows.Skip(1).First(r => r.Dim);
+            Assert.That(busy.A.Enabled, Is.False);
+            Assert.That(busy.Subtitle, Does.Contain("15"));
+            int credits = _app.Session.Wallet.Credits;
+            _app.Time.UtcNow = _app.Time.UtcNow.AddMinutes(16);
+            _app.MetaCtx.Touch(MetaArea.Operations);
+            Assert.That(_view.Rows[0].ProgressLabel, Is.EqualTo(_loc.T("ops.back")));
+            _view.ClickRow(0);
+            Assert.That(_app.Session.Wallet.Credits, Is.GreaterThan(credits));
+            Assert.That(_app.Operations.SlotOf("patrol"), Is.EqualTo(-1));
             p.Dispose();
         }
 

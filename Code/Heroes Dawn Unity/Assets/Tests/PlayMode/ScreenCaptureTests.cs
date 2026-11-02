@@ -143,8 +143,14 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return null;
             foreach (var room in new[] { (HubPage.Operations, "13-operations"), (HubPage.Lab, "14-labo"), (HubPage.Grimoire, "16-grimoire"), (HubPage.Inventory, "17-inventaire") })
             {
-                Object.FindAnyObjectByType<QgPageView>()!.RoomButton(room.Item1)!.onClick.Invoke();
-                yield return CaptureSettled(room.Item2);
+                if (room.Item1 == HubPage.Operations)
+                {
+                    // Des agents hors escouade, dont un déjà parti en patrouille, pour montrer la fiche de mission.
+                    var extra = session.Content.Members.Where(d => session.Find(d.Id) == null).Take(3).ToList();
+                    foreach (var d in extra) session.Roster.Add(new TeamMember(d, 6));
+                    Container.Resolve<N29.HeroesDawn.Application.Features.Meta.Expeditions>().Launch("patrol", new[] { extra[0].Id.Value });
+                }
+                Object.FindAnyObjectByType<QgPageView>()!.RoomButton(room.Item1)!.onClick.Invoke();                yield return CaptureSettled(room.Item2);
                 Shell.BackButton.Button.onClick.Invoke();
                 yield return null;
             }
