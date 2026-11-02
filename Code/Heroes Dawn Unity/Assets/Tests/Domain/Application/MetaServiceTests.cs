@@ -256,6 +256,32 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(Code(r), Is.EqualTo("hub.expedition"));
         }
 
+        [Test, Description("Vérifie que le lancement d'une mission exige exactement les agents demandés, libres, sans doublon — parce que le joueur choisit son équipe et que la règle de la salle doit tenir sans l'écran")]
+        public void Operations_Launch_ChecksTeam()
+        {
+            FreeMembers(3);
+            Assert.That(Code(_app.Operations.Launch("recon", new[] { "etincelle" })), Is.EqualTo("meta.no_members"), "il en faut deux");
+            Assert.That(Code(_app.Operations.Launch("recon", new[] { "etincelle", "etincelle" })), Is.EqualTo("meta.no_members"), "pas de doublon");
+            Assert.That(Code(_app.Operations.Launch("recon", new[] { "etincelle", "inconnu" })), Is.EqualTo("meta.no_members"), "agent absent de l'effectif");
+            Assert.That(Code(_app.Operations.Launch("nulle", new[] { "etincelle" })), Is.EqualTo("meta.unknown"));
+            Assert.That(_app.Operations.Launch("recon", new[] { "etincelle", "arc" }).IsSuccess);
+            Assert.That(_app.Operations.SlotOf("recon"), Is.EqualTo(0));
+            Assert.That(Code(_app.Operations.Launch("recon", new[] { "rempart", "verre" })), Is.EqualTo("meta.busy"), "la mission est déjà lancée");
+            Assert.That(Code(_app.Operations.Launch("patrol", new[] { "etincelle" })), Is.EqualTo("meta.no_members"), "etincelle est déjà parti");
+        }
+
+        [Test, Description("Vérifie que la liste des agents met les libres d'abord, indique le temps restant des agents en mission et laisse l'escouade de côté — parce que les agents occupés ne se choisissent pas")]
+        public void Operations_Agents_ListsBusyWithTimeLeft()
+        {
+            FreeMembers(2);
+            _app.Operations.Launch("patrol", new[] { "etincelle" });
+            var list = _app.Operations.Agents();
+            Assert.That(list.Select(a => a.Busy).ToArray(), Is.EqualTo(new[] { false, true }));
+            Assert.That(list[1].Member.Id.Value, Is.EqualTo("etincelle"));
+            Assert.That(list[1].Left, Is.EqualTo(TimeSpan.FromMinutes(15)));
+            Assert.That(list.All(a => !a.Member.InSquad));
+        }
+
         // ------------------------------------------------------------------ Labo
 
         [Test, Description("Vérifie qu'une recherche coûte des Crédits, dure plusieurs minutes, n'a lieu qu'une à la fois et améliore le niveau à son terme — parce que le labo est un investissement à long terme")]
