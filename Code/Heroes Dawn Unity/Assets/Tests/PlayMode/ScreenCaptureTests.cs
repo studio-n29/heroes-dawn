@@ -224,6 +224,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 var view = host.Spawn<IMiniGame2DPopupView>();
                 var task = view.PlayAsync(request, default);
                 var popup = (MiniGame2DPopupView)view;
+                if (id == "dna_lab" || id == "rescue_tool") { yield return new WaitForSecondsRealtime(0.5f); yield return Capture("103-minijeu-intro-" + id); }
                 popup.Input.PressAt(new Vector2(0.5f, 0.5f));
                 yield return null;
                 popup.Input.ReleaseNow();
