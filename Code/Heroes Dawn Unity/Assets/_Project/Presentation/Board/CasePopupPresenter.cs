@@ -236,6 +236,8 @@ namespace N29.HeroesDawn.Presentation.Board
                 TimeFormat = _loc.T("mg2d.time"),
                 WonText = _loc.T("mg2d.won"),
                 LostText = _loc.T("mg2d.lost"),
+                Theme = _loc.Has("mg2d." + plan.Def.Kind + ".theme") ? _loc.F("mg2d.theme", _loc.T("mg2d." + plan.Def.Kind + ".theme")) : "",
+                Learned = _loc.Has("mg2d." + plan.Def.Kind + ".learn") ? _loc.F("mg2d.learned", _loc.T("mg2d." + plan.Def.Kind + ".learn")) : "",
                 Driver = driver,
                 Background = N29.HeroesDawn.Presentation.Common.MiniGameArt.Background(plan.Def.Kind),
                 BackgroundTint = N29.HeroesDawn.Presentation.Common.MiniGameArt.Tint(plan.Level.Palette),

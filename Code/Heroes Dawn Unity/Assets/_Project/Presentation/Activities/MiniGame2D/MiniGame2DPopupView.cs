@@ -75,7 +75,7 @@ namespace N29.HeroesDawn.Presentation.Activities
             panelUser?.Bind(rescuePanel);
             _driver.Build(field);
             overlay.gameObject.SetActive(true);
-            overlay.text = r.Instructions + "\n\n<size=70%><color=#FFCF33>" + r.Start + "</color></size>";
+            overlay.text = r.Instructions + (r.Theme.Length > 0 ? "\n\n<size=70%><color=#7FE3FF>" + r.Theme + "</color></size>" : "") + "\n\n<size=70%><color=#FFCF33>" + r.Start + "</color></size>";
             overlay.transform.SetAsLastSibling();
             stickRing.gameObject.SetActive(false);
             stickKnob.gameObject.SetActive(false);
@@ -124,7 +124,7 @@ namespace N29.HeroesDawn.Presentation.Activities
             _finished = true;
             var result = _driver!.Game.Result();
             overlay.gameObject.SetActive(true);
-            overlay.text = result.Success ? _request!.WonText : _request!.LostText;
+            overlay.text = result.Success ? _request!.WonText + (_request.Learned.Length > 0 ? "\n<size=60%>" + _request.Learned + "</size>" : "") : _request!.LostText;
             overlay.transform.SetAsLastSibling();
             stickRing.gameObject.SetActive(false);
             stickKnob.gameObject.SetActive(false);
