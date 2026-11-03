@@ -234,7 +234,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Chapters.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ChaptersPageView>(ctx, "ChaptersPage", 0, false, false).gameObject;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ChaptersPageView>(ctx, "ChaptersPage", 640, true, false).gameObject;
     }
 
     public sealed class ArchivesPageRecipe : IPrefabRecipe

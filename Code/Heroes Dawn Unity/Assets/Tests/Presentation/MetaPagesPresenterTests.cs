@@ -42,6 +42,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void ClickRow(int row, int button = 0) => RowButtonClicked?.Invoke(row, button);
         public void SelectRow(int row) => RowSelected?.Invoke(row);
         public void ClickSide(int row, int button = 0) => SideButtonClicked?.Invoke(row, button);
+        public void SelectSide(int row) => SideRowSelected?.Invoke(row);
         public event Action<int, int>? FilterClicked;
         public FilterGroupData[] Filters = Array.Empty<FilterGroupData>();
         public void ShowFilters(FilterGroupData[] groups) => Filters = groups;

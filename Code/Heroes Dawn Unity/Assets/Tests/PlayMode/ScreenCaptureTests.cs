@@ -176,8 +176,14 @@ namespace N29.HeroesDawn.Tests.PlayMode
 
             Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
             yield return CaptureSettled("90-carte-bouton-chapitres");
+            // Deux zones validées : deux souvenirs débloqués dans la colonne de droite, dont un ouvert.
+            var narrationSession = Container.Resolve<GameSession>();
+            narrationSession.CompletedZones.Add("zone_ny_1_1");
+            narrationSession.CompletedZones.Add("zone_ny_1_2");
             Object.FindAnyObjectByType<CityMapPageView>()!.ChaptersButton.onClick.Invoke();
             yield return CaptureSettled("91-chapitres");
+            Object.FindAnyObjectByType<ChaptersPageView>()!.SideRows[0].Buttons[0].Button.onClick.Invoke();
+            yield return CaptureSettled("91b-chapitres-souvenir");
             Shell.BackButton.Button.onClick.Invoke();
             yield return null;
             Shell.BackButton.Button.onClick.Invoke();
