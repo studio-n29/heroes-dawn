@@ -13,6 +13,8 @@ namespace N29.HeroesDawn.Content.Prototype
         public static readonly ZoneId Zone12 = new ZoneId("zone_ny_1_2");
         public static readonly ZoneId Zone13 = new ZoneId("zone_ny_1_3");
         public static readonly ZoneId Zone14 = new ZoneId("zone_ny_1_4");
+        /// <summary>Repaire de l'AMIF : donjon à trois boss (Brick, Crocodile, le Titan), ouvert une fois Brooklyn terminé.</summary>
+        public static readonly ZoneId ZoneLairAmifVault = new ZoneId("zone_lair_amif_vault");
 
         static EffectDef Dmg(int pct) => new EffectDef(EffectType.Damage, pct);
         static EffectDef St(StatusType s, int turns, int chance = 100) => new EffectDef(EffectType.ApplyStatus, 0, s, turns, chance);
@@ -69,6 +71,7 @@ namespace N29.HeroesDawn.Content.Prototype
             yield return BuildZone12();
             yield return BuildZone13();
             yield return BuildZone14();
+            yield return BuildLairAmifVault();
         }
 
         /// <summary>Zones à valider avant d'ouvrir celle-ci (vide : disponible d'emblée).</summary>
@@ -77,6 +80,7 @@ namespace N29.HeroesDawn.Content.Prototype
             if (zone == Zone12) return new[] { PrototypeContent.Zone11 };
             if (zone == Zone13) return new[] { Zone12 };
             if (zone == Zone14) return new[] { Zone13 };
+            if (zone == ZoneLairAmifVault) return new[] { Zone14 };
             return System.Array.Empty<ZoneId>();
         }
 
@@ -200,6 +204,47 @@ namespace N29.HeroesDawn.Content.Prototype
                 new EncounterDef(CombatRank.Boss, new[] { new EnemyId("bridge_titan"), new EnemyId("amif_marksman"), new EnemyId("amif_trooper") }),
             };
             return new ZoneDef(Zone14, "zones.ny_1_4.name", new CaseId("n00"), BridgeNodes(titan), BridgeLinks(), objectives, encounters, "1.4", 1, "brooklyn", 10, Requires(Zone14), new ZoneEnvironment(Biome.City, Weather.Night));
+        }
+
+        /// <summary>Boss tenu seul sur sa case : la table n'a qu'un ennemi et chaque manche en tire un.</summary>
+        static NodeDef BossNode(string id, int x, string enemy)
+            => new NodeDef(new CaseId(id), CaseType.Combat, true, CombatRank.Boss, x, 2, null, new CombatSpec(new[] { new EnemyId(enemy) }, 1, 1, 1), null);
+
+        /// <summary>
+        /// Repaire de l'AMIF : une ligne droite de 15 cases avec trois boss fixes (Brick, Crocodile, le Titan), des repos entre eux et des élites.
+        /// La zone est validée quand les trois sont vaincus ; les boss vaincus sont retenus par le profil (voir LairBook).
+        /// </summary>
+        static ZoneDef BuildLairAmifVault()
+        {
+            var nodes = new List<NodeDef>
+            {
+                N("n00", CaseType.Entry, 0, 2, true),
+                N("n01", CaseType.Resource, 1, 2), N("n02", CaseType.Combat, 2, 2), N("n03", CaseType.Resource, 3, 2),
+                BossNode("n04", 4, "brick"),
+                N("n05", CaseType.Rest, 5, 2), N("n06", CaseType.Combat, 6, 2), N("n07", CaseType.Resource, 7, 2),
+                N("n08", CaseType.Combat, 8, 2, r: CombatRank.Elite),
+                BossNode("n09", 9, "crocodile"),
+                N("n10", CaseType.Rest, 10, 2), N("n11", CaseType.Combat, 11, 2, r: CombatRank.Elite), N("n12", CaseType.Resource, 12, 2),
+                N("n13", CaseType.Rest, 13, 2),
+                BossNode("n14", 14, "bridge_titan"),
+            };
+            var links = new List<LinkDef>();
+            for (int i = 0; i < nodes.Count - 1; i++) links.Add(new LinkDef(nodes[i].Id, nodes[i + 1].Id));
+            var objectives = new List<ObjectiveDef>
+            {
+                new ObjectiveDef("obj_brick", ObjectiveType.DefeatCombat, new CaseId("n04"), "objectives.lair_amif_vault.brick"),
+                new ObjectiveDef("obj_crocodile", ObjectiveType.DefeatCombat, new CaseId("n09"), "objectives.lair_amif_vault.crocodile"),
+                new ObjectiveDef("obj_titan", ObjectiveType.DefeatCombat, new CaseId("n14"), "objectives.lair_amif_vault.titan"),
+            };
+            var encounters = new List<EncounterDef>
+            {
+                new EncounterDef(CombatRank.Normal, new[] { new EnemyId("amif_trooper"), new EnemyId("amif_marksman"), new EnemyId("amif_trooper") }),
+                new EncounterDef(CombatRank.Normal, new[] { new EnemyId("brute"), new EnemyId("amif_marksman"), new EnemyId("thug") }),
+                new EncounterDef(CombatRank.Elite, new[] { new EnemyId("amif_captain"), new EnemyId("amif_trooper"), new EnemyId("amif_marksman") }),
+                new EncounterDef(CombatRank.Elite, new[] { new EnemyId("canal_chief"), new EnemyId("brute"), new EnemyId("sniper") }),
+            };
+            return new ZoneDef(ZoneLairAmifVault, "zones.lair_amif_vault.name", new CaseId("n00"), nodes, links, objectives, encounters, "R.1", 1,
+                               ZoneDef.LairBorough, 12, Requires(ZoneLairAmifVault), new ZoneEnvironment(Biome.Industrial, Weather.Night));
         }
     }
 }

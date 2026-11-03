@@ -77,6 +77,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
             }
 
             if (victory) TeamLinks.RecordVictory(s.Meta, _active.FighterMembers.Select(m => m.Id.Value).ToList());
+            if (victory && s.RunZone != null && s.RunZone.IsLair) World.LairBook.RecordBossDefeat(s.Meta, s.RunZone.Id.Value, pending.Case.Value);
 
             var res = ZoneActions.Apply(_fx, r => r.ResolveCombat(victory));
             IReadOnlyList<BoardEvent> boardEvents = res.IsSuccess ? res.Value : Array.Empty<BoardEvent>();

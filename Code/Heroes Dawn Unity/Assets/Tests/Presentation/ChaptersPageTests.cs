@@ -30,6 +30,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         FakeListView _view = null!;
         FakeChapterPopup _popup = null!;
         FakeModalHost _host = null!;
+        HubNavigator _nav = null!;
         readonly LocLocalization _loc = new LocLocalization();
 
         ChaptersPagePresenter Page()
@@ -40,7 +41,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _popup = new FakeChapterPopup();
             var host = _host = new FakeModalHost();
             host.Register<IChapterPopupView>(() => _popup);
-            var p = new ChaptersPagePresenter(_view, _app.Session, _app.Chapters, new ChapterIntroFlow(new ModalService(host), _loc), _app.Fragments, new NoFragmentAudio(), new ModalService(host), _loc, new FakeToasts(),
+            var p = new ChaptersPagePresenter(_view, _app.Session, _app.Chapters, new ChapterIntroFlow(new ModalService(host), _loc), _app.Fragments, new NoFragmentAudio(), new ModalService(host), _nav = new HubNavigator(), _loc, new FakeToasts(),
                                               _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time);
             _view.Show();
             ((VContainer.Unity.IStartable)p).Start();
@@ -85,6 +86,16 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_popup.Shown, Is.EqualTo(1));
             Assert.That(_popup.Data!.Value.Text, Is.EqualTo(_loc.T("chapter.ny_brooklyn.intro")));
             Assert.That(_app.Session.Meta.chaptersSeen, Is.Empty);
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie que le bouton REPAIRE du bandeau ouvre la page Repaire — parce que c'est l'entrée du donjon")]
+        public void Header_LairButton_OpensTheLairPage()
+        {
+            var p = Page();
+            Assert.That(_view.Header.A.Label, Is.EqualTo(_loc.T("chapters.lair")));
+            _view.ClickHeader(0);
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Lair));
             p.Dispose();
         }
 

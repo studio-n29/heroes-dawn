@@ -48,6 +48,35 @@ namespace N29.HeroesDawn.Presentation.Common
             d["fragment.dumbo_bridge.title"] = "Le pont de Dumbo";
             d["fragment.dumbo_bridge.text"] = "De l'autre côté du pont, Manhattan brillait comme si rien ne s'était passé. Brooklyn était derrière eux, et ils savaient que chaque victoire avait été vue, comptée, archivée. Le prochain pas ne se ferait plus dans l'ombre.";
 
+            // Repaire (L12) : donjon à trois boss, page Repaire et zone « repaire de l'AMIF ».
+            d["chapters.lair"] = "REPAIRE";
+            d["page.lair"] = "Repaire";
+            d["lair.title"] = "REPAIRE";
+            d["lair.line"] = "{0} · {1} / {2} boss vaincus · terminé {3} fois";
+            d["lair.locked"] = "Termine « {0} » pour ouvrir le repaire.";
+            d["lair.enter"] = "ENTRER";
+            d["lair.boss.down"] = "Vaincu";
+            d["lair.boss.next"] = "Étape {0} · à affronter";
+            d["lair.boss.later"] = "Étape {0} · plus loin dans le repaire";
+            d["lair.recommended"] = "Niveau conseillé {0}";
+            d["lair.fatigue"] = "fatigue max {0}";
+            d["lair.squad"] = "Escouade ({0})";
+            d["lair.bilan"] = "Bilan";
+            d["lair.bilan.line"] = "{0} / {1} boss vaincus · {2} repaire(s) terminé(s)";
+            d["lair.confirm.body"] = "{0} boss à la suite sur un plateau en ligne droite. Niveau conseillé : {1}. Les boss déjà vaincus sont retenus si tu pars, mais le plateau repart du début.";
+            d["lair.confirm.cancel"] = "PAS MAINTENANT";
+            d["lair.amif_vault.name"] = "Le coffre de l'AMIF";
+            d["lair.amif_vault.desc"] = "Sous le pont de Brooklyn, l'AMIF garde ses prises de guerre : Brick, Crocodile et le Titan, à la suite.";
+            d["zones.lair_amif_vault.name"] = "REPAIRE — LE COFFRE DE L'AMIF";
+            d["zones.lair_amif_vault.short"] = "Coffre de l'AMIF";
+            d["zones.lair_amif_vault.code"] = "Repaire 1";
+            d["zones.lair_amif_vault.desc"] = "Trois boss à la suite sous le pont de Brooklyn. Aucun détour, quelques cases de repos : l'endurance de l'escouade décide de la fin.";
+            d["objectives.lair_amif_vault.brick"] = "Vaincre Brick";
+            d["objectives.lair_amif_vault.crocodile"] = "Vaincre Crocodile";
+            d["objectives.lair_amif_vault.titan"] = "Vaincre le Titan de l'AMIF";
+            d["archives.zone.zone_lair_amif_vault"] = "Le coffre de l'AMIF : l'escouade a traversé le sous-sol où l'AMIF gardait Brick, Crocodile et le Titan. Les trois sont tombés, et avec eux une partie de ce que le Général croyait inviolable.";
+            d["qg.fil.zone_lair_amif_vault"] = "Le coffre de l'AMIF est ouvert : trois boss, aucun détour. Prépare l'escouade avant d'entrer.";
+
             d["chapter.ny_brooklyn.title"] = "Brooklyn";
             d["chapter.ny_brooklyn.intro"] = "Red Hook, Gowanus, Dumbo : Brooklyn est le premier front. L'AMIF et les gangs, qui prétendent se combattre, se partagent la ville en secret. L'Aube y fait ses preuves, mais chaque succès attire un peu plus l'attention de l'AMIF.";
             d["chapter.ny_queens.title"] = "Queens";
