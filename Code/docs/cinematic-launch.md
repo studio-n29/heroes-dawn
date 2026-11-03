@@ -30,3 +30,19 @@ Le fichier local fourni `Four-Note Awakening - usesuno.com.wav` est copié et re
 Entrée MusicId.Cinematic = 6 dans AudioCatalog. Lecture unique sans boucle ni coupe de la réverbération finale. La fin ou le bouton Passer déclenche un fondu vers MusicId.MainTheme. Les préférences de volume du joueur restent appliquées. Les délais de préparation des vidéos peuvent décaler les points musicaux par rapport au tableau éditorial.
 
 Contrôles : WAV lu, copie vérifiée par SHA-256, référence GUID du catalogue vérifiée ; compilation Presentation, Composition et Tests.PlayMode vérifiée. Lecture sonore dans Unity et sur appareils à contrôler.
+## 0.15.0 (L14) : montage de lancement, version longue en jeu et voix
+
+**Au lancement** : montage de 13 plans de 3,5 s (45,5 s), tirés des vidéos de la version longue (s07, s10, s16, s20, s24, s30, s33, s34, s38, s40, s41, s44, s46), sans sous-titre ni voix, fondus de 0,2 s, fin au noir (`CinematicVideoSequence.Launch`). Chaque plan est coupé à sa durée et joué à vitesse normale. Il passe sur la musique de cinématique déjà importée (Four-Note Awakening, 250 s) : une piste plus courte et plus rythmée serait un vrai plus, à fournir par l'équipe.
+
+**Version longue** (31 plans, 250 s, sous-titres) : elle ne se joue plus au lancement. Le bouton CINÉMATIQUE du bandeau de la page Chapitres la rejoue (`CinematicReplay`), avec la voix de chaque réplique si son fichier existe, puis rend la musique d'avant.
+
+**Voix FR et EN** : un fichier par réplique et par langue, dans `Assets/_Project/Resources/Voices/fr/` et `.../en/`. Nom du fichier : la clé de la réplique avec des soulignés à la place des points.
+
+| Réplique | Clé | Fichier |
+|---|---|---|
+| Cinématique longue, plan S01, réplique 0 | `cinematic.S01.0` | `cinematic_S01_0.wav` (ou .mp3/.ogg) |
+| Dialogue de narration | clé du texte, par exemple `narration.ny_1_3.n18.before.0` | `narration_ny_1_3_n18_before_0.wav` |
+
+Sans fichier pour une réplique, rien ne se joue et le sous-titre reste la référence. Chaque voix est normalisée à la lecture (crête visée 0,9, gain borné entre 0,25 et 4) et la musique descend à 30 % pendant la réplique (calque `DuckLayer.Voice`), puis revient en 0,6 s. Le volume suit les réglages Principal × Voix. Les fichiers déposés dans `Resources/Voices` sont importés décompressés au chargement, en mono (`AudioImportRules.ApplyVoice`).
+
+Reste à faire par l'équipe : la fiche de casting ElevenLabs, les fichiers voix FR/EN et, si voulu, une musique dédiée au montage de lancement. Il n'y avait pas de `NoVoiceFilesRemain` dans le code à retirer.

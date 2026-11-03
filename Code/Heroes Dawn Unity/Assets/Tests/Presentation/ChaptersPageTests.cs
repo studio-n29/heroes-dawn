@@ -41,7 +41,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _popup = new FakeChapterPopup();
             var host = _host = new FakeModalHost();
             host.Register<IChapterPopupView>(() => _popup);
-            var p = new ChaptersPagePresenter(_view, _app.Session, _app.Chapters, new ChapterIntroFlow(new ModalService(host), _loc), _app.Fragments, new NoFragmentAudio(), new ModalService(host), _nav = new HubNavigator(), _loc, new FakeToasts(),
+            var p = new ChaptersPagePresenter(_view, _app.Session, _app.Chapters, new ChapterIntroFlow(new ModalService(host), _loc), _app.Fragments, new NoFragmentAudio(), new ModalService(host), _nav = new HubNavigator(), new N29.HeroesDawn.Presentation.Login.CinematicReplay(new ModalService(host), _loc), _loc, new FakeToasts(),
                                               _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time);
             _view.Show();
             ((VContainer.Unity.IStartable)p).Start();

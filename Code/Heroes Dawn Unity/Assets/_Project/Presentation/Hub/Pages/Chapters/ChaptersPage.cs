@@ -11,6 +11,7 @@ using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Login;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
 
@@ -32,15 +33,17 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly IFragmentAudio _audio;
         readonly IModalService _modals;
         readonly HubNavigator _nav;
+        readonly CinematicReplay _cinematic;
+        bool _replaying;
         string? _selected;
         bool _reading;
 
-        public ChaptersPagePresenter(IChaptersPageView view, ISessionReadModel session, ChapterBook book, ChapterIntroFlow intro, MemoryFragmentBook fragments, IFragmentAudio audio, IModalService modals, HubNavigator nav, ILocalization loc,
+        public ChaptersPagePresenter(IChaptersPageView view, ISessionReadModel session, ChapterBook book, ChapterIntroFlow intro, MemoryFragmentBook fragments, IFragmentAudio audio, IModalService modals, HubNavigator nav, CinematicReplay cinematic, ILocalization loc,
                                      IToastService toasts, ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet,
                                      ISubscriber<RosterChanged> roster, IClock clock)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
-            _session = session; _book = book; _intro = intro; _fragments = fragments; _audio = audio; _modals = modals; _nav = nav;
+            _session = session; _book = book; _intro = intro; _fragments = fragments; _audio = audio; _modals = modals; _nav = nav; _cinematic = cinematic;
         }
 
         public override string Title => Loc.T("page.chapters");
@@ -55,6 +58,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Progress = done / (float)Chapters.All.Count,
                 ProgressLabel = done + " / " + Chapters.All.Count,
                 A = RowButtonData.Of(Loc.T("chapters.lair"), true, "", 0),
+                B = RowButtonData.Of(Loc.T("chapters.cinematic"), !_replaying, "", 0),
             });
 
             _rows.Clear();
@@ -118,7 +122,22 @@ namespace N29.HeroesDawn.Presentation.Hub
             return zone == null ? zoneId : Loc.T(zone.NameKey.Replace(".name", ".short"));
         }
 
-        protected override void OnHeader(int index) { if (index == 0) _nav.Open(HubPage.Lair); }
+        protected override void OnHeader(int index)
+        {
+            if (index == 0) _nav.Open(HubPage.Lair);
+            else if (index == 1) ReplayAsync().Forget();
+        }
+
+        /// <summary>Rejoue la cinématique longue (sous-titres, voix si elles existent) ; un seul lancement à la fois.</summary>
+        async UniTaskVoid ReplayAsync()
+        {
+            if (_replaying) return;
+            _replaying = true;
+            Refresh();
+            try { await _cinematic.PlayFullAsync(Lifetime); }
+            catch (OperationCanceledException) { }
+            finally { _replaying = false; if (!Disposed) Refresh(); }
+        }
 
         protected override void OnRowSelected(int row)
         {

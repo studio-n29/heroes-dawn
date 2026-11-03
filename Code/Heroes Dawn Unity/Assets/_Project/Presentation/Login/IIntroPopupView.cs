@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.Presentation.Login
         /// Joue la cinématique de lancement (vidéos et voix off) ; se termine à la fin ou quand le joueur la passe. <paramref name="mainTheme"/> règle le niveau
         /// (0 à 1) du thème principal du jeu : coupé pendant la cinématique, rouvert pour sa dernière séquence.
         /// </summary>
-        UniTask PlayCinematicAsync(IntroCinematicTexts texts, Action<float>? mainTheme, CancellationToken ct);
+        UniTask PlayCinematicAsync(IntroCinematicTexts texts, Action<float>? mainTheme, CancellationToken ct, CinematicKind kind = CinematicKind.Launch, Action<string>? voiceCue = null);
 
         /// <summary>Demande le nom et l'avatar du personnage ; se termine quand le nom est valide et « Commencer » touché.</summary>
         UniTask<CharacterChoice> ChooseCharacterAsync(ChooseCharacterData data, CancellationToken ct);

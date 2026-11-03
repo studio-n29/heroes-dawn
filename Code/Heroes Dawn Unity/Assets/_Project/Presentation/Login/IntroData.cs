@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace N29.HeroesDawn.Presentation.Login
 {
+    /// <summary>Launch : montage de lancement (45 s, sans texte). Full : la cinématique longue, avec sous-titres et voix.</summary>
+    public enum CinematicKind { Launch, Full }
+
     public struct IntroCinematicTexts
     {
         public string Skip;
