@@ -209,6 +209,9 @@ namespace N29.HeroesDawn.Application.Ports
         /// <summary>Fragments de souvenirs déjà lus (voir <see cref="N29.HeroesDawn.Definitions.MemoryFragments"/>).</summary>
         public List<string> fragmentsRead = new List<string>();
 
+        /// <summary>Boss de repaire déjà vaincus (« repaire:case »), gardés d'une partie à l'autre ; les compteurs lair_clears:{repaire} comptent les repaires terminés.</summary>
+        public List<string> lairBosses = new List<string>();
+
         /// <summary>Entrées en combat déjà vues (clé : les ennemis de l'affrontement) ; une introduction répétée est abrégée.</summary>
         public List<string> seenIntros = new List<string>();
 

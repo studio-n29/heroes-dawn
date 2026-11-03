@@ -237,6 +237,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ChaptersPageView>(ctx, "ChaptersPage", 640, true, false).gameObject;
     }
 
+    /// <summary>Page Repaire : étapes (boss) à gauche, préparation et bilan à droite.</summary>
+    public sealed class LairPageRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Pages/Lair.prefab";
+        public int Order => 10;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<LairPageView>(ctx, "LairPage", 640, true, false).gameObject;
+    }
+
     public sealed class ArchivesPageRecipe : IPrefabRecipe
     {
         public string RelativePath => "Pages/Archives.prefab";

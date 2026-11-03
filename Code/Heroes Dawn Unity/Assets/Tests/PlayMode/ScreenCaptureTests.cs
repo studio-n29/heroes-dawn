@@ -184,6 +184,18 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("91-chapitres");
             Object.FindAnyObjectByType<ChaptersPageView>()!.SideRows[0].Buttons[0].Button.onClick.Invoke();
             yield return CaptureSettled("91b-chapitres-souvenir");
+            // Repaire : Brooklyn terminé, Brick déjà vaincu ; le bouton REPAIRE du bandeau ouvre la page, puis ENTRER demande confirmation.
+            narrationSession.CompletedZones.Add("zone_ny_1_3");
+            narrationSession.CompletedZones.Add("zone_ny_1_4");
+            N29.HeroesDawn.Application.Features.World.LairBook.RecordBossDefeat(narrationSession.Meta, "zone_lair_amif_vault", "n04");
+            Object.FindAnyObjectByType<ChaptersPageView>()!.HeaderButtonA.Button.onClick.Invoke();
+            yield return CaptureSettled("91c-repaire");
+            Object.FindAnyObjectByType<LairPageView>()!.HeaderButtonA.Button.onClick.Invoke();
+            yield return CaptureSettled("91d-repaire-confirmation");
+            Shell.BackButton.Button.onClick.Invoke(); // ferme la confirmation
+            yield return null;
+            Shell.BackButton.Button.onClick.Invoke(); // repaire → chapitres
+            yield return null;
             Shell.BackButton.Button.onClick.Invoke();
             yield return null;
             Shell.BackButton.Button.onClick.Invoke();

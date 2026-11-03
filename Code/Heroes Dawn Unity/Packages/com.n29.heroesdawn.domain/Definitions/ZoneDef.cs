@@ -35,6 +35,10 @@ namespace N29.HeroesDawn.Definitions
         public const string TutorialBorough = "tutorial";
         public bool IsTutorial => Borough == TutorialBorough;
 
+        /// <summary>Quartier réservé aux repaires (donjons à plusieurs boss) : ils ne figurent ni sur la carte, ni dans un chapitre, ni dans la progression de l'histoire.</summary>
+        public const string LairBorough = "lair";
+        public bool IsLair => Borough == LairBorough;
+
         public ZoneDef(ZoneId id, string nameKey, CaseId entry, IReadOnlyList<NodeDef> nodes, IReadOnlyList<LinkDef> links,
                        IReadOnlyList<ObjectiveDef> objectives, IReadOnlyList<EncounterDef> encounters,
                        string code = "", int act = 1, string borough = "brooklyn", int recommendedLevel = 1, IReadOnlyList<ZoneId>? requires = null,

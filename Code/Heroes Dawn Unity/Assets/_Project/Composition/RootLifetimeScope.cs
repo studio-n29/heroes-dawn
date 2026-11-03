@@ -155,6 +155,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<Workshop>(Lifetime.Singleton);
             builder.Register<PlayerProfile>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.ChapterBook>(Lifetime.Singleton);
+            builder.Register<N29.HeroesDawn.Application.Features.World.LairBook>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.MemoryFragmentBook>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Presentation.Hub.NoFragmentAudio>(Lifetime.Singleton).As<N29.HeroesDawn.Presentation.Hub.IFragmentAudio>();
             builder.Register<LocalFriendsPort>(Lifetime.Singleton).As<N29.HeroesDawn.Application.Ports.IFriendsPort>();

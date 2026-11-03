@@ -31,15 +31,16 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly MemoryFragmentBook _fragments;
         readonly IFragmentAudio _audio;
         readonly IModalService _modals;
+        readonly HubNavigator _nav;
         string? _selected;
         bool _reading;
 
-        public ChaptersPagePresenter(IChaptersPageView view, ISessionReadModel session, ChapterBook book, ChapterIntroFlow intro, MemoryFragmentBook fragments, IFragmentAudio audio, IModalService modals, ILocalization loc,
+        public ChaptersPagePresenter(IChaptersPageView view, ISessionReadModel session, ChapterBook book, ChapterIntroFlow intro, MemoryFragmentBook fragments, IFragmentAudio audio, IModalService modals, HubNavigator nav, ILocalization loc,
                                      IToastService toasts, ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet,
                                      ISubscriber<RosterChanged> roster, IClock clock)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
-            _session = session; _book = book; _intro = intro; _fragments = fragments; _audio = audio; _modals = modals;
+            _session = session; _book = book; _intro = intro; _fragments = fragments; _audio = audio; _modals = modals; _nav = nav;
         }
 
         public override string Title => Loc.T("page.chapters");
@@ -53,6 +54,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Line = Loc.F("chapters.line", done, Chapters.All.Count),
                 Progress = done / (float)Chapters.All.Count,
                 ProgressLabel = done + " / " + Chapters.All.Count,
+                A = RowButtonData.Of(Loc.T("chapters.lair"), true, "", 0),
             });
 
             _rows.Clear();
@@ -115,6 +117,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             var zone = _session.Content.Zones.FirstOrDefault(z => z.Id.Value == zoneId);
             return zone == null ? zoneId : Loc.T(zone.NameKey.Replace(".name", ".short"));
         }
+
+        protected override void OnHeader(int index) { if (index == 0) _nav.Open(HubPage.Lair); }
 
         protected override void OnRowSelected(int row)
         {
