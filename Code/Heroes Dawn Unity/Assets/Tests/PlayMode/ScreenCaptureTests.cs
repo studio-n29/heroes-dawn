@@ -165,6 +165,21 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(File.Exists(Path.Combine(Folder, "85-parametres-support.png")));
         }
 
+        [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit les captures du tournoi simulé : départ puis tournoi fini — parce que la page se relit à l'œil (L13)")]
+        public IEnumerator CaptureTournament()
+        {
+            yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
+            Container.Resolve<N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide>().Skip();
+            yield return new WaitForSecondsRealtime(0.3f);
+            Object.FindAnyObjectByType<N29.HeroesDawn.Composition.HubLifetimeScope>()!.Container.Resolve<N29.HeroesDawn.Presentation.Hub.HubNavigator>().Open(HubPage.Tournament);
+            yield return CaptureSettled("92b-tournoi");
+            var tournament = Container.Resolve<N29.HeroesDawn.Application.Features.Meta.Tournament>();
+            while (!tournament.Finished) tournament.PlayNext();
+            yield return CaptureSettled("92c-tournoi-fini");
+        }
+
         [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit les captures de la narration : page Chapitres, dossier d'un agent et fenêtre d'ouverture d'un chapitre — parce que ces écrans se relisent à l'œil (lot G)")]
         public IEnumerator CaptureNarration()
         {

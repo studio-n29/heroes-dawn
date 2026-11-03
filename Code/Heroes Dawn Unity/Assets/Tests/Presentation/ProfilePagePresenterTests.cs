@@ -16,7 +16,7 @@ namespace N29.HeroesDawn.Tests.Presentation
     {
         // Lignes : registre, archives, dernier succès, trois lignes de carte (rang, avatar, fond), dix statistiques, deux rubriques de favoris
         // (titre et ligne vide chacune tant qu'il n'y a pas de combat), titre des amis, puis les amis.
-        const int NavRows = 6, StatRows = 10, FavRows = 4, FirstFriendRow = NavRows + StatRows + FavRows + 1;
+        const int NavRows = 7, StatRows = 10, FavRows = 4, FirstFriendRow = NavRows + StatRows + FavRows + 1;
         static readonly string[] StatKeys = { "combatsWon", "combatsLost", "zones", "agents", "topLevel", "bestLink", "crafted", "credits", "tiles", "enemies" };
 
         TestApp _app = null!;
@@ -74,6 +74,9 @@ namespace N29.HeroesDawn.Tests.Presentation
             _view.ClickRow(1);
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Archives));
             Assert.That(_nav.Stack.Count, Is.EqualTo(2));
+            _nav.Back();
+            _view.ClickRow(2);
+            Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Tournament), "la rangée Tournoi ouvre la page du tournoi");
             p.Dispose();
         }
 

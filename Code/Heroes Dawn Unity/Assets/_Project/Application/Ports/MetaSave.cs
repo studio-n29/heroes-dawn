@@ -93,6 +93,10 @@ namespace N29.HeroesDawn.Application.Ports
         public List<string> members = new List<string>();
     }
 
+    /// <summary>Tournoi simulé : jour en cours, manches gagnées, éliminé ou non, récompense prise, et points du joueur (gardés d'un jour à l'autre).</summary>
+    [Serializable]
+    public sealed class TournamentSave { public string day = ""; public int round; public bool eliminated; public bool claimed; public int rating = 1000; }
+
     /// <summary>Succès débloqué : identifiant et jour de la première constatation (aaaa-mm-jj).</summary>
     [Serializable]
     public sealed class AchievementSave { public string id = ""; public string day = ""; }
@@ -211,6 +215,9 @@ namespace N29.HeroesDawn.Application.Ports
 
         /// <summary>Boss de repaire déjà vaincus (« repaire:case »), gardés d'une partie à l'autre ; les compteurs lair_clears:{repaire} comptent les repaires terminés.</summary>
         public List<string> lairBosses = new List<string>();
+
+        /// <summary>Tournoi simulé du jour et points du joueur.</summary>
+        public TournamentSave tournament = new TournamentSave();
 
         /// <summary>Entrées en combat déjà vues (clé : les ennemis de l'affrontement) ; une introduction répétée est abrégée.</summary>
         public List<string> seenIntros = new List<string>();

@@ -66,6 +66,34 @@ namespace N29.HeroesDawn.Presentation.Common
             d["lair.bilan.line"] = "{0} / {1} boss vaincus · {2} repaire(s) terminé(s)";
             d["lair.confirm.body"] = "{0} boss à la suite sur un plateau en ligne droite. Niveau conseillé : {1}. Les boss déjà vaincus sont retenus si tu pars, mais le plateau repart du début.";
             d["lair.confirm.cancel"] = "PAS MAINTENANT";
+
+            // Tournoi simulé (L13) : JcJ local, adversaires générés, classement factice ; le serveur arrive en 0.16.0.
+            d["profile.tournament"] = "Tournoi";
+            d["profile.tournament.sub"] = "Trois manches par jour contre des adversaires simulés.";
+            d["page.tournament"] = "Tournoi";
+            d["tournament.title"] = "TOURNOI";
+            d["tournament.line"] = "Rang {0} · {1} points · {2}";
+            d["tournament.state.running"] = "{0} / {1} manches gagnées";
+            d["tournament.state.champion"] = "Champion du jour";
+            d["tournament.state.out"] = "Éliminé ({0} manche(s) gagnée(s))";
+            d["tournament.play"] = "COMBATTRE · {0}";
+            d["tournament.claim"] = "RÉCLAMER";
+            d["tournament.tomorrow"] = "REVIENS DEMAIN";
+            d["tournament.tomorrow_reason"] = "Un tournoi par jour : le prochain commence demain.";
+            d["tournament.claimed"] = "Récompense du tournoi : {0}";
+            d["tournament.points"] = "{0} points";
+            d["tournament.you"] = "Toi";
+            d["tournament.rounds"] = "MANCHES DU JOUR · SIMULÉ";
+            d["tournament.round.quarter"] = "Quarts de finale";
+            d["tournament.round.semi"] = "Demi-finale";
+            d["tournament.round.final"] = "Finale";
+            d["tournament.round_line"] = "{0} · {1}";
+            d["tournament.power"] = "Puissance {0}";
+            d["tournament.your_power"] = "Ton escouade";
+            d["tournament.won"] = "Gagné";
+            d["tournament.lost"] = "Perdu";
+            d["tournament.toast.win"] = "Victoire contre {0} !";
+            d["tournament.toast.loss"] = "Défaite contre {0}.";
             d["lair.amif_vault.name"] = "Le coffre de l'AMIF";
             d["lair.amif_vault.desc"] = "Sous le pont de Brooklyn, l'AMIF garde ses prises de guerre : Brick, Crocodile et le Titan, à la suite.";
             d["zones.lair_amif_vault.name"] = "REPAIRE — LE COFFRE DE L'AMIF";

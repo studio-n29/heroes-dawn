@@ -73,6 +73,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
             Add(NavRow("profile.registry", "profile.registry.sub", "R"), () => _nav.Open(HubPage.Agents));
             Add(NavRow("profile.archives", "profile.archives.sub", "A"), () => _nav.Open(HubPage.Archives));
+            Add(NavRow("profile.tournament", "profile.tournament.sub", "T"), () => _nav.Open(HubPage.Tournament));
 
             // Dernier succès débloqué : un appui ouvre la liste complète.
             var last = _profile.Achievements().Last();

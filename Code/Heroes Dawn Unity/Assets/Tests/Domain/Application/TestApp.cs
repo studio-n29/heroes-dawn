@@ -114,6 +114,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public N29.HeroesDawn.Application.Features.World.ChapterBook Chapters { get; }
         public N29.HeroesDawn.Application.Features.World.MemoryFragmentBook Fragments { get; }
         public N29.HeroesDawn.Application.Features.World.LairBook Lairs { get; }
+        public Tournament Tournament { get; }
         public ArchiveBook Archives { get; }
         public MetaTracker Tracker { get; }
         public Boutique Boutique { get; }
@@ -182,6 +183,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Chapters = new N29.HeroesDawn.Application.Features.World.ChapterBook(MetaCtx);
             Fragments = new N29.HeroesDawn.Application.Features.World.MemoryFragmentBook(MetaCtx);
             Lairs = new N29.HeroesDawn.Application.Features.World.LairBook(MetaCtx);
+            Tournament = new Tournament(MetaCtx);
             Archives = new ArchiveBook(MetaCtx);
             Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
             Collection = new N29.HeroesDawn.Application.Features.Collection.CollectionBook(MetaCtx, Publisher<RosterChanged>());
