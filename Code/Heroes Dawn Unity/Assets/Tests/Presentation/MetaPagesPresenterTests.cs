@@ -19,7 +19,7 @@ using NUnit.Framework;
 namespace N29.HeroesDawn.Tests.Presentation
 {
     /// <summary>Vue de liste factice : un seul double pour Pass, Boutique, Opérations, Labo et Archives.</summary>
-    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView, IProfilePageView, IChaptersPageView, ILairPageView, IFilterBarView
+    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView, IProfilePageView, IChaptersPageView, ILairPageView, ITournamentPageView, IFilterBarView
     {
         public event Action<string>? SearchChanged;
         public void Search(string query) => SearchChanged?.Invoke(query);
