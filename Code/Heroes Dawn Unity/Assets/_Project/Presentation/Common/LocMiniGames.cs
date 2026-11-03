@@ -13,6 +13,25 @@ namespace N29.HeroesDawn.Presentation.Common
             d["mg2d.time"] = "{0} s";
             d["mg2d.won"] = "<size=140%>RÉUSSI !</size>";
             d["mg2d.lost"] = "<size=140%>ÉCHEC…</size>";
+            d["mg2d.theme"] = "THÈME : {0}";
+            d["mg2d.learned"] = "Tu as appris : {0}";
+            // Aspect éducatif (L10) : un thème et un objectif pédagogique par jeu, montrés avant la partie et rappelés à la réussite.
+            d["mg2d.dna_analysis.theme"] = "Biologie";
+            d["mg2d.dna_analysis.learn"] = "l'ADN est un double brin ; un parasite se repère à ce qui diffère des nœuds sains.";
+            d["mg2d.gears.theme"] = "Mécanique";
+            d["mg2d.gears.learn"] = "deux engrenages qui s'engrènent tournent en sens inverse.";
+            d["mg2d.rhythm.theme"] = "Musique et temps";
+            d["mg2d.rhythm.learn"] = "suivre un tempo régulier, c'est anticiper le prochain temps.";
+            d["mg2d.free_throw.theme"] = "Physique";
+            d["mg2d.free_throw.learn"] = "la puissance d'un lancer décide de la distance : il faut la régler pour toucher la cible.";
+            d["mg2d.crate_pick.theme"] = "Logique et probabilités";
+            d["mg2d.crate_pick.learn"] = "observer avant de choisir, car chaque tirage est indépendant du précédent.";
+            d["mg2d.rescue_engineering.theme"] = "Ingénierie";
+            d["mg2d.rescue_engineering.learn"] = "lire un manuel, relever les contraintes d'ordre et écarter les pièces inutiles.";
+            d["mg2d.infiltration.theme"] = "Géographie";
+            d["mg2d.infiltration.learn"] = "lire un plan et anticiper les trajets des gardes pour choisir son chemin.";
+            d["mg2d.snow_survival.theme"] = "Sciences de la Terre";
+            d["mg2d.snow_survival.learn"] = "le terrain décide de l'effort : la neige refroidit, l'herbe haute et le sable ralentissent.";
             d["activity.param.notes"] = "Notes";
             d["activity.param.lanes"] = "Pistes";
             d["activity.param.lives"] = "Vies";

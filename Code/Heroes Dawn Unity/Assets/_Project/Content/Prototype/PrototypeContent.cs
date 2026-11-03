@@ -55,6 +55,12 @@ namespace N29.HeroesDawn.Content.Prototype
         static EnemyDef E(string id, Role r, Family f, StatBlock st, bool boss, params SkillDef[] skills)
             => new EnemyDef(new EnemyId(id), "enemies." + id + ".name", r, f, st, skills, boss);
 
+        /// <summary>Palier de boss : sous <paramref name="pct"/> % de PV, bonus permanents de force, de défense et de vitesse (en %).</summary>
+        static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd) => new BossPhaseDef(pct, nameKey, atk, def, spd);
+
+        static EnemyDef Phased(EnemyDef d, params BossPhaseDef[] phases)
+            => new EnemyDef(d.Id, d.NameKey, d.Role, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases);
+
         static SynergyDef C(string id, Family a, Family b, SynergyStat stat, int percent)
             => new SynergyDef(id, "synergies." + id + ".name", a, b, stat, percent);
 
@@ -89,10 +95,11 @@ namespace N29.HeroesDawn.Content.Prototype
                 E("street_pyro", Role.Damage, Family.Elemental, new StatBlock(950, 125, 65, 105), false,
                     S("pyro_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(90), St(StatusType.Burn, 2, 30)),
                     S("pyro_a2", SkillSlot.A2, 4, TargetRule.AllEnemies, Dmg(70))),
-                E("brick", Role.Tank, Family.PhysicalBio, new StatBlock(4500, 110, 130, 95), true,
+                Phased(E("brick", Role.Tank, Family.PhysicalBio, new StatBlock(4500, 110, 130, 95), true,
                     S("brick_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(120)),
                     S("brick_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(10)),
                     S("brick_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(90), St(StatusType.Shock, 1, 30))),
+                    Phase(66, "enemies.brick.phase2", 10, 0, 5), Phase(33, "enemies.brick.phase3", 25, -10, 10)),
             };
 
             var synergies = new List<SynergyDef>

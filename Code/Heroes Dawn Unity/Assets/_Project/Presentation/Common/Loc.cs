@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
@@ -61,13 +62,18 @@ namespace N29.HeroesDawn.Presentation.Common
             ["shop.reroll.confirm.body"] = "3 nouveaux héros pour {0} Crédits.",
             ["shop.recruited"] = "RECRUTÉ",
             ["shop.empty"] = "Collection de New York complète !",
+            ["shop.cat.gems"] = "GEMMES", ["shop.cat.gems_sub"] = "Paquets de gemmes à l'achat",
+            ["shop.cat.exchange"] = "ÉCHANGES", ["shop.cat.exchange_sub"] = "Transformer des gemmes en crédits ou en PR",
+            ["power.tier"] = "PUISSANCE {0} / 5",
+            ["shop.scrap_lot"] = "{0} × {1}", ["shop.scrap_sold"] = "ACHETÉ",
+            ["shop.scrap.confirm.title"] = "Acheter ce lot ?", ["shop.scrap.confirm.body"] = "{0} Crédits seront débités.",
             // --- Coque du hub ---
             ["nav.qg"] = "QG", ["nav.team"] = "ÉQUIPE", ["nav.recruit"] = "RECRUTER", ["nav.pass"] = "PASS", ["nav.shop"] = "BOUTIQUE",
             ["nav.back"] = "RETOUR", ["nav.settings"] = "RÉGLAGES",
             ["hub.quit.title"] = "Quitter le jeu ?", ["hub.quit.body"] = "Ta progression est sauvegardée.", ["hub.quit.ok"] = "Quitter",
             ["page.qg"] = "QG · Section New York", ["page.team"] = "Équipe · {0} membres", ["page.team_one"] = "Équipe · 1 membre", ["page.recruit"] = "Recrutement",
             ["page.pass"] = "Pass · Saison 1", ["page.shop"] = "Boutique",
-            ["page.operations"] = "Salle des opérations", ["page.lab"] = "Labo de recherche", ["page.archives"] = "Archives",
+            ["page.operations"] = "Salle des opérations", ["page.lab"] = "Atelier de fabrication", ["page.archives"] = "Archives",
             ["page.settings"] = "Paramètres", ["page.member_sheet"] = "Fiche de membre",
             // --- QG (M10) ---
             ["qg.rooms"] = "LES PIÈCES DU QG", ["qg.daily"] = "MISSIONS DU JOUR", ["qg.daily.body"] = "Trois missions par jour pour faire avancer le pass.",
@@ -166,6 +172,8 @@ namespace N29.HeroesDawn.Presentation.Common
             ["combat.debug_win"] = "DEBUG : GAGNER",
             ["combat.miss"] = "RATÉ", ["combat.crit"] = "CRITIQUE !", ["combat.skip"] = "SONNÉ",
             ["combat.rank"] = "Combat {0}",
+            ["combat.intro.skip"] = "PASSER", ["combat.intro.allies"] = "TON ÉQUIPE", ["combat.intro.enemies"] = "ENNEMIS",
+            ["combat.intro.boss_sub"] = "BOSS · {0}",
             ["combat.cost"] = "coût {0}",
 
             // --- Cases ---
@@ -330,7 +338,20 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendMiniGames(Dictionary<string, string> d);
         static partial void ExtendAccount(Dictionary<string, string> d);
 
-        public static string T(string key) => Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
+        static Func<string> _language = () => "fr";
+
+        /// <summary>Relie la langue des textes au profil (réglage « Langue des textes »). Sans liaison, le jeu reste en français.</summary>
+        public static void BindLanguage(Func<string> language) => _language = language ?? (() => "fr");
+
+        /// <summary>Langue active : « en » si le joueur l'a choisie, sinon français. Une clé sans traduction anglaise reprend le français.</summary>
+        public static string Language => _language() == "en" ? "en" : "fr";
+
+        public static string T(string key)
+        {
+            if (Language == "en" && En.TryGetValue(key, out var e)) return e;
+            return Fr.TryGetValue(key, out var v) ? v : "[" + key + "]";
+        }
+
         public static bool Has(string key) => Fr.ContainsKey(key);
 
         /// <summary>Toutes les clés de texte connues (outil de narration).</summary>

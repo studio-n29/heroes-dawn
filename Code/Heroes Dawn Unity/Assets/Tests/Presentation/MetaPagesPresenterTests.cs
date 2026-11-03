@@ -19,8 +19,10 @@ using NUnit.Framework;
 namespace N29.HeroesDawn.Tests.Presentation
 {
     /// <summary>Vue de liste factice : un seul double pour Pass, Boutique, Opérations, Labo et Archives.</summary>
-    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView, IProfilePageView, IChaptersPageView, IFilterBarView
+    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView, IProfilePageView, IChaptersPageView, ILairPageView, ITournamentPageView, IFilterBarView
     {
+        public event Action<string>? SearchChanged;
+        public void Search(string query) => SearchChanged?.Invoke(query);
         public event Action<int>? HeaderClicked;
         public event Action<int, int>? RowButtonClicked;
         public event Action<int>? RowSelected;
@@ -40,6 +42,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void ClickRow(int row, int button = 0) => RowButtonClicked?.Invoke(row, button);
         public void SelectRow(int row) => RowSelected?.Invoke(row);
         public void ClickSide(int row, int button = 0) => SideButtonClicked?.Invoke(row, button);
+        public void SelectSide(int row) => SideRowSelected?.Invoke(row);
         public event Action<int, int>? FilterClicked;
         public FilterGroupData[] Filters = Array.Empty<FilterGroupData>();
         public void ShowFilters(FilterGroupData[] groups) => Filters = groups;
@@ -71,7 +74,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             return p;
         }
 
-        PassPagePresenter Pass() => Start(new PassPagePresenter(_view, _app.Pass, _app.Daily, _loc, _toasts, _app.Subscriber<MetaChanged>(),
+        PassPagePresenter Pass() => Start(new PassPagePresenter(_view, _app.Pass, _app.Daily, _app.Boutique, _loc, _toasts, _app.Subscriber<MetaChanged>(),
                                                                _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
 
         [Test, Description("Vérifie que le pass affiche 30 niveaux, que la récompense gratuite d'un niveau atteint se prend d'un toucher et passe à « PRIS » — parce que c'est le geste central du pass (M40)")]
@@ -102,13 +105,13 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void Pass_SideShowsDailyMissions_ClaimWhenDone()
         {
             Pass();
-            Assert.That(_view.Side.Rows.Length, Is.EqualTo(3));
-            Assert.That(_view.Side.Rows[0].A.Enabled, Is.False);
+            Assert.That(_view.Side.Rows.Length, Is.EqualTo(4), "le cadeau du jour, puis les trois missions");
+            Assert.That(_view.Side.Rows[1].A.Enabled, Is.False);
             var m = _app.Daily.Today()[0];
             _app.Daily.Record(m.Template.Kind, m.Template.Target);
-            Assert.That(_view.Side.Rows[0].A.Enabled, Is.True, "la page se rafraîchit toute seule");
-            _view.ClickSide(0);
-            Assert.That(_view.Side.Rows[0].A.Label, Is.EqualTo(_loc.T("pass.taken")));
+            Assert.That(_view.Side.Rows[1].A.Enabled, Is.True, "la page se rafraîchit toute seule");
+            _view.ClickSide(1);
+            Assert.That(_view.Side.Rows[1].A.Label, Is.EqualTo(_loc.T("pass.taken")));
         }
 
         [Test, Description("Vérifie que l'échange de Gemmes contre des Crédits est grisé sans Gemmes, avec la raison, puis se fait quand on en a — parce qu'un bouton grisé doit dire pourquoi")]
@@ -129,7 +132,8 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        static int BoutiqueRow(string exchangeId) => Boutique.Packs.Count + Boutique.Exchanges.ToList().FindIndex(e => e.Id == exchangeId);
+        // Lignes : titre Gemmes, paquets, titre Échanges, échanges.
+        static int BoutiqueRow(string exchangeId) => 1 + Boutique.Packs.Count + 1 + Boutique.Exchanges.ToList().FindIndex(e => e.Id == exchangeId);
 
         [Test, Description("Vérifie que l'achat d'un paquet de Gemmes passe par une confirmation qui précise que le paiement est simulé, puis ajoute les Gemmes — parce qu'aucun argent réel ne doit être suggéré")]
         public void Boutique_PackPurchase_ConfirmsThenGrantsGems()
@@ -137,7 +141,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
                                                     _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator { ShopTab = ShopTab.Gems }));
             int gems = _app.Session.Wallet.Gems;
-            _view.ClickRow(0);
+            _view.ClickRow(1, 0); // ligne 0 : titre de la catégorie Gemmes
             var popup = (FakeConfirmPopup)_host.Spawned.Single();
             Assert.That(popup.Asked!.Value.Body, Does.Contain("simulé"));
             popup.Answer(true);
@@ -149,33 +153,32 @@ namespace N29.HeroesDawn.Tests.Presentation
             => Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
                                                _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, nav));
 
-        [Test, Description("Vérifie que la boutique affiche un onglet à la fois (boosters, objets, gemmes, cadeau), que changer d'onglet change les lignes et mémorise l'onglet, et que l'onglet Héros ouvre la page Recruter — parce que la boutique est unique, à onglets")]
+        [Test, Description("Vérifie que la boutique affiche un onglet à la fois (boosters, gemmes, cadeau), que changer d'onglet change les lignes et mémorise l'onglet, et que l'onglet Héros ouvre la page Recruter — parce que la boutique est unique, à onglets")]
         public void Boutique_Tabs_SwitchTheRows_AndHeroesGoToRecruit()
         {
             var nav = new HubNavigator();
             var p = NewBoutique(nav);
             Assert.That(_view.ShopTabShown, Is.EqualTo((int)ShopTab.Boosters), "les héros ont leur page : on retombe sur les boosters");
             Assert.That(_view.Rows.Length, Is.EqualTo(2), "stock + achat");
-            _view.ClickShopTab((int)ShopTab.Items);
-            Assert.That(nav.ShopTab, Is.EqualTo(ShopTab.Items));
-            Assert.That(_view.Rows.Length, Is.EqualTo(CollectionBook.ItemOfferCount));
             _view.ClickShopTab((int)ShopTab.Gems);
-            Assert.That(_view.Rows.Length, Is.EqualTo(Boutique.Packs.Count + Boutique.Exchanges.Count));
-            _view.ClickShopTab((int)ShopTab.Gift);
-            Assert.That(_view.Rows.Length, Is.EqualTo(1));
+            Assert.That(_view.Rows.Length, Is.EqualTo(Boutique.Packs.Count + Boutique.Exchanges.Count + 2), "deux titres de catégorie : gemmes et échanges");
             _view.ClickShopTab((int)ShopTab.Heroes);
             Assert.That(nav.Current.Page, Is.EqualTo(HubPage.Recruit));
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que l'onglet Cadeau récupère le cadeau du jour et grise la ligne ensuite — parce que le cadeau se prend une fois par jour")]
-        public void Boutique_GiftTab_ClaimsOncePerDay()
+        [Test, Description("Vérifie que le cadeau du jour se réclame dans le Pass, une fois par jour, et que la boutique ouvre le Pass — parce que le cadeau a quitté la boutique (0.15)")]
+        public void DailyGift_ClaimedInPass_OncePerDay_AndShopLinksToPass()
         {
-            var p = NewBoutique(new HubNavigator { ShopTab = ShopTab.Gift });
-            Assert.That(_view.Rows[0].A.Enabled, Is.True);
-            _view.ClickRow(0);
-            Assert.That(_view.Rows[0].A.Enabled, Is.False);
+            var nav = new HubNavigator();
+            var p = NewBoutique(nav);
+            _view.ClickHeader(0);
+            Assert.That(nav.Current.Page, Is.EqualTo(HubPage.Pass));
             p.Dispose();
+            Pass();
+            Assert.That(_view.Side.Rows[0].A.Enabled, Is.True);
+            _view.ClickSide(0);
+            Assert.That(_view.Side.Rows[0].A.Enabled, Is.False);
         }
 
         [Test, Description("Vérifie qu'« Ouvrir » est grisé sans booster, que l'achat en ajoute un, et qu'ouvrir montre la popup animée avec autant de cartes que le booster en contient puis consomme le booster — parce que l'ouverture est un moment à part")]
@@ -198,32 +201,85 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que le cadeau du jour se prend une fois par jour — parce qu'il donne une raison de revenir")]
-        public void Boutique_DailyGift_OncePerDay()
+        [Test, Description("Vérifie que le cadeau du jour se reprend le lendemain dans le Pass — parce qu'il donne une raison de revenir")]
+        public void DailyGift_ComesBackNextDay()
         {
-            var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
-                                                    _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, new HubNavigator()));
-            Assert.That(_view.Header.A.Enabled, Is.True);
-            _view.ClickHeader(0);
-            Assert.That(_view.Header.A.Enabled, Is.False);
+            Pass();
+            _view.ClickSide(0);
+            Assert.That(_view.Side.Rows[0].A.Enabled, Is.False);
             _app.Time.LocalNow = _app.Time.LocalNow.AddDays(1);
             _app.MetaCtx.Touch(MetaArea.Boutique);
-            Assert.That(_view.Header.A.Enabled, Is.True);
+            Assert.That(_view.Side.Rows[0].A.Enabled, Is.True);
+        }
+
+        OperationsPagePresenter Operations()
+            => Start(new OperationsPagePresenter(_view, _app.Operations, _app.Session, new ModalService(_host), _loc, _toasts, _app.Subscriber<MetaChanged>(),
+                                                 _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
+
+        void AddFree(params string[] ids)
+        {
+            foreach (var id in ids) _app.Session.Roster.Add(new TeamMember(_app.Session.Content.Member(new MemberId(id)), 8));
+        }
+
+        [Test, Description("Vérifie que la page Opérations liste les trois missions avec difficulté, durée et gains, et que la fiche de la mission choisie propose les agents — parce que le joueur compare avant de choisir")]
+        public void Operations_ListsMissions_SheetShowsAgents()
+        {
+            AddFree("etincelle", "arc");
+            var p = Operations();
+            Assert.That(_view.Rows.Length, Is.EqualTo(3));
+            Assert.That(_view.Rows[1].Subtitle, Does.Contain(_loc.T("ops.difficulty.2")).And.Contain("1 h").And.Contain("700 CR"));
+            Assert.That(_view.Side.Title, Is.EqualTo(_loc.T("ops.patrol")), "la première mission est choisie au départ");
+            _view.SelectRow(1);
+            Assert.That(_view.Side.Title, Is.EqualTo(_loc.T("ops.recon")));
+            Assert.That(_view.Side.Rows.Length, Is.EqualTo(4), "résumé, deux agents, ligne d'équipe");
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que la page Opérations propose les trois durées, grise celles qui manquent de membres libres et lance l'expédition choisie — parce que l'envoi est le geste principal de la salle")]
-        public void Operations_EmptySlot_StartsChosenExpedition()
+        [Test, Description("Vérifie qu'on choisit les agents, que le bouton Lancer ne s'allume qu'avec l'équipe complète et que la mission part après confirmation — parce que l'affectation est le geste principal de la salle")]
+        public void Operations_PickAgents_LaunchesAfterConfirm()
         {
-            _app.Session.Roster.Add(new TeamMember(_app.Session.Content.Member(new MemberId("etincelle")), 8));
-            var p = Start(new OperationsPagePresenter(_view, _app.Operations, _app.Session, _loc, _toasts, _app.Subscriber<MetaChanged>(),
-                                                      _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
-            Assert.That(_view.Rows.Length, Is.EqualTo(3));
-            Assert.That(_view.Rows[0].A.Enabled, Is.True, "patrouille : 1 membre");
-            Assert.That(_view.Rows[0].B.Enabled, Is.False, "reconnaissance : 2 membres");
-            _view.ClickRow(0, 0);
-            Assert.That(_app.Operations.SlotViews()[0].Running, Is.True);
-            Assert.That(_view.Rows[0].A.Label, Does.Contain(_loc.F("ops.speed", 3).Split(' ')[0]));
+            AddFree("etincelle", "arc");
+            var p = Operations();
+            _view.SelectRow(1); // reconnaissance : 2 agents
+            int go = _view.Side.Rows.Length - 1;
+            Assert.That(_view.Side.Rows[go].A.Enabled, Is.False, "personne choisi");
+            _view.ClickSide(1);
+            Assert.That(_view.Side.Rows[go].A.Enabled, Is.False, "un seul sur deux");
+            _view.ClickSide(2);
+            Assert.That(_view.Side.Rows[go].A.Enabled, Is.True);
+            _view.ClickSide(go);
+            var ask = (FakeConfirmPopup)_host.Spawned.Last();
+            Assert.That(_app.Operations.SlotOf("recon"), Is.EqualTo(-1), "rien ne part avant la confirmation");
+            ask.Answer(true);
+            Assert.That(_app.Operations.SlotOf("recon"), Is.EqualTo(0));
+            Assert.That(_view.Rows[1].A.Label, Does.Contain(_loc.F("ops.speed", 12).Split(' ')[0]));
+            Assert.That(_toasts.Shown.Last().Text, Is.EqualTo(_loc.T("ops.started")));
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie qu'un refus à la confirmation ne lance rien, qu'un agent en mission n'est pas sélectionnable et qu'on récupère le résultat au retour — parce que les agents occupés restent indisponibles jusqu'à la fin")]
+        public void Operations_Cancel_BusyAgentsLocked_ClaimAtReturn()
+        {
+            AddFree("etincelle", "arc");
+            var p = Operations();
+            _view.ClickSide(1);
+            _view.ClickSide(_view.Side.Rows.Length - 1);
+            ((FakeConfirmPopup)_host.Spawned.Last()).Answer(false);
+            Assert.That(_app.Operations.SlotOf("patrol"), Is.EqualTo(-1));
+            _view.ClickSide(_view.Side.Rows.Length - 1);
+            ((FakeConfirmPopup)_host.Spawned.Last()).Answer(true);
+            Assert.That(_app.Operations.SlotOf("patrol"), Is.EqualTo(0));
+            _view.SelectRow(1);
+            var busy = _view.Side.Rows.Skip(1).First(r => r.Dim);
+            Assert.That(busy.A.Enabled, Is.False);
+            Assert.That(busy.Subtitle, Does.Contain("15"));
+            int credits = _app.Session.Wallet.Credits;
+            _app.Time.UtcNow = _app.Time.UtcNow.AddMinutes(16);
+            _app.MetaCtx.Touch(MetaArea.Operations);
+            Assert.That(_view.Rows[0].ProgressLabel, Is.EqualTo(_loc.T("ops.back")));
+            _view.ClickRow(0);
+            Assert.That(_app.Session.Wallet.Credits, Is.GreaterThan(credits));
+            Assert.That(_app.Operations.SlotOf("patrol"), Is.EqualTo(-1));
             p.Dispose();
         }
 

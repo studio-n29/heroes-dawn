@@ -179,7 +179,6 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (_meta == null) return "";
             if (page == HubPage.Pass) { int n = _meta.PassBadge; return n > 0 ? n.ToString() : ""; }
             if (page == HubPage.Profile) { int n = _meta.ArchivesBadge; return n > 0 ? n.ToString() : ""; }
-            if (page == HubPage.Shop) return _meta.ShopBadge > 0 ? "!" : "";
             return "";
         }
 

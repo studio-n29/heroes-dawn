@@ -282,8 +282,26 @@ namespace N29.HeroesDawn.Domain.Combat
                 t.Statuses.Clear();
                 output.Add(new UnitDefeatedEvent(Tick, t.Id));
             }
-            else if (crit) InterruptOnCrit(t, output);
+            else
+            {
+                if (crit) InterruptOnCrit(t, output);
+                AdvanceBossPhase(t, output);
+            }
             return dmg;
+        }
+
+        /// <summary>Ouvre chaque phase dont le seuil de PV est atteint : bonus permanents, puis événement de changement de phase (un coup peut en franchir plusieurs).</summary>
+        void AdvanceBossPhase(CombatUnit t, List<CombatEvent> output)
+        {
+            while (t.PhaseReached < t.Phases.Count && t.Hp * 100L <= t.MaxHp * (long)t.Phases[t.PhaseReached].ThresholdPercent)
+            {
+                var phase = t.Phases[t.PhaseReached];
+                t.Atk += t.Atk * phase.AtkPercent / 100;
+                t.Def += t.Def * phase.DefPercent / 100;
+                t.Spd += t.Spd * phase.SpdPercent / 100;
+                t.PhaseReached++;
+                output.Add(new BossPhaseChangedEvent(Tick, t.Id, t.PhaseReached + 1, t.Phases.Count + 1, phase.NameKey));
+            }
         }
 
         void ApplyStatus(CombatUnit t, StatusType s, int turns, int value, List<CombatEvent> output)

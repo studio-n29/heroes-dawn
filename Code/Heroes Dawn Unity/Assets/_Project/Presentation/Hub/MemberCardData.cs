@@ -13,6 +13,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public Family Family;
         public string RarityText;
         public Rarity Rarity;
+        /// <summary>Puissance de 1 à 5 (affichée sur la carte).</summary>
+        public int PowerTier;
         public string RoleLine;
         public string LevelText;
         public string Stats;

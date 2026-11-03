@@ -45,6 +45,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         public float Progress;
         public string ProgressLabel;
         public RowButtonData A, B;
+        /// <summary>Couleur du bandeau d'en-tête (carte de profil) ; nulle : celle du gabarit.</summary>
+        public Color? HeaderTint;
     }
 
     /// <summary>Colonne de droite optionnelle : titre, lignes, texte de détail.</summary>

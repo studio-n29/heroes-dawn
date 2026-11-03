@@ -32,7 +32,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<AgentsPageView>() != null);
             yield return null;
             var page = Object.FindAnyObjectByType<AgentsPageView>()!;
-            int rows = page.GetComponentsInChildren<InfoRowView>(true).Count(r => r.gameObject.activeInHierarchy);
+            // Le registre est une grille de cartes (L3) : on compte les tuiles visibles.
+            int rows = page.Tiles.Count(t => t.gameObject.activeInHierarchy);
             Assert.That(rows, Is.EqualTo(30), "30 agents : le personnage joueur est un avatar hors registre");
             yield return new WaitForSeconds(0.5f);
             yield return ScreenCaptureTests.Capture("20-registre-agents");

@@ -21,6 +21,10 @@ namespace N29.HeroesDawn.Presentation.Login
             Id = id; Video = video; Seconds = seconds; FadeToBlack = fadeToBlack;
             Cues = Array.AsReadOnly(cues);
         }
+        /// <summary>Plan de montage (cinématique courte) : coupé à sa durée, sans sous-titre, fondu bref.</summary>
+        public CinematicVideoStep(string id, string video, float seconds, bool fadeToBlack, bool cut)
+            : this(id, video, seconds, fadeToBlack) { Cut = cut; }
+        public bool Cut { get; }
         public string Id { get; }
         public string Video { get; }
         public string? Voice => null; // Voix off volontairement désactivées.
@@ -28,7 +32,7 @@ namespace N29.HeroesDawn.Presentation.Login
         public float Seconds { get; }
         public bool FadeToBlack { get; }
         public IReadOnlyList<CinematicCaptionCue> Cues { get; }
-        public string Caption => Cues[0].Text;
+        public string Caption => Cues.Count > 0 ? Cues[0].Text : "";
         public string CaptionAt(float seconds)
         {
             string text = "";
@@ -55,6 +59,32 @@ namespace N29.HeroesDawn.Presentation.Login
         public static float PlaybackSpeedForDuration(double videoSeconds, float shotSeconds)
             => videoSeconds <= 0 || shotSeconds <= 0 ? 1f : (float)Math.Min(1.0, videoSeconds / shotSeconds);
 
+
+        static CinematicVideoStep M(string id, string video, float seconds, bool black = false) => new CinematicVideoStep(id, video, seconds, black, true);
+
+        /// <summary>Durée d'un plan du montage de lancement (secondes).</summary>
+        public const float LaunchShotSeconds = 3.5f;
+
+        /// <summary>Fondu enchaîné entre deux plans du montage : bref, pour garder le rythme.</summary>
+        public const float LaunchDissolveSeconds = 0.2f;
+
+        /// <summary>
+        /// Cinématique de lancement : montage dynamique de 13 plans de la version longue, sans dialogue ni texte, 45 à 50 secondes,
+        /// sur la musique de cinématique. La version longue (<see cref="Steps"/>) reste lisible depuis la page Chapitres.
+        /// </summary>
+        public static IReadOnlyList<CinematicVideoStep> Launch { get; } = Array.AsReadOnly(new[]
+        {
+            M("L01", "s07", LaunchShotSeconds), M("L02", "s10", LaunchShotSeconds), M("L03", "s16", LaunchShotSeconds),
+            M("L04", "s20", LaunchShotSeconds), M("L05", "s24", LaunchShotSeconds), M("L06", "s30", LaunchShotSeconds),
+            M("L07", "s33", LaunchShotSeconds), M("L08", "s34", LaunchShotSeconds), M("L09", "s38", LaunchShotSeconds),
+            M("L10", "s40", LaunchShotSeconds), M("L11", "s41", LaunchShotSeconds), M("L12", "s44", LaunchShotSeconds),
+            M("L13", "s46", LaunchShotSeconds, true),
+        });
+
+        public static float LaunchDurationSeconds => Launch.Sum(s => s.Seconds);
+
+        /// <summary>Clé de la voix d'une réplique de la version longue (« cinematic.S01.0 ») : le fichier est facultatif.</summary>
+        public static string VoiceKey(CinematicVideoStep step, int cueIndex) => "cinematic." + step.Id + "." + cueIndex;
         public static IReadOnlyList<CinematicVideoStep> Steps { get; } = Array.AsReadOnly(new[]
         {
             S("S01", "s01", 8, false,

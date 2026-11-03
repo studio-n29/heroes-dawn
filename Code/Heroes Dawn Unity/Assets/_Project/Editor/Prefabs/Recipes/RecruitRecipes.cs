@@ -108,6 +108,18 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             row.HLayout(50, 0, TextAnchor.MiddleCenter);
             var cards = new List<Object>();
             for (int i = 0; i < 3; i++) cards.Add(ctx.Nest<ShopCardView>("Widgets/ShopCard.prefab", row, "Card" + i));
+            // Six lots de scraps du jour, en une rangée sous les cartes (au-dessus des boutons du bas).
+            var scrapRow = Ui.Rect(rt, "Scraps").At(0.5f, 0f, 0, 168, 1700, 96);
+            scrapRow.HLayout(10, 0, TextAnchor.MiddleCenter);
+            var scraps = new List<Object>();
+            for (int i = 0; i < 6; i++)
+            {
+                var lot = Ui.Btn(scrapRow, "", Theme.Credits, Theme.TextDark, null!, 24, FontKind.Title, "Scrap" + i);
+                var le = lot.gameObject.AddComponent<LayoutElement>();
+                le.preferredWidth = 270f;
+                le.preferredHeight = 96f;
+                scraps.Add(lot);
+            }
             var empty = Ui.Txt(rt, "", 40, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Empty");
             empty.rectTransform.At(0.5f, 0.5f, 0, 0, 1200, 200);
             empty.Inked();
@@ -124,6 +136,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "rule", rule);
             ctx.Wire(view, "countdown", countdown);
             ctx.WireArray(view, "cards", cards);
+            ctx.WireArray(view, "scraps", scraps);
             ctx.Wire(view, "empty", empty);
             ctx.Wire(view, "progress", progress);
             ctx.Wire(view, "reroll", reroll);

@@ -136,6 +136,23 @@ namespace N29.HeroesDawn.Tests.Presentation
             gated.Release();
         }
 
+        [Test, Description("Vérifie que « Annuler » interrompt la requête en attente, affiche « Demande annulée » et laisse la fenêtre ouverte pour un nouvel essai — parce qu'une connexion qui traîne ne doit pas bloquer le joueur")]
+        public void Cancel_InterruptsTheRequest_AndKeepsTheWindowOpen()
+        {
+            var gated = new GatedAccounts();
+            var link = new AccountLink(gated, _cloud, _app.Session, _app.Save,
+                new CloudSync(_cloud, new MemorySyncStateStore(), _app.Session, new FixedClock(), _app.Logger, (t, ct) => UniTask.CompletedTask, _app.Save),
+                new MemorySyncStateStore(), new MemoryProgressBackupStore(), new FixedClock(), _app.Logger, _app.Publisher<WalletChanged>(), _app.Publisher<RosterChanged>());
+            var view = new FakeAccountPopup();
+            var run = new AccountPopupController(view, link, _loc).RunAsync(CancellationToken.None);
+            view.ClickSubmit("moi@exemple.fr", "motdepasse1");
+            view.ClickCancel();
+            Assert.That(view.LastMessage, Is.EqualTo((_loc.T("account.cancelled"), false)));
+            Assert.That(view.BusyStates, Is.EqualTo(new[] { true, false }));
+            Assert.That(run.Status, Is.EqualTo(UniTaskStatus.Pending), "la fenêtre reste ouverte");
+            gated.Release();
+        }
+
         /// <summary>Compte dont la connexion attend un signal.</summary>
         sealed class GatedAccounts : IAccountGateway
         {
@@ -146,7 +163,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             public async UniTask<Core.Result<PlayerAccount>> SignInAsync(string email, string password, CancellationToken ct)
             {
                 SignInCalls++;
-                await _gate.Task;
+                await _gate.Task.AttachExternalCancellation(ct);
                 return Core.Result<PlayerAccount>.Ok(new PlayerAccount("u", "Moi", email));
             }
             public UniTask<Core.Result<PlayerAccount>> SignInWithProviderAsync(AuthProvider provider, CancellationToken ct) => throw new System.NotSupportedException();

@@ -77,6 +77,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
             }
 
             if (victory) TeamLinks.RecordVictory(s.Meta, _active.FighterMembers.Select(m => m.Id.Value).ToList());
+            if (victory && s.RunZone != null && s.RunZone.IsLair) World.LairBook.RecordBossDefeat(s.Meta, s.RunZone.Id.Value, pending.Case.Value);
 
             var res = ZoneActions.Apply(_fx, r => r.ResolveCombat(victory));
             IReadOnlyList<BoardEvent> boardEvents = res.IsSuccess ? res.Value : Array.Empty<BoardEvent>();
@@ -88,6 +89,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
                 toHq = true;
             }
 
+            Meta.Stats.RecordCombat(s.Meta, sim);
             var report = new CombatReport(victory, credits, pending.Rank, boss, changes, boardEvents, toHq, drop, crafting);
             _fx.Log.Info($"Combat terminé : {(victory ? "victoire" : "défaite")} en {sim.Tick} ticks, +{credits} Crédits" + (drop.HasValue ? ", objet " + drop.Value.Value : ""));
             _fx.Wallet.PublishWallet(s);

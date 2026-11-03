@@ -7,5 +7,7 @@ namespace N29.HeroesDawn.Presentation.Audio
         Modal = 0,
         /// <summary>Un effet marquant (victoire, recrutement) passe devant la musique.</summary>
         Stinger = 1,
+        /// <summary>Une réplique doublée est en cours : la musique baisse pour laisser passer la voix.</summary>
+        Voice = 2,
     }
 }

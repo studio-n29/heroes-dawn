@@ -13,6 +13,8 @@ namespace N29.HeroesDawn.Content.Prototype
         public static readonly ZoneId Zone12 = new ZoneId("zone_ny_1_2");
         public static readonly ZoneId Zone13 = new ZoneId("zone_ny_1_3");
         public static readonly ZoneId Zone14 = new ZoneId("zone_ny_1_4");
+        /// <summary>Repaire de l'AMIF : donjon à trois boss (Brick, Crocodile, le Titan), ouvert une fois Brooklyn terminé.</summary>
+        public static readonly ZoneId ZoneLairAmifVault = new ZoneId("zone_lair_amif_vault");
 
         static EffectDef Dmg(int pct) => new EffectDef(EffectType.Damage, pct);
         static EffectDef St(StatusType s, int turns, int chance = 100) => new EffectDef(EffectType.ApplyStatus, 0, s, turns, chance);
@@ -24,6 +26,12 @@ namespace N29.HeroesDawn.Content.Prototype
         static EnemyDef E(string id, Role r, Family f, StatBlock st, bool boss, params SkillDef[] skills)
             => new EnemyDef(new EnemyId(id), "enemies." + id + ".name", r, f, st, skills, boss);
 
+        /// <summary>Palier de boss : sous <paramref name="pct"/> % de PV, bonus permanents de force, de défense et de vitesse (en %).</summary>
+        static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd) => new BossPhaseDef(pct, nameKey, atk, def, spd);
+
+        static EnemyDef Phased(EnemyDef d, params BossPhaseDef[] phases)
+            => new EnemyDef(d.Id, d.NameKey, d.Role, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases);
+
         /// <summary>Ennemis ajoutés aux zones 1.2 et 1.3.</summary>
         public static IEnumerable<EnemyDef> Enemies()
         {
@@ -34,15 +42,17 @@ namespace N29.HeroesDawn.Content.Prototype
                 S("canal_chief_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110)),
                 S("canal_chief_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(80), St(StatusType.Corrosion, 2, 40)),
                 S("canal_chief_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(20)));
-            yield return E("bridge_titan", Role.Tank, Family.PhysicalBio, new StatBlock(5600, 120, 140, 95), true,
+            yield return Phased(E("bridge_titan", Role.Tank, Family.PhysicalBio, new StatBlock(5600, 120, 140, 95), true,
                 S("bridge_titan_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(125)),
                 S("bridge_titan_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(12)),
-                S("bridge_titan_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(95), St(StatusType.Shock, 1, 35)));
+                S("bridge_titan_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(95), St(StatusType.Shock, 1, 35))),
+                Phase(66, "enemies.bridge_titan.phase2", 10, 0, 5), Phase(33, "enemies.bridge_titan.phase3", 25, -10, 10));
             // Crocodile (Antonio Kribelchi), mafieux méta-humain : boss de Coney Island. Morsure, coup de queue, cuirasse d'écailles.
-            yield return E("crocodile", Role.Damage, Family.PhysicalBio, new StatBlock(5200, 135, 120, 100), true,
+            yield return Phased(E("crocodile", Role.Damage, Family.PhysicalBio, new StatBlock(5200, 135, 120, 100), true,
                 S("crocodile_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(130)),
                 S("crocodile_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(90), St(StatusType.Shock, 1, 30)),
-                S("crocodile_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(25), St(StatusType.Taunt, 1)));
+                S("crocodile_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(25), St(StatusType.Taunt, 1))),
+                Phase(66, "enemies.crocodile.phase2", 10, 0, 5), Phase(33, "enemies.crocodile.phase3", 25, -10, 10));
             // Troupes de l'AMIF (zone 1.4) : soldat, tireur, capitaine.
             yield return E("amif_trooper", Role.Damage, Family.Matter, new StatBlock(1300, 120, 70, 105), false,
                 S("amif_trooper_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100)),
@@ -61,6 +71,7 @@ namespace N29.HeroesDawn.Content.Prototype
             yield return BuildZone12();
             yield return BuildZone13();
             yield return BuildZone14();
+            yield return BuildLairAmifVault();
         }
 
         /// <summary>Zones à valider avant d'ouvrir celle-ci (vide : disponible d'emblée).</summary>
@@ -69,6 +80,7 @@ namespace N29.HeroesDawn.Content.Prototype
             if (zone == Zone12) return new[] { PrototypeContent.Zone11 };
             if (zone == Zone13) return new[] { Zone12 };
             if (zone == Zone14) return new[] { Zone13 };
+            if (zone == ZoneLairAmifVault) return new[] { Zone14 };
             return System.Array.Empty<ZoneId>();
         }
 
@@ -192,6 +204,47 @@ namespace N29.HeroesDawn.Content.Prototype
                 new EncounterDef(CombatRank.Boss, new[] { new EnemyId("bridge_titan"), new EnemyId("amif_marksman"), new EnemyId("amif_trooper") }),
             };
             return new ZoneDef(Zone14, "zones.ny_1_4.name", new CaseId("n00"), BridgeNodes(titan), BridgeLinks(), objectives, encounters, "1.4", 1, "brooklyn", 10, Requires(Zone14), new ZoneEnvironment(Biome.City, Weather.Night));
+        }
+
+        /// <summary>Boss tenu seul sur sa case : la table n'a qu'un ennemi et chaque manche en tire un.</summary>
+        static NodeDef BossNode(string id, int x, string enemy)
+            => new NodeDef(new CaseId(id), CaseType.Combat, true, CombatRank.Boss, x, 2, null, new CombatSpec(new[] { new EnemyId(enemy) }, 1, 1, 1), null);
+
+        /// <summary>
+        /// Repaire de l'AMIF : une ligne droite de 15 cases avec trois boss fixes (Brick, Crocodile, le Titan), des repos entre eux et des élites.
+        /// La zone est validée quand les trois sont vaincus ; les boss vaincus sont retenus par le profil (voir LairBook).
+        /// </summary>
+        static ZoneDef BuildLairAmifVault()
+        {
+            var nodes = new List<NodeDef>
+            {
+                N("n00", CaseType.Entry, 0, 2, true),
+                N("n01", CaseType.Resource, 1, 2), N("n02", CaseType.Combat, 2, 2), N("n03", CaseType.Resource, 3, 2),
+                BossNode("n04", 4, "brick"),
+                N("n05", CaseType.Rest, 5, 2), N("n06", CaseType.Combat, 6, 2), N("n07", CaseType.Resource, 7, 2),
+                N("n08", CaseType.Combat, 8, 2, r: CombatRank.Elite),
+                BossNode("n09", 9, "crocodile"),
+                N("n10", CaseType.Rest, 10, 2), N("n11", CaseType.Combat, 11, 2, r: CombatRank.Elite), N("n12", CaseType.Resource, 12, 2),
+                N("n13", CaseType.Rest, 13, 2),
+                BossNode("n14", 14, "bridge_titan"),
+            };
+            var links = new List<LinkDef>();
+            for (int i = 0; i < nodes.Count - 1; i++) links.Add(new LinkDef(nodes[i].Id, nodes[i + 1].Id));
+            var objectives = new List<ObjectiveDef>
+            {
+                new ObjectiveDef("obj_brick", ObjectiveType.DefeatCombat, new CaseId("n04"), "objectives.lair_amif_vault.brick"),
+                new ObjectiveDef("obj_crocodile", ObjectiveType.DefeatCombat, new CaseId("n09"), "objectives.lair_amif_vault.crocodile"),
+                new ObjectiveDef("obj_titan", ObjectiveType.DefeatCombat, new CaseId("n14"), "objectives.lair_amif_vault.titan"),
+            };
+            var encounters = new List<EncounterDef>
+            {
+                new EncounterDef(CombatRank.Normal, new[] { new EnemyId("amif_trooper"), new EnemyId("amif_marksman"), new EnemyId("amif_trooper") }),
+                new EncounterDef(CombatRank.Normal, new[] { new EnemyId("brute"), new EnemyId("amif_marksman"), new EnemyId("thug") }),
+                new EncounterDef(CombatRank.Elite, new[] { new EnemyId("amif_captain"), new EnemyId("amif_trooper"), new EnemyId("amif_marksman") }),
+                new EncounterDef(CombatRank.Elite, new[] { new EnemyId("canal_chief"), new EnemyId("brute"), new EnemyId("sniper") }),
+            };
+            return new ZoneDef(ZoneLairAmifVault, "zones.lair_amif_vault.name", new CaseId("n00"), nodes, links, objectives, encounters, "R.1", 1,
+                               ZoneDef.LairBorough, 12, Requires(ZoneLairAmifVault), new ZoneEnvironment(Biome.Industrial, Weather.Night));
         }
     }
 }

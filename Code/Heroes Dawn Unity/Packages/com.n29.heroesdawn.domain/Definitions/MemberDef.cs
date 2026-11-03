@@ -19,12 +19,15 @@ namespace N29.HeroesDawn.Definitions
         public UnlockDef? Unlock { get; }
         /// <summary>Vrai si l agent entre dans la boutique de recrutement (pas d arc, d evenement ni de prouesse).</summary>
         public bool InShop => Unlock == null || Unlock.Kind == UnlockKind.Shop;
+        /// <summary>Puissance de 1 (pouvoirs basiques, aucune menace) à 5 (pouvoirs surpuissants, menace apocalyptique).</summary>
+        public int PowerTier { get; }
 
         public MemberDef(MemberId id, string nameKey, Family family, Role role, Rarity rarity, StatBlock baseStats, IReadOnlyList<SkillDef> skills,
-                         ZoneId? unlockZone = null, UnlockDef? unlock = null)
+                         ZoneId? unlockZone = null, UnlockDef? unlock = null, int powerTier = 1)
         {
             Id = id; NameKey = nameKey; Family = family; Role = role; Rarity = rarity; BaseStats = baseStats; Skills = skills;
             UnlockZone = unlockZone; Unlock = unlock;
+            PowerTier = powerTier < 1 ? 1 : powerTier > 5 ? 5 : powerTier;
         }
     }
 }

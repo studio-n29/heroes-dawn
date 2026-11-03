@@ -72,13 +72,13 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             _actions.Clear();
             View.ShowShopTab((int)Tab);
-            bool gift = _shop.DailyGiftAvailable;
             View.ShowHeader(new ListHeaderData
             {
                 Title = Loc.F("shop.gems", _session.Wallet.Gems),
                 Line = "",
                 Progress = -1f,
-                A = RowButtonData.Of(gift ? Loc.F("shop.gift", MetaFormat.RewardText(Boutique.DailyGift, Loc)) : Loc.T("shop.gift_done"), gift, Loc.T("shop.gift_done_reason"), 0),
+                // Le cadeau du jour se réclame dans le Pass (L2 de la 0.15.0).
+                A = RowButtonData.Of(Loc.T("nav.pass"), true, "", 0),
                 B = RowButtonData.Of(Loc.T("shop.grimoire"), true, "", 3),
             });
 
@@ -86,9 +86,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             switch (Tab)
             {
                 case ShopTab.Boosters: AddBoosters(rows); break;
-                case ShopTab.Items: AddItems(rows); break;
-                case ShopTab.Gems: AddGems(rows); break;
-                default: AddGift(rows, gift); break;
+                default: AddGems(rows); break;
             }
             View.ShowRows(rows.ToArray());
         }
@@ -122,30 +120,19 @@ namespace N29.HeroesDawn.Presentation.Hub
             });
         }
 
-        void AddItems(List<InfoRowData> rows)
+        /// <summary>Titre de catégorie (sans bouton) : sépare les paquets achetés des échanges de gemmes.</summary>
+        void AddSection(List<InfoRowData> rows, string title, string subtitle, string art)
         {
-            var offers = _collection.ItemOffers();
-            for (int i = 0; i < offers.Count; i++)
-            {
-                int index = i;
-                var it = offers[i].Item;
-                var r = InfoRowData.Basic(CollectionText.ItemName(Loc, it), CollectionText.RarityName(Loc, it.Rarity) + " · " + CollectionText.ItemEffects(Loc, it));
-                r.Tag = CollectionText.Tag(CollectionText.ItemName(Loc, it));
-                r.TagColor = CollectionText.RarityColor(it.Rarity);
-                r.Art = AgentArt.Item(CollectionText.ArtId(it, _session.Content.Collection));
-                int lacking = it.Price - _session.Wallet.Credits;
-                r.A = offers[i].Bought ? RowButtonData.Of(Loc.T("shop.item_sold"), false, "", 3)
-                                       : RowButtonData.Of(Loc.F("shop.item_price", it.Price), lacking <= 0, Loc.F("shop.item_missing", lacking), 0);
-                r.Dim = offers[i].Bought;
-                Add(rows, r, () =>
-                {
-                    if (Report(_collection.BuyItem(index), Loc.F("shop.item_bought", CollectionText.ItemName(Loc, it)))) Refresh();
-                });
-            }
+            var r = InfoRowData.Basic(title, subtitle);
+            r.Tag = "§"; r.TagColor = Theme.Primary;
+            r.Art = AgentArt.Shop(art);
+            r.Highlight = true;
+            Add(rows, r, null);
         }
 
         void AddGems(List<InfoRowData> rows)
         {
+            AddSection(rows, Loc.T("shop.cat.gems"), Loc.T("shop.cat.gems_sub"), "gems_medium");
             foreach (var p in Boutique.Packs)
             {
                 var pack = p;
@@ -155,6 +142,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.A = RowButtonData.Of(p.PriceText, !_buying, "", 0);
                 Add(rows, r, () => BuyAsync(pack).Forget());
             }
+            AddSection(rows, Loc.T("shop.cat.exchange"), Loc.T("shop.cat.exchange_sub"), "exchange_credits");
             foreach (var e in Boutique.Exchanges)
             {
                 var ex = e;
@@ -169,28 +157,15 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
         }
 
-        void AddGift(List<InfoRowData> rows, bool available)
-        {
-            var r = InfoRowData.Basic(Loc.T("shop.gift_title"), MetaFormat.RewardText(Boutique.DailyGift, Loc));
-            r.Tag = "+"; r.TagColor = Theme.Credits;
-            r.Art = AgentArt.Shop("gift");
-            r.Highlight = available;
-            r.Dim = !available;
-            r.A = RowButtonData.Of(available ? Loc.T("shop.gift_claim") : Loc.T("shop.gift_done"), available, Loc.T("shop.gift_done_reason"), 0);
-            Add(rows, r, ClaimGift);
-        }
-
         /// <summary>Icône d'un paquet de gemmes selon sa taille.</summary>
         static string PackArt(string packId) => packId == "gems_100" ? "gems_small" : packId == "gems_550" ? "gems_medium" : "gems_large";
 
         static string ExchangeArt(string id) => id == "ex_pr" ? "exchange_pr" : id == "ex_rest" ? "exchange_rest" : "exchange_credits";
 
-        void ClaimGift() => Report(_shop.ClaimDailyGift(), "shop.gift_taken");
-
         protected override void OnHeader(int index)
         {
-            if (index == 1) { _nav.Open(HubPage.Grimoire); return; }
-            ClaimGift();
+            if (index == 0) { _nav.Open(HubPage.Pass); return; }
+            _nav.Open(HubPage.Grimoire);
         }
 
         protected override void OnRowButton(int row, int button)

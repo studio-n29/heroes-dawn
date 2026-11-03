@@ -40,6 +40,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField, Mvp.OptionalRef] RectTransform? arena;
         [SerializeField, Mvp.OptionalRef] TMP_Text? arenaTitle;
         [SerializeField] BonusChipView[] bonusChips = null!;
+        [SerializeField] BossBarView bossBar = null!;
 
         readonly Dictionary<int, UnitCardView> _cards = new Dictionary<int, UnitCardView>();
         Coroutine? _bannerFade;
@@ -327,6 +328,16 @@ namespace N29.HeroesDawn.Presentation.Combat
         }
 
         public void ShowLog(IReadOnlyList<string> lines) => logText.text = string.Join("\n", lines);
+
+        /// <summary>Barre du boss affichée (tests PlayMode).</summary>
+        public BossBarView BossBar => bossBar;
+
+        public void ShowBoss(BossBarData? data, bool phaseChanged = false)
+        {
+            bool on = data.HasValue;
+            if (bossBar.gameObject.activeSelf != on) bossBar.gameObject.SetActive(on);
+            if (on) bossBar.Show(data!.Value, phaseChanged);
+        }
 
         public void ShowBonuses(IReadOnlyList<BonusChipData> bonuses)
         {

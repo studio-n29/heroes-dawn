@@ -7,6 +7,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Combat;
+using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
@@ -42,6 +43,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         readonly IFrameClock _clock;
         readonly IAudioService _audio;
         readonly TutorialGuide? _tutorial;
+        readonly CombatIntros? _intros;
 
         CombatSimulation? _sim;
         readonly Dictionary<int, string> _names = new Dictionary<int, string>();
@@ -71,9 +73,10 @@ namespace N29.HeroesDawn.Presentation.Combat
                                IFinishCombatUseCase finish, IVerifyCombatUseCase verify, IForceCombatWinUseCase forceWin,
                                IPublisher<CombatResultsClosed> closed, IPublisher<NavigateRequested> navigate, IModalService modals,
                                IToastService toasts, ILocalization loc, IFrameClock clock, BackButtonRouter router,
-                               IAudioService? audio = null, TutorialGuide? tutorial = null)
+                               IAudioService? audio = null, TutorialGuide? tutorial = null, CombatIntros? intros = null)
             : base(view, router)
         {
+            _intros = intros;
             _combat = combat; _session = session; _setAuto = setAuto; _finish = finish; _verify = verify; _forceWin = forceWin;
             _closed = closed; _navigate = navigate; _modals = modals; _toasts = toasts; _loc = loc; _clock = clock;
             _audio = audio ?? NullAudioService.Instance;
@@ -138,6 +141,40 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.ShowBanner(_loc.T("combat.rank").Replace("{0}", "").Trim().ToUpperInvariant() + " !", Tone.Primary);
             LogSynergies(sim);
             _tutorial?.Hint("auto");
+            if (_intros != null && _intros.Enabled) PlayIntroAsync(sim).Forget();
+        }
+
+        /// <summary>
+        /// Entrée en combat : un bandeau par combattant (agents à gauche, ennemis à droite). La boucle de combat attend la fermeture de la fenêtre ;
+        /// une introduction déjà vue est abrégée, et un toucher ou « Passer » la ferme.
+        /// </summary>
+        async UniTaskVoid PlayIntroAsync(CombatSimulation sim)
+        {
+            var intros = _intros!;
+            string key = CombatIntros.KeyOf(sim.Units.Where(u => u.Side == Side.Enemy).Select(u => u.DefId));
+            CombatIntroFighter Fighter(CombatUnit u)
+            {
+                string name = _names.TryGetValue(u.Id, out var n) ? n : u.DefId;
+                string role = _loc.RoleName(u.Role);
+                return new CombatIntroFighter(name.ToUpperInvariant(), u.IsBoss ? _loc.F("combat.intro.boss_sub", role) : role,
+                                              new PortraitData(name, u.Family, u.IsBoss, u.Side == Side.Ally ? AgentArt.For(u.DefId) : null));
+            }
+            var data = new CombatIntroData
+            {
+                AllyTitle = _loc.T("combat.intro.allies"),
+                EnemyTitle = _loc.T("combat.intro.enemies"),
+                Allies = sim.Units.Where(u => u.Side == Side.Ally).Select(Fighter).ToList(),
+                Enemies = sim.Units.Where(u => u.Side == Side.Enemy && u.IsAlive).Select(Fighter).ToList(),
+                Repeat = intros.Seen(key),
+            };
+            try
+            {
+                var view = await _modals.OpenAsync<ICombatIntroView>(Lifetime);
+                try { await view.PlayAsync(data, Lifetime); }
+                finally { _modals.Close(view); }
+            }
+            catch (OperationCanceledException) { return; }
+            intros.MarkSeen(key);
         }
 
         /// <summary>Synergies d'équipe actives (bonus permanents) : une ligne du journal par paire, au début du combat.</summary>
@@ -390,6 +427,15 @@ namespace N29.HeroesDawn.Presentation.Combat
                         View.Float(ad.Unit, _loc.F("combat.advanced", ad.Percent), Tone.Success, 34);
                         if (ad.Ready) { View.Act(ad.Unit); AddLog(Name(ad.Unit) + " : " + _loc.T("combat.propelled")); }
                         break;
+                    case BossPhaseChangedEvent bp:
+                        // Télégraphie : annonce au centre, nom de la phase sur le boss, coup sur sa carte, puis la frise attend que le joueur lise.
+                        View.ShowBanner(_loc.F("combat.boss.phase_banner", bp.Phase), Tone.Danger);
+                        View.Float(bp.Unit, _loc.T(bp.NameKey).ToUpperInvariant(), Tone.Danger, 44);
+                        View.Hit(bp.Unit);
+                        AddLog(Name(bp.Unit) + " : " + _loc.F("combat.boss.phase_log", bp.Phase, bp.PhaseCount, _loc.T(bp.NameKey)));
+                        _pauseLeft = Math.Max(_pauseLeft, BossPhasePauseSeconds);
+                        _bossPhaseChanged = true;
+                        break;
                     case WaveStartedEvent ws:
                         BuildUnits(_sim!);
                         _firstRefresh = true;
@@ -475,6 +521,29 @@ namespace N29.HeroesDawn.Presentation.Combat
                        : targetAllies ? _loc.T("combat.choose_ally")
                        : manual && _selected < 0 ? _loc.T("combat.waiting") : "");
             RefreshTopBar();
+            RefreshBoss(sim);
+        }
+
+        /// <summary>Durée du gel de la frise quand un boss change de phase : le temps de lire l'annonce.</summary>
+        const float BossPhasePauseSeconds = 1.4f;
+        bool _bossPhaseChanged;
+
+        /// <summary>Barre de vie élargie du premier boss vivant (nom, phase, PV, seuils) ; masquée sans boss. Le changement de phase est télégraphié une fois.</summary>
+        void RefreshBoss(CombatSimulation sim)
+        {
+            CombatUnit? boss = null;
+            foreach (var u in sim.Units) if (u.Side == Side.Enemy && u.IsBoss && u.IsAlive) { boss = u; break; }
+            if (boss == null) { View.ShowBoss(null); return; }
+            string phase = "";
+            if (boss.Phases.Count > 0)
+            {
+                phase = _loc.F("combat.boss.phase", boss.PhaseReached + 1, boss.Phases.Count + 1);
+                if (boss.PhaseReached > 0) phase += " · " + _loc.T(boss.Phases[boss.PhaseReached - 1].NameKey).ToUpperInvariant();
+            }
+            var marks = new List<float>(boss.Phases.Count);
+            foreach (var p in boss.Phases) marks.Add(p.ThresholdPercent / 100f);
+            View.ShowBoss(new BossBarData(Name(boss.Id).ToUpperInvariant(), phase, boss.MaxHp == 0 ? 0f : boss.Hp / (float)boss.MaxHp, boss.Hp + " / " + boss.MaxHp, marks), _bossPhaseChanged);
+            _bossPhaseChanged = false;
         }
 
         /// <summary>Les quatre icônes de compétence d'un agent : 1 et 2 propres à l'agent, 3 lourde, 4 réservée aux cartes du grimoire.</summary>

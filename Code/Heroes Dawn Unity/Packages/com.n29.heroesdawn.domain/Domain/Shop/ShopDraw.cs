@@ -57,6 +57,18 @@ namespace N29.HeroesDawn.Domain.Shop
             return result;
         }
 
+        /// <summary>Rang d'une rareté (0 = agent, 2 = légende) : sert à mettre le héros le plus rare en vedette.</summary>
+        public static int Rank(Rarity r) => System.Array.IndexOf(Order, r);
+
+        /// <summary>Tirage des lots de scraps du jour : famille uniforme, quantité et prix fixés par <see cref="ShopRules"/>.</summary>
+        public static System.Collections.Generic.List<ScrapLot> DrawScrapLots(IRandom rng, int count)
+        {
+            var lots = new System.Collections.Generic.List<ScrapLot>();
+            for (int i = 0; i < count; i++)
+                lots.Add(new ScrapLot((ScrapKind)rng.Range(0, ScrapKinds.Count), ShopRules.ScrapLotCount, ShopRules.ScrapLotPrice));
+            return lots;
+        }
+
         static bool Has(List<MemberDef> candidates, Rarity r)
         {
             foreach (var m in candidates) if (m.Rarity == r) return true;

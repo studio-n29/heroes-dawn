@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Meta;
+using N29.HeroesDawn.Application.Features.Tutorial;
 using N29.HeroesDawn.Application.Features.World;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
@@ -31,15 +32,18 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISubscriber<MetaChanged> _metaChanged;
         readonly QuestLogFlow? _quests;
         readonly IModalService? _modals;
+        readonly PlayerSettings? _settings;
+        readonly TutorialGuide? _tutorial;
         IDisposable? _subs;
         int _lastStamp = -1;
 
         public QgPagePresenter(IQgPageView view, ISessionReadModel session, HubNavigator nav, MissionLauncher mission, IClock clock,
                                ILocalization loc, MetaOverview meta, ISubscriber<RosterChanged> roster, ISubscriber<MetaChanged> metaChanged,
-                               QuestLogFlow? quests = null, IModalService? modals = null)
+                               QuestLogFlow? quests = null, IModalService? modals = null, PlayerSettings? settings = null, TutorialGuide? tutorial = null)
             : base(view, null)
         {
             _session = session; _nav = nav; _mission = mission; _clock = clock; _loc = loc; _meta = meta; _roster = roster; _metaChanged = metaChanged; _quests = quests; _modals = modals;
+            _settings = settings; _tutorial = tutorial;
         }
 
         public string Title => _loc.T("page.qg");
@@ -122,29 +126,26 @@ namespace N29.HeroesDawn.Presentation.Hub
             var now = _clock.LocalNow;
             var zone = ZoneProgress.Recommended(s);
             bool done = ZoneProgress.StatusOf(s, zone) == ZoneStatus.Done;
-            int toTrain = s.Roster.Count(m => m.Level < MetaRules.MaxLevel);
-            int tired = s.Roster.Count(m => m.Fatigue > 0);
             var secondary = _meta.Secondary.Active;
             _lastStamp = Stamp(now, secondary.HasValue);
             var activities = _meta.Quests.Activities();
             int claimable = activities.Count(a => a.Claimable);
-            var firstAgent = s.Roster.Count > 0 ? s.Roster[0].Def.Id.Value : s.Route.HeroId;
             var firstCard = s.Content.Collection.Cards.Count > 0 ? s.Content.Collection.Cards[0].Id.Value : "card";
             var firstItem = s.Content.Collection.Items.Count > 0 ? s.Content.Collection.Items[0].Id.Value : "item";
             View.Show(new QgPageData
             {
-                Rooms = new[]
+                Rooms = Stated(new[]
                 {
-                    new RoomCardData { Page = HubPage.Team, Title = _loc.T("page.team_care"), Info = SalonInfo(toTrain, tired), Badge = tired > 0 ? tired : 0, Art = AgentArt.For(firstAgent) },
                     new RoomCardData { Page = HubPage.Lab, Title = _loc.T("page.lab"), Info = LabInfo(), Badge = _meta.LabBadge, Art = AgentArt.Environment(1) },
                     new RoomCardData { Page = HubPage.Operations, Title = _loc.T("page.operations"), Info = OperationsInfo(), Badge = _meta.OperationsBadge, Art = AgentArt.Environment(2) },
                     new RoomCardData { Page = HubPage.Grimoire, Title = _loc.T("page.grimoire"), Info = GrimoireInfo(), Art = AgentArt.Card(firstCard) },
                     new RoomCardData { Page = HubPage.Inventory, Title = _loc.T("page.inventory"), Info = _loc.F("qg.inventory.info", _session.OwnedItemCount), Art = AgentArt.Item(firstItem) },
                     new RoomCardData { Page = HubPage.Agents, Title = _loc.T("page.agents"), Info = _loc.F("qg.agents.info", s.Roster.Count, s.Content.Members.Count), Art = AgentArt.For(s.Route.HeroId) },
-                },
+                }),
                 DailyLines = activities.Count == 0 ? new[] { _loc.T("activity.empty") }
                            : activities.Select(a => _loc.F("qg.activity.line", ActivityText(a), a.Claimed ? _loc.T("quests.state.done") : a.Progress + " / " + a.Target)).ToArray(),
                 DailyBadge = claimable > 0 ? claimable.ToString() : "",
+                DailyBanner = _loc.F("qg.daily.banner", activities.Count),
                 SecondaryText = secondary.HasValue ? SecondaryLine(secondary.Value) : _loc.T("qg.secondary.none"),
                 SecondaryActive = secondary.HasValue,
                 ShopAlertBadge = s.Shop.Day.Length > 0 && s.Shop.SeenDay != s.Shop.Day ? "N" : "",
@@ -152,8 +153,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 FilSpeaker = _loc.T("qg.fil.speaker"),
                 FilText = done ? _loc.T("qg.fil.done") : _loc.Or("qg.fil." + zone.Id.Value, "qg.fil.done"),
                 QuestsBadge = _meta.QuestsBadge > 0 ? _meta.QuestsBadge.ToString() : "",
+                MainTitle = _loc.T("quests.main"),
                 MissionTitle = _loc.T("qg.mission"),
-                MissionSub = _loc.T(zone.NameKey),
+                MissionSub = MainQuestLine(_loc.T(zone.NameKey)),
                 MissionEnabled = !s.SquadExhausted,
                 MissionHint = s.SquadExhausted ? _loc.T("hub.deploy.exhausted") : "",
             });
@@ -165,9 +167,6 @@ namespace N29.HeroesDawn.Presentation.Hub
             string name = zone != null ? _loc.T(zone.NameKey.Replace(".name", ".short")) : a.ZoneId;
             return a.Kind == ActivityKind.WinCombats ? _loc.F("qg.activity.wins", a.Target, name) : _loc.F("qg.activity.clear", name);
         }
-
-        string SalonInfo(int toTrain, int tired)
-            => tired > 0 ? Count("qg.infirmary", tired) : Count("qg.salon", toTrain);
 
         string SecondaryLine(SecondaryView v)
         {
@@ -181,6 +180,43 @@ namespace N29.HeroesDawn.Presentation.Hub
             var defs = _session.Content.Collection;
             int owned = _session.OwnedCardKinds;
             return _loc.F("qg.grimoire.info", owned, defs.Cards.Count);
+        }
+
+        /// <summary>Quête principale : la zone à jouer, et combien de zones de Brooklyn sont déjà validées (« 2 / 6 zones »).</summary>
+        string MainQuestLine(string zoneName)
+        {
+            var main = _meta.Quests.Main();
+            int done = main.Count(m => m.Status == ZoneStatus.Done);
+            return _loc.F("qg.main.line", zoneName, done, main.Count);
+        }
+
+        /// <summary>Renseigne l'état de chaque pièce : « NOUVEAU » si elle a une pastille (quelque chose à faire), sinon « ACCESSIBLE ».</summary>
+        RoomCardData[] Stated(RoomCardData[] rooms)
+        {
+            bool tutorialDone = _tutorial == null || !_tutorial.Active;
+            bool unlockAll = _settings != null && _settings.Current.unlockAll;
+            for (int i = 0; i < rooms.Length; i++)
+            {
+                var room = rooms[i];
+                string? reason = QgRoomLocks.Reason(room.Page, _session, tutorialDone, unlockAll);
+                if (reason != null)
+                {
+                    room.Locked = true;
+                    room.State = _loc.T("qg.state.locked");
+                    room.Info = LockText(reason);
+                }
+                else room.State = _loc.T(room.Badge > 0 ? "qg.state.new" : "qg.state.open");
+                rooms[i] = room;
+            }
+            return rooms;
+        }
+
+        /// <summary>Condition affichée sur une pièce verrouillée : le tutoriel, ou le chapitre à valider.</summary>
+        string LockText(string reason)
+        {
+            if (reason == "tutorial") return _loc.T("qg.lock.tutorial");
+            var zone = _session.Content.Zones.FirstOrDefault(z => z.Id.Value == reason);
+            return _loc.F("qg.lock.zone", zone != null ? zone.Code : reason);
         }
 
         string OperationsInfo()

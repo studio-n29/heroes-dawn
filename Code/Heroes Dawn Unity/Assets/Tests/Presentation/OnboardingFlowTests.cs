@@ -1,6 +1,7 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Application.Features.Auth;
+using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Login;
 using N29.HeroesDawn.Presentation.Mvp;
@@ -10,7 +11,7 @@ using NUnit.Framework;
 
 namespace N29.HeroesDawn.Tests.Presentation
 {
-    /// <summary>Première connexion : cinématique, choix du personnage joueur (sans pseudo).</summary>
+    /// <summary>Première connexion : cinématique, création du personnage joueur (nom et avatar).</summary>
     public sealed class OnboardingFlowTests
     {
         TestApp _app = null!;
@@ -31,38 +32,37 @@ namespace N29.HeroesDawn.Tests.Presentation
 
         FakeIntroPopup Popup => (FakeIntroPopup)_host.Spawned.Single();
 
-        [Test, Description("Vérifie que la première connexion commence au choix du personnage, la cinématique étant déjà passée au lancement")]
-        public void Onboarding_StartsWithCampaignSelection()
+        [Test, Description("Vérifie que la première connexion commence à la création du personnage, la cinématique étant déjà passée au lancement — parce que le joueur se nomme avant de jouer")]
+        public void Onboarding_StartsWithCharacterCreation()
         {
             _flow.RunIfNeededAsync(default).Forget();
             Assert.That(Popup.MainTheme, Is.Null);
-            Assert.That(Popup.Campaigns, Is.Not.Null);
+            Assert.That(Popup.Character, Is.Not.Null);
         }
 
-        [Test, Description("Vérifie que les deux personnages sont proposés, Agent D disponible et Agent M en création — parce que les zones de Moscou ne sont pas encore créées")]
-        public void Campaigns_OnlyAgentDIsAvailable()
+        [Test, Description("Vérifie que la création propose la galerie d'avatars et la longueur maximale du nom — parce que le formulaire doit correspondre aux règles du domaine")]
+        public void Character_ProposesTheGalleryAndTheNameLimit()
         {
             _flow.RunIfNeededAsync(default).Forget();
             Popup.FinishCinematic();
-            var cards = Popup.Campaigns!.Value.Cards;
-            Assert.That(cards.Count, Is.EqualTo(2));
-            Assert.That(cards.Single(c => c.Available).Id, Is.EqualTo("agent_d"));
-            Assert.That(cards.Where(c => !c.Available).Select(c => c.Badge).Distinct().Single(), Is.EqualTo("EN CRÉATION"));
+            Assert.That(Popup.Character!.Value.Avatars, Is.EqualTo(PlayerAvatars.Gallery));
+            Assert.That(Popup.Character!.Value.MaxNameLength, Is.EqualTo(PlayerTag.MaxNameLength));
         }
 
-        [Test, Description("Vérifie que le parcours complet enregistre le personnage, la campagne et l état « terminé », renomme le compte et ferme la popup — parce que la première connexion ne se joue qu'une fois")]
-        public void FullRun_SavesTheHeroAndRenamesTheAccount()
+        [Test, Description("Vérifie que le parcours complet garde le nom et l'avatar saisis, enregistre l'état « terminé », renomme le compte et ferme la popup — parce que le nom du joueur est celui de son agent")]
+        public void FullRun_SavesTheCharacterAndRenamesTheAccount()
         {
             var run = _flow.RunIfNeededAsync(default);
             var popup = Popup;
             popup.FinishCinematic();
-            popup.Choose("agent_d");
+            popup.Choose("Maya", "avatar_2");
             Assert.That(run.Status, Is.EqualTo(UniTaskStatus.Succeeded));
             Assert.That(_app.Session.Meta.onboarding.done, Is.True);
-            Assert.That(_app.Session.Meta.onboarding.pseudo, Is.EqualTo("Agent D"));
+            Assert.That(_app.Session.Meta.onboarding.pseudo, Is.EqualTo("Maya"));
+            Assert.That(_app.Session.Meta.onboarding.avatar, Is.EqualTo("avatar_2"));
             Assert.That(_app.Session.Meta.onboarding.campaign, Is.EqualTo("new_york"));
             Assert.That(_app.Session.Meta.onboarding.hero, Is.EqualTo("agent_d"));
-            Assert.That(_app.Session.Account!.DisplayName, Is.EqualTo("Agent D"));
+            Assert.That(_app.Session.Account!.DisplayName, Is.EqualTo("Maya"));
             Assert.That(_host.Despawned, Does.Contain(popup));
             Assert.That(_flow.Needed, Is.False);
         }
@@ -81,7 +81,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             foreach (var id in Loc.CinematicVoiceIds) Assert.That(Loc.Has("cinematic.vo." + id), Is.True, "cinematic.vo." + id);
             foreach (var key in new[] { "intro.skip",
-                                        "onboarding.campaign.title", "onboarding.campaign.confirm", "onboarding.campaign.open", "onboarding.campaign.wip", "onboarding.campaign.unavailable" })
+                                        "onboarding.character.title", "onboarding.character.name_hint", "onboarding.character.confirm", "onboarding.campaign.unavailable" })
                 Assert.That(Loc.Has(key), Is.True, key);
             foreach (var c in Campaigns.All) { Assert.That(Loc.Has(c.NameKey), Is.True, c.NameKey); Assert.That(Loc.Has(c.DescKey), Is.True, c.DescKey); }
         }

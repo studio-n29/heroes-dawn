@@ -17,12 +17,13 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         readonly PassProgress _pass;
         readonly DailyMissions _daily;
+        readonly Boutique _shop;
 
-        public PassPagePresenter(IPassPageView view, PassProgress pass, DailyMissions daily, ILocalization loc, IToastService toasts,
+        public PassPagePresenter(IPassPageView view, PassProgress pass, DailyMissions daily, Boutique shop, ILocalization loc, IToastService toasts,
                                  ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, IClock clock)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
-            _pass = pass; _daily = daily;
+            _pass = pass; _daily = daily; _shop = shop;
         }
 
         public override string Title => Loc.T("page.pass");
@@ -65,12 +66,25 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             View.ShowRows(rows);
 
+            // Ligne 0 : cadeau du jour (une fois par jour), puis les missions du jour.
+            bool gift = _shop.DailyGiftAvailable;
             var missions = _daily.Today();
-            var side = new InfoRowData[missions.Count];
-            for (int i = 0; i < side.Length; i++)
+            var side = new InfoRowData[missions.Count + 1];
+            side[0] = new InfoRowData
+            {
+                Tag = "+",
+                TagColor = gift ? Theme.Credits : Theme.Surface3,
+                Title = Loc.T("shop.gift_title"),
+                Subtitle = MetaFormat.RewardText(Boutique.DailyGift, Loc),
+                Progress = -1f,
+                Highlight = gift,
+                Dim = !gift,
+                A = RowButtonData.Of(gift ? Loc.T("shop.gift_claim") : Loc.T("shop.gift_done"), gift, Loc.T("shop.gift_done_reason"), 0),
+            };
+            for (int i = 0; i < missions.Count; i++)
             {
                 var m = missions[i];
-                side[i] = new InfoRowData
+                side[i + 1] = new InfoRowData
                 {
                     Tag = (i + 1).ToString(),
                     TagColor = m.Claimed ? Theme.Success : m.Complete ? Theme.Primary : Theme.Info,
@@ -106,9 +120,10 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         protected override void OnSideButton(int row, int button)
         {
+            if (row == 0) { Report(_shop.ClaimDailyGift(), "shop.gift_taken"); return; }
             var missions = _daily.Today();
-            if (row < 0 || row >= missions.Count) return;
-            Report(_daily.Claim(missions[row].Template.Id), "daily.claimed");
+            if (row < 0 || row >= missions.Count + 1) return;
+            Report(_daily.Claim(missions[row - 1].Template.Id), "daily.claimed");
         }
     }
 }

@@ -60,6 +60,21 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(r.Driver.Hud.Lives, Is.EqualTo(5));
         }
 
+        [Test, Description("Vérifie que chaque mini-jeu 2D annonce un thème éducatif avant la partie et un « Tu as appris… » à la réussite, propres à son type — parce que le plan veut un aspect éducatif sur les six jeux")]
+        public void EveryGame_AnnouncesATheme_AndALearningGoal()
+        {
+            var themes = new System.Collections.Generic.HashSet<string>();
+            foreach (var id in new[] { "dna_lab", "gears_workshop", "rhythm_rooftop", "free_throw_court", "crate_pick_depot", "rescue_tool", "infiltration_camp", "survival_snow" })
+            {
+                _window.Opened = 0;
+                var r = Play(id);
+                Assert.That(r.Theme, Does.StartWith("THÈME : "), id);
+                Assert.That(r.Learned, Does.StartWith("Tu as appris : ").And.EndWith("."), id);
+                themes.Add(r.Theme);
+            }
+            Assert.That(themes.Count, Is.EqualTo(8), "un thème différent par jeu");
+        }
+
         [Test, Description("Vérifie que « Tir franc » ouvre la fenêtre commune avec une partie de tir, son titre, sa consigne et un bandeau « Touches x / y » avec les lancers restants — parce que c'est un jeu à maintenir et relâcher")]
         public void FreeThrow_OpensTheCommonWindow()
         {

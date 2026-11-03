@@ -33,26 +33,30 @@ namespace N29.HeroesDawn.Presentation.Hub
         public void Launch(CancellationToken ct = default) => Launch(Zone, ct);
 
         /// <summary>Démarre la zone choisie sur la carte de la ville.</summary>
-        public void Launch(ZoneId zone, CancellationToken ct = default)
+        public void Launch(ZoneId zone, CancellationToken ct = default) => TryLaunchAsync(zone, ct).Forget();
+
+        /// <summary>Comme <see cref="Launch(ZoneId, CancellationToken)"/> mais rend vrai quand la zone est partie (faux : garde prise, échec ou annulation).</summary>
+        public async UniTask<bool> TryLaunchAsync(ZoneId zone, CancellationToken ct = default)
         {
-            if (!_gate.TryEnter()) return;
-            LaunchAsync(zone, ct).Forget();
+            if (!_gate.TryEnter()) return false;
+            return await LaunchAsync(zone, ct);
         }
 
-        async UniTaskVoid LaunchAsync(ZoneId zone, CancellationToken ct)
+        async UniTask<bool> LaunchAsync(ZoneId zone, CancellationToken ct)
         {
             Result r;
             try { r = await _start.ExecuteAsync(zone, ct); }
-            catch (OperationCanceledException) { _gate.Exit(); return; }
+            catch (OperationCanceledException) { _gate.Exit(); return false; }
             catch { _gate.Exit(); throw; }
-            if (ct.IsCancellationRequested) { _gate.Exit(); return; }
+            if (ct.IsCancellationRequested) { _gate.Exit(); return false; }
             if (r.IsFailure)
             {
                 _gate.Exit();
                 _toasts.Show(_loc.Error(r.Error!), ToastKind.Error);
-                return;
+                return false;
             }
             _navigate.Publish(new NavigateRequested(GameState.Board));
+            return true;
         }
     }
 }

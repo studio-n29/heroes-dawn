@@ -74,6 +74,7 @@ namespace N29.HeroesDawn.Application.Features.Zone
                         validated = new ZoneRewards(validated.Credits * pct / 100, validated.Pr * pct / 100, validated.FirstClear, first ? 1 : 0, joined.Select(m => m.Id).ToList());
                         if (joined.Count > 0) rosterChanged = true;
                         if (first) { Collection.CollectionOps.AddBooster(s, Definitions.BoosterDef.StandardId); collection = true; }
+                        if (s.RunZone != null && s.RunZone.IsLair) World.LairBook.RecordClear(s.Meta, zoneId);
                         s.Wallet.Add(validated.Credits, validated.Pr);
                         wallet = true;
                         fx.Log.Info($"Zone {zoneId} validée (1re fois : {first})");

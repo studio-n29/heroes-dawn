@@ -106,8 +106,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             catch (OperationCanceledException) { return; }
             finally { _introOpen = false; }
             if (Disposed) return;
-            _chapters!.MarkSeen(chapter.Id);
-            _mission.Launch(zone.Id, Lifetime);
+            // Marqué vu seulement si la zone part : un lancement refusé rouvrira l'ouverture du chapitre.
+            if (await _mission.TryLaunchAsync(zone.Id, Lifetime)) _chapters!.MarkSeen(chapter.Id);
         }
 
         void OpenChapters() => _nav?.Open(HubPage.Chapters);

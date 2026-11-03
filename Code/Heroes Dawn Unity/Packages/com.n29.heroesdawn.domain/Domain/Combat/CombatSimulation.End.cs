@@ -33,6 +33,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 h.Add(u.Point);
                 h.Add(u.PlannedSlot);
                 h.Add(u.BurnRemainder);
+                h.Add(u.PhaseReached);
                 foreach (var s in u.Statuses) { h.Add((int)s.Type); h.Add(s.TurnsLeft); h.Add(s.Value); }
             }
             h.Add(Victory == true ? 1 : Victory == false ? 2 : 0);

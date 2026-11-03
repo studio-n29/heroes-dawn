@@ -5,7 +5,7 @@ namespace N29.HeroesDawn.Presentation.Common
     /// <summary>Sprites générés au démarrage (aucun asset requis) : rectangle arrondi 9-slice, disque, anneau, dégradé.</summary>
     public static class Sprites
     {
-        static Sprite _rounded, _roundedSmall, _circle, _ring, _gradient, _burst, _cloud, _panel, _panelSmall, _diamond, _shine, _skyline, _panelFrame, _bracket, _bust;
+        static Sprite _rounded, _roundedSmall, _circle, _ring, _gradient, _burst, _cloud, _panel, _panelSmall, _diamond, _shine, _skyline, _panelFrame, _bracket, _bust, _halftone;
 
         // Assets générés (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface → Resources/UI) ; repli procédural sinon.
         public static Sprite Rounded => _rounded != null ? _rounded : (_rounded = Load("Rounded"));
@@ -32,10 +32,12 @@ namespace N29.HeroesDawn.Presentation.Common
         public static Sprite Bracket => _bracket != null ? _bracket : (_bracket = Load("Bracket"));
         /// <summary>Buste (tête et épaules) découpé dans un disque : silhouette provisoire des agents en attendant les portraits illustrés.</summary>
         public static Sprite Bust => _bust != null ? _bust : (_bust = Load("Bust"));
+        /// <summary>Dégradé tramé noir (dense en bas à gauche, transparent en haut à droite) : fond des dialogues et des bandeaux d'entrée en combat.</summary>
+        public static Sprite Halftone => _halftone != null ? _halftone : (_halftone = Load("Halftone"));
         public static Sprite Skyline => _skyline != null ? _skyline : (_skyline = Load("Skyline"));
 
         /// <summary>Noms des sprites d'interface générés (Resources/UI/&lt;nom&gt;.png).</summary>
-        public static readonly string[] UiSpriteNames = { "Rounded", "RoundedSmall", "Circle", "Ring", "VerticalGradient", "Burst", "Cloud", "Panel", "PanelSmall", "Diamond", "Shine", "Skyline", "PanelFrame", "Bracket", "Bust" };
+        public static readonly string[] UiSpriteNames = { "Rounded", "RoundedSmall", "Circle", "Ring", "VerticalGradient", "Burst", "Cloud", "Panel", "PanelSmall", "Diamond", "Shine", "Skyline", "PanelFrame", "Bracket", "Bust", "Halftone" };
 
         static Sprite Load(string name) { var s = Resources.Load<Sprite>("UI/" + name); return s != null ? s : Procedural(name); }
 
@@ -59,6 +61,7 @@ namespace N29.HeroesDawn.Presentation.Common
                 case "PanelFrame": return MakeCutFrame(64, 14, 3);
                 case "Bracket": return MakeBracket(32, 5);
                 case "Bust": return MakeBust(128);
+                case "Halftone": return MakeHalftone(128);
                 default: throw new System.ArgumentException("Sprite d'interface inconnu : " + name);
             }
         }
@@ -329,6 +332,29 @@ namespace N29.HeroesDawn.Presentation.Common
             t.SetPixels32(px);
             t.Apply();
             return Sprite.Create(t, new Rect(0, 0, 2, 64), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        /// <summary>
+        /// Dégradé tramé : plein et sombre en bas à gauche, de plus en plus clairsemé en points de trame, transparent en haut à droite.
+        /// Les pixels sont blancs, la couleur vient de l'image qui l'affiche.
+        /// </summary>
+        static Sprite MakeHalftone(int size)
+        {
+            const int Cell = 8;
+            var t = NewTex(size, size);
+            var px = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+                for (int x = 0; x < size; x++)
+                {
+                    float density = 1f - (0.5f * x / (size - 1) + 0.5f * y / (size - 1));
+                    float solid = Mathf.Clamp01((density - 0.55f) / 0.3f) * 0.92f;
+                    float dx = x % Cell - (Cell - 1) / 2f, dy = y % Cell - (Cell - 1) / 2f;
+                    float dot = Mathf.Sqrt(dx * dx + dy * dy) < density * Cell * 0.75f ? 0.85f * Mathf.Clamp01(density * 1.4f) : 0f;
+                    px[y * size + x] = new Color32(255, 255, 255, (byte)(255 * Mathf.Max(solid, dot)));
+                }
+            t.SetPixels32(px);
+            t.Apply();
+            return Sprite.Create(t, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
         }
     }
 }

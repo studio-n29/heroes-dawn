@@ -15,6 +15,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action<int>? CardTapped;
         public event Action<int>? RecruitClicked;
         public event Action? RerollClicked;
+        public event Action<int>? ScrapClicked;
         public event Action? RegistryClicked;
         public event Action<int>? ShopTabClicked;
         public int ShopTabShown = -1;
@@ -26,6 +27,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public void TapCard(int slot) => CardTapped?.Invoke(slot);
         public void ClickRecruit(int slot) => RecruitClicked?.Invoke(slot);
         public void ClickReroll() => RerollClicked?.Invoke();
+        public void ClickScrap(int slot) => ScrapClicked?.Invoke(slot);
         public void ClickRegistry() => RegistryClicked?.Invoke();
     }
 

@@ -15,6 +15,8 @@ namespace N29.HeroesDawn.EditorTools.Audio
     {
         public const string MusicFolder = "Assets/_Project/Audio/Music/";
         public const string SfxFolder = "Assets/_Project/Audio/Sfx/";
+        /// <summary>Voix des répliques : Resources/Voices/fr et en, un fichier par réplique (voir VoiceLevels.FileName).</summary>
+        public const string VoiceFolder = "Assets/_Project/Resources/Voices/";
 
         void OnPreprocessAudio()
         {
@@ -22,6 +24,7 @@ namespace N29.HeroesDawn.EditorTools.Audio
             if (!importer.importSettingsMissing) return;
             if (assetPath.StartsWith(MusicFolder)) ApplyMusic(importer);
             else if (assetPath.StartsWith(SfxFolder)) ApplySfx(importer);
+            else if (assetPath.StartsWith(VoiceFolder)) ApplyVoice(importer);
         }
 
         public static void ApplyMusic(AudioImporter importer)
@@ -36,6 +39,21 @@ namespace N29.HeroesDawn.EditorTools.Audio
             importer.defaultSampleSettings = s;
             importer.forceToMono = false;
             importer.loadInBackground = true;
+            importer.ambisonic = false;
+        }
+
+        /// <summary>Voix : décompressées au chargement (la normalisation lit les échantillons), mono, Vorbis qualité 70.</summary>
+        public static void ApplyVoice(AudioImporter importer)
+        {
+            var s = importer.defaultSampleSettings;
+            s.loadType = AudioClipLoadType.DecompressOnLoad;
+            s.compressionFormat = AudioCompressionFormat.Vorbis;
+            s.quality = 0.7f;
+            s.sampleRateSetting = AudioSampleRateSetting.OptimizeSampleRate;
+            s.preloadAudioData = false;
+            importer.defaultSampleSettings = s;
+            importer.forceToMono = true;
+            importer.loadInBackground = false;
             importer.ambisonic = false;
         }
 

@@ -1,6 +1,7 @@
 #nullable enable
 using System.Linq;
 using System.Collections;
+using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Composition;
 using N29.HeroesDawn.Infrastructure.Simulated;
@@ -19,7 +20,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         [UnityTearDown]
         public IEnumerator TearDown() => PlayModeHarness.TearDown();
 
-        [UnityTest, Timeout(300000), Description("Vérifie qu'un nouveau joueur passe par la cinématique (passée d'un clic), ne peut pas choisir une campagne en cours de création, choisit New York puis arrive au QG avec son pseudo — parce que c'est le parcours de première connexion")]
+        [UnityTest, Timeout(300000), Description("Vérifie qu'un nouveau joueur passe par la cinématique (passée d'un clic), ne peut pas commencer sans nom, crée son agent avec un nom et un avatar de la galerie, puis arrive au QG avec ce nom — parce que c'est le parcours de première connexion")]
         public IEnumerator FirstConnection_GoesThroughIntro_ThenTheHq()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway(), withIntro: true);
@@ -28,24 +29,22 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var intro = Object.FindAnyObjectByType<IntroPopupView>()!;
             yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Cinematic);
             intro.SkipButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign);
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Character);
 
-            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign);
-
-            Assert.That(intro.Cards.Count, Is.EqualTo(2), "Agent D et Agent M");
-            Assert.That(intro.CampaignConfirmButton.interactable, Is.False, "aucun personnage choisi");
-            intro.SelectCampaign("agent_m");
-            Assert.That(intro.CampaignConfirmButton.interactable, Is.False, "le parcours d Agent M est en cours de création");
-            intro.SelectCampaign("agent_d");
-            Assert.That(intro.CampaignConfirmButton.interactable, Is.True);
-            intro.CampaignConfirmButton.onClick.Invoke();
+            Assert.That(intro.Avatars.Count, Is.EqualTo(PlayerAvatars.Gallery.Count), "la galerie complète");
+            Assert.That(intro.CharacterConfirmButton.interactable, Is.False, "aucun nom saisi");
+            intro.NameField.text = "Maya";
+            Assert.That(intro.CharacterConfirmButton.interactable, Is.True, "un nom et un avatar suffisent");
+            intro.SelectAvatar("avatar_2");
+            intro.CharacterConfirmButton.onClick.Invoke();
 
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>());
             var session = GameBootstrap.Instance!.Scope.Container.Resolve<GameSession>();
-            Assert.That(session.Account!.DisplayName, Is.EqualTo("Agent D"));
+            Assert.That(session.Account!.DisplayName, Is.EqualTo("Maya"));
+            Assert.That(session.Meta.onboarding.avatar, Is.EqualTo("avatar_2"));
             Assert.That(session.Meta.onboarding.campaign, Is.EqualTo("new_york"));
             Assert.That(session.Meta.onboarding.hero, Is.EqualTo("agent_d"));
-            Assert.That(session.Roster.Select(m => m.Id.Value), Is.EqualTo(new[] { "darius_brooks" }));
+            Assert.That(session.Roster.Select(m => m.Id.Value), Is.EqualTo(new[] { "giulia_rossi", "ilona_varga", "lucas_mendes" }), "trois recrues de la boutique, mentors absents");
             Assert.That(Object.FindAnyObjectByType<IntroPopupView>(), Is.Null, "la popup est fermée");
         }
 
@@ -65,16 +64,18 @@ namespace N29.HeroesDawn.Tests.PlayMode
             while (video.frame < 0 && Time.realtimeSinceStartup < deadline) yield return null;
             Assert.That(video.frame, Is.GreaterThanOrEqualTo(0), "une image vidéo doit être décodée avant de quitter le noir");
             Assert.That(video.targetTexture.IsCreated(), Is.True);
-            float duration = CinematicVideoSequence.ShotDurationForVideo(video.length, CinematicVideoSequence.Steps[0].Seconds);
-            Assert.That(video.playbackSpeed, Is.EqualTo(CinematicVideoSequence.PlaybackSpeedForDuration(video.length, duration)).Within(0.001f), "la vidéo entière doit couvrir la durée du plan");
+            Assert.That(CinematicVideoSequence.Launch[0].Cut, Is.True, "le lancement joue le montage court");
+            Assert.That(video.playbackSpeed, Is.EqualTo(1f).Within(0.001f), "un plan de montage est joué à vitesse normale et coupé à sa durée");
             yield return new WaitForSecondsRealtime(1f);
             var fader = intro.Player.transform.Find("Fondu").GetComponent<UnityEngine.UI.Image>();
             Assert.That(fader.color.a, Is.LessThan(0.05f), "le voile noir doit révéler la vidéo");
             Assert.That(intro.Player.transform.Find("SousTitres").GetComponent<TMPro.TMP_Text>().text,
-                Is.EqualTo(CinematicVideoSequence.Steps[0].Caption));
+                Is.EqualTo(""), "le montage de lancement n'a aucun texte");
             intro.SkipButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<LoginView>());
             Assert.That(PlayModeHarness.Visible<LoginView>(), Is.True);
+            // Le popup se ferme par un fondu : on attend qu'il soit détruit (course avec l'affichage du login).
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<IntroPopupView>() == null);
             Assert.That(Object.FindAnyObjectByType<IntroPopupView>(), Is.Null);
         }
         [Test, Description("Vérifie que le compte local accepte l'inscription puis la connexion, refuse un mot de passe faux, un e-mail déjà pris et des saisies invalides — parce qu'il joue le rôle de Supabase Auth en attendant le vrai serveur")]
@@ -103,7 +104,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Cinematic);
             var player = intro.Player;
             yield return PlayModeHarness.WaitFor(() => player.CurrentShot >= 0, 600);
-            var steps = CinematicVideoSequence.Steps;
+            var steps = CinematicVideoSequence.Launch;
             for (int shot = 0; shot < steps.Count; shot++)
             {
                 // Avance de pas en pas par des touchers, puis laisse vivre le pas 2,4 s avant de le photographier.
@@ -116,8 +117,9 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<IntroPopupView>() != null);
             intro = Object.FindAnyObjectByType<IntroPopupView>()!;
-            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Campaign, 1200);
-            intro.SelectCampaign("agent_d");
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Character, 1200);
+            intro.NameField.text = "Maya";
+            intro.SelectAvatar("avatar_1");
             yield return new WaitForSecondsRealtime(1f);
             yield return ScreenCaptureTests.Capture("cin-choix");
         }

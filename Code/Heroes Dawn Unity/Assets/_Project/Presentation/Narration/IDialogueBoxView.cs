@@ -15,10 +15,12 @@ namespace N29.HeroesDawn.Presentation.Narration
         public string Text { get; }
         /// <summary>Vrai : le locuteur est à gauche (les agents) ; faux : à droite (les autres personnages).</summary>
         public bool Left { get; }
+        /// <summary>Clé de la réplique pour sa voix (la clé de son texte) ; vide : pas de voix.</summary>
+        public string VoiceKey { get; }
 
-        public DialogueBoxLine(string speaker, PortraitData portrait, string text, bool left)
+        public DialogueBoxLine(string speaker, PortraitData portrait, string text, bool left, string voiceKey = "")
         {
-            Speaker = speaker; Portrait = portrait; Text = text; Left = left;
+            Speaker = speaker; Portrait = portrait; Text = text; Left = left; VoiceKey = voiceKey;
         }
     }
 
@@ -27,5 +29,8 @@ namespace N29.HeroesDawn.Presentation.Narration
     {
         /// <summary>Joue les répliques dans l'ordre ; rend la main à la dernière (ou dès que le joueur passe le dialogue).</summary>
         UniTask PlayAsync(IReadOnlyList<DialogueBoxLine> lines, CancellationToken ct);
+
+        /// <summary>Levé quand une réplique s'affiche (pour sa voix).</summary>
+        event System.Action<DialogueBoxLine>? LineShown;
     }
 }

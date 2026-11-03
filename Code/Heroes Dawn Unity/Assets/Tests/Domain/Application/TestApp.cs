@@ -112,6 +112,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public LocalFriendsPort Friends { get; }
         public PlayerProfile Profile { get; }
         public N29.HeroesDawn.Application.Features.World.ChapterBook Chapters { get; }
+        public N29.HeroesDawn.Application.Features.World.MemoryFragmentBook Fragments { get; }
+        public N29.HeroesDawn.Application.Features.World.LairBook Lairs { get; }
+        public Tournament Tournament { get; }
         public ArchiveBook Archives { get; }
         public MetaTracker Tracker { get; }
         public Boutique Boutique { get; }
@@ -178,6 +181,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Friends = new LocalFriendsPort(MetaCtx);
             Profile = new PlayerProfile(MetaCtx, Pass);
             Chapters = new N29.HeroesDawn.Application.Features.World.ChapterBook(MetaCtx);
+            Fragments = new N29.HeroesDawn.Application.Features.World.MemoryFragmentBook(MetaCtx);
+            Lairs = new N29.HeroesDawn.Application.Features.World.LairBook(MetaCtx);
+            Tournament = new Tournament(MetaCtx);
             Archives = new ArchiveBook(MetaCtx);
             Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
             Collection = new N29.HeroesDawn.Application.Features.Collection.CollectionBook(MetaCtx, Publisher<RosterChanged>());
@@ -301,6 +307,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             public readonly IRecruitFromShopUseCase Recruit;
             public readonly IRerollShopUseCase Reroll;
             public readonly IMarkShopSeenUseCase MarkSeen;
+            public readonly IBuyScrapOfferUseCase BuyScrap;
 
             public ShopUseCases(TestApp a)
             {
@@ -309,6 +316,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
                 Recruit = new RecruitFromShopUseCase(a.Session, a.Time, a.Save, Open, a.Publisher<WalletChanged>(), a.Publisher<RosterChanged>(), shop);
                 Reroll = new RerollShopUseCase(a.Session, a.Time, a.Save, Open, a.Publisher<WalletChanged>(), shop);
                 MarkSeen = new MarkShopSeenUseCase(a.Session, a.Save, shop);
+                BuyScrap = new BuyScrapOfferUseCase(a.Session, a.Time, a.Save, Open, a.Publisher<WalletChanged>(), shop);
             }
         }
 

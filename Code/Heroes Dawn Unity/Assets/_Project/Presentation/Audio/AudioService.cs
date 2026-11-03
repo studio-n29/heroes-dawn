@@ -37,7 +37,7 @@ namespace N29.HeroesDawn.Presentation.Audio
         readonly int[] _nextTrack;
         readonly int[] _resumeTrack;
         readonly float[] _resumeTime;
-        readonly float[] _duckLevels = { 1f, 1f };
+        readonly float[] _duckLevels = { 1f, 1f, 1f };
         readonly VoicePool _pool;
         readonly bool[] _playing;
         readonly System.Random _rng = new System.Random();
@@ -184,7 +184,7 @@ namespace N29.HeroesDawn.Presentation.Audio
         public void Duck(DuckLayer layer, float level, float fadeSeconds)
         {
             _duckLevels[(int)layer] = Mathf.Clamp01(level);
-            float target = Mathf.Min(_duckLevels[0], _duckLevels[1]);
+            float target = Mathf.Min(_duckLevels[0], Mathf.Min(_duckLevels[1], _duckLevels[2]));
             if (Math.Abs(target - _duck.Target) > 0.001f) _duck.To(target, fadeSeconds);
             _dirty = true;
         }

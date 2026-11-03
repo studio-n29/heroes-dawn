@@ -16,7 +16,7 @@ namespace N29.HeroesDawn.Definitions
         public IReadOnlyList<string> ActCities { get; }
         /// <summary>Nom affiché du personnage joueur (avatar du chef d unité) : il remplace le pseudo du compte.</summary>
         public string HeroName { get; }
-        /// <summary>Agents de l effectif au début de la partie : une seule recrue ; le personnage joueur est un avatar, absent de l effectif.</summary>
+        /// <summary>Agents de l effectif au début de la partie : trois recrues de la boutique ; le personnage joueur et ses mentors sont absents de l effectif.</summary>
         public IReadOnlyList<string> StarterTeam { get; }
         /// <summary>Vrai si la première ville du parcours est jouable (zones créées).</summary>
         public bool Available { get; }
@@ -37,15 +37,21 @@ namespace N29.HeroesDawn.Definitions
         public const string Moscow = "moscow";
         public const string Salem = "salem";
 
+        /// <summary>
+        /// Équipe de départ d'un nouveau profil : trois recrues de la boutique, choisies par les mentors (Agent D : Giulia Rossi, Agent M : Ilona Varga),
+        /// et Lucas Mendes en tank. Les mentors ne sont pas dans l'effectif.
+        /// </summary>
+        public static readonly string[] StarterTeam = { "giulia_rossi", "ilona_varga", "lucas_mendes" };
+
         /// <summary>Agent D : New York, Paris, Moscou, Salem.</summary>
         public static readonly StoryRoute D = new StoryRoute(AgentD, AgentD, "Agent D",
             new[] { NewYork, Paris, Moscow, Salem },
-            new[] { "darius_brooks" }, true);
+            StarterTeam, true);
 
         /// <summary>Agent M : Moscou, Paris, New York, Salem. Indisponible tant que les zones de Moscou ne sont pas créées.</summary>
         public static readonly StoryRoute M = new StoryRoute(AgentM, AgentM, "Agent M",
             new[] { Moscow, Paris, NewYork, Salem },
-            new[] { "sam_okafor" }, false);
+            StarterTeam, false);
 
         public static readonly IReadOnlyList<StoryRoute> All = new[] { D, M };
 

@@ -25,6 +25,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISessionReadModel _session;
         readonly IOpenShopUseCase _open;
         readonly IRerollShopUseCase _reroll;
+        readonly IBuyScrapOfferUseCase _buyScrap;
         readonly IMarkShopSeenUseCase _markSeen;
         readonly RecruitFlow _flow;
         readonly HubNavigator _nav;
@@ -40,12 +41,12 @@ namespace N29.HeroesDawn.Presentation.Hub
         int _lastMinute = -1;
 
         public RecruitPagePresenter(IRecruitPageView view, ISessionReadModel session, IOpenShopUseCase open, IRerollShopUseCase reroll,
-                                    IMarkShopSeenUseCase markSeen, RecruitFlow flow, HubNavigator nav, IClock clock, IModalService modals,
-                                    IToastService toasts, ILocalization loc,
+                                    IBuyScrapOfferUseCase buyScrap, IMarkShopSeenUseCase markSeen, RecruitFlow flow, HubNavigator nav,
+                                    IClock clock, IModalService modals, IToastService toasts, ILocalization loc,
                                     ISubscriber<ShopChanged> shop, ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster)
             : base(view, null)
         {
-            _session = session; _open = open; _reroll = reroll; _markSeen = markSeen; _flow = flow; _nav = nav; _clock = clock;
+            _session = session; _open = open; _reroll = reroll; _buyScrap = buyScrap; _markSeen = markSeen; _flow = flow; _nav = nav; _clock = clock;
             _modals = modals; _toasts = toasts; _loc = loc; _shop = shop; _wallet = wallet; _roster = roster;
             _action = new PageAction(toasts, loc);
         }
@@ -57,6 +58,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.CardTapped += OpenSheet;
             View.RecruitClicked += Recruit;
             View.RerollClicked += Reroll;
+            View.ScrapClicked += BuyScrap;
             View.RegistryClicked += OpenRegistry;
             View.ShopTabClicked += OpenShopTab;
             View.ShowShopTab((int)ShopTab.Heroes);
@@ -90,6 +92,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.CardTapped -= OpenSheet;
             View.RecruitClicked -= Recruit;
             View.RerollClicked -= Reroll;
+            View.ScrapClicked -= BuyScrap;
             View.RegistryClicked -= OpenRegistry;
             View.ShopTabClicked -= OpenShopTab;
         }
@@ -122,6 +125,34 @@ namespace N29.HeroesDawn.Presentation.Hub
         }
 
         void Recruit(int slot) => _flow.RunAsync(slot, Lifetime).Forget();
+
+        /// <summary>Lot de scraps : confirmation de la dépense en Crédits, puis achat.</summary>
+        void BuyScrap(int slot)
+        {
+            if (_action.IsBusy) return;
+            var lots = _session.Shop.Scraps;
+            if (slot < 0 || slot >= lots.Count || lots[slot].Bought) return;
+            BuyScrapAsync(slot, lots[slot].Price, _session.Shop.Day, _session.Shop.Draw).Forget();
+        }
+
+        async UniTaskVoid BuyScrapAsync(int slot, int price, string day, int draw)
+        {
+            bool ok;
+            try
+            {
+                ok = await _modals.ConfirmAsync(new ConfirmData(_loc.T("shop.scrap.confirm.title"), _loc.F("shop.scrap.confirm.body", price),
+                                                                _loc.T("ui.confirm"), _loc.T("ui.cancel"), Tone.Primary), Lifetime);
+            }
+            catch (OperationCanceledException) { return; }
+            if (!ok || Disposed) return;
+            if (_session.Shop.Day != day || _session.Shop.Draw != draw)
+            {
+                _toasts.Show(_loc.Error(ShopErrors.Expired), ToastKind.Error);
+                Refresh();
+                return;
+            }
+            _action.Run(ct => _buyScrap.ExecuteAsync(slot, ct), Lifetime);
+        }
 
         /// <summary>Renouveler : direct si gratuit, sinon après confirmation de la dépense.</summary>
         void Reroll()
@@ -165,11 +196,23 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Rule = _loc.T("recruit.rule"),
                 Countdown = ShopCountdown.Text(now, s.Content.Balance.ShopResetHour, _loc),
                 Cards = offers.Select((o, i) => Card(o, i)).ToArray(),
+                Scraps = s.Shop.Scraps.Select((lot, i) => Scrap(lot, i)).ToArray(),
                 EmptyText = offers.Count == 0 ? _loc.T("shop.empty") : "",
                 RerollLabel = rerollCost == 0 ? _loc.T("shop.reroll.free") : _loc.F("shop.reroll.cost", rerollCost),
                 RerollEnabled = offers.Count > 0 && s.Wallet.Credits >= rerollCost,
                 Progress = _loc.F("recruit.progress", s.Roster.Count, s.Content.Members.Count),
             });
+        }
+
+        RecruitScrapState Scrap(ShopScrapOffer lot, int slot)
+        {
+            string what = _loc.F("shop.scrap_lot", lot.Count, _loc.T("scrap." + lot.Kind));
+            return new RecruitScrapState
+            {
+                Slot = slot,
+                Text = lot.Bought ? what + " · " + _loc.T("shop.scrap_sold") : what + " · " + _loc.F("shop.item_price", lot.Price),
+                Enabled = !lot.Bought && _session.Wallet.Credits >= lot.Price,
+            };
         }
 
         RecruitCardState Card(ShopOffer offer, int slot)

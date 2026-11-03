@@ -14,7 +14,19 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public int Minutes { get; }
         public int Members { get; }
         public Reward Reward { get; }
-        public ExpeditionTemplate(string id, int minutes, int members, Reward reward) { Id = id; Minutes = minutes; Members = members; Reward = reward; }
+        /// <summary>1 (facile) à 3 (difficile) : sert à l affichage ; en 0.15.0 le succès est toujours acquis.</summary>
+        public int Difficulty { get; }
+        public ExpeditionTemplate(string id, int minutes, int members, Reward reward, int difficulty = 1)
+        { Id = id; Minutes = minutes; Members = members; Reward = reward; Difficulty = difficulty; }
+    }
+
+    /// <summary>Un agent hors escouade, proposé pour une mission : libre, ou en mission jusqu à son retour.</summary>
+    public readonly struct MissionAgentView
+    {
+        public readonly TeamMember Member;
+        public readonly bool Busy;
+        public readonly TimeSpan Left;
+        public MissionAgentView(TeamMember member, bool busy, TimeSpan left) { Member = member; Busy = busy; Left = left; }
     }
 
     /// <summary>Un emplacement de la salle des opérations.</summary>
@@ -42,9 +54,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
 
         public static readonly IReadOnlyList<ExpeditionTemplate> Templates = new[]
         {
-            new ExpeditionTemplate("patrol", 15, 1, new Reward(credits: 250, pr: 10)),
-            new ExpeditionTemplate("recon", 60, 2, new Reward(credits: 700, pr: 25, gems: 2)),
-            new ExpeditionTemplate("convoy", 240, 3, new Reward(credits: 2000, pr: 60, gems: 8)),
+            new ExpeditionTemplate("patrol", 15, 1, new Reward(credits: 250, pr: 10), 1),
+            new ExpeditionTemplate("recon", 60, 2, new Reward(credits: 700, pr: 25, gems: 2), 2),
+            new ExpeditionTemplate("convoy", 240, 3, new Reward(credits: 2000, pr: 60, gems: 8), 3),
         };
 
         readonly MetaContext _c;
@@ -67,6 +79,27 @@ namespace N29.HeroesDawn.Application.Features.Meta
         /// <summary>Membres libres : hors escouade et pas déjà en expédition, du plus haut niveau au plus bas.</summary>
         public IReadOnlyList<TeamMember> Available()
             => _c.Session.Roster.Where(m => !m.InSquad && !IsBusy(m.Id)).OrderByDescending(m => m.Level).ThenBy(m => m.Id.Value, StringComparer.Ordinal).ToList();
+
+        /// <summary>Agents hors escouade, libres d abord (du plus haut niveau au plus bas), puis ceux en mission avec leur temps restant.</summary>
+        public IReadOnlyList<MissionAgentView> Agents()
+        {
+            var list = new List<MissionAgentView>();
+            foreach (var m in _c.Session.Roster)
+            {
+                if (m.InSquad) continue;
+                var e = _c.Meta.expeditions.FirstOrDefault(x => x.members.Contains(m.Id.Value));
+                var left = e == null ? TimeSpan.Zero : new DateTime(e.endUtcTicks, DateTimeKind.Utc) - _c.UtcNow;
+                list.Add(new MissionAgentView(m, e != null, left));
+            }
+            return list.OrderBy(a => a.Busy).ThenByDescending(a => a.Member.Level).ThenBy(a => a.Member.Id.Value, StringComparer.Ordinal).ToList();
+        }
+
+        /// <summary>Emplacement où la mission est en cours ou prête à récupérer ; -1 si elle n est pas lancée.</summary>
+        public int SlotOf(string templateId)
+        {
+            var e = _c.Meta.expeditions.FirstOrDefault(x => x.templateId == templateId);
+            return e == null ? -1 : e.slot;
+        }
 
         public IReadOnlyList<ExpeditionSlotView> SlotViews()
         {
@@ -92,6 +125,28 @@ namespace N29.HeroesDawn.Application.Features.Meta
             if (free.Count < t.Members) return Result.Fail(MetaErrors.NoMembers);
             var e = new ExpeditionSave { slot = slot, templateId = t.Id, endUtcTicks = (_c.UtcNow + TimeSpan.FromMinutes(t.Minutes)).Ticks };
             foreach (var m in free.Take(t.Members)) e.members.Add(m.Id.Value);
+            _c.Meta.expeditions.Add(e);
+            _c.Touch(MetaArea.Operations);
+            return Result.Ok();
+        }
+
+        /// <summary>
+        /// Lance la mission avec les agents choisis, dans le premier emplacement libre : exactement le nombre demandé,
+        /// sans doublon, tous hors escouade et libres. Une mission déjà lancée ne se relance pas avant sa récupération.
+        /// </summary>
+        public Result Launch(string templateId, IReadOnlyList<string> memberIds)
+        {
+            var t = Find(templateId);
+            if (t == null) return Result.Fail(MetaErrors.Unknown);
+            if (SlotOf(t.Id) >= 0) return Result.Fail(MetaErrors.Busy);
+            if (memberIds.Count != t.Members || memberIds.Distinct().Count() != memberIds.Count) return Result.Fail(MetaErrors.NoMembers);
+            var free = Available();
+            foreach (var id in memberIds) if (!free.Any(m => m.Id.Value == id)) return Result.Fail(MetaErrors.NoMembers);
+            int slot = -1;
+            for (int i = 0; i < Slots && slot < 0; i++) if (!_c.Meta.expeditions.Any(x => x.slot == i)) slot = i;
+            if (slot < 0) return Result.Fail(MetaErrors.Busy);
+            var e = new ExpeditionSave { slot = slot, templateId = t.Id, endUtcTicks = (_c.UtcNow + TimeSpan.FromMinutes(t.Minutes)).Ticks };
+            foreach (var id in memberIds) e.members.Add(id);
             _c.Meta.expeditions.Add(e);
             _c.Touch(MetaArea.Operations);
             return Result.Ok();

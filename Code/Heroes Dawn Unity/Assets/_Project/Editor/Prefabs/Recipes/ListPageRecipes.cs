@@ -90,7 +90,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public const float HeaderH = 150;
 
-        public static T Build<T>(PrefabContext ctx, string name, float sideWidth, bool sideRows, bool sideText, bool shopTabs = false) where T : ListPageView
+        public static T Build<T>(PrefabContext ctx, string name, float sideWidth, bool sideRows, bool sideText, bool shopTabs = false, bool tintedHeader = false) where T : ListPageView
         {
             var rt = ScreenKit.Root(name);
 
@@ -117,6 +117,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             mainArea.offsetMin = Vector2.zero;
             float tabsH = shopTabs ? ShopTabsRecipe.Height + 10 : 0f;
             mainArea.offsetMax = new Vector2(-(sideWidth > 0 ? sideWidth + 24 : 0), -(HeaderH + 14 + tabsH));
+            // Barre de filtres sous l'en-tête, comme sur la grille : hauteur 0 tant que la page n'a pas de groupe.
+            float shift = sideWidth > 0 ? sideWidth + 24 : 0f;
+            var filters = Ui.Rect(rt, "Filters");
+            filters.anchorMin = new Vector2(0, 1);
+            filters.anchorMax = new Vector2(1, 1);
+            filters.pivot = new Vector2(0.5f, 1);
+            filters.sizeDelta = new Vector2(-shift, 0);
+            filters.anchoredPosition = new Vector2(-shift / 2f, -(HeaderH + 14 + tabsH));
             var rows = Ui.VScroll(mainArea, out _);
             rows.VLayout(10, 0, TextAnchor.UpperCenter);
             rows.GetComponent<VerticalLayoutGroup>().childControlHeight = true;
@@ -128,9 +136,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "headerTitle", title);
             ctx.Wire(view, "headerLine", line);
             ctx.Wire(view, "headerBar", bar);
+            if (tintedHeader) ctx.Wire(view, "headerPanel", header);
             ctx.Wire(view, "headerA", a);
             ctx.Wire(view, "headerB", b);
             ctx.Wire(view, "rows", rows);
+            ctx.Wire(view, "filterBar", filters);
+            ctx.Wire(view, "listArea", mainArea);
             ctx.Wire(view, "rowPrefab", ctx.Asset("Widgets/InfoRow.prefab").GetComponent<InfoRowView>());
             if (shopTabs)
             {
@@ -200,14 +211,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Operations.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<OperationsPageView>(ctx, "OperationsPage", 0, false, false).gameObject;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<OperationsPageView>(ctx, "OperationsPage", 640, true, false).gameObject;
     }
 
     public sealed class LabPageRecipe : IPrefabRecipe
     {
         public string RelativePath => "Pages/Lab.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<LabPageView>(ctx, "LabPage", 0, false, false).gameObject;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<LabPageView>(ctx, "LabPage", 560, true, true).gameObject;
     }
 
     /// <summary>Profil du joueur : tag, accès au registre et aux archives, statistiques, amis.</summary>
@@ -215,7 +226,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Profile.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ProfilePageView>(ctx, "ProfilePage", 0, false, false).gameObject;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ProfilePageView>(ctx, "ProfilePage", 0, false, false, false, true).gameObject;
     }
 
     /// <summary>Page Chapitres : les 8 chapitres de l'histoire, leur statut et « Relire ».</summary>
@@ -223,7 +234,23 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Chapters.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ChaptersPageView>(ctx, "ChaptersPage", 0, false, false).gameObject;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ChaptersPageView>(ctx, "ChaptersPage", 640, true, false).gameObject;
+    }
+
+    /// <summary>Page Repaire : étapes (boss) à gauche, préparation et bilan à droite.</summary>
+    public sealed class LairPageRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Pages/Lair.prefab";
+        public int Order => 10;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<LairPageView>(ctx, "LairPage", 640, true, false).gameObject;
+    }
+
+    /// <summary>Page Tournoi : classement à gauche, manches du jour à droite.</summary>
+    public sealed class TournamentPageRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Pages/Tournament.prefab";
+        public int Order => 10;
+        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<TournamentPageView>(ctx, "TournamentPage", 640, true, false).gameObject;
     }
 
     public sealed class ArchivesPageRecipe : IPrefabRecipe

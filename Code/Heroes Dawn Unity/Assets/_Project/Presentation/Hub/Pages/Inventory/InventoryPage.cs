@@ -34,6 +34,8 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         /// <summary>Filtre choisi : 0 = tous les types, sinon 1 + le type. Gardé d'un rafraîchissement à l'autre.</summary>
         int _type;
+        /// <summary>Tri choisi : 0 = rareté (défaut), 1 = nom, 2 = quantité.</summary>
+        int _sort;
 
         protected override void OnStart()
         {
@@ -49,7 +51,8 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         void OnFilter(int group, int option)
         {
-            _type = option;
+            if (group == 1) _sort = option;
+            else _type = option;
             Refresh();
         }
 
@@ -79,9 +82,21 @@ namespace N29.HeroesDawn.Presentation.Hub
                     Labels = new[] { Loc.T("filters.all") }.Concat(System.Enum.GetValues(typeof(ItemType)).Cast<ItemType>().Select(t => CollectionText.ItemTypeName(Loc, t))).ToArray(),
                     Selected = _type,
                 },
+                new FilterGroupData
+                {
+                    Labels = new[] { Loc.T("inventory.sort.rarity"), Loc.T("inventory.sort.name"), Loc.T("inventory.sort.count") },
+                    Selected = _sort,
+                },
             });
             var rows = new List<InfoRowData>();
-            foreach (var it in owned.Where(i => _type == 0 || (int)i.Type == _type - 1))
+            var filtered = owned.Where(i => _type == 0 || (int)i.Type == _type - 1);
+            IEnumerable<N29.HeroesDawn.Definitions.ItemDef> ordered = _sort switch
+            {
+                1 => filtered.OrderBy(i => CollectionText.ItemName(Loc, i)),
+                2 => filtered.OrderByDescending(i => CollectionOps.OwnedItems(_session, i.Id)).ThenByDescending(i => i.Rarity),
+                _ => filtered,
+            };
+            foreach (var it in ordered)
             {
                 int count = CollectionOps.OwnedItems(_session, it.Id);
                 var wearers = _session.Roster.Where(m => m.Items.Contains(it.Id)).Select(m => Loc.MemberName(m.Def)).ToList();

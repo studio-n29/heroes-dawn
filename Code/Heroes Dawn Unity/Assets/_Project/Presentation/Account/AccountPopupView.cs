@@ -34,6 +34,7 @@ namespace N29.HeroesDawn.Presentation.Account
         [SerializeField] UiButton close = null!;
         [SerializeField] GameObject busyOverlay = null!;
         [SerializeField] TMP_Text busyText = null!;
+        [SerializeField] UiButton busyCancel = null!;
         [SerializeField] RectTransform window = null!;
         [SerializeField] CanvasGroup group = null!;
 
@@ -41,6 +42,7 @@ namespace N29.HeroesDawn.Presentation.Account
         public event Action<AccountForm>? SubmitClicked;
         public event Action<AuthProvider>? ProviderClicked;
         public event Action<string>? ForgotClicked;
+        public event Action? CancelClicked;
         public event Action? CloseClicked;
 
         public bool Cancelable => true;
@@ -69,6 +71,7 @@ namespace N29.HeroesDawn.Presentation.Account
             apple.Button.onClick.AddListener(() => ProviderClicked?.Invoke(AuthProvider.Apple));
             forgot.Button.onClick.AddListener(() => ForgotClicked?.Invoke(emailField.text));
             close.Button.onClick.AddListener(() => CloseClicked?.Invoke());
+            busyCancel.Button.onClick.AddListener(() => CancelClicked?.Invoke());
         }
 
         public void Show(AccountPopupData data)

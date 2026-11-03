@@ -15,7 +15,9 @@ namespace N29.HeroesDawn.Application.Features.Zone
         public UniTask<Result<IReadOnlyList<BoardEvent>>> ExecuteAsync(CaseId target, CancellationToken ct = default)
         {
             ct.ThrowIfCancellationRequested();
-            return UniTask.FromResult(ZoneActions.Apply(_fx, r => r.MoveTo(target)));
+            var moved = ZoneActions.Apply(_fx, r => r.MoveTo(target));
+            if (moved.IsSuccess) Meta.Stats.RecordMoves(_fx.Session.Meta, moved.Value);
+            return UniTask.FromResult(moved);
         }
     }
 }

@@ -428,7 +428,7 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             arena.rectTransform.At(0.5f, 0.5f, 0, -36, 1000, 520);
             arena.raycastTarget = false;
             var arenaTitle = Ui.Txt(arena.transform, "", 64, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "SkillTitle");
-            arenaTitle.rectTransform.At(0.5f, 1f, 0, -36, 900, 90);
+            arenaTitle.rectTransform.At(0.5f, 1f, 0, -120, 900, 90); // sous la barre de vie du boss
             arenaTitle.Inked();
             arenaTitle.gameObject.SetActive(false);
             var enemyRow = Ui.Rect(rt, "Enemies").At(1f, 1f, -36, -250, 500, 530);
@@ -514,6 +514,32 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             ctx.Wire(timeline, "prepZone", prep.rectTransform);
             ctx.Wire(timeline, "markerPrefab", ctx.Asset("Widgets/TimelineMarker.prefab").GetComponent<TimelineMarkerView>());
 
+            // ---- Barre de vie du boss : large, au centre sous la frise, visible seulement quand un boss est en vie
+            var bossFill = Ui.Panel(rt, "BossBar", Theme.WithAlpha(Theme.Frost, 0.94f), 4f, 6f, false);
+            var bossFrame = bossFill.Frame().At(0.5f, 1f, 0, -240, 960, 100);
+            var bossName = Ui.Txt(bossFill.transform, "", 36, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Name");
+            bossName.rectTransform.At(0f, 1f, 20, -6, 560, 44);
+            bossName.Inked();
+            var bossPhase = Ui.Txt(bossFill.transform, "", 26, Theme.TextMuted, TextAnchor.MiddleRight, FontKind.Title, "Phase");
+            bossPhase.rectTransform.At(1f, 1f, -20, -10, 520, 36);
+            var bossHp = Ui.Bar(bossFill.transform, "Hp", Theme.Danger, Theme.Surface3, true, 26);
+            ((RectTransform)bossHp.transform).At(0.5f, 0f, 0, 10, 920, 36);
+            var bossMarks = Ui.Rect(bossHp.transform, "Marks");
+            bossMarks.Stretch();
+            var bossFlash = Ui.Img(bossFill.transform, "Flash", Color.white, Sprites.Panel);
+            bossFlash.rectTransform.Stretch();
+            bossFlash.raycastTarget = false;
+            var bossFlashGroup = bossFlash.gameObject.AddComponent<CanvasGroup>();
+            bossFlashGroup.alpha = 0f;
+            bossFlashGroup.blocksRaycasts = false;
+            var bossBar = bossFrame.gameObject.AddComponent<BossBarView>();
+            ctx.Wire(bossBar, "nameText", bossName);
+            ctx.Wire(bossBar, "phaseText", bossPhase);
+            ctx.Wire(bossBar, "bar", bossHp);
+            ctx.Wire(bossBar, "marksRoot", bossMarks);
+            ctx.Wire(bossBar, "flash", bossFlashGroup);
+            bossFrame.gameObject.SetActive(false);
+
 
             // ---- Éventail de compétences (bas centre) : visible seulement pour l'agent dont c'est le tour ; la 1re carte à gauche penche à gauche
             var fanRoot = Ui.Rect(rt, "SkillFan").At(0.5f, 0f, 0, -24, 760, 240);
@@ -572,6 +598,7 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             ctx.Wire(view, "fanRoot", fanRoot);
             ctx.WireArray(view, "fan", fan);
             ctx.WireArray(view, "bonusChips", bonusChips);
+            ctx.Wire(view, "bossBar", bossBar);
             ctx.Wire(view, "fanMarker", fanMarker);
             ctx.Wire(view, "descPanel", descFill.Frame());
             ctx.Wire(view, "descTitle", descTitle);

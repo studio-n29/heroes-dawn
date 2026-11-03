@@ -1,27 +1,32 @@
 #nullable enable
-using UnityEngine;
+using System.Collections.Generic;
 
 namespace N29.HeroesDawn.Presentation.Login
 {
+    /// <summary>Launch : montage de lancement (45 s, sans texte). Full : la cinématique longue, avec sous-titres et voix.</summary>
+    public enum CinematicKind { Launch, Full }
+
     public struct IntroCinematicTexts
     {
         public string Skip;
     }
 
-
-    public struct CampaignCardData
-    {
-        public string Id;
-        public string Name;
-        public string Description;
-        public bool Available;
-        public string Badge;
-    }
-
-    public struct ChooseCampaignData
+    /// <summary>Création du personnage joueur : titre, texte du bouton, indication du champ de nom, longueur maximale et galerie d'avatars.</summary>
+    public struct ChooseCharacterData
     {
         public string Title;
         public string Confirm;
-        public System.Collections.Generic.IReadOnlyList<CampaignCardData> Cards;
+        public string NameHint;
+        public int MaxNameLength;
+        public IReadOnlyList<string> Avatars;
+    }
+
+    /// <summary>Le personnage choisi : nom saisi (non vide, rognage fait) et identifiant de l'avatar de la galerie.</summary>
+    public readonly struct CharacterChoice
+    {
+        public readonly string Name;
+        public readonly string Avatar;
+
+        public CharacterChoice(string name, string avatar) { Name = name; Avatar = avatar; }
     }
 }

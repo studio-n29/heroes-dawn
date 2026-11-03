@@ -20,10 +20,11 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var dim = Ui.Img(root, "Dim", Theme.WithAlpha(Theme.Navy, 0.3f), null, true);
             dim.rectTransform.Stretch();
             // Voile cinÃ©ma : un dÃ©gradÃ© sombre qui monte du bas de l'Ã©cran, pour que la rÃ©plique se lise sur n'importe quel fond.
-            var shade = Ui.Img(root, "Shade", Theme.WithAlpha(Theme.Outline, 0.92f), Sprites.VerticalGradient);
+            // Dégradé tramé noir : dense en bas à gauche (là où le texte est posé), transparent en haut à droite.
+            var shade = Ui.Img(root, "Shade", Theme.WithAlpha(Theme.Outline, 0.96f), Sprites.Halftone);
             shade.raycastTarget = false;
             shade.rectTransform.anchorMin = new Vector2(0f, 0f);
-            shade.rectTransform.anchorMax = new Vector2(1f, 0.62f);
+            shade.rectTransform.anchorMax = new Vector2(1f, 0.7f);
             shade.rectTransform.offsetMin = shade.rectTransform.offsetMax = Vector2.zero;
             var tap = dim.gameObject.AddComponent<Button>();
             tap.transition = Selectable.Transition.None;
@@ -33,23 +34,30 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             var strip = Ui.Rect(root, "Strip").At(0.5f, 0f, 0, 40, 1800, 400);
 
-            var bubbleFill = Ui.Panel(strip, "Bubble", Theme.WithAlpha(Theme.Navy, 0.94f), 5f, 12f, false);
-            var bubble = bubbleFill.Frame();
+            // Pas de cadre : le texte se pose directement sur le dégradé tramé.
+            var bubble = Ui.Rect(strip, "Bubble");
             bubble.anchorMin = new Vector2(0f, 0f);
             bubble.anchorMax = new Vector2(1f, 1f);
-            bubble.offsetMin = new Vector2(380, 20);
+            bubble.offsetMin = new Vector2(380, 110);
             bubble.offsetMax = new Vector2(-30, -70);
 
-            var body = Ui.Txt(bubbleFill.transform, "", 40, Color.white, TextAnchor.MiddleLeft, FontKind.Body, "Body");
-            body.rectTransform.Stretch(40, 50, 40, 34);
+            var body = Ui.Txt(bubble, "", 40, Color.white, TextAnchor.MiddleLeft, FontKind.Body, "Body");
+            body.rectTransform.Stretch(40, 8, 40, 8);
             body.lineSpacing = 6;
             body.overflowMode = TMPro.TextOverflowModes.Ellipsis;
             body.enableAutoSizing = true;
             body.fontSizeMin = 28;
             body.fontSizeMax = 44;
-            var hint = Ui.LocTxt(bubbleFill.transform, "narration.next", 24, Theme.Primary, TextAnchor.LowerRight, FontKind.Title, "Hint");
-            hint.rectTransform.At(1f, 0f, -26, 10, 420, 36);
+            body.Inked();
+            var hint = Ui.LocTxt(strip, "narration.next", 24, Theme.Primary, TextAnchor.UpperLeft, FontKind.Title, "Hint");
+            hint.rectTransform.At(0f, 1f, 600, -22, 700, 40);
             hint.gameObject.AddComponent<Pulse>().Amplitude = 0.04f;
+            var progress = Ui.Txt(strip, "", 28, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Title, "Progress");
+            progress.rectTransform.At(0f, 1f, 410, -22, 160, 40);
+            var next = Ui.LocBtn(strip, "narration.next_btn", Theme.Primary, Theme.TextDark, null!, 30, FontKind.Title, "Next");
+            next.Rect.At(1f, 0f, -30, 16, 240, 80);
+            var auto = Ui.LocBtn(strip, "narration.auto", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Auto");
+            auto.Rect.At(1f, 0f, -290, 16, 200, 80);
 
             // Queue de la bulle : un losange encré, posé sur le bord de la bulle côté avatar.
             var tail = Ui.Img(strip, "Tail", Theme.WithAlpha(Theme.Ink, 0f), Sprites.Rounded);
@@ -83,6 +91,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "body", body);
             ctx.Wire(view, "hint", hint);
             ctx.Wire(view, "skip", skip.Button);
+            ctx.Wire(view, "progress", progress);
+            ctx.Wire(view, "next", next);
+            ctx.Wire(view, "auto", auto);
             return root.gameObject;
         }
     }

@@ -12,6 +12,8 @@ namespace N29.HeroesDawn.Presentation.Audio
     {
         public AudioSource[] Decks { get; private set; } = Array.Empty<AudioSource>();
         public AudioSource[] Voices { get; private set; } = Array.Empty<AudioSource>();
+        /// <summary>Source des répliques doublées (dialogues, cinématique) : une seule à la fois, hors du pool des effets.</summary>
+        public AudioSource Speech { get; private set; } = null!;
 
         /// <summary>Application mise en arrière-plan (vrai) ou reprise (faux).</summary>
         public event Action<bool>? Paused;
@@ -23,6 +25,7 @@ namespace N29.HeroesDawn.Presentation.Audio
             go.AddComponent<AudioListener>();
             var rig = go.AddComponent<AudioRig>();
             rig.Decks = new[] { NewSource(go, "Music A", 0), NewSource(go, "Music B", 0) };
+            rig.Speech = NewSource(go, "Speech", 16);
             rig.Voices = new AudioSource[voices];
             for (int i = 0; i < voices; i++) rig.Voices[i] = NewSource(go, "Sfx", 64);
             return rig;

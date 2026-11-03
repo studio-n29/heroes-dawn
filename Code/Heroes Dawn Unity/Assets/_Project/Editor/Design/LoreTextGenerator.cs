@@ -81,7 +81,8 @@ namespace N29.HeroesDawn.EditorTools.Design
             return order.ToDictionary(id => id, id => result[id]);
         }
 
-        static string Escape(string text) => text.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", "\\n");
+        // La flèche n'est pas dans la police Barlow du jeu : elle devient le chevron » à l'écriture (L1 de la 0.15.0).
+        static string Escape(string text) => text.Replace("→", "»").Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", "\\n");
 
         /// <summary>Code de <c>Loc.ExtendLore</c> (fins de ligne LF).</summary>
         public static string Render(IReadOnlyDictionary<string, Dictionary<string, string>> lore)

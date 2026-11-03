@@ -1,4 +1,3 @@
-#nullable enable
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Login;
 using TMPro;
@@ -7,26 +6,21 @@ using UnityEngine.UI;
 
 namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 {
-    /// <summary>Carte d'une campagne (300 × 420) : nom, description et badge « disponible / en création ».</summary>
-    public sealed class CampaignCardRecipe : IPrefabRecipe
+    /// <summary>Vignette d'un avatar de la galerie (150 × 150) : cadre, numéro, bouton.</summary>
+    public sealed class AvatarTileRecipe : IPrefabRecipe
     {
-        public string RelativePath => "Widgets/CampaignCard.prefab";
+        public string RelativePath => "Widgets/AvatarTile.prefab";
         public int Order => 0;
 
         public GameObject Build(PrefabContext ctx)
         {
-            var fill = RecipeKit.PanelRoot("CampaignCard", Theme.Frost, 5f, 8f, true);
+            var fill = RecipeKit.PanelRoot("AvatarTile", Theme.Frost, 5f, 8f, true);
             var rootRt = fill.Frame();
-            rootRt.sizeDelta = new Vector2(300, 420);
-            rootRt.Pref(300, 420);
+            rootRt.sizeDelta = new Vector2(150, 150);
+            rootRt.Pref(150, 150);
             var frame = rootRt.GetComponent<Image>();
-            var name = Ui.Txt(fill.transform, "", 40, Theme.Text, TextAnchor.UpperCenter, FontKind.Title, "Name");
-            name.rectTransform.At(0.5f, 1f, 0, -26, 270, 120);
-            name.AutoSize(40);
-            var desc = Ui.Txt(fill.transform, "", 26, Theme.TextDark, TextAnchor.UpperCenter, FontKind.Body, "Desc");
-            desc.rectTransform.At(0.5f, 0.5f, 0, -20, 260, 190);
-            var badge = Ui.Txt(fill.transform, "", 28, Theme.Success, TextAnchor.MiddleCenter, FontKind.Title, "Badge");
-            badge.rectTransform.At(0.5f, 0f, 0, 36, 270, 50);
+            var label = Ui.Txt(fill.transform, "", 60, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Number");
+            label.rectTransform.Stretch();
             var button = rootRt.gameObject.AddComponent<Button>();
             button.targetGraphic = frame;
             button.transition = Selectable.Transition.None;
@@ -34,23 +28,19 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             nav.mode = Navigation.Mode.None;
             button.navigation = nav;
 
-            var view = rootRt.gameObject.AddComponent<CampaignCardView>();
+            var view = rootRt.gameObject.AddComponent<AvatarTileView>();
             ctx.Wire(view, "frame", frame);
-            ctx.Wire(view, "fill", fill);
-            ctx.Wire(view, "cardName", name);
-            ctx.Wire(view, "description", desc);
-            ctx.Wire(view, "badge", badge);
+            ctx.Wire(view, "label", label);
             ctx.Wire(view, "button", button);
             return rootRt.gameObject;
         }
     }
 
-    /// <summary>Première connexion : popup plein écran (cinématique de lancement, choix du personnage joueur).</summary>
+    /// <summary>Première connexion : popup plein écran (cinématique de lancement, création du personnage : nom et avatar).</summary>
     public sealed class IntroPopupRecipe : IPrefabRecipe
     {
         public string RelativePath => "Popups/IntroPopup.prefab";
         public int Order => 10;
-
 
         public GameObject Build(PrefabContext ctx)
         {
@@ -75,22 +65,38 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             skip.Rect.pivot = Vector2.one;
             skip.Label.fontSize = 24f;
 
-            // ---- Campagne
-            var campaignStage = Ui.Rect(root, "Campaign");
-            campaignStage.Stretch();
-            var campaignBg = Ui.Img(campaignStage, "Bg", Theme.SkyMid, Sprites.VerticalGradient);
-            campaignBg.rectTransform.Stretch();
-            campaignBg.raycastTarget = false;
-            var campaignTitle = Ui.Txt(campaignStage, "", 64, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Title");
-            campaignTitle.rectTransform.At(0.5f, 1f, 0, -60, 1400, 100);
-            campaignTitle.Inked();
-            var cardRow = Ui.Rect(campaignStage, "Cards");
-            cardRow.At(0.5f, 0.5f, 0, 10, 1400, 440);
-            cardRow.HLayout(30, 0, TextAnchor.MiddleCenter);
-            var cardPrefab = ctx.Asset("Widgets/CampaignCard.prefab").GetComponent<CampaignCardView>();
-            var campaignConfirm = Ui.LocBtn(campaignStage, "onboarding.campaign.confirm", Theme.Primary, Theme.TextDark, null!, 46, FontKind.Title, "Confirm");
-            campaignConfirm.Rect.At(0.5f, 0f, 0, 60, 520, 104);
-            campaignStage.gameObject.SetActive(false);
+            // ---- Personnage : titre, nom saisi, galerie d'avatars, bouton « Commencer »
+            var characterStage = Ui.Rect(root, "Character");
+            characterStage.Stretch();
+            var characterBg = Ui.Img(characterStage, "Bg", Theme.SkyMid, Sprites.VerticalGradient);
+            characterBg.rectTransform.Stretch();
+            characterBg.raycastTarget = false;
+            var characterTitle = Ui.Txt(characterStage, "", 64, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Title");
+            characterTitle.rectTransform.At(0.5f, 1f, 0, -60, 1400, 100);
+            characterTitle.Inked();
+
+            var nameBox = Ui.Img(characterStage, "NameBox", Theme.Surface3, Sprites.Panel, true);
+            nameBox.rectTransform.At(0.5f, 0.5f, 0, 230, 720, 96);
+            var viewport = Ui.Rect(nameBox.transform, "Viewport").Stretch(20, 8, 20, 8);
+            viewport.gameObject.AddComponent<RectMask2D>();
+            var nameText = Ui.Txt(viewport, "", 40, Theme.Text, TextAnchor.MiddleCenter, FontKind.Body, "Text");
+            nameText.rectTransform.Stretch();
+            var nameHint = Ui.Txt(viewport, "", 40, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Body, "Hint");
+            nameHint.rectTransform.Stretch();
+            var nameField = nameBox.gameObject.AddComponent<TMP_InputField>();
+            nameField.textViewport = viewport;
+            nameField.textComponent = nameText;
+            nameField.placeholder = nameHint;
+            nameField.lineType = TMP_InputField.LineType.SingleLine;
+
+            var avatarRow = Ui.Rect(characterStage, "Avatars");
+            avatarRow.At(0.5f, 0.5f, 0, -80, 1100, 170);
+            avatarRow.HLayout(30, 0, TextAnchor.MiddleCenter);
+            var avatarPrefab = ctx.Asset("Widgets/AvatarTile.prefab").GetComponent<AvatarTileView>();
+
+            var characterConfirm = Ui.LocBtn(characterStage, "onboarding.character.confirm", Theme.Primary, Theme.TextDark, null!, 46, FontKind.Title, "Confirm");
+            characterConfirm.Rect.At(0.5f, 0f, 0, 60, 520, 104);
+            characterStage.gameObject.SetActive(false);
 
             var view = root.gameObject.AddComponent<IntroPopupView>();
             ctx.Wire(view, "group", group);
@@ -98,13 +104,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "player", player);
             ctx.Wire(view, "tapArea", tapButton);
             ctx.Wire(view, "skip", skip);
-            ctx.Wire(view, "campaignStage", campaignStage);
-            ctx.Wire(view, "campaignTitle", campaignTitle);
-            ctx.Wire(view, "cardRow", cardRow);
-            ctx.Wire(view, "cardPrefab", cardPrefab);
-            ctx.Wire(view, "campaignConfirm", campaignConfirm);
+            ctx.Wire(view, "characterStage", characterStage);
+            ctx.Wire(view, "characterTitle", characterTitle);
+            ctx.Wire(view, "nameField", nameField);
+            ctx.Wire(view, "nameHint", nameHint);
+            ctx.Wire(view, "avatarRow", avatarRow);
+            ctx.Wire(view, "avatarPrefab", avatarPrefab);
+            ctx.Wire(view, "characterConfirm", characterConfirm);
             return root.gameObject;
         }
-
     }
 }

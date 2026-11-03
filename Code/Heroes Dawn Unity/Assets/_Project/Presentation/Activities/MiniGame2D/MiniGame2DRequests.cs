@@ -17,6 +17,10 @@ namespace N29.HeroesDawn.Presentation.Activities
         public string TimeFormat { get; set; } = "{0} s";
         public string WonText { get; set; } = "";
         public string LostText { get; set; } = "";
+        /// <summary>Aspect éducatif : « THÈME : … — objectif » montré avant la partie, vide si le jeu n'en a pas.</summary>
+        public string Theme { get; set; } = "";
+        /// <summary>« Tu as appris : … » ajouté au texte de réussite, vide si le jeu n'en a pas.</summary>
+        public string Learned { get; set; } = "";
         public IMiniGameDriver Driver { get; set; } = null!;
         public Sprite? Background { get; set; }
         public Color BackgroundTint { get; set; } = Color.white;

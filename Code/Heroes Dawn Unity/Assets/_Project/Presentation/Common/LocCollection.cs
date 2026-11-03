@@ -119,7 +119,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["loadout.card_slot"] = "Carte {0} · {1}";
             d["loadout.remove"] = "RETIRER";
             d["loadout.equip"] = "ÉQUIPER";
-            d["loadout.to_slot"] = "→ {0}";
+            d["loadout.to_slot"] = "» {0}";
             d["loadout.none_items"] = "Aucun objet en réserve. Cherche-en en boutique ou en événement.";
             d["loadout.none_cards"] = "Aucune carte compatible. Ouvre des boosters dans le Grimoire.";
             d["loadout.copies"] = "×{0}";
@@ -141,7 +141,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["grimoire.card_line"] = "{0} · {1} · {2}";
             d["grimoire.owned_level"] = "×{0} · Niv. {1}/{2}";
             d["grimoire.upgrade"] = "AMÉLIORER ({0} doublon(s) + {1} Cr)";
-            d["grimoire.upgrade_unlocks"] = "→ débloque {0}";
+            d["grimoire.upgrade_unlocks"] = "» débloque {0}";
             d["grimoire.tiers"] = "Paliers";
             d["grimoire.tier_line"] = "Niv. {0} · {1}";
             d["grimoire.max_level"] = "NIVEAU MAX";

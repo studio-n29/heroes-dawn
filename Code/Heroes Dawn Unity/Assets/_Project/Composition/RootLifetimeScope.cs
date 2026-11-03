@@ -138,6 +138,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<OpenShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<RecruitFromShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<RerollShopUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<BuyScrapOfferUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<MarkShopSeenUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<HealRosterUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<HealMemberUseCase>(Lifetime.Singleton).AsImplementedInterfaces();
@@ -154,6 +155,10 @@ namespace N29.HeroesDawn.Composition
             builder.Register<Workshop>(Lifetime.Singleton);
             builder.Register<PlayerProfile>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.ChapterBook>(Lifetime.Singleton);
+            builder.Register<N29.HeroesDawn.Application.Features.World.LairBook>(Lifetime.Singleton);
+            builder.Register<Tournament>(Lifetime.Singleton);
+            builder.Register<N29.HeroesDawn.Application.Features.World.MemoryFragmentBook>(Lifetime.Singleton);
+            builder.Register<N29.HeroesDawn.Presentation.Hub.NoFragmentAudio>(Lifetime.Singleton).As<N29.HeroesDawn.Presentation.Hub.IFragmentAudio>();
             builder.Register<LocalFriendsPort>(Lifetime.Singleton).As<N29.HeroesDawn.Application.Ports.IFriendsPort>();
             builder.Register<ArchiveBook>(Lifetime.Singleton);
             builder.Register<Boutique>(Lifetime.Singleton);
@@ -161,6 +166,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<PlayerSettings>(Lifetime.Singleton);
             builder.Register<MetaOverview>(Lifetime.Singleton);
             builder.Register<TutorialGuide>(Lifetime.Singleton);
+            builder.Register<CombatIntros>(Lifetime.Singleton);
             builder.Register<OnboardingGuide>(Lifetime.Singleton);
             builder.Register<OnboardingFlow>(Lifetime.Singleton).As<IOnboardingFlow>();
             builder.Register<MetaTracker>(Lifetime.Singleton);
@@ -186,6 +192,8 @@ namespace N29.HeroesDawn.Composition
             builder.RegisterInstance(rig);
             builder.RegisterEntryPoint(c => new AudioService(rig, audioCatalog, c.Resolve<IFrameClock>(), log), Lifetime.Singleton);
             builder.RegisterEntryPoint<MusicDirector>();
+            builder.RegisterEntryPoint<VoicePlayer>(Lifetime.Singleton).As<IVoicePlayer>();
+            builder.Register<N29.HeroesDawn.Presentation.Login.CinematicReplay>(Lifetime.Singleton);
             builder.RegisterEntryPoint<SettingsApplier>();
             builder.RegisterEntryPoint<TutorialDirector>();
 
@@ -193,7 +201,8 @@ namespace N29.HeroesDawn.Composition
             builder.Register<IPopupHost>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return new AudiblePopupHost(ui.Modals, c.Resolve<IAudioService>()); }, Lifetime.Singleton);
             builder.Register<IToastService>(c => { var ui = c.Resolve<UiRoot>(); ui.EnsureLayers(screens); return new AudibleToastService(ui.Toasts, c.Resolve<IAudioService>()); }, Lifetime.Singleton);
             builder.Register<IModalService, ModalService>(Lifetime.Singleton);
-            builder.Register<ILocalization, LocLocalization>(Lifetime.Singleton);
+            // La langue des textes suit le réglage enregistré dans le profil (lu à chaque affichage).
+            builder.Register<ILocalization>(c => { var session = c.Resolve<GameSession>(); Loc.BindLanguage(() => session.Meta.settings.language); return new LocLocalization(); }, Lifetime.Singleton);
             builder.Register<IBackInput, InputSystemBackInput>(Lifetime.Singleton);
             builder.RegisterEntryPoint<BackButtonRouter>().AsSelf();
             builder.RegisterEntryPoint<ToastRelay>();

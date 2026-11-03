@@ -172,6 +172,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             dossierText.text = sb.ToString();
             dossierClose.SetLabel(d.Close);
             dossierRoot.SetActive(true);
+            // Un dossier rouvert repart du haut du texte, pas de la position du dossier précédent.
+            var scroll = dossierText.GetComponentInParent<UnityEngine.UI.ScrollRect>();
+            if (scroll != null) scroll.verticalNormalizedPosition = 1f;
         }
 
         public void HideDossier() => dossierRoot.SetActive(false);

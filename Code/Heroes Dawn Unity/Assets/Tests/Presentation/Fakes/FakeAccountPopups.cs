@@ -16,6 +16,10 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action<AccountForm>? SubmitClicked;
         public event Action<AuthProvider>? ProviderClicked;
         public event Action<string>? ForgotClicked;
+        public event Action? CancelClicked;
+
+        /// <summary>Touche « Annuler » du voile d'attente (tests).</summary>
+        public void ClickCancel() => CancelClicked?.Invoke();
         public event Action? CloseClicked;
 
         public AccountPopupData? Data;

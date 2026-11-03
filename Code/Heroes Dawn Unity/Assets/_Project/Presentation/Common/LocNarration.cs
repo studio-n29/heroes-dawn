@@ -10,6 +10,8 @@ namespace N29.HeroesDawn.Presentation.Common
         {
             d["narration.skip"] = "PASSER";
             d["narration.next"] = "▼ Touche pour continuer";
+            d["narration.next_btn"] = "SUIVANT";
+            d["narration.auto"] = "AUTO";
             d["speaker.brick"] = "Brick";
             d["speaker.dockmaster"] = "Contremaître";
             d["narration.ny_1_1.n23.before.0"] = "« Vous avez traversé tout mon quai pour finir ici. Courageux. Ou idiots. »";

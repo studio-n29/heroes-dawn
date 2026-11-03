@@ -55,6 +55,8 @@ namespace N29.HeroesDawn.Application.Ports
     {
         public int master = 100, music = 80, sfx = 100, voice = 100;
         public bool muteInBackground = true;
+        /// <summary>Test : débloque toutes les pièces du QG, sans condition de tutoriel ni de chapitre.</summary>
+        public bool unlockAll;
         /// <summary>0 = auto, 1 = bas, 2 = moyen, 3 = haut.</summary>
         public int quality;
         public bool fps60 = true;
@@ -91,6 +93,14 @@ namespace N29.HeroesDawn.Application.Ports
         public List<string> members = new List<string>();
     }
 
+    /// <summary>Tournoi simulé : jour en cours, manches gagnées, éliminé ou non, récompense prise, et points du joueur (gardés d'un jour à l'autre).</summary>
+    [Serializable]
+    public sealed class TournamentSave { public string day = ""; public int round; public bool eliminated; public bool claimed; public int rating = 1000; }
+
+    /// <summary>Succès débloqué : identifiant et jour de la première constatation (aaaa-mm-jj).</summary>
+    [Serializable]
+    public sealed class AchievementSave { public string id = ""; public string day = ""; }
+
     /// <summary>Victoires remportées ensemble par deux agents (identifiants triés : a avant b).</summary>
     [Serializable]
     public sealed class LinkSave
@@ -119,6 +129,8 @@ namespace N29.HeroesDawn.Application.Ports
         public string campaign = "";
         /// <summary>Parcours choisi : Agent D ou Agent M (vide : Agent D par défaut).</summary>
         public string hero = "";
+        /// <summary>Avatar du personnage créé par le joueur (identifiant de la galerie ; vide : premier avatar).</summary>
+        public string avatar = "";
     }
 
     /// <summary>Tout ce qui dépasse le noyau (équipe, ressources, boutique de recrutement) : pass, missions, opérations, labo, archives…</summary>
@@ -189,9 +201,26 @@ namespace N29.HeroesDawn.Application.Ports
         // Profil (lot F) : compteurs de statistiques (combatsWon, combatsLost, creditsEarned) et tags des amis (liste simulée locale)
         public List<CounterSave> stats = new List<CounterSave>();
         public List<string> friends = new List<string>();
+        /// <summary>Succès débloqués, avec le jour de la première constatation.</summary>
+        public List<AchievementSave> achievements = new List<AchievementSave>();
+
+        /// <summary>Fond de la carte de profil (voir <see cref="N29.HeroesDawn.Application.Features.Meta.ProfileBackgrounds"/>) ; vide : premier fond.</summary>
+        public string profileBackground = "";
 
         // Narration (lot G) : chapitres dont l'ouverture a été montrée
         public List<string> chaptersSeen = new List<string>();
+
+        /// <summary>Fragments de souvenirs déjà lus (voir <see cref="N29.HeroesDawn.Definitions.MemoryFragments"/>).</summary>
+        public List<string> fragmentsRead = new List<string>();
+
+        /// <summary>Boss de repaire déjà vaincus (« repaire:case »), gardés d'une partie à l'autre ; les compteurs lair_clears:{repaire} comptent les repaires terminés.</summary>
+        public List<string> lairBosses = new List<string>();
+
+        /// <summary>Tournoi simulé du jour et points du joueur.</summary>
+        public TournamentSave tournament = new TournamentSave();
+
+        /// <summary>Entrées en combat déjà vues (clé : les ennemis de l'affrontement) ; une introduction répétée est abrégée.</summary>
+        public List<string> seenIntros = new List<string>();
 
         public int GetCounter(List<CounterSave> list, string id)
         {

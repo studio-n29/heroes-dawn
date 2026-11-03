@@ -40,8 +40,15 @@ namespace N29.HeroesDawn.Presentation.Common
         public Image Bust => bust;
         public Image Art => art;
 
-        public void Show(PortraitData d)
+        /// <summary>Affiche le portrait ; détouré (dialogues), l'anneau et le disque de fond disparaissent : seul le personnage reste sur la scène.</summary>
+        public void Show(PortraitData d, bool cutout = false)
         {
+            // Les illustrations actuelles sont des images pleines : elles gardent leur disque (sinon elles s'afficheraient en rectangle).
+            // Seule la silhouette provisoire se détache sans fond ; des portraits détourés demanderont leur propre indicateur.
+            cutout &= d.Art == null;
+            var ring = GetComponent<Image>();
+            if (ring != null) ring.enabled = !cutout;
+            disc.enabled = !cutout;
             var family = Theme.FamilyColor(d.Family);
             disc.color = family;
             bust.color = Color.Lerp(family, Theme.Outline, 0.5f);

@@ -99,7 +99,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
             var session = Container.Resolve<GameSession>();
-            session.Find(new N29.HeroesDawn.Core.MemberId("darius_brooks"))!.Fatigue = 30; // la seule recrue de départ
+            session.Find(new N29.HeroesDawn.Core.MemberId("giulia_rossi"))!.Fatigue = 30; // la première recrue de l'équipe de départ
             yield return CaptureSettled("10-qg");
             Container.Resolve<N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide>().Skip();
             yield return new WaitForSecondsRealtime(0.3f);
@@ -134,7 +134,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("40-pass");
             yield return Tab(HubPage.Shop);
             yield return CaptureSettled("50-boutique");
-            foreach (var shopTab in new[] { (ShopTab.Boosters, "50b-boutique-boosters"), (ShopTab.Items, "50c-boutique-objets"), (ShopTab.Gems, "50d-boutique-gemmes"), (ShopTab.Gift, "50e-boutique-cadeau") })
+            foreach (var shopTab in new[] { (ShopTab.Boosters, "50b-boutique-boosters"), (ShopTab.Gems, "50c-boutique-gemmes") })
             {
                 Object.FindAnyObjectByType<ShopTabsView>()!.Tab((int)shopTab.Item1).Button.onClick.Invoke();
                 yield return CaptureSettled(shopTab.Item2);
@@ -143,8 +143,14 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return null;
             foreach (var room in new[] { (HubPage.Operations, "13-operations"), (HubPage.Lab, "14-labo"), (HubPage.Grimoire, "16-grimoire"), (HubPage.Inventory, "17-inventaire") })
             {
-                Object.FindAnyObjectByType<QgPageView>()!.RoomButton(room.Item1)!.onClick.Invoke();
-                yield return CaptureSettled(room.Item2);
+                if (room.Item1 == HubPage.Operations)
+                {
+                    // Des agents hors escouade, dont un déjà parti en patrouille, pour montrer la fiche de mission.
+                    var extra = session.Content.Members.Where(d => session.Find(d.Id) == null).Take(3).ToList();
+                    foreach (var d in extra) session.Roster.Add(new TeamMember(d, 6));
+                    Container.Resolve<N29.HeroesDawn.Application.Features.Meta.Expeditions>().Launch("patrol", new[] { extra[0].Id.Value });
+                }
+                Object.FindAnyObjectByType<QgPageView>()!.RoomButton(room.Item1)!.onClick.Invoke();                yield return CaptureSettled(room.Item2);
                 Shell.BackButton.Button.onClick.Invoke();
                 yield return null;
             }
@@ -159,6 +165,21 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(File.Exists(Path.Combine(Folder, "85-parametres-support.png")));
         }
 
+        [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit les captures du tournoi simulé : départ puis tournoi fini — parce que la page se relit à l'œil (L13)")]
+        public IEnumerator CaptureTournament()
+        {
+            yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
+            Container.Resolve<N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide>().Skip();
+            yield return new WaitForSecondsRealtime(0.3f);
+            Object.FindAnyObjectByType<N29.HeroesDawn.Composition.HubLifetimeScope>()!.Container.Resolve<N29.HeroesDawn.Presentation.Hub.HubNavigator>().Open(HubPage.Tournament);
+            yield return CaptureSettled("92b-tournoi");
+            var tournament = Container.Resolve<N29.HeroesDawn.Application.Features.Meta.Tournament>();
+            while (!tournament.Finished) tournament.PlayNext();
+            yield return CaptureSettled("92c-tournoi-fini");
+        }
+
         [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit les captures de la narration : page Chapitres, dossier d'un agent et fenêtre d'ouverture d'un chapitre — parce que ces écrans se relisent à l'œil (lot G)")]
         public IEnumerator CaptureNarration()
         {
@@ -170,8 +191,26 @@ namespace N29.HeroesDawn.Tests.PlayMode
 
             Object.FindAnyObjectByType<QgPageView>()!.MissionButton.onClick.Invoke();
             yield return CaptureSettled("90-carte-bouton-chapitres");
+            // Deux zones validées : deux souvenirs débloqués dans la colonne de droite, dont un ouvert.
+            var narrationSession = Container.Resolve<GameSession>();
+            narrationSession.CompletedZones.Add("zone_ny_1_1");
+            narrationSession.CompletedZones.Add("zone_ny_1_2");
             Object.FindAnyObjectByType<CityMapPageView>()!.ChaptersButton.onClick.Invoke();
             yield return CaptureSettled("91-chapitres");
+            Object.FindAnyObjectByType<ChaptersPageView>()!.SideRows[0].Buttons[0].Button.onClick.Invoke();
+            yield return CaptureSettled("91b-chapitres-souvenir");
+            // Repaire : Brooklyn terminé, Brick déjà vaincu ; le bouton REPAIRE du bandeau ouvre la page, puis ENTRER demande confirmation.
+            narrationSession.CompletedZones.Add("zone_ny_1_3");
+            narrationSession.CompletedZones.Add("zone_ny_1_4");
+            N29.HeroesDawn.Application.Features.World.LairBook.RecordBossDefeat(narrationSession.Meta, "zone_lair_amif_vault", "n04");
+            Object.FindAnyObjectByType<ChaptersPageView>()!.HeaderButtonA.Button.onClick.Invoke();
+            yield return CaptureSettled("91c-repaire");
+            Object.FindAnyObjectByType<LairPageView>()!.HeaderButtonA.Button.onClick.Invoke();
+            yield return CaptureSettled("91d-repaire-confirmation");
+            Shell.BackButton.Button.onClick.Invoke(); // ferme la confirmation
+            yield return null;
+            Shell.BackButton.Button.onClick.Invoke(); // repaire → chapitres
+            yield return null;
             Shell.BackButton.Button.onClick.Invoke();
             yield return null;
             Shell.BackButton.Button.onClick.Invoke();
@@ -218,6 +257,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 var view = host.Spawn<IMiniGame2DPopupView>();
                 var task = view.PlayAsync(request, default);
                 var popup = (MiniGame2DPopupView)view;
+                if (id == "dna_lab" || id == "rescue_tool") { yield return new WaitForSecondsRealtime(0.5f); yield return Capture("103-minijeu-intro-" + id); }
                 popup.Input.PressAt(new Vector2(0.5f, 0.5f));
                 yield return null;
                 popup.Input.ReleaseNow();
