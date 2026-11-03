@@ -29,6 +29,25 @@ namespace N29.HeroesDawn.Presentation.Common
             d["chapter.heading"] = "CHAPITRE {0} · {1}";
             d["chapter.continue"] = "CONTINUER";
 
+            // Fragments de souvenirs (L11) : récits courts gagnés en validant une zone, relus depuis la page Chapitres.
+            d["fragments.title"] = "SOUVENIRS · {0} ({1} / {2})";
+            d["fragments.none"] = "Ce chapitre ne contient pas encore de souvenir.";
+            d["fragments.locked"] = "Souvenir verrouillé";
+            d["fragments.unlock"] = "Valide : {0}";
+            d["fragments.read"] = "LIRE";
+            d["fragments.close"] = "FERMER";
+            d["fragments.new"] = "{0} NOUVEAU";
+            d["fragments.audio"] = "Voix disponible";
+            d["fragments.no_audio"] = "Audio à venir.";
+            d["fragment.redhook_docks.title"] = "La nuit des quais";
+            d["fragment.redhook_docks.text"] = "Les conteneurs de Red Hook n'ont jamais été vides. Cette nuit-là, les dockers regardaient ailleurs et les camions de l'AMIF sont repartis sans un bruit. C'est en voyant les mêmes plaques des deux côtés de la grille que l'Aube a compris qui se parlait vraiment, derrière la guerre affichée.";
+            d["fragment.brownsville_hostages.title"] = "Les otages de Brownsville";
+            d["fragment.brownsville_hostages.text"] = "Ils étaient onze, dans une cave sans fenêtre, et ils ne demandaient pas qu'on les sauve : ils demandaient qu'on se taise. Le gang les gardait pour que l'AMIF puisse « les retrouver » en héros. L'Aube a choisi de ne pas faire partie de la mise en scène.";
+            d["fragment.coney_trap.title"] = "Le piège de Coney Island";
+            d["fragment.coney_trap.text"] = "La grande roue tournait pour personne. Tout avait été préparé pour que l'équipe entre par le mauvais côté : une porte ouverte, une lumière allumée, un message laissé exprès. On ne se méfie jamais assez d'un chemin trop facile.";
+            d["fragment.dumbo_bridge.title"] = "Le pont de Dumbo";
+            d["fragment.dumbo_bridge.text"] = "De l'autre côté du pont, Manhattan brillait comme si rien ne s'était passé. Brooklyn était derrière eux, et ils savaient que chaque victoire avait été vue, comptée, archivée. Le prochain pas ne se ferait plus dans l'ombre.";
+
             d["chapter.ny_brooklyn.title"] = "Brooklyn";
             d["chapter.ny_brooklyn.intro"] = "Red Hook, Gowanus, Dumbo : Brooklyn est le premier front. L'AMIF et les gangs, qui prétendent se combattre, se partagent la ville en secret. L'Aube y fait ses preuves, mais chaque succès attire un peu plus l'attention de l'AMIF.";
             d["chapter.ny_queens.title"] = "Queens";

@@ -206,6 +206,9 @@ namespace N29.HeroesDawn.Application.Ports
         // Narration (lot G) : chapitres dont l'ouverture a été montrée
         public List<string> chaptersSeen = new List<string>();
 
+        /// <summary>Fragments de souvenirs déjà lus (voir <see cref="N29.HeroesDawn.Definitions.MemoryFragments"/>).</summary>
+        public List<string> fragmentsRead = new List<string>();
+
         /// <summary>Entrées en combat déjà vues (clé : les ennemis de l'affrontement) ; une introduction répétée est abrégée.</summary>
         public List<string> seenIntros = new List<string>();
 
