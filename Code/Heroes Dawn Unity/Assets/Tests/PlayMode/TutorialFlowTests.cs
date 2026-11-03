@@ -111,7 +111,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.ZoneCompletePopupView>()!.ToHqButton.onClick.Invoke();
             // 3. Progression : l'agent gratuit a rejoint l'équipe, on apprend l'entraînement et l'équipement.
             yield return WaitStep(TutorialStep.OpenTeam);
-            Assert.That(session.Roster.Count, Is.EqualTo(2), "la recrue du départ et l'agent gratuit");
+            Assert.That(session.Roster.Count, Is.EqualTo(session.Content.StarterTeam.Count + 1), "les trois recrues de départ et l'agent gratuit");
             Assert.That(session.CompletedZones, Is.Empty, "le niveau tutoriel ne compte pas dans la progression");
             Assert.That(Overlay.FrameSprite, Is.SameAs(N29.HeroesDawn.Presentation.Common.Sprites.PanelFrame), "la mise en valeur est un rectangle à coins coupés, pas un rond");
             Object.FindAnyObjectByType<HubShellView>()!.TabButton(HubPage.Team).Button.onClick.Invoke();
