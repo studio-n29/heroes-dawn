@@ -41,7 +41,13 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
     public sealed class FakeDialogueBox : FakePopup, N29.HeroesDawn.Presentation.Narration.IDialogueBoxView
     {
         public readonly System.Collections.Generic.List<N29.HeroesDawn.Presentation.Narration.DialogueBoxLine> Played = new System.Collections.Generic.List<N29.HeroesDawn.Presentation.Narration.DialogueBoxLine>();
-        public UniTask PlayAsync(System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Presentation.Narration.DialogueBoxLine> lines, CancellationToken ct) { Played.AddRange(lines); return UniTask.CompletedTask; }
+        public event System.Action<N29.HeroesDawn.Presentation.Narration.DialogueBoxLine>? LineShown;
+        public UniTask PlayAsync(System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Presentation.Narration.DialogueBoxLine> lines, CancellationToken ct)
+        {
+            Played.AddRange(lines);
+            foreach (var l in lines) LineShown?.Invoke(l);
+            return UniTask.CompletedTask;
+        }
     }
 
     public sealed class FakeDialoguePopup : FakePopup, IDialoguePopupView

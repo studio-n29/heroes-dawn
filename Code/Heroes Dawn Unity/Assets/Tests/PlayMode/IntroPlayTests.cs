@@ -64,13 +64,13 @@ namespace N29.HeroesDawn.Tests.PlayMode
             while (video.frame < 0 && Time.realtimeSinceStartup < deadline) yield return null;
             Assert.That(video.frame, Is.GreaterThanOrEqualTo(0), "une image vidéo doit être décodée avant de quitter le noir");
             Assert.That(video.targetTexture.IsCreated(), Is.True);
-            float duration = CinematicVideoSequence.ShotDurationForVideo(video.length, CinematicVideoSequence.Steps[0].Seconds);
-            Assert.That(video.playbackSpeed, Is.EqualTo(CinematicVideoSequence.PlaybackSpeedForDuration(video.length, duration)).Within(0.001f), "la vidéo entière doit couvrir la durée du plan");
+            Assert.That(CinematicVideoSequence.Launch[0].Cut, Is.True, "le lancement joue le montage court");
+            Assert.That(video.playbackSpeed, Is.EqualTo(1f).Within(0.001f), "un plan de montage est joué à vitesse normale et coupé à sa durée");
             yield return new WaitForSecondsRealtime(1f);
             var fader = intro.Player.transform.Find("Fondu").GetComponent<UnityEngine.UI.Image>();
             Assert.That(fader.color.a, Is.LessThan(0.05f), "le voile noir doit révéler la vidéo");
             Assert.That(intro.Player.transform.Find("SousTitres").GetComponent<TMPro.TMP_Text>().text,
-                Is.EqualTo(CinematicVideoSequence.Steps[0].Caption));
+                Is.EqualTo(""), "le montage de lancement n'a aucun texte");
             intro.SkipButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<LoginView>());
             Assert.That(PlayModeHarness.Visible<LoginView>(), Is.True);
@@ -104,7 +104,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Cinematic);
             var player = intro.Player;
             yield return PlayModeHarness.WaitFor(() => player.CurrentShot >= 0, 600);
-            var steps = CinematicVideoSequence.Steps;
+            var steps = CinematicVideoSequence.Launch;
             for (int shot = 0; shot < steps.Count; shot++)
             {
                 // Avance de pas en pas par des touchers, puis laisse vivre le pas 2,4 s avant de le photographier.

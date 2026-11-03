@@ -83,11 +83,11 @@ namespace N29.HeroesDawn.Presentation.Login
 
         // ------------------------------------------------------------------ Cinématique
 
-        public async UniTask PlayCinematicAsync(IntroCinematicTexts texts, Action<float>? mainTheme, CancellationToken ct)
+        public async UniTask PlayCinematicAsync(IntroCinematicTexts texts, Action<float>? mainTheme, CancellationToken ct, CinematicKind kind = CinematicKind.Launch, Action<string>? voiceCue = null)
         {
             skip.SetLabel(texts.Skip);
             SetStage(Stage.Cinematic);
-            await player.PlayAsync(mainTheme, ct);
+            await player.PlayAsync(mainTheme, ct, kind == CinematicKind.Full ? CinematicVideoSequence.Steps : CinematicVideoSequence.Launch, voiceCue);
         }
 
         // ------------------------------------------------------------------ Personnage

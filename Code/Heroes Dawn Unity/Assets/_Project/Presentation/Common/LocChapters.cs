@@ -50,6 +50,7 @@ namespace N29.HeroesDawn.Presentation.Common
 
             // Repaire (L12) : donjon à trois boss, page Repaire et zone « repaire de l'AMIF ».
             d["chapters.lair"] = "REPAIRE";
+            d["chapters.cinematic"] = "CINÉMATIQUE";
             d["page.lair"] = "Repaire";
             d["lair.title"] = "REPAIRE";
             d["lair.line"] = "{0} · {1} / {2} boss vaincus · terminé {3} fois";

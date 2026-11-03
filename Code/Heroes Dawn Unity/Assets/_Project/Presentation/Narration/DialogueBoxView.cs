@@ -54,6 +54,8 @@ namespace N29.HeroesDawn.Presentation.Narration
         /// <summary>« 2 / 5 » : la réplique affichée sur le total (tests).</summary>
         public string Progress => progress.text;
 
+        public event System.Action<DialogueBoxLine>? LineShown;
+
         public async UniTask PlayAsync(IReadOnlyList<DialogueBoxLine> lines, CancellationToken ct)
         {
             group.alpha = 0f;
@@ -69,6 +71,7 @@ namespace N29.HeroesDawn.Presentation.Narration
                 index++;
                 progress.text = index + " / " + lines.Count;
                 Show(line);
+                LineShown?.Invoke(line);
                 Tween.PopIn(bubble, 0.2f);
                 Tween.PopIn(avatarRoot, 0.3f);
                 var advance = new UniTaskCompletionSource();

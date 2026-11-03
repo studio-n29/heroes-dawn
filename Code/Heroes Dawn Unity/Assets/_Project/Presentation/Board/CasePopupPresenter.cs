@@ -36,12 +36,14 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly IToastService _toasts;
         readonly ILocalization _loc;
         readonly IAudioService _audio;
+        readonly IVoicePlayer? _voice;
 
         public CasePopupPresenter(IModalService modals, IResolveRestUseCase rest, IResolveNarrativeUseCase narrative, IPlanActivityUseCase plan, IResolveActivityUseCase activity,
-                                  ISessionReadModel session, IToastService toasts, ILocalization loc, IAudioService? audio = null)
+                                  ISessionReadModel session, IToastService toasts, ILocalization loc, IAudioService? audio = null, IVoicePlayer? voice = null)
         {
             _modals = modals; _rest = rest; _narrative = narrative; _plan = plan; _activity = activity; _session = session; _toasts = toasts; _loc = loc;
             _audio = audio ?? NullAudioService.Instance;
+            _voice = voice;
         }
 
         /// <summary>Joue la case ; liste vide si elle n'est pas interactive ou si sa résolution échoue.</summary>
@@ -350,8 +352,10 @@ namespace N29.HeroesDawn.Presentation.Board
             var lines = NarrationLines.Build(e, _session.Content, _loc);
             if (lines.Count == 0) return;
             var view = await _modals.OpenAsync<IDialogueBoxView>(ct);
+            void Voice(DialogueBoxLine l) => _voice?.Play(l.VoiceKey);
+            view.LineShown += Voice;
             try { await view.PlayAsync(lines, ct); }
-            finally { _modals.Close(view); }
+            finally { view.LineShown -= Voice; _voice?.Stop(); _modals.Close(view); }
         }
 
         /// <summary>Écran « zone sécurisée » : récompenses, puis attend « Vers le QG ».</summary>

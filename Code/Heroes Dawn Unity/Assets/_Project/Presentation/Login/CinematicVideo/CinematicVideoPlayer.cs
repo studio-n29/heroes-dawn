@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -46,6 +47,9 @@ namespace N29.HeroesDawn.Presentation.Login
         RenderTexture? _texture;
         Coroutine? _run;
         Action<float>? _mainTheme;
+        IReadOnlyList<CinematicVideoStep> _steps = CinematicVideoSequence.Steps;
+        Action<string>? _voiceCue;
+        int _cueIndex;
         bool _skipStep;
         bool _skipAll;
         bool _videoError;
@@ -77,6 +81,7 @@ namespace N29.HeroesDawn.Presentation.Login
             if (IsPlaying && _activeStep != null)
             {
                 _subtitle.text = _activeStep.CaptionAt(Time.realtimeSinceStartup - _shotStartedAt);
+                AnnounceCue(Time.realtimeSinceStartup - _shotStartedAt);
                 // Continue a subtle camera drift over the held last frame instead of
                 // stretching a 24 fps clip into a visibly stepped slow-motion clip.
                 float progress = Mathf.Clamp01((Time.realtimeSinceStartup - _shotStartedAt) / _activeStep.Seconds);
@@ -85,6 +90,17 @@ namespace N29.HeroesDawn.Presentation.Login
             }
             // Do not leave a dark patch over the picture while a shot is loading.
             _subtitleShade.enabled = !string.IsNullOrEmpty(_subtitle.text);
+        }
+
+        /// <summary>Annonce la voix de la réplique qui commence (une seule fois par réplique) ; sans fichier, le sous-titre suffit.</summary>
+        void AnnounceCue(float seconds)
+        {
+            if (_voiceCue == null || _activeStep == null) return;
+            int index = -1;
+            for (int i = 0; i < _activeStep.Cues.Count; i++) if (seconds >= _activeStep.Cues[i].At) index = i;
+            if (index < 0 || index == _cueIndex) return;
+            _cueIndex = index;
+            _voiceCue(CinematicVideoSequence.VoiceKey(_activeStep, index));
         }
 
         void OnDestroy()
@@ -103,18 +119,20 @@ namespace N29.HeroesDawn.Presentation.Login
         }
 
         /// <summary>Lance la cinématique depuis le début. <paramref name="mainTheme"/> règle le thème principal (0 coupé, 1 plein). Sans effet si elle joue déjà.</summary>
-        public void Play(Action<float>? mainTheme)
+        public void Play(Action<float>? mainTheme, IReadOnlyList<CinematicVideoStep>? steps = null, Action<string>? voiceCue = null)
         {
             if (IsPlaying) return;
             IsPlaying = true;
             _mainTheme = mainTheme;
+            _steps = steps ?? CinematicVideoSequence.Steps;
+            _voiceCue = voiceCue;
             _run = StartCoroutine(Run());
         }
 
         /// <summary>Joue la cinématique jusqu'à sa fin ou jusqu'à « Passer ». Si <paramref name="ct"/> est annulé, elle est arrêtée.</summary>
-        public async UniTask PlayAsync(Action<float>? mainTheme, CancellationToken ct)
+        public async UniTask PlayAsync(Action<float>? mainTheme, CancellationToken ct, IReadOnlyList<CinematicVideoStep>? steps = null, Action<string>? voiceCue = null)
         {
-            Play(mainTheme);
+            Play(mainTheme, steps, voiceCue);
             try
             {
                 await UniTask.WaitUntil(() => !IsPlaying, cancellationToken: ct);
@@ -159,7 +177,7 @@ namespace N29.HeroesDawn.Presentation.Login
             SetFade(1f);
             _mainTheme?.Invoke(1f);
 
-            var steps = CinematicVideoSequence.Steps;
+            var steps = _steps;
             for (int i = 0; i < steps.Count && !_skipAll; i++)
             {
                 CurrentShot = i;
@@ -232,9 +250,10 @@ namespace N29.HeroesDawn.Presentation.Login
                 yield break;
             }
 
-            float shotDuration = CinematicVideoSequence.ShotDurationForVideo(_video.length, step.Seconds);
-            float fadeDuration = Mathf.Clamp(fadeSeconds, 0f, shotDuration / 2f);
-            if (_video.canSetPlaybackSpeed)
+            // Un plan de montage est coupé à sa durée ; un plan de la version longue garde au moins la durée de sa vidéo.
+            float shotDuration = step.Cut ? step.Seconds : CinematicVideoSequence.ShotDurationForVideo(_video.length, step.Seconds);
+            float fadeDuration = step.Cut ? Mathf.Min(CinematicVideoSequence.LaunchDissolveSeconds, shotDuration / 2f) : Mathf.Clamp(fadeSeconds, 0f, shotDuration / 2f);
+            if (_video.canSetPlaybackSpeed && !step.Cut)
                 _video.playbackSpeed = CinematicVideoSequence.PlaybackSpeedForDuration(_video.length, shotDuration);
             _video.Play();
             waited = 0f;
@@ -252,6 +271,7 @@ namespace N29.HeroesDawn.Presentation.Login
             _video.Pause();
             _activeStep = step;
             _shotStartedAt = Time.realtimeSinceStartup;
+            _cueIndex = -1;
             _picture.uvRect = new Rect(0f, 0f, 1f, 1f);
             _subtitle.text = step.Caption ?? "";
 

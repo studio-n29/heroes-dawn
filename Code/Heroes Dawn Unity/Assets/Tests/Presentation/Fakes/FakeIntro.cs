@@ -16,9 +16,10 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public System.Action<float>? MainTheme { get; private set; }
         public ChooseCharacterData? Character { get; private set; }
 
-        public UniTask PlayCinematicAsync(IntroCinematicTexts texts, System.Action<float>? mainTheme, CancellationToken ct)
+        public CinematicKind? Kind { get; private set; }
+        public UniTask PlayCinematicAsync(IntroCinematicTexts texts, System.Action<float>? mainTheme, CancellationToken ct, CinematicKind kind = CinematicKind.Launch, System.Action<string>? voiceCue = null)
         {
-            MainTheme = mainTheme;
+            MainTheme = mainTheme; Kind = kind;
             _cinematic = new UniTaskCompletionSource();
             return _cinematic.Task;
         }
