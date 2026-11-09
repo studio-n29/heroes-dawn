@@ -121,6 +121,16 @@ Au début du jeu, le joueur choisit **Agent D** ou **Agent M**. Ce choix déterm
 
 Répartition des agents par zone : Paris 10, New York 10 (+ Agent D), Moscou 10 (+ Agent M), Salem 10 cryptides.
 
+## 10. Décisions narratives du 2026-11-09
+
+La bible `08_Bible_Narrative.md` et les fichiers `09` à `12` précisent et **remplacent** certains passages ci-dessus :
+
+- **Paris** : ville démolie (soldats, scientifiques, civils), sans cultes de Mephisto ni d'Eda. Remplace « la ville se reconstruit » et la mention des cultes aux sections 2, 3 et 5.
+- **Cabale** : nouvelle faction, l'ancienne X Society, présente à Salem.
+- **Rayner** : alliée sincère, prise entre l'AMIF et la Cabale (répond à la question ouverte de la section 7).
+- **Cryptides** : ennemis puis recrutables après N29 *(à valider)*.
+- **Salem** : zone en 4 chapitres, comme les autres villes.
+
 ## 9. Points à valider (relevés à l'import du 2026-10-22)
 
 - **Titre des agents** : « 40 agents, 4 zones » = 30 agents numérotés + 10 cryptides, hors les 2 personnages joueurs.
