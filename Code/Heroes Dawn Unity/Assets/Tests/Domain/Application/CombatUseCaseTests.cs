@@ -74,6 +74,29 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Run!.IsSpent(new CaseId("n03")));
         }
 
+        [Test, Description("Vérifie qu'une victoire Facile donne l'EXP du rang à chaque agent engagé (cumulée sur le membre et sauvegardée) et qu'une défaite n'en donne pas — parce que l'EXP récompense les combats gagnés")]
+        public void Finish_Victory_GrantsXp_DefeatDoesNot_AndItPersists()
+        {
+            var lost = BeginEasyCombat();
+            lost.Submit(CombatCommand.Retreat());
+            RunToEnd(lost);
+            var defeat = C.Finish.ExecuteAsync().GetAwaiter().GetResult().Value;
+            Assert.That(defeat.Fatigue.All(f => f.XpGain == 0));
+
+            var won = BeginEasyCombat();
+            Assert.That(C.ForceWin.ExecuteAsync().GetAwaiter().GetResult().IsSuccess);
+            RunToEnd(won);
+            var victory = C.Finish.ExecuteAsync().GetAwaiter().GetResult().Value;
+            Assert.That(victory.Fatigue.Count, Is.GreaterThan(0));
+            Assert.That(victory.Fatigue.All(f => f.XpGain == MetaRules.XpEasy && f.XpTotal == MetaRules.XpEasy));
+            var first = victory.Fatigue[0].Member;
+            Assert.That(_app.Session.Roster.First(m => m.Id == first).Xp, Is.EqualTo(MetaRules.XpEasy));
+
+            var restored = new GameSession(TestContent.Build());
+            restored.ApplyProfile(UnityEngine.JsonUtility.FromJson<N29.HeroesDawn.Application.Ports.ProfileData>(UnityEngine.JsonUtility.ToJson(_app.Session.ToProfile(DateTime.UtcNow))));
+            Assert.That(restored.Roster.First(m => m.Id == first).Xp, Is.EqualTo(MetaRules.XpEasy));
+        }
+
         [Test, Description("Vérifie qu une victoire ajoute une victoire commune à chaque paire d agents engagés et qu une défaite n en ajoute pas — parce que le lien se gagne en gagnant ensemble")]
         public void Finish_Victory_ProgressesTheLinks_DefeatDoesNot()
         {

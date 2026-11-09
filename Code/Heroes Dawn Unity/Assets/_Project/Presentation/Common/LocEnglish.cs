@@ -12,6 +12,13 @@ namespace N29.HeroesDawn.Presentation.Common
         static readonly Dictionary<string, string> En = new Dictionary<string, string>
         {
             // --- Général ---
+            ["booster.next"] = "NEXT",
+            ["lab.mode.craft"] = "CRAFTING",
+            ["lab.mode.research"] = "RESEARCH",
+            ["lab.mode.research_hint"] = "Choose a research project. Its cost and duration are shown before starting. Only one project can run at a time.",
+            ["booster.summary"] = "BOOSTER SUMMARY",
+            ["booster.received"] = "{0} cards added to the Grimoire",
+            ["shop.daily_pass"] = "GIFT · PASS",
             ["game.tagline"] = "New York still holds. For how long?",
             ["ui.ok"] = "OK", ["ui.cancel"] = "Cancel", ["ui.confirm"] = "Confirm", ["ui.continue"] = "Continue",
             ["ui.close"] = "Close", ["ui.back"] = "Back", ["ui.credits"] = "Credits",

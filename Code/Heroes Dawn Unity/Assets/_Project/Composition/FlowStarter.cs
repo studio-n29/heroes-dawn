@@ -32,6 +32,7 @@ namespace N29.HeroesDawn.Composition
             // Boot runs once per application launch, before the Login state is entered.
             while (!UnityEngine.Rendering.SplashScreen.isFinished)
                 await UniTask.Yield(ct);
+            if (!N29.HeroesDawn.Presentation.Login.CinematicSwitch.Enabled) { _flow.Start(); return; }
             var view = await _modals.OpenAsync<IIntroPopupView>(ct);
             try
             {

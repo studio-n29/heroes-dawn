@@ -75,3 +75,7 @@ La direction « Secret Wars » ci-dessus est remplacée pour l'interface par un 
 - **Doublage partiel** : répliques courtes en combat (Légendes, PNJ principaux, Héraut). Dialogues en texte.
 - **SFX** : banques sous licence ; signature sonore par famille.
 - Voix : en anglais au lancement (sous-titres dans les 5 langues).
+
+## Direction intégrée : Aube tactique (4 novembre 2026)
+
+Direction choisie par l'utilisateur pour l'ensemble de l'UI. Elle remplace les variantes pastel et Mo.Co : marine encre, ivoire d'action, accents laiton, étoile The Dawn, panneaux mats à filet fin et coin coupé. Typographie sans contour, Barlow à chasse normale pour les textes et Barlow Condensed pour les titres. La charte de référence et la commande Unity de reconstruction sont décrites dans `Code/docs/specs/2026-11-04-aube-tactique-ui.md`. Les couleurs de famille restent distinctes des effets illustrés et les interactions du jeu sont conservées.

@@ -29,6 +29,9 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UiButton recruit = null!;
         [SerializeField] TMP_Text inTeam = null!;
         [SerializeField] CanvasGroup body = null!;
+        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] Image? bigArt;
+        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] Image? familyBadge;
+        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] Image? selection;
 
         bool _shown;
         bool _wasInTeam;
@@ -38,6 +41,10 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public Button RecruitButton => recruit.Button;
         public Button TapButton => tap;
+        /// <summary>Dernier état affiché (alimente la fiche de droite de la page).</summary>
+        public RecruitCardState State { get; private set; }
+
+        public void SetSelected(bool on) { if (selection != null && selection.gameObject.activeSelf != on) selection.gameObject.SetActive(on); }
 
         void Awake()
         {
@@ -55,6 +62,15 @@ namespace N29.HeroesDawn.Presentation.Hub
             ((RectTransform)halo.transform).anchoredPosition = card.anchoredPosition; // le halo suit la carte surélevée
             strip.color = Theme.FamilyColor(d.Card.Family);
             portrait.Show(d.Card.Portrait);
+            State = d;
+            if (familyBadge != null) familyBadge.color = Theme.FamilyColor(d.Card.Family);
+            if (bigArt != null)
+            {
+                var art = d.Card.Portrait.Art;
+                bigArt.gameObject.SetActive(art != null);
+                portrait.gameObject.SetActive(art == null);
+                if (art != null) { bigArt.sprite = art; Cover(bigArt, art); }
+            }
             memberName.text = d.Card.Name;
             rarity.text = d.Card.RarityText;
             rarity.color = color;
@@ -62,7 +78,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             stats.text = d.Card.Stats;
             skills.text = d.Card.Skills;
             recruit.SetLabel(d.PriceLabel);
-            recruit.SetColors(d.Affordable ? Theme.Pr : Theme.Surface3, d.Affordable ? Theme.TextDark : Theme.Text);
+            recruit.SetColors(d.Affordable ? Theme.Primary : Theme.Surface3, d.Affordable ? Theme.TextDark : Theme.Text);
             recruit.Interactable = !d.InTeam;
             if (recruit.gameObject.activeSelf == d.InTeam) recruit.gameObject.SetActive(!d.InTeam);
             inTeam.text = d.InTeamText;
@@ -77,6 +93,19 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             _wasInTeam = d.InTeam;
             _shown = true;
+        }
+
+        /// <summary>Illustration pleine carte : couvre toute la zone, ancrée vers le haut où se trouve le visage.</summary>
+        static void Cover(Image image, Sprite art)
+        {
+            var area = ((RectTransform)image.transform.parent).rect.size;
+            if (area.x < 1f || area.y < 1f) area = new Vector2(288f, 508f);
+            float scale = Mathf.Max(area.x / art.rect.width, area.y / art.rect.height);
+            var size = new Vector2(art.rect.width * scale, art.rect.height * scale);
+            var rect = image.rectTransform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = size;
+            rect.anchoredPosition = new Vector2(0f, -(size.y - area.y) * 0.4f);
         }
 
         /// <summary>Nouvelle offre dans cet emplacement (renouvellement) : l'état « recruté » repart de zéro.</summary>

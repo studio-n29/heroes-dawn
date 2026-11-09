@@ -561,6 +561,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                     Visible = true,
                     Label = "[" + (i + 1) + "] " + name,
                     Description = _loc.DescribeSkill(s, u.Atk, u.MaxHp),
+                    ArtKey = s.Id.Value,
                     Glyph = string.IsNullOrEmpty(name) ? "?" : name.Substring(0, 1).ToUpperInvariant(),
                     Cost = s.Cost,
                     Affordable = u.Energy >= s.Cost,
@@ -799,6 +800,18 @@ namespace N29.HeroesDawn.Presentation.Combat
                         Label = f.Before + " % → " + f.After + " %",
                         Delta = "+" + (f.After - f.Before) + " %",
                     }).ToArray(),
+                    XpTitle = _loc.T("combat.xp"),
+                    Xp = report.Victory
+                        ? report.Fatigue.Where(f => f.XpGain > 0).Select(f => new FatigueRowData
+                        {
+                            Name = _loc.MemberName(content.Member(f.Member)),
+                            Before01 = (f.XpTotal - f.XpGain) % MetaRules.XpBar / (float)MetaRules.XpBar,
+                            After01 = f.XpTotal % MetaRules.XpBar / (float)MetaRules.XpBar,
+                            After = 0,
+                            Label = _loc.F("combat.xp_total", f.XpTotal),
+                            Delta = _loc.F("combat.xp_gain", f.XpGain),
+                        }).ToArray()
+                        : System.Array.Empty<FatigueRowData>(),
                     Verify = _loc.T("combat.verify.pending"),
                     ToHq = report.ReturnedToHq ? _loc.T("combat.to_hq") : "",
                     Continue = _loc.T("ui.continue"),

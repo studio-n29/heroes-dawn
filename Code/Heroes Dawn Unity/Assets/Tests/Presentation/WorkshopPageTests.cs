@@ -15,7 +15,7 @@ namespace N29.HeroesDawn.Tests.Presentation
     public sealed class WorkshopPageTests
     {
         // 4 recherches, un titre d'atelier, 4 compétences, puis les recettes connues.
-        const int FirstRecipeRow = 4 + 1 + 4;
+        const int FirstRecipeRow = 0;
 
         TestApp _app = null!;
         FakeListView _view = null!;
@@ -40,15 +40,19 @@ namespace N29.HeroesDawn.Tests.Presentation
             return p;
         }
 
-        [Test, Description("Vérifie que la page du labo montre, après les 4 recherches, un titre d'atelier, 4 compétences et les 4 recettes de départ — parce que la fabrication vit sur la page du labo")]
-        public void LabPage_ShowsTheWorkshopRowsAfterTheTechs()
+        [Test, Description("Les recettes sont proposées en premier ; les recherches ont un mode distinct et les compétences de création restent consultables")]
+        public void LabPage_ShowsRecipesFirst_AndResearchInSeparateMode()
         {
             var p = Lab();
-            Assert.That(_view.Rows.Length, Is.EqualTo(FirstRecipeRow + 4));
+            Assert.That(_view.Rows.Length, Is.EqualTo(9));
             Assert.That(_view.Rows[4].Title, Is.EqualTo(_loc.T("lab.workshop")));
             Assert.That(_view.Rows[FirstRecipeRow].Title, Is.EqualTo(_loc.T("craft.recipe.scrap_blade")));
             Assert.That(_view.Rows[5].Title, Does.Contain(CollectionText.ItemTypeName(_loc, ItemType.Weapon)));
             Assert.That(_view.Rows[5].Title, Does.Contain("1/10"));
+            _view.ClickHeader(1);
+            Assert.That(_view.Rows.Length, Is.EqualTo(ResearchLab.Techs.Count));
+            _view.ClickHeader(1);
+            Assert.That(_view.Rows[0].Title, Is.EqualTo(_loc.T("craft.recipe.scrap_blade")));
             p.Dispose();
         }
 

@@ -63,6 +63,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         }
 
         [Test, Description("Vérifie que chaque vidéo du nouveau montage existe avec la casse utilisée sur mobile")]
+        [Ignore("Cinématique retirée du jeu pour l'instant (CinematicSwitch.Enabled)")]
         public void EverySelectedVideo_Exists()
         {
             foreach (var step in CinematicVideoSequence.Steps)

@@ -40,7 +40,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             potion.IngredientButton(recipe.Steps[2 % recipe.Steps.Count].Ingredient).onClick.Invoke();
             potion.BrewButton.onClick.Invoke();
             yield return ScreenCaptureTests.Capture("07b-potion-retour");
-            Assert.That(System.IO.File.Exists(System.IO.Path.GetFullPath(System.IO.Path.Combine(UnityEngine.Application.dataPath, "../../docs/test-reports/captures/07b-potion-retour.png"))));
+            Assert.That(System.IO.File.Exists(System.IO.Path.Combine(ScreenCaptureTests.Folder, "07b-potion-retour.png")));
         }
 
         [UnityTest, Explicit("Captures à la demande"), Timeout(240000), Description("Produit la capture du dialogue des quais (réplique et trois ou quatre réponses) — parce que la mise en page des textes se relit à l'œil")]
@@ -52,7 +52,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var dialogue = ActivityGamesPlayTests.Find<DialoguePopupView>();
             yield return PlayModeHarness.WaitFor(() => dialogue.ChoiceButtons > 0);
             yield return ScreenCaptureTests.Capture("08-dialogue");
-            Assert.That(System.IO.File.Exists(System.IO.Path.GetFullPath(System.IO.Path.Combine(UnityEngine.Application.dataPath, "../../docs/test-reports/captures/08-dialogue.png"))));
+            Assert.That(System.IO.File.Exists(System.IO.Path.Combine(ScreenCaptureTests.Folder, "08-dialogue.png")));
         }
 
         [UnityTest, Explicit("Captures à la demande"), Timeout(400000), Description("Produit les captures de la survie en neige, de la pêche et de l'arène en cours de partie (3D) — parce que le rendu des primitives plates et le HUD se relisent à l'œil")]
@@ -88,7 +88,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 ActivityGamesPlayTests.Find<StageGameView>().Driver?.Abandon();
                 while (result == null && run.MoveNext()) yield return run.Current;
             }
-            Assert.That(System.IO.File.Exists(System.IO.Path.GetFullPath(System.IO.Path.Combine(UnityEngine.Application.dataPath, "../../docs/test-reports/captures/11-arene.png"))));
+            Assert.That(System.IO.File.Exists(System.IO.Path.Combine(ScreenCaptureTests.Folder, "11-arene.png")));
         }
     }
 }
+

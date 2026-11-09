@@ -55,7 +55,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             var p = Lab();
             var recipes = _app.Workshop.Recipes();
-            int firstRecipe = _view.Rows.Length - recipes.Count;
+            int firstRecipe = System.Array.FindIndex(_view.Rows, r => r.Title == _loc.T(recipes[0].Recipe.NameKey));
             _view.SelectRow(firstRecipe);
             var type = recipes[0].Recipe.Type;
             var craft = _view.Side.Rows.Last();

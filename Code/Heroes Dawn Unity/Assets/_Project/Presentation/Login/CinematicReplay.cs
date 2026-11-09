@@ -25,6 +25,7 @@ namespace N29.HeroesDawn.Presentation.Login
         /// <summary>Joue la version longue ; se termine à la fin, à « Passer » ou à l'annulation.</summary>
         public async UniTask PlayFullAsync(CancellationToken ct)
         {
+            if (!CinematicSwitch.Enabled) return;
             var before = _audio?.CurrentMusic ?? MusicId.None;
             var view = await _modals.OpenAsync<IIntroPopupView>(ct);
             try
@@ -42,5 +43,14 @@ namespace N29.HeroesDawn.Presentation.Login
                 if (before != MusicId.None) _audio?.PlayMusic(before, 1f, true);
             }
         }
+    }
+}
+
+namespace N29.HeroesDawn.Presentation.Login
+{
+    /// <summary>Interrupteur global : la cinématique est retirée du jeu pour l'instant (lancement et rejeu). Remettre à true pour la réactiver.</summary>
+    public static class CinematicSwitch
+    {
+        public static bool Enabled = false;
     }
 }

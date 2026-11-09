@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>());
             yield return null;
-            Assert.Ignore("Entrée supprimée du QG (retrait du panneau Rayner) : à rebrancher sur le suivi des quêtes.");
+            Object.FindAnyObjectByType<QgPageView>()!.QuestsButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<QuestLogPopupView>() != null);
         }
 
@@ -46,7 +46,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>());
             yield return new WaitForSecondsRealtime(1.2f);
             yield return ScreenCaptureTests.Capture("40-qg-quetes");
-            Assert.Ignore("Entrée supprimée du QG (retrait du panneau Rayner) : à rebrancher sur le suivi des quêtes.");
+            Object.FindAnyObjectByType<QgPageView>()!.QuestsButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<QuestLogPopupView>() != null);
             yield return new WaitForSecondsRealtime(0.8f);
             yield return ScreenCaptureTests.Capture("41-suivi-des-quetes");

@@ -43,6 +43,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         }
 
         [Test, Description("Vérifie que chaque plan du montage vient d'une vidéo de la version longue et que son fichier existe — parce qu'un plan manquant couperait la cinématique de lancement")]
+        [Ignore("Cinématique retirée du jeu pour l'instant (CinematicSwitch.Enabled)")]
         public void LaunchMontage_UsesExistingClips()
         {
             var longVideos = CinematicVideoSequence.Steps.Select(s => s.Video).Concat(new[] { "s46" }).ToHashSet();
@@ -107,6 +108,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         }
 
         [Test, Description("Vérifie que le rejeu de la cinématique ouvre la fenêtre en version longue, relaie la voix de chaque réplique et l'arrête à la fin — parce que la version longue reste accessible depuis le jeu")]
+        [Ignore("Cinématique retirée du jeu pour l'instant (CinematicSwitch.Enabled)")]
         public void Replay_PlaysTheLongVersion_WithVoices()
         {
             var host = new FakeModalHost();
@@ -123,6 +125,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         }
 
         [Test, Description("Vérifie que la page Chapitres propose CINÉMATIQUE et que le bouton lance la version longue — parce que c'est l'accès in-game à la cinématique complète")]
+        [Ignore("Cinématique retirée du jeu pour l'instant (CinematicSwitch.Enabled)")]
         public void ChaptersPage_CinematicButton_PlaysTheLongVersion()
         {
             var app = new TestApp();

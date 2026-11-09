@@ -35,7 +35,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [Tooltip("Zone de la grille, descendue sous la barre de filtres quand elle est visible.")]
         [SerializeField] RectTransform? gridArea;
 
-        const float FilterRowH = 56f, FilterGap = 8f, FilterButtonW = 190f;
+        const float FilterRowH = 96f, FilterGap = 8f, FilterButtonW = 190f;
         readonly List<List<UiButton>> _filterButtons = new List<List<UiButton>>();
         string _filterShape = "";
         float _gridTop;
@@ -109,6 +109,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 row.anchorMin = new Vector2(0, 1); row.anchorMax = new Vector2(1, 1); row.pivot = new Vector2(0.5f, 1);
                 row.sizeDelta = new Vector2(0, FilterRowH);
                 row.anchoredPosition = new Vector2(0, -g * (FilterRowH + FilterGap));
+                var layout = row.HLayout(8, 4, TextAnchor.MiddleLeft);
+                layout.childControlWidth = true;
+                layout.childForceExpandWidth = true;
                 var buttons = new List<UiButton>();
                 for (int o = 0; o < groups[g].Labels.Length; o++)
                 {
@@ -120,6 +123,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                     rt.pivot = new Vector2(0, 0.5f);
                     rt.sizeDelta = new Vector2(FilterButtonW, FilterRowH);
                     rt.anchoredPosition = new Vector2(4 + o * (FilterButtonW + 8), 0);
+                    var element = b.gameObject.GetComponent<LayoutElement>() ?? b.gameObject.AddComponent<LayoutElement>();
+                    element.minWidth = 0; element.preferredWidth = FilterButtonW; element.flexibleWidth = 1; element.preferredHeight = FilterRowH;
                     b.SetLabel(groups[g].Labels[o]);
                     b.Interactable = true;
                     b.DisabledReason = "";
@@ -169,6 +174,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             while (_tiles.Count < _rowOf.Count)
             {
                 var tile = Instantiate(tilePrefab, grid);
+                tile.PortraitFraming = this is AgentsPageView;
                 int index = _tiles.Count;
                 tile.Button.onClick.AddListener(() => Select(index));
                 _tiles.Add(tile);
@@ -203,6 +209,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 detailArt.sprite = row.Value.Art;
                 var fitter = detailArt.GetComponent<AspectRatioFitter>();
                 if (fitter != null) fitter.aspectRatio = row.Value.Art.rect.width / row.Value.Art.rect.height;
+                if (fitter != null) fitter.enabled = !(this is AgentsPageView);
+                if (this is AgentsPageView) PortraitView.FrameFace(detailArt, .4f);
             }
             Apply(0, has ? row!.Value.A : default);
             Apply(1, has ? row!.Value.B : default);
@@ -226,3 +234,5 @@ namespace N29.HeroesDawn.Presentation.Hub
         }
     }
 }
+
+

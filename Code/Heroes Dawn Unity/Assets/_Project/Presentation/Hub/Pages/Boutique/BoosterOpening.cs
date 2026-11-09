@@ -47,9 +47,9 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         /// <summary>Ouvre un booster standard ; faux (et erreur affichée) s'il n'y en a pas en réserve.</summary>
         public static async UniTask<bool> OpenAndShowAsync(CollectionBook book, CollectionDef defs, IModalService modals, ILocalization loc,
-                                                           IToastService toasts, CancellationToken ct, SkillOwnerStats? stats = null)
+                                                           IToastService toasts, CancellationToken ct, SkillOwnerStats? stats = null, string boosterId = BoosterDef.StandardId)
         {
-            var result = book.OpenBoosterDetailed(BoosterDef.StandardId);
+            var result = book.OpenBoosterDetailed(boosterId);
             if (result.IsFailure) { toasts.Show(loc.Error(result.Error!), ToastKind.Error); return false; }
             var view = await modals.OpenAsync<IBoosterOpeningPopupView>(ct);
             try { await view.ShowAsync(Build(defs, result.Value, loc, stats), ct); }

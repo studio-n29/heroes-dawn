@@ -122,6 +122,10 @@ namespace N29.HeroesDawn.Definitions
     {
         /// <summary>Booster ordinaire : gagne en jeu, vendu en boutique.</summary>
         public const string StandardId = "booster_standard";
+        /// <summary>Pack Opération : cinq cartes, vendu en boutique.</summary>
+        public const string OperationId = "booster_operation";
+        /// <summary>Pack Mission : quatre cartes avec davantage de Rares, vendu en boutique.</summary>
+        public const string MissionId = "booster_mission";
         public string Id { get; }
         public string NameKey { get; }
         public int Cards { get; }

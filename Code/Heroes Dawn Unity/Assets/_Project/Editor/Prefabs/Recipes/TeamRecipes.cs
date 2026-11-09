@@ -20,7 +20,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         {
             var fill = RecipeKit.PanelRoot("MemberTile", Theme.Surface, 4f, 6f, true);
             var frame = fill.Frame();
-            frame.sizeDelta = new Vector2(270, 300);
+            frame.sizeDelta = new Vector2(270, 330);
             var tap = frame.gameObject.AddComponent<Button>();
             tap.targetGraphic = fill;
             var nav = tap.navigation;
@@ -30,20 +30,32 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             strip.rectTransform.TopBand(10, 0);
             var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", fill.transform, "Portrait");
             ((RectTransform)portrait.transform).At(0f, 1f, 12, -20, 80, 80);
+            portrait.gameObject.SetActive(false); // remplacé par la grande illustration cadrée sur le visage ; repli : silhouette (voir MemberTileView)
+            var holder = Ui.Rect(fill.transform, "ArtHolder").At(0.5f, 1f, 0, -10, 262, 190);
+            holder.gameObject.AddComponent<RectMask2D>();
+            var bigArt = Ui.Img(holder, "Art", Color.white, null);
+            bigArt.raycastTarget = false;
+            bigArt.gameObject.SetActive(false);
+            var shade = Ui.Img(holder, "Shade", Theme.WithAlpha(Theme.Outline, 0.85f), Sprites.VerticalGradient);
+            shade.raycastTarget = false;
+            shade.rectTransform.BottomBand(90);
+            strip.transform.SetAsLastSibling();
             var name = Ui.Txt(fill.transform, "", 30, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Name");
-            name.rectTransform.At(0f, 1f, 102, -18, 158, 38);
+            name.rectTransform.At(0f, 1f, 16, -142, 238, 38);
             name.AutoSize(30);
             name.Inked(1.5f);
             var level = Ui.Txt(fill.transform, "", 24, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Level");
-            level.rectTransform.At(0f, 1f, 102, -58, 158, 28);
+            level.rectTransform.At(0f, 1f, 16, -176, 84, 28);
             var rarity = Ui.Txt(fill.transform, "", 20, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Body, "Rarity");
-            rarity.rectTransform.At(0f, 1f, 102, -86, 158, 26);
+            rarity.rectTransform.At(0f, 1f, 104, -178, 156, 26);
+            rarity.AutoSize(20);
+            rarity.alignment = TMPro.TextAlignmentOptions.MidlineRight;
             var status = Ui.Txt(fill.transform, "", 22, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Status");
-            status.rectTransform.At(0f, 1f, 14, -112, 242, 30);
+            status.rectTransform.At(0f, 1f, 14, -206, 242, 26);
             var bar = Ui.Bar(fill.transform, "Fatigue", Theme.Success, Theme.SurfaceDark, true, 20);
-            ((RectTransform)bar.transform).At(0f, 1f, 14, -146, 242, 26);
+            ((RectTransform)bar.transform).At(0f, 1f, 14, -236, 242, 24);
             var squad = Ui.Btn(fill.transform, "", Theme.Primary, Theme.TextDark, null!, 30, FontKind.Title, "Squad");
-            squad.Rect.At(0.5f, 0f, 0, 12, 242, 96);
+            squad.Rect.At(0.5f, 0f, 0, 10, 242, 56);
             RecipeKit.Mark(frame, TutorialTarget.TeamTile);
             var view = frame.gameObject.AddComponent<MemberTileView>();
             ctx.Wire(view, "tap", tap);
@@ -56,6 +68,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "status", status);
             ctx.Wire(view, "fatigue", bar);
             ctx.Wire(view, "squad", squad);
+            ctx.Wire(view, "bigArt", bigArt);
             return frame.gameObject;
         }
     }
@@ -98,7 +111,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             gridArea.offsetMax = new Vector2(GridW, -222);
             var grid = Ui.VScroll(gridArea, out _);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(270, 300);
+            layout.cellSize = new Vector2(270, 330);
             layout.spacing = new Vector2(20, 20);
             layout.padding = new RectOffset(2, 2, 4, 16);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
@@ -118,13 +131,16 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var squadRow = Ui.Rect(side.transform, "SquadRow").At(0.5f, 1f, 0, -66, 536, 150);
             squadRow.HLayout(12, 0, TextAnchor.UpperCenter);
             Ui.LocTxt(side.transform, "team.synergies", 28, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "SynergiesTitle").rectTransform.At(0f, 1f, 22, -232, 520, 38);
-            var synergies = Ui.Txt(side.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Synergies");
-            synergies.rectTransform.Stretch(22, 196, 22, 392);
+            var synergyArea = Ui.Rect(side.transform, "SynergyScroll").Stretch(22, 352, 22, 274);
+            var synergyContent = Ui.VScroll(synergyArea, out _);
+            synergyContent.VLayout(8, 0, TextAnchor.UpperLeft);
+            var synergies = Ui.Txt(synergyContent, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Synergies");
+            synergies.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             var none = Ui.LocTxt(side.transform, "team.synergies.none", 22, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "SynergiesNone");
-            none.rectTransform.Stretch(22, 196, 22, 392);
+            none.rectTransform.Stretch(22, 352, 22, 274);
             none.gameObject.SetActive(false);
             // ---- Compositions d equipe : trois emplacements + Sauver
-            var presetRow = Ui.Rect(side.transform, "Presets").At(0.5f, 0f, 0, 176, 536, 96);
+            var presetRow = Ui.Rect(side.transform, "Presets").At(0.5f, 0f, 0, 132, 536, 96);
             presetRow.HLayout(10, 0, TextAnchor.MiddleCenter);
             var presets = new List<Object>();
             for (int i = 0; i < 3; i++)
@@ -135,14 +151,15 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             }
             var presetSave = Ui.Btn(presetRow, "", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "PresetSave");
             presetSave.Rect.Pref(150, 96);
-            var healAll = Ui.Btn(side.transform, "", Theme.Surface3, Theme.Text, null!, 28, FontKind.Title, "HealAll");
-            healAll.Rect.At(0.5f, 0f, 0, 282, 536, 96);
+            var healAll = Ui.Btn(side.transform, "", Theme.Primary, Theme.TextDark, null!, 28, FontKind.Title, "HealAll");
+            healAll.Rect.At(0.5f, 0f, 0, 240, 536, 96);
+            healAll.Label.Inked();
             var hint = Ui.Txt(side.transform, "", 22, Theme.Fatigue, TextAnchor.MiddleCenter, FontKind.Body, "MissionHint");
-            hint.rectTransform.At(0.5f, 0f, 0, 140, 520, 30);
+            hint.rectTransform.At(0.5f, 0f, 0, 96, 520, 30);
             RecipeKit.Mark(side.Frame(), TutorialTarget.TeamSquad);
-            var mission = Ui.LocBtn(side.transform, "team.mission", Theme.Danger, Color.white, null!, 40, FontKind.Title, "Mission");
+            var mission = Ui.LocBtn(side.transform, "team.mission", Theme.Primary, Theme.TextDark, null!, 40, FontKind.Title, "Mission");
             RecipeKit.Mark(mission, TutorialTarget.TeamMission);
-            mission.Rect.At(0.5f, 0f, 0, 18, 520, 112);
+            mission.Rect.At(0.5f, 0f, 0, 0, 520, 96);
             mission.Label.Inked();
 
             var view = rt.gameObject.AddComponent<TeamPageView>();
@@ -196,7 +213,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             // ---- Illustration large, en opacité réduite, derrière toute la fiche
             var wideHolder = Ui.Rect(rt, "WideArt").Stretch();
             wideHolder.gameObject.AddComponent<RectMask2D>();
-            var wide = Ui.Img(wideHolder, "Image", new Color(1f, 1f, 1f, 0.28f), null);
+            var wide = Ui.Img(wideHolder, "Image", new Color(1f, 1f, 1f, 0.12f), null);
             wide.gameObject.AddComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
 
             // ---- Colonne gauche : illustration de l'agent, nom, rareté, rôle, fatigue, flèches

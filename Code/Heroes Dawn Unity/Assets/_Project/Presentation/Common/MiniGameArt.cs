@@ -20,7 +20,7 @@ namespace N29.HeroesDawn.Presentation.Common
         public static Sprite? Background(string kind)
         {
             if (!Cache.TryGetValue(kind, out var sprite))
-                Cache[kind] = sprite = Resources.Load<Sprite>("MiniGames/bg_" + kind);
+                Cache[kind] = sprite = TacticalArt.Load("mini-" + kind) ?? Resources.Load<Sprite>("MiniGames/bg_" + kind);
             return sprite;
         }
 

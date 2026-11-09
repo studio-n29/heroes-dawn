@@ -49,6 +49,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         }
 
         [UnityTest, Timeout(300000), Description("Vérifie que la vidéo affiche une première image avant la connexion et que Passer ouvre le menu")]
+        [Ignore("Cinématique retirée du jeu pour l'instant (CinematicSwitch.Enabled)")]
         public IEnumerator Launch_PlaysBeforeLogin_AndSkipOpensLogin()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway(), skipLaunch: false);

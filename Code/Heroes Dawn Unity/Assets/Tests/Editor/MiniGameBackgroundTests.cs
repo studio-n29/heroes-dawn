@@ -44,8 +44,9 @@ namespace N29.HeroesDawn.Tests.Editor
             {
                 var sprite = MiniGameArt.Background(kind);
                 Assert.That(sprite, Is.Not.Null, kind);
-                Assert.That(sprite!.rect.width, Is.EqualTo(1280f), kind);
-                Assert.That(sprite.rect.height, Is.EqualTo(640f), kind);
+                Assert.That(sprite!.rect.width, Is.GreaterThanOrEqualTo(1280f), kind + " : définition adaptée au mobile paysage");
+                Assert.That(sprite.rect.height, Is.GreaterThanOrEqualTo(640f), kind);
+                Assert.That(sprite.rect.width / sprite.rect.height, Is.InRange(1.6f, 2.1f), kind + " : fond paysage");
             }
             Assert.That(MiniGameArt.Background("no_such_kind"), Is.Null);
         }

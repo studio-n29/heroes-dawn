@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UiButton mission = null!;
         [SerializeField] TMP_Text missionSub = null!;
         [SerializeField] TMP_Text missionHint = null!;
-        /// <summary>Bandeau compact de la quête principale (en haut) : touché, il lance la mission comme le bouton MISSION.</summary>
+        /// <summary>Bandeau compact de la quête principale : ouvre le suivi ; MISSION conserve le déploiement.</summary>
         [SerializeField] Button banner = null!;
         [SerializeField] TMP_Text bannerTitle = null!;
         [SerializeField] TMP_Text bannerLine = null!;
@@ -45,6 +45,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         /// <summary>Bouton MISSION (tests PlayMode : clic réel).</summary>
         public Button MissionButton => mission.Button;
+        public Button QuestsButton => banner;
 
         /// <summary>Bouton d'une pièce (tests PlayMode), selon le dernier affichage.</summary>
         public Button? RoomButton(HubPage page)
@@ -61,10 +62,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 rooms[i].Clicked += () => RoomClicked?.Invoke(_pages[index]);
             }
             mission.Button.onClick.AddListener(() => MissionClicked?.Invoke());
-            banner.onClick.AddListener(() => MissionClicked?.Invoke());
-            dailyDrawer.SetActive(false); // fermé au départ : seul le bandeau est visible
-            dailyCard.onClick.AddListener(() => dailyDrawer.SetActive(true));
-            dailyClose.onClick.AddListener(() => dailyDrawer.SetActive(false));
+            banner.onClick.AddListener(() => QuestsClicked?.Invoke());
+            dailyDrawer.SetActive(true); // liste du jour toujours visible (planche 3.1)
             secondaryCard.onClick.AddListener(() => SecondaryClicked?.Invoke());
             shopAlertButton.onClick.AddListener(() => ShopAlertClicked?.Invoke());
         }
@@ -94,7 +93,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             missionHint.text = d.MissionHint;
             bannerTitle.text = d.MainTitle;
             bannerLine.text = d.MissionSub;
-            banner.interactable = d.MissionEnabled;
+            banner.interactable = true;
             _cascaded = true;
         }
     }

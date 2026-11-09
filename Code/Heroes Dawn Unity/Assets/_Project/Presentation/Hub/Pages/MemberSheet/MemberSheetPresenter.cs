@@ -311,7 +311,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 {
                     Title = has ? _loc.SkillName(def.Skills[i]) : "",
                     Sub = _loc.F("sheet.skill_fixed", i + 1),
-                    Art = has ? AgentArt.Ability(def.Id.Value + i) : null,
+                    Art = has ? AgentArt.Skill(def.Skills[i].Id.Value) : null,
                     Frame = family,
                     Kind = has ? SheetTileKind.Fixed : SheetTileKind.Empty,
                 };

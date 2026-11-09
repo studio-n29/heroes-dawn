@@ -27,33 +27,23 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             srt.anchoredPosition = new Vector2(0, 260);
             srt.localRotation = Quaternion.Euler(0, 0, 180); // opaque en bas, transparent en haut
 
-            RectTransform logo;
-            var titleSprite = Sprites.Title;
-            if (titleSprite != null)
-            {
-                var img = Ui.Img(rt, "Title", Color.white, titleSprite);
-                img.preserveAspect = true;
-                logo = img.rectTransform.At(0.5f, 1f, 0, -20, 1000, 580);
-            }
-            else
-            {
-                var title = Ui.LocTxt(rt, "game.title", 128, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Title");
-                title.Inked();
-                logo = title.rectTransform.At(0.5f, 1f, 0, -120, 1400, 200);
-            }
+            Ui.Panel(rt, "Identity", Theme.WithAlpha(Theme.Background, 0.9f), 4f, 0f, false).Frame().At(1f, 1f, -72, -130, 1120, 350);
+            var title = Ui.LocTxt(rt, "game.title", 112, Theme.Primary, TextAnchor.MiddleRight, FontKind.Title, "Title");
+            RectTransform logo = title.rectTransform.At(1f, 1f, -100, -170, 1000, 180);
+            var emblem = Ui.Img(rt, "DawnEmblem", Theme.Accent, Sprites.DawnStar);
+            emblem.rectTransform.At(1f, 1f, -120, -100, 72, 72);
+            Ui.Img(rt, "TitleRule", Theme.Accent).rectTransform.At(1f, 1f, -100, -366, 900, 2);
 
             var tagline = Ui.LocTxt(rt, "game.tagline", 36, Theme.Text, TextAnchor.MiddleCenter, FontKind.Body, "Tagline");
-            tagline.rectTransform.At(0.5f, 0f, 0, 250, 1400, 50);
+            tagline.rectTransform.At(1f, 1f, -100, -394, 1100, 60);
+            tagline.alignment = TMPro.TextAlignmentOptions.Right;
             tagline.Inked();
 
             var play = Ui.LocBtn(rt, "login.play", Theme.Primary, Theme.TextDark, null!, 52, FontKind.Title, "Play");
-            play.Rect.At(0.5f, 0f, 0, 120, 560, 110);
-            var pulse = play.gameObject.AddComponent<Pulse>();
-            pulse.Amplitude = 0.04f;
-            pulse.Speed = 3.5f;
+            play.Rect.At(1f, 0f, -100, 224, 600, 110);
 
             var account = Ui.LocBtn(rt, "login.account", Theme.Surface3, Theme.Text, null!, 34, FontKind.Title, "Account");
-            account.Rect.At(1f, 0f, -40, 130, 460, 96);
+            account.Rect.At(1f, 0f, -100, 110, 600, 96);
 
             var status = Ui.Txt(rt, "", 30, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Body, "Status");
             status.rectTransform.At(0.5f, 0f, 0, 60, 1200, 44);
@@ -68,7 +58,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             spinner.gameObject.SetActive(false);
 
             Ui.LocTxt(rt, "game.studio", 30, Theme.Primary, TextAnchor.LowerLeft, FontKind.Title, "Studio").rectTransform.At(0f, 0f, 40, 24, 400, 50);
-            Ui.LocTxt(rt, "game.build", 22, Theme.Text, TextAnchor.LowerRight, FontKind.Regular, "Build").rectTransform.At(1f, 0f, -40, 70, 600, 40);
 
             var view = rt.gameObject.AddComponent<LoginView>();
             ScreenKit.WireFade(ctx, view);

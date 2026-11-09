@@ -52,7 +52,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             switch (quality)
             {
-                case CraftQuality.Masterwork: return Theme.Primary;
+                case CraftQuality.Masterwork: return Theme.Accent;
                 case CraftQuality.Superior: return Theme.Perception;
                 case CraftQuality.Fine: return Theme.Info;
                 case CraftQuality.Standard: return Theme.Text;

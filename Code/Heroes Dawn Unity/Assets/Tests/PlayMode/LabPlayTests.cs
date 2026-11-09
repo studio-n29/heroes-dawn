@@ -36,7 +36,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(recipes.Count, Is.GreaterThan(0), "au moins une recette connue");
 
             // Sans matériaux : le bouton de fabrication du panneau est grisé.
-            page.SelectRowForTest(page.MainRows.Count(r => r.gameObject.activeInHierarchy) - recipes.Count);
+            page.SelectRowForTest(0);
             yield return null;
             var craft = page.SideRows.Last();
             Assert.That(craft.Buttons[0].Interactable, Is.False, "aucun matériau : pas de fabrication");
@@ -46,7 +46,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             int before = session.OwnedItemCount;
             CraftingOps.AddScraps(session, N29.HeroesDawn.Definitions.ScrapKinds.For(type), 1000);
             CraftingOps.AddScraps(session, N29.HeroesDawn.Definitions.ScrapKind.Core, 1000);
-            page.SelectRowForTest(page.MainRows.Count(r => r.gameObject.activeInHierarchy) - recipes.Count);
+            page.SelectRowForTest(0);
             yield return null;
             page.SideRows.Last().Buttons[0].Button.onClick.Invoke();
             yield return null;

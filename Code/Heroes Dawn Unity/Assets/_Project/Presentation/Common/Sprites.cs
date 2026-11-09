@@ -35,9 +35,11 @@ namespace N29.HeroesDawn.Presentation.Common
         /// <summary>Dégradé tramé noir (dense en bas à gauche, transparent en haut à droite) : fond des dialogues et des bandeaux d'entrée en combat.</summary>
         public static Sprite Halftone => _halftone != null ? _halftone : (_halftone = Load("Halftone"));
         public static Sprite Skyline => _skyline != null ? _skyline : (_skyline = Load("Skyline"));
+        public static Sprite DawnStar => Load("DawnStar");
+        public static Sprite Glyph(string name) => Load("Glyph" + name);
 
         /// <summary>Noms des sprites d'interface générés (Resources/UI/&lt;nom&gt;.png).</summary>
-        public static readonly string[] UiSpriteNames = { "Rounded", "RoundedSmall", "Circle", "Ring", "VerticalGradient", "Burst", "Cloud", "Panel", "PanelSmall", "Diamond", "Shine", "Skyline", "PanelFrame", "Bracket", "Bust", "Halftone" };
+        public static readonly string[] UiSpriteNames = { "Rounded", "RoundedSmall", "Circle", "Ring", "VerticalGradient", "Burst", "Cloud", "Panel", "PanelSmall", "Diamond", "Shine", "Skyline", "PanelFrame", "Bracket", "Bust", "Halftone", "DawnStar", "GlyphTeam", "GlyphPass", "GlyphShop", "GlyphProfile", "GlyphWorkshop", "GlyphOperations", "GlyphGrimoire", "GlyphInventory", "GlyphRegister", "GlyphQuest" };
 
         static Sprite Load(string name) { var s = Resources.Load<Sprite>("UI/" + name); return s != null ? s : Procedural(name); }
 
@@ -53,16 +55,16 @@ namespace N29.HeroesDawn.Presentation.Common
                 case "VerticalGradient": return MakeGradient();
                 case "Burst": return MakeBurst(256, 14);
                 case "Cloud": return MakeCloud(128);
-                case "Panel": return MakeRounded(64, 14);
-                case "PanelSmall": return MakeRounded(32, 8);
+                case "Panel": return MakeCutPanel(64, 10);
+                case "PanelSmall": return MakeCutPanel(32, 4);
                 case "Diamond": return MakeDiamond(128);
                 case "Shine": return MakeShine();
                 case "Skyline": return MakeSkyline(512, 128);
-                case "PanelFrame": return MakeCutFrame(64, 14, 3);
+                case "PanelFrame": return MakeCutFrame(64, 10, 2);
                 case "Bracket": return MakeBracket(32, 5);
                 case "Bust": return MakeBust(128);
                 case "Halftone": return MakeHalftone(128);
-                default: throw new System.ArgumentException("Sprite d'interface inconnu : " + name);
+                default: return TacticalGlyphs.Create(name);
             }
         }
 
@@ -192,7 +194,7 @@ namespace N29.HeroesDawn.Presentation.Common
                 float dTopRight = ((size - fx) + (size - fy) - cut) / 1.4142f;   // > 0 à l'intérieur du biseau haut-droit
                 float dBottomLeft = (fx + fy - cut) / 1.4142f;                    // idem bas-gauche
                 float edge = Mathf.Min(Mathf.Min(fx, size - fx), Mathf.Min(fy, size - fy));
-                float a = Mathf.Clamp01(Mathf.Min(Mathf.Min(dTopRight, dBottomLeft), edge) + 0.5f);
+                float a = Mathf.Clamp01(Mathf.Min(dTopRight, edge) + 0.5f);
                 px[y * size + x] = new Color32(255, 255, 255, (byte)(a * 255));
             }
             t.SetPixels32(px);
@@ -211,7 +213,7 @@ namespace N29.HeroesDawn.Presentation.Common
             {
                 float fx = x + 0.5f, fy = y + 0.5f;
                 float edge = Mathf.Min(Mathf.Min(fx, size - fx), Mathf.Min(fy, size - fy));
-                float diag = Mathf.Min(((size - fx) + (size - fy) - cut) / 1.4142f, (fx + fy - cut) / 1.4142f);
+                float diag = ((size - fx) + (size - fy) - cut) / 1.4142f;
                 float outer = Mathf.Clamp01(Mathf.Min(diag, edge) + 0.5f);
                 float inner = Mathf.Clamp01(Mathf.Min(diag - thick, edge - thick) + 0.5f);
                 px[y * size + x] = new Color32(255, 255, 255, (byte)(Mathf.Clamp01(outer - inner) * 255));

@@ -169,6 +169,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Title = _page?.Title ?? "", ShowBack = !_nav.IsOnTab, Tabs = tabs,
                 Avatar = new PortraitData(route.HeroName, hero?.Family ?? Family.Matter, art: AgentArt.For(route.HeroId)),
                 AvatarName = route.HeroName.ToUpperInvariant(), AvatarRole = _loc.T("hub.avatar_role"),
+                BackgroundKey = route.ActCities[0] == StoryRoutes.Moscow ? "hq-moscow" : "hq-new-york",
             });
         }
 

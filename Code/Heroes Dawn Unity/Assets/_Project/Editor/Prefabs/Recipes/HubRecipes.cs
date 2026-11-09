@@ -34,12 +34,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         {
             var cell = PrefabContext.NewRoot("SquadSlot", 125, 150);
             cell.Pref(125, 150);
-            var portrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", cell, "Portrait");
-            ((RectTransform)portrait.transform).At(0.5f, 1f, 0, 0, 90, 90);
+            var portrait = ctx.Nest<PortraitView>("Widgets/PortraitSquare.prefab", cell, "Portrait");
+            ((RectTransform)portrait.transform).At(0.5f, 1f, 0, 0, 100, 100);
             var name = Ui.Txt(cell, "", 22, Theme.Text, TextAnchor.MiddleCenter, FontKind.Body, "Name");
-            name.rectTransform.At(0.5f, 1f, 0, -92, 125, 26);
+            name.rectTransform.At(0.5f, 1f, 0, -126, 125, 26);
+            name.AutoSize(22);
+            // Jauge de fatigue posée au pied du portrait, comme sur la planche 7.
             var bar = Ui.Bar(cell, "Fatigue", Theme.Success, Theme.SurfaceDark);
-            ((RectTransform)bar.transform).At(0.5f, 1f, 0, -122, 110, 16);
+            ((RectTransform)bar.transform).At(0.5f, 1f, 0, -96, 90, 14);
             var view = cell.gameObject.AddComponent<SquadSlotView>();
             ctx.Wire(view, "portrait", portrait);
             ctx.Wire(view, "memberName", name);

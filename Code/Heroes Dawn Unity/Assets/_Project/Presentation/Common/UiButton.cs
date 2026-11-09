@@ -9,7 +9,7 @@ namespace N29.HeroesDawn.Presentation.Common
     /// <summary>Bouton « comics » : léger écrasement à l'appui, son de clic (relais audio de la hiérarchie).</summary>
     public sealed class UiButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler
     {
-        static readonly Vector3 HoverScale = new Vector3(1.04f, 1.04f, 1f);
+        static readonly Vector3 HoverScale = new Vector3(1.015f, 1.015f, 1f);
         bool _hover;
         // Sérialisés : le bouton fonctionne aussi dans un prefab.
         [SerializeField] Button button;
@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.Presentation.Common
 
         public void Init(Button b, Image fillImage, TMP_Text text, Color bg, Color fg)
         {
-            button = b; fill = fillImage; label = text; _bg = bg; _fg = fg;
+            button = b; fill = fillImage; label = text; _bg = bg; _fg = Ui.ReadableText(bg, fg);
             ApplyState();
         }
 
@@ -67,15 +67,14 @@ namespace N29.HeroesDawn.Presentation.Common
 
         public void SetColors(Color bg, Color fg)
         {
-            if (bg == Theme.Surface2 || bg == Theme.Surface3) bg = Theme.Secondary;
-            _bg = bg; _fg = fg;
+            _bg = bg; _fg = Ui.ReadableText(bg, fg);
             ApplyState();
         }
 
         /// <summary>Raison affichée en toast quand on touche le bouton grisé (vide : simple secousse).</summary>
         public string DisabledReason { get; set; } = "";
 
-        public void OnPointerDown(PointerEventData e) { if (Button.interactable) transform.localScale = new Vector3(0.95f, 0.95f, 1f); }
+        public void OnPointerDown(PointerEventData e) { if (Button.interactable) transform.localScale = new Vector3(0.985f, 0.985f, 1f); }
         public void OnPointerUp(PointerEventData e) => transform.localScale = _hover ? HoverScale : Vector3.one;
 
         /// <summary>Survol (souris) : léger grossissement et fond éclairci.</summary>

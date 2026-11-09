@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation
 {
@@ -20,6 +21,14 @@ namespace N29.HeroesDawn.Presentation
             _last = Screen.safeArea;
             _lastSize = new Vector2Int(Screen.width, Screen.height);
             if (Screen.width <= 0 || Screen.height <= 0) return;
+            // Keep a complete landscape composition inside the notch-safe viewport,
+            // including tablets (4:3), wide phones and window resizing.
+            var scaler = GetComponentInParent<CanvasScaler>();
+            if (scaler != null)
+            {
+                scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+                scaler.referenceResolution = ReferenceFor(_last, Screen.width, Screen.height);
+            }
             var min = _last.position;
             var max = _last.position + _last.size;
             min.x /= Screen.width; min.y /= Screen.height;
@@ -29,5 +38,8 @@ namespace N29.HeroesDawn.Presentation
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
         }
+
+        public static Vector2 ReferenceFor(Rect safe, int width, int height) =>
+            new Vector2(1920f * width / Mathf.Max(1, safe.width), 1080f * height / Mathf.Max(1, safe.height));
     }
 }

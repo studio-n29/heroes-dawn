@@ -14,41 +14,39 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var fill = RecipeKit.PanelRoot("BoosterCard", Theme.Frost, 5f, 8f, false);
+            var fill = RecipeKit.PanelRoot("BoosterCard", Theme.Surface, 1.5f, 3f, false);
             var rootRt = fill.Frame();
-            rootRt.sizeDelta = new Vector2(300, 420);
-            rootRt.Pref(300, 420);
+            rootRt.sizeDelta = new Vector2(340, 500);
+            rootRt.Pref(340, 500);
             var frame = rootRt.GetComponent<Image>();
 
             // ---- Face
             var face = Ui.Rect(fill.transform, "Face").Stretch();
-            var shine = Ui.Img(face, "Shine", new Color(1f, 1f, 1f, 0.45f), Sprites.Shine);
-            shine.rectTransform.Stretch();
             var glyph = Ui.Txt(face, "A", 150, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Glyph");
             glyph.rectTransform.At(0.5f, 1f, 0, -40, 260, 170);
-            var art = Ui.Img(face, "Art", Color.white, null, false);
-            art.preserveAspect = true;
-            art.rectTransform.At(0.5f, 1f, 0, -58, 270, 170);
+            var artHolder = Ui.Rect(face, "ArtHolder").At(.5f, 1f, 0, -24, 310, 280);
+            artHolder.gameObject.AddComponent<RectMask2D>();
+            var art = Ui.Img(artHolder, "Art", Color.white, null, false);
+            art.gameObject.AddComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            Ui.Img(face, "Caption", Theme.Surface, Sprites.Panel).rectTransform.BottomBand(184);
             var name = Ui.Txt(face, "", 34, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Name");
-            name.rectTransform.At(0.5f, 0f, 0, 168, 270, 56);
+            name.rectTransform.At(0.5f, 0f, 0, 126, 308, 56);
             name.AutoSize(34);
             var rarity = Ui.Txt(face, "", 24, Theme.Text, TextAnchor.MiddleCenter, FontKind.Body, "Rarity");
-            rarity.rectTransform.At(0.5f, 0f, 0, 136, 270, 32);
+            rarity.rectTransform.At(0.5f, 0f, 0, 96, 308, 32);
             var description = Ui.Txt(face, "", 22, Theme.Text, TextAnchor.UpperCenter, FontKind.Body, "Description");
-            description.rectTransform.At(0.5f, 0f, 0, 14, 270, 116);
+            description.rectTransform.At(0.5f, 0f, 0, 10, 308, 82);
             description.AutoSize(22);
             var badgeFill = Ui.Panel(face, "NewBadge", Theme.Accent, 3f, 4f, false);
             badgeFill.Frame().At(0.5f, 1f, 0, -8, 230, 44);
-            var newText = Ui.Txt(badgeFill.transform, "", 26, Theme.TextOnDark, TextAnchor.MiddleCenter, FontKind.Title, "Text");
+            var newText = Ui.Txt(badgeFill.transform, "", 26, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Text");
             newText.rectTransform.Stretch();
 
             // ---- Dos
             var back = Ui.Img(fill.transform, "Back", Theme.Navy, Sprites.Panel);
             back.rectTransform.Stretch();
-            var backShine = Ui.Img(back.transform, "Shine", new Color(1f, 1f, 1f, 0.2f), Sprites.Shine);
-            backShine.rectTransform.Stretch();
-            var mark = Ui.Txt(back.transform, "?", 160, Theme.Glow, TextAnchor.MiddleCenter, FontKind.Title, "Mark");
-            mark.rectTransform.Stretch();
+            var mark = Ui.Img(back.transform, "Mark", Theme.Accent, Sprites.DawnStar);
+            mark.rectTransform.At(.5f, .5f, 0, 0, 130, 180);
 
             var view = rootRt.gameObject.AddComponent<BoosterCardView>();
             ctx.Wire(view, "frame", frame);
@@ -74,8 +72,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx)
         {
             var root = PrefabContext.NewRoot("BoosterOpeningPopup");
+            Ui.Img(root, "Backdrop", Theme.Background).rectTransform.Stretch();
+            ScreenKit.ArtBackdrop(root, TacticalArt.Load("hq-new-york"), .45f, .6f);
             var group = root.gameObject.AddComponent<CanvasGroup>();
-            var dim = Ui.Img(root, "Dim", Theme.WithAlpha(Theme.Navy, 0.94f), null, true);
+            var dim = Ui.Img(root, "Dim", Theme.WithAlpha(Theme.Navy, 0.35f), null, true);
             dim.rectTransform.Stretch();
             var tap = dim.gameObject.AddComponent<Button>();
             tap.transition = Selectable.Transition.None;
@@ -89,19 +89,17 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             // ---- Paquet : étoile lumineuse et carte scellée
             var pack = Ui.Rect(root, "Pack").At(0.5f, 0.5f, 0, 10, 380, 500);
-            var burst = Ui.Img(pack, "Burst", Theme.WithAlpha(Theme.Glow, 0.55f), Sprites.Burst);
-            burst.rectTransform.Stretch(-120, -120, -120, -120);
+            var burst = Ui.Img(pack, "Burst", Theme.WithAlpha(Theme.Glow, 0.18f), Sprites.Burst);
+            burst.rectTransform.Stretch(-90, -90, -90, -90);
             burst.raycastTarget = false;
-            var packFill = Ui.Panel(pack, "Body", Theme.Accent, 5f, 10f, false);
+            var packFill = Ui.Panel(pack, "Body", Theme.Background, 1.5f, 4f, false);
             packFill.Frame().Stretch();
-            var packShine = Ui.Img(packFill.transform, "Shine", new Color(1f, 1f, 1f, 0.4f), Sprites.Shine);
-            packShine.rectTransform.Stretch();
-            var packMark = Ui.Txt(packFill.transform, "B", 220, Theme.TextOnDark, TextAnchor.MiddleCenter, FontKind.Title, "Mark");
-            packMark.rectTransform.Stretch();
-            packMark.Inked();
+            var packArt = Ui.Img(packFill.transform, "PacketArt", Color.white, TacticalArt.Load("shop-booster"));
+            packArt.preserveAspect = true;
+            packArt.rectTransform.Stretch(8, 8, 8, 8);
 
             // ---- Cartes
-            var row = Ui.Rect(root, "Cards").At(0.5f, 0.5f, 0, 10, 1400, 440);
+            var row = Ui.Rect(root, "Cards").At(0.5f, 0.5f, 0, 10, 1600, 520);
             row.HLayout(40, 0, TextAnchor.MiddleCenter);
             var cardPrefab = ctx.Asset("Widgets/BoosterCard.prefab").GetComponent<BoosterCardView>();
 
@@ -111,8 +109,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             var skip = Ui.LocBtn(root, "booster.skip", Theme.Surface2, Theme.Text, null!, 30, FontKind.Title, "Skip");
             skip.Rect.At(1f, 1f, -40, -40, 260, 72);
-            var cont = Ui.LocBtn(root, "ui.continue", Theme.Accent, Theme.TextOnDark, null!, 44, FontKind.Title, "Continue");
-            cont.Rect.At(0.5f, 0f, 0, 50, 460, 104);
+            var cont = Ui.LocBtn(root, "ui.continue", Theme.Primary, Theme.TextDark, null!, 44, FontKind.Title, "Continue");
+            cont.Rect.At(1f, 0f, -80, 50, 460, 104);
 
             var flash = Ui.Img(root, "Flash", new Color(1f, 1f, 1f, 0f), null, false);
             flash.rectTransform.Stretch();

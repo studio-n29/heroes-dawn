@@ -12,6 +12,7 @@ namespace N29.HeroesDawn.Application.Session
         MemberDef Def { get; }
         int Level { get; }
         int Fatigue { get; }
+        int Xp { get; }
         bool InSquad { get; }
         bool Exhausted { get; }
         IReadOnlyList<ItemId> Items { get; }

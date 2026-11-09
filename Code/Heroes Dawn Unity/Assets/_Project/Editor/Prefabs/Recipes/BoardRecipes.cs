@@ -103,7 +103,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             root.anchorMin = root.anchorMax = root.pivot = new Vector2(0.5f, 0.5f);
             var img = root.gameObject.AddComponent<Image>();
             img.sprite = Sprites.Cloud;
-            img.color = new Color(0.78f, 0.84f, 0.93f, 0.78f);
+            img.color = Theme.WithAlpha(Theme.Surface2, 0.4f);
             img.raycastTarget = false;
             var view = root.gameObject.AddComponent<FogCloudView>();
             ctx.Wire(view, "image", img);
@@ -166,7 +166,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         {
             var rt = ScreenKit.Root("Board");
             ScreenKit.Backdrop(rt, Theme.SkyTop, Theme.SkyBottom);
-            ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.86f);
+            ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.5f); // l'illustration Red Hook reste lisible derrière le plateau (planche 7.1)
 
             // ---- Barre du haut
             var top = Ui.Panel(rt, "TopBar", Theme.SurfaceDark, 0f, 0f, true).Frame().TopBand(96);
@@ -248,13 +248,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var squadStrip = Ui.Rect(hudFill, "Squad").At(0f, 0.5f, 20, 0, 560, 140);
             squadStrip.HLayout(10, 0, TextAnchor.MiddleLeft);
             var hint = Ui.Txt(hudFill, "", 24, Theme.Text, TextAnchor.MiddleCenter, FontKind.Body, "Hint");
-            hint.rectTransform.At(0.5f, 0.5f, -120, 34, 560, 70);
-            var pm = Ui.Txt(hudFill, "", 34, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Pm");
-            pm.rectTransform.At(0.5f, 0.5f, -120, -16, 300, 42);
+            hint.rectTransform.At(0.5f, 0.5f, -120, 38, 560, 76);
+            hint.AutoSize(24);
+            var pm = Ui.Txt(hudFill, "", 32, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Pm");
+            pm.rectTransform.At(0.5f, 0.5f, -120, -30, 300, 38);
             pm.Inked();
             var reserve = Ui.Bar(hudFill, "Reserve", Theme.Primary, Theme.SurfaceDark, true, 20);
             ((RectTransform)reserve.transform).At(0.5f, 0f, -120, 8, 420, 24);
-            var dieFill = Ui.Panel(hudFill, "Die", Color.white, 5f, 6f, false);
+            var dieFill = Ui.Panel(hudFill, "Die", Theme.Primary, 5f, 6f, false);
             var die = dieFill.Frame().At(1f, 0.5f, -640, 0, 124, 124);
             var dieFace = Ui.Txt(dieFill.transform, "-", 86, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Face");
             dieFace.rectTransform.Stretch();

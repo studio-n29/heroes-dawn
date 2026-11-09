@@ -77,6 +77,8 @@ namespace N29.HeroesDawn.Application.Ports
         public string id = "";
         public int level = 1;
         public int fatigue;
+        /// <summary>EXP cumulée (absente des anciennes sauvegardes : 0).</summary>
+        public int xp;
         public bool inSquad;
         /// <summary>Objets equipes (au plus 2).</summary>
         public List<string> items = new List<string>();

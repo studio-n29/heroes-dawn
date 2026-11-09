@@ -107,6 +107,8 @@ namespace N29.HeroesDawn.Content.Prototype
             new List<BoosterDef>
             {
                 new BoosterDef(BoosterDef.StandardId, "boosters.booster_standard.name", 3, new[] { 70, 22, 7, 1 }, 5, 120),
+                new BoosterDef(BoosterDef.OperationId, "boosters.booster_operation.name", 5, new[] { 58, 28, 12, 2 }, 4, 300),
+                new BoosterDef(BoosterDef.MissionId, "boosters.booster_mission.name", 4, new[] { 30, 45, 20, 5 }, 3, 250),
             });
     }
 }

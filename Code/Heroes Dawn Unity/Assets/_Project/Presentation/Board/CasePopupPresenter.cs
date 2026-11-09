@@ -66,6 +66,17 @@ namespace N29.HeroesDawn.Presentation.Board
                 bool take = await view.ChooseAsync(new RestPopupData
                 {
                     Title = _loc.T("rest.title"), Body = _loc.T("rest.body"), Skip = _loc.T("rest.skip"), Take = _loc.T("rest.take"),
+                    FatigueTitle = _loc.T("rest.fatigue"),
+                    Fatigue = _session.Squad.Select(m =>
+                    {
+                        int after = Math.Max(0, m.Fatigue - _session.Content.Balance.RestFatigueReduction);
+                        return new N29.HeroesDawn.Presentation.Combat.FatigueRowData
+                        {
+                            Name = _loc.MemberName(m.Def),
+                            Before01 = m.Fatigue / 100f, After01 = after / 100f, After = after,
+                            Label = m.Fatigue + " % → " + after + " %", Delta = "",
+                        };
+                    }).ToArray(),
                 }, ct);
                 return Events(await _rest.ExecuteAsync(take, ct));
             }
@@ -370,7 +381,17 @@ namespace N29.HeroesDawn.Presentation.Board
                 if (rewards != null && rewards.Boosters > 0) text += _loc.F("board.zone_booster", rewards.Boosters);
                 if (rewards != null && rewards.NewAgents.Count > 0)
                     text += _loc.F("agents.joined_rewards", string.Join(", ", rewards.NewAgents.Select(id => _loc.MemberName(_session.Content.Member(id)))));
-                await view.ShowAsync(new ZoneCompleteData { Title = _loc.T("board.zone_complete"), Rewards = text, ToHq = _loc.T("board.to_hq") }, ct);
+                string objectives = "";
+                var run = _session.Run;
+                var zone = _session.RunZone;
+                if (run != null && zone != null)
+                    objectives = string.Join("\n", zone.Objectives.Select(o =>
+                        (run.CompletedObjectives.Contains(o.Id) ? "OK  " : "–  ") + _loc.T(o.NameKey)));
+                await view.ShowAsync(new ZoneCompleteData
+                {
+                    Title = _loc.T("board.zone_complete"), Rewards = text, ToHq = _loc.T("board.to_hq"),
+                    ObjectivesTitle = _loc.T("zone.objectives"), Objectives = objectives, RewardsTitle = _loc.T("zone.rewards"),
+                }, ct);
             }
             finally { _modals.Close(view); }
         }

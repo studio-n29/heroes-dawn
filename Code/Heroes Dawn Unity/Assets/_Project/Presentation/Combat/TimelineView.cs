@@ -13,8 +13,8 @@ namespace N29.HeroesDawn.Presentation.Combat
     /// </summary>
     public sealed class TimelineView : MonoBehaviour
     {
-        const float RowOffset = 44f;
-        const float SpreadStep = 46f;
+        const float RowOffset = 18f;
+        const float SpreadStep = 34f;
         /// <summary>Durée d'un pas de la frise, en secondes (un point toutes les 0,5 s).</summary>
         public const float StepDurationSeconds = 0.5f;
 

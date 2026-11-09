@@ -50,8 +50,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var poly = pointerGo.GetComponent<UiPolygon>();
             poly.raycastTarget = false;
             poly.color = Theme.Primary;
-            poly.OutlineColor = Color.black;
-            poly.OutlineWidth = 5f;
+            poly.OutlineColor = Theme.AccentDark;
+            poly.OutlineWidth = 1.5f;
             poly.SetPoints(new[] { new Vector2(0.5f, 0.02f), new Vector2(0.98f, 0.98f), new Vector2(0.02f, 0.98f) });
 
             // ---- Bulle de Rayner
@@ -59,12 +59,17 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var bubble = bubblePanel.Frame();
             bubble.anchorMin = bubble.anchorMax = new Vector2(0.5f, 0f);
             bubble.pivot = new Vector2(0.5f, 0f);
-            bubble.sizeDelta = new Vector2(1060, 250);
+            bubble.sizeDelta = new Vector2(1060, 300);
             var medal = Ui.Img(bubblePanel.transform, "Medallion", Theme.Perception, Sprites.Circle);
             medal.rectTransform.At(0f, 0.5f, 22, 6, 128, 128);
-            var medalLetter = Ui.Txt(medal.transform, "R", 84, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Letter");
-            medalLetter.rectTransform.Stretch();
-            medalLetter.Inked();
+            var guide = AgentArt.For("rayner");
+            if (guide != null)
+            {
+                medal.color = Theme.Background;
+                medal.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+                var face = Ui.Img(medal.transform, "Rayner", Color.white, guide);
+                face.rectTransform.At(0.5f, 0.5f, -13, -83, 448, 252);
+            }
             var band = Ui.Panel(bubblePanel.transform, "TitleBand", Theme.Primary, 4f, 4f, false);
             band.Frame().At(0f, 1f, 170, -14, 640, 56);
             var title = Ui.Txt(band.transform, "", 34, Theme.TextDark, TextAnchor.MiddleLeft, FontKind.Title, "Title");
@@ -75,9 +80,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var progress = Ui.Txt(bubblePanel.transform, "", 22, Theme.TextMuted, TextAnchor.MiddleRight, FontKind.Body, "Progress");
             progress.rectTransform.At(1f, 1f, -20, -18, 200, 32);
             var skip = Ui.Btn(bubblePanel.transform, "", Theme.Surface3, Theme.TextMuted, null!, 22, FontKind.Body, "Skip");
-            skip.Rect.At(0f, 0f, 22, 14, 330, 52);
+            skip.Rect.At(0f, 0f, 22, 14, 330, 96);
             var ok = Ui.Btn(bubblePanel.transform, "", Theme.Primary, Theme.TextDark, null!, 36, FontKind.Title, "Ok");
-            ok.Rect.At(1f, 0f, -20, 14, 300, 74);
+            ok.Rect.At(1f, 0f, -20, 14, 300, 96);
             RecipeKit.Shine(ok);
 
             // ---- Carte « Astuce » (non bloquante, en bas)

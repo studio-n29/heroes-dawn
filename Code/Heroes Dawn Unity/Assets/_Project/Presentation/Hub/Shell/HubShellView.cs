@@ -30,6 +30,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text avatarName = null!;
         [SerializeField] TMP_Text avatarRole = null!;
         [SerializeField, OptionalRef] RectTransform? tabIndicator;
+        [SerializeField, OptionalRef] Image? backdrop;
 
         int _activeTab = -1;
 
@@ -60,6 +61,21 @@ namespace N29.HeroesDawn.Presentation.Hub
         public void ShowChrome(HubShellData d)
         {
             title.text = d.Title;
+            if (backdrop != null)
+            {
+                bool home = d.Tabs != null && d.Tabs.Length > 0 && d.Tabs[0].Active && !d.ShowBack;
+                backdrop.color = new Color(1f, 1f, 1f, home ? 1f : 0.22f);
+            }
+            if (backdrop != null && !string.IsNullOrEmpty(d.BackgroundKey))
+            {
+                var art = TacticalArt.Load(d.BackgroundKey);
+                if (art != null)
+                {
+                    backdrop.sprite = art;
+                    var fit = backdrop.GetComponent<AspectRatioFitter>();
+                    if (fit != null) fit.aspectRatio = art.rect.width / art.rect.height;
+                }
+            }
             bool hasAvatar = !string.IsNullOrEmpty(d.AvatarName);
             if (avatarRoot.gameObject.activeSelf != hasAvatar) avatarRoot.gameObject.SetActive(hasAvatar);
             if (hasAvatar)
@@ -76,6 +92,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (t.Active) active = i;
                 tabs[i].SetLabel(t.Label);
                 tabs[i].SetColors(t.Active ? Theme.Primary : Theme.WithAlpha(Theme.Surface, 0f), t.Active ? Theme.TextDark : Theme.TextMuted);
+                var icon = tabs[i].Fill.transform.Find("TabIcon");
+                if (icon != null) icon.GetComponent<Image>().color = t.Active ? Theme.TextDark : Theme.Accent;
                 if (tabs[i].gameObject.activeSelf == t.Hidden) tabs[i].gameObject.SetActive(!t.Hidden);
                 bool show = !string.IsNullOrEmpty(t.Badge);
                 var badge = badges[i].transform.parent.gameObject;

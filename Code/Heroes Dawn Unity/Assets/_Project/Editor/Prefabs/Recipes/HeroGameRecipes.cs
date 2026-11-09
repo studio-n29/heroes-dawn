@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             lives.rectTransform.At(1f, 1f, 0, 0, 420, 56);
 
             // ---- Zone de jeu : un ciel nocturne de ville, la ligne du sol en bas
-            var field = Ui.Img(content, "Field", new Color(0.07f, 0.06f, 0.16f, 1f), Sprites.Panel, true);
+            var field = Ui.Img(content, "Field", Theme.Background, Sprites.Panel, true);
             field.rectTransform.anchorMin = new Vector2(0f, 0f);
             field.rectTransform.anchorMax = new Vector2(1f, 1f);
             field.rectTransform.offsetMin = new Vector2(0, 120);

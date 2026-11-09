@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// </summary>
     public sealed class BoosterOpeningPopupView : MonoBehaviour, IBoosterOpeningPopupView
     {
-        public enum Phase { Idle, Sealed, Opening, Revealing, Done }
+        public enum Phase { Idle, Sealed, Opening, Revealing, Done, Summary }
 
         [SerializeField] CanvasGroup group = null!;
         [SerializeField] Button tapArea = null!;
@@ -32,6 +32,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         readonly List<BoosterCardView> _cards = new List<BoosterCardView>();
         UniTaskCompletionSource? _done;
+        string _continueLabel = "";
 
         public bool Cancelable => true;
         public void RequestCancel() => _done?.TrySetResult();
@@ -49,15 +50,21 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             tapArea.onClick.AddListener(OnTap);
             skip.Button.onClick.AddListener(RevealAll);
-            continueButton.Button.onClick.AddListener(() => _done?.TrySetResult());
+            continueButton.Button.onClick.AddListener(() =>
+            {
+                if (Current == Phase.Done) ShowSummary();
+                else if (Current == Phase.Summary) _done?.TrySetResult();
+            });
         }
 
-        public UniTask ShowAsync(BoosterOpeningData d, CancellationToken ct)
+        public async UniTask ShowAsync(BoosterOpeningData d, CancellationToken ct)
         {
             title.text = d.Title;
             hint.text = d.TapHint;
             skip.SetLabel(d.SkipLabel);
             continueButton.SetLabel(d.ContinueLabel);
+            _continueLabel = d.ContinueLabel;
+            cardRow.localScale = Vector3.one;
             cardRow.Clear();
             _cards.Clear();
             foreach (var c in d.Cards)
@@ -78,8 +85,11 @@ namespace N29.HeroesDawn.Presentation.Hub
             Tween.Fade(group, 1f, 0.15f);
             Tween.PopIn(pack, 0.3f);
             _done = new UniTaskCompletionSource();
-            ct.Register(() => _done.TrySetCanceled());
-            return _done.Task;
+            using (ct.Register(() => _done.TrySetCanceled(ct)))
+            {
+                try { await _done.Task; }
+                finally { Current = Phase.Idle; }
+            }
         }
 
         void OnTap()
@@ -103,7 +113,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             Tween.Shake(pack, 16f, 0.45f);
             Tween.Run(0.45f, k => { if (flash != null) flash.color = new Color(1f, 1f, 1f, k * k); }, () =>
             {
-                if (this == null) return;
+                if (this == null || Current != Phase.Opening) return;
                 pack.gameObject.SetActive(false);
                 ShowCards(true);
                 Tween.Run(0.35f, k => { if (flash != null) flash.color = new Color(1f, 1f, 1f, 1f - k); }, null, this, Tween.Linear);
@@ -141,7 +151,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public void RevealAll()
         {
             if (Current == Phase.Sealed) { StartOpening(); return; }
-            if (Current == Phase.Done || Current == Phase.Idle) return;
+            if (Current == Phase.Done || Current == Phase.Summary || Current == Phase.Idle) return;
             if (pack.gameObject.activeSelf) pack.gameObject.SetActive(false);
             foreach (var c in _cards) { c.gameObject.SetActive(true); c.transform.localScale = Vector3.one; c.Reveal(false); }
             flash.color = new Color(1f, 1f, 1f, 0f);
@@ -163,7 +173,19 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (this == null) return;
             skip.gameObject.SetActive(false);
             continueButton.gameObject.SetActive(true);
+            continueButton.SetLabel(Loc.T("booster.next"));
             Tween.PopIn(continueButton.transform, 0.22f);
+        }
+
+        void ShowSummary()
+        {
+            Current = Phase.Summary;
+            title.text = Loc.T("booster.summary");
+            hint.rectTransform.anchoredPosition = new Vector2(0, 230);
+            hint.gameObject.SetActive(true);
+            hint.text = Loc.F("booster.received", _cards.Count);
+            cardRow.localScale = Vector3.one * .72f;
+            continueButton.SetLabel(_continueLabel);
         }
     }
 }

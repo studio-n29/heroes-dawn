@@ -163,7 +163,7 @@ namespace N29.HeroesDawn.Presentation.Board
             _fogLayer.anchorMin = linkLayer.anchorMin; _fogLayer.anchorMax = linkLayer.anchorMax; _fogLayer.pivot = linkLayer.pivot;
             _fogLayer.anchoredPosition = linkLayer.anchoredPosition; _fogLayer.sizeDelta = linkLayer.sizeDelta;
             _fogLayer.SetSiblingIndex(nodeLayer.GetSiblingIndex());
-            var tint = new Color(0.78f, 0.84f, 0.93f, 1f);
+            var tint = new Color(0.46f, 0.54f, 0.66f, 1f);
             int k = 0;
             foreach (var n in d.Nodes)
             {
@@ -197,6 +197,7 @@ namespace N29.HeroesDawn.Presentation.Board
             _background = go.GetComponent<Image>();
             _background.sprite = sprite;
             _background.raycastTarget = false;
+            _background.color = new Color(0.55f, 0.6f, 0.7f, 0.3f); // l'illustration Aube tactique de l'écran reste visible derrière le plateau
         }
 
         void AddNeighbor(CaseId from, CaseId to, int link)

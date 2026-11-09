@@ -36,6 +36,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         /// <summary>Filtres des recettes : catégorie (0 = toutes, sinon 1 + le type d'objet) et qualité possible (0 = toutes, sinon 1 + la qualité).</summary>
         int _category, _quality;
+        bool _research;
 
         protected override void OnStart()
         {
@@ -93,7 +94,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             Finish();
             _recipes = FilteredRecipes();
             if (_selected >= _recipes.Count) _selected = 0;
-            ShowFilters();
+            if (_research) View.ShowFilters(System.Array.Empty<FilterGroupData>());
+            else ShowFilters();
             var views = _lab.Views();
             var active = views.FirstOrDefault(v => v.Active);
             View.ShowHeader(new ListHeaderData
@@ -102,6 +104,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Title = _selected >= 0 && _selected < _recipes.Count ? Loc.T(_recipes[_selected].Recipe.NameKey) : Loc.T("lab.title"),
                 Line = active.Tech != null ? Loc.F("lab.running", Loc.T("lab." + active.Tech.Id), MetaFormat.Duration(active.Left)) : Loc.T("lab.idle"),
                 Progress = -1f,
+                B = RowButtonData.Of(Loc.T(_research ? "lab.mode.craft" : "lab.mode.research"), true, "", 3),
                 A = active.Tech != null
                     ? RowButtonData.Of(Loc.F("lab.speed", ResearchLab.SpeedUpCost(active.Left)), _session.Wallet.Gems >= ResearchLab.SpeedUpCost(active.Left), Loc.T("errors.not_enough_gems"), 1)
                     : default,
@@ -131,10 +134,11 @@ namespace N29.HeroesDawn.Presentation.Hub
                 }
                 rows[i] = r;
             }
-            var all = new List<InfoRowData>(rows);
-            AddWorkshopRows(all);
+            var all = _research ? new List<InfoRowData>(rows) : new List<InfoRowData>();
+            if (!_research) AddWorkshopRows(all);
             View.ShowRows(all.ToArray());
-            ShowSide();
+            if (_research) View.ShowSide(new ListSideData { Title = Loc.T("lab.mode.research"), Rows = System.Array.Empty<InfoRowData>(), Text = Loc.T("lab.mode.research_hint") });
+            else ShowSide();
         }
 
         /// <summary>Panneau de droite : la recette choisie, ses matériaux (possédés et manquants), l'état et le bouton Fabriquer.</summary>
@@ -182,6 +186,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         protected override void OnRowSelected(int row)
         {
+            if (_research) return;
             int recipe = row - _firstRecipeRow;
             if (recipe < 0 || recipe >= _recipes.Count) return;
             _selected = recipe;
@@ -210,7 +215,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (!s.Maxed) { r.Progress = Mathf.Clamp01(s.XpInLevel / (float)s.XpToNext); r.ProgressLabel = s.XpInLevel + " / " + s.XpToNext; }
                 rows.Add(r);
             }
-            _firstRecipeRow = rows.Count;
+            var recipeRows = new List<InfoRowData>();
+            _firstRecipeRow = 0;
             foreach (var v in _recipes)
             {
                 string name = Loc.T(v.Recipe.NameKey);
@@ -218,8 +224,10 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.Tag = CollectionText.Tag(name);
                 r.TagColor = CollectionText.RarityColor(v.Recipe.Rarity);
                 r.A = RowButtonData.Of(Loc.T("lab.craft"), v.CanAfford, Loc.T("errors.not_enough_scraps"), 0);
-                rows.Add(r);
+                r.Highlight = recipeRows.Count == _selected;
+                recipeRows.Add(r);
             }
+            rows.InsertRange(0, recipeRows);
         }
 
         string RecipeLine(RecipeView v)
@@ -232,12 +240,16 @@ namespace N29.HeroesDawn.Presentation.Hub
             return Loc.F("lab.recipe_sub", cost, v.Recipe.Difficulty, string.Join(" · ", odds));
         }
 
-        protected override void OnHeader(int index) => Report(_lab.SpeedUp(), Loc.T("lab.sped"));
+        protected override void OnHeader(int index)
+        {
+            if (index == 1) { _research = !_research; Refresh(); }
+            else Report(_lab.SpeedUp(), Loc.T("lab.sped"));
+        }
 
         protected override void OnRowButton(int row, int button)
         {
             if (row < 0) return;
-            if (row >= ResearchLab.Techs.Count)
+            if (!_research)
             {
                 int recipe = row - _firstRecipeRow;
                 if (recipe >= 0 && recipe < _recipes.Count) Craft(_recipes[recipe].Recipe.Id);

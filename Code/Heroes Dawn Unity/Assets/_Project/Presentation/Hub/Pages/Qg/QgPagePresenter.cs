@@ -136,11 +136,11 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 Rooms = Stated(new[]
                 {
-                    new RoomCardData { Page = HubPage.Lab, Title = _loc.T("page.lab"), Info = LabInfo(), Badge = _meta.LabBadge, Art = AgentArt.Environment(1) },
-                    new RoomCardData { Page = HubPage.Operations, Title = _loc.T("page.operations"), Info = OperationsInfo(), Badge = _meta.OperationsBadge, Art = AgentArt.Environment(2) },
-                    new RoomCardData { Page = HubPage.Grimoire, Title = _loc.T("page.grimoire"), Info = GrimoireInfo(), Art = AgentArt.Card(firstCard) },
-                    new RoomCardData { Page = HubPage.Inventory, Title = _loc.T("page.inventory"), Info = _loc.F("qg.inventory.info", _session.OwnedItemCount), Art = AgentArt.Item(firstItem) },
-                    new RoomCardData { Page = HubPage.Agents, Title = _loc.T("page.agents"), Info = _loc.F("qg.agents.info", s.Roster.Count, s.Content.Members.Count), Art = AgentArt.For(s.Route.HeroId) },
+                    new RoomCardData { Page = HubPage.Lab, Title = _loc.T("page.lab"), Info = LabInfo(), Badge = _meta.LabBadge, Art = TacticalArt.Load("room-workshop") },
+                    new RoomCardData { Page = HubPage.Operations, Title = _loc.T("page.operations"), Info = OperationsInfo(), Badge = _meta.OperationsBadge, Art = TacticalArt.Load("room-operations") },
+                    new RoomCardData { Page = HubPage.Grimoire, Title = _loc.T("page.grimoire"), Info = GrimoireInfo(), Art = TacticalArt.Load("room-grimoire") ?? AgentArt.Card(firstCard) },
+                    new RoomCardData { Page = HubPage.Inventory, Title = _loc.T("page.inventory"), Info = _loc.F("qg.inventory.info", _session.OwnedItemCount), Art = TacticalArt.Load("room-inventory") ?? AgentArt.Item(firstItem) },
+                    new RoomCardData { Page = HubPage.Agents, Title = _loc.T("page.agents"), Info = _loc.F("qg.agents.info", s.Roster.Count, s.Content.Members.Count), Art = TacticalArt.Load("room-register") },
                 }),
                 DailyLines = activities.Count == 0 ? new[] { _loc.T("activity.empty") }
                            : activities.Select(a => _loc.F("qg.activity.line", ActivityText(a), a.Claimed ? _loc.T("quests.state.done") : a.Progress + " / " + a.Target)).ToArray(),

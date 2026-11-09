@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             lives.rectTransform.At(1f, 1f, 0, 0, 420, 56);
 
             // ---- Zone de jeu : fond (image du jeu, teintée), éléments créés par le pilote, joystick, texte de début et de fin
-            var field = Ui.Img(content, "Field", new Color(0.07f, 0.06f, 0.16f, 1f), Sprites.Panel, true);
+            var field = Ui.Img(content, "Field", Theme.Background, Sprites.Panel, true);
             field.rectTransform.anchorMin = new Vector2(0f, 0f);
             field.rectTransform.anchorMax = new Vector2(1f, 1f);
             field.rectTransform.offsetMin = new Vector2(0, 120);
@@ -52,6 +52,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
             var rescue = BuildRescuePanel(ctx, field.transform);
 
+            var briefing = Ui.Img(field.transform, "BriefingPlate", Theme.WithAlpha(Theme.Background, .97f), Sprites.Panel, false);
+            briefing.rectTransform.Stretch(26, 26, 26, 26);
+
             var overlay = Ui.Txt(field.transform, "", 40, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Overlay");
             overlay.rectTransform.Stretch(60, 40, 60, 40);
             overlay.Inked();
@@ -66,6 +69,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "timeText", time);
             ctx.Wire(view, "livesText", lives);
             ctx.Wire(view, "overlay", overlay);
+            ctx.Wire(view, "briefing", briefing);
             ctx.Wire(view, "field", field.rectTransform);
             ctx.Wire(view, "backgroundImage", background);
             ctx.Wire(view, "abandon", abandon);
@@ -94,7 +98,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             manualBack.raycastTarget = false;
             manualBack.rectTransform.At(0.5f, 0.5f, left + leftW / 2f, 79f, leftW, 399f);
             var manual = Ui.Txt(rt, "", 28, Color.white, TextAnchor.UpperLeft, FontKind.Body, "Manual");
-            manual.rectTransform.At(0.5f, 0.5f, left + leftW / 2f, 79f, leftW - 36f, 375f);
+            manual.rectTransform.At(0.5f, 0.5f, left + leftW / 2f, 79f, leftW - 36f, 360f);
+            manual.AutoSize(28); // le manuel rétrécit pour tenir au-dessus des emplacements, même avec 8 indices
 
             var boxes = new Image[slotCapacity];
             var texts = new TMPro.TMP_Text[slotCapacity];

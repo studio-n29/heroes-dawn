@@ -48,6 +48,16 @@ namespace N29.HeroesDawn.Presentation.Common
             d["skills.card_guiding_echo"] = "Écho guide"; d["skills.card_guard_break"] = "Faille de garde"; d["skills.card_premonition"] = "Prémonition";
             d["skills.card_shared_watch"] = "Veille partagée"; d["skills.card_silent_takedown"] = "Exécution silencieuse"; d["skills.card_time_veil"] = "Voile temporel";
             d["boosters.booster_standard.name"] = "Booster de cartes";
+            d["boosters.booster_operation.name"] = "Pack Opération";
+            d["boosters.booster_mission.name"] = "Pack Mission";
+            d["shop.pack_stock"] = "En réserve : {0}";
+            d["shop.wallet"] = "{0} CR  ·  {1} PR  ·  {2} GM";
+            d["shop.gift_sub"] = "Un cadeau à récupérer chaque jour, aussi proposé dans le Pass.";
+            d["shop.pack_buy"] = "ACHETER · {0} PR";
+            d["shop.pack_open"] = "OUVRIR ×{0}";
+            d["shop.pack_contents"] = "Contenu du pack";
+            d["shop.pack_cards"] = "{0} cartes de compétences";
+            d["shop.pack_chances"] = "Rare ou mieux : {0} % par carte · garantie tous les {1} packs";
 
             // Raretés, effets
             d["item.rarity.Common"] = "Commun";
@@ -168,11 +178,18 @@ namespace N29.HeroesDawn.Presentation.Common
             d["shop.gift_title"] = "Cadeau du jour";
             d["shop.gift_claim"] = "RÉCUPÉRER";
             d["shop.tab.heroes"] = "HÉROS";
+            d["shop.daily_pass"] = "CADEAU · PASS";
             d["shop.tab.boosters"] = "BOOSTERS";
             d["shop.tab.items"] = "OBJETS";
             d["shop.tab.gems"] = "GEMMES ET CRÉDITS";
             d["shop.tab.gift"] = "CADEAU";
             d["booster.title"] = "OUVERTURE DU BOOSTER";
+            d["booster.next"] = "SUIVANT";
+            d["lab.mode.craft"] = "FABRICATION";
+            d["lab.mode.research"] = "RECHERCHES";
+            d["lab.mode.research_hint"] = "Choisis une recherche dans la liste. Son coût et sa durée sont affichés avant le lancement. Une seule recherche peut être active à la fois.";
+            d["booster.summary"] = "RÉSUMÉ DU BOOSTER";
+            d["booster.received"] = "{0} cartes ajoutées au Grimoire";
             d["booster.tap"] = "Touche pour ouvrir";
             d["booster.skip"] = "PASSER";
             d["shop.booster_sub"] = "3 cartes de compétences pour ton grimoire.";

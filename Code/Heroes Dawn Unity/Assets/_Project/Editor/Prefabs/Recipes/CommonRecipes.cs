@@ -25,8 +25,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         /// <summary>Reflet animé sur un bouton d action (shader HD/UI/Shine).</summary>
         public static void Shine(UiButton b)
         {
-            var m = Mat("UiShine");
-            if (m != null) b.Fill.material = m;
+            // Le bouton d'action porte un emblème mat ; aucun reflet animé permanent.
+            b.Fill.material = null;
         }
 
         public static Material? Mat(string name)
@@ -54,19 +54,22 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     }
 
     /// <summary>Portrait provisoire : anneau, disque de famille, ombre, initiale, couronne de boss.</summary>
-    public sealed class PortraitRecipe : IPrefabRecipe
+    public class PortraitRecipe : IPrefabRecipe
     {
-        public string RelativePath => "Widgets/Portrait.prefab";
+        public virtual string RelativePath => "Widgets/Portrait.prefab";
         public int Order => 0;
+        protected virtual bool Square => false;
 
         public GameObject Build(PrefabContext ctx)
         {
             var root = PrefabContext.NewRoot("Portrait", 96, 96);
             var ring = root.gameObject.AddComponent<Image>();
-            ring.sprite = Sprites.Circle;
+            ring.sprite = Square ? Sprites.Rounded : Sprites.Circle;
+            if (Square) ring.type = Image.Type.Sliced;
             ring.color = Theme.FrostEdge;
             ring.raycastTarget = false;
-            var disc = Ui.Img(root, "Disc", Theme.Surface3, Sprites.Circle);
+            var disc = Ui.Img(root, "Disc", Theme.Surface3, Square ? Sprites.Rounded : Sprites.Circle);
+            if (Square) disc.type = Image.Type.Sliced;
             disc.rectTransform.Stretch(4, 4, 4, 4);
             disc.gameObject.AddComponent<Mask>().showMaskGraphic = true;
             var bust = Ui.Img(disc.transform, "Bust", Theme.Navy, Sprites.Bust);
@@ -92,6 +95,13 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "boss", boss.gameObject);
             return root.gameObject;
         }
+    }
+
+    /// <summary>Portrait carré à coins arrondis (escouade du plateau, planche 7).</summary>
+    public sealed class PortraitSquareRecipe : PortraitRecipe
+    {
+        public override string RelativePath => "Widgets/PortraitSquare.prefab";
+        protected override bool Square => true;
     }
 
     /// <summary>Pastille de ressource (Crédits ou PR) : badge rond + valeur.</summary>
@@ -256,7 +266,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var window = fill.Frame().At(0.5f, 0.5f, 0, 0, width, height);
             var bandFill = Ui.Panel(window, "TitleBand", band, 4f, 0f, false);
             bandFill.Frame().At(0.5f, 1f, 0, 30, Mathf.Min(width - 80, 760), 84);
-            var title = Ui.Txt(bandFill.transform, "", 50, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Title").AutoSize(50);
+            var title = Ui.Txt(bandFill.transform, "", 50, Ui.ReadableText(band, Theme.TextDark), TextAnchor.MiddleCenter, FontKind.Title, "Title").AutoSize(50);
             title.rectTransform.Stretch(12, 0, 12, 0);
             var content = Ui.Rect(window, "Content").Stretch(36, 30, 36, 80);
             return (window, content, title);

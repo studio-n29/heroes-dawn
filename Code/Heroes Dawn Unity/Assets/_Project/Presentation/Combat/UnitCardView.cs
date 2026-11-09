@@ -15,6 +15,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] Image target = null!;
         [SerializeField] Image strip = null!;
         [SerializeField] PortraitView portrait = null!;
+        /// <summary>Illustration de l'agent (null : silhouette provisoire), reprise en grand au centre du terrain quand il agit.</summary>
+        public Sprite? PortraitArt { get; private set; }
         [SerializeField] TMP_Text unitName = null!;
         [SerializeField] UiBar hp = null!;
         [SerializeField] UiBar gauge = null!;
@@ -57,12 +59,13 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             UnitId = d.Id;
             _ally = d.Ally;
-            _baseFill = d.Ally ? Theme.Surface : Color.Lerp(Theme.Surface, Theme.AccentSoft, 0.35f);
+            _baseFill = d.Ally ? Theme.Surface : Color.Lerp(Theme.SurfaceDark, Theme.Danger, 0.16f);
             fill.color = _baseFill;
             sub.text = d.Sub ?? "";
             portraitArea.color = Color.Lerp(Theme.FamilyColor(d.Family), Theme.Navy, d.Ally ? 0.25f : 0.4f);
             strip.color = Theme.FamilyColor(d.Family);
             portrait.Show(d.Portrait);
+            PortraitArt = d.Portrait.Art;
             unitName.text = d.Name;
             unitName.color = d.Boss ? Theme.Primary : _nameColor;
             hp.SetColor(d.Ally ? Theme.Hp : Theme.HpEnemy);

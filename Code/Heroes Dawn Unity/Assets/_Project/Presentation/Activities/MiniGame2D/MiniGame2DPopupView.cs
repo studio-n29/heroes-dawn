@@ -22,6 +22,7 @@ namespace N29.HeroesDawn.Presentation.Activities
         [SerializeField] TMP_Text timeText = null!;
         [SerializeField] TMP_Text livesText = null!;
         [SerializeField] TMP_Text overlay = null!;
+        [SerializeField] Image briefing = null!;
         [SerializeField] RectTransform field = null!;
         [SerializeField] Image backgroundImage = null!;
         [SerializeField] UiButton abandon = null!;
@@ -74,7 +75,7 @@ namespace N29.HeroesDawn.Presentation.Activities
             rescuePanel.gameObject.SetActive(panelUser != null);
             panelUser?.Bind(rescuePanel);
             _driver.Build(field);
-            overlay.gameObject.SetActive(true);
+            SetOverlay(true);
             overlay.text = r.Instructions + (r.Theme.Length > 0 ? "\n\n<size=70%><color=#7FE3FF>" + r.Theme + "</color></size>" : "") + "\n\n<size=70%><color=#FFCF33>" + r.Start + "</color></size>";
             overlay.transform.SetAsLastSibling();
             stickRing.gameObject.SetActive(false);
@@ -94,7 +95,7 @@ namespace N29.HeroesDawn.Presentation.Activities
             if (_driver == null || _finished) return;
             // Abandonner avant le début compte comme une partie perdue : Update conclut à la prochaine image.
             _started = true;
-            overlay.gameObject.SetActive(false);
+            SetOverlay(false);
             _driver.Game.Abandon();
         }
 
@@ -107,7 +108,7 @@ namespace N29.HeroesDawn.Presentation.Activities
                 if (!input.Down) { Refresh(); return; }
                 // Le premier appui démarre la partie ; il n'est pas transmis au jeu.
                 _started = true;
-                overlay.gameObject.SetActive(false);
+                SetOverlay(false);
             }
             else if (_driver.Game.Status == GameStatus.Running)
             {
@@ -123,12 +124,19 @@ namespace N29.HeroesDawn.Presentation.Activities
             if (_finished) return;
             _finished = true;
             var result = _driver!.Game.Result();
-            overlay.gameObject.SetActive(true);
+            SetOverlay(true);
             overlay.text = result.Success ? _request!.WonText + (_request.Learned.Length > 0 ? "\n<size=60%>" + _request.Learned + "</size>" : "") : _request!.LostText;
             overlay.transform.SetAsLastSibling();
             stickRing.gameObject.SetActive(false);
             stickKnob.gameObject.SetActive(false);
             _done!.TrySetResult(result);
+        }
+
+        void SetOverlay(bool visible)
+        {
+            briefing.gameObject.SetActive(visible);
+            overlay.gameObject.SetActive(visible);
+            if (visible) { briefing.transform.SetAsLastSibling(); overlay.transform.SetAsLastSibling(); }
         }
 
         void UpdateStick()
@@ -159,3 +167,4 @@ namespace N29.HeroesDawn.Presentation.Activities
         }
     }
 }
+

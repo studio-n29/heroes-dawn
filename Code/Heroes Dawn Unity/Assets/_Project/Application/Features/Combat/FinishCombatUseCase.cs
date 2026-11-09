@@ -73,7 +73,9 @@ namespace N29.HeroesDawn.Application.Features.Combat
                 s.RunEngaged.Add(m.Id.Value);
                 int before = m.Fatigue;
                 m.AddFatigue(fatigue);
-                changes.Add(new FatigueChange(m.Id, before, m.Fatigue));
+                int xp = victory ? MetaRules.XpFor(pending.Rank, boss) : 0;
+                m.Xp += xp;
+                changes.Add(new FatigueChange(m.Id, before, m.Fatigue, xp, m.Xp));
             }
 
             if (victory) TeamLinks.RecordVictory(s.Meta, _active.FighterMembers.Select(m => m.Id.Value).ToList());

@@ -15,6 +15,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text title = null!;
         [SerializeField] TMP_Text info = null!;
         [SerializeField] TMP_Text state = null!;
+        [SerializeField, Mvp.OptionalRef] UnityEngine.UI.Image? icon;
         [SerializeField] WipMark wip = null!;
         [SerializeField] GameObject badge = null!;
         [SerializeField] TMP_Text badgeText = null!;
@@ -28,6 +29,11 @@ namespace N29.HeroesDawn.Presentation.Hub
         public void Show(RoomCardData d)
         {
             title.text = d.Title;
+            if (icon != null)
+            {
+                string glyph = d.Page == HubPage.Lab ? "Workshop" : d.Page == HubPage.Operations ? "Operations" : d.Page == HubPage.Grimoire ? "Grimoire" : d.Page == HubPage.Inventory ? "Inventory" : "Register";
+                icon.sprite = Sprites.Glyph(glyph);
+            }
             art.sprite = d.Art;
             art.enabled = d.Art != null;
             if (d.Art != null) { var fit = art.GetComponent<UnityEngine.UI.AspectRatioFitter>(); if (fit != null) fit.aspectRatio = d.Art.rect.width / d.Art.rect.height; }

@@ -54,9 +54,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var (root, content, title) = CasePopupKit.Build("RestPopup", 980, 500, Theme.Success, out var window);
-            var body = Ui.Txt(content, "", 34, Theme.Text, TextAnchor.MiddleCenter, FontKind.Body, "Body");
-            body.rectTransform.Stretch(0, 120, 0, 10);
+            var (root, content, title) = CasePopupKit.Build("RestPopup", 980, 760, Theme.Success, out var window);
+            var body = Ui.Txt(content, "", 30, Theme.Text, TextAnchor.UpperCenter, FontKind.Body, "Body");
+            body.rectTransform.At(0.5f, 1f, 0, -4, 880, 100);
+            body.AutoSize(30);
+            var fatigueTitle = Ui.Txt(content, "", 28, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "FatigueTitle");
+            fatigueTitle.rectTransform.At(0.5f, 1f, 0, -116, 880, 36);
+            var fatigueList = Ui.Rect(content, "Fatigue").At(0.5f, 1f, 0, -156, 880, 270);
+            fatigueList.VLayout(8, 0, TextAnchor.UpperCenter);
             var row = Ui.Rect(content, "Buttons").BottomBand(96);
             row.HLayout(40);
             var skip = Ui.Btn(row, "", Theme.Surface3, Theme.Text, null!, 34, FontKind.Title, "Skip");
@@ -66,6 +71,9 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var view = root.gameObject.AddComponent<RestPopupView>();
             CasePopupKit.WireBase(ctx, view, title, window);
             ctx.Wire(view, "body", body);
+            ctx.Wire(view, "fatigueTitle", fatigueTitle);
+            ctx.Wire(view, "fatigueList", fatigueList);
+            ctx.Wire(view, "rowPrefab", ctx.Asset("Widgets/FatigueRow.prefab").GetComponent<N29.HeroesDawn.Presentation.Combat.FatigueRowView>());
             ctx.Wire(view, "skip", skip);
             ctx.Wire(view, "take", take);
             return root.gameObject;
@@ -181,15 +189,31 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var (root, content, title) = CasePopupKit.Build("ZoneCompletePopup", 1000, 520, Theme.Success, out var window);
-            var rewards = Ui.Txt(content, "", 54, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Rewards");
-            rewards.rectTransform.Stretch(0, 130, 0, 20);
+            var (root, content, title) = CasePopupKit.Build("ZoneCompletePopup", 1300, 640, Theme.Success, out var window);
+            // Deux cartes côte à côte (planche 9.4) : objectifs à gauche, récompenses à droite.
+            var objCard = Ui.Panel(content, "ObjectivesCard", Theme.Surface2, 3f, 6f, false);
+            objCard.Frame().At(0f, 1f, 10, 0, 600, 360);
+            var objectivesTitle = Ui.Txt(objCard.transform, "", 32, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
+            objectivesTitle.rectTransform.At(0f, 1f, 20, -10, 560, 44);
+            var objectives = Ui.Txt(objCard.transform, "", 28, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Lines");
+            objectives.rectTransform.At(0f, 1f, 20, -62, 560, 280);
+            objectives.AutoSize(28);
+            var rewCard = Ui.Panel(content, "RewardsCard", Theme.Surface2, 3f, 6f, false);
+            rewCard.Frame().At(1f, 1f, -10, 0, 600, 360);
+            var rewardsTitle = Ui.Txt(rewCard.transform, "", 32, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
+            rewardsTitle.rectTransform.At(0f, 1f, 20, -10, 560, 44);
+            var rewards = Ui.Txt(rewCard.transform, "", 34, Theme.Primary, TextAnchor.UpperLeft, FontKind.Title, "Rewards");
+            rewards.rectTransform.At(0f, 1f, 20, -62, 560, 280);
+            rewards.AutoSize(34);
             rewards.Inked();
             var toHq = Ui.Btn(content, "", Theme.Primary, Theme.TextDark, null!, 44, FontKind.Title, "ToHq");
             toHq.Rect.At(0.5f, 0f, 0, 0, 440, 100);
             var view = root.gameObject.AddComponent<ZoneCompletePopupView>();
             CasePopupKit.WireBase(ctx, view, title, window);
             ctx.Wire(view, "rewards", rewards);
+            ctx.Wire(view, "objectivesTitle", objectivesTitle);
+            ctx.Wire(view, "objectives", objectives);
+            ctx.Wire(view, "rewardsTitle", rewardsTitle);
             ctx.Wire(view, "toHq", toHq);
             return root.gameObject;
         }

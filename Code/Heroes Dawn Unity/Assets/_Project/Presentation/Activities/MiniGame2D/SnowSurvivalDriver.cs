@@ -50,7 +50,7 @@ namespace N29.HeroesDawn.Presentation.Activities
                     bool match = role == "terrain_" ? pr.Role.StartsWith("terrain_") : role == "totem_ring" ? pr.Role == "totem" : pr.Role == role;
                     if (!match) continue;
                     var center = new Vec2f(pr.X / 100f, pr.Z / 100f);
-                    if (role == "ground") AddItem(null, ToColor(pr.Color), center, new Vec2f(pr.SizeX / 100f, pr.SizeZ / 100f));
+                    if (role == "ground") { /* Le sol peint vient de MiniGameArt ; les objets interactifs restent dans le pilote. */ }
                     else if (role == "terrain_") AddItem(null, new Color(ToColor(pr.Color).r, ToColor(pr.Color).g, ToColor(pr.Color).b, 0.8f), center, new Vec2f(pr.SizeX / 100f, pr.SizeZ / 100f));
                     else if (role == "totem_ring") AddItem(Sprites.Ring, new Color(1f, 0.6f, 0.2f, 0.55f), center, new Vec2f(_game.Inner.TotemRadius * 2f, _game.Inner.TotemRadius * 2f));
                     else if (role == "totem") AddItem(Sprites.Circle, new Color(1f, 0.55f, 0.15f), center, new Vec2f(1.2f, 1.2f));

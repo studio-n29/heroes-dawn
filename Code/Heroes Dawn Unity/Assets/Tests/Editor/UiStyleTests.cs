@@ -14,14 +14,14 @@ namespace N29.HeroesDawn.Tests.Editor
         [TearDown] public void TearDown() => Object.DestroyImmediate(_root);
 
         [Test, Description("Vérifie que Ui.Panel garde son contrat (cadre parent, enfant Fill étiré avec marge) et dessine un contour sombre épais autour d'un aplat plein — parce que tous les écrans l'appellent et que le style Mo.Co repose sur ce contour")]
-        public void Panel_KeepsContract_AndHasThickOutline()
+        public void Panel_KeepsContract_AndHasFineOutline()
         {
             var fill = Ui.Panel(_root.transform, "P", Theme.Surface, 4f, 8f);
             var frame = fill.Frame().GetComponent<Image>();
             Assert.That(fill.name, Is.EqualTo("Fill"));
             Assert.That(fill.rectTransform.offsetMin.x, Is.GreaterThan(0f), "marge intérieure");
-            Assert.That(frame.color, Is.EqualTo(Theme.Outline));
             Assert.That(frame.color, Is.EqualTo(Theme.FrostEdge));
+            Assert.That(fill.rectTransform.offsetMin.x, Is.LessThanOrEqualTo(2f), "filet fin Aube tactique");
             Assert.That(frame.sprite, Is.SameAs(Sprites.Panel));
             var shadow = frame.GetComponent<Shadow>();
             Assert.That(shadow.effectColor.a, Is.LessThanOrEqualTo(0.5f), "une seule ombre, jamais dure");
@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(b.Label.color.a, Is.LessThan(1f), "libellé estompé");
             b.Interactable = true;
             Assert.That(b.Fill.color, Is.EqualTo(Theme.Accent));
-            Assert.That(b.Label.color, Is.EqualTo(Theme.TextOnDark));
+            Assert.That(ThemeContrast.Ratio(b.Label.color, b.Fill.color), Is.GreaterThanOrEqualTo(4.5f), "le texte actif est contrasté sur le laiton");
         }
 
         [Test, Description("Vérifie que la barre à 0 masque son remplissage et à 1 l'étire entièrement — parce que sans contour noir un remplissage résiduel à 0 se verrait")]

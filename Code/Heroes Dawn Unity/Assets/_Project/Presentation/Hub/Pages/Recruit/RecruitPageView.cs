@@ -21,6 +21,14 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] UiButton reroll = null!;
         [SerializeField] UiButton registry = null!;
         [SerializeField] ShopTabsView shopTabs = null!;
+        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] TMP_Text? detailName;
+        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] TMP_Text? detailRarity;
+        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] TMP_Text? detailRole;
+        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] TMP_Text? detailStats;
+        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] TMP_Text? detailSkills;
+        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] UiButton? detailRecruit;
+
+        int _selected;
 
         readonly int[] _slots = new int[8];
         readonly Core.MemberId[] _ids = new Core.MemberId[8];
@@ -44,7 +52,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             for (int i = 0; i < cards.Length; i++)
             {
                 int index = i;
-                cards[i].Tapped += () => CardTapped?.Invoke(_slots[index]);
+                cards[i].Tapped += () => { if (_selected == index) CardTapped?.Invoke(_slots[index]); else { _selected = index; ShowDetail(); } };
                 cards[i].RecruitClicked += () => RecruitClicked?.Invoke(_slots[index]);
             }
             for (int i = 0; i < scraps.Length; i++)
@@ -53,11 +61,30 @@ namespace N29.HeroesDawn.Presentation.Hub
                 scraps[i].Button.onClick.AddListener(() => ScrapClicked?.Invoke(_scrapSlots[index]));
             }
             reroll.Button.onClick.AddListener(() => RerollClicked?.Invoke());
+            if (detailRecruit != null) detailRecruit.Button.onClick.AddListener(() => RecruitClicked?.Invoke(_slots[Mathf.Clamp(_selected, 0, _slots.Length - 1)]));
             registry.Button.onClick.AddListener(() => RegistryClicked?.Invoke());
             shopTabs.TabClicked += i => ShopTabClicked?.Invoke(i);
         }
 
         public void ShowShopTab(int active) => shopTabs.Show(active);
+
+        /// <summary>Fiche de l'agent sélectionné (première carte par défaut) : un toucher sur une carte la sélectionne, un second ouvre sa fiche complète.</summary>
+        void ShowDetail()
+        {
+            for (int i = 0; i < cards.Length; i++) cards[i].SetSelected(i == _selected);
+            if (detailName == null || detailRarity == null || detailRole == null || detailStats == null || detailSkills == null || detailRecruit == null) return;
+            var s = cards[Mathf.Clamp(_selected, 0, cards.Length - 1)].State;
+            if (s.Card.Name == null) return;
+            detailName.text = s.Card.Name;
+            detailRarity.text = s.Card.RarityText;
+            detailRarity.color = Theme.RarityColor(s.Rarity);
+            detailRole.text = s.Card.RoleLine;
+            detailStats.text = s.Card.Stats;
+            detailSkills.text = s.Card.Skills;
+            detailRecruit.SetLabel(s.PriceLabel);
+            detailRecruit.SetColors(s.Affordable ? Theme.Primary : Theme.Surface3, s.Affordable ? Theme.TextDark : Theme.Text);
+            detailRecruit.gameObject.SetActive(!s.InTeam);
+        }
 
         public void Show(RecruitPageData d)
         {
@@ -94,6 +121,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             progress.text = d.Progress;
             reroll.SetLabel(d.RerollLabel);
             reroll.Interactable = d.RerollEnabled;
+            if (_selected >= d.Cards.Length) _selected = 0;
+            ShowDetail();
         }
     }
 }

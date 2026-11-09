@@ -22,20 +22,56 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
+    /// <summary>Tuile d'offre de la boutique : illustration pleine, nom au-dessus d'un bandeau ivoire qui porte le prix (planches 10.2 et 10.3).</summary>
+    public sealed class ShopTileRecipe : IPrefabRecipe
+    {
+        public string RelativePath => "Widgets/ShopTile.prefab";
+        public int Order => 5;
+
+        public GameObject Build(PrefabContext ctx)
+        {
+            var scratch = PrefabContext.NewRoot("Scratch", 282, 300);
+            var tile = MemberSheetRecipe.Tile(ctx, scratch, "ShopTile", 282, 300, false);
+            var fill = tile.transform.Find("Fill");
+            var band = Ui.Img(fill, "PriceBand", Theme.Primary, Sprites.PanelSmall);
+            band.raycastTarget = false;
+            band.rectTransform.BottomBand(58, 8);
+            var sub = (RectTransform)fill.Find("Sub");
+            sub.SetAsLastSibling();
+            sub.anchorMin = new Vector2(0f, 0f);
+            sub.anchorMax = new Vector2(1f, 0f);
+            sub.offsetMin = new Vector2(12f, 10f);
+            sub.offsetMax = new Vector2(-12f, 60f);
+            var subText = sub.GetComponent<TMPro.TMP_Text>();
+            subText.color = Theme.TextDark;
+            subText.fontSize = 30;
+            subText.alignment = TMPro.TextAlignmentOptions.Center;
+            var title = (RectTransform)fill.Find("Title");
+            title.Stretch(10, 72, 8, 6);
+            tile.transform.SetParent(null, false);
+            Object.DestroyImmediate(scratch.gameObject);
+            return tile.gameObject;
+        }
+    }
+
     /// <summary>Gabarit commun des pages « grille de cartes » : en-tête, grille défilante à gauche, fiche détaillée à droite.</summary>
     static class CardGridKit
     {
-        const float DetailW = 700;
+
 
         /// <param name="shopTabs">Boutique : les onglets de la boutique sont posés sous l'en-tête et la grille comme la fiche descendent d'autant.</param>
         public static T Build<T>(PrefabContext ctx, string name, bool shopTabs = false) where T : CardGridPageView
         {
             var rt = ScreenKit.Root(name);
-            float tabsH = shopTabs ? ShopTabsRecipe.Height + 10 : 0f;
+            rt.gameObject.AddComponent<TacticalPageLayout>();
+            float tabsH = 0f;
+            float DetailW = shopTabs ? 520f : 700f; // boutique : colonnes d'offres plus larges et fiche plus étroite (planches 10.2 à 10.4)
+            float artH = shopTabs ? 320f : 230f;
+            float headerH = shopTabs ? 110f : ListPageKit.HeaderH; // boutique : en-tête compact, l'espace va aux offres
 
             // ---- En-tête (même gabarit que les pages liste)
             var header = Ui.Panel(rt, "Header", Theme.Surface, 4f, 6f, false);
-            header.Frame().TopBand(ListPageKit.HeaderH);
+            header.Frame().TopBand(headerH);
             var title = Ui.Txt(header.transform, "", 40, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
             title.rectTransform.At(0f, 1f, 22, -10, 900, 54);
             title.AutoSize(40);
@@ -44,7 +80,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var bar = Ui.Bar(header.transform, "Bar", Theme.Primary, Theme.SurfaceDark, true, 20);
             ((RectTransform)bar.transform).At(0f, 0f, 22, 14, 760, 28);
             var a = Ui.Btn(header.transform, "", Theme.Primary, Theme.TextDark, null!, 28, FontKind.Title, "ButtonA");
-            a.Rect.At(1f, 0.5f, -16, 0, 420, 96);
+            a.Rect.At(1f, 0.5f, -16, 0, 420, shopTabs ? 96 : 96);
             var b = Ui.Btn(header.transform, "", Theme.Primary, Theme.TextDark, null!, 28, FontKind.Title, "ButtonB");
             b.Rect.At(1f, 0.5f, -16 - 440, 0, 420, 96);
 
@@ -52,15 +88,15 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var main = Ui.Rect(rt, "Main");
             main.anchorMin = Vector2.zero;
             main.anchorMax = Vector2.one;
-            main.offsetMin = Vector2.zero;
-            main.offsetMax = new Vector2(-(DetailW + 14), -(ListPageKit.HeaderH + 14 + tabsH));
+            main.offsetMin = new Vector2(shopTabs ? 274 : 0, 0);
+            main.offsetMax = new Vector2(-(DetailW + 14), -(headerH + 14 + tabsH));
             var content = Ui.VScroll(main, out _);
             var layout = content.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(246, 140);
+            layout.cellSize = shopTabs ? new Vector2(282, 300) : new Vector2(246, 140);
             layout.spacing = new Vector2(10, 10);
             layout.padding = new RectOffset(4, 4, 4, 12);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            layout.constraintCount = 4;
+            layout.constraintCount = shopTabs ? 3 : 4;
             layout.childAlignment = TextAnchor.UpperLeft;
 
             // ---- Barre de filtres : au-dessus de la grille, masquée tant que la page n'a pas de filtres (la grille descend sous elle)
@@ -69,7 +105,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             filters.anchorMax = new Vector2(1, 1);
             filters.pivot = new Vector2(0.5f, 1);
             filters.sizeDelta = new Vector2(-(DetailW + 14), 0);
-            filters.anchoredPosition = new Vector2(-(DetailW + 14) / 2f, -(ListPageKit.HeaderH + 14 + tabsH));
+            filters.anchoredPosition = new Vector2(-(DetailW + 14) / 2f, -(headerH + 14 + tabsH));
+            if (shopTabs) { filters.offsetMin = new Vector2(274, filters.offsetMin.y); }
 
             // ---- Fiche détaillée de la tuile choisie
             var detail = Ui.Panel(rt, "Detail", Theme.Surface, 5f, 8f, false);
@@ -77,13 +114,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             frame.anchorMin = new Vector2(1, 0);
             frame.anchorMax = new Vector2(1, 1);
             frame.pivot = new Vector2(1, 0.5f);
-            frame.sizeDelta = new Vector2(DetailW, -(ListPageKit.HeaderH + 14 + tabsH));
-            frame.anchoredPosition = new Vector2(0, -(ListPageKit.HeaderH + 14 + tabsH) / 2f);
+            frame.sizeDelta = new Vector2(DetailW, -(headerH + 14 + tabsH));
+            frame.anchoredPosition = new Vector2(0, -(headerH + 14 + tabsH) / 2f);
+            if (shopTabs) { frame.anchorMin = frame.anchorMax = new Vector2(1, 1); frame.pivot = new Vector2(1, 1); frame.sizeDelta = new Vector2(DetailW, 600); frame.anchoredPosition = new Vector2(0, -(headerH + 14)); } // fiche compacte, sans vide sous le texte
             var holder = Ui.Rect(detail.transform, "ArtHolder");
-            holder.At(0f, 1f, 8, -8, DetailW - 26, 190);
+            holder.At(0f, 1f, 8, -8, DetailW - 26, artH);
             holder.gameObject.AddComponent<RectMask2D>();
             var art = Ui.Img(holder, "Art", Color.white, null);
-            art.gameObject.AddComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            art.gameObject.AddComponent<AspectRatioFitter>().aspectMode = shopTabs ? AspectRatioFitter.AspectMode.FitInParent : AspectRatioFitter.AspectMode.EnvelopeParent;
             var shade = Ui.Img(holder, "Shade", Theme.WithAlpha(Theme.Outline, 0.85f), Sprites.VerticalGradient);
             shade.rectTransform.Stretch();
             shade.rectTransform.localScale = new Vector3(1, -1, 1);
@@ -92,8 +130,11 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             dTitle.AutoSize(38);
             var dBadge = Ui.Txt(holder, "", 26, Theme.Primary, TextAnchor.UpperRight, FontKind.Title, "Badge");
             dBadge.rectTransform.At(1f, 1f, -14, -10, 220, 36);
-            var dText = Ui.Txt(detail.transform, "", 24, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Text");
-            dText.rectTransform.At(0f, 1f, 20, -208, DetailW - 56, 120);
+            var textArea = Ui.Rect(detail.transform, "TextArea").Stretch(20, 124, 20, artH + 20);
+            var textContent = Ui.VScroll(textArea, out _);
+            textContent.VLayout(0, 0, TextAnchor.UpperLeft).childControlHeight = true;
+            var dText = Ui.Txt(textContent, "", 26, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Text");
+            dText.rectTransform.Stretch();
             var buttons = new Object[3];
             for (int i = 0; i < 3; i++)
             {
@@ -110,7 +151,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(view, "headerA", a);
             ctx.Wire(view, "headerB", b);
             ctx.Wire(view, "grid", content);
-            ctx.Wire(view, "tilePrefab", ctx.Asset("Widgets/CardTile.prefab").GetComponent<SheetTileView>());
+            ctx.Wire(view, "tilePrefab", ctx.Asset(shopTabs ? "Widgets/ShopTile.prefab" : "Widgets/CardTile.prefab").GetComponent<SheetTileView>());
             ctx.Wire(view, "detailArt", art);
             ctx.Wire(view, "detailTitle", dTitle);
             ctx.Wire(view, "detailBadge", dBadge);
@@ -122,8 +163,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             {
                 var tabs = ctx.Nest<ShopTabsView>("Widgets/ShopTabs.prefab", rt, "ShopTabs");
                 var trt = (RectTransform)tabs.transform;
-                trt.anchorMin = new Vector2(0f, 1f); trt.anchorMax = new Vector2(1f, 1f); trt.pivot = new Vector2(0.5f, 1f);
-                trt.anchoredPosition = new Vector2(0f, -(ListPageKit.HeaderH + 8)); trt.sizeDelta = new Vector2(0f, ShopTabsRecipe.Height);
+                trt.anchorMin = trt.anchorMax = Vector2.up; trt.pivot = Vector2.up;
+                trt.anchoredPosition = new Vector2(0f, -(headerH + 18)); trt.sizeDelta = new Vector2(250f, 474);
                 ctx.Wire(view, "shopTabs", tabs);
             }
             return view;
@@ -156,7 +197,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         {
             var page = CardGridKit.Build<GrimoirePageView>(ctx, "GrimoirePage");
             // Champ de recherche à droite de l'en-tête, à gauche des boutons A et B.
-            var header = (RectTransform)page.transform.Find("Header");
+            var header = (RectTransform)page.transform.Find("Header/Fill");
             var box = Ui.Img(header, "Search", Theme.Surface3, Sprites.Panel, true);
             box.rectTransform.At(1f, 0.5f, -896, 0, 320, 70);
             var viewport = Ui.Rect(box.transform, "Viewport").Stretch(16, 8, 16, 8);
@@ -187,3 +228,4 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public UnityEngine.GameObject Build(PrefabContext ctx) => CardGridKit.Build<N29.HeroesDawn.Presentation.Hub.InventoryPageView>(ctx, "InventoryPage").gameObject;
     }
 }
+

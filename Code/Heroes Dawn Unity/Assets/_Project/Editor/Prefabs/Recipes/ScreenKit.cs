@@ -39,18 +39,15 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         /// <summary>Illustration plein écran (mode « couvrir ») avec voile sombre.</summary>
         public static Image? ArtBackdrop(RectTransform rt, Sprite? art, float alpha, float veil)
         {
-            // Décor illustré du Drive (3 variantes, attribuées par nom d'écran) à la place du fond d'origine ; opacité réduite pour la lisibilité.
-            int pick = 0;
-            foreach (char c in rt.name) pick += c;
-            art = AgentArt.Environment(pick) ?? art;
+            art = TacticalArt.Load(rt.name == "Combat" || rt.name == "Board" ? "combat-red-hook" : "hq-new-york") ?? art;
             if (art == null) return null;
             var holder = Ui.Rect(rt, "Art").Stretch();
             holder.gameObject.AddComponent<RectMask2D>();
-            var img = Ui.Img(holder, "Illustration", new Color(1, 1, 1, alpha * 0.55f), art);
+            var img = Ui.Img(holder, "Illustration", new Color(1, 1, 1, alpha), art);
             var fitter = img.gameObject.AddComponent<AspectRatioFitter>();
             fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
             fitter.aspectRatio = art.rect.width / art.rect.height;
-            if (veil > 0f) Ui.Img(holder, "Veil", Theme.WithAlpha(Theme.SkyMid, veil * 0.55f)).rectTransform.Stretch();
+            if (veil > 0f) Ui.Img(holder, "Veil", Theme.WithAlpha(Theme.Background, veil)).rectTransform.Stretch();
             return img;
         }
     }

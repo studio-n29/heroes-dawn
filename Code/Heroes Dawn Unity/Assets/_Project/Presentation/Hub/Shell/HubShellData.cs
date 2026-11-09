@@ -25,6 +25,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public PortraitData Avatar;
         public string AvatarName;
         public string AvatarRole;
+        public string BackgroundKey;
 
         public static HubShellData Empty => new HubShellData { Title = "", Tabs = Array.Empty<HubTabData>() };
     }

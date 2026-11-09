@@ -23,6 +23,12 @@ namespace N29.HeroesDawn.Application.Session
         /// <summary>Soin d'un seul agent depuis sa fiche (même réduction de fatigue que l'infirmerie d'équipe).</summary>
         public const int HealMemberCost = 50;
         public const int BossCredits = 1000;
+        /// <summary>EXP gagnée par chaque agent engagé dans un combat remporté (selon le rang ; boss : XpBoss).</summary>
+        public const int XpEasy = 120, XpNormal = 240, XpElite = 360, XpBoss = 600;
+        /// <summary>Palier de la jauge d'EXP affichée sur la fiche de résultats.</summary>
+        public const int XpBar = 1000;
+        public static int XpFor(Definitions.CombatRank rank, bool boss)
+            => boss ? XpBoss : rank == Definitions.CombatRank.Easy ? XpEasy : rank == Definitions.CombatRank.Normal ? XpNormal : XpElite;
         public const int ZoneReplayCredits = 300;
         /// <summary>Récupération passive de fatigue (points par minute réelle, hors mission).</summary>
         public const int FatigueRecoveryPerMinute = 1;
@@ -63,6 +69,8 @@ namespace N29.HeroesDawn.Application.Session
         public MemberDef Def { get; }
         public int Level { get; set; }
         public int Fatigue { get; set; }
+        /// <summary>EXP cumulée (gagnée en combat ; n'altère pas le niveau d'entraînement).</summary>
+        public int Xp { get; set; }
         public bool InSquad { get; set; }
         /// <summary>Objets equipes (au plus 2).</summary>
         public List<ItemId> Items { get; } = new List<ItemId>();
@@ -218,6 +226,7 @@ namespace N29.HeroesDawn.Application.Session
                     var member = new TeamMember(def, Math.Max(1, Math.Min(MetaRules.MaxLevel, s.level)))
                     {
                         Fatigue = Math.Max(0, Math.Min(100, s.fatigue)),
+                        Xp = Math.Max(0, s.xp),
                         InSquad = s.inSquad,
                     };
                     LoadEquipment(member, s);
@@ -255,7 +264,7 @@ namespace N29.HeroesDawn.Application.Session
             p.completedZones.Sort(StringComparer.Ordinal);
             foreach (var m in Roster)
             {
-                var save = new MemberSave { id = m.Id.Value, level = m.Level, fatigue = m.Fatigue, inSquad = m.InSquad };
+                var save = new MemberSave { id = m.Id.Value, level = m.Level, fatigue = m.Fatigue, xp = m.Xp, inSquad = m.InSquad };
                 foreach (var item in m.Items) save.items.Add(item.Value);
                 foreach (var card in m.Cards) save.cards.Add(card.HasValue ? card.Value.Value : "");
                 p.team.Add(save);

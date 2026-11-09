@@ -20,8 +20,8 @@ namespace N29.HeroesDawn.Presentation.Common
 
         // Polices TextMeshPro générées (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface → Resources/Fonts/TMP).
         public static TMP_FontAsset TitleFont => _title != null ? _title : (_title = LoadFont("BarlowCondensed-ExtraBoldItalic"));
-        public static TMP_FontAsset BodyFont => _body != null ? _body : (_body = LoadFont("BarlowCondensed-SemiBold"));
-        public static TMP_FontAsset RegularFont => _regular != null ? _regular : (_regular = LoadFont("BarlowCondensed-Regular"));
+        public static TMP_FontAsset BodyFont => _body != null ? _body : (_body = LoadFont("Barlow-SemiBold"));
+        public static TMP_FontAsset RegularFont => _regular != null ? _regular : (_regular = LoadFont("Barlow-Regular"));
 
         static TMP_FontAsset LoadFont(string name)
         {
@@ -130,23 +130,23 @@ namespace N29.HeroesDawn.Presentation.Common
         /// </summary>
         public static Image Panel(Transform parent, string name, Color fill, float border = 4f, float shadow = 8f, bool raycast = true)
         {
-            // Style Mo.Co : contour sombre épais (3 à 6 px), aplat plein, liseré clair en haut et une seule ombre portée.
-            var frame = Img(parent, name, Theme.Outline, Sprites.Panel, raycast);
+            // Le cadre reste le parent de Fill : les recettes et vues conservent leurs références.
+            var frame = Img(parent, name, Theme.WithAlpha(Theme.FrostEdge, fill.a), Sprites.Panel, raycast);
             if (shadow > 0)
             {
                 var sh = frame.gameObject.AddComponent<Shadow>();
-                sh.effectColor = Theme.WithAlpha(Theme.Outline, 0.45f);
-                sh.effectDistance = new Vector2(0f, -shadow * 0.5f);
+                sh.effectColor = Theme.WithAlpha(Theme.Outline, 0.28f);
+                sh.effectDistance = new Vector2(0f, -Mathf.Min(shadow, 4f));
             }
-            float edge = Mathf.Clamp(border, 3f, 6f);
+            float edge = Mathf.Clamp(border * 0.3f, 1f, 1.8f);
             var inner = Img(frame.transform, "Fill", fill, Sprites.Panel, false);
             inner.rectTransform.Stretch(edge, edge, edge, edge);
-            var hi = Img(inner.transform, "Hi", new Color(1f, 1f, 1f, 0.16f));
+            var hi = Img(inner.transform, "Hi", Theme.WithAlpha(Theme.Accent, 0.22f));
             var hrt = hi.rectTransform;
             hrt.anchorMin = new Vector2(0f, 1f);
             hrt.anchorMax = new Vector2(1f, 1f);
-            hrt.offsetMin = new Vector2(12f, -12f);
-            hrt.offsetMax = new Vector2(-12f, -5f);
+            hrt.offsetMin = new Vector2(16f, -2f);
+            hrt.offsetMax = new Vector2(-16f, -1f);
             return inner;
         }
 
@@ -179,12 +179,10 @@ namespace N29.HeroesDawn.Presentation.Common
             t.raycastTarget = false;
             t.textWrappingMode = TextWrappingModes.Normal;
             t.overflowMode = TextOverflowModes.Overflow;
-            t.lineSpacing = font == FontKind.Title ? -10f : 0f;
+            t.lineSpacing = 0f;
             if (font == FontKind.Title)
             {
-                // Titres à contour épais (style Mo.Co) : matériau partagé « encré » de la police.
-                t.fontStyle = FontStyles.UpperCase;
-                t.fontSharedMaterial = InkedMaterial(t.font);
+                t.fontSharedMaterial = t.font.material;
             }
             return t;
         }
@@ -204,7 +202,7 @@ namespace N29.HeroesDawn.Presentation.Common
         /// </summary>
         public static T Inked<T>(this T g, float size = 2.5f) where T : Graphic
         {
-            if (g is TMP_Text tmp) { tmp.fontSharedMaterial = InkedMaterial(tmp.font); return g; }
+            if (g is TMP_Text tmp) { tmp.fontSharedMaterial = tmp.font.material; return g; }
             var s = g.gameObject.AddComponent<Shadow>();
             s.effectColor = Theme.WithAlpha(Theme.Outline, 0.6f);
             s.effectDistance = new Vector2(size * 0.5f, -size * 0.5f);
@@ -214,17 +212,15 @@ namespace N29.HeroesDawn.Presentation.Common
         public static UiButton Btn(Transform parent, string label, Color bg, Color fg, Action onClick, int fontSize = 34,
                                    FontKind font = FontKind.Title, string name = "Button")
         {
-            // Style Mo.Co : contour épais, socle plus sombre (« lèvre » du bas) et face colorée par-dessus ; les fonds de panneau deviennent bleu vif.
-            if (bg == Theme.Surface2 || bg == Theme.Surface3) bg = Theme.Secondary;
-            var lip = Panel(parent, name, Color.Lerp(bg, Theme.Outline, 0.5f), 4f, 6f, true);
+            var lip = Panel(parent, name, bg, 4f, 3f, true);
             var frameGo = lip.transform.parent.gameObject;
             var fill = Img(lip.transform, "Face", bg, Sprites.Panel, true);
-            fill.rectTransform.Stretch(0, 9, 0, 0);
-            var faceHi = Img(fill.transform, "Hi", new Color(1f, 1f, 1f, 0.28f));
+            fill.rectTransform.Stretch();
+            var faceHi = Img(fill.transform, "Hi", Theme.WithAlpha(Theme.Accent, 0.3f));
             faceHi.rectTransform.anchorMin = new Vector2(0f, 1f);
             faceHi.rectTransform.anchorMax = new Vector2(1f, 1f);
-            faceHi.rectTransform.offsetMin = new Vector2(12f, -13f);
-            faceHi.rectTransform.offsetMax = new Vector2(-12f, -6f);
+            faceHi.rectTransform.offsetMin = new Vector2(14f, -2f);
+            faceHi.rectTransform.offsetMax = new Vector2(-14f, -1f);
             var button = frameGo.AddComponent<Button>();
             button.targetGraphic = fill;
             var colors = button.colors;
@@ -239,23 +235,31 @@ namespace N29.HeroesDawn.Presentation.Common
             nav.mode = Navigation.Mode.None;
             button.navigation = nav;
 
-            if (bg == Theme.Accent)
+            if (bg == Theme.Primary)
             {
                 // Bouton d'action : reflet diagonal clair sur la face jaune.
-                var shine = Img(fill.transform, "Shine", new Color(1f, 1f, 1f, 0.35f), Sprites.Shine);
-                shine.rectTransform.Stretch(0, 0, 0, 0);
-                shine.type = Image.Type.Simple;
+                var star = Img(fill.transform, "DawnStar", Theme.AccentDark, Sprites.DawnStar);
+                star.rectTransform.At(0f, 0.5f, 16, 0, 24, 24);
             }
-            var text = Txt(fill.transform, label, fontSize, font == FontKind.Title ? Theme.TextOnDark : fg, TextAnchor.MiddleCenter, font, "Label");
+            fg = ReadableText(bg, fg);
+            var text = Txt(fill.transform, label, fontSize, fg, TextAnchor.MiddleCenter, font, "Label");
             text.rectTransform.Stretch(10, 4, 10, 4);
             text.enableAutoSizing = true;
             text.fontSizeMin = Mathf.Min(fontSize, Mathf.Max(20, fontSize / 2));
             text.fontSizeMax = fontSize;
 
             var ub = frameGo.AddComponent<UiButton>();
-            ub.Init(button, fill, text, bg, font == FontKind.Title ? Theme.TextOnDark : fg);
+            ub.Init(button, fill, text, bg, fg);
             if (onClick != null) button.onClick.AddListener(() => onClick());
             return ub;
+        }
+
+        /// <summary>Les états actifs changent de fond à l'exécution : leur texte reste contrasté.</summary>
+        public static Color ReadableText(Color background, Color preferred)
+        {
+            if (background.a < 0.5f || ThemeContrast.Ratio(background, preferred) >= 4.5f) return preferred;
+            return ThemeContrast.Ratio(background, Theme.TextDark) > ThemeContrast.Ratio(background, Theme.Text)
+                ? Theme.TextDark : Theme.Text;
         }
 
         /// <summary>Bouton à libellé statique localisé (clé portée par <see cref="Mvp.LocalizedText"/>).</summary>
@@ -281,6 +285,9 @@ namespace N29.HeroesDawn.Presentation.Common
             TMP_Text label = null;
             if (withLabel)
             {
+                // Le nombre reste lisible quelle que soit la proportion pleine/vide de la jauge.
+                var labelBack = Img(bg.transform, "LabelBack", Theme.WithAlpha(Theme.Background, 0.9f), Sprites.PanelSmall);
+                labelBack.rectTransform.Stretch(40, 0, 40, 0);
                 label = Txt(bg.transform, "", labelSize, Color.white, TextAnchor.MiddleCenter, FontKind.Body, "Label");
                 label.rectTransform.Stretch();
                 label.Inked(1.5f);

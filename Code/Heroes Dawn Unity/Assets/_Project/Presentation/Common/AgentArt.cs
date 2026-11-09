@@ -66,6 +66,18 @@ namespace N29.HeroesDawn.Presentation.Common
         /// <summary>Illustration temporaire d une carte (recadrage de l art du Drive, teinté par catégorie) ; à défaut un visuel de capacité.</summary>
         public static Sprite? Card(string id) => Load("Illustrations/Cards/" + id, 3000, id) ?? Ability(id);
 
+        /// <summary>Une compétence native garde l'illustration de son agent ; une carte équipée garde son propre visuel.</summary>
+        public static Sprite? Skill(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            var card = Resources.Load<Sprite>("Illustrations/Cards/" + id);
+            if (card != null) return card;
+            int suffix = id.LastIndexOf("_a", System.StringComparison.Ordinal);
+            if (suffix > 0 && suffix + 3 == id.Length && (id[id.Length - 1] == '1' || id[id.Length - 1] == '2'))
+                return For(id.Substring(0, suffix));
+            return Ability(id);
+        }
+
         /// <summary>Chemin de ressource de l'icône d'une offre de boutique (<c>Illustrations/Shop/&lt;id&gt;</c>).</summary>
         public static string ShopPath(string id) => "Illustrations/Shop/" + id;
 
@@ -83,6 +95,11 @@ namespace N29.HeroesDawn.Presentation.Common
         /// <summary>Icône SVG d'une offre de boutique (booster, paquets de gemmes, échanges, cadeau) ; null si le fichier manque.</summary>
         public static Sprite? Shop(string id)
         {
+            if (id == "booster")
+            {
+                var packet = TacticalArt.Load("shop-booster");
+                if (packet != null) return packet;
+            }
             if (!ShopCache.TryGetValue(id, out var s)) ShopCache[id] = s = Resources.Load<Sprite>(ShopPath(id));
             return s;
         }

@@ -16,7 +16,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx)
         {
             var root = PrefabContext.NewRoot("InfoRow", 800, 120);
-            root.Pref(-1, 120, 1);
+            root.Pref(-1, 144, 1);
             var rim = Ui.Img(root, "Rim", Theme.Ink, Sprites.Rounded, true);
             rim.type = Image.Type.Sliced;
             rim.rectTransform.Stretch();
@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             select.navigation = nav;
             var fill = Ui.Img(rim.transform, "Fill", Theme.Surface2, Sprites.Rounded);
             fill.type = Image.Type.Sliced;
-            fill.rectTransform.Stretch(5, 5, 5, 5);
+            fill.rectTransform.Stretch(1.5f, 1.5f, 1.5f, 1.5f);
 
             var tag = Ui.Img(fill.transform, "Tag", Theme.Info, Sprites.Circle);
             tag.rectTransform.At(0f, 0.5f, 14, 0, 70, 70);
@@ -93,6 +93,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public static T Build<T>(PrefabContext ctx, string name, float sideWidth, bool sideRows, bool sideText, bool shopTabs = false, bool tintedHeader = false) where T : ListPageView
         {
             var rt = ScreenKit.Root(name);
+            rt.gameObject.AddComponent<TacticalPageLayout>();
 
             // ---- En-tête
             var header = Ui.Panel(rt, "Header", Theme.WithAlpha(Theme.Frost, 0.9f), 4f, 6f, false);
@@ -174,18 +175,22 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
                     sRows.anchorMax = new Vector2(1, 1);
                     sRows.offsetMin = new Vector2(10, 50);
                     sRows.offsetMax = new Vector2(-10, -60);
-                    var v = sRows.VLayout(10, 0, TextAnchor.UpperCenter);
+                    var scrollRows = Ui.VScroll(sRows, out _);
+                    var v = scrollRows.VLayout(12, 0, TextAnchor.UpperCenter);
                     v.childControlHeight = true;
                     v.childForceExpandHeight = false;
-                    ctx.Wire(view, "sideRows", sRows);
+                    ctx.Wire(view, "sideRows", scrollRows);
                     var hint = Ui.Txt(side.transform, "", 22, Theme.TextMuted, TextAnchor.LowerLeft, FontKind.Body, "Text");
                     hint.rectTransform.At(0f, 0f, 18, 10, sideWidth - 36, 36);
                     ctx.Wire(view, "sideText", hint);
                 }
                 else if (sideText)
                 {
-                    var text = Ui.Txt(side.transform, "", 28, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Text");
-                    text.rectTransform.Stretch(22, 16, 22, 66);
+                    var textArea = Ui.Rect(side.transform, "TextArea").Stretch(22, 16, 22, 66);
+                    var textContent = Ui.VScroll(textArea, out _);
+                    var text = Ui.Txt(textContent, "", 28, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Text");
+                    text.rectTransform.Stretch();
+                    textContent.VLayout(0, 0, TextAnchor.UpperLeft).childControlHeight = true;
                     ctx.Wire(view, "sideText", text);
                 }
             }

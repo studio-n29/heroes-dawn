@@ -128,7 +128,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             var bg = _button.Fill.color;
             _button.OnPointerEnter(null!);
-            Assert.That(_button.transform.localScale.x, Is.EqualTo(1.04f).Within(1e-4));
+            Assert.That(_button.transform.localScale.x, Is.GreaterThan(1f).And.LessThanOrEqualTo(1.03f), "survol contenu pour éviter le chevauchement des boutons voisins");
             Assert.That(_button.Fill.color.r, Is.GreaterThan(bg.r));
             _button.OnPointerExit(null!);
             Assert.That(_button.transform.localScale, Is.EqualTo(Vector3.one));

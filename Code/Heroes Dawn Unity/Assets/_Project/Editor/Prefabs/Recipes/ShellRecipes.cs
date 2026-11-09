@@ -18,10 +18,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var root = PrefabContext.NewRoot("HubWallet", 920, 70);
+            var root = PrefabContext.NewRoot("HubWallet", 770, 70);
             root.HLayout(14, 0, TextAnchor.MiddleRight);
             var saving = Ui.Txt(root, "", 22, Theme.TextMuted, TextAnchor.MiddleRight, FontKind.Regular, "Saving");
-            saving.Pref(170, 60);
+            saving.Pref(150, 60);
             var credits = Pill(ctx, root, "PillCR", "CR", Theme.Credits);
             var pr = Pill(ctx, root, "PillPR", "PR", Theme.Pr);
             var gems = Pill(ctx, root, "PillGM", "GM", Theme.Perception);
@@ -51,7 +51,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         static TMP_Text Pill(PrefabContext ctx, RectTransform parent, string name, string tag, Color accent)
         {
             var pill = (RectTransform)ctx.Nest("Widgets/ResourcePill.prefab", parent, name).transform;
-            pill.Pref(230, 62);
+            pill.Pref(190, 62);
             pill.Find("Fill/Badge").GetComponent<Image>().color = accent;
             pill.Find("Fill/Badge/Tag").GetComponent<TMP_Text>().text = tag;
             return pill.Find("Fill/Value").GetComponent<TMP_Text>();
@@ -73,29 +73,29 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         {
             var rt = ScreenKit.Root("Hub");
             ScreenKit.Backdrop(rt, Theme.SkyTop, Theme.SkyBottom);
-            ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.8f);
+            var backdrop = ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.28f);
             var relay = rt.gameObject.AddComponent<UiTapRelay>();
 
             // ---- Zone de page (entre les barres, zones sûres de 88 px sur les côtés)
             var pageArea = Ui.Rect(rt, "PageArea").Stretch(Safe, NavH + 12, Safe, TopH + 12);
 
             // ---- Barre haute
-            var top = Ui.Img(rt, "TopBar", Theme.WithAlpha(Theme.Frost, 0.92f), null, true);
+            var top = Ui.Img(rt, "TopBar", Theme.WithAlpha(Theme.Frost, 0.98f), null, true);
             top.rectTransform.TopBand(TopH);
             var back = Ui.LocBtn(top.transform, "nav.back", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Back");
             back.Rect.At(0f, 0.5f, Safe - 70, 0, 160, 96);
             back.gameObject.SetActive(false);
-            var title = Ui.Txt(top.transform, "", 56, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Title");
-            title.rectTransform.At(0f, 0.5f, Safe + 110, 0, 820, 96);
+            var title = Ui.Txt(top.transform, "", 48, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Title");
+            title.rectTransform.At(0f, 0.5f, Safe + 110, 0, 460, 96);
             title.AutoSize(56);
             title.Inked();
             var settings = Ui.LocBtn(top.transform, "nav.settings", Theme.Surface2, Theme.Text, null!, 24, FontKind.Title, "Settings");
             settings.Rect.At(1f, 0.5f, -(Safe - 70), 0, 170, 96);
             var wallet = ctx.Nest<HubWalletView>("Widgets/HubWallet.prefab", top.transform, "Wallet");
-            ((RectTransform)wallet.transform).At(1f, 0.5f, -(Safe - 70) - 190, 0, 920, 70);
+            ((RectTransform)wallet.transform).At(1f, 0.5f, -(Safe - 70) - 190, 0, 770, 70);
             // Avatar du chef d'unité (Agent D ou M) : portrait, nom et fonction, entre le titre et la bourse.
             var avatarRoot = Ui.Rect(top.transform, "Avatar");
-            avatarRoot.At(0f, 0.5f, 835, 0, 250, 84);
+            avatarRoot.At(0f, 0.5f, 680, 0, 250, 84);
             var avatarPortrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", avatarRoot, "Portrait");
             ((RectTransform)avatarPortrait.transform).At(0f, 0.5f, 0, 0, 76, 76);
             var avatarName = Ui.Txt(avatarRoot, "", 30, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Name");
@@ -104,7 +104,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             avatarRole.rectTransform.At(0f, 0.5f, 88, -18, 162, 30);
 
             // ---- Barre de navigation basse
-            var nav = Ui.Img(rt, "NavBar", Theme.WithAlpha(Theme.Frost, 0.95f), null, true);
+            var nav = Ui.Img(rt, "NavBar", Theme.WithAlpha(Theme.Frost, 0.98f), null, true);
             nav.rectTransform.BottomBand(NavH);
             var row = Ui.Rect(nav.transform, "Tabs").Stretch(Safe - 40, 10, Safe - 40, 10);
             row.HLayout(16, 0, TextAnchor.MiddleCenter);
@@ -114,6 +114,10 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             {
                 var tab = Ui.Btn(row, "", Theme.WithAlpha(Theme.Surface, 0f), Theme.TextMuted, null!, 36, FontKind.Title, "Tab" + page);
                 tab.Rect.Pref(330, 96);
+                string glyph = page == HubPage.Team ? "Team" : page == HubPage.Pass ? "Pass" : page == HubPage.Shop || page == HubPage.Recruit ? "Shop" : "Profile";
+                var tabIcon = Ui.Img(tab.Fill.transform, "TabIcon", Theme.Accent, page == HubPage.Qg ? Sprites.DawnStar : Sprites.Glyph(glyph));
+                tabIcon.rectTransform.At(0f, 0.5f, 24, 0, 34, 34);
+                tab.Label.rectTransform.Stretch(70, 4, 18, 4);
                 var badge = Ui.Img(tab.transform, "Badge", Theme.Danger, Sprites.Circle);
                 badge.rectTransform.At(1f, 1f, 6, 10, 48, 48);
                 var badgeText = Ui.Txt(badge.transform, "", 26, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Text");
@@ -135,6 +139,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var view = rt.gameObject.AddComponent<HubShellView>();
             ScreenKit.WireFade(ctx, view);
             ctx.Wire(view, "title", title);
+            ctx.Wire(view, "backdrop", backdrop);
             ctx.Wire(view, "avatarRoot", avatarRoot);
             ctx.Wire(view, "avatar", avatarPortrait);
             ctx.Wire(view, "avatarName", avatarName);

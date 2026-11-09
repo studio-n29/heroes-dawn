@@ -141,17 +141,17 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             title.AutoSize(34);
             title.Inked();
             var description = Ui.Txt(detail.transform, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Description");
-            description.rectTransform.At(0f, 1f, 18, -52, RightW - 36, 72);
+            description.rectTransform.At(0f, 1f, 18, -52, RightW - 36, 118);
             var chips = Ui.Txt(detail.transform, "", 22, Theme.Info, TextAnchor.MiddleLeft, FontKind.Body, "Chips");
-            chips.rectTransform.At(0f, 1f, 18, -126, RightW - 36, 30);
-            var objectives = Ui.Rect(detail.transform, "Objectives").At(0f, 1f, 18, -158, RightW - 36, 100);
+            chips.rectTransform.At(0f, 1f, 18, -170, RightW - 36, 30);
+            var objectives = Ui.Rect(detail.transform, "Objectives").At(0f, 1f, 18, -206, RightW - 36, 100);
             objectives.VLayout(2, 0, TextAnchor.UpperLeft);
             var rewards = Ui.Txt(detail.transform, "", 24, Theme.Success, TextAnchor.MiddleLeft, FontKind.Body, "Rewards");
             rewards.rectTransform.At(0f, 0f, 18, 10, RightW - 36, 34);
 
             var chapters = Ui.LocBtn(column, "chapters.button", Theme.Surface3, Theme.Text, null!, 34, FontKind.Title, "Chapters");
             chapters.Rect.At(0.5f, 0f, 0, 108, RightW, 96);
-            var deploy = Ui.Btn(column, "", Theme.Danger, Color.white, null!, 54, FontKind.Title, "Deploy");
+            var deploy = Ui.Btn(column, "", Theme.Primary, Theme.TextDark, null!, 54, FontKind.Title, "Deploy");
             deploy.Rect.At(0.5f, 0f, 0, 0, RightW, 96);
             deploy.Label.Inked();
             RecipeKit.Mark(deploy, TutorialTarget.MapDeploy);

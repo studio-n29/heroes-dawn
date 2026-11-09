@@ -58,6 +58,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         public bool NeedsTarget;
         /// <summary>Initiale affichée sur l'icône.</summary>
         public string Glyph;
+        /// <summary>Identifiant du visuel de compétence existant ; indépendant du nom localisé.</summary>
+        public string ArtKey;
     }
 
     public struct SkillPanelData
@@ -124,6 +126,9 @@ namespace N29.HeroesDawn.Presentation.Combat
         public string Reward;
         public string FatigueTitle;
         public FatigueRowData[] Fatigue;
+        /// <summary>EXP des agents (victoire seulement) : même ligne que la fatigue, jauge = progression vers le palier.</summary>
+        public string XpTitle;
+        public FatigueRowData[] Xp;
         public string Verify;
         public string ToHq;
         public string Continue;

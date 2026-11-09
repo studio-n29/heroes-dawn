@@ -11,6 +11,9 @@ namespace N29.HeroesDawn.Presentation.Popups
         public string Body;
         public string Skip;
         public string Take;
+        /// <summary>Fatigue actuelle → après repos de chaque agent de l'escouade (planche 7.4).</summary>
+        public string FatigueTitle;
+        public N29.HeroesDawn.Presentation.Combat.FatigueRowData[] Fatigue;
     }
 
     public struct NarrativeChoiceData
@@ -44,6 +47,10 @@ namespace N29.HeroesDawn.Presentation.Popups
         public string Title;
         public string Rewards;
         public string ToHq;
+        /// <summary>Carte « Objectifs » (une ligne par objectif, coché ou non) et titres des deux cartes.</summary>
+        public string ObjectivesTitle;
+        public string Objectives;
+        public string RewardsTitle;
     }
 
     /// <summary>Activité (hors réflexe) : description, lignes de détail (décor, réglages, niveau), mention « en développement », résultats à simuler.</summary>

@@ -39,6 +39,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField, Mvp.OptionalRef] RectTransform? dropZone;
         [SerializeField, Mvp.OptionalRef] RectTransform? arena;
         [SerializeField, Mvp.OptionalRef] TMP_Text? arenaTitle;
+        [SerializeField, Mvp.OptionalRef] UnityEngine.UI.Image? spotlight;
         [SerializeField] BonusChipView[] bonusChips = null!;
         [SerializeField] BossBarView bossBar = null!;
 
@@ -193,12 +194,13 @@ namespace N29.HeroesDawn.Presentation.Combat
                 card.Setup(u);
                 card.Tapped += id => UnitTapped?.Invoke(id);
                 _cards[u.Id] = card;
+                if (u.Ally && allies == 1) Spotlight(card.PortraitArt);
             }
         }
 
         /// <summary>Chaque camp est un bloc de deux rangées de deux cartes (croquis du combat) ; sans rangées, les cartes sont posées dans le bloc.</summary>
         static RectTransform RowFor(RectTransform block, int index)
-            => block.childCount == 0 ? block : (RectTransform)block.GetChild(Mathf.Min(index / 2, block.childCount - 1));
+            => block.childCount == 0 ? block : (RectTransform)block.GetChild(Mathf.Min(block.childCount >= 4 ? index : index / 2, block.childCount - 1));
 
         static void ClearRows(RectTransform block)
         {
@@ -355,7 +357,20 @@ namespace N29.HeroesDawn.Presentation.Combat
         }
 
         public void Hit(int unitId) { if (_cards.TryGetValue(unitId, out var c)) c.Hit(); }
-        public void Act(int unitId) { if (_cards.TryGetValue(unitId, out var c)) c.Act(); }
+        public void Act(int unitId)
+        {
+            if (!_cards.TryGetValue(unitId, out var c)) return;
+            c.Act();
+            Spotlight(c.PortraitArt);
+        }
+
+        /// <summary>Grande illustration de l'unité qui agit, au centre du terrain (planche 8.2) ; masquée sans illustration.</summary>
+        void Spotlight(Sprite? art)
+        {
+            if (spotlight == null || art == null) return;
+            spotlight.sprite = art;
+            spotlight.gameObject.SetActive(true);
+        }
 
         public UniTask PauseAsync(float seconds, CancellationToken ct)
             => UniTask.Delay(TimeSpan.FromSeconds(seconds), ignoreTimeScale: true, cancellationToken: ct);

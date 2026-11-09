@@ -80,6 +80,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => popup.ContinueVisible, 300);
             Assert.That(popup.Cards.All(x => x.Revealed && x.FaceVisible), Is.True, "toutes les cartes sont retournées");
             popup.ContinueButton.onClick.Invoke();
+            Assert.That(popup.Current, Is.EqualTo(BoosterOpeningPopupView.Phase.Summary));
+            Assert.That(popup.GetComponentsInChildren<TMPro.TMP_Text>().Any(t => t.text == N29.HeroesDawn.Presentation.Common.Loc.F("booster.received", 3)), Is.True, "le résumé n'affiche plus l'invite d'ouverture");
+            Assert.That(CollectionOps.Boosters(session, BoosterDef.StandardId), Is.EqualTo(0), "le résumé ne consomme pas un second booster");
+            popup.ContinueButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoosterOpeningPopupView>() == null, 120);
             Assert.That(CollectionOps.Boosters(session, BoosterDef.StandardId), Is.EqualTo(0));
             Assert.That(session.Content.Collection.Cards.Sum(card => CollectionOps.OwnedCards(session, card.Id)), Is.EqualTo(3));
@@ -113,6 +117,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return ScreenCaptureTests.Capture("62-booster-revelation");
             popup.TapButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => popup.ContinueVisible, 300);
+            popup.ContinueButton.onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.6f);
             yield return ScreenCaptureTests.Capture("63-booster-resume");
             popup.ContinueButton.onClick.Invoke();

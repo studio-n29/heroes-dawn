@@ -7,7 +7,7 @@ namespace N29.HeroesDawn.Tests.Editor
 {
     public sealed class ThemeTests
     {
-        [Test, Description("Vérifie que le texte blanc atteint 4,5:1 sur les panneaux violets et le fond, le texte secondaire sur les surfaces principales et le texte sombre sur le jaune d'action — parce que le style Mo.Co repose sur des aplats pleins où le texte doit rester lisible")]
+        [Test, Description("Les textes Aube tactique restent lisibles sur les surfaces marines, l'ivoire d'action et les accents de laiton")]
         public void Theme_TextOnSurfaces_MeetsContrast()
         {
             foreach (var bg in new[] { Theme.Surface, Theme.Surface2, Theme.Surface3, Theme.Background })
@@ -15,7 +15,24 @@ namespace N29.HeroesDawn.Tests.Editor
             foreach (var bg in new[] { Theme.Surface, Theme.Surface3, Theme.Background })
                 Assert.That(ThemeContrast.Ratio(Theme.TextMuted, bg), Is.GreaterThanOrEqualTo(4.5f), "TextMuted sur " + bg);
             Assert.That(ThemeContrast.Ratio(Theme.TextDark, Theme.Accent), Is.GreaterThanOrEqualTo(4.5f), "texte sombre sur jaune d'action");
+            Assert.That(ThemeContrast.Ratio(Theme.TextDark, Theme.Primary), Is.GreaterThanOrEqualTo(4.5f), "texte sombre sur ivoire d'action");
             Assert.That(ThemeContrast.Ratio(Theme.Outline, Theme.Surface), Is.GreaterThanOrEqualTo(1.5f), "le contour se détache du panneau");
+        }
+
+        [Test, Description("Le passage d'un bouton secondaire sombre à un état actif ivoire conserve un libellé contrasté")]
+        public void Button_ActiveState_KeepsReadableLabel()
+        {
+            var parent = new GameObject("Contrast", typeof(RectTransform));
+            try
+            {
+                var button = Ui.Btn(parent.transform, "Mission", Theme.Primary, Theme.Text, null);
+                Assert.That(ThemeContrast.Ratio(button.Fill.color, button.Label.color), Is.GreaterThanOrEqualTo(4.5f));
+                button.SetColors(Theme.Surface3, Theme.TextDark);
+                Assert.That(ThemeContrast.Ratio(button.Fill.color, button.Label.color), Is.GreaterThanOrEqualTo(4.5f));
+                button.SetColors(Theme.Primary, Theme.Text);
+                Assert.That(ThemeContrast.Ratio(button.Fill.color, button.Label.color), Is.GreaterThanOrEqualTo(4.5f));
+            }
+            finally { Object.DestroyImmediate(parent); }
         }
 
         [Test, Description("Vérifie que les quatre familles restent deux à deux distinctes après l'adoucissement — parce qu'elles servent à lire le gameplay d'un coup d'œil")]

@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// </summary>
     public abstract class ListPageView : ViewBase, IListPageView, IFilterBarView
     {
-        const float FilterRowH = 56f, FilterGap = 8f, FilterButtonW = 190f;
+        const float FilterRowH = 96f, FilterGap = 8f, FilterButtonW = 190f;
         [SerializeField] TMP_Text headerTitle = null!;
         [SerializeField] TMP_Text headerLine = null!;
         [SerializeField] UiBar headerBar = null!;
@@ -113,6 +113,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 row.anchorMin = new Vector2(0, 1); row.anchorMax = new Vector2(1, 1); row.pivot = new Vector2(0.5f, 1);
                 row.sizeDelta = new Vector2(0, FilterRowH);
                 row.anchoredPosition = new Vector2(0, -g * (FilterRowH + FilterGap));
+                var layout = row.HLayout(8, 4, TextAnchor.MiddleLeft);
+                layout.childControlWidth = true;
+                layout.childForceExpandWidth = true;
                 var buttons = new List<UiButton>();
                 for (int o = 0; o < groups[g].Labels.Length; o++)
                 {
@@ -124,6 +127,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                     rt.pivot = new Vector2(0, 0.5f);
                     rt.sizeDelta = new Vector2(FilterButtonW, FilterRowH);
                     rt.anchoredPosition = new Vector2(4 + o * (FilterButtonW + 8), 0);
+                    var element = b.gameObject.GetComponent<LayoutElement>() ?? b.gameObject.AddComponent<LayoutElement>();
+                    element.minWidth = 0; element.preferredWidth = FilterButtonW; element.flexibleWidth = 1; element.preferredHeight = FilterRowH;
                     b.SetLabel(groups[g].Labels[o]);
                     b.Interactable = true;
                     b.DisabledReason = "";
@@ -150,6 +155,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (sideRoot == null) return;
             if (sideTitle != null) sideTitle.text = d.Title;
             if (sideText != null) sideText.text = d.Text ?? "";
+            if (sideRows != null && sideText != null)
+            {
+                float height = string.IsNullOrEmpty(d.Text) ? 0 : Mathf.Clamp(sideText.GetPreferredValues(d.Text, sideText.rectTransform.rect.width, 0).y + 8, 36, 220);
+                sideText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+                // The content belongs to a ScrollRect inside the Rows viewport.
+                var area = sideRows.parent.parent as RectTransform;
+                if (area != null) area.offsetMin = new Vector2(area.offsetMin.x, height + 24);
+            }
             if (sideRows != null) Fill(_side, sideRows, d.Rows ?? Array.Empty<InfoRowData>(), (r, b) => SideButtonClicked?.Invoke(r, b), r => SideRowSelected?.Invoke(r), false);
         }
 
@@ -173,3 +186,5 @@ namespace N29.HeroesDawn.Presentation.Hub
         }
     }
 }
+
+

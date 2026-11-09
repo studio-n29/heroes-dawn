@@ -130,7 +130,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _nav.ShopTab = ShopTab.Boosters;
             var p = Start(new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(_host), _loc, _toasts,
                                                     _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Collection, _nav));
-            _view.ClickRow(1);
+            _view.ClickRow(0);
             Assert.That(CollectionOps.Boosters(_app.Session, BoosterDef.StandardId), Is.EqualTo(1));
             _view.ClickHeader(1);
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Grimoire));

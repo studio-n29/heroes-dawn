@@ -38,13 +38,21 @@ namespace N29.HeroesDawn.Tests.PlayMode
         static IObjectResolver Container => GameBootstrap.Instance!.Scope.Container;
         static IGameFlow Flow => Container.Resolve<IGameFlow>();
 
-        static string Folder => Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "../../docs/test-reports/captures"));
+        static string CaptureArg(string key, string fallback)
+        {
+            var args = System.Environment.GetCommandLineArgs();
+            int index = System.Array.IndexOf(args, key);
+            return index >= 0 && index + 1 < args.Length ? args[index + 1] : fallback;
+        }
+
+        internal static string Folder => Path.GetFullPath(CaptureArg("-captureFolder", Path.Combine(UnityEngine.Application.dataPath, "../../docs/test-reports/captures")));
 
         internal static IEnumerator Capture(string name)
         {
             for (int i = 0; i < 20; i++) yield return null; // fondus et mises en page terminés
             // En batchmode, la fin d'image n'arrive jamais (WaitForEndOfFrame bloque) : rendu explicite par une caméra.
-            const int w = 2160, h = 972; // téléphone 20:9 : le cas le plus bas (zone de page de ~710 px)
+            int w = int.Parse(CaptureArg("-captureWidth", "2160"));
+            int h = int.Parse(CaptureArg("-captureHeight", "972"));
             var rt = new RenderTexture(w, h, 24);
             var camGo = new GameObject("CaptureCamera");
             var cam = camGo.AddComponent<Camera>();
@@ -61,6 +69,11 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 canvases[i].worldCamera = cam;
                 canvases[i].planeDistance = 10f - canvases[i].sortingOrder * 0.01f;
             }
+            Canvas.ForceUpdateCanvases();
+            // Let canvas scalers and responsive layouts observe the render target's aspect.
+            yield return null;
+            Canvas.ForceUpdateCanvases();
+            foreach (var layout in Object.FindObjectsByType<TacticalPageLayout>(FindObjectsSortMode.None)) layout.Reflow();
             Canvas.ForceUpdateCanvases();
             cam.Render();
             var prev = RenderTexture.active;
@@ -85,6 +98,30 @@ namespace N29.HeroesDawn.Tests.PlayMode
         }
 
         static HubShellView Shell => Object.FindAnyObjectByType<HubShellView>()!;
+
+        [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Relit les huit catégories de réglages et les archives dans le viewport choisi, avec les vrais contrôles de catégorie")]
+        public IEnumerator CaptureAllSettingsAndArchives()
+        {
+            yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
+            Container.Resolve<N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide>().Skip();
+            var nav = Object.FindAnyObjectByType<N29.HeroesDawn.Composition.HubLifetimeScope>()!.Container.Resolve<HubNavigator>();
+            Shell.SettingsButton.Button.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<SettingsPageView>());
+            var settings = Object.FindAnyObjectByType<SettingsPageView>()!;
+            var names = new[] { "80-parametres-audio", "81-parametres-graphismes", "82-parametres-accessibilite", "83-parametres-langue", "84-parametres-notifications", "86-parametres-controles", "87-parametres-compte", "85-parametres-support" };
+            for (int i = 0; i < names.Length; i++)
+            {
+                settings.CategoryButton(i).onClick.Invoke();
+                yield return CaptureSettled(names[i]);
+                Assert.That(settings.Rows.Count, Is.GreaterThan(0));
+            }
+            nav.SelectTab(HubPage.Profile);
+            yield return null;
+            nav.Open(HubPage.Archives);
+            yield return CaptureSettled("15b-archives");
+        }
 
         static IEnumerator Tab(HubPage tab)
         {
@@ -134,7 +171,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("40-pass");
             yield return Tab(HubPage.Shop);
             yield return CaptureSettled("50-boutique");
-            foreach (var shopTab in new[] { (ShopTab.Boosters, "50b-boutique-boosters"), (ShopTab.Gems, "50c-boutique-gemmes") })
+            foreach (var shopTab in new[] { (ShopTab.Boosters, "50b-boutique-boosters"), (ShopTab.Gems, "50c-boutique-gemmes"), (ShopTab.Gift, "50d-boutique-cadeau") })
             {
                 Object.FindAnyObjectByType<ShopTabsView>()!.Tab((int)shopTab.Item1).Button.onClick.Invoke();
                 yield return CaptureSettled(shopTab.Item2);
@@ -207,14 +244,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("91c-repaire");
             Object.FindAnyObjectByType<LairPageView>()!.HeaderButtonA.Button.onClick.Invoke();
             yield return CaptureSettled("91d-repaire-confirmation");
-            Shell.BackButton.Button.onClick.Invoke(); // ferme la confirmation
-            yield return null;
-            Shell.BackButton.Button.onClick.Invoke(); // repaire → chapitres
-            yield return null;
-            Shell.BackButton.Button.onClick.Invoke();
-            yield return null;
-            Shell.BackButton.Button.onClick.Invoke();
-            yield return null;
+            Object.FindAnyObjectByType<ConfirmPopupView>()!.CancelButton.Button.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<ConfirmPopupView>() == null);
 
             yield return Tab(HubPage.Team);
             Object.FindAnyObjectByType<TeamPageView>()!.Tiles[0].TapButton.onClick.Invoke();
@@ -277,6 +308,53 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 yield return null;
             }
             Assert.That(File.Exists(Path.Combine(Folder, "102-minijeu-caisses.png")));
+        }
+
+        static bool HasView(string typeName) => Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).Any(m => m != null && m.GetType().Name == typeName);
+
+        [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Capture les écrans qui n'avaient pas de capture : journal de quêtes, confirmation de retour, potion, dialogue à choix — parce que la comparaison avec les planches 16 et 19 en a besoin")]
+        public IEnumerator CaptureMissingScreens()
+        {
+            // Journal de quêtes (QG).
+            yield return ActivityGamesPlayTests.OnBoardNext(PrototypeContent.Zone11, "n21");
+            // Retour au QG depuis le plateau : fenêtre de confirmation.
+            Object.FindAnyObjectByType<BoardView>()!.BackButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<ConfirmPopupView>() != null, 300);
+            yield return CaptureSettled("120-retour-qg-confirmation");
+            Object.FindAnyObjectByType<ConfirmPopupView>()!.CancelButton.Button.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<ConfirmPopupView>() == null, 300);
+
+            // Dialogue à choix (case n21 de la zone 1.1).
+            PlayModeHarness.TapNode(new N29.HeroesDawn.Core.CaseId("n21"));
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<DialoguePopupView>() != null, 600);
+            yield return CaptureSettled("121-dialogue-choix");
+            var dialogue = Object.FindAnyObjectByType<DialoguePopupView>()!;
+            var script = Container.Resolve<GameSession>().Run!.CurrentActivity!.Level.PayloadAs<N29.HeroesDawn.Domain.Activities.DialogueScript>()!;
+            foreach (var line in script.Lines)
+            {
+                yield return PlayModeHarness.WaitFor(() => dialogue.ChoiceButtons == line.Choices.Count);
+                dialogue.ChoiceButton(line.Choices.First(c => c.Score == 2).Index).onClick.Invoke();
+                yield return PlayModeHarness.WaitFor(() => dialogue.ChoiceButtons == 0, 120);
+            }
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<DialoguePopupView>() == null, 900);
+        }
+
+        [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Capture la potion et le journal de quêtes")]
+        public IEnumerator CapturePotionAndQuests()
+        {
+            yield return ActivityGamesPlayTests.OnBoardNext(PrototypeZones.Zone13, "n06", prototypeZone: true);
+            PlayModeHarness.TapNode(new N29.HeroesDawn.Core.CaseId("n06"));
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<PotionPopupView>() != null, 600);
+            yield return CaptureSettled("122-potion");
+
+            yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning);
+            Container.Resolve<N29.HeroesDawn.Application.Features.Tutorial.TutorialGuide>().Skip();
+            yield return new WaitForSecondsRealtime(0.3f);
+            Object.FindAnyObjectByType<QgPageView>()!.QuestsButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => HasView("QuestLogPopupView"), 300);
+            yield return CaptureSettled("123-journal-quetes");
         }
 
         [UnityTest, Explicit("Captures à la demande"), Timeout(300000), Description("Produit les captures du compte : titre avec le bouton, fenêtre Compte (connexion, erreur, création), choix de progression, profil invité et connecté — parce que ces écrans se relisent à l'œil (lot I)")]
@@ -408,6 +486,41 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning);
             yield return Capture("03-plateau");
 
+            // Écran « zone sécurisée » ouvert directement (la victoire du test ne valide pas la zone).
+            ActivityGamesPlayTests.CasePresenter().ShowZoneCompleteAsync(new N29.HeroesDawn.Application.Features.Zone.ZoneRewards(1500, 40, true), default).Forget();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.ZoneCompletePopupView>() != null, 300);
+            for (int i = 0; i < 30; i++) yield return null;
+            yield return Capture("05b-zone-securisee");
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.ZoneCompletePopupView>()!.ToHqButton.onClick.Invoke();
+            for (int i = 0; i < 30; i++) yield return null;
+
+            // Fenêtre « Repos » ouverte directement avec la fatigue des agents de l'escouade.
+            var restSquad = Container.Resolve<N29.HeroesDawn.Application.Session.ISessionReadModel>().Squad;
+            var restRows = new System.Collections.Generic.List<N29.HeroesDawn.Presentation.Combat.FatigueRowData>();
+            int fat = 30;
+            foreach (var m in restSquad)
+            {
+                restRows.Add(new N29.HeroesDawn.Presentation.Combat.FatigueRowData
+                {
+                    Name = m.Def.Id.Value, Before01 = fat / 100f, After01 = (fat - 20) / 100f, After = fat - 20, Label = fat + " % → " + (fat - 20) + " %", Delta = "",
+                });
+                fat += 15;
+            }
+            var restView = Container.Resolve<N29.HeroesDawn.Presentation.Mvp.IModalService>();
+            var restPopup = restView.OpenAsync<N29.HeroesDawn.Presentation.Popups.IRestPopupView>(default);
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.RestPopupView>() != null, 300);
+            var restPrefab = Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.RestPopupView>()!;
+            restPrefab.ChooseAsync(new N29.HeroesDawn.Presentation.Popups.RestPopupData
+            {
+                Title = "Repos", Body = "Se reposer fait baisser la fatigue de toute l'escouade.", Skip = "Continuer", Take = "Se reposer",
+                FatigueTitle = "Fatigue actuelle → après repos", Fatigue = restRows.ToArray(),
+            }, default).Forget();
+            for (int i = 0; i < 30; i++) yield return null;
+            yield return Capture("05c-repos");
+            restPrefab.RequestCancel();
+            restView.Close(restPrefab);
+            for (int i = 0; i < 30; i++) yield return null;
+
             PlayModeHarness.TapNode(new N29.HeroesDawn.Core.CaseId("n03"));
             yield return PlayModeHarness.WaitFor(() => SceneManager.GetSceneByName(SceneNames.Combat).isLoaded && !Flow.IsTransitioning, 600);
             yield return new WaitForSecondsRealtime(5f); // le temps qu un allié soit prêt (panneau de compétences)
@@ -434,3 +547,4 @@ namespace N29.HeroesDawn.Tests.PlayMode
         }
     }
 }
+

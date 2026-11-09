@@ -28,10 +28,14 @@ namespace N29.HeroesDawn.Tests.Editor
         [Test, Description("Vérifie que chaque sprite du HUD (panneau, losange, reflet, skyline) est cuit en asset et que les panneaux sont découpés en 9 — parce qu'un prefab ne référence que des assets et que les coins coupés doivent rester intacts à l'étirement")]
         public void Bake_WritesHudSprites()
         {
-            foreach (var name in new[] { "Panel", "PanelSmall", "Diamond", "Shine", "Skyline", "PanelFrame", "Bracket", "Bust" })
+            foreach (var name in Sprites.UiSpriteNames)
                 Assert.That(Resources.Load<Sprite>("UI/" + name), Is.Not.Null, name);
-            Assert.That(Resources.Load<Sprite>("UI/Panel").border, Is.EqualTo(new Vector4(15, 15, 15, 15)));
-            Assert.That(Resources.Load<Sprite>("UI/PanelSmall").border, Is.EqualTo(new Vector4(9, 9, 9, 9)));
+            foreach (var name in new[] { "Panel", "PanelSmall", "PanelFrame" })
+            {
+                var sprite = Resources.Load<Sprite>("UI/" + name);
+                Assert.That(sprite.border.x, Is.GreaterThan(0), name);
+                Assert.That(sprite.border.x * 2, Is.LessThan(sprite.rect.width), name + " : centre étirable");
+            }
         }
 
         [Test, Description("Vérifie que le fond paysage importé garde la largeur de l'image d'origine — parce que les illustrations étaient stockées en octets pour ne pas être redimensionnées par l'import Unity")]
@@ -49,7 +53,7 @@ namespace N29.HeroesDawn.Tests.Editor
         [Test, Description("Vérifie que les 3 polices TMP existent, sont dynamiques et ont un matériau encré à contour — parce que la spec impose Barlow Condensed en TextMeshPro avec une ombre douce partagée")]
         public void Fonts_AreDynamicTmpAssets()
         {
-            foreach (var name in new[] { "BarlowCondensed-ExtraBoldItalic", "BarlowCondensed-SemiBold", "BarlowCondensed-Regular" })
+            foreach (var name in new[] { "BarlowCondensed-ExtraBoldItalic", "BarlowCondensed-SemiBold", "BarlowCondensed-Regular", "Barlow-SemiBold", "Barlow-Regular" })
             {
                 var fa = Resources.Load<TMP_FontAsset>(FontAssetGenerator.ResourcesFolder + "/" + name + " SDF");
                 Assert.That(fa, Is.Not.Null, name);
@@ -65,7 +69,7 @@ namespace N29.HeroesDawn.Tests.Editor
         public void Fonts_CoverFrenchGlyphs()
         {
             const string glyphs = "éèêëàâîïôûùüçœÉÈÀÇŒ«»’…°";
-            foreach (var name in new[] { "BarlowCondensed-ExtraBoldItalic", "BarlowCondensed-SemiBold", "BarlowCondensed-Regular" })
+            foreach (var name in new[] { "BarlowCondensed-ExtraBoldItalic", "BarlowCondensed-SemiBold", "BarlowCondensed-Regular", "Barlow-SemiBold", "Barlow-Regular" })
             {
                 var font = Resources.Load<Font>("Fonts/" + name);
                 Assert.That(font, Is.Not.Null, name);
@@ -82,6 +86,9 @@ namespace N29.HeroesDawn.Tests.Editor
                 var t = Ui.Txt(parent.transform, "x", 30, Color.white, TextAnchor.MiddleCenter, FontKind.Title);
                 Assert.That(t, Is.InstanceOf<TextMeshProUGUI>());
                 Assert.That(t.font.name, Does.Contain("BarlowCondensed"));
+                Assert.That(t.fontSharedMaterial.GetFloat(ShaderUtilities.ID_OutlineWidth), Is.EqualTo(0).Within(0.001f), "Le titre ne porte plus de contour comics");
+                var body = Ui.Txt(parent.transform, "Une interface lisible", 30, Theme.Text);
+                Assert.That(body.font.name, Does.StartWith("Barlow-SemiBold"), "Le texte courant utilise la chasse normale");
             }
             finally { Object.DestroyImmediate(parent); }
         }

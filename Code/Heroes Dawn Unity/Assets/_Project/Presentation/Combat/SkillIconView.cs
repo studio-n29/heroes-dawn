@@ -15,6 +15,7 @@ namespace N29.HeroesDawn.Presentation.Combat
     {
         [SerializeField] Button button = null!;
         [SerializeField] Image disc = null!;
+        [SerializeField, Mvp.OptionalRef] Image? artwork;
         [SerializeField] Image costBadge = null!;
         [SerializeField] Image ring = null!;
         [SerializeField] TMP_Text glyph = null!;
@@ -36,6 +37,8 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         /// <summary>Dernière donnée affichée (tests).</summary>
         public SkillSlotData Data { get; private set; }
+        string? _artKey;
+        Sprite? _cachedArt;
 
         void Awake()
         {
@@ -56,13 +59,27 @@ namespace N29.HeroesDawn.Presentation.Combat
             slot.text = (index + 1).ToString();
             glyph.text = d.Locked ? "+" : d.Glyph;
             if (label != null) label.text = d.Locked ? "" : NameOf(d.Label);
-            var baseColor = d.Locked ? Theme.Surface3 : Color.Lerp(index == 3 ? Theme.Perception : index == 2 ? Theme.Danger : index == 1 ? Theme.Info : Theme.Primary, Color.white, 0.3f);
-            disc.color = d.Pending ? Color.white : baseColor;
-            glyph.color = d.Locked ? Theme.TextMuted : Theme.TextOnDark;
+            disc.color = d.Pending ? Theme.Surface2 : Theme.SurfaceDark;
+            if (_artKey != d.ArtKey)
+            {
+                _artKey = d.ArtKey;
+                _cachedArt = AgentArt.Skill(d.ArtKey ?? "");
+            }
+            var art = d.Locked ? null : _cachedArt;
+            if (artwork != null)
+            {
+                artwork.sprite = art;
+                artwork.gameObject.SetActive(art != null);
+                var fit = artwork.GetComponent<AspectRatioFitter>();
+                if (fit != null && art != null) fit.aspectRatio = art.rect.width / art.rect.height;
+            }
+            glyph.gameObject.SetActive(d.Locked || art == null);
+            glyph.color = Theme.Text;
+            if (label != null) label.color = Theme.Text;
             bool paid = !d.Locked && d.Cost > 0;
             costBadge.gameObject.SetActive(paid);
             cost.text = paid ? d.Cost.ToString() : "";
-            cost.color = d.Affordable ? Theme.Glow : Theme.Danger;
+            cost.color = d.Affordable ? Theme.TextDark : Theme.Danger;
             ring.gameObject.SetActive(d.Enabled || d.Pending);
             ring.color = d.Pending ? Theme.Primary : Theme.Glow;
             button.interactable = d.Enabled;

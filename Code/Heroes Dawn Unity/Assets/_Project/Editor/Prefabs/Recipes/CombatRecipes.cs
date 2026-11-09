@@ -93,7 +93,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ((RectTransform)gauge.transform).Row(12, 12, -180, 12);
             var statuses = Ui.Txt(fill.transform, "", 20, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "Statuses");
             statuses.rectTransform.Row(12, 12, -196, 24);
-            var sub = Ui.Txt(fill.transform, "", 20, Theme.AccentDark, TextAnchor.UpperLeft, FontKind.Body, "Sub");
+            var sub = Ui.Txt(fill.transform, "", 20, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Sub");
             sub.rectTransform.Row(12, 12, -218, 24);
             var ko = Ui.Txt(fill.transform, "K.O.", 64, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Title, "KO");
             ko.rectTransform.Stretch();
@@ -169,7 +169,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var unitName = Ui.Txt(fill.transform, "", 28, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Name");
             unitName.rectTransform.At(0f, 1f, 112, -8, 190, 32);
             unitName.AutoSize(28);
-            var sub = Ui.Txt(fill.transform, "", 20, Theme.AccentDark, TextAnchor.MiddleRight, FontKind.Body, "Sub");
+            var sub = Ui.Txt(fill.transform, "", 20, Theme.Text, TextAnchor.MiddleRight, FontKind.Body, "Sub");
             sub.rectTransform.At(1f, 1f, -14, -10, 150, 28);
             var hp = Ui.Bar(fill.transform, "Hp", Theme.Hp, Theme.Surface3, true, 20);
             ((RectTransform)hp.transform).At(0f, 1f, 112, -44, 310, 24);
@@ -224,23 +224,24 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var root = PrefabContext.NewRoot("TimelineMarker", 80, 80);
+            var root = PrefabContext.NewRoot("TimelineMarker", 56, 56);
             root.anchorMin = root.anchorMax = root.pivot = new Vector2(0.5f, 0.5f);
             var group = root.gameObject.AddComponent<CanvasGroup>();
             group.blocksRaycasts = false;
             var ring = Ui.Img(root, "Ring", Color.white, Sprites.Ring);
-            ring.rectTransform.At(0.5f, 0.5f, 0, 0, 104, 104);
+            ring.rectTransform.At(0.5f, 0.5f, 0, 0, 68, 68);
             ring.gameObject.AddComponent<Pulse>().Amplitude = 0.1f;
             ring.gameObject.SetActive(false);
             var frame = Ui.Img(root, "Frame", Theme.Navy, Sprites.Diamond);
-            frame.rectTransform.At(0.5f, 0.5f, 0, 0, 88, 88);
+            frame.rectTransform.At(0.5f, 0.5f, 0, 0, 56, 56);
             var disc = Ui.Img(frame.transform, "Disc", Theme.Info, Sprites.Diamond);
             disc.rectTransform.Stretch(7, 7, 7, 7);
-            var initial = Ui.Txt(disc.transform, "", 34, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Initial");
+            var initial = Ui.Txt(disc.transform, "", 26, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Initial");
             initial.rectTransform.Stretch();
             initial.Inked();
             var plan = Ui.Txt(root, "", 30, Theme.Primary, TextAnchor.LowerCenter, FontKind.Title, "Plan");
-            plan.rectTransform.At(0.5f, 1f, 0, 42, 160, 36);
+            plan.rectTransform.At(0.5f, 0f, 0, -8, 120, 24);
+            plan.fontSize = 20;
             plan.textWrappingMode = TextWrappingModes.NoWrap;
             plan.Inked();
             plan.gameObject.SetActive(false);
@@ -257,8 +258,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     /// <summary>Carte de compétence de l'éventail du bas d'écran (150 × 210) : numéro en losange, grande initiale, nom, coût en énergie, anneau lumineux.</summary>
     public sealed class SkillIconRecipe : IPrefabRecipe
     {
-        public const float Width = 150f;
-        public const float Height = 210f;
+        public const float Width = 180f;
+        public const float Height = 236f;
         public string RelativePath => "Widgets/SkillIcon.prefab";
         public int Order => 0;
 
@@ -285,12 +286,15 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             ctx.Wire(drag, "group", group);
             var disc = Ui.Img(frame.transform, "Disc", Theme.Primary, Sprites.Panel);
             disc.rectTransform.Stretch(3, 3, 3, 3);
-            var shine = Ui.Img(disc.transform, "Shine", new Color(1f, 1f, 1f, 0.35f), Sprites.Shine);
-            shine.rectTransform.Stretch();
+            var holder = Ui.Rect(disc.transform, "ArtHolder").Stretch(4, 74, 4, 4);
+            holder.gameObject.AddComponent<RectMask2D>();
+            var artwork = Ui.Img(holder, "Artwork", Color.white);
+            artwork.rectTransform.Stretch();
+            artwork.gameObject.AddComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
             var glyph = Ui.Txt(disc.transform, "A", 84, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Glyph");
             glyph.rectTransform.At(0.5f, 1f, 0, -26, 134, 100);
             var label = Ui.Txt(disc.transform, "", 24, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Label");
-            label.rectTransform.At(0.5f, 0f, 0, 10, 134, 66);
+            label.rectTransform.At(0.5f, 0f, 0, 8, 162, 62);
             label.enableAutoSizing = true;
             label.fontSizeMax = 24;
             label.fontSizeMin = 20;
@@ -304,6 +308,7 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             var view = root.gameObject.AddComponent<SkillIconView>();
             ctx.Wire(view, "button", button);
             ctx.Wire(view, "disc", disc);
+            ctx.Wire(view, "artwork", artwork);
             ctx.Wire(view, "ring", ring);
             ctx.Wire(view, "glyph", glyph);
             ctx.Wire(view, "slot", slot);
@@ -350,15 +355,20 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
 
         public GameObject Build(PrefabContext ctx)
         {
-            var (root, content, title) = CasePopupKit.Build("CombatResultsPopup", 1100, 720, Theme.Primary, out var window);
+            var (root, content, title) = CasePopupKit.Build("CombatResultsPopup", 1100, 1000, Theme.Primary, out var window);
             var band = window.Find("TitleBand/Fill").GetComponent<Image>();
             var reward = Ui.Txt(content, "", 50, Theme.Primary, TextAnchor.UpperCenter, FontKind.Title, "Reward");
-            reward.rectTransform.At(0.5f, 1f, 0, -6, 900, 60);
+            reward.rectTransform.At(0.5f, 1f, 0, -4, 900, 110);
+            reward.AutoSize(46);
             reward.Inked();
             var fatigueTitle = Ui.Txt(content, "", 28, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "FatigueTitle");
-            fatigueTitle.rectTransform.At(0.5f, 1f, 0, -76, 900, 36);
-            var list = Ui.Rect(content, "Fatigue").At(0.5f, 1f, 0, -118, 900, 260);
-            list.VLayout(10, 0, TextAnchor.UpperCenter);
+            fatigueTitle.rectTransform.At(0.5f, 1f, 0, -118, 900, 36);
+            var list = Ui.Rect(content, "Fatigue").At(0.5f, 1f, 0, -156, 900, 240);
+            list.VLayout(8, 0, TextAnchor.UpperCenter);
+            var xpTitle = Ui.Txt(content, "", 28, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "XpTitle");
+            xpTitle.rectTransform.At(0.5f, 1f, 0, -404, 900, 36);
+            var xpList = Ui.Rect(content, "Xp").At(0.5f, 1f, 0, -442, 900, 240);
+            xpList.VLayout(8, 0, TextAnchor.UpperCenter);
             var verify = Ui.Txt(content, "", 22, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Regular, "Verify");
             verify.rectTransform.At(0.5f, 0f, 0, 118, 900, 34);
             var toHq = Ui.Txt(content, "", 26, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Body, "ToHq");
@@ -373,6 +383,8 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             ctx.Wire(view, "fatigueTitle", fatigueTitle);
             ctx.Wire(view, "fatigueList", list);
             ctx.Wire(view, "fatigueRowPrefab", ctx.Asset("Widgets/FatigueRow.prefab").GetComponent<FatigueRowView>());
+            ctx.Wire(view, "xpTitle", xpTitle);
+            ctx.Wire(view, "xpList", xpList);
             ctx.Wire(view, "verify", verify);
             ctx.Wire(view, "toHq", toHq);
             ctx.Wire(view, "continueButton", cont);
@@ -391,12 +403,11 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
         /// <summary>Deux rangées de deux cartes, décalées l'une de l'autre (alignement de la 1re puis de la 2e rangée).</summary>
         static void StaggeredRows(RectTransform block, TextAnchor first, TextAnchor second)
         {
-            var anchors = new[] { first, second };
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 4; i++)
             {
                 var row = Ui.Rect(block, "Row" + i);
-                row.HLayout(20, 0, anchors[i]);
-                row.gameObject.AddComponent<LayoutElement>().preferredHeight = 255;
+                row.HLayout(0, 0, first);
+                row.gameObject.AddComponent<LayoutElement>().preferredHeight = 108;
             }
         }
 
@@ -427,20 +438,25 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             var arena = Ui.Img(rt, "Arena", Theme.WithAlpha(Theme.Frost, 0.16f), Sprites.Rounded);
             arena.rectTransform.At(0.5f, 0.5f, 0, -36, 1000, 520);
             arena.raycastTarget = false;
+            var spotlight = Ui.Img(arena.transform, "Spotlight", new Color(1f, 1f, 1f, 0.92f), null);
+            spotlight.rectTransform.At(0.5f, 0.5f, 0, 0, 520, 520);
+            spotlight.preserveAspect = true;
+            spotlight.raycastTarget = false;
+            spotlight.gameObject.SetActive(false);
             var arenaTitle = Ui.Txt(arena.transform, "", 64, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "SkillTitle");
             arenaTitle.rectTransform.At(0.5f, 1f, 0, -120, 900, 90); // sous la barre de vie du boss
             arenaTitle.Inked();
             arenaTitle.gameObject.SetActive(false);
-            var enemyRow = Ui.Rect(rt, "Enemies").At(1f, 1f, -36, -250, 500, 530);
-            enemyRow.VLayout(20, 0, TextAnchor.UpperRight);
+            var enemyRow = Ui.Rect(rt, "Enemies").At(1f, 1f, -36, -220, 440, 480);
+            enemyRow.VLayout(12, 0, TextAnchor.UpperRight);
             RecipeKit.Mark(enemyRow, TutorialTarget.CombatEnemies);
             StaggeredRows(enemyRow, TextAnchor.UpperLeft, TextAnchor.UpperRight);
-            var allyRow = Ui.Rect(rt, "Allies").At(0f, 1f, 36, -250, 500, 530);
-            allyRow.VLayout(20, 0, TextAnchor.UpperLeft);
+            var allyRow = Ui.Rect(rt, "Allies").At(0f, 1f, 36, -220, 440, 480);
+            allyRow.VLayout(12, 0, TextAnchor.UpperLeft);
             StaggeredRows(allyRow, TextAnchor.UpperRight, TextAnchor.UpperLeft);
 
             // ---- Bonus actifs de l'équipe (bas gauche, sous les alliés) : jusqu'à six pastilles, 3 par rangée
-            var bonusRow = Ui.Rect(rt, "Bonuses").At(0f, 1f, 36, -806, 640, 128);
+            var bonusRow = Ui.Rect(rt, "Bonuses").At(0f, 1f, 36, -726, 640, 128);
             var bonusChips = new Object[6];
             for (int i = 0; i < bonusChips.Length; i++)
             {
@@ -481,9 +497,10 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
 
             // ---- Frise chronologique : grande bande mise en valeur au centre (100 à gauche → 0 à droite : à 0, c'est le tour)
             var glow = Ui.Img(rt, "TimelineGlow", Theme.WithAlpha(Theme.Primary, 0.35f), Sprites.Rounded);
-            glow.rectTransform.At(0.5f, 1f, 0, -98, 2100, 132);
+            glow.rectTransform.At(0.5f, 1f, 0, -98, 2100, 88);
+            glow.color = Color.clear;
             var stripFill = Ui.Panel(rt, "Timeline", Theme.WithAlpha(Theme.Frost, 0.94f), 5f, 8f, false);
-            var strip = stripFill.Frame().At(0.5f, 1f, 0, -104, 2084, 120);
+            var strip = stripFill.Frame().At(0.5f, 1f, 0, -104, 2084, 104);
             var track = Ui.Rect(stripFill.transform, "Track");
             track.anchorMin = new Vector2(0f, 0.5f);
             track.anchorMax = new Vector2(1f, 0.5f);
@@ -506,7 +523,7 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             var gate = Ui.Img(track, "Gate", Theme.Primary, Sprites.RoundedSmall);
             gate.rectTransform.anchorMin = new Vector2(1f, 0f);
             gate.rectTransform.anchorMax = new Vector2(1f, 1f);
-            gate.rectTransform.sizeDelta = new Vector2(22, 110);
+            gate.rectTransform.sizeDelta = new Vector2(8, 64);
             gate.rectTransform.anchoredPosition = Vector2.zero;
             gate.gameObject.AddComponent<Pulse>().Amplitude = 0.12f;
             var timeline = strip.gameObject.AddComponent<TimelineView>();
@@ -545,9 +562,9 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             var fanRoot = Ui.Rect(rt, "SkillFan").At(0.5f, 0f, 0, -24, 760, 240);
             RecipeKit.Mark(fanRoot, TutorialTarget.CombatSkills, enabled: false);
             var fanMarker = fanRoot.GetComponent<TutorialTargetMarker>();
-            float[] fanX = { -190f, 0f, 190f, 380f };
-            float[] fanY = { 0f, 16f, 0f, 0f };
-            float[] fanRot = { 8f, 0f, -8f, -14f };
+            float[] fanX = { -285f, -95f, 95f, 285f };
+            float[] fanY = { 0f, 0f, 0f, 0f };
+            float[] fanRot = { 3f, 1f, -1f, -3f };
             var fan = new Object[4];
             for (int i = 0; i < 4; i++)
             {
@@ -593,8 +610,8 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             ctx.Wire(view, "bannerGroup", bannerGroup);
             ctx.Wire(view, "enemyRow", enemyRow);
             ctx.Wire(view, "allyRow", allyRow);
-            ctx.Wire(view, "unitCardPrefab", ctx.Asset("Widgets/UnitCard.prefab").GetComponent<UnitCardView>());
-            ctx.Wire(view, "allyCardPrefab", ctx.Asset("Widgets/UnitCard.prefab").GetComponent<UnitCardView>());
+            ctx.Wire(view, "unitCardPrefab", ctx.Asset("Widgets/AllyCard.prefab").GetComponent<UnitCardView>());
+            ctx.Wire(view, "allyCardPrefab", ctx.Asset("Widgets/AllyCard.prefab").GetComponent<UnitCardView>());
             ctx.Wire(view, "fanRoot", fanRoot);
             ctx.WireArray(view, "fan", fan);
             ctx.WireArray(view, "bonusChips", bonusChips);
@@ -606,6 +623,7 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             ctx.Wire(view, "dropZone", dropFill.Frame());
             ctx.Wire(view, "arena", arena.rectTransform);
             ctx.Wire(view, "arenaTitle", arenaTitle);
+            ctx.Wire(view, "spotlight", spotlight);
             return rt.gameObject;
         }
     }

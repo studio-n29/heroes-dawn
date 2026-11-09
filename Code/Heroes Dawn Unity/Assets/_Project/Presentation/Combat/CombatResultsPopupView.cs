@@ -18,6 +18,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] TMP_Text fatigueTitle = null!;
         [SerializeField] RectTransform fatigueList = null!;
         [SerializeField] FatigueRowView fatigueRowPrefab = null!;
+        [SerializeField] TMP_Text xpTitle = null!;
+        [SerializeField] RectTransform xpList = null!;
         [SerializeField] TMP_Text verify = null!;
         [SerializeField] TMP_Text toHq = null!;
         [SerializeField] UiButton continueButton = null!;
@@ -39,6 +41,15 @@ namespace N29.HeroesDawn.Presentation.Combat
             fatigueTitle.text = d.FatigueTitle;
             fatigueList.Clear();
             foreach (var f in d.Fatigue) Instantiate(fatigueRowPrefab, fatigueList).Show(f);
+            bool hasXp = d.Xp != null && d.Xp.Length > 0;
+            xpTitle.gameObject.SetActive(hasXp);
+            xpList.gameObject.SetActive(hasXp);
+            xpList.Clear();
+            if (hasXp)
+            {
+                xpTitle.text = d.XpTitle;
+                foreach (var x in d.Xp) Instantiate(fatigueRowPrefab, xpList).Show(x);
+            }
             verify.text = d.Verify;
             verify.color = Theme.TextMuted;
             toHq.text = d.ToHq;

@@ -17,7 +17,11 @@ namespace N29.HeroesDawn.Application.Features.Combat
         public readonly MemberId Member;
         public readonly int Before;
         public readonly int After;
-        public FatigueChange(MemberId member, int before, int after) { Member = member; Before = before; After = after; }
+        /// <summary>EXP gagnée par ce combat et EXP cumulée après (0 en cas de défaite).</summary>
+        public readonly int XpGain;
+        public readonly int XpTotal;
+        public FatigueChange(MemberId member, int before, int after, int xpGain = 0, int xpTotal = 0)
+        { Member = member; Before = before; After = after; XpGain = xpGain; XpTotal = xpTotal; }
     }
 
     public sealed class CombatReport

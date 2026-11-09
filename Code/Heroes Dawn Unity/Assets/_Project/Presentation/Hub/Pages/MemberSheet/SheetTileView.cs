@@ -17,6 +17,11 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] GameObject locked = null!;
 
         public Button Button => button;
+        public bool PortraitFraming { get; set; }
+        void OnRectTransformDimensionsChange()
+        {
+            if (PortraitFraming && art != null && art.sprite != null) PortraitView.FrameFace(art, .75f);
+        }
 
         public void Show(SheetTile t)
         {
@@ -30,6 +35,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 var fitter = art.GetComponent<AspectRatioFitter>();
                 if (fitter != null) fitter.aspectRatio = t.Art.rect.width / t.Art.rect.height;
+                if (fitter != null) fitter.enabled = !PortraitFraming;
+                if (PortraitFraming) PortraitView.FrameFace(art, .75f);
             }
             locked.SetActive(t.Kind == SheetTileKind.Locked);
             title.color = empty || t.Dim ? Theme.TextMuted : Theme.Text;

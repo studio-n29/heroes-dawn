@@ -22,6 +22,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         [SerializeField] TMP_Text status = null!;
         [SerializeField] UiBar fatigue = null!;
         [SerializeField] UiButton squad = null!;
+        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] Image? bigArt;
 
         Color _fill;
         Family _family;
@@ -55,6 +56,14 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             strip.color = Theme.FamilyColor(d.Card.Family);
             portrait.Show(d.Card.Portrait);
+            var art = d.Card.Portrait.Art;
+            if (bigArt != null)
+            {
+                bool has = art != null;
+                bigArt.gameObject.SetActive(has);
+                portrait.gameObject.SetActive(!has);
+                if (has) { bigArt.sprite = art; PortraitView.FrameFace(bigArt, 0.55f); }
+            }
             memberName.text = d.Card.Name;
             level.text = d.Card.LevelText;
             rarity.text = d.Card.RarityText;

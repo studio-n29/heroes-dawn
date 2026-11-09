@@ -36,12 +36,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             frame.color = Theme.FrostEdge;
             glyph.text = d.Glyph;
             art.sprite = d.Art;
+            var fitter = art.GetComponent<AspectRatioFitter>();
+            if (fitter != null && d.Art != null) fitter.aspectRatio = d.Art.rect.width / d.Art.rect.height;
             art.enabled = d.Art != null;
             glyph.enabled = d.Art == null;
             description.text = d.Description ?? "";
             cardName.text = d.Name;
             rarity.text = d.RarityName;
-            rarity.color = Color.Lerp(d.RarityColor, Theme.Navy, 0.35f);
+            rarity.color = Ui.ReadableText(Theme.Surface, d.RarityColor);
             newText.text = newLabel;
             faceRoot.SetActive(false);
             back.SetActive(true);

@@ -159,7 +159,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             var nav = new HubNavigator();
             var p = NewBoutique(nav);
             Assert.That(_view.ShopTabShown, Is.EqualTo((int)ShopTab.Boosters), "les héros ont leur page : on retombe sur les boosters");
-            Assert.That(_view.Rows.Length, Is.EqualTo(2), "stock + achat");
+            Assert.That(_view.Rows.Length, Is.EqualTo(3), "trois packs : standard, Opération, Mission");
             _view.ClickShopTab((int)ShopTab.Gems);
             Assert.That(_view.Rows.Length, Is.EqualTo(Boutique.Packs.Count + Boutique.Exchanges.Count + 2), "deux titres de catégorie : gemmes et échanges");
             _view.ClickShopTab((int)ShopTab.Heroes);
@@ -187,11 +187,11 @@ namespace N29.HeroesDawn.Tests.Presentation
             _host.Register<IBoosterOpeningPopupView>(() => new FakeBoosterOpeningPopup());
             _app.Session.Wallet.Add(0, 1000);
             var p = NewBoutique(new HubNavigator { ShopTab = ShopTab.Boosters });
-            Assert.That(_view.Rows[0].A.Enabled, Is.False, "aucun booster en réserve");
-            _view.ClickRow(1);
+            Assert.That(_view.Rows[0].B.Enabled, Is.False, "aucun booster en réserve");
+            _view.ClickRow(0, 0);
             Assert.That(_app.Collection.BoosterStock(BoosterDef.StandardId), Is.EqualTo(1));
-            Assert.That(_view.Rows[0].A.Enabled, Is.True);
-            _view.ClickRow(0);
+            Assert.That(_view.Rows[0].B.Enabled, Is.True);
+            _view.ClickRow(0, 1);
             var popup = (FakeBoosterOpeningPopup)_host.Spawned.Single(s => s is FakeBoosterOpeningPopup);
             Assert.That(popup.Shown!.Value.Cards.Length, Is.EqualTo(_app.Session.Content.Collection.Booster(BoosterDef.StandardId).Cards));
             Assert.That(popup.Shown!.Value.Cards.All(c => c.IsNew || c.Name.Length > 0));
@@ -201,6 +201,44 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
+
+        [Test, Description("Vérifie que la boutique propose trois packs différents (standard, Opération, Mission) qui s'achètent et s'ouvrent séparément, avec leurs propres cartes et leur prix — parce que chaque pack doit avoir sa place dans l'offre")]
+        public void Boutique_Boosters_OffersThreeDistinctPacks()
+        {
+            _host.Register<IBoosterOpeningPopupView>(() => new FakeBoosterOpeningPopup());
+            _app.Session.Wallet.Add(0, 2000);
+            var p = NewBoutique(new HubNavigator { ShopTab = ShopTab.Boosters });
+            Assert.That(_view.Rows.Length, Is.EqualTo(3));
+            var defs = _app.Session.Content.Collection;
+            Assert.That(defs.Booster(BoosterDef.OperationId).Cards, Is.EqualTo(5));
+            Assert.That(defs.Booster(BoosterDef.MissionId).Cards, Is.EqualTo(4));
+            _view.ClickRow(1, 0);
+            Assert.That(_app.Collection.BoosterStock(BoosterDef.OperationId), Is.EqualTo(1));
+            Assert.That(_app.Collection.BoosterStock(BoosterDef.StandardId), Is.EqualTo(0));
+            _view.ClickRow(2, 0);
+            Assert.That(_app.Collection.BoosterStock(BoosterDef.MissionId), Is.EqualTo(1));
+            _view.ClickRow(1, 1);
+            var popup = (FakeBoosterOpeningPopup)_host.Spawned.Single(s => s is FakeBoosterOpeningPopup);
+            Assert.That(popup.Shown!.Value.Cards.Length, Is.EqualTo(5), "le Pack Opération contient cinq cartes");
+            Assert.That(_app.Collection.BoosterStock(BoosterDef.OperationId), Is.EqualTo(0));
+            Assert.That(_app.Collection.BoosterStock(BoosterDef.MissionId), Is.EqualTo(1), "l'autre pack n'est pas touché");
+            popup.Continue();
+            p.Dispose();
+        }
+        [Test, Description("Vérifie que l'onglet Cadeau de la boutique réclame le cadeau du jour une seule fois — et que l'en-tête affiche les ressources")]
+        public void Boutique_GiftTab_ClaimsDailyGiftOnce()
+        {
+            var p = NewBoutique(new HubNavigator { ShopTab = ShopTab.Gift });
+            Assert.That(_view.Rows.Length, Is.EqualTo(1));
+            Assert.That(_view.Header.Line, Does.Contain("PR"));
+            int credits = _app.Session.Wallet.Credits;
+            _view.ClickRow(0, 0);
+            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(credits + Boutique.DailyGift.Credits));
+            Assert.That(_view.Rows[0].A.Enabled, Is.False);
+            _view.ClickRow(0, 0);
+            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(credits + Boutique.DailyGift.Credits));
+            p.Dispose();
+        }
         [Test, Description("Vérifie que le cadeau du jour se reprend le lendemain dans le Pass — parce qu'il donne une raison de revenir")]
         public void DailyGift_ComesBackNextDay()
         {
@@ -289,6 +327,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _app.Session.Wallet.Set(10_000, 0);
             var p = Start(new LabPagePresenter(_view, _app.Lab, _app.Session, _loc, _toasts, _app.Subscriber<MetaChanged>(),
                                                _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Workshop));
+            _view.ClickHeader(1); // mode Recherches
             _view.ClickRow(0);
             Assert.That(_view.Rows[0].Progress, Is.GreaterThanOrEqualTo(0f));
             Assert.That(_view.Rows[1].A.Enabled, Is.False);
