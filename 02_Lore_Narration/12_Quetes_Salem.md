@@ -27,7 +27,7 @@ Agent D et Agent M se retrouvent pour la première fois à la Lisière (chapitre
 
 Les **preuves** de chaque ville (Queens, Moscou, Paris, archives de Khost) servent à exposer Stroke devant les négociateurs. Les choix de Harlem et de la Place Rouge ne changent que l'épilogue. Fin ouverte vers Eda.
 
-## Cryptides *(à valider)*
+## Cryptides *(validé le 2026-11-09)*
 
 Les dix cryptides de Salem (S1 à S10, voir `04_Agents_The_Dawn.md`) sont des **ennemis au chapitre 1**, puis **recrutables après N29**.
 
@@ -97,7 +97,7 @@ Id : `salem_accords`. **Le dénouement.**
 | 4.3 `zone_sal_4_3` | Crypte sous la salle | Empêcher la réouverture de la brèche | La Cabale tente le rituel avec les résidus de Paris |
 | 4.4 `zone_sal_4_4` | Crypte | Boss : le Prédicateur | La Cabale est brisée |
 
-**Fin du chapitre :** les Accords sont signés. Ils reconnaissent les Apex sans les soumettre. Dans la crypte, une trace dorée persiste : fin ouverte vers Eda.
+**Fin du chapitre :** les Accords sont signés. Ils reconnaissent les Apex sans les soumettre, et retirent à l'AMIF son pouvoir de prélèvement. Dans la crypte, une trace dorée persiste : fin ouverte vers Eda.
 
 **Épilogue :** une courte scène par personnage-clé, qui varie selon les choix de Harlem (clinique ou marché) et de la Place Rouge (arrêter le Conseiller ou l'écouter).
 
@@ -106,7 +106,6 @@ Id : `salem_accords`. **Le dénouement.**
 ## Points à valider
 
 - Le Prédicateur, le Béhémoth : noms propres à fixer.
-- Cryptides recrutables après N29, ou toujours ennemis.
-- Contenu exact des Accords signés (reconnaissance sans soumission ?).
-- Fin ouverte vers Eda : conserver, ou conclure ?
+- Cadre de contrôle civil des Accords : laissé ouvert pour les suites (reconnaissance sans soumission et fin du pouvoir de prélèvement de l'AMIF, validés).
+- Fin ouverte vers Eda : conservée (arc « Retour d'Eda » du plan LiveOps, M+24).
 - Détails des zones : objectifs précis définis lors d'un lot dédié.

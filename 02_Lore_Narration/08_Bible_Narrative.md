@@ -90,9 +90,10 @@ Les **cultes de Mephisto et d'Eda sont retirés de Paris**. Mephisto n'apparaît
 | Chapitre Harlem | Texte d'ouverture reformulé : un gang exploite le chaos, il n'y a plus de culte. |
 | Cabale | Nouvelle faction : l'ancienne **X Society**. N'existait pas dans le lore du dépôt. |
 | Rayner | Alliée sincère. Résout la question « alliée ou adversaire ? » de `03_Histoire_et_Actes.md`. |
-| Résidus de la Supernova | Fragments de la brèche portant la trace d'Eda *(à valider)*. |
-| Cryptides de Salem | Ennemis au chapitre 1, recrutables après N29 *(à valider)*. |
-| Recherches de Volkov | Piste du marché noir de Moscou ; premier fil de la Cabale *(à valider)*. |
+| Résidus de la Supernova | Fragments de la brèche portant la trace d'Eda *(validé le 2026-11-09)*. |
+| Cryptides de Salem | Ennemis au chapitre 1, recrutables après N29 *(validé le 2026-11-09)*. |
+| Recherches de Volkov | Piste du marché noir de Moscou ; premier fil de la Cabale *(validé le 2026-11-09)*. |
+| Accords de Salem | Reconnaissance des Apex sans soumission ; l'AMIF perd son pouvoir de prélèvement ; le cadre de contrôle civil reste ouvert pour les suites *(validé le 2026-11-09)*. |
 | Salem | Zone en 4 chapitres, comme les autres villes. |
 
 ---
@@ -100,11 +101,12 @@ Les **cultes de Mephisto et d'Eda sont retirés de Paris**. Mephisto n'apparaît
 ## 7. Points à valider
 
 - **Noms propres nouveaux** : Dmitri Orlan, le Passeur, le Contremaître, le Conseiller, le Régisseur, Colonel Avrilly, Dr Hélène Marchetti, le Béhémoth, le Prédicateur, l'Écho.
-- **Nature des résidus** (trace d'Eda) : une fiche dédiée à la Supernova reste à écrire.
-- **Cryptides recrutables** : ennemis au chapitre 1 puis recrutables, ou toujours ennemis ?
+- **Fiche dédiée à la Supernova** : reste à écrire (la nature des résidus est tranchée, pas leurs détails).
 - **Rôle exact des Apex Unit** dans les actes (mentors visibles, ou seulement évoqués).
-- **Fin ouverte vers Eda** : conservée comme ouverture pour une suite (Œuvre 2, La Croisade Infernale).
+- **Fin ouverte vers Eda** : conservée, en cohérence avec le plan LiveOps (arc « Retour d'Eda » à M+24, Eda non recrutable). Voir `05_Production/Live_Ops_Plan_24_mois.md`.
 - **Présence de Mephisto et d'Eda** dans la cinématique et les actes : validée à travers la Cabale et l'Écho, à confirmer avec le récit de lancement.
+
+*Validés le 2026-11-09 : cryptides ennemis puis recrutables, résidus = trace d'Eda, piste Volkov à Moscou, Accords = reconnaissance sans soumission.*
 
 ---
 

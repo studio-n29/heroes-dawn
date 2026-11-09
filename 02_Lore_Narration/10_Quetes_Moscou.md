@@ -12,7 +12,7 @@ Moscou a accepté les Apex plus vite que n'importe quelle ville. Ils sont intég
 - **La mafia**, alliée à l'AMIF dans l'ombre : le **Passeur** et le **Contremaître** *(à valider)*.
 - **Le Conseiller** *(à valider)* : haut responsable de la faction interne, boss de la Place Rouge.
 
-## Piste vers Salem *(à valider)*
+## Piste vers Salem *(validée le 2026-11-09)*
 
 Le marché noir exploite d'anciennes recherches soviétiques de Viktor Volkov. Le joueur y trouve les premiers fils de la future Cabale (ancienne X Society) sans encore comprendre ce qu'ils signifient. Payoff : Salem, chapitre 3.
 
@@ -95,6 +95,5 @@ Id : `mos_place_rouge`. **Face-à-face et choix de confiance.**
 ## Points à valider
 
 - Noms des antagonistes (Passeur, Contremaître, Orlan, Conseiller).
-- Lien Volkov : confirmer que les recherches soviétiques sont la source du marché noir.
 - Attentat de la cathédrale : confirmer qu'il est orchestré par la faction interne.
 - Détails des zones : objectifs précis définis lors d'un lot dédié.

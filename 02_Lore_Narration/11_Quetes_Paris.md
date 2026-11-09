@@ -15,7 +15,7 @@ Cinq ans après, Paris n'est plus « en reconstruction » : c'est une ville fig�
 - **Dr Hélène Marchetti** *(à valider)* : directrice scientifique de l'AMIF, boss du chapitre 3.
 - **L'Écho** *(à valider)* : manifestation née des résidus, boss du chapitre 4.
 
-## Ce que contiennent les résidus *(à valider)*
+## Ce que contiennent les résidus *(validé le 2026-11-09)*
 
 Les résidus sont des fragments de la brèche, chargés de l'énergie d'Eda (Phoenix Doré, disparu avec Mephisto). Ils éveillent et amplifient les pouvoirs, ce qui explique pourquoi l'AMIF les veut, pourquoi Rayner cherche à ramener Eda, et pourquoi la Cabale les convoitera à Salem.
 
@@ -102,6 +102,6 @@ Id : `paris_epicentre`. **Révélation sur les résidus.**
 ## Points à valider
 
 - Noms des antagonistes (Avrilly, Marchetti, l'Écho).
-- Nature des résidus (trace d'Eda) : une fiche dédiée à la Supernova reste à écrire.
+- Fiche dédiée à la Supernova : reste à écrire (la nature des résidus, trace d'Eda, est validée).
 - Rôles de soutien des agents de Paris : à confirmer avec les fiches.
 - Détails des zones : objectifs précis définis lors d'un lot dédié.

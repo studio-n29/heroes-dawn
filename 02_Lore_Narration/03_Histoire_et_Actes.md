@@ -128,7 +128,7 @@ La bible `08_Bible_Narrative.md` et les fichiers `09` à `12` précisent et **re
 - **Paris** : ville démolie (soldats, scientifiques, civils), sans cultes de Mephisto ni d'Eda. Remplace « la ville se reconstruit » et la mention des cultes aux sections 2, 3 et 5.
 - **Cabale** : nouvelle faction, l'ancienne X Society, présente à Salem.
 - **Rayner** : alliée sincère, prise entre l'AMIF et la Cabale (répond à la question ouverte de la section 7).
-- **Cryptides** : ennemis puis recrutables après N29 *(à valider)*.
+- **Cryptides** : ennemis puis recrutables après N29 *(validé le 2026-11-09)*.
 - **Salem** : zone en 4 chapitres, comme les autres villes.
 
 ## 9. Points à valider (relevés à l'import du 2026-10-22)
