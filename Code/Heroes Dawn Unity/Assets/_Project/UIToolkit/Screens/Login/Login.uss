@@ -1,0 +1,41 @@
+/* Écran titre (planche 1.1) : panorama de New York à l'aube, héroïne détourée, logotype, Jouer et Se connecter. */
+.login { background-color: #101C29; }
+.login__backdrop {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/hq-new-york.png");
+    -unity-background-scale-mode: scale-and-crop;
+}
+/* Voile : assombrit le haut pour le logotype et le bas pour les boutons (lisibilité sur le ciel clair). */
+.login__veil {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    background-color: rgba(10, 17, 26, 0.34);
+}
+.login__hero {
+    position: absolute; left: 0; bottom: 0; width: 46%; height: 100%;
+    background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Ext/Agents/giulia_rossi-cutout.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+.login__safe { flex-direction: column; }
+.login__lockup {
+    position: absolute; right: 7%; top: 12%; width: 44%;
+    align-items: center;
+    background-color: rgba(10, 17, 26, 0.55); border-radius: 12px; padding: 20px 16px;
+}
+.login__logo {
+    width: 100%; height: 150px;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Brand/heroes-dawn-ivory.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+.login__actions { position: absolute; right: 7%; bottom: 9%; width: 40%; }
+.login__play { height: 112px; font-size: 54px; margin-bottom: 14px; }
+.login__account { height: 88px; font-size: 40px; }
+.login__status { margin-bottom: 12px; min-height: 36px; }
+.login__spinner {
+    width: 70px; height: 70px; align-self: center; margin-bottom: 14px; display: none;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Indicators/spinner-00.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+.login__studio { position: absolute; left: 3%; bottom: 3%; color: #ECE7DC; }
+/* Apparition du logotype. */
+.login__lockup { opacity: 0; scale: 0.92 0.92; transition: opacity 0.5s ease-out, scale 0.5s ease-out; }
+.login__lockup--in { opacity: 1; scale: 1 1; }

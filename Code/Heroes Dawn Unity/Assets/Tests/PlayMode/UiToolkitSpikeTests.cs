@@ -61,7 +61,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.Destroy(tex);
         }
 
-        [UnityTest, Explicit("Prototype UI Toolkit"), Timeout(120000)]
+        [UnityTest, Explicit("Prototype UI Toolkit"), Timeout(120000), Description("Vérifie que le prototype UI Toolkit de l'écran titre se rend aux formats cibles et que la manette déplace le focus puis valide — parce que la décision UI Toolkit repose sur ces mesures")]
         public IEnumerator Title_RendersAtTheTargetFormats()
         {
             foreach (var (w, h, name) in new[] { (1920, 1080, "title-1920x1080"), (2160, 972, "title-2160x972-mobile"), (1280, 720, "title-1280x720-switch"), (1280, 960, "title-1280x960-4x3") })
@@ -79,7 +79,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             }
         }
 
-        [UnityTest, Explicit("Prototype UI Toolkit"), Timeout(120000)]
+        [UnityTest, Explicit("Prototype UI Toolkit"), Timeout(120000), Description("Vérifie que le prototype UI Toolkit de l'écran titre se rend aux formats cibles et que la manette déplace le focus puis valide — parce que la décision UI Toolkit repose sur ces mesures")]
         public IEnumerator Title_GamepadNavigation_MovesFocusAndSubmits()
         {
             var (doc, rt, go) = Build(1920, 1080);

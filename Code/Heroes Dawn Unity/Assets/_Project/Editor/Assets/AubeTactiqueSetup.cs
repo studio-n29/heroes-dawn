@@ -23,6 +23,8 @@ namespace N29.HeroesDawn.EditorTools.Assets
                 if (!File.Exists(path)) throw new FileNotFoundException("Illustration Aube tactique manquante", path);
             }
             foreach (var path in Directory.GetFiles(ArtFolder, "*.png")) ConfigureIllustration(path.Replace('\\', '/'));
+            AubeTactiqueExtensionSync.Run();
+            N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.EnsurePanelSettings();
             UiAssetBaker.GenerateFromMenu();
             var report = PrefabGenerator.Generate(PrefabGenerator.DefaultRoot, OverwritePolicy.All);
             if (report.Failed.Count != 0) throw new InvalidOperationException("Aube tactique : " + report);

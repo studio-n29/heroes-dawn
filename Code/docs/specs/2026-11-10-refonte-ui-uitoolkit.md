@@ -127,6 +127,17 @@ Les lots 1 à 5 et 8 à 9 sont indépendants entre eux une fois le lot 0 fini ; 
 | Volume de la réécriture | Lots courts, fusion à chaque lot vert, aucun écran à moitié migré dans `develop` (migration derrière un interrupteur de configuration tant que tous les lots ne sont pas finis) |
 | Switch non testable ici | Profil « Switch portable » simulé en 1280×720 tactile ; certification console en lot 10 |
 
+## 7 bis. Contraintes venant du développement 1.0.0 (reçues le 2026-11-10, à ne pas implémenter dans la refonte)
+
+Source : la session « Heroes Dawn 1.0.0 - Tournois et repaires ». Aucune action demandée maintenant ; la refonte doit seulement laisser la place.
+
+- **Navigation du hub** : l'onglet « Laboratoire de recherche » est supprimé et remplacé par un onglet **« Atelier de fabrication »** à interface propre. La barre de navigation et le routeur de pages (lot 2) doivent traiter l'Atelier comme une page de premier niveau échangeable avec le Laboratoire : un emplacement nommé, pas de dépendance au contenu du Laboratoire.
+- **Éventail de combat** : 3 cartes équipables par agent au lieu de 2, soit **5 places** (2 natives + 3 équipées). La mise en page de la main du lot 7 doit accepter 4 ou 5 cartes sans changer de composition (largeur de carte dérivée du nombre de places, jamais en dur).
+- **Agents et cartes** : les agents passent à une *position* (Première ligne, Attaquant, Contrôle, Soutien, Précision à distance) et à un *rang* de 1 à 5 étoiles ; les cartes à 1 à 5 étoiles et 4 types (Offensif, Défensif, Contrôle, Soutien). Les composants « étoiles » et « puce de type » du lot 0 doivent donc être génériques (valeur 1 à 6, type libre), pas liés aux familles actuelles.
+- **Objets fabriqués** : 1 à 6 étoiles. Même composant d'étoiles.
+- **Plus tard** : Tournois (classement, JcJ en ligne et hors ligne) et Repaires (donjons, boss à phases) auront leurs propres écrans ; ils ne font pas partie de cette refonte.
+- Les spécifications détaillées sont dans `docs/specs/` (celle des rangs, positions et cartes existe ; celle de l'Atelier arrive). Elles ne sont pas modifiées ici.
+
 ## 8. État de la branche
 
 - Branche créée : `feature/refonte-ui-aube-tactique`.

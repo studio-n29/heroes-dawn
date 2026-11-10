@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Login.uss" />
+    <ui:VisualElement name="screen" class="hd-screen login">
+        <ui:VisualElement class="login__backdrop" />
+        <ui:VisualElement class="login__veil" />
+        <ui:VisualElement name="hero" class="login__hero" />
+        <ui:VisualElement name="safe" class="hd-fill login__safe">
+            <ui:VisualElement name="lockup" class="login__lockup">
+                <ui:VisualElement name="logo" class="login__logo" />
+            </ui:VisualElement>
+            <ui:VisualElement name="actions" class="login__actions">
+                <ui:Label name="status" class="hd-text hd-text--muted hd-text--center login__status" />
+                <ui:VisualElement name="spinner" class="login__spinner" />
+                <ui:Button name="play" class="hd-btn hd-btn--primary login__play" />
+                <ui:Button name="account" class="hd-btn hd-btn--secondary login__account" />
+            </ui:VisualElement>
+            <ui:Label name="studio" class="hd-text hd-text--heading login__studio" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

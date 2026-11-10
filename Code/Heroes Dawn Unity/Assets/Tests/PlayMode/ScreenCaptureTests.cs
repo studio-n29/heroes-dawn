@@ -54,6 +54,22 @@ namespace N29.HeroesDawn.Tests.PlayMode
             int w = int.Parse(CaptureArg("-captureWidth", "2160"));
             int h = int.Parse(CaptureArg("-captureHeight", "972"));
             var rt = new RenderTexture(w, h, 24);
+            // Panneaux UI Toolkit : rendus dans une texture le temps de la capture, intercalés entre les canvas uGUI du bas (fond, écrans) et ceux du haut (fenêtres, toasts).
+            var uiSettings = Object.FindObjectsByType<UnityEngine.UIElements.UIDocument>(FindObjectsSortMode.None)
+                .Where(d => d.isActiveAndEnabled && d.panelSettings != null).Select(d => d.panelSettings).Distinct().ToList();
+            RenderTexture? uiRt = null;
+            var savedTargets = new System.Collections.Generic.List<(UnityEngine.UIElements.PanelSettings s, RenderTexture? t, bool clear, Color color)>();
+            if (uiSettings.Count > 0)
+            {
+                uiRt = new RenderTexture(w, h, 24);
+                foreach (var ps in uiSettings)
+                {
+                    savedTargets.Add((ps, ps.targetTexture, ps.clearColor, ps.colorClearValue));
+                    ps.targetTexture = uiRt; ps.clearColor = true; ps.colorClearValue = new Color(0f, 0f, 0f, 0f);
+                }
+                for (int i = 0; i < 4; i++) yield return null;
+            }
+            Directory.CreateDirectory(Folder);
             var camGo = new GameObject("CaptureCamera");
             var cam = camGo.AddComponent<Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
@@ -75,12 +91,44 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Canvas.ForceUpdateCanvases();
             foreach (var layout in Object.FindObjectsByType<TacticalPageLayout>(FindObjectsSortMode.None)) layout.Reflow();
             Canvas.ForceUpdateCanvases();
-            cam.Render();
+            Texture2D? composed = null;
+            if (uiRt == null) cam.Render();
+            else
+            {
+                // Panneaux UI Toolkit en dessous, canvas uGUI au-dessus : on rend les canvas sur noir puis sur blanc pour retrouver leur transparence exacte.
+                Color32[] Read(RenderTexture source)
+                {
+                    var previous = RenderTexture.active;
+                    RenderTexture.active = source;
+                    var t = new Texture2D(w, h, TextureFormat.RGBA32, false);
+                    t.ReadPixels(new Rect(0, 0, w, h), 0, 0);
+                    var px = t.GetPixels32();
+                    RenderTexture.active = previous;
+                    Object.Destroy(t);
+                    return px;
+                }
+                cam.clearFlags = CameraClearFlags.SolidColor;
+                cam.backgroundColor = Color.black; cam.Render(); var onBlack = Read(rt);
+                cam.backgroundColor = Color.white; cam.Render(); var onWhite = Read(rt);
+                var ui = Read(uiRt);
+                var result = new Color32[onBlack.Length];
+                for (int i = 0; i < result.Length; i++)
+                {
+                    float alpha = 1f - (onWhite[i].g - onBlack[i].g) / 255f; // opacité des canvas à ce pixel
+                    float inv = 1f - Mathf.Clamp01(alpha);
+                    result[i] = new Color32(
+                        (byte)Mathf.Clamp(onBlack[i].r + ui[i].r * inv, 0, 255),
+                        (byte)Mathf.Clamp(onBlack[i].g + ui[i].g * inv, 0, 255),
+                        (byte)Mathf.Clamp(onBlack[i].b + ui[i].b * inv, 0, 255), 255);
+                }
+                composed = new Texture2D(w, h, TextureFormat.RGB24, false);
+                composed.SetPixels32(result);
+                composed.Apply();
+            }
             var prev = RenderTexture.active;
             RenderTexture.active = rt;
-            var tex = new Texture2D(w, h, TextureFormat.RGB24, false);
-            tex.ReadPixels(new Rect(0, 0, w, h), 0, 0);
-            tex.Apply();
+            var tex = composed != null ? composed : new Texture2D(w, h, TextureFormat.RGB24, false);
+            if (composed == null) { tex.ReadPixels(new Rect(0, 0, w, h), 0, 0); tex.Apply(); }
             RenderTexture.active = prev;
             for (int i = 0; i < canvases.Length; i++) if (canvases[i] != null && canvases[i].isRootCanvas) canvases[i].renderMode = modes[i];
             Directory.CreateDirectory(Folder);
@@ -88,6 +136,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.Destroy(tex);
             Object.Destroy(camGo);
             rt.Release();
+            foreach (var (ps, t, clear, color) in savedTargets) { ps.targetTexture = t; ps.clearColor = clear; ps.colorClearValue = color; }
+            if (uiRt != null) uiRt.Release();
         }
 
         /// <summary>Capture après la fin des animations d'entrée (cascade, glissement : temps réel).</summary>

@@ -1,53 +1,72 @@
 #nullable enable
 using System;
 using N29.HeroesDawn.Presentation.Common;
-using N29.HeroesDawn.Presentation.Mvp;
-using TMPro;
+using N29.HeroesDawn.Presentation.UiToolkit;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Login
 {
-    /// <summary>Écran titre (prefab Screens/Login) : illustration, logo, Jouer, état de connexion.</summary>
-    public sealed class LoginView : ViewBase, ILoginView
+    /// <summary>Écran titre (UI Toolkit, planche 1.1) : panorama, héroïne, logotype, Jouer, Se connecter, état de connexion.</summary>
+    public sealed class LoginView : HdView, ILoginView
     {
-        [SerializeField] UiButton play = null!;
-        [SerializeField] TMP_Text status = null!;
-        [SerializeField] RectTransform spinner = null!;
-        [SerializeField] RectTransform logo = null!;
-        [SerializeField] UiButton account = null!;
+        Button _play = null!;
+        Button _account = null!;
+        Label _status = null!;
+        VisualElement _spinner = null!;
+        VisualElement _lockup = null!;
+        IVisualElementScheduledItem? _spin;
+        float _angle;
 
         public event Action? PlayClicked;
         public event Action? AccountClicked;
 
-        /// <summary>Bouton Jouer (tests PlayMode : clic réel).</summary>
-        public Button PlayButton => play.Button;
+        /// <summary>Bouton Jouer (tests PlayMode : appui réel par la validation de la manette).</summary>
+        public HdButtonRef PlayButton { get; private set; } = null!;
 
-        /// <summary>Bouton « Se connecter » (tests PlayMode : clic réel).</summary>
-        public Button AccountButton => account.Button;
-        public string AccountLabel => account.Label.text;
+        /// <summary>Bouton « Se connecter » (tests PlayMode).</summary>
+        public HdButtonRef AccountButton { get; private set; } = null!;
+        public string AccountLabel => _account.text;
 
-        void Awake()
+        protected override void Bind()
         {
-            play.Button.onClick.AddListener(() => PlayClicked?.Invoke());
-            account.Button.onClick.AddListener(() => AccountClicked?.Invoke());
+            _play = Q<Button>("play");
+            _account = Q<Button>("account");
+            _status = Q<Label>("status");
+            _spinner = Q<VisualElement>("spinner");
+            _lockup = Q<VisualElement>("lockup");
+            PlayButton = new HdButtonRef(_play, this);
+            AccountButton = new HdButtonRef(_account, this);
+            _play.text = Loc.T("login.play");
+            _account.text = Loc.T("login.account");
+            Q<Label>("studio").text = Loc.T("game.studio");
+            _play.clicked += () => PlayClicked?.Invoke();
+            _account.clicked += () => AccountClicked?.Invoke();
+            _play.Focus();
         }
 
-        public void SetAccountLabel(string label) => account.SetLabel(label);
-
-        void Update()
-        {
-            if (spinner.gameObject.activeSelf) spinner.Rotate(0, 0, -360f * Time.unscaledDeltaTime);
-        }
+        public void SetAccountLabel(string label) => _account.text = label;
 
         public void SetBusy(bool busy, string text)
         {
-            play.Interactable = !busy;
-            play.gameObject.SetActive(!busy);
-            spinner.gameObject.SetActive(busy);
-            status.text = text;
+            _play.SetEnabled(!busy);
+            _play.style.display = busy ? DisplayStyle.None : DisplayStyle.Flex;
+            _spinner.style.display = busy ? DisplayStyle.Flex : DisplayStyle.None;
+            _status.text = text;
+            _spin?.Pause();
+            if (!busy) return;
+            // Le disque tourne tant que la connexion est en cours.
+            _spin = _spinner.schedule.Execute(() =>
+            {
+                _angle = (_angle + 6f) % 360f;
+                _spinner.style.rotate = new Rotate(new Angle(_angle, AngleUnit.Degree));
+            }).Every(16);
         }
 
-        public void PlayIntro() => Tween.PopIn(logo, 0.5f);
+        public void PlayIntro()
+        {
+            _lockup.RemoveFromClassList("login__lockup--in");
+            _lockup.schedule.Execute(() => _lockup.AddToClassList("login__lockup--in")).StartingIn(30);
+        }
     }
 }

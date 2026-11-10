@@ -65,13 +65,19 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(small, Is.Empty, string.Join("\n", small));
         }
 
-        [Test, Description("Vérifie que le cercle de chargement de la connexion tourne autour de son centre (pivot 0,5 / 0,5) — parce qu'un pivot en bas le faisait tourner autour d'un point du bas au lieu de sur lui-même (retour du test sur téléphone)")]
-        public void LoginSpinner_PivotIsCentered()
+        [Test, Description("Vérifie que l'écran titre est un document UI Toolkit complet (RectTransform, UIDocument, modèle, réglage du panneau, éléments nommés attendus par la vue) — parce que la refonte remplace les prefabs uGUI écran par écran et qu'une vue sans élément nommé échouerait à l'activation")]
+        public void Login_IsAUiToolkitScreen()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabGenerator.DefaultRoot + "/Screens/Login.prefab");
-            var view = prefab.GetComponent<N29.HeroesDawn.Presentation.Login.LoginView>();
-            var spinner = (RectTransform)new SerializedObject(view).FindProperty("spinner").objectReferenceValue;
-            Assert.That(spinner.pivot, Is.EqualTo(new Vector2(0.5f, 0.5f)));
+            Assert.That(prefab.GetComponent<N29.HeroesDawn.Presentation.Login.LoginView>(), Is.Not.Null);
+            Assert.That(prefab.transform, Is.InstanceOf<RectTransform>(), "les couches existantes placent l'écran comme un prefab uGUI");
+            var doc = prefab.GetComponent<UnityEngine.UIElements.UIDocument>();
+            Assert.That(doc, Is.Not.Null);
+            Assert.That(doc.panelSettings, Is.Not.Null, "réglage du panneau");
+            Assert.That(doc.visualTreeAsset, Is.Not.Null, "modèle UXML");
+            var root = doc.visualTreeAsset.Instantiate();
+            foreach (var name in new[] { "play", "account", "status", "spinner", "lockup", "logo", "studio" })
+                Assert.That(UnityEngine.UIElements.UQueryExtensions.Q(root, name), Is.Not.Null, "élément « " + name + " »");
         }
 
         [Test, Description("Vérifie que chaque clé de texte statique des prefabs existe dans la localisation — parce qu'une clé inconnue s'afficherait « [clé] » à l'écran")]
