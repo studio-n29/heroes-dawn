@@ -7,7 +7,7 @@
 > Les anciennes règles (jauge ATB, combos de famille, duos légendaires, compétences d'avatar) ont été remplacées ; leur ancienne description est dans l'historique git.
 
 ## Objectif du système
-Des combats **courts**, lisibles sur mobile, où le joueur crée de la valeur par ses **choix d'équipe** (familles, rôles, liens entre agents) et par le **moment** où il agit (pilier « Mon équipe, mes choix »). Le mode Auto permet de rejouer vite.
+Des combats **courts**, lisibles sur mobile, où le joueur crée de la valeur par ses **choix d'équipe** (familles, positions, liens entre agents) et par le **moment** où il agit (pilier « Mon équipe, mes choix »). Le mode Auto permet de rejouer vite.
 
 ## La frise
 - Chaque unité occupe un point de la **frise** : 10 points entre le départ (0) et le **point d'action** (10). Toutes les unités avancent d'un point à chaque pas : **0,35 s** (×2 par défaut ; ×1 et ×3 disponibles). Au départ, chaque unité est placée au hasard entre les points 0 et 2.
@@ -34,7 +34,7 @@ Des combats **courts**, lisibles sur mobile, où le joueur crée de la valeur pa
 | Critique | 15 % de base, ×1,5 dégâts |
 | Énergie | 0 à 100, voir ci-dessous |
 
-Valeurs de base par **rôle** (Tank, Dégâts, Contrôle, Soutien, Précision) et par rareté : onglet **Stats** du tableur.
+Valeurs de base par **position** (Première ligne, Attaquant, Contrôle, Soutien, Précision à distance) et par rang AMIF (×1 à ×1,65) : onglet **Stats** du tableur.
 
 ## Énergie
 - Chaque unité a une **énergie** (max 100, **30 au départ** ⚑) qui se **régénère de 3 par pas** de la frise ⚑, sauf pendant le tour d'un allié qui attend l'ordre.

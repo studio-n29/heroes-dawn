@@ -5,22 +5,22 @@
 > Valeurs de départ, à équilibrer avec le simulateur d'équilibrage (menu *Heroes Dawn ▸ Équilibrage ▸ Simulateur*).
 > Source des données : `Code/Heroes Dawn Unity/Assets/_Project/Content/Prototype/PrototypeAgents.cs` (gabarits), `Resources/Content/skills.json` (valeurs éditables dans l'outil Compétences), `Presentation/Common/LocDawnAgents.cs` (noms).
 
-## Gabarits par rôle
-Chaque compétence est construite sur le **rôle** de l'agent, plus un **statut propre** à l'agent (voir le tableau plus bas). Seuls les noms et les statuts distinguent deux agents du même rôle : des effets entièrement sur mesure restent à écrire. ⚑
+## Gabarits par position
+Chaque compétence est construite sur la **position** de l agent (ancien rôle), plus un **statut propre** à l'agent (voir le tableau plus bas). Seuls les noms et les statuts distinguent deux agents de la même position : des effets entièrement sur mesure restent à écrire. ⚑
 
-| Rôle | A1 (gratuite) | A2 (coût 30, 40 pour un contrôle) |
+| Position | A1 (gratuite) | A2 (coût 30, 40 pour un contrôle) |
 |---|---|---|
-| Tank | 110 % à 1 ennemi, recul de 10 %, + statut propre (30 %) | Sur lui : Provocation (2 tours) + Bouclier (25 % de ses PV), + statut propre |
-| Dégâts | 100 % à 1 ennemi, + statut propre (40 %) | 90 % à tous les ennemis, + statut propre (30 %) |
+| Première ligne | 110 % à 1 ennemi, recul de 10 %, + statut propre (30 %) | Sur lui : Provocation (2 tours) + Bouclier (25 % de ses PV), + statut propre |
+| Attaquant | 100 % à 1 ennemi, + statut propre (40 %) | 90 % à tous les ennemis, + statut propre (30 %) |
 | Contrôle | 90 % à 1 ennemi, + statut propre (30 %) | Entrave (2 tours) + recul de 25 % sur 1 ennemi, + statut propre |
 | Soutien | 80 % à 1 ennemi, + statut propre (25 %) | Soin de 35 % + élan de 20 % sur 1 allié, + statut propre |
-| Précision | 100 % à 1 ennemi + Marque, + statut propre (30 %) | Vulnérabilité (2 tours) + 10 % de la frise retirés à tous les ennemis, + statut propre (30 %) |
+| Précision à distance | 100 % à 1 ennemi + Marque, + statut propre (30 %) | Vulnérabilité (2 tours) + 10 % de la frise retirés à tous les ennemis, + statut propre (30 %) |
 
-## Cartes du grimoire (3e et 4e places)
-Une carte de la **même famille** que l'agent s'équipe en 3e place (la 2e carte en 4e). Une carte d'une autre famille est refusée. Le coût d une carte est dérivé de sa recharge d origine (40 ou 50). Le catalogue des cartes est dans `Resources` (collection) et se complète avec le grimoire.
+## Cartes du grimoire (3 places équipables)
+Équipement **libre** : n importe quelle carte sur n importe quel agent, jamais deux fois la même carte sur un agent (3 cartes + 2 compétences de base = 5 places en combat). La famille donne +5 % aux cartes de l agent, et sa position +15 % aux cartes dont le type est boosté (Défensif, Offensif, Contrôle, Soutien) ; les ennemis n en reçoivent pas. Le coût d une carte est dérivé de sa recharge d origine (40 ou 50). Le catalogue des cartes est dans `Resources` (collection) et se complète avec le grimoire.
 
 ### Catalogue
-**48 cartes** : **12 par famille**, dont **4 par nature** (Offensive, Défensive, Soutien), et par famille **5 Communes, 4 Rares, 2 Épiques, 1 Légendaire** (taux des boosters 70 / 22 / 7 / 1). Chaque carte a 3 paliers (niveaux 3, 6, 10). Table complète des 36 cartes ajoutées, gabarits de puissance par rareté et règles de contenu : `Code/docs/specs/2026-10-27-catalogue-36-cartes-design.md`. Illustrations temporaires : recadrages teintés de l'art du Drive, une source par carte (`Resources/Illustrations/Cards/SOURCES.md`).
+**48 cartes**, 4 types (Offensive, Défensive, Soutien, Contrôle) et **5 étoiles** : 12 ★1, 12 ★2, 12 ★3, 8 ★4, 4 ★5 (taux du booster ordinaire 50 / 28 / 15 / 6 / 1 %). Types Contrôle : card_shackle, card_prism_burst, card_mark, card_guard_break, card_ram_strike. Étoiles : ★5 card_monolith, card_chain_lightning, card_telluric_fist, card_time_rift ; ★4 card_living_forge, card_prism_burst, card_ice_carapace, card_inferno, card_living_bastion, card_regen_field, card_silent_takedown, card_time_veil ; ★3 card_reflecting_prism, card_support_cables, card_shackle, card_storm, card_spark_rush, card_power_flux, card_bloodletting, card_challenge, card_bulwark_charge, card_guard_break, card_shared_watch, card_precog ; ★2 card_borrowed_mask, card_neon_halo, card_shared_pulse, card_premonition, card_glass_shards, card_ember, card_ram_strike, card_second_wind, card_tonic_current, card_precise_shot, card_guiding_echo, card_mark ; ★1 les 12 autres. Chaque carte a 3 paliers (niveaux 3, 6, 10). Table complète des 36 cartes ajoutées, gabarits de puissance par rareté et règles de contenu : `Code/docs/specs/2026-10-27-catalogue-36-cartes-design.md`. Illustrations temporaires : recadrages teintés de l'art du Drive, une source par carte (`Resources/Illustrations/Cards/SOURCES.md`).
 
 ### Catégories des cartes
 Une carte se classe sur deux axes : sa **famille** (le type de pouvoir, celle des agents qui peuvent l'équiper) × sa **nature** : **Offensive**, **Défensive** ou **Soutien**. La nature est **saisie par carte** ; à défaut, elle est déduite de l'effet de base et de la cible :
@@ -80,42 +80,42 @@ La catégorie fine (Dégâts, Soins, Protection, Boost, Gestion du temps) reste 
 Certaines compétences déplacent directement les unités sur la frise : **recul** (« −25 % de la frise »), **élan** (« +20 %, à 100 % l'agent agit aussitôt ») et **retrait ou ajout de frise** (« −10 % »).
 
 ## Les 32 kits
-Rareté : Agent ×1, Élite ×1,2, Légende ×1,45 sur les statistiques. Entre parenthèses : le statut propre de la compétence. Fiches de lore : `02_Lore_Narration/04_Agents_The_Dawn.md`.
+Rang AMIF : ×1 / ×1,15 / ×1,30 / ×1,45 / ×1,65 sur les statistiques (rangs 1 à 5). Entre parenthèses : le statut propre de la compétence. Fiches de lore : `02_Lore_Narration/04_Agents_The_Dawn.md`.
 
-| Agent | Famille | Rôle | Rareté | A1 (gratuite) | A2 (coût 30 ou 40) |
+| Agent | Famille | Position | Rang | A1 (gratuite) | A2 (coût 30 ou 40) |
 |---|---|---|---|---|---|
-| Agent D | Matière | Contrôle | Légende | Barrière de craie (Entrave) | Créature dessinée (Vulnérabilité) |
-| Agent M | Perception | Précision | Légende | Vision du présent (Choc) | Futur fragmenté (Vulnérabilité) |
-| Darius Brooks | Matière | Tank | Agent | Poutre propulsée (Vulnérabilité) | Rempart de ferraille (Ancrage) |
-| Mei-Lin Chen | Élémentaire | Dégâts | Agent | Jet de flammes (Brûlure) | Brasier (Brûlure) |
-| Freya Lindqvist | Perception | Soutien | Agent | Murmure mental (Marque) | Esprit partagé (Hâte) |
-| Kwame Abara | Physique/Bio | Dégâts | Agent | Griffes du fauve (Entrave) | Meute déchaînée (Vulnérabilité) |
-| Giulia Rossi | Matière | Dégâts | Agent | Projection (Choc) | Tempête d'objets (Vulnérabilité) |
-| Lucas Mendes | Physique/Bio | Tank | Agent | Frappe fantôme (Marque) | Corps de brume (Esquive) |
-| Rin Takeda | Élémentaire | Contrôle | Agent | Décharge radio (Choc) | Brouillage (Choc) |
-| Amara Hughes | Perception | Soutien | Agent | Note apaisante (Entrave) | Chœur de guérison (Régénération) |
-| Ilona Varga | Perception | Contrôle | Agent | Ombre de la peur (Choc) | Cauchemar (Marque) |
-| Fatou Diallo | Physique/Bio | Tank | Agent | Foulée explosive (Choc) | Bouclier cinétique (Hâte) |
-| Clément Lefèvre | Perception | Précision | Élite | Mirage (Choc) | Grande illusion (Entrave) |
-| Youssef Haddad | Physique/Bio | Précision | Élite | Écoute absolue (Vulnérabilité) | Perception totale (Marque) |
-| Séverine Morel | Physique/Bio | Soutien | Agent | Drain vital (Corrosion) | Transfusion (Régénération) |
-| Sam Okafor | Physique/Bio | Tank | Agent | Encaisser (Choc) | Onde de choc (Ancrage) |
-| Astrid Hallström | Élémentaire | Soutien | Élite | Vague (Gel) | Marée vive (Régénération) |
-| Céleste Moreau | Élémentaire | Contrôle | Agent | Brume toxique (Corrosion) | Nuage soporifique (Corrosion) |
-| Haruto Nakamura | Perception | Contrôle | Agent | Âme errante (Entrave) | Souffle astral (Vulnérabilité) |
-| Yelena Ivanova | Élémentaire | Contrôle | Élite | Givre mordant (Gel) | Glace éternelle (Gel) |
-| Noah Kaplan | Matière | Contrôle | Agent | Permutation (Choc) | Échange forcé (Vulnérabilité) |
-| Tunde Oyelaran | Matière | Soutien | Agent | Poche d'espace (Entrave) | Refuge plié (Bouclier) |
-| Victor Sorel | Perception | Contrôle | Légende | Emprise (Marque) | Volonté dominée (Vulnérabilité) |
-| Odile Ferrand | Perception | Soutien | Légende | Seconde suspendue (Gel) | Temps accéléré (Hâte) |
-| Louis Dubois | Matière | Contrôle | Élite | Aimant (Choc) | Champ magnétique (Choc) |
-| Marco Bellini | Matière | Dégâts | Élite | Transmutation (Corrosion) | Or alchimique (Corrosion) |
-| Zofia Kowalczyk | Élémentaire | Dégâts | Élite | Archet vibrant (Choc) | Crescendo (Choc) |
-| Mateo Vasquez | Physique/Bio | Soutien | Élite | Pression sanguine (Corrosion) | Coagulation (Régénération) |
-| Ada Okonkwo | Physique/Bio | Soutien | Légende | Mutation (Corrosion) | Régénération cellulaire (Régénération) |
-| Eero Nieminen | Matière | Dégâts | Légende | Poids mort (Entrave) | Gravité écrasante (Vulnérabilité) |
-| Ji-Hoon Park | Perception | Précision | Agent | Coup invisible (Choc) | Disparition (Vulnérabilité) |
-| Anna Petrov | Perception | Précision | Agent | Saut instantané (Choc) | Pirouette téléportée (Entrave) |
+| Agent D | Matière | Contrôle | 5 | Barrière de craie (Entrave) | Créature dessinée (Vulnérabilité) |
+| Agent M | Perception | Précision à distance | 5 | Vision du présent (Choc) | Futur fragmenté (Vulnérabilité) |
+| Darius Brooks | Matière | Première ligne | 1 | Poutre propulsée (Vulnérabilité) | Rempart de ferraille (Ancrage) |
+| Mei-Lin Chen | Élémentaire | Attaquant | 2 | Jet de flammes (Brûlure) | Brasier (Brûlure) |
+| Freya Lindqvist | Perception | Soutien | 1 | Murmure mental (Marque) | Esprit partagé (Hâte) |
+| Kwame Abara | Physique/Bio | Attaquant | 2 | Griffes du fauve (Entrave) | Meute déchaînée (Vulnérabilité) |
+| Giulia Rossi | Matière | Attaquant | 2 | Projection (Choc) | Tempête d'objets (Vulnérabilité) |
+| Lucas Mendes | Physique/Bio | Première ligne | 1 | Frappe fantôme (Marque) | Corps de brume (Esquive) |
+| Rin Takeda | Élémentaire | Contrôle | 2 | Décharge radio (Choc) | Brouillage (Choc) |
+| Amara Hughes | Perception | Soutien | 1 | Note apaisante (Entrave) | Chœur de guérison (Régénération) |
+| Ilona Varga | Perception | Contrôle | 2 | Ombre de la peur (Choc) | Cauchemar (Marque) |
+| Fatou Diallo | Physique/Bio | Première ligne | 1 | Foulée explosive (Choc) | Bouclier cinétique (Hâte) |
+| Clément Lefèvre | Perception | Précision à distance | 3 | Mirage (Choc) | Grande illusion (Entrave) |
+| Youssef Haddad | Physique/Bio | Précision à distance | 3 | Écoute absolue (Vulnérabilité) | Perception totale (Marque) |
+| Séverine Morel | Physique/Bio | Soutien | 1 | Drain vital (Corrosion) | Transfusion (Régénération) |
+| Sam Okafor | Physique/Bio | Première ligne | 1 | Encaisser (Choc) | Onde de choc (Ancrage) |
+| Astrid Hallström | Élémentaire | Soutien | 4 | Vague (Gel) | Marée vive (Régénération) |
+| Céleste Moreau | Élémentaire | Contrôle | 2 | Brume toxique (Corrosion) | Nuage soporifique (Corrosion) |
+| Haruto Nakamura | Perception | Contrôle | 2 | Âme errante (Entrave) | Souffle astral (Vulnérabilité) |
+| Yelena Ivanova | Élémentaire | Contrôle | 3 | Givre mordant (Gel) | Glace éternelle (Gel) |
+| Noah Kaplan | Matière | Contrôle | 2 | Permutation (Choc) | Échange forcé (Vulnérabilité) |
+| Tunde Oyelaran | Matière | Soutien | 1 | Poche d'espace (Entrave) | Refuge plié (Bouclier) |
+| Victor Sorel | Perception | Contrôle | 5 | Emprise (Marque) | Volonté dominée (Vulnérabilité) |
+| Odile Ferrand | Perception | Soutien | 4 | Seconde suspendue (Gel) | Temps accéléré (Hâte) |
+| Louis Dubois | Matière | Contrôle | 4 | Aimant (Choc) | Champ magnétique (Choc) |
+| Marco Bellini | Matière | Attaquant | 3 | Transmutation (Corrosion) | Or alchimique (Corrosion) |
+| Zofia Kowalczyk | Élémentaire | Attaquant | 3 | Archet vibrant (Choc) | Crescendo (Choc) |
+| Mateo Vasquez | Physique/Bio | Soutien | 3 | Pression sanguine (Corrosion) | Coagulation (Régénération) |
+| Ada Okonkwo | Physique/Bio | Soutien | 4 | Mutation (Corrosion) | Régénération cellulaire (Régénération) |
+| Eero Nieminen | Matière | Attaquant | 4 | Poids mort (Entrave) | Gravité écrasante (Vulnérabilité) |
+| Ji-Hoon Park | Perception | Précision à distance | 1 | Coup invisible (Choc) | Disparition (Vulnérabilité) |
+| Anna Petrov | Perception | Précision à distance | 1 | Saut instantané (Choc) | Pirouette téléportée (Entrave) |
 
 ## Ennemis
 Les compétences des ennemis (Voyou, Gros bras, Pyro de rue, Brick, Crocodile…) sont dans `Content/Prototype/PrototypeContent.cs` et `PrototypeZones.cs` ; elles suivent les mêmes règles d énergie.

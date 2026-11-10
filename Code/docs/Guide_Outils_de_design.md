@@ -4,7 +4,7 @@ Quatre fenêtres sous **Heroes Dawn ▸ Outils**. Elles éditent des fichiers JS
 
 | Fenêtre | Fichier | Ce qu'on y fait |
 |---|---|---|
-| **Agents** | `agents.json` | Ajouter, dupliquer, modifier, supprimer un agent complet : nom, famille, rôle, rareté, statistiques, déblocage (boutique, arc, week-end, prouesse + zone), deux compétences de base (la 3e place du combat est une carte du grimoire). |
+| **Agents** | `agents.json` | Ajouter, dupliquer, modifier, supprimer un agent complet : nom, famille, position, rang AMIF (1 à 5), statistiques, déblocage (boutique, arc, week-end, prouesse + zone), deux compétences de base (la 3e place du combat est une carte du grimoire). |
 | **Compétences** | `skills.json` | Une compétence : nom, emplacement, recharge, cible, liste d'effets (dégâts, soin, bouclier, statut, recul, élan, jauge). La description du jeu est calculée à partir des effets ; l'aperçu la montre. |
 | **Objets** | `items.json` | Un objet : nom, rareté, bonus en % (PV, attaque, défense, vitesse), effet spécial, prix. |
 | **Narration** | zones (`Resources/Zones`) et `texts.json` | Onglet *Dialogues* : répliques jouées avant et après une case de chaque zone (créer, modifier, réordonner, supprimer). Onglet *Textes* : modifier un texte du jeu (tutoriel, astuces, première connexion, quêtes, QG, combat…), en ajouter, revenir à l'original. |

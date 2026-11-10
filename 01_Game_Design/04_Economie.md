@@ -18,7 +18,7 @@ Modèle **F2P + pass saisonnier**. Principe directeur : **l'argent réel fait un
 - Renouvellement de la pool : **1 gratuit**, puis payant en Crédits (100 → 800), puis en premium.
 - **Aucun doublon** : une recrue possédée ne réapparaît jamais.
 - Les agents d arc, d événement et de prouesse ne passent pas par la boutique : ils se gagnent en jouant.
-- **Rareté** : Agent / Élite / Légende ; coût en PR croissant. Les 4 Légendes numérotées se gagnent par arc ou par prouesse (pas en boutique).
+- **Rang AMIF** (1 à 5) : remplace la rareté d agent ; coût en PR croissant. Les rangs 4 et 5 se gagnent par arc ou par prouesse (pas en boutique). Les cartes du grimoire ont 1 à 5 **étoiles** (boosters ordinaires : 50 / 28 / 15 / 6 / 1 %).
 
 ## Pass saisonnier
 - Saison de **6 semaines**, **piste gratuite + piste premium**.
@@ -69,8 +69,8 @@ Soit 3 € / 6 € / 10 € pour une tenue ; aucun cosmétique au-delà de 10 �
 ### Recrutement
 | Élément | Valeur |
 |---|---|
-| Coût Agent / Élite / Légende | 150 / 450 / 1 200 PR |
-| Pool quotidienne | 3 agents à 9 h locale, tirage pondéré 70 / 25 / 5 ⚑ |
+| Coût par rang AMIF (1 à 5) | 150 / 220 / 450 / 800 / 1 200 PR ⚑ |
+| Pool quotidienne | 3 agents à 9 h locale, tirage pondéré par rang 45 / 25 / 20 / 8 / 2 ⚑ |
 | Renouvellements | 1er gratuit, puis 100 Crédits, jusqu à 800 |
 | Les 14 agents de la boutique (10 Agents + 4 Élites) | 3 300 PR |
 
