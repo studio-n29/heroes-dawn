@@ -210,6 +210,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["card.nature.offensive"] = "Offensive";
             d["card.nature.defensive"] = "Défensive";
             d["card.nature.support"] = "Soutien";
+            d["card.nature.control"] = "Contrôle";
             d["item.type.weapon"] = "Arme";
             d["item.type.armor"] = "Armure";
             d["item.type.tool"] = "Outil";

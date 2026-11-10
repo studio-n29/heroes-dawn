@@ -129,7 +129,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         /// <summary>Pastille colorée de la nature d'une carte (« ● Défensive »), en texte enrichi.</summary>
         public static string NatureChip(ILocalization loc, CardNature n)
-            => Chip(NatureName(loc, n), n == CardNature.Offensive ? Theme.Danger : n == CardNature.Defensive ? Theme.Info : Theme.Success);
+            => Chip(NatureName(loc, n), n == CardNature.Offensive ? Theme.Danger : n == CardNature.Defensive ? Theme.Info : n == CardNature.Control ? Theme.Accent : Theme.Success);
 
         /// <summary>Pastille colorée du type d'un objet (« ● Armure »), en texte enrichi.</summary>
         public static string ItemTypeChip(ILocalization loc, ItemType t)

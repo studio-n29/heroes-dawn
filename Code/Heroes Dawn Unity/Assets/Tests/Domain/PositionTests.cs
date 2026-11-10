@@ -15,5 +15,15 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That((int)Position.Support, Is.EqualTo(3));
             Assert.That((int)Position.Ranged, Is.EqualTo(4));
         }
+
+        [Test, Description("Vérifie que chaque position booste les types de la spec : Première ligne Défensif, Attaquant Offensif, Contrôle Contrôle, Soutien Soutien, Précision à distance Offensif et Contrôle — parce que le bonus de position récompense le rôle tenu par l agent")]
+        public void BoostedTypes_suit_la_table_de_la_spec()
+        {
+            Assert.That(Positions.BoostedTypes(Position.FrontLine), Is.EqualTo(new[] { CardNature.Defensive }));
+            Assert.That(Positions.BoostedTypes(Position.Attacker), Is.EqualTo(new[] { CardNature.Offensive }));
+            Assert.That(Positions.BoostedTypes(Position.Controller), Is.EqualTo(new[] { CardNature.Control }));
+            Assert.That(Positions.BoostedTypes(Position.Support), Is.EqualTo(new[] { CardNature.Support }));
+            Assert.That(Positions.BoostedTypes(Position.Ranged), Is.EquivalentTo(new[] { CardNature.Offensive, CardNature.Control }));
+        }
     }
 }

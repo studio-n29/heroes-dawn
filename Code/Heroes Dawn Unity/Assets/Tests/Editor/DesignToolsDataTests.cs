@@ -169,9 +169,9 @@ namespace N29.HeroesDawn.Tests.Editor
 
         static readonly Dictionary<string, CardNature> SpecNatures = new Dictionary<string, CardNature>
         {
-            ["card_prism_burst"] = CardNature.Offensive, ["card_shackle"] = CardNature.Offensive, ["card_ember"] = CardNature.Offensive,
+            ["card_prism_burst"] = CardNature.Control, ["card_shackle"] = CardNature.Control, ["card_ember"] = CardNature.Offensive,
             ["card_storm"] = CardNature.Offensive, ["card_inferno"] = CardNature.Offensive, ["card_bulwark_charge"] = CardNature.Offensive,
-            ["card_mark"] = CardNature.Offensive, ["card_glass_wall"] = CardNature.Defensive, ["card_second_wind"] = CardNature.Support,
+            ["card_mark"] = CardNature.Control, ["card_glass_wall"] = CardNature.Defensive, ["card_second_wind"] = CardNature.Support,
             ["card_regen_field"] = CardNature.Support, ["card_precog"] = CardNature.Support, ["card_time_rift"] = CardNature.Support,
             // Lot C2 : 36 nouvelles cartes
             ["card_glass_shards"] = CardNature.Offensive, ["card_concrete_rampart"] = CardNature.Defensive, ["card_rivet_armor"] = CardNature.Defensive,
@@ -180,11 +180,11 @@ namespace N29.HeroesDawn.Tests.Editor
             ["card_frost_wall"] = CardNature.Defensive, ["card_steam_shield"] = CardNature.Defensive, ["card_tonic_current"] = CardNature.Support,
             ["card_soothing_mist"] = CardNature.Support, ["card_neon_halo"] = CardNature.Defensive, ["card_spark_rush"] = CardNature.Support,
             ["card_power_flux"] = CardNature.Support, ["card_ice_carapace"] = CardNature.Defensive, ["card_chain_lightning"] = CardNature.Offensive,
-            ["card_ram_strike"] = CardNature.Offensive, ["card_steel_skin"] = CardNature.Defensive, ["card_deep_anchor"] = CardNature.Defensive,
+            ["card_ram_strike"] = CardNature.Control, ["card_steel_skin"] = CardNature.Defensive, ["card_deep_anchor"] = CardNature.Defensive,
             ["card_fresh_blood"] = CardNature.Support, ["card_bloodletting"] = CardNature.Offensive, ["card_challenge"] = CardNature.Defensive,
             ["card_shared_pulse"] = CardNature.Support, ["card_living_bastion"] = CardNature.Defensive, ["card_telluric_fist"] = CardNature.Offensive,
             ["card_precise_shot"] = CardNature.Offensive, ["card_side_step"] = CardNature.Defensive, ["card_camouflage"] = CardNature.Defensive,
-            ["card_guiding_echo"] = CardNature.Support, ["card_guard_break"] = CardNature.Offensive, ["card_premonition"] = CardNature.Defensive,
+            ["card_guiding_echo"] = CardNature.Support, ["card_guard_break"] = CardNature.Control, ["card_premonition"] = CardNature.Defensive,
             ["card_shared_watch"] = CardNature.Support, ["card_silent_takedown"] = CardNature.Offensive, ["card_time_veil"] = CardNature.Defensive,
         };
 
@@ -196,7 +196,7 @@ namespace N29.HeroesDawn.Tests.Editor
             ["power_gauntlet"] = ItemType.Implant, ["arcane_focus"] = ItemType.Implant,
         };
 
-        [Test, Description("Vérifie que les 12 cartes et les 12 objets du code ont la nature et le type fixés par la spec du lot B — parce que ces catégories pilotent les filtres et la règle d'équipement")]
+        [Test, Description("Vérifie que les cartes et les objets du code ont la nature et le type fixés par la spec du lot B — parce que ces catégories pilotent les filtres et la règle d'équipement")]
         public void CodeCatalog_HasTheSpecCategories()
         {
             var col = PrototypeCollection.Build();

@@ -193,9 +193,12 @@ namespace N29.HeroesDawn.Tests.Domain
         static SkillDef Skill(TargetRule target, params EffectDef[] fx) => new SkillDef(new SkillId("test"), SkillSlot.A3, 5, target, fx);
 
         [TestCase(EffectType.Damage, 100, StatusType.None, TargetRule.SingleEnemy, CardNature.Offensive)]
-        [TestCase(EffectType.ApplyStatus, 0, StatusType.Bind, TargetRule.SingleEnemy, CardNature.Offensive)]
-        [TestCase(EffectType.PushBack, 25, StatusType.None, TargetRule.AllEnemies, CardNature.Offensive)]
-        [TestCase(EffectType.GaugeDelta, -20, StatusType.None, TargetRule.SingleEnemy, CardNature.Offensive)]
+        [TestCase(EffectType.ApplyStatus, 0, StatusType.Burn, TargetRule.SingleEnemy, CardNature.Offensive)]
+        [TestCase(EffectType.ApplyStatus, 0, StatusType.Mark, TargetRule.SingleEnemy, CardNature.Control)]
+        [TestCase(EffectType.ApplyStatus, 0, StatusType.Freeze, TargetRule.AllEnemies, CardNature.Control)]
+        [TestCase(EffectType.ApplyStatus, 0, StatusType.Bind, TargetRule.SingleEnemy, CardNature.Control)]
+        [TestCase(EffectType.PushBack, 25, StatusType.None, TargetRule.AllEnemies, CardNature.Control)]
+        [TestCase(EffectType.GaugeDelta, -20, StatusType.None, TargetRule.SingleEnemy, CardNature.Control)]
         [TestCase(EffectType.Shield, 15, StatusType.Shield, TargetRule.AllAllies, CardNature.Defensive)]
         [TestCase(EffectType.Heal, 35, StatusType.None, TargetRule.SingleAlly, CardNature.Support)]
         [TestCase(EffectType.ApplyStatus, 0, StatusType.Haste, TargetRule.Self, CardNature.Support)]
@@ -237,7 +240,7 @@ namespace N29.HeroesDawn.Tests.Domain
 
         // ------------------------------------------------------------------ Catalogue de 48 cartes (lot C2)
 
-        [Test, Description("Vérifie que le catalogue compte 48 cartes aux identifiants uniques, 12 par famille et 4 par nature dans chaque famille — parce que le deck building demande un vrai choix dans chaque case")]
+        [Test, Description("Vérifie que le catalogue compte 48 cartes aux identifiants uniques, 12 par famille dont 4 défensives, 4 de soutien et 4 offensives ou de contrôle — parce que le type Contrôle prend la place d une partie des offensives")]
         public void Catalog_Has48Cards_12PerFamily_4PerNature()
         {
             Assert.That(Catalog.Length, Is.EqualTo(48));
@@ -246,8 +249,9 @@ namespace N29.HeroesDawn.Tests.Domain
             {
                 var fam = Catalog.Where(c => c.Family == f).ToList();
                 Assert.That(fam.Count, Is.EqualTo(12), f.ToString());
-                foreach (CardNature n in System.Enum.GetValues(typeof(CardNature)))
-                    Assert.That(fam.Count(c => c.Nature == n), Is.EqualTo(4), f + " " + n);
+                Assert.That(fam.Count(c => c.Nature == CardNature.Defensive), Is.EqualTo(4), f + " Defensive");
+                Assert.That(fam.Count(c => c.Nature == CardNature.Support), Is.EqualTo(4), f + " Support");
+                Assert.That(fam.Count(c => c.Nature == CardNature.Offensive || c.Nature == CardNature.Control), Is.EqualTo(4), f + " Offensive + Control");
             }
         }
 
@@ -262,10 +266,12 @@ namespace N29.HeroesDawn.Tests.Domain
             }
         }
 
-        [Test, Description("Vérifie que la nature saisie de chaque carte est celle déduite de son effet de base — parce que la spec du catalogue l'exige pour les 48 cartes")]
+        [Test, Description("Vérifie que la nature de chaque carte est celle déduite de son effet de base, sauf 4 cartes à effet principal de dégâts passées explicitement en Contrôle — parce que leur intention de jeu est le contrôle (spec du bloc A)")]
         public void EveryCard_NatureEqualsItsDeduction()
         {
-            foreach (var c in Catalog) Assert.That(c.Nature, Is.EqualTo(CardNatures.Of(c.Skill)), c.Id.Value);
+            var explicitControl = new[] { "card_prism_burst", "card_mark", "card_guard_break", "card_ram_strike" };
+            foreach (var c in Catalog.Where(c => !explicitControl.Contains(c.Id.Value))) Assert.That(c.Nature, Is.EqualTo(CardNatures.Of(c.Skill)), c.Id.Value);
+            foreach (var c in Catalog.Where(c => explicitControl.Contains(c.Id.Value))) Assert.That(c.Nature, Is.EqualTo(CardNature.Control), c.Id.Value);
         }
 
         [Test, Description("Vérifie qu'aucune carte lancée sur soi ne compte sur un élan ou un gain de jauge — parce que l'élan ignore le lanceur et l'effet serait perdu")]
@@ -362,6 +368,14 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(CollectionRules.CanEquip(armor2, new[] { armor }), Is.False);
             Assert.That(CollectionRules.CanEquip(armor2, new[] { weapon }), Is.True);
             Assert.That(CollectionRules.CanEquip(armor2, new ItemDef[0]), Is.True);
+        }
+
+        [Test, Description("Vérifie que card_shackle, card_prism_burst et card_mark sont de type Contrôle, et card_ember, card_inferno et card_monolith de type Offensif — parce que la spec du bloc A fixe ces cartes témoins")]
+        public void Les_cartes_prototypes_ont_les_types_attendus()
+        {
+            CardNature Of(string id) => Catalog.Single(c => c.Id.Value == id).Nature;
+            foreach (var id in new[] { "card_shackle", "card_prism_burst", "card_mark" }) Assert.That(Of(id), Is.EqualTo(CardNature.Control), id);
+            foreach (var id in new[] { "card_ember", "card_inferno", "card_monolith" }) Assert.That(Of(id), Is.EqualTo(CardNature.Offensive), id);
         }
     }
 }

@@ -48,15 +48,15 @@ namespace N29.HeroesDawn.Content.Prototype
             new List<SkillCardDef>
             {
                 C("card_glass_wall", Family.Matter, CardNature.Defensive, ItemRarity.Common, 5, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Anchor, 1), St(StatusType.Regen, 2)), Shield(15)),
-                C("card_shackle", Family.Matter, CardNature.Offensive, ItemRarity.Rare, 4, TargetRule.SingleEnemy, Tiers(St(StatusType.Vulnerable, 2), Purge(1), St(StatusType.Shock, 1)), St(StatusType.Bind, 2), Push(25)),
-                C("card_prism_burst", Family.Matter, CardNature.Offensive, ItemRarity.Epic, 5, TargetRule.AllEnemies, Tiers(St(StatusType.Corrosion, 2, 30), Exec(30), Purge(1)), Dmg(80), St(StatusType.Vulnerable, 2)),
+                C("card_shackle", Family.Matter, CardNature.Control, ItemRarity.Rare, 4, TargetRule.SingleEnemy, Tiers(St(StatusType.Vulnerable, 2), Purge(1), St(StatusType.Shock, 1)), St(StatusType.Bind, 2), Push(25)),
+                C("card_prism_burst", Family.Matter, CardNature.Control, ItemRarity.Epic, 5, TargetRule.AllEnemies, Tiers(St(StatusType.Corrosion, 2, 30), Exec(30), Purge(1)), Dmg(80), St(StatusType.Vulnerable, 2)),
                 C("card_ember", Family.Elemental, CardNature.Offensive, ItemRarity.Common, 5, TargetRule.SingleEnemy, Tiers(St(StatusType.Burn, 2), Bounce(50), Exec(50)), Dmg(140)),
                 C("card_storm", Family.Elemental, CardNature.Offensive, ItemRarity.Rare, 5, TargetRule.AllEnemies, Tiers(St(StatusType.Blind, 1, 30), Steal(15), St(StatusType.Vulnerable, 2)), Dmg(70), St(StatusType.Shock, 1, 30)),
                 C("card_inferno", Family.Elemental, CardNature.Offensive, ItemRarity.Epic, 6, TargetRule.AllEnemies, Tiers(Steal(10), St(StatusType.Corrosion, 2), Exec(40)), Dmg(110), St(StatusType.Burn, 3)),
                 C("card_second_wind", Family.PhysicalBio, CardNature.Support, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(Purge(0), Shield(10), St(StatusType.Regen, 2)), Heal(35)),
                 C("card_bulwark_charge", Family.PhysicalBio, CardNature.Offensive, ItemRarity.Rare, 5, TargetRule.SingleEnemy, Tiers(Steal(20), Bounce(50), St(StatusType.Vulnerable, 2)), Dmg(120), Push(25)),
                 C("card_regen_field", Family.PhysicalBio, CardNature.Support, ItemRarity.Epic, 6, TargetRule.AllAllies, Tiers(Purge(1), Shield(8), St(StatusType.Haste, 1)), Heal(20), St(StatusType.Regen, 3)),
-                C("card_mark", Family.Perception, CardNature.Offensive, ItemRarity.Common, 4, TargetRule.SingleEnemy, Tiers(Exec(30), Bounce(40), St(StatusType.Blind, 1)), Dmg(100), St(StatusType.Mark, 99)),
+                C("card_mark", Family.Perception, CardNature.Control, ItemRarity.Common, 4, TargetRule.SingleEnemy, Tiers(Exec(30), Bounce(40), St(StatusType.Blind, 1)), Dmg(100), St(StatusType.Mark, 99)),
                 C("card_precog", Family.Perception, CardNature.Support, ItemRarity.Rare, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Evade, 1), Purge(0), Shield(15)), Adv(50), St(StatusType.Haste, 2)),
                 C("card_time_rift", Family.Perception, CardNature.Support, ItemRarity.Legendary, 7, TargetRule.AllAllies, Tiers(St(StatusType.Regen, 2), Purge(1), St(StatusType.Evade, 1)), Adv(40), St(StatusType.Haste, 3)),
 
@@ -83,7 +83,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 C("card_chain_lightning", Family.Elemental, CardNature.Offensive, ItemRarity.Legendary, 7, TargetRule.SingleEnemy, Tiers(Bounce(60), St(StatusType.Vulnerable, 2), Exec(50)), Dmg(160), St(StatusType.Shock, 1, 40)),
 
                 // ---- Lot C2 : Physique / Bio
-                C("card_ram_strike", Family.PhysicalBio, CardNature.Offensive, ItemRarity.Common, 4, TargetRule.SingleEnemy, Tiers(St(StatusType.Vulnerable, 1), Steal(15), Bounce(40)), Dmg(110), Push(20)),
+                C("card_ram_strike", Family.PhysicalBio, CardNature.Control, ItemRarity.Common, 4, TargetRule.SingleEnemy, Tiers(St(StatusType.Vulnerable, 1), Steal(15), Bounce(40)), Dmg(110), Push(20)),
                 C("card_steel_skin", Family.PhysicalBio, CardNature.Defensive, ItemRarity.Common, 4, TargetRule.Self, Tiers(St(StatusType.Taunt, 1), St(StatusType.Regen, 2), St(StatusType.Anchor, 1)), Shield(25)),
                 C("card_deep_anchor", Family.PhysicalBio, CardNature.Defensive, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(Purge(1), St(StatusType.Regen, 2), St(StatusType.Haste, 1)), Shield(15), St(StatusType.Anchor, 1)),
                 C("card_fresh_blood", Family.PhysicalBio, CardNature.Support, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Regen, 2), Purge(0), Shield(10)), Heal(30)),
@@ -98,7 +98,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 C("card_side_step", Family.Perception, CardNature.Defensive, ItemRarity.Common, 4, TargetRule.Self, Tiers(St(StatusType.Haste, 1), Purge(1), St(StatusType.Regen, 2)), Shield(15), St(StatusType.Evade, 1)),
                 C("card_camouflage", Family.Perception, CardNature.Defensive, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Evade, 1, 30), Purge(1), St(StatusType.Haste, 1)), Shield(18)),
                 C("card_guiding_echo", Family.Perception, CardNature.Support, ItemRarity.Common, 5, TargetRule.SingleAlly, Tiers(St(StatusType.Haste, 1), Shield(10), Purge(0)), Adv(40)),
-                C("card_guard_break", Family.Perception, CardNature.Offensive, ItemRarity.Rare, 5, TargetRule.SingleEnemy, Tiers(St(StatusType.Mark, 1), Exec(40), Bounce(50)), Dmg(100), Purge(1), St(StatusType.Vulnerable, 2)),
+                C("card_guard_break", Family.Perception, CardNature.Control, ItemRarity.Rare, 5, TargetRule.SingleEnemy, Tiers(St(StatusType.Mark, 1), Exec(40), Bounce(50)), Dmg(100), Purge(1), St(StatusType.Vulnerable, 2)),
                 C("card_premonition", Family.Perception, CardNature.Defensive, ItemRarity.Rare, 5, TargetRule.AllAllies, Tiers(St(StatusType.Evade, 1, 30), Purge(1), St(StatusType.Haste, 1)), Shield(12)),
                 C("card_shared_watch", Family.Perception, CardNature.Support, ItemRarity.Rare, 5, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Haste, 1), Shield(8)), Gauge(100)),
                 C("card_silent_takedown", Family.Perception, CardNature.Offensive, ItemRarity.Epic, 6, TargetRule.SingleEnemy, Tiers(St(StatusType.Blind, 1), Steal(15), Bounce(60)), Dmg(150), Exec(50)),

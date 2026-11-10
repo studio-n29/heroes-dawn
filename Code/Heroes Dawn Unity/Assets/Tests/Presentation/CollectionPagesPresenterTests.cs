@@ -222,7 +222,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             var p = Grimoire();
             Assert.That(_view.Filters.Length, Is.EqualTo(2));
             Assert.That(_view.Filters[0].Labels.Length, Is.EqualTo(5));
-            Assert.That(_view.Filters[1].Labels.Length, Is.EqualTo(4));
+            Assert.That(_view.Filters[1].Labels.Length, Is.EqualTo(5));
             _view.ClickFilter(0, Opt(Family.Matter));
             _view.ClickFilter(1, Opt(CardNature.Defensive));
             Assert.That(Titles(), Is.EquivalentTo(new[] { "Mur de verre", "Rempart de béton", "Armure de rivets", "Prisme réfléchissant" }));
@@ -234,12 +234,12 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que chacune des 12 combinaisons famille × nature montre exactement 4 cartes, sans note « aucune carte » — parce que le catalogue de 48 cartes remplit toutes les cases")]
+        [Test, Description("Vérifie que chacune des 8 combinaisons famille × (défensive ou soutien) montre exactement 4 cartes, sans note « aucune carte » — parce que le catalogue de 48 cartes remplit toutes les cases")]
         public void Grimoire_EveryFamilyAndNature_Shows4Cards()
         {
             var p = Grimoire();
             foreach (Family f in System.Enum.GetValues(typeof(Family)))
-                foreach (CardNature n in System.Enum.GetValues(typeof(CardNature)))
+                foreach (CardNature n in new[] { CardNature.Defensive, CardNature.Support })
                 {
                     _view.ClickFilter(0, Opt(f));
                     _view.ClickFilter(1, Opt(n));

@@ -70,19 +70,25 @@ namespace N29.HeroesDawn.Definitions
         }
     }
 
-    /// <summary>Nature d'une carte : ce qu'elle fait dans le combat (axe croisé avec la famille, le type de pouvoir).</summary>
-    public enum CardNature { Offensive, Defensive, Support }
+    /// <summary>Type d une carte : Offensif, Défensif, Soutien ou Contrôle (axe croisé avec la famille ; les positions boostent certains types).</summary>
+    public enum CardNature { Offensive, Defensive, Support, Control }
 
     /// <summary>Nature déduite de l'effet de base et de la cible ; pré-remplit la nature saisie de chaque carte.</summary>
     public static class CardNatures
     {
+        /// <summary>Statuts qui contrôlent un ennemi : Entrave, Choc, Gel, Marque, Vulnérabilité, Aveuglement.</summary>
+        public static bool IsControlStatus(StatusType s) =>
+            s == StatusType.Bind || s == StatusType.Shock || s == StatusType.Freeze || s == StatusType.Mark || s == StatusType.Vulnerable || s == StatusType.Blind;
+
         public static CardNature Of(SkillDef skill)
         {
             var fx = skill.BaseEffect;
             if (fx == null) return CardNature.Offensive;
             if (fx.Type == EffectType.Shield) return CardNature.Defensive;
             if (fx.Type == EffectType.Heal) return CardNature.Support;
-            return skill.Target == TargetRule.SingleEnemy || skill.Target == TargetRule.AllEnemies ? CardNature.Offensive : CardNature.Support;
+            if (skill.Target != TargetRule.SingleEnemy && skill.Target != TargetRule.AllEnemies) return CardNature.Support;
+            bool control = fx.Type == EffectType.PushBack || fx.Type == EffectType.GaugeDelta || (fx.Type == EffectType.ApplyStatus && IsControlStatus(fx.Status));
+            return control ? CardNature.Control : CardNature.Offensive;
         }
     }
 
