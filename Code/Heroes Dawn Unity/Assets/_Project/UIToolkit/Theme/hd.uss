@@ -309,3 +309,61 @@ TemplateContainer { width: 100%; height: 100%; flex-grow: 1; }
 .hd-choice__card--account .hd-choice__header { color: var(--hd-success); }
 .hd-choice__summary { -unity-font: var(--hd-font-body); font-size: var(--hd-text-body); color: var(--hd-ivory); white-space: normal; -unity-text-align: middle-center; margin: 16px 0 24px 0; }
 .hd-busy { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(10, 17, 26, 0.85); align-items: center; justify-content: center; }
+
+/* ---------------------------------------------------------------- Pages « liste » */
+.hd-list { flex-direction: row; }
+.hd-list__main { flex-grow: 1; flex-basis: 0; min-width: 0; }
+.hd-list__header { flex-direction: row; align-items: center; min-height: 150px; margin: 0 0 12px 0; padding: 14px 28px; flex-shrink: 0; }
+.hd-list__headtext { flex-grow: 1; flex-basis: 0; min-width: 0; justify-content: center; }
+.hd-list__title { -unity-font: var(--hd-font-title); font-size: 40px; color: var(--hd-brass); }
+.hd-list__line { -unity-font: var(--hd-font-body); font-size: 26px; color: var(--hd-ivory); white-space: normal; }
+.hd-list__bar { margin-top: 8px; max-width: 720px; }
+.hd-list__barlabel { position: absolute; left: 0; right: 0; top: -2px; -unity-text-align: middle-center; -unity-font: var(--hd-font-heading); font-size: 22px; color: var(--hd-ivory); }
+.hd-list__headbtn { margin: 0 0 0 16px; min-width: 260px; flex-shrink: 0; }
+.hd-list__filters { flex-direction: column; flex-shrink: 0; }
+.hd-list__filterrow { flex-direction: row; margin-bottom: 8px; }
+.hd-list__filter { margin: 0 8px 0 0; }
+.hd-list__rows { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-height: 0; }
+.hd-list__side { width: 640px; flex-shrink: 0; margin: 0 0 0 24px; padding: 20px 24px; }
+.hd-list__side--wide { width: 860px; }
+.hd-list__side--none { display: none; }
+.hd-list__sidetitle { -unity-font: var(--hd-font-title); font-size: 34px; color: var(--hd-brass); margin-bottom: 8px; }
+.hd-list__sidetext { -unity-font: var(--hd-font-body); font-size: 28px; color: var(--hd-ivory); white-space: normal; margin-bottom: 10px; }
+.hd-row { flex-direction: row; align-items: center; min-height: 120px; margin: 0 0 10px 0; padding: 10px 14px; background-color: var(--hd-surface-2);
+    border-width: 2px; border-color: var(--hd-ink); border-radius: 6px; flex-shrink: 0; }
+.hd-row:focus { border-color: var(--hd-brass); }
+.hd-row--hl { border-color: var(--hd-brass); }
+.hd-row--dim { background-color: rgba(38, 59, 76, 0.7); }
+.hd-row__tag { width: 70px; height: 70px; border-radius: 35px; margin-right: 18px; align-items: center; justify-content: center; flex-shrink: 0; }
+.hd-row__tag > Label { -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-ink); }
+.hd-row__text { flex-grow: 1; flex-basis: 0; min-width: 0; justify-content: center; }
+.hd-row__title { -unity-font: var(--hd-font-title); font-size: 32px; color: var(--hd-ivory); white-space: normal; }
+.hd-row--dim .hd-row__title { color: var(--hd-muted); }
+.hd-row__sub { -unity-font: var(--hd-font-body); font-size: 24px; color: var(--hd-muted); white-space: normal; }
+.hd-row__bar { margin-top: 6px; height: 28px; }
+.hd-row__badge { position: absolute; right: 6px; top: 2px; -unity-font: var(--hd-font-title); font-size: 22px; color: var(--hd-danger); }
+.hd-row__buttons { flex-direction: row; flex-shrink: 0; margin-left: 12px; }
+.hd-row__btn { margin: 0 0 0 10px; min-width: 190px; }
+.hd-row__btn--ok { }
+.hd-btn--pr { color: var(--hd-pr); }
+
+/* ---------------------------------------------------------------- Suivi des quêtes */
+.hd-quests__window { width: 70%; max-width: 1400px; height: 82%; max-height: 900px; }
+.hd-quests__body { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-height: 0; margin-bottom: 12px; }
+.hd-quests__section { flex-shrink: 0; -unity-font: var(--hd-font-title); font-size: 34px; color: var(--hd-brass); margin: 10px 0 8px 0; }
+.hd-quests__empty { flex-shrink: 0; -unity-font: var(--hd-font-body); font-size: 24px; color: var(--hd-muted); margin-bottom: 8px; }
+.hd-quest { flex-direction: row; align-items: center; min-height: 112px; margin: 0 0 10px 0; padding: 8px 20px 8px 0; background-color: var(--hd-surface-2); border-width: 2px; border-color: var(--hd-ink); border-radius: 6px; flex-shrink: 0; }
+.hd-quest--side { padding-left: 20px; background-color: var(--hd-surface-3); }
+.hd-quest__accent { width: 10px; align-self: stretch; margin-right: 20px; background-color: var(--hd-muted); }
+.hd-quest--active .hd-quest__accent { background-color: var(--hd-brass); }
+.hd-quest--done .hd-quest__accent { background-color: var(--hd-success); }
+.hd-quest__text { flex-grow: 1; flex-basis: 0; min-width: 0; }
+.hd-quest__title { -unity-font: var(--hd-font-title); font-size: 32px; color: var(--hd-ivory); white-space: normal; }
+.hd-quest--locked .hd-quest__title { color: var(--hd-muted); }
+.hd-quest__detail { -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-ivory); white-space: normal; }
+.hd-quest__state { -unity-font: var(--hd-font-title); font-size: 26px; color: var(--hd-muted); margin-left: 16px; }
+.hd-quest--active .hd-quest__state { color: var(--hd-brass); }
+.hd-quest--done .hd-quest__state { color: var(--hd-success); }
+.hd-quest__bar { margin-top: 6px; height: 26px; max-width: 520px; }
+.hd-quest__reward { -unity-font: var(--hd-font-title); font-size: 22px; color: var(--hd-fatigue); margin-top: 4px; }
+.hd-quest__claim { margin: 0 0 0 16px; min-width: 220px; flex-shrink: 0; }

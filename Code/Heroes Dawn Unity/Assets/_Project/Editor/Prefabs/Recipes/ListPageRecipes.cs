@@ -216,7 +216,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Operations.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<OperationsPageView>(ctx, "OperationsPage", 640, true, false).gameObject;
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<OperationsPageView>("OperationsPage", "ListPage/ListPage.uxml", 10);
     }
 
     public sealed class LabPageRecipe : IPrefabRecipe
@@ -262,6 +262,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Archives.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => ListPageKit.Build<ArchivesPageView>(ctx, "ArchivesPage", 860, false, true).gameObject;
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<ArchivesPageView>("ArchivesPage", "ListPage/ListPage.uxml", 10);
     }
 }

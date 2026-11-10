@@ -3,51 +3,55 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using N29.HeroesDawn.Presentation.Common;
-using TMPro;
+using N29.HeroesDawn.Presentation.UiToolkit;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Suivi des quêtes (popup prefab) : quêtes principales de la campagne, puis quêtes secondaires à réclamer. Retour = Fermer.</summary>
-    public sealed class QuestLogPopupView : MonoBehaviour, IQuestLogPopupView
+    /// <summary>Suivi des quêtes (fenêtre UI Toolkit) : activités du jour, quêtes principales, puis quêtes secondaires à réclamer. Retour = Fermer.</summary>
+    public sealed class QuestLogPopupView : HdPopup, IQuestLogPopupView
     {
-        [SerializeField] TMP_Text title = null!;
-        [SerializeField] TMP_Text mainTitle = null!;
-        [SerializeField] TMP_Text sideTitle = null!;
-        [SerializeField] TMP_Text sideEmpty = null!;
-        [SerializeField] RectTransform mainList = null!;
-        [SerializeField] RectTransform sideList = null!;
-        [SerializeField] TMP_Text activityTitle = null!;
-        [SerializeField] TMP_Text activityEmpty = null!;
-        [SerializeField] RectTransform activityList = null!;
-        [SerializeField] QuestMainRowView mainRowPrefab = null!;
-        [SerializeField] QuestSideRowView sideRowPrefab = null!;
-        [SerializeField] UiButton close = null!;
-        [SerializeField] RectTransform window = null!;
-        [SerializeField] CanvasGroup group = null!;
+        /// <summary>Ce que les tests lisent d'une quête principale affichée.</summary>
+        public sealed class MainRowInfo { public int Status; public string Title = ""; }
 
-        readonly List<QuestMainRowView> _main = new List<QuestMainRowView>();
-        readonly List<QuestSideRowView> _side = new List<QuestSideRowView>();
-        readonly List<QuestSideRowView> _activities = new List<QuestSideRowView>();
+        /// <summary>Ce que les tests lisent d'une quête secondaire affichée, avec son bouton Réclamer.</summary>
+        public sealed class SideRowInfo
+        {
+            public string Id = "";
+            public SideQuestRowData Data;
+            public HdButtonRef ClaimButton = null!;
+        }
+
+        readonly List<MainRowInfo> _main = new List<MainRowInfo>();
+        readonly List<SideRowInfo> _side = new List<SideRowInfo>();
+        readonly List<SideRowInfo> _activities = new List<SideRowInfo>();
+        Label _title = null!;
+        ScrollView _body = null!;
+        UnityEngine.UIElements.Button _close = null!;
         UniTaskCompletionSource? _done;
+        QuestLogData? _last;
 
-        public bool Cancelable => true;
+        public override bool Cancelable => true;
         public event Action<string>? ClaimClicked;
-        public IReadOnlyList<QuestMainRowView> MainRows => _main;
-        public IReadOnlyList<QuestSideRowView> SideRows => _side;
-        public IReadOnlyList<QuestSideRowView> ActivityRows => _activities;
-        public UiButton CloseButton => close;
+        public IReadOnlyList<MainRowInfo> MainRows => _main;
+        public IReadOnlyList<SideRowInfo> SideRows => _side;
+        public IReadOnlyList<SideRowInfo> ActivityRows => _activities;
+        public HdButtonRef CloseButton { get; private set; } = null!;
 
-        void Awake() => close.Button.onClick.AddListener(() => _done?.TrySetResult());
+        protected override VisualElement DefaultFocus => _close;
+
+        protected override void Bind()
+        {
+            _title = Q<Label>("title"); _body = Q<ScrollView>("body"); _close = Q<UnityEngine.UIElements.Button>("close");
+            CloseButton = new HdButtonRef(_close, this);
+            _close.clicked += () => _done?.TrySetResult();
+            if (_last.HasValue) Refresh(_last.Value);
+        }
 
         public UniTask ShowAsync(QuestLogData d, CancellationToken ct)
         {
             Refresh(d);
-            close.SetLabel(d.Close);
-            group.alpha = 0f;
-            Tween.Fade(group, 1f, 0.15f);
-            Tween.PopIn(window, 0.26f);
             _done = new UniTaskCompletionSource();
             ct.Register(() => _done.TrySetCanceled());
             return _done.Task;
@@ -55,42 +59,86 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public void Refresh(QuestLogData d)
         {
-            title.text = d.Title;
-            mainTitle.text = d.MainTitle;
-            sideTitle.text = d.SideTitle;
-            mainList.Clear();
-            _main.Clear();
-            foreach (var m in d.Main)
-            {
-                var row = Instantiate(mainRowPrefab, mainList);
-                row.Show(m);
-                _main.Add(row);
-            }
-            sideList.Clear();
-            _side.Clear();
-            foreach (var s in d.Side)
-            {
-                var row = Instantiate(sideRowPrefab, sideList);
-                row.Show(s);
-                row.Claimed += id => ClaimClicked?.Invoke(id);
-                _side.Add(row);
-            }
-            activityTitle.text = d.ActivityTitle;
-            activityList.Clear();
-            _activities.Clear();
-            foreach (var s in d.Activities)
-            {
-                var row = Instantiate(sideRowPrefab, activityList);
-                row.Show(s);
-                row.Claimed += id => ClaimClicked?.Invoke(id);
-                _activities.Add(row);
-            }
-            activityEmpty.text = d.ActivityEmpty;
-            activityEmpty.gameObject.SetActive(d.Activities.Length == 0);
-            sideEmpty.text = d.SideEmpty;
-            sideEmpty.gameObject.SetActive(d.Side.Length == 0);
+            _last = d;
+            _main.Clear(); _side.Clear(); _activities.Clear();
+            if (_body == null) return;
+            _title.text = d.Title;
+            _close.text = d.Close;
+            _body.Clear();
+            Section(d.ActivityTitle, d.Activities.Length == 0 ? d.ActivityEmpty : null);
+            foreach (var s in d.Activities) _activities.Add(SideRow(s));
+            Section(d.MainTitle, null);
+            foreach (var m in d.Main) MainRow(m);
+            Section(d.SideTitle, d.Side.Length == 0 ? d.SideEmpty : null);
+            foreach (var s in d.Side) _side.Add(SideRow(s));
         }
 
-        public void RequestCancel() => _done?.TrySetResult();
+        void Section(string title, string? empty)
+        {
+            var label = new Label(title);
+            label.AddToClassList("hd-quests__section");
+            _body.Add(label);
+            if (empty == null) return;
+            var e = new Label(empty);
+            e.AddToClassList("hd-quests__empty");
+            _body.Add(e);
+        }
+
+        void MainRow(MainQuestRowData d)
+        {
+            _main.Add(new MainRowInfo { Status = d.Status, Title = d.Title });
+            var row = new VisualElement();
+            row.AddToClassList("hd-quest");
+            row.AddToClassList(d.Status == 2 ? "hd-quest--done" : d.Status == 1 ? "hd-quest--active" : "hd-quest--locked");
+            var accent = new VisualElement { pickingMode = PickingMode.Ignore };
+            accent.AddToClassList("hd-quest__accent");
+            var text = new VisualElement { pickingMode = PickingMode.Ignore };
+            text.AddToClassList("hd-quest__text");
+            var title = new Label(d.Title) { pickingMode = PickingMode.Ignore };
+            title.AddToClassList("hd-quest__title");
+            var detail = new Label(d.Detail) { pickingMode = PickingMode.Ignore };
+            detail.AddToClassList("hd-quest__detail");
+            text.Add(title); text.Add(detail);
+            var state = new Label(d.State) { pickingMode = PickingMode.Ignore };
+            state.AddToClassList("hd-quest__state");
+            row.Add(accent); row.Add(text); row.Add(state);
+            _body.Add(row);
+        }
+
+        SideRowInfo SideRow(SideQuestRowData d)
+        {
+            var row = new VisualElement();
+            row.AddToClassList("hd-quest");
+            row.AddToClassList("hd-quest--side");
+            var text = new VisualElement { pickingMode = PickingMode.Ignore };
+            text.AddToClassList("hd-quest__text");
+            var title = new Label(d.Title) { pickingMode = PickingMode.Ignore };
+            title.AddToClassList("hd-quest__title");
+            var desc = new Label(d.Description) { pickingMode = PickingMode.Ignore };
+            desc.AddToClassList("hd-quest__detail");
+            var bar = new VisualElement { pickingMode = PickingMode.Ignore };
+            bar.AddToClassList("hd-bar"); bar.AddToClassList("hd-quest__bar");
+            var fill = new VisualElement { pickingMode = PickingMode.Ignore };
+            fill.AddToClassList("hd-bar__fill");
+            fill.style.width = Length.Percent(Mathf.Clamp01(d.Progress01) * 100f);
+            if (d.Claimed) fill.style.unityBackgroundImageTintColor = new Color(0.376f, 0.729f, 0.608f);
+            var barLabel = new Label(d.ProgressText) { pickingMode = PickingMode.Ignore };
+            barLabel.AddToClassList("hd-list__barlabel");
+            bar.Add(fill); bar.Add(barLabel);
+            var reward = new Label(d.RewardText) { pickingMode = PickingMode.Ignore };
+            reward.AddToClassList("hd-quest__reward");
+            text.Add(title); text.Add(desc); text.Add(bar); text.Add(reward);
+            var claim = new UnityEngine.UIElements.Button { text = d.ClaimLabel };
+            claim.AddToClassList("hd-btn"); claim.AddToClassList("hd-btn--primary"); claim.AddToClassList("hd-btn--small"); claim.AddToClassList("hd-quest__claim");
+            claim.style.display = d.Claimed ? DisplayStyle.None : DisplayStyle.Flex;
+            claim.SetEnabled(d.Claimable);
+            string id = d.Id;
+            claim.clicked += () => ClaimClicked?.Invoke(id);
+            row.Add(text); row.Add(claim);
+            _body.Add(row);
+            return new SideRowInfo { Id = d.Id, Data = d, ClaimButton = new HdButtonRef(claim, this) };
+        }
+
+        public override void RequestCancel() => _done?.TrySetResult();
     }
 }
