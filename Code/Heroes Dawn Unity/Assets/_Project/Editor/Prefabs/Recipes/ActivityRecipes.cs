@@ -116,31 +116,8 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     public sealed class DialoguePopupRecipe : IPrefabRecipe
     {
         public string RelativePath => "Popups/DialoguePopup.prefab";
-        public int Order => 11;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var (root, content, title) = CasePopupKit.Build("DialoguePopup", 1400, 780, Theme.Perception, out var window);
-            title.color = Color.white;
-            title.Inked();
-            var progress = Ui.Txt(content, "", 26, Theme.TextMuted, TextAnchor.MiddleRight, FontKind.Body, "Progress");
-            progress.rectTransform.At(1f, 1f, 0, 0, 400, 40);
-            var prompt = Ui.Txt(content, "", 40, Theme.Text, TextAnchor.UpperCenter, FontKind.Body, "Prompt");
-            prompt.rectTransform.Stretch(20, 440, 20, 50);
-            var choices = Ui.Rect(content, "Choices").At(0.5f, 0f, 0, 80, 1240, 350);
-            choices.VLayout(12, 0, TextAnchor.LowerCenter);
-            var reaction = Ui.Txt(content, "", 34, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "Reaction");
-            reaction.rectTransform.At(0.5f, 0f, 0, 10, 1200, 60);
-
-            var view = root.gameObject.AddComponent<DialoguePopupView>();
-            CasePopupKit.WireBase(ctx, view, title, window);
-            ctx.Wire(view, "prompt", prompt);
-            ctx.Wire(view, "progress", progress);
-            ctx.Wire(view, "reaction", reaction);
-            ctx.Wire(view, "choiceRow", choices);
-            ctx.Wire(view, "choicePrefab", ctx.Asset("Widgets/ChoiceButton.prefab").GetComponent<UiButton>());
-            return root.gameObject;
-        }
+        public int Order => 10;
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<N29.HeroesDawn.Presentation.Activities.DialoguePopupView>("DialoguePopup", "Popups/Dialogue.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
 
     /// <summary>Activités 3D (survie, pêche, arène) : image de la scène, HUD, joystick, deux boutons, introduction et choix de l'agent.</summary>
