@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <Style src="TitleSpike.uss" />
+    <ui:VisualElement name="screen" class="screen">
+        <ui:VisualElement name="backdrop" class="backdrop" />
+        <ui:VisualElement name="veil" class="veil" />
+        <ui:VisualElement name="hero" class="hero" />
+        <ui:VisualElement name="top" class="top">
+            <ui:VisualElement name="lang" class="chip" focusable="true">
+                <ui:Label text="FR" class="chip__label" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="lockup" class="lockup">
+            <ui:VisualElement name="logo" class="logo" />
+        </ui:VisualElement>
+        <ui:VisualElement name="actions" class="actions">
+            <ui:Button name="play" text="JOUER" class="btn btn--primary" />
+            <ui:Button name="connect" text="SE CONNECTER" class="btn btn--secondary" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

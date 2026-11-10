@@ -1,0 +1,53 @@
+/* Prototype UI Toolkit de l'ecran titre (planche 1.1) : jetons de la charte Aube tactique. */
+:root {
+    --ink: #101C29;
+    --ivory: #ECE7DC;
+    --brass: #D6AF5B;
+    --font-title: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Fonts/BarlowCondensed-ExtraBoldItalic.ttf");
+    --font-body: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Fonts/Barlow-SemiBold.ttf");
+}
+TemplateContainer { width: 100%; height: 100%; }
+.screen { width: 100%; height: 100%; background-color: var(--ink); }
+.backdrop {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/hq-new-york.png");
+    -unity-background-scale-mode: scale-and-crop;
+}
+.veil { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(16, 28, 41, 0.28); }
+.hero {
+    position: absolute; left: 0; bottom: 0; width: 46%; height: 100%;
+    background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Ext/Agents/giulia_rossi-cutout.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+.top { position: absolute; right: 3%; top: 4%; flex-direction: row; }
+.chip {
+    padding: 6px 22px; background-color: rgba(16, 28, 41, 0.78);
+    border-width: 1px; border-color: var(--brass); border-radius: 4px;
+}
+.chip__label { color: var(--ivory); -unity-font: var(--font-body); font-size: 26px; }
+.chip:focus { border-color: var(--ivory); background-color: rgba(214, 175, 91, 0.32); }
+.lockup { position: absolute; right: 6%; top: 14%; width: 44%; align-items: center; }
+.logo {
+    width: 100%; height: 150px;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Brand/heroes-dawn-ivory.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+.actions { position: absolute; right: 6%; bottom: 8%; width: 40%; }
+.btn {
+    height: 112px; margin: 0 0 14px 0; padding: 0 32px;
+    border-width: 0; border-radius: 0;
+    -unity-slice-left: 40; -unity-slice-top: 40; -unity-slice-right: 40; -unity-slice-bottom: 24;
+    -unity-font: var(--font-title); font-size: 54px; -unity-text-align: middle-center;
+    transition: scale 0.08s ease-out;
+}
+.btn--primary {
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Buttons/button-primary-normal.png");
+    background-color: rgba(255, 255, 255, 0); color: var(--ink);
+}
+.btn--secondary {
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Buttons/button-secondary-normal.png");
+    background-color: rgba(255, 255, 255, 0); color: var(--ivory); font-size: 40px; height: 88px;
+}
+.btn:hover { scale: 1.015 1.015; }
+.btn:active { scale: 0.985 0.985; }
+.btn:focus { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Buttons/button-primary-focus.png"); color: var(--ink); }
