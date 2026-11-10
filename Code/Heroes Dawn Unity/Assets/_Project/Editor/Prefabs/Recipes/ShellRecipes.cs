@@ -71,88 +71,15 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var rt = ScreenKit.Root("Hub");
-            ScreenKit.Backdrop(rt, Theme.SkyTop, Theme.SkyBottom);
-            var backdrop = ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.28f);
-            var relay = rt.gameObject.AddComponent<UiTapRelay>();
+            var go = N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<HubShellView>("Hub", "Hub/Hub.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ScreenOrder);
+            var relay = go.AddComponent<UiTapRelay>();
+            // Zone de page (uGUI) entre les barres, zones sûres de 88 px sur les côtés.
+            var pageArea = Ui.Rect((RectTransform)go.transform, "PageArea").Stretch(Safe, NavH + 12, Safe, TopH + 12);
 
-            // ---- Zone de page (entre les barres, zones sûres de 88 px sur les côtés)
-            var pageArea = Ui.Rect(rt, "PageArea").Stretch(Safe, NavH + 12, Safe, TopH + 12);
-
-            // ---- Barre haute
-            var top = Ui.Img(rt, "TopBar", Theme.WithAlpha(Theme.Frost, 0.98f), null, true);
-            top.rectTransform.TopBand(TopH);
-            var back = Ui.LocBtn(top.transform, "nav.back", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "Back");
-            back.Rect.At(0f, 0.5f, Safe - 70, 0, 160, 96);
-            back.gameObject.SetActive(false);
-            var title = Ui.Txt(top.transform, "", 48, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Title");
-            title.rectTransform.At(0f, 0.5f, Safe + 110, 0, 460, 96);
-            title.AutoSize(56);
-            title.Inked();
-            var settings = Ui.LocBtn(top.transform, "nav.settings", Theme.Surface2, Theme.Text, null!, 24, FontKind.Title, "Settings");
-            settings.Rect.At(1f, 0.5f, -(Safe - 70), 0, 170, 96);
-            var wallet = ctx.Nest<HubWalletView>("Widgets/HubWallet.prefab", top.transform, "Wallet");
-            ((RectTransform)wallet.transform).At(1f, 0.5f, -(Safe - 70) - 190, 0, 770, 70);
-            // Avatar du chef d'unité (Agent D ou M) : portrait, nom et fonction, entre le titre et la bourse.
-            var avatarRoot = Ui.Rect(top.transform, "Avatar");
-            avatarRoot.At(0f, 0.5f, 680, 0, 250, 84);
-            var avatarPortrait = ctx.Nest<PortraitView>("Widgets/Portrait.prefab", avatarRoot, "Portrait");
-            ((RectTransform)avatarPortrait.transform).At(0f, 0.5f, 0, 0, 76, 76);
-            var avatarName = Ui.Txt(avatarRoot, "", 30, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Name");
-            avatarName.rectTransform.At(0f, 0.5f, 88, 18, 162, 38);
-            var avatarRole = Ui.Txt(avatarRoot, "", 20, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Role");
-            avatarRole.rectTransform.At(0f, 0.5f, 88, -18, 162, 30);
-
-            // ---- Barre de navigation basse
-            var nav = Ui.Img(rt, "NavBar", Theme.WithAlpha(Theme.Frost, 0.98f), null, true);
-            nav.rectTransform.BottomBand(NavH);
-            var row = Ui.Rect(nav.transform, "Tabs").Stretch(Safe - 40, 10, Safe - 40, 10);
-            row.HLayout(16, 0, TextAnchor.MiddleCenter);
-            var tabs = new List<Object>();
-            var badges = new List<Object>();
-            foreach (var page in HubNavigator.Tabs)
-            {
-                var tab = Ui.Btn(row, "", Theme.WithAlpha(Theme.Surface, 0f), Theme.TextMuted, null!, 36, FontKind.Title, "Tab" + page);
-                tab.Rect.Pref(330, 96);
-                string glyph = page == HubPage.Team ? "Team" : page == HubPage.Pass ? "Pass" : page == HubPage.Shop || page == HubPage.Recruit ? "Shop" : "Profile";
-                var tabIcon = Ui.Img(tab.Fill.transform, "TabIcon", Theme.Accent, page == HubPage.Qg ? Sprites.DawnStar : Sprites.Glyph(glyph));
-                tabIcon.rectTransform.At(0f, 0.5f, 24, 0, 34, 34);
-                tab.Label.rectTransform.Stretch(70, 4, 18, 4);
-                var badge = Ui.Img(tab.transform, "Badge", Theme.Danger, Sprites.Circle);
-                badge.rectTransform.At(1f, 1f, 6, 10, 48, 48);
-                var badgeText = Ui.Txt(badge.transform, "", 26, Color.white, TextAnchor.MiddleCenter, FontKind.Title, "Text");
-                badgeText.rectTransform.Stretch();
-                var pulse = badge.gameObject.AddComponent<Pulse>();
-                pulse.Amplitude = 0.1f;
-                pulse.Speed = 4f;
-                badge.gameObject.SetActive(false);
-                if (page == HubPage.Team) RecipeKit.Mark(tab, TutorialTarget.TabTeam);
-                if (page == HubPage.Shop) RecipeKit.Mark(tab, TutorialTarget.TabRecruit);
-                tabs.Add(tab);
-                badges.Add(badgeText);
-            }
-            // Bloc sous l'onglet actif : il glisse d'un onglet à l'autre (hors de la disposition des onglets).
-            var indicator = Ui.Img(nav.transform, "TabIndicator", Theme.Primary, Sprites.RoundedSmall);
-            indicator.rectTransform.At(0.5f, 0f, 0, 2, 300, 8);
-            indicator.raycastTarget = false;
-
-            var view = rt.gameObject.AddComponent<HubShellView>();
-            ScreenKit.WireFade(ctx, view);
-            ctx.Wire(view, "title", title);
-            ctx.Wire(view, "backdrop", backdrop);
-            ctx.Wire(view, "avatarRoot", avatarRoot);
-            ctx.Wire(view, "avatar", avatarPortrait);
-            ctx.Wire(view, "avatarName", avatarName);
-            ctx.Wire(view, "avatarRole", avatarRole);
-            ctx.Wire(view, "back", back);
-            ctx.Wire(view, "settings", settings);
-            ctx.Wire(view, "wallet", wallet);
+            var view = go.GetComponent<HubShellView>();
             ctx.Wire(view, "pageArea", pageArea);
             ctx.Wire(view, "relay", relay);
-            ctx.WireArray(view, "tabs", tabs);
-            ctx.WireArray(view, "badges", badges);
-            ctx.Wire(view, "tabIndicator", indicator.rectTransform);
-            return rt.gameObject;
+            return go;
         }
     }
 }

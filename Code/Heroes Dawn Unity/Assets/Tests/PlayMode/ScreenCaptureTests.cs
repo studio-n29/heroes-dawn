@@ -221,7 +221,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("30-recruter");
             Object.FindAnyObjectByType<RecruitPageView>()!.Card(0).RecruitButton.onClick.Invoke();
             yield return CaptureSettled("31-confirmation");
-            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.RecruitConfirmPopupView>()!.CancelButton.Button.onClick.Invoke();
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.RecruitConfirmPopupView>()?.CancelButton.Button.onClick.Invoke();
             yield return null;
 
             yield return Tab(HubPage.Pass);

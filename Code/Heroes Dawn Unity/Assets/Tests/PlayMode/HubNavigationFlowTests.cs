@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         }
 
         /// <summary>Nombre de pages vivantes sous la zone de page de la coque.</summary>
-        static int LivePages() => Object.FindObjectsByType<ViewBase>(FindObjectsSortMode.None)
+        static int LivePages() => Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).Where(m => m is ViewBase || m is N29.HeroesDawn.Presentation.UiToolkit.HdView)
             .Count(v => v != null && v.gameObject.activeInHierarchy && !(v is HubShellView) && v.GetComponentInParent<HubShellView>() != null);
 
         [UnityTest, Description("Vérifie que les 4 onglets de la barre affichent chacun leur page, une seule à la fois, et que la Boutique s'ouvre sur les héros puis sur ses autres sections par son bandeau d'onglets — parce que la boutique est unique et que la barre de navigation est la colonne vertébrale du hub (spec §3.2)")]

@@ -45,8 +45,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
         }
 
         /// <summary>Barre de ressources de la coque du hub (compte ses affichages : diagnostic des abonnements).</summary>
-        public static N29.HeroesDawn.Presentation.Common.HubWalletView HubWallet()
-            => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Common.HubWalletView>()!;
+        public static N29.HeroesDawn.Presentation.Hub.HubShellView.WalletBar HubWallet()
+            => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Hub.HubShellView>()!.Bar;
 
         /// <summary>
         /// Page Recruter affichée : touche « Recruter » sur la première offre payable avec les PR du joueur,
@@ -58,7 +58,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var offers = session.Shop.Offers;
             int slot = -1;
             for (int i = 0; i < offers.Count && slot < 0; i++)
-                if (!offers[i].Recruited && session.Wallet.Pr >= N29.HeroesDawn.Application.Session.MetaRules.RecruitCost(session.Content.Member(offers[i].Id).Rarity))
+                if (!offers[i].Recruited && session.Wallet.Pr >= N29.HeroesDawn.Application.Session.MetaRules.RecruitCost(session.Content.Member(offers[i].Id).Rank))
                     slot = i;
             NUnit.Framework.Assert.That(slot, NUnit.Framework.Is.GreaterThanOrEqualTo(0), "une offre est payable avec les PR de départ");
             int roster = session.Roster.Count;
@@ -98,6 +98,14 @@ namespace N29.HeroesDawn.Tests.PlayMode
         }
 
         /// <summary>MISSION puis DÉPLOYER : la carte de la ville s ouvre entre les deux (zone proposée par défaut).</summary>
+        public static IEnumerator Deploy(N29.HeroesDawn.Presentation.UiToolkit.HdButtonRef mission)
+        {
+            mission.onClick.Invoke();
+            yield return WaitFor(() => Visible<N29.HeroesDawn.Presentation.Hub.CityMapPageView>());
+            DeployNow();
+            yield return DismissChapterIntro();
+        }
+
         public static IEnumerator Deploy(UnityEngine.UI.Button mission)
         {
             mission.onClick.Invoke();
