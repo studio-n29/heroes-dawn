@@ -51,7 +51,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var skills = new List<SkillDef>();
             var stats = new StatBlock(100, 10, 10, 10);
             BossPhaseDef P(int pct) => new BossPhaseDef(pct, "k", 0, 0, 0);
-            EnemyDef Make(bool boss, params BossPhaseDef[] phases) => new EnemyDef(new EnemyId("x"), "k", Role.Tank, Family.Matter, stats, skills, boss, phases);
+            EnemyDef Make(bool boss, params BossPhaseDef[] phases) => new EnemyDef(new EnemyId("x"), "k", Position.FrontLine, Family.Matter, stats, skills, boss, phases);
             Assert.DoesNotThrow(() => Make(true, P(66), P(33)));
             Assert.Throws<ArgumentException>(() => Make(false, P(50)), "pas de phase sans être boss");
             Assert.Throws<ArgumentException>(() => Make(true, P(0)));

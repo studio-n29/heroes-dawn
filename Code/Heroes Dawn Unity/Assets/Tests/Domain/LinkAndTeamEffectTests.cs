@@ -55,11 +55,11 @@ namespace N29.HeroesDawn.Tests.Domain
         public void TeamEffects_AreDetectedFromTheComposition()
         {
             var kinds = TeamEffects.Active(new[] { Family.PhysicalBio, Family.Matter, Family.Elemental, Family.Perception },
-                                           new[] { Role.Tank, Role.Control, Role.Damage, Role.Support });
+                                           new[] { Position.FrontLine, Position.Controller, Position.Attacker, Position.Support });
             Assert.That(kinds, Is.EquivalentTo(new[] { TeamEffectKind.Quartet, TeamEffectKind.Trinity }));
-            Assert.That(TeamEffects.Active(new[] { Family.Matter, Family.Matter }, new[] { Role.Tank, Role.Tank }), Is.EqualTo(new[] { TeamEffectKind.DoubleFront }));
-            Assert.That(TeamEffects.Active(new[] { Family.Matter, Family.Elemental }, new[] { Role.Control, Role.Control }), Is.EqualTo(new[] { TeamEffectKind.Spark }));
-            Assert.That(TeamEffects.Active(new[] { Family.Matter }, new[] { Role.Damage }), Is.Empty);
+            Assert.That(TeamEffects.Active(new[] { Family.Matter, Family.Matter }, new[] { Position.FrontLine, Position.FrontLine }), Is.EqualTo(new[] { TeamEffectKind.DoubleFront }));
+            Assert.That(TeamEffects.Active(new[] { Family.Matter, Family.Elemental }, new[] { Position.Controller, Position.Controller }), Is.EqualTo(new[] { TeamEffectKind.Spark }));
+            Assert.That(TeamEffects.Active(new[] { Family.Matter }, new[] { Position.Attacker }), Is.Empty);
         }
 
         [Test, Description("Vérifie que les effets de composition s'appliquent aux alliés en combat : critique du Quatuor, régénération d'énergie de la Trinité, bouclier du Double front, énergie de départ de l'Étincelle — parce qu'un effet affiché doit exister")]

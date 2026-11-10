@@ -56,7 +56,7 @@ namespace N29.HeroesDawn.Authoring
         public string id = "";
         [Tooltip("Nom de code affiché en jeu.")] public string name = "";
         public Family family;
-        public Role role;
+        public Position position;
         public Rarity rarity;
         public int hp = 1000;
         public int atk = 100;

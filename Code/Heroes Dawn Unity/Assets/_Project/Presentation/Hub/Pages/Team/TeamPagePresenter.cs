@@ -149,8 +149,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                     var a = squad[i]; var b = squad[j];
                     int level = _session.LinkLevel(a.Id, b.Id);
                     if (level < PairBonusRules.MinLevel) continue;
-                    yield return _loc.F("team.pair_line", _loc.PairTheme(a.Def.Role, b.Def.Role), _loc.MemberName(a.Def), _loc.MemberName(b.Def), level,
-                                        string.Join(", ", PairBonusRules.Merge(PairBonusRules.Of(a.Def.Role, b.Def.Role, level)).Select(_loc.PairBonusText)));
+                    yield return _loc.F("team.pair_line", _loc.PairTheme(a.Def.Position, b.Def.Position), _loc.MemberName(a.Def), _loc.MemberName(b.Def), level,
+                                        string.Join(", ", PairBonusRules.Merge(PairBonusRules.Of(a.Def.Position, b.Def.Position, level)).Select(_loc.PairBonusText)));
                 }
         }
 
@@ -169,7 +169,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 SquadTitle = _loc.F("hub.squad", squad.Count),
                 Squad = squad.Select(m => MemberCards.Slot(m, _loc)).ToArray(),
                 Synergies = synergies.Select(c => _loc.F("team.synergy_line", _loc.SynergyName(c.Synergy), _loc.SynergyEffect(c.Synergy, s.LinkLevel(c.A.Id, c.B.Id)), _loc.MemberName(c.A), _loc.MemberName(c.B)))
-                    .Concat(TeamEffects.Active(squad.Select(m => m.Def.Family).ToList(), squad.Select(m => m.Def.Role).ToList()).Select(_loc.TeamEffect))
+                    .Concat(TeamEffects.Active(squad.Select(m => m.Def.Family).ToList(), squad.Select(m => m.Def.Position).ToList()).Select(_loc.TeamEffect))
                     .Concat(PairLines(squad.ToList())).ToArray(),
                 HealAllLabel = _loc.F("hub.heal", MetaRules.InfirmaryCost + " CR"),
                 HealAllEnabled = HealAllReason(s).Length == 0 && _healAll != null,

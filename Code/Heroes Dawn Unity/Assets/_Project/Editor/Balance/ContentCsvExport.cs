@@ -75,7 +75,7 @@ namespace N29.HeroesDawn.EditorTools.Balance
                 var skills = m.Skills.Select(s => s.Id.Value).ToList();
                 rows.Add(new[]
                 {
-                    m.Id.Value, Loc.MemberName(m), Loc.FamilyName(m.Family), Loc.RoleName(m.Role), Loc.RarityName(m.Rarity),
+                    m.Id.Value, Loc.MemberName(m), Loc.FamilyName(m.Family), Loc.RoleName(m.Position), Loc.RarityName(m.Rarity),
                     m.BaseStats.Hp.ToString(), m.BaseStats.Atk.ToString(), m.BaseStats.Def.ToString(), m.BaseStats.Spd.ToString(), Unlock(m),
                     skills.Count > 0 ? skills[0] : "", skills.Count > 1 ? skills[1] : "", skills.Count > 2 ? skills[2] : "",
                 });

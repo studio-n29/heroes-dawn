@@ -123,7 +123,7 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test, Description("Vérifie que Merge additionne les bonus de même type en gardant l'ordre d'apparition — parce que les listes affichées ne doivent pas répéter « ATQ +4 %, ATQ +4 % »")]
         public void Merge_SumsBonusesOfTheSameKind()
         {
-            var merged = PairBonusRules.Merge(PairBonusRules.Of(Role.Damage, Role.Damage, 4)).ToList();
+            var merged = PairBonusRules.Merge(PairBonusRules.Of(Position.Attacker, Position.Attacker, 4)).ToList();
             Assert.That(merged.Select(b => b.Kind), Is.Unique);
             Assert.That(merged.Single(b => b.Kind == PairBonusKind.AtkPercent).Value, Is.EqualTo(8));
         }

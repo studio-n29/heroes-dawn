@@ -65,12 +65,12 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Link = _loc.F("affinity.link", level, wins),
                 Bonus = synergy == null ? _loc.T("affinity.none") : _loc.SynergyName(synergy) + " : " + _loc.SynergyEffect(synergy, level),
                 HasBonus = synergy != null,
-                Pair = PairText(me.Role, other.Def.Role, wins),
+                Pair = PairText(me.Position, other.Def.Position, wins),
             };
         }
 
         /// <summary>Thème du couple de rôles, bonus des niveaux 2 à 5 (atteints en vert avec ●, à venir grisés) et victoires restantes avant le niveau suivant.</summary>
-        string PairText(Role a, Role b, int wins)
+        string PairText(Position a, Position b, int wins)
         {
             int level = LinkRules.Level(wins);
             string Colored(string text, Color c) => "<color=#" + ColorUtility.ToHtmlStringRGB(c) + ">" + text + "</color>";

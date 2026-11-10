@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Tests.Domain
             void Add(Rarity r, int n)
             {
                 for (int i = 0; i < n; i++)
-                    list.Add(new MemberDef(new MemberId(r + "_" + i), "k", proto.Family, proto.Role, r, proto.BaseStats, proto.Skills));
+                    list.Add(new MemberDef(new MemberId(r + "_" + i), "k", proto.Family, proto.Position, r, proto.BaseStats, proto.Skills));
             }
             Add(Rarity.Agent, agents);
             Add(Rarity.Elite, elites);

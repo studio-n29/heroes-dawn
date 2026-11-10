@@ -9,7 +9,7 @@ namespace N29.HeroesDawn.Definitions
         public MemberId Id { get; }
         public string NameKey { get; }
         public Family Family { get; }
-        public Role Role { get; }
+        public Position Position { get; }
         public Rarity Rarity { get; }
         public StatBlock BaseStats { get; }
         public IReadOnlyList<SkillDef> Skills { get; }
@@ -22,10 +22,10 @@ namespace N29.HeroesDawn.Definitions
         /// <summary>Puissance de 1 (pouvoirs basiques, aucune menace) à 5 (pouvoirs surpuissants, menace apocalyptique).</summary>
         public int PowerTier { get; }
 
-        public MemberDef(MemberId id, string nameKey, Family family, Role role, Rarity rarity, StatBlock baseStats, IReadOnlyList<SkillDef> skills,
+        public MemberDef(MemberId id, string nameKey, Family family, Position role, Rarity rarity, StatBlock baseStats, IReadOnlyList<SkillDef> skills,
                          ZoneId? unlockZone = null, UnlockDef? unlock = null, int powerTier = 1)
         {
-            Id = id; NameKey = nameKey; Family = family; Role = role; Rarity = rarity; BaseStats = baseStats; Skills = skills;
+            Id = id; NameKey = nameKey; Family = family; Position = role; Rarity = rarity; BaseStats = baseStats; Skills = skills;
             UnlockZone = unlockZone; Unlock = unlock;
             PowerTier = powerTier < 1 ? 1 : powerTier > 5 ? 5 : powerTier;
         }

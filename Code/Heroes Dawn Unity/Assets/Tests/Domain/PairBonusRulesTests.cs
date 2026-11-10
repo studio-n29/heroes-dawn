@@ -9,9 +9,9 @@ namespace N29.HeroesDawn.Tests.Domain
     /// <summary>Bonus propres à chaque paire d'agents, par couple de rôles et niveau de lien (lot D de la 0.14.0).</summary>
     public sealed class PairBonusRulesTests
     {
-        static readonly Role[] Roles = (Role[])Enum.GetValues(typeof(Role));
+        static readonly Position[] Roles = (Position[])Enum.GetValues(typeof(Position));
 
-        static IEnumerable<(Role A, Role B)> Pairs()
+        static IEnumerable<(Position A, Position B)> Pairs()
         {
             for (int i = 0; i < Roles.Length; i++)
                 for (int j = i; j < Roles.Length; j++) yield return (Roles[i], Roles[j]);
@@ -38,16 +38,16 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test, Description("Vérifie quelques lignes de la table de la spec (Tank+Tank, Dégâts+Précision, Soutien+Soutien, Précision+Précision, Contrôle+Contrôle) — parce que le contenu doit suivre la table validée")]
         public void Table_MatchesTheSpec()
         {
-            Expect(PairBonusRules.At(Role.Tank, Role.Tank, 2), PairBonusKind.DefPercent, 4, "TT 2");
-            Expect(PairBonusRules.At(Role.Tank, Role.Tank, 4), PairBonusKind.OpeningShieldPercent, 8, "TT 4");
-            Expect(PairBonusRules.At(Role.Tank, Role.Tank, 5), PairBonusKind.OpeningShieldPercent, 7, "TT 5");
-            Expect(PairBonusRules.At(Role.Damage, Role.Precision, 3), PairBonusKind.CritPercent, 4, "DP 3");
-            Expect(PairBonusRules.At(Role.Damage, Role.Precision, 5), PairBonusKind.AtkPercent, 4, "DP 5");
-            Expect(PairBonusRules.At(Role.Support, Role.Support, 5), PairBonusKind.EnergyPerStep, 1, "SS 5");
-            Expect(PairBonusRules.At(Role.Precision, Role.Precision, 5), PairBonusKind.StartGaugePercent, 10, "PP 5");
-            Expect(PairBonusRules.At(Role.Control, Role.Control, 4), PairBonusKind.StartGaugePercent, 10, "CC 4");
-            Expect(PairBonusRules.At(Role.Tank, Role.Support, 2), PairBonusKind.HpPercent, 4, "TS 2");
-            Expect(PairBonusRules.At(Role.Tank, Role.Support, 3), PairBonusKind.DefPercent, 3, "TS 3");
+            Expect(PairBonusRules.At(Position.FrontLine, Position.FrontLine, 2), PairBonusKind.DefPercent, 4, "TT 2");
+            Expect(PairBonusRules.At(Position.FrontLine, Position.FrontLine, 4), PairBonusKind.OpeningShieldPercent, 8, "TT 4");
+            Expect(PairBonusRules.At(Position.FrontLine, Position.FrontLine, 5), PairBonusKind.OpeningShieldPercent, 7, "TT 5");
+            Expect(PairBonusRules.At(Position.Attacker, Position.Ranged, 3), PairBonusKind.CritPercent, 4, "DP 3");
+            Expect(PairBonusRules.At(Position.Attacker, Position.Ranged, 5), PairBonusKind.AtkPercent, 4, "DP 5");
+            Expect(PairBonusRules.At(Position.Support, Position.Support, 5), PairBonusKind.EnergyPerStep, 1, "SS 5");
+            Expect(PairBonusRules.At(Position.Ranged, Position.Ranged, 5), PairBonusKind.StartGaugePercent, 10, "PP 5");
+            Expect(PairBonusRules.At(Position.Controller, Position.Controller, 4), PairBonusKind.StartGaugePercent, 10, "CC 4");
+            Expect(PairBonusRules.At(Position.FrontLine, Position.Support, 2), PairBonusKind.HpPercent, 4, "TS 2");
+            Expect(PairBonusRules.At(Position.FrontLine, Position.Support, 3), PairBonusKind.DefPercent, 3, "TS 3");
         }
 
         [Test, Description("Vérifie que l'ordre des deux rôles n'a aucune importance (mêmes bonus, même thème) pour les 25 combinaisons ordonnées — parce qu'une paire A+B est la même que B+A")]
@@ -62,13 +62,13 @@ namespace N29.HeroesDawn.Tests.Domain
                     Assert.That(PairBonusRules.ThemeKey(a, b), Is.EqualTo(PairBonusRules.ThemeKey(b, a)), a + "+" + b);
                 }
             Assert.That(Pairs().Select(p => PairBonusRules.ThemeKey(p.A, p.B)).Distinct().Count(), Is.EqualTo(15));
-            Assert.That(PairBonusRules.ThemeKey(Role.Damage, Role.Tank), Is.EqualTo("link.theme.tank_damage"));
+            Assert.That(PairBonusRules.ThemeKey(Position.Attacker, Position.FrontLine), Is.EqualTo("link.theme.frontline_attacker"));
         }
 
         [Test, Description("Vérifie qu'un niveau de lien au-delà de 5 donne les bonus du niveau 5 — parce que le niveau maximum est 5")]
         public void LevelAbove5_IsClampedTo5()
         {
-            Assert.That(PairBonusRules.Of(Role.Tank, Role.Damage, 9).Count, Is.EqualTo(4));
+            Assert.That(PairBonusRules.Of(Position.FrontLine, Position.Attacker, 9).Count, Is.EqualTo(4));
         }
 
         static PairBonus[] Many(PairBonusKind kind, int value, int count) => Enumerable.Repeat(new PairBonus(kind, value), count).ToArray();

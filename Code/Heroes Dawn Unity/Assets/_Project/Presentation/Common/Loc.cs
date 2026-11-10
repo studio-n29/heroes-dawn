@@ -228,7 +228,7 @@ namespace N29.HeroesDawn.Presentation.Common
 
             // --- Familles, rôles, raretés ---
             ["family.Matter"] = "Matière", ["family.Elemental"] = "Élémentaire", ["family.PhysicalBio"] = "Physique / Bio", ["family.Perception"] = "Perception",
-            ["role.Tank"] = "Tank", ["role.Damage"] = "Dégâts", ["role.Control"] = "Contrôle", ["role.Support"] = "Soutien", ["role.Precision"] = "Précision",
+            ["role.FrontLine"] = "Première ligne", ["role.Attacker"] = "Attaquant", ["role.Controller"] = "Contrôle", ["role.Support"] = "Soutien", ["role.Ranged"] = "Précision à distance",
             ["rarity.Agent"] = "Agent", ["rarity.Elite"] = "Élite", ["rarity.Legend"] = "Légende",
 
             // --- Membres ---
@@ -387,11 +387,11 @@ namespace N29.HeroesDawn.Presentation.Common
         public static string SynergyEffect(SynergyDef s, int linkLevel)
             => "+" + s.Percent * LinkRules.MultiplierPercent(linkLevel) / 100 + " % " + T("synergy.stat." + s.Stat) + (linkLevel > 1 ? " (" + F("link.level", linkLevel) + ")" : "");
         public static string TeamEffect(TeamEffectKind kind) => T("team_effect." + kind + ".name") + " : " + T("team_effect." + kind + ".text");
-        public static string PairTheme(Role a, Role b) => T(PairBonusRules.ThemeKey(a, b));
+        public static string PairTheme(Position a, Position b) => T(PairBonusRules.ThemeKey(a, b));
         public static string PairBonusText(PairBonus b) => F("link.bonus." + b.Kind, b.Value);
         public static string StatusName(StatusType s) => T("status." + s);
         public static string FamilyName(Family f) => T("family." + f);
-        public static string RoleName(Role r) => T("role." + r);
+        public static string RoleName(Position r) => T("role." + r);
         public static string RarityName(Rarity r) => T("rarity." + r);
         public static string RankName(CombatRank r) => T("rank." + r);
         public static string CaseName(CaseType t) => T("case." + t);

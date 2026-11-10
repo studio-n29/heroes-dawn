@@ -25,44 +25,44 @@ namespace N29.HeroesDawn.Tests.Domain
         static EffectDef Adv(int pct) => new EffectDef(EffectType.Advance, pct);
         static SkillDef S(string id, SkillSlot slot, int cd, TargetRule t, params EffectDef[] fx) => new SkillDef(new SkillId(id), slot, cd, t, fx);
 
-        static MemberDef M(string id, Family f, Role r, Rarity ra, params SkillDef[] skills)
+        static MemberDef M(string id, Family f, Position r, Rarity ra, params SkillDef[] skills)
             => new MemberDef(new MemberId(id), "members." + id + ".name", f, r, ra, PrototypeContent.BaseStats(r, ra), skills);
 
         static MemberDef Locked(MemberDef d, ZoneId zone)
-            => new MemberDef(d.Id, d.NameKey, d.Family, d.Role, d.Rarity, d.BaseStats, d.Skills, zone);
+            => new MemberDef(d.Id, d.NameKey, d.Family, d.Position, d.Rarity, d.BaseStats, d.Skills, zone);
 
         /// <summary>Les huit premiers agents (tests des règles de boutique, indépendants du reste de la roster).</summary>
         public static IReadOnlyList<MemberDef> Core() => new List<MemberDef>
         {
-            M("ancre", Family.PhysicalBio, Role.Tank, Rarity.Legend,
+            M("ancre", Family.PhysicalBio, Position.FrontLine, Rarity.Legend,
                 S("ancre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), St(StatusType.Taunt, 1, 30), Push(15)),
                 S("ancre_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(20)),
                 S("ancre_a3", SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15), St(StatusType.Anchor, 2))),
-            Locked(M("verre", Family.Matter, Role.Control, Rarity.Legend,
+            Locked(M("verre", Family.Matter, Position.Controller, Rarity.Legend,
                 S("verre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Vulnerable, 2, 25)),
                 S("verre_a2", SkillSlot.A2, 4, TargetRule.SingleEnemy, St(StatusType.Bind, 2), Push(30)),
                 S("verre_a3", SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15), St(StatusType.Anchor, 2))), PrototypeContent.Zone11),
-            M("givre", Family.Elemental, Role.Damage, Rarity.Legend,
+            M("givre", Family.Elemental, Position.Attacker, Rarity.Legend,
                 S("givre_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Freeze, 2, 40)),
                 S("givre_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(70), Gauge(-150)),
                 S("givre_a3", SkillSlot.A3, 5, TargetRule.SingleEnemy, Dmg(220))),
-            M("echo", Family.Perception, Role.Precision, Rarity.Legend,
+            M("echo", Family.Perception, Position.Ranged, Rarity.Legend,
                 S("echo_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Mark, 99)),
                 S("echo_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, St(StatusType.Vulnerable, 2), Gauge(-100)),
                 S("echo_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(70))),
-            M("arc", Family.Elemental, Role.Damage, Rarity.Elite,
+            M("arc", Family.Elemental, Position.Attacker, Rarity.Elite,
                 S("arc_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Shock, 1, 20)),
                 S("arc_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, St(StatusType.Haste, 2), Adv(35)),
                 S("arc_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(90))),
-            M("rempart", Family.PhysicalBio, Role.Tank, Rarity.Elite,
+            M("rempart", Family.PhysicalBio, Position.FrontLine, Rarity.Elite,
                 S("rempart_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), Push(15)),
                 S("rempart_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, Shield(25)),
                 S("rempart_a3", SkillSlot.A3, 5, TargetRule.Self, St(StatusType.Taunt, 2), Shield(30))),
-            M("seve", Family.PhysicalBio, Role.Support, Rarity.Elite,
+            M("seve", Family.PhysicalBio, Position.Support, Rarity.Elite,
                 S("seve_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(80)),
                 S("seve_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, Heal(30)),
                 S("seve_a3", SkillSlot.A3, 5, TargetRule.AllAllies, St(StatusType.Regen, 2))),
-            M("etincelle", Family.Elemental, Role.Control, Rarity.Agent,
+            M("etincelle", Family.Elemental, Position.Controller, Rarity.Agent,
                 S("etincelle_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Shock, 1, 15)),
                 S("etincelle_a2", SkillSlot.A2, 3, TargetRule.SingleAlly, Adv(60)),
                 S("etincelle_a3", SkillSlot.A3, 5, TargetRule.SingleEnemy, Dmg(150))),
@@ -75,28 +75,28 @@ namespace N29.HeroesDawn.Tests.Domain
         /// <summary>Les 22 agents ajoutés : boutique, arcs, événements de week-end et prouesses (kits générés par rôle).</summary>
         public static readonly IReadOnlyList<PrototypeAgents.Entry> Extra = new[]
         {
-            new PrototypeAgents.Entry("bastion", "Bastion", Family.Matter, Role.Tank, Rarity.Agent),
-            new PrototypeAgents.Entry("prism", "Prism", Family.Matter, Role.Damage, Rarity.Elite),
-            new PrototypeAgents.Entry("warden", "Warden", Family.Matter, Role.Control, Rarity.Agent),
-            new PrototypeAgents.Entry("cinder", "Cinder", Family.Elemental, Role.Damage, Rarity.Agent),
-            new PrototypeAgents.Entry("volt", "Volt", Family.Elemental, Role.Control, Rarity.Elite),
-            new PrototypeAgents.Entry("tide", "Tide", Family.Elemental, Role.Support, Rarity.Agent),
-            new PrototypeAgents.Entry("sinew", "Sinew", Family.PhysicalBio, Role.Damage, Rarity.Agent),
-            new PrototypeAgents.Entry("marrow", "Marrow", Family.PhysicalBio, Role.Support, Rarity.Elite),
-            new PrototypeAgents.Entry("radar", "Radar", Family.Perception, Role.Precision, Rarity.Agent),
-            new PrototypeAgents.Entry("lens", "Lens", Family.Perception, Role.Control, Rarity.Elite),
-            new PrototypeAgents.Entry("vanguard", "Vanguard", Family.PhysicalBio, Role.Tank, Rarity.Elite, UnlockDef.Arc(Z11)),
-            new PrototypeAgents.Entry("oracle", "Oracle", Family.Perception, Role.Support, Rarity.Legend, UnlockDef.Arc(Z12)),
-            new PrototypeAgents.Entry("meteor", "Meteor", Family.Elemental, Role.Damage, Rarity.Legend, UnlockDef.Arc(Z12)),
-            new PrototypeAgents.Entry("monolith", "Monolith", Family.Matter, Role.Tank, Rarity.Legend, UnlockDef.Arc(Z13)),
-            new PrototypeAgents.Entry("forge", "Forge", Family.Matter, Role.Damage, Rarity.Elite, UnlockDef.WeekendEvent(Z11)),
-            new PrototypeAgents.Entry("tempest", "Tempest", Family.Elemental, Role.Control, Rarity.Elite, UnlockDef.WeekendEvent(Z12)),
-            new PrototypeAgents.Entry("mend", "Mend", Family.PhysicalBio, Role.Support, Rarity.Elite, UnlockDef.WeekendEvent(Z12)),
-            new PrototypeAgents.Entry("mirage", "Mirage", Family.Perception, Role.Precision, Rarity.Elite, UnlockDef.WeekendEvent(Z13)),
-            new PrototypeAgents.Entry("lone_wolf", "Lone Wolf", Family.PhysicalBio, Role.Damage, Rarity.Legend, UnlockDef.FeatOf(Z11, FeatKind.SoloClear)),
-            new PrototypeAgents.Entry("hermit", "Hermit", Family.Perception, Role.Precision, Rarity.Legend, UnlockDef.FeatOf(Z13, FeatKind.SoloClear)),
-            new PrototypeAgents.Entry("phoenix", "Phoenix", Family.Elemental, Role.Support, Rarity.Legend, UnlockDef.FeatOf(Z12, FeatKind.NoDefeat)),
-            new PrototypeAgents.Entry("aegis", "Aegis", Family.Matter, Role.Tank, Rarity.Legend, UnlockDef.FeatOf(Z13, FeatKind.NoDefeat)),
+            new PrototypeAgents.Entry("bastion", "Bastion", Family.Matter, Position.FrontLine, Rarity.Agent),
+            new PrototypeAgents.Entry("prism", "Prism", Family.Matter, Position.Attacker, Rarity.Elite),
+            new PrototypeAgents.Entry("warden", "Warden", Family.Matter, Position.Controller, Rarity.Agent),
+            new PrototypeAgents.Entry("cinder", "Cinder", Family.Elemental, Position.Attacker, Rarity.Agent),
+            new PrototypeAgents.Entry("volt", "Volt", Family.Elemental, Position.Controller, Rarity.Elite),
+            new PrototypeAgents.Entry("tide", "Tide", Family.Elemental, Position.Support, Rarity.Agent),
+            new PrototypeAgents.Entry("sinew", "Sinew", Family.PhysicalBio, Position.Attacker, Rarity.Agent),
+            new PrototypeAgents.Entry("marrow", "Marrow", Family.PhysicalBio, Position.Support, Rarity.Elite),
+            new PrototypeAgents.Entry("radar", "Radar", Family.Perception, Position.Ranged, Rarity.Agent),
+            new PrototypeAgents.Entry("lens", "Lens", Family.Perception, Position.Controller, Rarity.Elite),
+            new PrototypeAgents.Entry("vanguard", "Vanguard", Family.PhysicalBio, Position.FrontLine, Rarity.Elite, UnlockDef.Arc(Z11)),
+            new PrototypeAgents.Entry("oracle", "Oracle", Family.Perception, Position.Support, Rarity.Legend, UnlockDef.Arc(Z12)),
+            new PrototypeAgents.Entry("meteor", "Meteor", Family.Elemental, Position.Attacker, Rarity.Legend, UnlockDef.Arc(Z12)),
+            new PrototypeAgents.Entry("monolith", "Monolith", Family.Matter, Position.FrontLine, Rarity.Legend, UnlockDef.Arc(Z13)),
+            new PrototypeAgents.Entry("forge", "Forge", Family.Matter, Position.Attacker, Rarity.Elite, UnlockDef.WeekendEvent(Z11)),
+            new PrototypeAgents.Entry("tempest", "Tempest", Family.Elemental, Position.Controller, Rarity.Elite, UnlockDef.WeekendEvent(Z12)),
+            new PrototypeAgents.Entry("mend", "Mend", Family.PhysicalBio, Position.Support, Rarity.Elite, UnlockDef.WeekendEvent(Z12)),
+            new PrototypeAgents.Entry("mirage", "Mirage", Family.Perception, Position.Ranged, Rarity.Elite, UnlockDef.WeekendEvent(Z13)),
+            new PrototypeAgents.Entry("lone_wolf", "Lone Wolf", Family.PhysicalBio, Position.Attacker, Rarity.Legend, UnlockDef.FeatOf(Z11, FeatKind.SoloClear)),
+            new PrototypeAgents.Entry("hermit", "Hermit", Family.Perception, Position.Ranged, Rarity.Legend, UnlockDef.FeatOf(Z13, FeatKind.SoloClear)),
+            new PrototypeAgents.Entry("phoenix", "Phoenix", Family.Elemental, Position.Support, Rarity.Legend, UnlockDef.FeatOf(Z12, FeatKind.NoDefeat)),
+            new PrototypeAgents.Entry("aegis", "Aegis", Family.Matter, Position.FrontLine, Rarity.Legend, UnlockDef.FeatOf(Z13, FeatKind.NoDefeat)),
         };
 
         static EffectDef Signature(Family f)
@@ -114,30 +114,30 @@ namespace N29.HeroesDawn.Tests.Domain
         static IReadOnlyList<SkillDef> LegacyKit(PrototypeAgents.Entry e)
         {
             string a1 = e.Id + "_a1", a2 = e.Id + "_a2", a3 = e.Id + "_a3";
-            switch (e.Role)
+            switch (e.Position)
             {
-                case Role.Tank:
+                case Position.FrontLine:
                     return new[]
                     {
                         S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110), Push(10)),
                         S(a2, SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(20)),
                         S(a3, SkillSlot.A3, 5, TargetRule.AllAllies, Shield(15), St(StatusType.Anchor, 2)),
                     };
-                case Role.Damage:
+                case Position.Attacker:
                     return new[]
                     {
                         S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), Signature(e.Family)),
                         S(a2, SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(70)),
                         S(a3, SkillSlot.A3, 5, TargetRule.SingleEnemy, Dmg(220)),
                     };
-                case Role.Control:
+                case Position.Controller:
                     return new[]
                     {
                         S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100), St(StatusType.Shock, 1, 15)),
                         S(a2, SkillSlot.A2, 4, TargetRule.SingleEnemy, St(StatusType.Bind, 2), Push(25)),
                         S(a3, SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(60), St(StatusType.Vulnerable, 2)),
                     };
-                case Role.Support:
+                case Position.Support:
                     return new[]
                     {
                         S(a1, SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(80)),
@@ -158,8 +158,8 @@ namespace N29.HeroesDawn.Tests.Domain
         public static IReadOnlyList<MemberDef> All()
         {
             var list = Core().ToList();
-            list.AddRange(Extra.Select(e => new MemberDef(new MemberId(e.Id), "members." + e.Id + ".name", e.Family, e.Role, e.Rarity,
-                PrototypeContent.BaseStats(e.Role, e.Rarity), LegacyKit(e), null, e.Unlock)));
+            list.AddRange(Extra.Select(e => new MemberDef(new MemberId(e.Id), "members." + e.Id + ".name", e.Family, e.Position, e.Rarity,
+                PrototypeContent.BaseStats(e.Position, e.Rarity), LegacyKit(e), null, e.Unlock)));
             return list;
         }
     }

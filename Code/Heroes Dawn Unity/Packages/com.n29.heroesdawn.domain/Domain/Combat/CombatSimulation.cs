@@ -44,8 +44,8 @@ namespace N29.HeroesDawn.Domain.Combat
                 s => (s.Synergy, setup.LinkLevel(setup.Allies[s.A].Member, setup.Allies[s.B].Member))));
             for (int i = 0; i < setup.Allies.Count; i++)
                 _units.Add(UnitFactory.Ally(id++, c.Member(setup.Allies[i].Member), setup.Allies[i], _b, c.Collection, synergy, PairBonusOf(c, setup, i)));
-            var roles = new List<Role>();
-            foreach (var a in setup.Allies) roles.Add(c.Member(a.Member).Role);
+            var roles = new List<Position>();
+            foreach (var a in setup.Allies) roles.Add(c.Member(a.Member).Position);
             ApplyTeamEffects(TeamEffects.Active(families, roles));
             SpawnWave(0);
             foreach (var u in _units)
@@ -66,7 +66,7 @@ namespace N29.HeroesDawn.Domain.Combat
             {
                 if (j == index) continue;
                 var other = c.Member(setup.Allies[j].Member);
-                bonuses.AddRange(PairBonusRules.Of(me.Role, other.Role, setup.LinkLevel(me.Id, other.Id)));
+                bonuses.AddRange(PairBonusRules.Of(me.Position, other.Position, setup.LinkLevel(me.Id, other.Id)));
             }
             return PairBonusRules.Total(bonuses);
         }

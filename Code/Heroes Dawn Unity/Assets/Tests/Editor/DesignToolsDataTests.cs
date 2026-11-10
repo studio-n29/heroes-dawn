@@ -40,7 +40,7 @@ namespace N29.HeroesDawn.Tests.Editor
             {
                 var a = Code.Members[i]; var b = lib.Members[i];
                 Assert.That(b.Id, Is.EqualTo(a.Id));
-                Assert.That((b.Family, b.Role, b.Rarity), Is.EqualTo((a.Family, a.Role, a.Rarity)));
+                Assert.That((b.Family, b.Position, b.Rarity), Is.EqualTo((a.Family, a.Position, a.Rarity)));
                 Assert.That((b.BaseStats.Hp, b.BaseStats.Atk, b.BaseStats.Def, b.BaseStats.Spd), Is.EqualTo((a.BaseStats.Hp, a.BaseStats.Atk, a.BaseStats.Def, a.BaseStats.Spd)));
                 Assert.That(b.UnlockZone, Is.EqualTo(a.UnlockZone), a.Id.Value);
                 Assert.That(b.Unlock?.Kind, Is.EqualTo(a.Unlock?.Kind), a.Id.Value);
@@ -103,7 +103,7 @@ namespace N29.HeroesDawn.Tests.Editor
             agents.agents.RemoveAll(a => a.id == "giulia_rossi");
             for (int i = 1; i <= 2; i++)
                 skills.skills.Add(new SkillRecord { id = "nova_a" + i, name = "Nova " + i, slot = (SkillSlot)(i - 1), target = TargetRule.SingleEnemy, effects = { new EffectRecord { type = EffectType.Damage, value = 100 } } });
-            agents.agents.Add(new AgentRecord { id = "nova", name = "Nova", family = Family.Elemental, role = Role.Damage, rarity = Rarity.Elite, skills = new List<string> { "nova_a1", "nova_a2" }, hp = 1200, atk = 150, def = 90, spd = 110 });
+            agents.agents.Add(new AgentRecord { id = "nova", name = "Nova", family = Family.Elemental, position = Position.Attacker, rarity = Rarity.Elite, skills = new List<string> { "nova_a1", "nova_a2" }, hp = 1200, atk = 150, def = 90, spd = 110 });
             var lib = ContentDataLibrary.FromFiles(items, skills, agents);
             var catalog = Code.WithMembers(lib.Members!);
             Assert.That(catalog.Members.Any(m => m.Id.Value == "giulia_rossi"), Is.False);

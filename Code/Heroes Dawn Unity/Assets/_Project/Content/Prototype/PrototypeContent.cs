@@ -27,17 +27,17 @@ namespace N29.HeroesDawn.Content.Prototype
             => new SkillDef(new SkillId(id), slot, cd, t, fx);
 
         /// <summary>Statistiques de départ d un agent selon son rôle et sa rareté (valeurs proposées par l outil des agents).</summary>
-        public static StatBlock BaseStats(Role role, Rarity rarity) => Stats(role, rarity);
+        public static StatBlock BaseStats(Position role, Rarity rarity) => Stats(role, rarity);
 
-        static StatBlock Stats(Role role, Rarity rarity)
+        static StatBlock Stats(Position role, Rarity rarity)
         {
             StatBlock b;
             switch (role)
             {
-                case Role.Tank: b = new StatBlock(1500, 80, 120, 95); break;
-                case Role.Damage: b = new StatBlock(1000, 130, 70, 105); break;
-                case Role.Control: b = new StatBlock(1100, 100, 90, 110); break;
-                case Role.Support: b = new StatBlock(1100, 85, 85, 100); break;
+                case Position.FrontLine: b = new StatBlock(1500, 80, 120, 95); break;
+                case Position.Attacker: b = new StatBlock(1000, 130, 70, 105); break;
+                case Position.Controller: b = new StatBlock(1100, 100, 90, 110); break;
+                case Position.Support: b = new StatBlock(1100, 85, 85, 100); break;
                 default: b = new StatBlock(950, 120, 70, 115); break;
             }
             int m = rarity == Rarity.Elite ? 120 : rarity == Rarity.Legend ? 145 : 100;
@@ -45,21 +45,21 @@ namespace N29.HeroesDawn.Content.Prototype
             return new StatBlock(b.Hp * m / 100, b.Atk * m / 100, b.Def * m / 100, spd);
         }
 
-        static MemberDef M(string id, Family f, Role r, Rarity ra, params SkillDef[] skills)
+        static MemberDef M(string id, Family f, Position r, Rarity ra, params SkillDef[] skills)
             => new MemberDef(new MemberId(id), "members." + id + ".name", f, r, ra, Stats(r, ra), skills);
 
         /// <summary>Recrue qui n'entre dans la boutique qu'une fois <paramref name="zone"/> validée.</summary>
         static MemberDef Locked(MemberDef d, ZoneId zone)
-            => new MemberDef(d.Id, d.NameKey, d.Family, d.Role, d.Rarity, d.BaseStats, d.Skills, zone);
+            => new MemberDef(d.Id, d.NameKey, d.Family, d.Position, d.Rarity, d.BaseStats, d.Skills, zone);
 
-        static EnemyDef E(string id, Role r, Family f, StatBlock st, bool boss, params SkillDef[] skills)
+        static EnemyDef E(string id, Position r, Family f, StatBlock st, bool boss, params SkillDef[] skills)
             => new EnemyDef(new EnemyId(id), "enemies." + id + ".name", r, f, st, skills, boss);
 
         /// <summary>Palier de boss : sous <paramref name="pct"/> % de PV, bonus permanents de force, de défense et de vitesse (en %).</summary>
         static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd) => new BossPhaseDef(pct, nameKey, atk, def, spd);
 
         static EnemyDef Phased(EnemyDef d, params BossPhaseDef[] phases)
-            => new EnemyDef(d.Id, d.NameKey, d.Role, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases);
+            => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases);
 
         static SynergyDef C(string id, Family a, Family b, SynergyStat stat, int percent)
             => new SynergyDef(id, "synergies." + id + ".name", a, b, stat, percent);
@@ -86,16 +86,16 @@ namespace N29.HeroesDawn.Content.Prototype
             var members = agents;
             var enemies = new List<EnemyDef>
             {
-                E("thug", Role.Damage, Family.PhysicalBio, new StatBlock(1000, 120, 70, 100), false,
+                E("thug", Position.Attacker, Family.PhysicalBio, new StatBlock(1000, 120, 70, 100), false,
                     S("thug_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100)),
                     S("thug_a2", SkillSlot.A2, 4, TargetRule.SingleEnemy, Dmg(160))),
-                E("brute", Role.Tank, Family.PhysicalBio, new StatBlock(1500, 80, 120, 90), false,
+                E("brute", Position.FrontLine, Family.PhysicalBio, new StatBlock(1500, 80, 120, 90), false,
                     S("brute_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(90)),
                     S("brute_a2", SkillSlot.A2, 4, TargetRule.Self, St(StatusType.Taunt, 2))),
-                E("street_pyro", Role.Damage, Family.Elemental, new StatBlock(950, 125, 65, 105), false,
+                E("street_pyro", Position.Attacker, Family.Elemental, new StatBlock(950, 125, 65, 105), false,
                     S("pyro_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(90), St(StatusType.Burn, 2, 30)),
                     S("pyro_a2", SkillSlot.A2, 4, TargetRule.AllEnemies, Dmg(70))),
-                Phased(E("brick", Role.Tank, Family.PhysicalBio, new StatBlock(4500, 110, 130, 95), true,
+                Phased(E("brick", Position.FrontLine, Family.PhysicalBio, new StatBlock(4500, 110, 130, 95), true,
                     S("brick_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(120)),
                     S("brick_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(10)),
                     S("brick_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(90), St(StatusType.Shock, 1, 30))),

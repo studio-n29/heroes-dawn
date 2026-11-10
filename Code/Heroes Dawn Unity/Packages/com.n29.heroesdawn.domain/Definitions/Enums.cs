@@ -1,7 +1,8 @@
 namespace N29.HeroesDawn.Definitions
 {
     public enum Family { Matter, Elemental, PhysicalBio, Perception }
-    public enum Role { Tank, Damage, Control, Support, Precision }
+    /// <summary>Position de l agent (remplace l ancien rôle) ; mêmes valeurs entières : Tank, Damage, Control, Support, Precision.</summary>
+    public enum Position { FrontLine, Attacker, Controller, Support, Ranged }
     public enum Rarity { Agent, Elite, Legend }
     public enum CaseType { Entry, Empty, Combat, MiniGame, Narrative, Resource, Rest }
     public enum CombatRank { Easy, Normal, Elite, Boss }

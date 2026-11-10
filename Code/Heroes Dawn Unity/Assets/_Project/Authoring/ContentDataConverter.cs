@@ -42,7 +42,7 @@ namespace N29.HeroesDawn.Authoring
                 case UnlockKind.Hero: unlock = UnlockDef.Hero(); break;
             }
             var shopZone = a.unlockKind == UnlockKind.Shop ? zone : null;
-            return new MemberDef(new MemberId(a.id), "members." + a.id + ".name", a.family, a.role, a.rarity, new StatBlock(a.hp, a.atk, a.def, a.spd), kit, shopZone, unlock);
+            return new MemberDef(new MemberId(a.id), "members." + a.id + ".name", a.family, a.position, a.rarity, new StatBlock(a.hp, a.atk, a.def, a.spd), kit, shopZone, unlock);
         }
 
         public static AgentRecord FromDef(MemberDef m, string name)
@@ -51,7 +51,7 @@ namespace N29.HeroesDawn.Authoring
             var zone = m.Unlock?.Zone ?? m.UnlockZone;
             return new AgentRecord
             {
-                id = m.Id.Value, name = name, family = m.Family, role = m.Role, rarity = m.Rarity,
+                id = m.Id.Value, name = name, family = m.Family, position = m.Position, rarity = m.Rarity,
                 hp = m.BaseStats.Hp, atk = m.BaseStats.Atk, def = m.BaseStats.Def, spd = m.BaseStats.Spd,
                 unlockKind = kind, unlockZone = zone.HasValue ? zone.Value.Value : "", feat = m.Unlock?.Feat ?? FeatKind.None,
                 skills = m.Skills.Select(s => s.Id.Value).ToList(),

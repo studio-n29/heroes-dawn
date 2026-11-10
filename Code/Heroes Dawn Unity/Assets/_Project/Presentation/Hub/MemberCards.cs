@@ -22,7 +22,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 RarityText = loc.F("power.tier", def.PowerTier),
                 Rarity = def.Rarity,
                 PowerTier = def.PowerTier,
-                RoleLine = loc.RoleName(def.Role) + " · " + loc.FamilyName(def.Family),
+                RoleLine = loc.RoleName(def.Position) + " · " + loc.FamilyName(def.Family),
                 LevelText = loc.F("ui.level", level),
                 Stats = loc.F("hub.stats", UnitFactory.ScaleStat(def.BaseStats.Hp, level, b), UnitFactory.ScaleStat(def.BaseStats.Atk, level, b),
                               UnitFactory.ScaleStat(def.BaseStats.Def, level, b), def.BaseStats.Spd),

@@ -10,7 +10,7 @@ namespace N29.HeroesDawn.Tests.Presentation
     public sealed class PairBonusTextTests
     {
         readonly LocLocalization _loc = new LocLocalization();
-        static readonly Role[] Roles = (Role[])Enum.GetValues(typeof(Role));
+        static readonly Position[] Roles = (Position[])Enum.GetValues(typeof(Position));
 
         [Test, Description("Vérifie que chacun des 15 couples de rôles a un nom de thème français distinct (« Double rempart », « Rempart et lame », « Étau »…), dans les deux ordres de rôles — parce que le joueur lit le thème de chaque paire dans la fenêtre d'affinités")]
         public void EveryRolePair_HasItsOwnThemeName()
@@ -26,10 +26,10 @@ namespace N29.HeroesDawn.Tests.Presentation
                     names.Add(name);
                 }
             Assert.That(names.Distinct().Count(), Is.EqualTo(15));
-            Assert.That(_loc.PairTheme(Role.Tank, Role.Tank), Is.EqualTo("Double rempart"));
-            Assert.That(_loc.PairTheme(Role.Tank, Role.Damage), Is.EqualTo("Rempart et lame"));
-            Assert.That(_loc.PairTheme(Role.Tank, Role.Control), Is.EqualTo("Étau"));
-            Assert.That(_loc.PairTheme(Role.Precision, Role.Precision), Is.EqualTo("Double regard"));
+            Assert.That(_loc.PairTheme(Position.FrontLine, Position.FrontLine), Is.EqualTo("Double rempart"));
+            Assert.That(_loc.PairTheme(Position.FrontLine, Position.Attacker), Is.EqualTo("Rempart et lame"));
+            Assert.That(_loc.PairTheme(Position.FrontLine, Position.Controller), Is.EqualTo("Étau"));
+            Assert.That(_loc.PairTheme(Position.Ranged, Position.Ranged), Is.EqualTo("Double regard"));
         }
 
         [TestCase(PairBonusKind.HpPercent, 4, "PV +4 %")]

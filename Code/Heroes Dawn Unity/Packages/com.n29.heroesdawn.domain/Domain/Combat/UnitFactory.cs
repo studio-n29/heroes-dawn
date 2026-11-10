@@ -43,7 +43,7 @@ namespace N29.HeroesDawn.Domain.Combat
                     }
                 }
             int S(int v, int itemPercent) => ScaleStat(v, e.Level, b) * f / 1000 * (100 + e.StatPercent) / 100 * (100 + itemPercent) / 100;
-            var unit = new CombatUnit(id, Side.Ally, d.Id.Value, d.Family, d.Role, false,
+            var unit = new CombatUnit(id, Side.Ally, d.Id.Value, d.Family, d.Position, false,
                                       S(d.BaseStats.Hp, hpP), S(d.BaseStats.Atk, atkP), S(d.BaseStats.Def, defP), d.BaseStats.Spd * (100 + spdP) / 100,
                                       b.TimelinePoints, EmpoweredSkills(SkillsWithCards(d, e, collection), skillPower));
             unit.MaxEnergy = b.EnergyMax;
@@ -93,7 +93,7 @@ namespace N29.HeroesDawn.Domain.Combat
             int pct = rank == CombatRank.Easy ? b.RankEasyStatPercent
                     : (rank == CombatRank.Elite || rank == CombatRank.Boss) ? b.RankEliteStatPercent : 100;
             int S(int v) => ScaleStat(v, e.Level, b) * pct / 100;
-            var unit = new CombatUnit(id, Side.Enemy, d.Id.Value, d.Family, d.Role, d.IsBoss,
+            var unit = new CombatUnit(id, Side.Enemy, d.Id.Value, d.Family, d.Position, d.IsBoss,
                                   S(d.BaseStats.Hp), S(d.BaseStats.Atk), S(d.BaseStats.Def), d.BaseStats.Spd,
                                   b.TimelinePoints, d.Skills);
             unit.MaxEnergy = b.EnergyMax;

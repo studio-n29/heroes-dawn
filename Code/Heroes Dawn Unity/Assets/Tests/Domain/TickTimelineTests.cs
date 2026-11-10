@@ -141,7 +141,7 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var list = new List<CombatUnit>();
             for (int i = 0; i < spec.Length; i++)
-                list.Add(new CombatUnit(i, spec[i].Side, "x", Family.Matter, Role.Tank, false, 100, 10, 10, 10, 10, System.Array.Empty<SkillDef>()) { Point = spec[i].Point });
+                list.Add(new CombatUnit(i, spec[i].Side, "x", Family.Matter, Position.FrontLine, false, 100, 10, 10, 10, 10, System.Array.Empty<SkillDef>()) { Point = spec[i].Point });
             return list;
         }
 

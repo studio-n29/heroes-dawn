@@ -92,7 +92,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 // Carte verticale : portrait, puissance (1 à 5), rang (niveau) pour l'équipe, puis la façon d'obtenir les autres.
                 string power = Loc.F("power.tier", d.PowerTier);
                 string line = own
-                    ? Loc.RoleName(d.Role) + " · " + Loc.FamilyName(d.Family) + " · " + power + " · " + Loc.F("ui.level", _session.Roster.First(m => m.Id == d.Id).Level)
+                    ? Loc.RoleName(d.Position) + " · " + Loc.FamilyName(d.Family) + " · " + power + " · " + Loc.F("ui.level", _session.Roster.First(m => m.Id == d.Id).Level)
                     : power + "\n" + How(d);
                 var r = InfoRowData.Basic(name, line);
                 r.Tag = name.Substring(0, 1).ToUpperInvariant();

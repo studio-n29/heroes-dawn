@@ -10,7 +10,7 @@ namespace N29.HeroesDawn.Domain.Combat
         public Side Side { get; }
         public string DefId { get; }
         public Family Family { get; }
-        public Role Role { get; }
+        public Position Position { get; }
         public bool IsBoss { get; }
         public int MaxHp { get; }
         public int Hp { get; set; }
@@ -51,10 +51,10 @@ namespace N29.HeroesDawn.Domain.Combat
         public bool IsAlive => Hp > 0;
         public bool IsReady => IsAlive && Point >= ActionPoint;
 
-        public CombatUnit(int id, Side side, string defId, Family family, Role role, bool isBoss,
+        public CombatUnit(int id, Side side, string defId, Family family, Position role, bool isBoss,
                           int hp, int atk, int def, int spd, int actionPoint, IReadOnlyList<SkillDef> skills)
         {
-            Id = id; Side = side; DefId = defId; Family = family; Role = role; IsBoss = isBoss;
+            Id = id; Side = side; DefId = defId; Family = family; Position = role; IsBoss = isBoss;
             MaxHp = hp; Hp = hp; Atk = atk; Def = def; Spd = spd; ActionPoint = actionPoint; Skills = skills;
         }
 

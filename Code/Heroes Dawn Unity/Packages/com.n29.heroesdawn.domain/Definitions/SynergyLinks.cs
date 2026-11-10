@@ -68,7 +68,7 @@ namespace N29.HeroesDawn.Definitions
         public const int DoubleFrontShieldPercent = 10;
         public const int SparkStartEnergy = 20;
 
-        public static IReadOnlyList<TeamEffectKind> Active(IReadOnlyList<Family> families, IReadOnlyList<Role> roles)
+        public static IReadOnlyList<TeamEffectKind> Active(IReadOnlyList<Family> families, IReadOnlyList<Position> roles)
         {
             var list = new List<TeamEffectKind>();
             var distinct = new HashSet<Family>(families);
@@ -77,10 +77,10 @@ namespace N29.HeroesDawn.Definitions
             foreach (var r in roles)
                 switch (r)
                 {
-                    case Role.Tank: tanks++; break;
-                    case Role.Damage: damage++; break;
-                    case Role.Support: support++; break;
-                    case Role.Control: control++; break;
+                    case Position.FrontLine: tanks++; break;
+                    case Position.Attacker: damage++; break;
+                    case Position.Support: support++; break;
+                    case Position.Controller: control++; break;
                 }
             if (tanks >= 1 && damage >= 1 && support >= 1) list.Add(TeamEffectKind.Trinity);
             if (tanks >= 2) list.Add(TeamEffectKind.DoubleFront);

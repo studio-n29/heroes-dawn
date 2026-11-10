@@ -92,12 +92,12 @@ namespace N29.HeroesDawn.EditorTools.Design
         protected override string Noun => "agent";
         protected override List<AgentRecord> Records => DesignStore.Agents.agents;
         protected override string IdOf(AgentRecord r) => r.id;
-        protected override string LabelOf(AgentRecord r) => r.name + "  ·  " + r.role + "  ·  " + r.rarity;
+        protected override string LabelOf(AgentRecord r) => r.name + "  ·  " + r.position + "  ·  " + r.rarity;
         protected override AgentRecord NewRecord()
         {
             string id = "nouvel_agent";
             for (int n = 2; DesignStore.Agents.agents.Any(a => a.id == id); n++) id = "nouvel_agent" + n;
-            var a = new AgentRecord { id = id, name = "Nouvel agent", role = Role.Damage, family = Family.Matter, rarity = Rarity.Agent };
+            var a = new AgentRecord { id = id, name = "Nouvel agent", position = Position.Attacker, family = Family.Matter, rarity = Rarity.Agent };
             ApplyBaseStats(a);
             return a;
         }
@@ -144,7 +144,7 @@ namespace N29.HeroesDawn.EditorTools.Design
 
         static void ApplyBaseStats(AgentRecord a)
         {
-            var s = PrototypeContent.BaseStats(a.role, a.rarity);
+            var s = PrototypeContent.BaseStats(a.position, a.rarity);
             a.hp = s.Hp; a.atk = s.Atk; a.def = s.Def; a.spd = s.Spd;
         }
 
@@ -165,7 +165,7 @@ namespace N29.HeroesDawn.EditorTools.Design
         /// <summary>Remplace les trois compétences de l'agent par le kit standard de son rôle et de sa famille.</summary>
         static void GenerateKit(AgentRecord a)
         {
-            var entry = new PrototypeAgents.Entry(a.id, a.name, a.family, a.role, a.rarity);
+            var entry = new PrototypeAgents.Entry(a.id, a.name, a.family, a.position, a.rarity);
             var kit = PrototypeAgents.Kit(entry);
             a.skills = new List<string>();
             for (int i = 0; i < kit.Count; i++)
@@ -197,7 +197,7 @@ namespace N29.HeroesDawn.EditorTools.Design
                           : a.unlockKind == UnlockKind.Event ? "événement du week-end, zone " + a.unlockZone
                           : a.unlockKind == UnlockKind.Hero ? "personnage joueur (rejoint au choix de la première connexion)"
                           : "prouesse " + a.feat + ", zone " + a.unlockZone;
-            EditorGUILayout.HelpBox(a.name + " · " + a.family + " · " + a.role + " · " + a.rarity + "\nPV " + a.hp + " · ATK " + a.atk + " · DEF " + a.def + " · VIT " + a.spd + "\n" + unlock, MessageType.None);
+            EditorGUILayout.HelpBox(a.name + " · " + a.family + " · " + a.position + " · " + a.rarity + "\nPV " + a.hp + " · ATK " + a.atk + " · DEF " + a.def + " · VIT " + a.spd + "\n" + unlock, MessageType.None);
         }
     }
 }
