@@ -1,0 +1,63 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="screen" class="hd-screen" style="background-color: #101C29;">
+        <ui:VisualElement name="safe" style="flex-grow: 1; flex-direction: column; padding: 24px;">
+            <ui:Label text="Composants" class="hd-text hd-text--title" style="margin-bottom: 8px;" />
+            <ui:VisualElement style="flex-direction: row; flex-grow: 1;">
+                <!-- Colonne gauche : boutons, onglets, champs -->
+                <ui:VisualElement style="flex-grow: 1; flex-basis: 0; margin-right: 24px;">
+                    <ui:Label text="Boutons" class="hd-text hd-text--heading hd-text--gold" />
+                    <ui:VisualElement style="flex-direction: row; margin-bottom: 8px;">
+                        <ui:Button name="primary" text="JOUER" class="hd-btn hd-btn--primary" style="flex-grow: 1; margin-right: 12px;" />
+                        <ui:Button name="primary-off" text="DÉSACTIVÉ" enabled="false" class="hd-btn hd-btn--primary" style="flex-grow: 1;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement style="flex-direction: row; margin-bottom: 8px;">
+                        <ui:Button name="secondary" text="SE CONNECTER" class="hd-btn hd-btn--secondary" style="flex-grow: 1; margin-right: 12px;" />
+                        <ui:Button name="ghost" text="PLUS TARD" class="hd-btn hd-btn--ghost" style="flex-grow: 1;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement style="flex-direction: row; margin-bottom: 8px;">
+                        <ui:Button name="danger" text="SUPPRIMER" class="hd-btn hd-btn--danger" style="flex-grow: 1; margin-right: 12px;" />
+                        <ui:Button name="nav" text="ÉQUIPE" class="hd-btn hd-btn--nav" style="flex-grow: 1;" />
+                    </ui:VisualElement>
+                    <ui:Label text="Onglets et puces" class="hd-text hd-text--heading hd-text--gold" />
+                    <ui:VisualElement style="flex-direction: row; margin-bottom: 8px;">
+                        <ui:Button name="tab-a" text="Toutes" class="hd-tab hd-tab--active" style="margin-right: 8px;" />
+                        <ui:Button name="tab-b" text="Matière" class="hd-tab" style="margin-right: 8px;" />
+                        <ui:Button name="tab-c" text="Élémentaire" class="hd-tab" />
+                    </ui:VisualElement>
+                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                        <ui:Button name="chip" text="FR" class="hd-chip" style="margin-right: 16px;" />
+                        <ui:VisualElement class="hd-pill" style="width: 280px; margin-right: 12px;">
+                            <ui:VisualElement class="hd-pill__icon" style="background-image: url('project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/credits.png');" />
+                            <ui:Label text="12 450" class="hd-pill__value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="toggle" focusable="true" class="hd-toggle hd-toggle--on" style="width: 140px; height: 70px;" />
+                    </ui:VisualElement>
+                    <ui:Label text="Champ de saisie" class="hd-text hd-text--heading hd-text--gold" />
+                    <ui:TextField name="field" value="joueur@exemple.fr" class="hd-field-host" />
+                </ui:VisualElement>
+                <!-- Colonne droite : panneaux, barres, textes -->
+                <ui:VisualElement style="flex-grow: 1; flex-basis: 0;">
+                    <ui:VisualElement name="panel-navy" class="hd-panel" style="margin-bottom: 12px;">
+                        <ui:Label text="Panneau marine" class="hd-text hd-text--heading" />
+                        <ui:Label name="long" text="Un texte volontairement très long pour vérifier le retour à la ligne : « Les quais sont bloqués depuis l'aube. On dégage le passage et on remet les livraisons en route, tout de suite. »" class="hd-text hd-text--muted" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="panel-ivory" class="hd-panel hd-panel--ivory" style="margin-bottom: 12px;">
+                        <ui:Label text="Panneau ivoire" class="hd-text hd-text--heading" />
+                        <ui:Label text="Texte sombre sur surface claire" class="hd-text" />
+                    </ui:VisualElement>
+                    <ui:Label text="Barres" class="hd-text hd-text--heading hd-text--gold" />
+                    <ui:VisualElement class="hd-bar hd-bar--hp" style="margin-bottom: 8px;"><ui:VisualElement name="bar-hp" class="hd-bar__fill" style="width: 72%;" /></ui:VisualElement>
+                    <ui:VisualElement class="hd-bar hd-bar--fatigue" style="margin-bottom: 8px;"><ui:VisualElement class="hd-bar__fill" style="width: 30%;" /></ui:VisualElement>
+                    <ui:VisualElement class="hd-bar hd-bar--xp" style="margin-bottom: 8px;"><ui:VisualElement class="hd-bar__fill" style="width: 12%;" /></ui:VisualElement>
+                    <ui:Label text="Familles" class="hd-text hd-text--heading hd-text--gold" />
+                    <ui:VisualElement style="flex-direction: row;">
+                        <ui:Label text="Matière" class="hd-text hd-family--matter" style="margin-right: 20px;" />
+                        <ui:Label text="Élémentaire" class="hd-text hd-family--elemental" style="margin-right: 20px;" />
+                        <ui:Label text="Physique/Bio" class="hd-text hd-family--physical-bio" style="margin-right: 20px;" />
+                        <ui:Label text="Perception" class="hd-text hd-family--perception" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
