@@ -291,7 +291,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             narrationSession.CompletedZones.Add("zone_ny_1_2");
             Object.FindAnyObjectByType<CityMapPageView>()!.ChaptersButton.onClick.Invoke();
             yield return CaptureSettled("91-chapitres");
-            Object.FindAnyObjectByType<ChaptersPageView>()!.SideRows[0].Buttons[0].Button.onClick.Invoke();
+            Object.FindAnyObjectByType<ChaptersPageView>()!.SideRowButton(0, 0)!.Button.onClick.Invoke();
             yield return CaptureSettled("91b-chapitres-souvenir");
             // Repaire : Brooklyn terminé, Brick déjà vaincu ; le bouton REPAIRE du bandeau ouvre la page, puis ENTRER demande confirmation.
             narrationSession.CompletedZones.Add("zone_ny_1_3");

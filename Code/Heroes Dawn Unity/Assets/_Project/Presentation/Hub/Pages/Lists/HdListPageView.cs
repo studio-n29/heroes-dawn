@@ -45,6 +45,9 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         /// <summary>La colonne de droite est large (page de texte : Archives).</summary>
         protected virtual bool WideSide => false;
+        protected virtual bool HasSide => true;
+
+        protected void RaiseRowSelected(int row) => RowSelected?.Invoke(row);
 
         public HdButtonRef HeaderButtonA { get; private set; } = null!;
         public HdButtonRef HeaderButtonB { get; private set; } = null!;
@@ -68,6 +71,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _headerA.clicked += () => HeaderClicked?.Invoke(0);
             _headerB.clicked += () => HeaderClicked?.Invoke(1);
             _side.EnableInClassList("hd-list__side--wide", WideSide);
+            _side.style.display = HasSide ? DisplayStyle.Flex : DisplayStyle.None;
             _main.Clear(); _sideList.Clear(); _filterButtons.Clear(); _filterShape = "";
             if (_lastHeader.HasValue) ShowHeader(_lastHeader.Value);
             if (_lastFilters != null) ShowFilters(_lastFilters);
@@ -81,6 +85,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (_title == null) return;
             _title.text = d.Title;
             _line.text = d.Line;
+            Q<VisualElement>("header").style.backgroundColor = d.HeaderTint.HasValue ? new Color(d.HeaderTint.Value.r, d.HeaderTint.Value.g, d.HeaderTint.Value.b, 0.9f) : new StyleColor(StyleKeyword.Null);
             bool bar = d.Progress >= 0f;
             _bar.style.display = bar ? DisplayStyle.Flex : DisplayStyle.None;
             if (bar) { _barFill.style.width = Length.Percent(Mathf.Clamp01(d.Progress) * 100f); _barLabel.text = d.ProgressLabel; }
