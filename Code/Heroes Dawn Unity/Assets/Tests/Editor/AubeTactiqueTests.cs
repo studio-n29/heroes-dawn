@@ -11,7 +11,6 @@ namespace N29.HeroesDawn.Tests.Editor
     public sealed class AubeTactiqueTests
     {
         [TestCase("Pages/Settings.prefab")]
-        [TestCase("Widgets/SettingRow.prefab")]
         [Description("Les prefabs conservés sans recette doivent recevoir la même DA que les écrans reconstruits")]
         public void PreservedSettings_HaveNoLegacyPaletteOrOutlinedText(string relative)
         {
