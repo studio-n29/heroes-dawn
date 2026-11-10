@@ -33,9 +33,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                     return new BoosterCardData
                     {
                         Name = name,
-                        RarityName = CollectionText.RarityName(loc, def.Rarity),
-                        RarityColor = CollectionText.RarityColor(def.Rarity),
-                        RarityRank = RarityRank(def.Rarity),
+                        RarityName = CollectionText.RarityName(loc, CollectionText.StarsRarity(def.Stars)),
+                        RarityColor = CollectionText.RarityColor(CollectionText.StarsRarity(def.Stars)),
+                        RarityRank = RarityRank(CollectionText.StarsRarity(def.Stars)),
                         Glyph = CollectionText.Tag(name),
                         Art = AgentArt.Card(c.Id.Value),
                         Description = stats.HasValue ? loc.DescribeSkill(def.Skill, stats.Value.Atk, stats.Value.MaxHp) : loc.DescribeSkill(def.Skill),

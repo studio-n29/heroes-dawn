@@ -60,6 +60,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
         }
 
+        /// <summary>Étoiles d une carte (1 à 5) vers la couleur et le libellé de rareté d affichage : 1-2 Commune, 3 Rare, 4 Épique, 5 Légendaire.</summary>
+        public static ItemRarity StarsRarity(int stars) => stars >= 5 ? ItemRarity.Legendary : stars == 4 ? ItemRarity.Epic : stars == 3 ? ItemRarity.Rare : ItemRarity.Common;
+
         public static string RarityName(ILocalization loc, ItemRarity r) => loc.T("item.rarity." + r);
 
         /// <summary>Couleur de rareté (jamais seule porteuse du sens : le nom de la rareté est toujours écrit).</summary>
@@ -107,7 +110,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         /// <summary>« Matière · Rare · Dégâts 80 % … » (catégorie, rareté, effets).</summary>
         public static string CardLine(ILocalization loc, SkillCardDef card, SkillOwnerStats? owner = null, int level = 1)
-            => loc.F("grimoire.card_line", loc.FamilyName(card.Family), RarityName(loc, card.Rarity), owner.HasValue ? loc.DescribeSkill(CardLevels.SkillAt(card, level), owner.Value.Atk, owner.Value.MaxHp) : loc.DescribeSkill(CardLevels.SkillAt(card, level)));
+            => loc.F("grimoire.card_line", loc.FamilyName(card.Family), RarityName(loc, StarsRarity(card.Stars)), owner.HasValue ? loc.DescribeSkill(CardLevels.SkillAt(card, level), owner.Value.Atk, owner.Value.MaxHp) : loc.DescribeSkill(CardLevels.SkillAt(card, level)));
 
         /// <summary>Initiale colorée pour la pastille d'une ligne.</summary>
         public static string Tag(string name) => string.IsNullOrEmpty(name) ? "?" : name.Substring(0, 1).ToUpperInvariant();

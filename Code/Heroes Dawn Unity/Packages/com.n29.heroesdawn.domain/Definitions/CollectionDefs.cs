@@ -99,16 +99,17 @@ namespace N29.HeroesDawn.Definitions
         public string NameKey { get; }
         /// <summary>Catégorie d'agent qui peut l'utiliser (le type de pouvoir de la carte).</summary>
         public Family Family { get; }
-        public ItemRarity Rarity { get; }
+        /// <summary>Étoiles de 1 à 5 (remplacent la rareté des cartes ; les objets gardent <see cref="ItemRarity"/>).</summary>
+        public int Stars { get; }
         public SkillDef Skill { get; }
         /// <summary>Offensive, défensive ou de soutien : saisie, sinon déduite de l'effet.</summary>
         public CardNature Nature { get; }
         /// <summary>Paliers d'effets secondaires (niveaux 3, 6 et 10), dans l'ordre des niveaux ; vide : aucun.</summary>
         public IReadOnlyList<CardTier> Tiers { get; }
 
-        public SkillCardDef(CardId id, string nameKey, Family family, ItemRarity rarity, SkillDef skill, CardNature? nature = null, IReadOnlyList<CardTier>? tiers = null)
+        public SkillCardDef(CardId id, string nameKey, Family family, int stars, SkillDef skill, CardNature? nature = null, IReadOnlyList<CardTier>? tiers = null)
         {
-            Id = id; NameKey = nameKey; Family = family; Rarity = rarity; Skill = skill;
+            Id = id; NameKey = nameKey; Family = family; Stars = stars < 1 ? 1 : stars > 5 ? 5 : stars; Skill = skill;
             Nature = nature ?? CardNatures.Of(skill);
             Tiers = tiers ?? Array.Empty<CardTier>();
         }
@@ -123,9 +124,13 @@ namespace N29.HeroesDawn.Definitions
         public CardTier(int level, params EffectDef[] effects) { Level = level; Effects = effects; }
     }
 
-    /// <summary>Booster de cartes : nombre de cartes, poids de rareté (Commun, Rare, Épique, Légendaire), carte au moins Rare garantie tous les N boosters.</summary>
+    /// <summary>Booster de cartes : nombre de cartes, poids des étoiles (★1 à ★5), carte au moins ★3 garantie tous les N boosters.</summary>
     public sealed class BoosterDef
     {
+        /// <summary>Poids des étoiles ★1 à ★5 du booster ordinaire : 50, 28, 15, 6 et 1 %.</summary>
+        public static readonly IReadOnlyList<int> StandardWeights = new[] { 50, 28, 15, 6, 1 };
+        /// <summary>Étoiles minimales de la carte garantie par la pitié.</summary>
+        public const int PityStars = 3;
         /// <summary>Booster ordinaire : gagne en jeu, vendu en boutique.</summary>
         public const string StandardId = "booster_standard";
         /// <summary>Pack Opération : cinq cartes, vendu en boutique.</summary>
@@ -136,7 +141,7 @@ namespace N29.HeroesDawn.Definitions
         public string NameKey { get; }
         public int Cards { get; }
         public IReadOnlyList<int> Weights { get; }
-        /// <summary>Pitié : au bout de ce nombre de boosters sans carte Rare ou mieux, le suivant en contient une.</summary>
+        /// <summary>Pitié : au bout de ce nombre de boosters sans carte ★3 ou mieux, le suivant en contient une.</summary>
         public int PityEvery { get; }
         /// <summary>Prix en PR en boutique ; 0 : non vendu.</summary>
         public int PricePr { get; }

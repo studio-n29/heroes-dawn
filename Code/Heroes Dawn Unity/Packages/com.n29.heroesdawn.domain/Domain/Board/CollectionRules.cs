@@ -54,6 +54,21 @@ namespace N29.HeroesDawn.Domain.Board
             return ItemRarity.Common;
         }
 
+        /// <summary>Étoiles tirées (1 à 5) selon les poids ★1 à ★5.</summary>
+        public static int RollStars(IRandom rng, IReadOnlyList<int> weights)
+        {
+            int total = 0;
+            foreach (var w in weights) total += System.Math.Max(0, w);
+            if (total <= 0) return 1;
+            int roll = rng.Range(0, total);
+            for (int i = 0; i < weights.Count; i++)
+            {
+                roll -= System.Math.Max(0, weights[i]);
+                if (roll < 0) return System.Math.Min(i + 1, 5);
+            }
+            return 1;
+        }
+
         /// <summary>Objet de la rareté tirée (ou de la rareté inférieure la plus proche si le jeu n'en a pas) ; null si le jeu n'a aucun objet.</summary>
         public static ItemDef? RollItem(CollectionDef c, IRandom rng, IReadOnlyList<int>? weights = null)
         {
@@ -87,31 +102,31 @@ namespace N29.HeroesDawn.Domain.Board
             return offers;
         }
 
-        /// <summary>Ouvre un booster : tire ses cartes selon les poids ; la pitié garantit une carte Rare ou mieux au bout de N boosters sans.</summary>
+        /// <summary>Ouvre un booster : tire ses cartes selon les poids ; la pitié garantit une carte ★3 ou mieux au bout de N boosters sans.</summary>
         public static BoosterOpening OpenBooster(CollectionDef c, BoosterDef booster, ulong seed, int pity)
         {
             var rng = new Pcg32(seed);
             var cards = new List<SkillCardDef>();
             for (int i = 0; i < booster.Cards; i++)
             {
-                var rarity = RollRarity(rng, booster.Weights);
-                cards.Add(PickCard(c, rarity, rng));
+                var stars = RollStars(rng, booster.Weights);
+                cards.Add(PickCard(c, stars, rng));
             }
-            bool hasRare = cards.Any(x => x.Rarity >= ItemRarity.Rare);
+            bool hasRare = cards.Any(x => x.Stars >= BoosterDef.PityStars);
             int newPity = hasRare ? 0 : pity + 1;
             if (!hasRare && booster.PityEvery > 0 && newPity >= booster.PityEvery && cards.Count > 0)
             {
-                cards[cards.Count - 1] = PickCard(c, ItemRarity.Rare, rng);
+                cards[cards.Count - 1] = PickCard(c, BoosterDef.PityStars, rng);
                 newPity = 0;
             }
             return new BoosterOpening(cards.Select(x => x.Id).ToList(), newPity);
         }
 
-        static SkillCardDef PickCard(CollectionDef c, ItemRarity rarity, IRandom rng)
+        static SkillCardDef PickCard(CollectionDef c, int stars, IRandom rng)
         {
-            for (int r = (int)rarity; r >= 0; r--)
+            for (int r = stars; r >= 1; r--)
             {
-                var pool = c.Cards.Where(x => (int)x.Rarity == r).OrderBy(x => x.Id).ToList();
+                var pool = c.Cards.Where(x => x.Stars == r).OrderBy(x => x.Id).ToList();
                 if (pool.Count > 0) return pool[rng.Range(0, pool.Count)];
             }
             var all = c.Cards.OrderBy(x => x.Id).ToList();

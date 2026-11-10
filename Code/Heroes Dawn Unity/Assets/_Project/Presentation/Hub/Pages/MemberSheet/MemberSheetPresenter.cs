@@ -325,7 +325,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 {
                     var cd = defs.Card(card.Value);
                     tiles[slot + 2] = new SheetTile { Title = CollectionText.CardName(_loc, cd), Sub = sub, Art = AgentArt.Card(card.Value.Value),
-                                                      Frame = CollectionText.RarityColor(cd.Rarity), Kind = SheetTileKind.Card };
+                                                      Frame = CollectionText.RarityColor(CollectionText.StarsRarity(cd.Stars)), Kind = SheetTileKind.Card };
                 }
                 else
                 {
@@ -403,14 +403,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             var defs = _session.Content.Collection;
             var options = new List<SheetTile>();
             _pickActions.Clear();
-            foreach (var cd in CollectionText.CardsFor(defs, m.Def).OrderByDescending(c => c.Rarity).ThenBy(c => c.Id))
+            foreach (var cd in CollectionText.CardsFor(defs, m.Def).OrderByDescending(c => c.Stars).ThenBy(c => c.Id))
             {
                 int free = CollectionOps.AvailableCards(_game!, cd.Id);
                 if (free <= 0) continue;
                 var id = cd.Id;
                 string name = CollectionText.CardName(_loc, cd);
-                options.Add(new SheetTile { Title = name, Sub = free > 1 ? _loc.F("loadout.copies", free) : CollectionText.RarityName(_loc, cd.Rarity),
-                                            Art = AgentArt.Card(id.Value), Frame = CollectionText.RarityColor(cd.Rarity), Kind = SheetTileKind.Card });
+                options.Add(new SheetTile { Title = name, Sub = free > 1 ? _loc.F("loadout.copies", free) : CollectionText.RarityName(_loc, CollectionText.StarsRarity(cd.Stars)),
+                                            Art = AgentArt.Card(id.Value), Frame = CollectionText.RarityColor(CollectionText.StarsRarity(cd.Stars)), Kind = SheetTileKind.Card });
                 _pickActions.Add(() => Apply(_book!.EquipCard(_member, slot, id), "loadout.equipped", name));
             }
             var current = m.Cards[slot];

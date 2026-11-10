@@ -133,7 +133,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             // ---- Réserve de cartes compatibles
             Section("loadout.stock_cards");
             bool anyCard = false;
-            foreach (var def in CollectionText.CardsFor(Defs, m.Def).OrderByDescending(c => c.Rarity).ThenBy(c => c.Id))
+            foreach (var def in CollectionText.CardsFor(Defs, m.Def).OrderByDescending(c => c.Stars).ThenBy(c => c.Id))
             {
                 int free = CollectionOps.AvailableCards(_session, def.Id);
                 if (free <= 0) continue;
@@ -174,7 +174,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var owner = _session.Find(_member);
             var r = InfoRowData.Basic(title, CollectionText.CardLine(Loc, def, owner != null ? CollectionText.StatsOf(owner.Def, owner.Level, _session.Content.Balance) : (SkillOwnerStats?)null, CollectionOps.CardLevel(_session, def.Id)));
             r.Tag = CollectionText.Tag(CollectionText.CardName(Loc, def));
-            r.TagColor = CollectionText.RarityColor(def.Rarity);
+            r.TagColor = CollectionText.RarityColor(CollectionText.StarsRarity(def.Stars));
             r.Art = AgentArt.Card(def.Id.Value);
             return r;
         }

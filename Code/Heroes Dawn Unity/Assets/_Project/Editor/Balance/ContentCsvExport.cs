@@ -94,7 +94,7 @@ namespace N29.HeroesDawn.EditorTools.Balance
                 => rows.Add(new[] { s.Id.Value, owner, ownerType, s.Slot.ToString(), Loc.SkillName(s), Loc.DescribeSkill(s), s.Cost.ToString(), s.Target.ToString(), s.Category.ToString(), Effects(s) });
             foreach (var m in c.Members) foreach (var s in m.Skills) Add(m.Id.Value, "agent", s);
             foreach (var e in c.Enemies) foreach (var s in e.Skills) Add(e.Id.Value, "ennemi", s);
-            foreach (var card in c.Collection.Cards) Add(card.Id.Value + " (" + Loc.FamilyName(card.Family) + ", " + card.Rarity + ")", "carte du grimoire", card.Skill);
+            foreach (var card in c.Collection.Cards) Add(card.Id.Value + " (" + Loc.FamilyName(card.Family) + ", " + card.Stars + " étoile(s)" + ")", "carte du grimoire", card.Skill);
             return rows;
         }
 

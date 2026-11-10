@@ -158,17 +158,17 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(a.Cards.All(c => Defs.HasCard(c)), Is.True);
         }
 
-        [Test, Description("Vérifie que la pitié garantit une carte Rare ou mieux au bout de N boosters sans — parce que la malchance ne doit pas durer")]
+        [Test, Description("Vérifie que la pitié garantit une carte ★3 ou mieux au bout de N boosters sans — parce que la malchance ne doit pas durer")]
         public void Booster_Pity_GuaranteesARareCard()
         {
-            var commonOnly = new BoosterDef("test", "boosters.test", 3, new[] { 100, 0, 0, 0 }, 3, 0);
+            var commonOnly = new BoosterDef("test", "boosters.test", 3, new[] { 100, 0, 0, 0, 0 }, 3, 0);
             var defs = new CollectionDef(Defs.Items, Defs.Cards, new[] { commonOnly });
             int pity = 0;
             bool guaranteed = false;
             for (int i = 0; i < 3; i++)
             {
                 var o = CollectionRules.OpenBooster(defs, commonOnly, (ulong)(100 + i), pity);
-                bool hasRare = o.Cards.Any(c => defs.Card(c).Rarity >= ItemRarity.Rare);
+                bool hasRare = o.Cards.Any(c => defs.Card(c).Stars >= BoosterDef.PityStars);
                 if (i < 2) { Assert.That(hasRare, Is.False, "booster " + i); Assert.That(o.Pity, Is.EqualTo(i + 1)); }
                 else { guaranteed = hasRare; Assert.That(o.Pity, Is.EqualTo(0), "pitié remise à zéro"); }
                 pity = o.Pity;
@@ -220,8 +220,8 @@ namespace N29.HeroesDawn.Tests.Domain
         public void SkillCardDef_Nature_IsTheGivenOneOrTheDeducedOne()
         {
             var hit = Skill(TargetRule.SingleEnemy, new EffectDef(EffectType.Damage, 100));
-            Assert.That(new SkillCardDef(new CardId("a"), "a", Family.Matter, ItemRarity.Common, hit).Nature, Is.EqualTo(CardNature.Offensive));
-            Assert.That(new SkillCardDef(new CardId("b"), "b", Family.Matter, ItemRarity.Common, hit, CardNature.Support).Nature, Is.EqualTo(CardNature.Support));
+            Assert.That(new SkillCardDef(new CardId("a"), "a", Family.Matter, 1, hit).Nature, Is.EqualTo(CardNature.Offensive));
+            Assert.That(new SkillCardDef(new CardId("b"), "b", Family.Matter, 1, hit, CardNature.Support).Nature, Is.EqualTo(CardNature.Support));
         }
 
         // ------------------------------------------------------------------ Paliers (lot C1)
@@ -255,17 +255,6 @@ namespace N29.HeroesDawn.Tests.Domain
             }
         }
 
-        [Test, Description("Vérifie que chaque famille a 5 cartes Communes, 4 Rares, 2 Épiques et 1 Légendaire — parce que la répartition suit les taux des boosters")]
-        public void Catalog_Rarities_Are5_4_2_1_PerFamily()
-        {
-            foreach (Family f in System.Enum.GetValues(typeof(Family)))
-            {
-                var fam = Catalog.Where(c => c.Family == f).ToList();
-                Assert.That(new[] { ItemRarity.Common, ItemRarity.Rare, ItemRarity.Epic, ItemRarity.Legendary }.Select(r => fam.Count(c => c.Rarity == r)),
-                            Is.EqualTo(new[] { 5, 4, 2, 1 }), f.ToString());
-            }
-        }
-
         [Test, Description("Vérifie que la nature de chaque carte est celle déduite de son effet de base, sauf 4 cartes à effet principal de dégâts passées explicitement en Contrôle — parce que leur intention de jeu est le contrôle (spec du bloc A)")]
         public void EveryCard_NatureEqualsItsDeduction()
         {
@@ -287,7 +276,7 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             SkillCardDef Card(string id) => Catalog.Single(c => c.Id.Value == id);
             var chain = Card("card_chain_lightning");
-            Assert.That((chain.Rarity, chain.Skill.Target, chain.Skill.Cooldown), Is.EqualTo((ItemRarity.Legendary, TargetRule.SingleEnemy, 7)));
+            Assert.That((chain.Stars, chain.Skill.Target, chain.Skill.Cooldown), Is.EqualTo((5, TargetRule.SingleEnemy, 7)));
             Assert.That(chain.Skill.Effects.Select(e => (e.Type, e.Value, e.Status, e.ChancePercent)),
                         Is.EqualTo(new[] { (EffectType.Damage, 160, StatusType.None, 100), (EffectType.ApplyStatus, 0, StatusType.Shock, 40) }));
             Assert.That(chain.Tiers[1].Effects[0].Status, Is.EqualTo(StatusType.Vulnerable));

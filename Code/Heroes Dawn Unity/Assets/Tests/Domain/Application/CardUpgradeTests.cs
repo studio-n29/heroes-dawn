@@ -98,7 +98,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         // ------------------------------------------------------------------ Paliers (lot C1)
 
         /// <summary>Carte de test Matière : dégâts 100 sur un ennemi ; paliers 3 (Brûlure 2 t), 6 (Bouclier 10 % 2 t), 10 (Vulnérable 2 t).</summary>
-        static SkillCardDef TestCard() => new SkillCardDef(new CardId("card_test"), "cards.card_test.name", Family.Matter, ItemRarity.Common,
+        static SkillCardDef TestCard() => new SkillCardDef(new CardId("card_test"), "cards.card_test.name", Family.Matter, 1,
             new SkillDef(new SkillId("card_test"), SkillSlot.A3, 0, TargetRule.SingleEnemy, new[] { new EffectDef(EffectType.Damage, 100) }, 0),
             tiers: new[]
             {

@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var c = TestContent.Build();
             var col = c.Collection;
-            var card = new SkillCardDef(new CardId("card_test"), "cards.card_test.name", Family.Matter, ItemRarity.Common,
+            var card = new SkillCardDef(new CardId("card_test"), "cards.card_test.name", Family.Matter, 1,
                                         new SkillDef(new SkillId("card_test"), SkillSlot.A3, 0, target, effects, 0));
             var catalog = c.WithCollection(new CollectionDef(col.Items, col.Cards.Concat(new[] { card }).ToList(), col.Boosters));
             var ally = new AllyEntry(new MemberId("verre"), 5, 0, 0, null, new CardId?[] { new CardId("card_test") });
@@ -274,7 +274,7 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var c = TestContent.Build();
             var col = c.Collection;
-            var card = new SkillCardDef(new CardId("card_test"), "cards.card_test.name", Family.Matter, ItemRarity.Common,
+            var card = new SkillCardDef(new CardId("card_test"), "cards.card_test.name", Family.Matter, 1,
                 new SkillDef(new SkillId("card_test"), SkillSlot.A3, 0, TargetRule.SingleEnemy, new[] { Fx(EffectType.Damage, 100), Fx(EffectType.Bounce, 60) }, 0));
             var catalog = c.WithCollection(new CollectionDef(col.Items, col.Cards.Concat(new[] { card }).ToList(), col.Boosters));
             var setup = new CombatSetup(21UL, CombatRank.Normal,

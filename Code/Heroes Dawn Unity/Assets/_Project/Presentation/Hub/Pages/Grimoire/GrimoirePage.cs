@@ -114,7 +114,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             ShowFilters();
             _rows.Clear();
             var rows = new List<InfoRowData>();
-            foreach (var card in Defs.Cards.Where(Shown).OrderByDescending(c => CollectionOps.OwnedCards(_session, c.Id) > 0).ThenByDescending(c => c.Rarity).ThenBy(c => c.Family).ThenBy(c => c.Id))
+            foreach (var card in Defs.Cards.Where(Shown).OrderByDescending(c => CollectionOps.OwnedCards(_session, c.Id) > 0).ThenByDescending(c => c.Stars).ThenBy(c => c.Family).ThenBy(c => c.Id))
             {
                 int count = CollectionOps.OwnedCards(_session, card.Id);
                 int level = CollectionOps.CardLevel(_session, card.Id);
@@ -122,7 +122,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                                           CollectionText.NatureChip(Loc, card.Nature) + " · " + CollectionText.CardLine(Loc, card, CollectionText.ReferenceStats(_session), level)
                                           + (card.Tiers.Count > 0 ? "\n" + Loc.T("grimoire.tiers") + "\n" + CollectionText.TierLines(Loc, card, level) : ""));
                 r.Tag = CollectionText.Tag(CollectionText.CardName(Loc, card));
-                r.TagColor = count > 0 ? CollectionText.RarityColor(card.Rarity) : Theme.Surface3;
+                r.TagColor = count > 0 ? CollectionText.RarityColor(CollectionText.StarsRarity(card.Stars)) : Theme.Surface3;
                 r.Badge = CollectionText.NatureChip(Loc, card.Nature) + " " + (count > 0 ? Loc.F("grimoire.owned_level", count, level, CardLevels.Max) : Loc.T("grimoire.missing"));
                 if (count > 0) r.A = UpgradeButton(card, level, count);
                 r.Dim = count == 0;
