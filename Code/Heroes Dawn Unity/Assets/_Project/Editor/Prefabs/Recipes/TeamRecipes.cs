@@ -73,126 +73,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Page Équipe (M20) : filtres par famille et tri en haut, grille défilante, escouade et synergies à droite.</summary>
+    /// <summary>Page Équipe (UI Toolkit) : filtres et tri, grille de cartes, escouade, synergies et compositions à droite.</summary>
     public sealed class TeamPageRecipe : IPrefabRecipe
     {
         public string RelativePath => "Pages/Team.prefab";
         public int Order => 10;
-
-        const float GridW = 1150, RightW = 566;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var rt = ScreenKit.Root("TeamPage");
-
-            // ---- Filtres (famille : libellé + bande de couleur) et tri
-            var filterRow = Ui.Rect(rt, "Filters").At(0f, 1f, 0, 0, GridW, 96);
-            filterRow.HLayout(14, 0, TextAnchor.MiddleLeft);
-            var filters = new List<Object> { Chip(filterRow, "team.filter.all", "FilterAll", 170, null) };
-            foreach (Family f in System.Enum.GetValues(typeof(Family)))
-                filters.Add(Chip(filterRow, "family." + f, "Filter" + f, 228, Theme.FamilyColor(f)));
-            var sortRow = Ui.Rect(rt, "Sorts").At(0f, 1f, 0, -110, GridW, 96);
-            sortRow.HLayout(14, 0, TextAnchor.MiddleLeft);
-            var sortLabel = Ui.LocTxt(sortRow, "team.sort", 30, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Title, "Label");
-            sortLabel.Pref(90, 96);
-            var sorts = new List<Object>
-            {
-                Chip(sortRow, "team.sort.level", "SortLevel", 210, null),
-                Chip(sortRow, "team.sort.rarity", "SortRarity", 210, null),
-                Chip(sortRow, "team.sort.fatigue", "SortFatigue", 210, null),
-            };
-
-            // ---- Grille
-            var gridArea = Ui.Rect(rt, "GridArea");
-            gridArea.anchorMin = new Vector2(0, 0);
-            gridArea.anchorMax = new Vector2(0, 1);
-            gridArea.pivot = new Vector2(0, 0.5f);
-            gridArea.offsetMin = new Vector2(0, 0);
-            gridArea.offsetMax = new Vector2(GridW, -222);
-            var grid = Ui.VScroll(gridArea, out _);
-            var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(270, 330);
-            layout.spacing = new Vector2(20, 20);
-            layout.padding = new RectOffset(2, 2, 4, 16);
-            layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            layout.constraintCount = 4;
-
-            // ---- Escouade, synergies, mission
-            var side = Ui.Panel(rt, "Squad", Theme.Surface, 5f, 10f, true);
-            var sideFrame = side.Frame();
-            sideFrame.anchorMin = new Vector2(1, 0);
-            sideFrame.anchorMax = new Vector2(1, 1);
-            sideFrame.pivot = new Vector2(1, 0.5f);
-            sideFrame.offsetMin = new Vector2(-RightW, 0);
-            sideFrame.offsetMax = new Vector2(0, 0);
-            var squadTitle = Ui.Txt(side.transform, "", 36, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "SquadTitle");
-            squadTitle.rectTransform.At(0f, 1f, 22, -14, 520, 46);
-            squadTitle.Inked();
-            var squadRow = Ui.Rect(side.transform, "SquadRow").At(0.5f, 1f, 0, -66, 536, 150);
-            squadRow.HLayout(12, 0, TextAnchor.UpperCenter);
-            Ui.LocTxt(side.transform, "team.synergies", 28, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "SynergiesTitle").rectTransform.At(0f, 1f, 22, -232, 520, 38);
-            var synergyArea = Ui.Rect(side.transform, "SynergyScroll").Stretch(22, 352, 22, 274);
-            var synergyContent = Ui.VScroll(synergyArea, out _);
-            synergyContent.VLayout(8, 0, TextAnchor.UpperLeft);
-            var synergies = Ui.Txt(synergyContent, "", 22, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Synergies");
-            synergies.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            var none = Ui.LocTxt(side.transform, "team.synergies.none", 22, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "SynergiesNone");
-            none.rectTransform.Stretch(22, 352, 22, 274);
-            none.gameObject.SetActive(false);
-            // ---- Compositions d equipe : trois emplacements + Sauver
-            var presetRow = Ui.Rect(side.transform, "Presets").At(0.5f, 0f, 0, 132, 536, 96);
-            presetRow.HLayout(10, 0, TextAnchor.MiddleCenter);
-            var presets = new List<Object>();
-            for (int i = 0; i < 3; i++)
-            {
-                var pb = Ui.Btn(presetRow, "", Theme.Surface3, Theme.Text, null!, 24, FontKind.Title, "Preset" + i);
-                pb.Rect.Pref(118, 96);
-                presets.Add(pb);
-            }
-            var presetSave = Ui.Btn(presetRow, "", Theme.Surface3, Theme.Text, null!, 26, FontKind.Title, "PresetSave");
-            presetSave.Rect.Pref(150, 96);
-            var healAll = Ui.Btn(side.transform, "", Theme.Primary, Theme.TextDark, null!, 28, FontKind.Title, "HealAll");
-            healAll.Rect.At(0.5f, 0f, 0, 240, 536, 96);
-            healAll.Label.Inked();
-            var hint = Ui.Txt(side.transform, "", 22, Theme.Fatigue, TextAnchor.MiddleCenter, FontKind.Body, "MissionHint");
-            hint.rectTransform.At(0.5f, 0f, 0, 96, 520, 30);
-            RecipeKit.Mark(side.Frame(), TutorialTarget.TeamSquad);
-            var mission = Ui.LocBtn(side.transform, "team.mission", Theme.Primary, Theme.TextDark, null!, 40, FontKind.Title, "Mission");
-            RecipeKit.Mark(mission, TutorialTarget.TeamMission);
-            mission.Rect.At(0.5f, 0f, 0, 0, 520, 96);
-            mission.Label.Inked();
-
-            var view = rt.gameObject.AddComponent<TeamPageView>();
-            ScreenKit.WireFade(ctx, view);
-            ctx.WireArray(view, "filters", filters);
-            ctx.WireArray(view, "sorts", sorts);
-            ctx.Wire(view, "grid", grid);
-            ctx.Wire(view, "squadTitle", squadTitle);
-            ctx.Wire(view, "squadRow", squadRow);
-            ctx.Wire(view, "synergies", synergies);
-            ctx.Wire(view, "synergiesNone", none.gameObject);
-            ctx.Wire(view, "mission", mission);
-            ctx.Wire(view, "healAll", healAll);
-            ctx.WireArray(view, "presets", presets);
-            ctx.Wire(view, "presetSave", presetSave);
-            ctx.Wire(view, "missionHint", hint);
-            ctx.Wire(view, "tilePrefab", ctx.Asset("Widgets/MemberTile.prefab").GetComponent<MemberTileView>());
-            ctx.Wire(view, "squadSlotPrefab", ctx.Asset("Widgets/SquadSlot.prefab").GetComponent<SquadSlotView>());
-            return rt.gameObject;
-        }
-
-        /// <summary>Puce de filtre ou de tri (96 px de haut) ; une bande de couleur de famille sous le libellé.</summary>
-        static UiButton Chip(RectTransform row, string key, string name, float width, Color? family)
-        {
-            var b = Ui.LocBtn(row, key, Theme.Surface3, Theme.Text, null!, 28, FontKind.Title, name);
-            b.Rect.Pref(width, 96);
-            if (family != null)
-            {
-                var band = Ui.Img(b.Fill.transform, "FamilyBand", family.Value, Sprites.RoundedSmall);
-                band.rectTransform.BottomBand(8, 6);
-            }
-            return b;
-        }
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<TeamPageView>("TeamPage", "Team/Team.uxml", 10);
     }
 
     /// <summary>

@@ -176,7 +176,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Loadout.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => CardGridKit.Build<LoadoutPageView>(ctx, "LoadoutPage").gameObject;
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<LoadoutPageView>("LoadoutPage", "CardGrid/CardGrid.uxml", 10);
     }
 
     /// <summary>Registre des agents : les 30 agents et leur voie d obtention.</summary>
@@ -184,7 +184,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Agents.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => CardGridKit.Build<AgentsPageView>(ctx, "AgentsPage").gameObject;
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<AgentsPageView>("AgentsPage", "CardGrid/CardGrid.uxml", 10);
     }
 
     /// <summary>Page Grimoire : la collection de cartes en grille, l'ouverture des boosters, et la recherche par nom dans l'en-tête.</summary>
@@ -195,25 +195,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 
         public GameObject Build(PrefabContext ctx)
         {
-            var page = CardGridKit.Build<GrimoirePageView>(ctx, "GrimoirePage");
-            // Champ de recherche à droite de l'en-tête, à gauche des boutons A et B.
-            var header = (RectTransform)page.transform.Find("Header/Fill");
-            var box = Ui.Img(header, "Search", Theme.Surface3, Sprites.Panel, true);
-            box.rectTransform.At(1f, 0.5f, -896, 0, 320, 70);
-            var viewport = Ui.Rect(box.transform, "Viewport").Stretch(16, 8, 16, 8);
-            viewport.gameObject.AddComponent<RectMask2D>();
-            var text = Ui.Txt(viewport, "", 28, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "Text");
-            text.rectTransform.Stretch();
-            var hint = Ui.LocTxt(viewport, "grimoire.search", 28, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Hint");
-            hint.rectTransform.Stretch();
-            var field = box.gameObject.AddComponent<TMPro.TMP_InputField>();
-            field.textViewport = viewport;
-            field.textComponent = text;
-            field.placeholder = hint;
-            field.lineType = TMPro.TMP_InputField.LineType.SingleLine;
-            field.characterLimit = 32;
-            ctx.Wire(page, "search", field);
-            return page.gameObject;
+            return N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<GrimoirePageView>("GrimoirePage", "CardGrid/CardGrid.uxml", 10);
         }
     }
 }
@@ -225,7 +207,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Inventory.prefab";
         public int Order => 10;
-        public UnityEngine.GameObject Build(PrefabContext ctx) => CardGridKit.Build<N29.HeroesDawn.Presentation.Hub.InventoryPageView>(ctx, "InventoryPage").gameObject;
+        public UnityEngine.GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<N29.HeroesDawn.Presentation.Hub.InventoryPageView>("InventoryPage", "CardGrid/CardGrid.uxml", 10);
     }
 }
 

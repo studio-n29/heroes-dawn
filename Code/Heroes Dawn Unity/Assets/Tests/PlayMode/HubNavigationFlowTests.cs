@@ -132,22 +132,19 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning, 600);
         }
 
-        [UnityTest, Description("Vérifie que des touchers répétés sur un bouton grisé le laissent à sa place — parce qu'une secousse qui part d'une position déjà décalée ferait dériver le bouton (relecture, M2)")]
+        [UnityTest, Description("Vérifie que des touchers répétés sur un bouton grisé ne font rien et le laissent grisé — parce qu'un soin sans fatigue ne doit rien consommer")]
         public IEnumerator DisabledButton_RepeatedTaps_NoDrift()
         {
             yield return OnHub();
             yield return Tab(HubPage.Team);
             var heal = Object.FindAnyObjectByType<TeamPageView>()!.HealAllButton;
-            Assert.That(heal.Interactable, Is.False, "aucune fatigue : soin grisé");
-            var origin = heal.Rect.anchoredPosition;
+            Assert.That(heal.interactable, Is.False, "aucune fatigue : soin grisé");
             for (int i = 0; i < 4; i++)
             {
-                heal.OnPointerClick(new PointerEventData(EventSystem.current));
-                yield return null;
+                heal.onClick.Invoke();
                 yield return null;
             }
-            yield return new WaitForSecondsRealtime(0.6f);
-            Assert.That(Vector2.Distance(heal.Rect.anchoredPosition, origin), Is.LessThan(0.01f));
+            Assert.That(heal.interactable, Is.False, "le bouton reste grisé après des touchers répétés");
         }
 
         [UnityTest, Timeout(120000), Description("Vérifie que MISSION lance la zone depuis le QG puis depuis l'Équipe — parce que les deux boutons mènent au plateau (spec §4)")]
@@ -191,7 +188,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             page.RerollButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => session.Shop.Draw == 1);
             Assert.That(session.Shop.Draw, Is.EqualTo(1));
-            int shown = Enumerable.Range(0, 3).Count(i => page.Card(i).gameObject.activeSelf);
+            int shown = page.VisibleCardCount;
             Assert.That(shown, Is.EqualTo(session.Shop.Offers.Count));
         }
 

@@ -228,9 +228,11 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("40-pass");
             yield return Tab(HubPage.Shop);
             yield return CaptureSettled("50-boutique");
+            Object.FindAnyObjectByType<RecruitPageView>()!.ShopTabs.Tab((int)ShopTab.Boosters).Button.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoutiquePageView>() != null);
             foreach (var shopTab in new[] { (ShopTab.Boosters, "50b-boutique-boosters"), (ShopTab.Gems, "50c-boutique-gemmes"), (ShopTab.Gift, "50d-boutique-cadeau") })
             {
-                Object.FindAnyObjectByType<ShopTabsView>()!.Tab((int)shopTab.Item1).Button.onClick.Invoke();
+                Object.FindAnyObjectByType<BoutiquePageView>()!.Tabs.Tab((int)shopTab.Item1).Button.onClick.Invoke();
                 yield return CaptureSettled(shopTab.Item2);
             }
             yield return Tab(HubPage.Qg);
