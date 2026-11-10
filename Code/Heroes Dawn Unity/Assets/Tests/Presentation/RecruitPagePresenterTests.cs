@@ -73,7 +73,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(cards.Length, Is.EqualTo(3));
             Assert.That(cards.Select(c => c.Card.Id.Value), Is.EquivalentTo(new[] { "rempart", "etincelle", "givre" }));
             Assert.That(cards.Where(c => c.Halo).Select(c => c.Card.Id.Value), Is.EqualTo(new[] { "givre" }));
-            Assert.That(cards.Single(c => c.Card.Id.Value == "givre").Rarity, Is.EqualTo(Rarity.Legend));
+            Assert.That(cards.Single(c => c.Card.Id.Value == "givre").Rarity, Is.EqualTo(4));
             Assert.That(cards.Single(c => c.Card.Id.Value == "rempart").PriceLabel, Is.EqualTo("RECRUTER · 450 PR"));
             Assert.That(_view.Last.Countdown, Is.EqualTo("Nouveaux héros dans 21 h 00"));
             Assert.That(_view.Last.Progress, Is.EqualTo(_loc.F("recruit.progress", 4, 8)));

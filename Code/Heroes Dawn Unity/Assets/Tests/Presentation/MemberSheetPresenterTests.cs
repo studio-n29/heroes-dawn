@@ -107,7 +107,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             var offer = _app.Session.Shop.Offers[0].Id;
             var def = _app.Session.Content.Member(offer);
             Make(offer.Value, fromShop: true);
-            int cost = Application.Session.MetaRules.RecruitCost(def.Rarity);
+            int cost = Application.Session.MetaRules.RecruitCost(def.Rank);
             Assert.That(_view.Last.Owned, Is.False);
             Assert.That(_view.Last.PrimaryLabel, Is.EqualTo(_loc.F("hub.recruit", cost)));
             Assert.That(_view.Last.PrimaryEnabled, Is.True);

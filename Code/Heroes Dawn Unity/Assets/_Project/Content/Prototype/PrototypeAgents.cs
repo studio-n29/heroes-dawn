@@ -19,13 +19,17 @@ namespace N29.HeroesDawn.Content.Prototype
             public readonly string Name;
             public readonly Family Family;
             public readonly Position Position;
-            public readonly Rarity Rarity;
+            /// <summary>Rang AMIF imposé (0 : lu dans la table <c>Ranks</c>, 1 par défaut).</summary>
+            public readonly int Rank;
             public readonly UnlockDef? Unlock;
             /// <summary>Zone à valider avant l'entrée dans la boutique (nul : disponible tout de suite).</summary>
             public readonly ZoneId? ShopZone;
-            public Entry(string id, string name, Family family, Position role, Rarity rarity, UnlockDef? unlock = null, ZoneId? shopZone = null)
+            public Entry(string id, string name, Family family, Position position, UnlockDef? unlock = null, ZoneId? shopZone = null)
+                : this(id, name, family, position, 0, unlock, shopZone) { }
+
+            public Entry(string id, string name, Family family, Position position, int rank, UnlockDef? unlock = null, ZoneId? shopZone = null)
             {
-                Id = id; Name = name; Family = family; Position = role; Rarity = rarity; Unlock = unlock; ShopZone = shopZone;
+                Id = id; Name = name; Family = family; Position = position; Rank = rank; Unlock = unlock; ShopZone = shopZone;
             }
         }
 
@@ -39,43 +43,43 @@ namespace N29.HeroesDawn.Content.Prototype
         public static readonly IReadOnlyList<Entry> Roster = new[]
         {
             // Personnages joueurs : le choix de la première connexion décide lequel rejoint l équipe
-            new Entry(StoryRoutes.AgentD, "Agent D", Family.Matter, Position.Controller, Rarity.Legend, UnlockDef.Hero()),
-            new Entry(StoryRoutes.AgentM, "Agent M", Family.Perception, Position.Ranged, Rarity.Legend, UnlockDef.Hero()),
+            new Entry(StoryRoutes.AgentD, "Agent D", Family.Matter, Position.Controller, UnlockDef.Hero()),
+            new Entry(StoryRoutes.AgentM, "Agent M", Family.Perception, Position.Ranged, UnlockDef.Hero()),
             // Départ (New York)
-            new Entry("darius_brooks", "Darius Brooks", Family.Matter, Position.FrontLine, Rarity.Agent),
-            new Entry("mei_lin_chen", "Mei-Lin Chen", Family.Elemental, Position.Attacker, Rarity.Agent),
-            new Entry("freya_lindqvist", "Freya Lindqvist", Family.Perception, Position.Support, Rarity.Agent),
-            new Entry("kwame_abara", "Kwame Abara", Family.PhysicalBio, Position.Attacker, Rarity.Agent),
+            new Entry("darius_brooks", "Darius Brooks", Family.Matter, Position.FrontLine),
+            new Entry("mei_lin_chen", "Mei-Lin Chen", Family.Elemental, Position.Attacker),
+            new Entry("freya_lindqvist", "Freya Lindqvist", Family.Perception, Position.Support),
+            new Entry("kwame_abara", "Kwame Abara", Family.PhysicalBio, Position.Attacker),
             // Boutique de recrutement
-            new Entry("giulia_rossi", "Giulia Rossi", Family.Matter, Position.Attacker, Rarity.Agent),
-            new Entry("lucas_mendes", "Lucas Mendes", Family.PhysicalBio, Position.FrontLine, Rarity.Agent),
-            new Entry("rin_takeda", "Rin Takeda", Family.Elemental, Position.Controller, Rarity.Agent),
-            new Entry("amara_hughes", "Amara Hughes", Family.Perception, Position.Support, Rarity.Agent, null, Z11),
-            new Entry("ilona_varga", "Ilona Varga", Family.Perception, Position.Controller, Rarity.Agent),
-            new Entry("fatou_diallo", "Fatou Diallo", Family.PhysicalBio, Position.FrontLine, Rarity.Agent),
-            new Entry("clement_lefevre", "Clément Lefèvre", Family.Perception, Position.Ranged, Rarity.Elite),
-            new Entry("youssef_haddad", "Youssef Haddad", Family.PhysicalBio, Position.Ranged, Rarity.Elite),
-            new Entry("severine_morel", "Séverine Morel", Family.PhysicalBio, Position.Support, Rarity.Agent),
-            new Entry("sam_okafor", "Sam Okafor", Family.PhysicalBio, Position.FrontLine, Rarity.Agent),
-            new Entry("astrid_hallstrom", "Astrid Hallström", Family.Elemental, Position.Support, Rarity.Elite),
-            new Entry("celeste_moreau", "Céleste Moreau", Family.Elemental, Position.Controller, Rarity.Agent),
-            new Entry("haruto_nakamura", "Haruto Nakamura", Family.Perception, Position.Controller, Rarity.Agent),
-            new Entry("yelena_ivanova", "Yelena Ivanova", Family.Elemental, Position.Controller, Rarity.Elite),
+            new Entry("giulia_rossi", "Giulia Rossi", Family.Matter, Position.Attacker),
+            new Entry("lucas_mendes", "Lucas Mendes", Family.PhysicalBio, Position.FrontLine),
+            new Entry("rin_takeda", "Rin Takeda", Family.Elemental, Position.Controller),
+            new Entry("amara_hughes", "Amara Hughes", Family.Perception, Position.Support, null, Z11),
+            new Entry("ilona_varga", "Ilona Varga", Family.Perception, Position.Controller),
+            new Entry("fatou_diallo", "Fatou Diallo", Family.PhysicalBio, Position.FrontLine),
+            new Entry("clement_lefevre", "Clément Lefèvre", Family.Perception, Position.Ranged),
+            new Entry("youssef_haddad", "Youssef Haddad", Family.PhysicalBio, Position.Ranged),
+            new Entry("severine_morel", "Séverine Morel", Family.PhysicalBio, Position.Support),
+            new Entry("sam_okafor", "Sam Okafor", Family.PhysicalBio, Position.FrontLine),
+            new Entry("astrid_hallstrom", "Astrid Hallström", Family.Elemental, Position.Support),
+            new Entry("celeste_moreau", "Céleste Moreau", Family.Elemental, Position.Controller),
+            new Entry("haruto_nakamura", "Haruto Nakamura", Family.Perception, Position.Controller),
+            new Entry("yelena_ivanova", "Yelena Ivanova", Family.Elemental, Position.Controller),
             // Arcs narratifs : l'agent rejoint à la validation de la zone
-            new Entry("noah_kaplan", "Noah Kaplan", Family.Matter, Position.Controller, Rarity.Agent, UnlockDef.Arc(Z11)),
-            new Entry("tunde_oyelaran", "Tunde Oyelaran", Family.Matter, Position.Support, Rarity.Agent, UnlockDef.Arc(Z12)),
-            new Entry("victor_sorel", "Victor Sorel", Family.Perception, Position.Controller, Rarity.Legend, UnlockDef.Arc(Z12)),
-            new Entry("odile_ferrand", "Odile Ferrand", Family.Perception, Position.Support, Rarity.Legend, UnlockDef.Arc(Z13)),
+            new Entry("noah_kaplan", "Noah Kaplan", Family.Matter, Position.Controller, UnlockDef.Arc(Z11)),
+            new Entry("tunde_oyelaran", "Tunde Oyelaran", Family.Matter, Position.Support, UnlockDef.Arc(Z12)),
+            new Entry("victor_sorel", "Victor Sorel", Family.Perception, Position.Controller, UnlockDef.Arc(Z12)),
+            new Entry("odile_ferrand", "Odile Ferrand", Family.Perception, Position.Support, UnlockDef.Arc(Z13)),
             // Événements temporaires (week-end) dans des zones précises
-            new Entry("louis_dubois", "Louis Dubois", Family.Matter, Position.Controller, Rarity.Elite, UnlockDef.WeekendEvent(Z11)),
-            new Entry("marco_bellini", "Marco Bellini", Family.Matter, Position.Attacker, Rarity.Elite, UnlockDef.WeekendEvent(Z12)),
-            new Entry("zofia_kowalczyk", "Zofia Kowalczyk", Family.Elemental, Position.Attacker, Rarity.Elite, UnlockDef.WeekendEvent(Z12)),
-            new Entry("mateo_vasquez", "Mateo Vasquez", Family.PhysicalBio, Position.Support, Rarity.Elite, UnlockDef.WeekendEvent(Z13)),
+            new Entry("louis_dubois", "Louis Dubois", Family.Matter, Position.Controller, UnlockDef.WeekendEvent(Z11)),
+            new Entry("marco_bellini", "Marco Bellini", Family.Matter, Position.Attacker, UnlockDef.WeekendEvent(Z12)),
+            new Entry("zofia_kowalczyk", "Zofia Kowalczyk", Family.Elemental, Position.Attacker, UnlockDef.WeekendEvent(Z12)),
+            new Entry("mateo_vasquez", "Mateo Vasquez", Family.PhysicalBio, Position.Support, UnlockDef.WeekendEvent(Z13)),
             // Compagnons : une prouesse
-            new Entry("ada_okonkwo", "Ada Okonkwo", Family.PhysicalBio, Position.Support, Rarity.Legend, UnlockDef.FeatOf(Z11, FeatKind.SoloClear)),
-            new Entry("eero_nieminen", "Eero Nieminen", Family.Matter, Position.Attacker, Rarity.Legend, UnlockDef.FeatOf(Z12, FeatKind.NoDefeat)),
-            new Entry("ji_hoon_park", "Ji-Hoon Park", Family.Perception, Position.Ranged, Rarity.Agent, UnlockDef.FeatOf(Z13, FeatKind.SoloClear)),
-            new Entry("anna_petrov", "Anna Petrov", Family.Perception, Position.Ranged, Rarity.Agent, UnlockDef.FeatOf(Z13, FeatKind.NoDefeat)),
+            new Entry("ada_okonkwo", "Ada Okonkwo", Family.PhysicalBio, Position.Support, UnlockDef.FeatOf(Z11, FeatKind.SoloClear)),
+            new Entry("eero_nieminen", "Eero Nieminen", Family.Matter, Position.Attacker, UnlockDef.FeatOf(Z12, FeatKind.NoDefeat)),
+            new Entry("ji_hoon_park", "Ji-Hoon Park", Family.Perception, Position.Ranged, UnlockDef.FeatOf(Z13, FeatKind.SoloClear)),
+            new Entry("anna_petrov", "Anna Petrov", Family.Perception, Position.Ranged, UnlockDef.FeatOf(Z13, FeatKind.NoDefeat)),
         };
 
         static EffectDef Dmg(int pct) => new EffectDef(EffectType.Damage, pct);
@@ -170,29 +174,31 @@ namespace N29.HeroesDawn.Content.Prototype
                 S(a2, SkillSlot.A2, cooldown2, target2, fx2.ToArray()),
             };
         }
-
         /// <summary>
-        /// Puissance de chaque agent, de 1 (pouvoirs basiques, aucune menace) à 5 (pouvoirs surpuissants, menace apocalyptique).
-        /// Première proposition à ajuster après essais ; sans entrée, l'agent est au niveau 1.
+        /// Rang AMIF de chaque agent (table validée du bloc A de la 1.0.0) ; sans entrée, l agent est au rang 1.
+        /// Les rangs 4 et 5 se gagnent par arc ou par prouesse, jamais en boutique.
         /// </summary>
-        static readonly Dictionary<string, int> PowerTiers = new Dictionary<string, int>
+        public static readonly IReadOnlyDictionary<string, int> Ranks = new Dictionary<string, int>
         {
-            ["agent_d"] = 4, ["agent_m"] = 3,
-            ["darius_brooks"] = 2, ["mei_lin_chen"] = 2, ["freya_lindqvist"] = 2, ["kwame_abara"] = 2,
-            ["giulia_rossi"] = 2, ["lucas_mendes"] = 2, ["rin_takeda"] = 2, ["amara_hughes"] = 1,
-            ["ilona_varga"] = 2, ["fatou_diallo"] = 2, ["clement_lefevre"] = 3, ["youssef_haddad"] = 3,
-            ["severine_morel"] = 1, ["sam_okafor"] = 2, ["astrid_hallstrom"] = 3, ["celeste_moreau"] = 2,
-            ["haruto_nakamura"] = 2, ["yelena_ivanova"] = 4, ["noah_kaplan"] = 1, ["tunde_oyelaran"] = 1,
-            ["victor_sorel"] = 4, ["odile_ferrand"] = 4, ["louis_dubois"] = 3, ["marco_bellini"] = 4,
-            ["zofia_kowalczyk"] = 3, ["mateo_vasquez"] = 3, ["ada_okonkwo"] = 4, ["eero_nieminen"] = 5,
-            ["ji_hoon_park"] = 2, ["anna_petrov"] = 2,
+            ["agent_d"] = 5, ["agent_m"] = 5, ["victor_sorel"] = 5,
+            ["odile_ferrand"] = 4, ["ada_okonkwo"] = 4, ["eero_nieminen"] = 4, ["astrid_hallstrom"] = 4, ["louis_dubois"] = 4,
+            ["yelena_ivanova"] = 3, ["marco_bellini"] = 3, ["zofia_kowalczyk"] = 3, ["mateo_vasquez"] = 3, ["clement_lefevre"] = 3, ["youssef_haddad"] = 3,
+            ["ilona_varga"] = 2, ["haruto_nakamura"] = 2, ["noah_kaplan"] = 2, ["celeste_moreau"] = 2,
+            ["rin_takeda"] = 2, ["giulia_rossi"] = 2, ["kwame_abara"] = 2, ["mei_lin_chen"] = 2,
+            ["darius_brooks"] = 1, ["freya_lindqvist"] = 1, ["lucas_mendes"] = 1, ["amara_hughes"] = 1, ["fatou_diallo"] = 1,
+            ["severine_morel"] = 1, ["sam_okafor"] = 1, ["tunde_oyelaran"] = 1, ["ji_hoon_park"] = 1, ["anna_petrov"] = 1,
         };
 
-        public static IEnumerable<MemberDef> Members(System.Func<Position, Rarity, StatBlock> stats)
+        /// <summary>Rang d un agent du roster : celui imposé par l entrée, sinon celui de la table, sinon 1.</summary>
+        public static int RankOf(Entry e) => e.Rank > 0 ? e.Rank : Ranks.TryGetValue(e.Id, out var rank) ? rank : 1;
+
+        public static IEnumerable<MemberDef> Members(System.Func<Position, int, StatBlock> stats)
         {
             foreach (var e in Roster)
-                yield return new MemberDef(new MemberId(e.Id), "members." + e.Id + ".name", e.Family, e.Position, e.Rarity, stats(e.Position, e.Rarity), Kit(e), e.ShopZone, e.Unlock,
-                                           PowerTiers.TryGetValue(e.Id, out var tier) ? tier : 1);
+            {
+                int rank = RankOf(e);
+                yield return new MemberDef(new MemberId(e.Id), "members." + e.Id + ".name", e.Family, e.Position, rank, stats(e.Position, rank), Kit(e), e.ShopZone, e.Unlock);
+            }
         }
     }
 }

@@ -26,13 +26,13 @@ namespace N29.HeroesDawn.Content.Prototype
         static SkillDef S(string id, SkillSlot slot, int cd, TargetRule t, params EffectDef[] fx)
             => new SkillDef(new SkillId(id), slot, cd, t, fx);
 
-        /// <summary>Statistiques de départ d un agent selon son rôle et sa rareté (valeurs proposées par l outil des agents).</summary>
-        public static StatBlock BaseStats(Position role, Rarity rarity) => Stats(role, rarity);
+        /// <summary>Statistiques de départ d un agent selon sa position et son rang AMIF (valeurs proposées par l outil des agents).</summary>
+        public static StatBlock BaseStats(Position position, int rank) => Stats(position, rank);
 
-        static StatBlock Stats(Position role, Rarity rarity)
+        static StatBlock Stats(Position position, int rank)
         {
             StatBlock b;
-            switch (role)
+            switch (position)
             {
                 case Position.FrontLine: b = new StatBlock(1500, 80, 120, 95); break;
                 case Position.Attacker: b = new StatBlock(1000, 130, 70, 105); break;
@@ -40,17 +40,17 @@ namespace N29.HeroesDawn.Content.Prototype
                 case Position.Support: b = new StatBlock(1100, 85, 85, 100); break;
                 default: b = new StatBlock(950, 120, 70, 115); break;
             }
-            int m = rarity == Rarity.Elite ? 120 : rarity == Rarity.Legend ? 145 : 100;
-            int spd = b.Spd + (rarity == Rarity.Elite ? 5 : rarity == Rarity.Legend ? 10 : 0);
+            int m = AgentRanks.StatPercent(rank);
+            int spd = b.Spd + (rank >= 5 ? 10 : rank >= 3 ? 5 : 0);
             return new StatBlock(b.Hp * m / 100, b.Atk * m / 100, b.Def * m / 100, spd);
         }
 
-        static MemberDef M(string id, Family f, Position r, Rarity ra, params SkillDef[] skills)
-            => new MemberDef(new MemberId(id), "members." + id + ".name", f, r, ra, Stats(r, ra), skills);
+        static MemberDef M(string id, Family f, Position r, int rank, params SkillDef[] skills)
+            => new MemberDef(new MemberId(id), "members." + id + ".name", f, r, rank, Stats(r, rank), skills);
 
         /// <summary>Recrue qui n'entre dans la boutique qu'une fois <paramref name="zone"/> validée.</summary>
         static MemberDef Locked(MemberDef d, ZoneId zone)
-            => new MemberDef(d.Id, d.NameKey, d.Family, d.Position, d.Rarity, d.BaseStats, d.Skills, zone);
+            => new MemberDef(d.Id, d.NameKey, d.Family, d.Position, d.Rank, d.BaseStats, d.Skills, zone);
 
         static EnemyDef E(string id, Position r, Family f, StatBlock st, bool boss, params SkillDef[] skills)
             => new EnemyDef(new EnemyId(id), "enemies." + id + ".name", r, f, st, skills, boss);

@@ -52,8 +52,8 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(C.Members.All(m => m.Skills.Count == 2), Is.True, "deux compétences de base par agent");
             foreach (Family f in Enum.GetValues(typeof(Family))) Assert.That(C.Members.Count(m => m.Family == f), Is.GreaterThanOrEqualTo(4), f.ToString());
             foreach (Position r in Enum.GetValues(typeof(Position))) Assert.That(C.Members.Any(m => m.Position == r), Is.True, r.ToString());
-            Assert.That(C.Members.Count(m => m.Rarity == Rarity.Legend && m.Unlock?.Kind != UnlockKind.Hero), Is.EqualTo(4));
-            Assert.That(C.Members.Count(m => m.Rarity == Rarity.Elite), Is.EqualTo(8));
+            Assert.That(C.Members.Count(m => m.Rank >= 4 && m.Unlock?.Kind != UnlockKind.Hero), Is.EqualTo(6), "rangs 4 et 5 hors héros : Victor Sorel, Odile Ferrand, Ada Okonkwo, Eero Nieminen, Astrid Hallström, Louis Dubois");
+            Assert.That(C.Members.Count(m => m.Rank == 3), Is.EqualTo(6));
             Assert.That(PrototypeAgents.StarterTeam.All(id => C.StarterTeam.Contains(id)), Is.True, "équipe de départ portée par le catalogue");
         }
 
@@ -117,7 +117,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(eligible.Count, Is.EqualTo(18));
             for (ulong seed = 1; seed < 40; seed++)
             {
-                var picks = ShopDraw.Draw(new Pcg32(seed), eligible, new ShopWeights(70, 25, 5));
+                var picks = ShopDraw.Draw(new Pcg32(seed), eligible, new ShopWeights(70, 0, 25, 5, 0));
                 Assert.That(picks.All(id => C.Member(id).InShop), Is.True, "graine " + seed);
             }
         }

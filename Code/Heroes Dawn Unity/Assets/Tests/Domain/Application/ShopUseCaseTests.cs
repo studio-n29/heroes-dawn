@@ -84,7 +84,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             var id = Shop.Offers[0].Id;
             var def = _app.Session.Content.Members.First(m => m.Id == id);
             Assert.That(Code(Recruit(0)), Is.EqualTo("ok"));
-            Assert.That(_app.Session.Wallet.Pr, Is.EqualTo(2000 - MetaRules.RecruitCost(def.Rarity)));
+            Assert.That(_app.Session.Wallet.Pr, Is.EqualTo(2000 - MetaRules.RecruitCost(def.Rank)));
             Assert.That(_app.Session.Find(id)!.Level, Is.EqualTo(MetaRules.RecruitLevel));
             Assert.That(Shop.Offers[0].Recruited, Is.True);
             Assert.That(Shop.Offers.Skip(1).All(o => !o.Recruited), Is.True);

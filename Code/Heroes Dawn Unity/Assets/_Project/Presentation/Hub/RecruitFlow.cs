@@ -52,7 +52,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (slot < 0 || slot >= shop.Offers.Count) return Expired();
             var offer = shop.Offers[slot];
             var def = _session.Content.Member(offer.Id);
-            var balance = RecruitBalance.Of(_session.Wallet.Pr, MetaRules.RecruitCost(def.Rarity));
+            var balance = RecruitBalance.Of(_session.Wallet.Pr, MetaRules.RecruitCost(def.Rank));
             string day = shop.Day;
             int draw = shop.Draw;
 

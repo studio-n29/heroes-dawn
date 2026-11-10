@@ -57,7 +57,7 @@ namespace N29.HeroesDawn.Authoring
         [Tooltip("Nom de code affiché en jeu.")] public string name = "";
         public Family family;
         public Position position;
-        public Rarity rarity;
+        [Tooltip("Rang AMIF de 1 à 5 (absent : 1).")] public int rank = 1;
         public int hp = 1000;
         public int atk = 100;
         public int def = 100;

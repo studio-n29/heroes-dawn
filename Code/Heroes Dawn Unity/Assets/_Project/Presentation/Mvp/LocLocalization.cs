@@ -24,7 +24,7 @@ namespace N29.HeroesDawn.Presentation.Mvp
         public string StatusName(StatusType s) => Loc.StatusName(s);
         public string FamilyName(Family f) => Loc.FamilyName(f);
         public string RoleName(Position r) => Loc.RoleName(r);
-        public string RarityName(Rarity r) => Loc.RarityName(r);
+        public string RarityName(int rank) => Loc.RarityName(rank);
         public string RankName(CombatRank r) => Loc.RankName(r);
         public string DescribeSkill(SkillDef s) => SkillText.Describe(s);
         public string DescribeSkill(SkillDef s, int atk, int maxHp) => SkillText.Describe(s, new SkillOwnerStats(atk, maxHp));

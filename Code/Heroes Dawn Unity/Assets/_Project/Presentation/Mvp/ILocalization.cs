@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.Presentation.Mvp
         string StatusName(StatusType s);
         string FamilyName(Family f);
         string RoleName(Position r);
-        string RarityName(Rarity r);
+        string RarityName(int rank);
         string RankName(CombatRank r);
         string DescribeSkill(SkillDef s);
         /// <summary>Description avec les montants bruts (dégâts, soins, boucliers) pour un agent de ces statistiques.</summary>

@@ -69,14 +69,11 @@ namespace N29.HeroesDawn.Presentation.Common
             }
         }
 
-        public static Color RarityColor(Rarity r)
+        public static Color RarityColor(int rank)
         {
-            switch (r)
-            {
-                case Rarity.Legend: return Hex(0xF5C542);
-                case Rarity.Elite: return Hex(0xA9B4CC);
-                default: return Hex(0xC9976A);
-            }
+            if (rank >= 4) return Hex(0xF5C542);
+            if (rank >= 2) return Hex(0xA9B4CC);
+            return Hex(0xC9976A);
         }
 
         public static Color CaseColor(CaseType t, CombatRank rank)

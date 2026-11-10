@@ -16,7 +16,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var q = all.Where(m => family == null || m.Def.Family == family.Value);
             q = sort switch
             {
-                MemberSort.Rarity => q.OrderByDescending(m => m.Def.Rarity).ThenByDescending(m => m.Level),
+                MemberSort.Rarity => q.OrderByDescending(m => m.Def.Rank).ThenByDescending(m => m.Level),
                 MemberSort.Fatigue => q.OrderByDescending(m => m.Fatigue),
                 _ => q.OrderByDescending(m => m.Level),
             };

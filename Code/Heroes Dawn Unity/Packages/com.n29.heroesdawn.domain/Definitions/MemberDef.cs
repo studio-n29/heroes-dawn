@@ -10,7 +10,8 @@ namespace N29.HeroesDawn.Definitions
         public string NameKey { get; }
         public Family Family { get; }
         public Position Position { get; }
-        public Rarity Rarity { get; }
+        /// <summary>Rang AMIF de 1 à 5 (voir <see cref="AgentRanks"/>) : remplace la rareté d agent et la puissance.</summary>
+        public int Rank { get; }
         public StatBlock BaseStats { get; }
         public IReadOnlyList<SkillDef> Skills { get; }
         /// <summary>Zone à valider avant que la recrue entre dans la boutique ; nul = toujours disponible.</summary>
@@ -19,15 +20,12 @@ namespace N29.HeroesDawn.Definitions
         public UnlockDef? Unlock { get; }
         /// <summary>Vrai si l agent entre dans la boutique de recrutement (pas d arc, d evenement ni de prouesse).</summary>
         public bool InShop => Unlock == null || Unlock.Kind == UnlockKind.Shop;
-        /// <summary>Puissance de 1 (pouvoirs basiques, aucune menace) à 5 (pouvoirs surpuissants, menace apocalyptique).</summary>
-        public int PowerTier { get; }
 
-        public MemberDef(MemberId id, string nameKey, Family family, Position role, Rarity rarity, StatBlock baseStats, IReadOnlyList<SkillDef> skills,
-                         ZoneId? unlockZone = null, UnlockDef? unlock = null, int powerTier = 1)
+        public MemberDef(MemberId id, string nameKey, Family family, Position position, int rank, StatBlock baseStats, IReadOnlyList<SkillDef> skills,
+                         ZoneId? unlockZone = null, UnlockDef? unlock = null)
         {
-            Id = id; NameKey = nameKey; Family = family; Position = role; Rarity = rarity; BaseStats = baseStats; Skills = skills;
+            Id = id; NameKey = nameKey; Family = family; Position = position; Rank = AgentRanks.Clamp(rank); BaseStats = baseStats; Skills = skills;
             UnlockZone = unlockZone; Unlock = unlock;
-            PowerTier = powerTier < 1 ? 1 : powerTier > 5 ? 5 : powerTier;
         }
     }
 }

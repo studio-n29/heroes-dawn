@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Application.Features.Shop
             var seed = ShopSeed.For(s.Account?.PlayerId ?? "", day, draw);
             // Le héros le plus rare du tirage est en vedette (première place de la boutique).
             var ids = ShopDraw.Draw(new Pcg32(seed), eligible, ShopWeights.From(s.Content.Balance))
-                .OrderByDescending(id => ShopDraw.Rank(s.Content.Member(id).Rarity)).ToList();
+                .OrderByDescending(id => s.Content.Member(id).Rank).ToList();
             s.Shop.Replace(day, draw, ids.Select(id => new ShopOffer(id)));
             var lots = ShopDraw.DrawScrapLots(new Pcg32(ShopSeed.For(s.Account?.PlayerId ?? "", day + "/scraps", draw)), ShopRules.ScrapLotsPerDay);
             s.Shop.ReplaceScraps(lots.Select(l => new ShopScrapOffer(l.Kind, l.Count, l.Price)));

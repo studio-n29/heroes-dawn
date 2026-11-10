@@ -44,10 +44,10 @@ namespace N29.HeroesDawn.Tests.Editor
                 Assert.That(Distance(Theme.FamilyColor(fam[i]), Theme.FamilyColor(fam[j])), Is.GreaterThanOrEqualTo(0.2f), fam[i] + "/" + fam[j]);
         }
 
-        [Test, Description("Vérifie que les trois raretés restent distinctes — parce que le joueur doit les reconnaître sans lire")]
+        [Test, Description("Vérifie que les couleurs de rang (1, 3 et 5) restent distinctes — parce que le joueur doit les reconnaître sans lire")]
         public void Theme_RarityStaysDistinct()
         {
-            var r = new[] { Rarity.Legend, Rarity.Elite, Rarity.Agent };
+            var r = new[] { 5, 3, 1 };
             for (int i = 0; i < r.Length; i++)
             for (int j = i + 1; j < r.Length; j++)
                 Assert.That(Distance(Theme.RarityColor(r[i]), Theme.RarityColor(r[j])), Is.GreaterThanOrEqualTo(0.15f), r[i] + "/" + r[j]);

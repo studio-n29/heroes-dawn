@@ -85,12 +85,12 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (u != null && u.Kind == UnlockKind.Event && u.IsEventDay(_clockSource.LocalNow)) return 1; // événement du jour en tête des agents à débloquer
                 return 2 + (u == null ? 3 : (int)u.Kind == 0 ? 3 : (int)u.Kind - 1);
             }
-            foreach (var d in all.OrderBy(Rank).ThenByDescending(d => d.Rarity).ThenBy(d => d.Id))
+            foreach (var d in all.OrderBy(Rank).ThenByDescending(d => d.Rank).ThenBy(d => d.Id))
             {
                 bool own = Owned(d);
                 string name = Loc.MemberName(d);
                 // Carte verticale : portrait, puissance (1 à 5), rang (niveau) pour l'équipe, puis la façon d'obtenir les autres.
-                string power = Loc.F("power.tier", d.PowerTier);
+                string power = Loc.F("power.tier", d.Rank);
                 string line = own
                     ? Loc.RoleName(d.Position) + " · " + Loc.FamilyName(d.Family) + " · " + power + " · " + Loc.F("ui.level", _session.Roster.First(m => m.Id == d.Id).Level)
                     : power + "\n" + How(d);

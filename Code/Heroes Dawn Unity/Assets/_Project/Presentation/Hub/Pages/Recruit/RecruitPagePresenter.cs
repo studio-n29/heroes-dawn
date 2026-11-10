@@ -218,18 +218,18 @@ namespace N29.HeroesDawn.Presentation.Hub
         RecruitCardState Card(ShopOffer offer, int slot)
         {
             var def = _session.Content.Member(offer.Id);
-            int cost = MetaRules.RecruitCost(def.Rarity);
+            int cost = MetaRules.RecruitCost(def.Rank);
             bool inTeam = offer.Recruited || _session.Roster.Any(m => m.Id == offer.Id);
             return new RecruitCardState
             {
                 Slot = slot,
                 Card = MemberCards.Card(def, MetaRules.RecruitLevel, _session.Content.Balance, _loc),
-                Rarity = def.Rarity,
+                Rarity = def.Rank,
                 PriceLabel = _loc.F("hub.recruit", cost),
                 InTeam = inTeam,
                 InTeamText = _loc.T("recruit.in_team"),
                 Affordable = !inTeam && _session.Wallet.Pr >= cost,
-                Halo = def.Rarity == Rarity.Legend,
+                Halo = def.Rank >= 4,
             };
         }
     }

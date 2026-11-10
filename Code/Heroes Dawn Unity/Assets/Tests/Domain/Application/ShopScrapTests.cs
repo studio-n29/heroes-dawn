@@ -42,9 +42,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             var offers = _app.Session.Shop.Offers;
             Assert.That(offers.Count, Is.GreaterThan(0), "la boutique doit proposer au moins un héros");
-            int featured = ShopDraw.Rank(_app.Session.Content.Member(offers[0].Id).Rarity);
+            int featured = _app.Session.Content.Member(offers[0].Id).Rank;
             foreach (var o in offers)
-                Assert.That(ShopDraw.Rank(_app.Session.Content.Member(o.Id).Rarity), Is.LessThanOrEqualTo(featured));
+                Assert.That(_app.Session.Content.Member(o.Id).Rank, Is.LessThanOrEqualTo(featured));
         }
 
         [Test, Description("Vérifie qu'acheter un lot débite les Crédits et ajoute les scraps au profil — parce que c'est le seul moyen d'obtenir des scraps depuis la boutique")]

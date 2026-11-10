@@ -8,7 +8,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         public int Slot;
         public MemberCardData Card;
-        public Rarity Rarity;
+        public int Rarity;
         public string PriceLabel;
         public bool InTeam;
         public string InTeamText;

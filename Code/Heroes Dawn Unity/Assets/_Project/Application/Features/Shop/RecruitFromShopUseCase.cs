@@ -41,7 +41,7 @@ namespace N29.HeroesDawn.Application.Features.Shop
             if (offer.Recruited || _s.Owns(offer.Id)) return Result.Fail(ShopErrors.AlreadyRecruited);
             var def = _s.Content.Members.FirstOrDefault(m => m.Id == offer.Id);
             if (def == null) return Result.Fail(HubErrors.UnknownMember);
-            if (!_s.Wallet.TrySpend(0, MetaRules.RecruitCost(def.Rarity))) return Result.Fail(HubErrors.NotEnoughPr);
+            if (!_s.Wallet.TrySpend(0, MetaRules.RecruitCost(def.Rank))) return Result.Fail(HubErrors.NotEnoughPr);
 
             // Comme l'ancien recrutement : dans l'escouade s'il y a de la place et pas de partie en cours.
             _s.Roster.Add(new TeamMember(def, MetaRules.RecruitLevel) { InSquad = _s.Squad.Count < MetaRules.SquadSize && _s.Run == null });

@@ -17,7 +17,7 @@ namespace N29.HeroesDawn.EditorTools.Design
     {
         static readonly Dictionary<string, string> Labels = new Dictionary<string, string>
         {
-            ["id"] = "Identifiant", ["name"] = "Nom", ["rarity"] = "Rareté", ["family"] = "Famille", ["role"] = "Rôle",
+            ["id"] = "Identifiant", ["name"] = "Nom", ["rarity"] = "Rareté", ["rank"] = "Rang AMIF", ["family"] = "Famille", ["position"] = "Position",
             ["hp"] = "PV", ["atk"] = "Attaque", ["def"] = "Défense", ["spd"] = "Vitesse", ["perk"] = "Effet spécial", ["perkValue"] = "Valeur de l'effet",
             ["price"] = "Prix (Crédits)", ["slot"] = "Emplacement", ["cost"] = "Coût (énergie)", ["cooldown"] = "Recharge historique (inutilisée)", ["target"] = "Cible", ["effects"] = "Effets",
             ["type"] = "Type", ["value"] = "Valeur", ["status"] = "Statut", ["duration"] = "Durée (tours)", ["chance"] = "Chance (%)",

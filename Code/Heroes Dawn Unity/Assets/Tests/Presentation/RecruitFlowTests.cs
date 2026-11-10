@@ -65,7 +65,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             _app.Session.Wallet.Set(0, 5000);
             var def = Offer(0);
-            int cost = MetaRules.RecruitCost(def.Rarity);
+            int cost = MetaRules.RecruitCost(def.Rank);
             var task = Make().RunAsync(0, default);
             var asked = Popup.Asked!.Value;
             Assert.That(asked.Before, Is.EqualTo("5000 PR"));
@@ -109,7 +109,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             var pending = new PendingRecruit();
             var task = Make(pending).RunAsync(0, default);
             var asked = Popup.Asked!.Value;
-            int cost = MetaRules.RecruitCost(Offer(0).Rarity);
+            int cost = MetaRules.RecruitCost(Offer(0).Rank);
             Assert.That(asked.CanAfford, Is.False);
             Assert.That(asked.Missing, Is.EqualTo(_loc.F("recruit.missing", cost - 100)));
             Assert.That(asked.HowToEarn, Is.EqualTo(_loc.T("recruit.how_to_earn")));

@@ -229,7 +229,9 @@ namespace N29.HeroesDawn.Presentation.Common
             // --- Familles, rôles, raretés ---
             ["family.Matter"] = "Matière", ["family.Elemental"] = "Élémentaire", ["family.PhysicalBio"] = "Physique / Bio", ["family.Perception"] = "Perception",
             ["role.FrontLine"] = "Première ligne", ["role.Attacker"] = "Attaquant", ["role.Controller"] = "Contrôle", ["role.Support"] = "Soutien", ["role.Ranged"] = "Précision à distance",
-            ["rarity.Agent"] = "Agent", ["rarity.Elite"] = "Élite", ["rarity.Legend"] = "Légende",
+            ["rank.1"] = "Capacités secondaires ne représentant pas une menace directe", ["rank.2"] = "Capacité notable pouvant représenter une menace ponctuelle",
+            ["rank.3"] = "Capacités significatives pouvant représenter une menace sérieuse", ["rank.4"] = "Capacités majeures pouvant représenter une menace à grande échelle",
+            ["rank.5"] = "Capacités extraordinaires pouvant représenter une menace planétaire",
 
             // --- Membres ---
             ["members.ancre.name"] = "Ancre", ["members.verre.name"] = "Verre", ["members.givre.name"] = "Givre", ["members.echo.name"] = "Écho",
@@ -392,7 +394,7 @@ namespace N29.HeroesDawn.Presentation.Common
         public static string StatusName(StatusType s) => T("status." + s);
         public static string FamilyName(Family f) => T("family." + f);
         public static string RoleName(Position r) => T("role." + r);
-        public static string RarityName(Rarity r) => T("rarity." + r);
+        public static string RarityName(int rank) => T("rank." + N29.HeroesDawn.Definitions.AgentRanks.Clamp(rank));
         public static string RankName(CombatRank r) => T("rank." + r);
         public static string CaseName(CaseType t) => T("case." + t);
     }

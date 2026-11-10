@@ -58,7 +58,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var offers = session.Shop.Offers;
             int slot = -1;
             for (int i = 0; i < offers.Count && slot < 0; i++)
-                if (!offers[i].Recruited && session.Wallet.Pr >= N29.HeroesDawn.Application.Session.MetaRules.RecruitCost(session.Content.Member(offers[i].Id).Rarity))
+                if (!offers[i].Recruited && session.Wallet.Pr >= N29.HeroesDawn.Application.Session.MetaRules.RecruitCost(session.Content.Member(offers[i].Id).Rank))
                     slot = i;
             NUnit.Framework.Assert.That(slot, NUnit.Framework.Is.GreaterThanOrEqualTo(0), "une offre est payable avec les PR de départ");
             int roster = session.Roster.Count;

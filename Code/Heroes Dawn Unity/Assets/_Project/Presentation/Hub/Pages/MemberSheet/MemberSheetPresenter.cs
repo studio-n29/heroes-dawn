@@ -253,7 +253,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             bool inTeam = offer.Recruited || _session.Roster.Any(x => x.Id == offer.Id);
             var d = Sheet(def, MetaRules.RecruitLevel, false);
             d.FatigueText = "";
-            d.PrimaryLabel = inTeam ? _loc.T("recruit.in_team") : _loc.F("hub.recruit", MetaRules.RecruitCost(def.Rarity));
+            d.PrimaryLabel = inTeam ? _loc.T("recruit.in_team") : _loc.F("hub.recruit", MetaRules.RecruitCost(def.Rank));
             d.PrimaryEnabled = !inTeam;
             d.PrimaryReason = "";
             View.Show(d);

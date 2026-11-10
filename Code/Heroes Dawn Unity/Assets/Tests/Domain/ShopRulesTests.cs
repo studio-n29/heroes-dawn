@@ -11,21 +11,21 @@ namespace N29.HeroesDawn.Tests.Domain
 {
     public sealed class ShopRulesTests
     {
-        static readonly ShopWeights Weights = new ShopWeights(70, 25, 5);
+        static readonly ShopWeights Weights = new ShopWeights(70, 0, 25, 5, 0);
 
         /// <summary>Contenu fictif : n recrues par rareté (stats et compétences d'une recrue du prototype).</summary>
         static List<MemberDef> Fake(int agents, int elites, int legends)
         {
             var proto = TestContent.Build().Members[0];
             var list = new List<MemberDef>();
-            void Add(Rarity r, int n)
+            void Add(int r, int n)
             {
                 for (int i = 0; i < n; i++)
                     list.Add(new MemberDef(new MemberId(r + "_" + i), "k", proto.Family, proto.Position, r, proto.BaseStats, proto.Skills));
             }
-            Add(Rarity.Agent, agents);
-            Add(Rarity.Elite, elites);
-            Add(Rarity.Legend, legends);
+            Add(1, agents);
+            Add(3, elites);
+            Add(4, legends);
             return list;
         }
 
@@ -94,7 +94,7 @@ namespace N29.HeroesDawn.Tests.Domain
             {
                 var offers = DrawWith(seed, c);
                 Assert.That(offers.Count, Is.EqualTo(3));
-                Assert.That(offers.All(id => c.First(m => m.Id == id).Rarity != Rarity.Legend));
+                Assert.That(offers.All(id => c.First(m => m.Id == id).Rank != 4));
             }
         }
 
@@ -120,16 +120,16 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var c = Fake(5, 5, 5);
             var rng = new Pcg32(2026);
-            var counts = new Dictionary<Rarity, int> { [Rarity.Agent] = 0, [Rarity.Elite] = 0, [Rarity.Legend] = 0 };
+            var counts = new Dictionary<int, int> { [1] = 0, [3] = 0, [4] = 0 };
             const int n = 10000;
             for (int i = 0; i < n; i++)
             {
                 var id = ShopDraw.Draw(rng, c, Weights, 1)[0];
-                counts[c.First(m => m.Id == id).Rarity]++;
+                counts[c.First(m => m.Id == id).Rank]++;
             }
-            Assert.That(counts[Rarity.Agent] * 100.0 / n, Is.EqualTo(70).Within(2));
-            Assert.That(counts[Rarity.Elite] * 100.0 / n, Is.EqualTo(25).Within(2));
-            Assert.That(counts[Rarity.Legend] * 100.0 / n, Is.EqualTo(5).Within(2));
+            Assert.That(counts[1] * 100.0 / n, Is.EqualTo(70).Within(2));
+            Assert.That(counts[3] * 100.0 / n, Is.EqualTo(25).Within(2));
+            Assert.That(counts[4] * 100.0 / n, Is.EqualTo(5).Within(2));
         }
 
         [Test, Description("Vérifie que le renouvellement est gratuit la première fois puis coûte 100, 200, 400 et 800 Crédits au plus — parce que ce sont les prix validés (spec §3)")]

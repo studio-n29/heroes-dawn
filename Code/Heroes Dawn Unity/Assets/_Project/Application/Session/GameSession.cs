@@ -34,7 +34,7 @@ namespace N29.HeroesDawn.Application.Session
         public const int FatigueRecoveryPerMinute = 1;
 
 
-        public static int RecruitCost(Rarity r) => r == Rarity.Legend ? 1200 : r == Rarity.Elite ? 450 : 150;
+        public static int RecruitCost(int rank) => AgentRanks.RecruitCost(rank);
         public static int TrainCost(int level) => 100 * level;
     }
 
