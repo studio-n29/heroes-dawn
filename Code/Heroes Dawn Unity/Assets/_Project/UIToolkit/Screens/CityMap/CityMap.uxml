@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-map">
+        <ui:VisualElement name="mapArea" class="hd-map__area" />
+        <ui:VisualElement class="hd-panel hd-map__side">
+            <ui:Label name="actTitle" class="hd-list__sidetitle" />
+            <ui:VisualElement name="rows" class="hd-map__rows" />
+            <ui:ScrollView class="hd-map__detail">
+                <ui:Label name="detailTitle" class="hd-map__dtitle" />
+                <ui:Label name="chips" class="hd-pop__hint" />
+                <ui:Label name="description" class="hd-pop__text" />
+                <ui:VisualElement name="objectives" />
+                <ui:Label name="rewards" class="hd-pop__section" />
+            </ui:ScrollView>
+            <ui:Button name="chapters" class="hd-btn hd-btn--secondary hd-btn--small" />
+            <ui:Button name="deploy" class="hd-btn hd-btn--primary" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

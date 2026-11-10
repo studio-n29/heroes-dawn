@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal">
+        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-pop__wide">
+            <ui:Label name="title" class="hd-modal__title" />
+            <ui:Label name="subtitle" class="hd-pop__hint" />
+            <ui:VisualElement class="hd-divider" />
+            <ui:Label name="empty" class="hd-pop__text" />
+            <ui:ScrollView name="list" class="hd-pop__scroll" />
+            <ui:VisualElement class="hd-modal__buttons"><ui:Button name="close" class="hd-btn hd-btn--secondary" /></ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

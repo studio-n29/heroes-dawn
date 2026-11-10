@@ -463,3 +463,94 @@ TemplateContainer { width: 100%; height: 100%; flex-grow: 1; }
 .hd-squadslot__art { width: 100px; height: 100px; border-radius: 50px; border-width: 3px; border-color: var(--hd-brass); -unity-background-scale-mode: scale-and-crop; background-position: center top; }
 .hd-squadslot__name { -unity-font: var(--hd-font-title); font-size: 20px; color: var(--hd-ivory); }
 .hd-squadslot__bar { width: 100px; height: 12px; }
+/* Fenêtres modales communes (feuille séparée, ajoutée au thème par @import dans hd.uss) */
+.hd-pop__wide { width: 1100px; max-height: 900px; }
+.hd-pop__section { -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-brass); margin: 10px 0 4px 0; white-space: normal; }
+.hd-pop__text { -unity-font: var(--hd-font-body); font-size: 28px; color: var(--hd-ivory); white-space: normal; margin-bottom: 8px; }
+.hd-pop__hint { -unity-font: var(--hd-font-body); font-size: 22px; color: #9fb0bf; white-space: normal; margin-bottom: 8px; }
+.hd-pop__wip { -unity-font: var(--hd-font-heading); font-size: 22px; color: var(--hd-brass); white-space: normal; margin: 4px 0 12px 0; }
+.hd-pop__missing { -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-danger); white-space: normal; }
+.hd-pop__scroll { flex-grow: 0; flex-shrink: 0; height: 460px; }
+.hd-pop__scroll--short { height: 230px; }
+.hd-pop__rows { flex-shrink: 0; margin-bottom: 6px; }
+.hd-pop__choices { flex-shrink: 0; }
+.hd-pop__choices > .hd-btn { margin: 6px 0; }
+.hd-pop__field { margin: 8px 0; min-height: 64px; }
+.hd-pop__field > .unity-base-text-field__input { background-color: rgba(16, 28, 42, 0.92); color: #f1e9d8; font-size: 28px; -unity-font: var(--hd-font-body); border-width: 2px; border-color: var(--hd-brass); border-radius: 4px; padding: 6px 14px; min-height: 64px; }
+.hd-pop__art { height: 300px; flex-shrink: 0; margin-bottom: 10px; -unity-background-scale-mode: scale-and-crop; background-position: center; }
+.hd-pop__hero { flex-direction: row; flex-shrink: 0; margin-bottom: 8px; }
+.hd-pop__portrait { width: 200px; height: 260px; flex-shrink: 0; margin-right: 20px; border-width: 3px; border-color: var(--hd-brass); -unity-background-scale-mode: scale-and-crop; background-position: center top; }
+.hd-pop__herotext { flex-grow: 1; flex-basis: 0; min-width: 0; }
+.hd-pop__heroname { -unity-font: var(--hd-font-title); font-size: 38px; color: var(--hd-ivory); white-space: normal; }
+.hd-poprow { flex-direction: row; align-items: center; min-height: 64px; margin-bottom: 6px; padding: 4px 12px; background-color: var(--hd-surface-2); border-radius: 4px; flex-shrink: 0; }
+.hd-poprow__name { -unity-font: var(--hd-font-title); font-size: 26px; color: var(--hd-ivory); width: 240px; flex-shrink: 0; }
+.hd-poprow__bar { flex-grow: 1; flex-basis: 0; height: 22px; margin: 0 14px; }
+.hd-poprow__label { -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-ivory); min-width: 180px; -unity-text-align: middle-right; white-space: normal; }
+.hd-poprow__art { width: 64px; height: 64px; border-radius: 32px; margin-right: 14px; flex-shrink: 0; border-width: 2px; border-color: var(--hd-brass); -unity-background-scale-mode: scale-and-crop; background-position: center top; }
+.hd-poprow__text { flex-grow: 1; flex-basis: 0; min-width: 0; }
+
+/* Fiche d'agent */
+.hd-sheet { flex-direction: row; overflow: hidden; }
+.hd-sheet__art { width: 520px; flex-shrink: 0; margin-right: 20px; padding: 0; overflow: hidden; }
+.hd-sheet__wide { position: absolute; left: 0; right: 0; top: 0; bottom: 0; opacity: 0.35; -unity-background-scale-mode: scale-and-crop; background-position: center; }
+.hd-sheet__cutout { position: absolute; left: 0; right: 0; top: 0; bottom: 0; -unity-background-scale-mode: scale-to-fit; }
+.hd-sheet__strip { position: absolute; left: 0; right: 0; bottom: 0; height: 12px; }
+.hd-sheet__info { flex-grow: 1; flex-basis: 0; min-width: 0; margin-right: 20px; padding: 18px 22px; min-height: 0; }
+.hd-sheet__name { -unity-font: var(--hd-font-title); font-size: 44px; color: var(--hd-ivory); white-space: normal; }
+.hd-sheet__rarity { -unity-font: var(--hd-font-heading); font-size: 26px; }
+.hd-sheet__role { -unity-font: var(--hd-font-body); font-size: 26px; color: var(--hd-ivory); white-space: normal; margin-bottom: 6px; }
+.hd-sheet__bar { height: 28px; margin: 6px 0; flex-shrink: 0; }
+.hd-sheet__scroll { flex-grow: 1; flex-basis: 0; min-height: 0; }
+.hd-sheet__bio { -unity-font: var(--hd-font-body); font-size: 24px; color: var(--hd-ivory); white-space: normal; margin-bottom: 8px; }
+.hd-sheet__stats { -unity-font: var(--hd-font-heading); font-size: 26px; color: var(--hd-brass); white-space: normal; margin-bottom: 8px; }
+.hd-sheet__section { -unity-font: var(--hd-font-title); font-size: 28px; color: var(--hd-brass); margin-top: 6px; }
+.hd-sheet__tiers { -unity-font: var(--hd-font-body); font-size: 24px; white-space: normal; }
+.hd-sheet__side { width: 640px; flex-shrink: 0; padding: 16px 20px; min-height: 0; overflow: hidden; }
+.hd-sheet__tiles { flex-direction: row; flex-wrap: wrap; flex-shrink: 0; margin-bottom: 6px; }
+.hd-sheettile { width: 135px; height: 150px; margin: 0 8px 8px 0; padding: 4px; }
+.hd-sheettile .hd-tile__title { font-size: 18px; margin-top: 2px; }
+.hd-sheettile .hd-tile__sub { font-size: 15px; }
+.hd-sheet__affinity { flex-shrink: 0; margin-bottom: 6px; }
+.hd-sheet__faces { flex-direction: row; }
+.hd-sheet__faces > .hd-squadslot__art { margin-right: 8px; width: 80px; height: 80px; border-radius: 40px; }
+.hd-sheet__reason { -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-danger); white-space: normal; flex-shrink: 0; }
+.hd-sheet__actions { flex-direction: row; justify-content: flex-end; flex-shrink: 0; margin-top: 8px; }
+.hd-sheet__actions > .hd-btn { margin-left: 8px; }
+.hd-sheet__primary { flex-grow: 1; flex-basis: 0; }
+.hd-sheet__overlay { position: absolute; left: 0; right: 0; top: 0; bottom: 0; background-color: rgba(6, 12, 20, 0.78); align-items: center; justify-content: center; }
+.hd-sheet__overlaybox { width: 1200px; max-height: 760px; padding: 22px 28px; }
+.hd-sheet__overlayscroll { height: 480px; flex-shrink: 0; margin: 10px 0; }
+.hd-wip { align-items: center; justify-content: center; }
+.hd-wip__card { width: 1200px; padding: 40px 60px; align-items: center; }
+.hd-wip__title { -unity-font: var(--hd-font-title); font-size: 64px; color: var(--hd-brass); -unity-text-align: middle-center; white-space: normal; }
+.hd-wip__soon { -unity-font: var(--hd-font-title); font-size: 36px; color: #16202c; background-color: var(--hd-brass); padding: 6px 28px; margin: 14px 0 24px 0; rotate: -4deg; }
+.hd-wip__planned { -unity-font: var(--hd-font-body); font-size: 32px; color: var(--hd-ivory); -unity-text-align: upper-center; white-space: normal; }
+
+/* Carte de la ville */
+.hd-map { flex-direction: row; overflow: hidden; }
+.hd-map__area { flex-grow: 1; flex-basis: 0; min-width: 0; margin-right: 20px; }
+.hd-map__side { width: 640px; flex-shrink: 0; padding: 18px 22px; min-height: 0; overflow: hidden; }
+.hd-map__rows { flex-shrink: 0; margin-bottom: 8px; }
+.hd-map__row { margin: 0 0 6px 0; min-height: 56px; -unity-text-align: middle-left; }
+.hd-map__detail { flex-grow: 1; flex-basis: 0; min-height: 0; }
+.hd-map__dtitle { -unity-font: var(--hd-font-title); font-size: 34px; color: var(--hd-brass); white-space: normal; }
+.hd-map__tag { position: absolute; width: 420px; translate: -50% -50%; -unity-font: var(--hd-font-title); font-size: 26px; -unity-text-align: middle-center; }
+.hd-map__point { position: absolute; width: 120px; height: 84px; translate: -50% -50%; padding: 4px; background-color: #5fa8cf; border-width: 3px; border-color: var(--hd-ink); border-radius: 42px; align-items: center; justify-content: center; }
+.hd-map__point--selected { background-color: var(--hd-brass); border-color: #f1e9d8; }
+.hd-map__point--done { background-color: #5fba9b; }
+.hd-map__point--locked { background-color: #3a4a5c; opacity: 0.7; }
+.hd-map__plabel { -unity-font: var(--hd-font-title); font-size: 28px; color: #16202c; }
+.hd-map__psub { -unity-font: var(--hd-font-body); font-size: 15px; color: #16202c; white-space: normal; -unity-text-align: middle-center; }
+
+/* Le contenu d'une liste défilante ne rétrécit jamais pour tenir dans la fenêtre : il défile. */
+.unity-scroll-view__content-container > * { flex-shrink: 0; }
+.hd-sheet__actions { flex-wrap: wrap; }
+.hd-sheet__actions > .hd-btn { flex-shrink: 0; white-space: nowrap; }
+
+/* Un texte ne rétrécit jamais en hauteur (sinon deux textes se chevauchent dans une liste défilante). */
+Label { flex-shrink: 0; }
+.hd-team__chip { white-space: nowrap; flex-shrink: 0; }
+
+/* Les listes défilantes découpent leur contenu à leur cadre. */
+.unity-scroll-view { overflow: hidden; }
+.unity-scroll-view__content-viewport { overflow: hidden; }

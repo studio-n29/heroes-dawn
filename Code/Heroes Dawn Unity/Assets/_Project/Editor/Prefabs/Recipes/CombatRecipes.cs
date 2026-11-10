@@ -352,44 +352,7 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
     {
         public string RelativePath => "Popups/CombatResultsPopup.prefab";
         public int Order => 10;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var (root, content, title) = CasePopupKit.Build("CombatResultsPopup", 1100, 1000, Theme.Primary, out var window);
-            var band = window.Find("TitleBand/Fill").GetComponent<Image>();
-            var reward = Ui.Txt(content, "", 50, Theme.Primary, TextAnchor.UpperCenter, FontKind.Title, "Reward");
-            reward.rectTransform.At(0.5f, 1f, 0, -4, 900, 110);
-            reward.AutoSize(46);
-            reward.Inked();
-            var fatigueTitle = Ui.Txt(content, "", 28, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "FatigueTitle");
-            fatigueTitle.rectTransform.At(0.5f, 1f, 0, -118, 900, 36);
-            var list = Ui.Rect(content, "Fatigue").At(0.5f, 1f, 0, -156, 900, 240);
-            list.VLayout(8, 0, TextAnchor.UpperCenter);
-            var xpTitle = Ui.Txt(content, "", 28, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "XpTitle");
-            xpTitle.rectTransform.At(0.5f, 1f, 0, -404, 900, 36);
-            var xpList = Ui.Rect(content, "Xp").At(0.5f, 1f, 0, -442, 900, 240);
-            xpList.VLayout(8, 0, TextAnchor.UpperCenter);
-            var verify = Ui.Txt(content, "", 22, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Regular, "Verify");
-            verify.rectTransform.At(0.5f, 0f, 0, 118, 900, 34);
-            var toHq = Ui.Txt(content, "", 26, Theme.Danger, TextAnchor.MiddleCenter, FontKind.Body, "ToHq");
-            toHq.rectTransform.At(0.5f, 0f, 0, 150, 900, 34);
-            var cont = Ui.Btn(content, "", Theme.Primary, Theme.TextDark, null!, 42, FontKind.Title, "Continue");
-            RecipeKit.Mark(cont, TutorialTarget.ResultsContinue);
-            cont.Rect.At(0.5f, 0f, 0, 0, 420, 100);
-            var view = root.gameObject.AddComponent<CombatResultsPopupView>();
-            CasePopupKit.WireBase(ctx, view, title, window);
-            ctx.Wire(view, "titleBand", band);
-            ctx.Wire(view, "reward", reward);
-            ctx.Wire(view, "fatigueTitle", fatigueTitle);
-            ctx.Wire(view, "fatigueList", list);
-            ctx.Wire(view, "fatigueRowPrefab", ctx.Asset("Widgets/FatigueRow.prefab").GetComponent<FatigueRowView>());
-            ctx.Wire(view, "xpTitle", xpTitle);
-            ctx.Wire(view, "xpList", xpList);
-            ctx.Wire(view, "verify", verify);
-            ctx.Wire(view, "toHq", toHq);
-            ctx.Wire(view, "continueButton", cont);
-            return root.gameObject;
-        }
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<N29.HeroesDawn.Presentation.Combat.CombatResultsPopupView>("CombatResultsPopup", "Popups/CombatResults.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
     /// <summary>
     /// Combat (M65/M66). Adapté à un écran de ~2160 × 972 : barre haute (retraite, titre, AUTO, vitesse, pause), ennemis en haut à droite,

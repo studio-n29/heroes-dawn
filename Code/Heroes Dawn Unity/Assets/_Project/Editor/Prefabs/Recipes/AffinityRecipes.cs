@@ -46,43 +46,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Popups/AffinityPopup.prefab";
         public int Order => 10;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var root = PrefabContext.NewRoot("AffinityPopup");
-            var group = root.gameObject.AddComponent<CanvasGroup>();
-            var (window, content, title) = PopupKit.Window(root, 1280, 800, Theme.Success);
-
-            var subtitle = Ui.Txt(content, "", 24, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Subtitle");
-            subtitle.rectTransform.At(0f, 1f, 0, 0, 1200, 40);
-
-            var scrollBody = Ui.VScroll(content, out _);
-            ((RectTransform)scrollBody.parent).Stretch(0, 100, 0, 52); // sous le rappel, au-dessus du bouton Fermer
-            var v = scrollBody.gameObject.AddComponent<VerticalLayoutGroup>();
-            v.spacing = 12;
-            v.padding = new RectOffset(0, 0, 0, 20);
-            v.childControlWidth = true;
-            v.childControlHeight = true;
-            v.childForceExpandWidth = true;
-            v.childForceExpandHeight = false;
-
-            var empty = Ui.Txt(content, "", 28, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Body, "Empty");
-            empty.rectTransform.Stretch(0, 100, 0, 52);
-
-            var close = Ui.Btn(content, "", Theme.Surface3, Theme.Text, null!, 36, FontKind.Title, "Close");
-            close.Rect.At(0.5f, 0f, 0, 0, 320, 84);
-
-            var rowPrefab = ctx.Asset("Widgets/AffinityRow.prefab").GetComponent<AffinityRowView>();
-            var view = root.gameObject.AddComponent<AffinityPopupView>();
-            ctx.Wire(view, "title", title);
-            ctx.Wire(view, "subtitle", subtitle);
-            ctx.Wire(view, "empty", empty);
-            ctx.Wire(view, "list", scrollBody);
-            ctx.Wire(view, "rowPrefab", rowPrefab);
-            ctx.Wire(view, "close", close);
-            ctx.Wire(view, "window", window);
-            ctx.Wire(view, "group", group);
-            return root.gameObject;
-        }
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<N29.HeroesDawn.Presentation.Hub.AffinityPopupView>("AffinityPopup", "Popups/Affinity.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
 }

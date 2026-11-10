@@ -62,6 +62,13 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Bouton de la fiche détaillée (tests PlayMode : clic réel).</summary>
         public HdButtonRef DetailButton(int i) => new HdButtonRef(_detailButtons[i], this);
 
+        /// <summary>Premier bouton visible de la fiche portant ce libellé (tests PlayMode).</summary>
+        public HdButtonRef? DetailButtonLabelled(string label)
+        {
+            foreach (var b in _detailButtons) if (b.style.display != DisplayStyle.None && b.text == label) return new HdButtonRef(b, this);
+            return null;
+        }
+
         /// <summary>Touche la tuile n comme le ferait un joueur (tests PlayMode).</summary>
         public void TapTile(int tile) => Select(tile);
 

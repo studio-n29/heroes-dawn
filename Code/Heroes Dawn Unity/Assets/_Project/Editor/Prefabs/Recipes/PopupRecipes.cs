@@ -20,6 +20,21 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             return (root, content, title);
         }
 
+        /// <summary>Laurées dorées de part et d'autre du titre (kit d'extension Aube tactique).</summary>
+        public static void Laurels(RectTransform window)
+        {
+            var band = window.Find("TitleBand") as RectTransform;
+            var left = KitArt.GetExt("Decorations/laurel-left");
+            var right = KitArt.GetExt("Decorations/laurel-right");
+            if (band == null || left == null || right == null) return;
+            var l = Ui.Img(band, "LaurelLeft", Color.white, left);
+            l.rectTransform.At(0f, 0.5f, 70, 0, 84, 84);
+            l.preserveAspect = true;
+            var r = Ui.Img(band, "LaurelRight", Color.white, right);
+            r.rectTransform.At(1f, 0.5f, -70, 0, 84, 84);
+            r.preserveAspect = true;
+        }
+
         public static void WireBase(PrefabContext ctx, PopupViewBase view, TMP_Text title, RectTransform window)
         {
             ctx.Wire(view, "title", title);
@@ -51,33 +66,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Popups/RestPopup.prefab";
         public int Order => 10;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var (root, content, title) = CasePopupKit.Build("RestPopup", 980, 760, Theme.Success, out var window);
-            var body = Ui.Txt(content, "", 30, Theme.Text, TextAnchor.UpperCenter, FontKind.Body, "Body");
-            body.rectTransform.At(0.5f, 1f, 0, -4, 880, 100);
-            body.AutoSize(30);
-            var fatigueTitle = Ui.Txt(content, "", 28, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "FatigueTitle");
-            fatigueTitle.rectTransform.At(0.5f, 1f, 0, -116, 880, 36);
-            var fatigueList = Ui.Rect(content, "Fatigue").At(0.5f, 1f, 0, -156, 880, 270);
-            fatigueList.VLayout(8, 0, TextAnchor.UpperCenter);
-            var row = Ui.Rect(content, "Buttons").BottomBand(96);
-            row.HLayout(40);
-            var skip = Ui.Btn(row, "", Theme.Surface3, Theme.Text, null!, 34, FontKind.Title, "Skip");
-            skip.Rect.Pref(280, 90);
-            var take = Ui.Btn(row, "", Theme.Success, Theme.TextDark, null!, 40, FontKind.Title, "Take");
-            take.Rect.Pref(380, 90);
-            var view = root.gameObject.AddComponent<RestPopupView>();
-            CasePopupKit.WireBase(ctx, view, title, window);
-            ctx.Wire(view, "body", body);
-            ctx.Wire(view, "fatigueTitle", fatigueTitle);
-            ctx.Wire(view, "fatigueList", fatigueList);
-            ctx.Wire(view, "rowPrefab", ctx.Asset("Widgets/FatigueRow.prefab").GetComponent<N29.HeroesDawn.Presentation.Combat.FatigueRowView>());
-            ctx.Wire(view, "skip", skip);
-            ctx.Wire(view, "take", take);
-            return root.gameObject;
-        }
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<N29.HeroesDawn.Presentation.Popups.RestPopupView>("RestPopup", "Popups/Rest.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
 
     /// <summary>Case Événement (reprise de CasePopups.Narrative).</summary>
@@ -85,23 +74,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Popups/NarrativePopup.prefab";
         public int Order => 10;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var (root, content, title) = CasePopupKit.Build("NarrativePopup", 1180, 660, Theme.Perception, out var window);
-            title.color = Color.white;
-            title.Inked();
-            var body = Ui.Txt(content, "", 32, Theme.Text, TextAnchor.UpperCenter, FontKind.Regular, "Body");
-            body.rectTransform.Stretch(10, 330, 10, 20);
-            var list = Ui.Rect(content, "Choices").BottomBand(310);
-            list.VLayout(14, 0, TextAnchor.LowerCenter);
-            var view = root.gameObject.AddComponent<NarrativePopupView>();
-            CasePopupKit.WireBase(ctx, view, title, window);
-            ctx.Wire(view, "body", body);
-            ctx.Wire(view, "choices", list);
-            ctx.Wire(view, "choicePrefab", ctx.Asset("Widgets/ChoiceButton.prefab").GetComponent<UiButton>());
-            return root.gameObject;
-        }
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<N29.HeroesDawn.Presentation.Popups.NarrativePopupView>("NarrativePopup", "Popups/Narrative.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
 
     /// <summary>Case Mini-jeu (reprise de CasePopups.MiniGame et TimingMiniGame.Build).</summary>
@@ -155,30 +128,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Popups/ActivityPopup.prefab";
         public int Order => 10;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var (root, content, title) = CasePopupKit.Build("ActivityPopup", 1300, 800, Theme.Info, out var window);
-            var body = Ui.Txt(content, "", 28, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Body");
-            body.rectTransform.Stretch(24, 560, 24, 10);
-            var details = Ui.Txt(content, "", 24, Theme.TextMuted, TextAnchor.UpperLeft, FontKind.Body, "Details");
-            details.rectTransform.Stretch(24, 235, 24, 140);
-            var wip = Ui.Txt(content, "", 24, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Body, "Wip");
-            wip.rectTransform.At(0.5f, 0f, 0, 130, 1240, 90);
-            var win = Ui.Btn(content, "", Theme.Success, Theme.TextDark, null!, 34, FontKind.Title, "Win");
-            win.Rect.At(0f, 0f, 24, 20, 580, 90);
-            var fail = Ui.Btn(content, "", Theme.Danger, Color.white, null!, 34, FontKind.Title, "Fail");
-            fail.Rect.At(1f, 0f, -24, 20, 580, 90);
-
-            var view = root.gameObject.AddComponent<ActivityPopupView>();
-            CasePopupKit.WireBase(ctx, view, title, window);
-            ctx.Wire(view, "body", body);
-            ctx.Wire(view, "details", details);
-            ctx.Wire(view, "wip", wip);
-            ctx.Wire(view, "win", win);
-            ctx.Wire(view, "fail", fail);
-            return root.gameObject;
-        }
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<N29.HeroesDawn.Presentation.Popups.ActivityPopupView>("ActivityPopup", "Popups/Activity.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
 
     /// <summary>Zone sécurisée (reprise de BoardScreen.ShowZoneComplete).</summary>
@@ -186,36 +136,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Popups/ZoneCompletePopup.prefab";
         public int Order => 10;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var (root, content, title) = CasePopupKit.Build("ZoneCompletePopup", 1300, 640, Theme.Success, out var window);
-            // Deux cartes côte à côte (planche 9.4) : objectifs à gauche, récompenses à droite.
-            var objCard = Ui.Panel(content, "ObjectivesCard", Theme.Surface2, 3f, 6f, false);
-            objCard.Frame().At(0f, 1f, 10, 0, 600, 360);
-            var objectivesTitle = Ui.Txt(objCard.transform, "", 32, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
-            objectivesTitle.rectTransform.At(0f, 1f, 20, -10, 560, 44);
-            var objectives = Ui.Txt(objCard.transform, "", 28, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Lines");
-            objectives.rectTransform.At(0f, 1f, 20, -62, 560, 280);
-            objectives.AutoSize(28);
-            var rewCard = Ui.Panel(content, "RewardsCard", Theme.Surface2, 3f, 6f, false);
-            rewCard.Frame().At(1f, 1f, -10, 0, 600, 360);
-            var rewardsTitle = Ui.Txt(rewCard.transform, "", 32, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
-            rewardsTitle.rectTransform.At(0f, 1f, 20, -10, 560, 44);
-            var rewards = Ui.Txt(rewCard.transform, "", 34, Theme.Primary, TextAnchor.UpperLeft, FontKind.Title, "Rewards");
-            rewards.rectTransform.At(0f, 1f, 20, -62, 560, 280);
-            rewards.AutoSize(34);
-            rewards.Inked();
-            var toHq = Ui.Btn(content, "", Theme.Primary, Theme.TextDark, null!, 44, FontKind.Title, "ToHq");
-            toHq.Rect.At(0.5f, 0f, 0, 0, 440, 100);
-            var view = root.gameObject.AddComponent<ZoneCompletePopupView>();
-            CasePopupKit.WireBase(ctx, view, title, window);
-            ctx.Wire(view, "rewards", rewards);
-            ctx.Wire(view, "objectivesTitle", objectivesTitle);
-            ctx.Wire(view, "objectives", objectives);
-            ctx.Wire(view, "rewardsTitle", rewardsTitle);
-            ctx.Wire(view, "toHq", toHq);
-            return root.gameObject;
-        }
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<N29.HeroesDawn.Presentation.Popups.ZoneCompletePopupView>("ZoneCompletePopup", "Popups/ZoneComplete.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
 }

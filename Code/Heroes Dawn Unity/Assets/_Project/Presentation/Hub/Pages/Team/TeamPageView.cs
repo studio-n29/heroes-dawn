@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using N29.HeroesDawn.Presentation.UiToolkit;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -38,6 +39,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         Label _squadTitle = null!, _synergies = null!, _synergiesTitle = null!, _hint = null!;
         UnityEngine.UIElements.Button _healAll = null!, _mission = null!, _presetSave = null!;
         TeamPageData? _last;
+        HdTutorialAnchor? _tileAnchor;
 
         public event Action<int>? FilterClicked;
         public event Action<MemberSort>? SortClicked;
@@ -87,6 +89,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             _presetSave.AddToClassList("hd-btn"); _presetSave.AddToClassList("hd-btn--small"); _presetSave.AddToClassList("hd-team__chip");
             _presetSave.clicked += () => PresetSaveClicked?.Invoke();
             _presetBox.Add(_presetSave);
+            HdTutorialAnchor.Attach(this, Q<VisualElement>("side"), TutorialTarget.TeamSquad);
+            HdTutorialAnchor.Attach(this, _mission, TutorialTarget.TeamMission);
+            _tileAnchor = null;
             if (_last.HasValue) Show(_last.Value);
         }
 
@@ -114,6 +119,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             _grid.Clear();
             _infos.Clear();
             foreach (var m in d.Members) _grid.Add(NewTile(m));
+            if (_tileAnchor != null) Destroy(_tileAnchor.gameObject);
+            _tileAnchor = _grid.childCount > 0 ? HdTutorialAnchor.Attach(this, _grid[0], TutorialTarget.TeamTile) : null;
 
             _squadTitle.text = d.SquadTitle;
             _squadRow.Clear();

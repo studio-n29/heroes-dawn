@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Tutorial;
 using N29.HeroesDawn.Presentation.UiToolkit;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -146,6 +147,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             c.Root.RegisterCallback<ClickEvent>(e => { if (!(e.target is UnityEngine.UIElements.Button)) Tap(); });
             c.Root.RegisterCallback<NavigationSubmitEvent>(e => { if (e.target == c.Root) Tap(); });
             c.Info.RecruitButton = new HdButtonRef(c.Recruit, this);
+            if (index == 0) HdTutorialAnchor.Attach(this, c.Recruit, TutorialTarget.RecruitCard);
             c.Info.TapButton = new HdButtonRef((UnityEngine.UIElements.Button)c.Root, this);
             return c;
         }

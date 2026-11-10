@@ -17,6 +17,9 @@ namespace N29.HeroesDawn.Presentation.UiToolkit
 
         public static HdTutorialAnchor Attach(Component host, VisualElement element, TutorialTarget id)
         {
+            // Un document recréé (ou une liste reconstruite) repose son ancre : l'ancienne, restée sur un élément détaché, disparaît.
+            var previous = host.transform.Find("Anchor_" + id);
+            if (previous != null) { previous.gameObject.SetActive(false); Destroy(previous.gameObject); }
             var go = new GameObject("Anchor_" + id, typeof(RectTransform));
             go.transform.SetParent(host.transform, false);
             var anchor = go.AddComponent<HdTutorialAnchor>();
@@ -32,7 +35,8 @@ namespace N29.HeroesDawn.Presentation.UiToolkit
 
         void LateUpdate()
         {
-            if (_element == null || _element.panel == null || _marker == null || _parent == null) return;
+            if (_marker == null) return;
+            if (_element == null || _element.panel == null || _parent == null) { if (_marker.enabled) _marker.enabled = false; return; }
             bool visible = _element.resolvedStyle.display != DisplayStyle.None && _element.resolvedStyle.visibility == Visibility.Visible
                            && _element.enabledInHierarchy && !float.IsNaN(_element.worldBound.width) && _element.worldBound.width > 0f && IsShown(_element);
             if (_marker.enabled != visible) _marker.enabled = visible;

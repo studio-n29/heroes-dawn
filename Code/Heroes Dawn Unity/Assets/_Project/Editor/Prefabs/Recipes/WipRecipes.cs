@@ -33,29 +33,6 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/WipPage.prefab";
         public int Order => 10;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var rt = ScreenKit.Root("WipPage");
-            var fill = Ui.Panel(rt, "Card", Theme.Surface, 5f, 10f, true);
-            var card = fill.Frame().At(0.5f, 0.5f, 0, 0, 1200, 560);
-            var title = Ui.Txt(fill.transform, "", 64, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Feature");
-            title.rectTransform.At(0.5f, 1f, 0, -60, 1080, 90);
-            title.Inked();
-            var band = Ui.Img(fill.transform, "SoonBand", Theme.Primary, Sprites.RoundedSmall);
-            band.type = UnityEngine.UI.Image.Type.Sliced;
-            band.rectTransform.At(0.5f, 1f, 0, -170, 300, 60);
-            band.rectTransform.localRotation = Quaternion.Euler(0, 0, -4);
-            var soon = Ui.Txt(band.transform, "", 36, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Soon");
-            soon.rectTransform.Stretch();
-            var planned = Ui.Txt(fill.transform, "", 32, Theme.Text, TextAnchor.UpperCenter, FontKind.Body, "Planned");
-            planned.rectTransform.At(0.5f, 0f, 0, 60, 1000, 220);
-            var view = rt.gameObject.AddComponent<WipPageView>();
-            ScreenKit.WireFade(ctx, view);
-            ctx.Wire(view, "featureTitle", title);
-            ctx.Wire(view, "planned", planned);
-            ctx.Wire(view, "soon", soon);
-            return rt.gameObject;
-        }
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<WipPageView>("WipPage", "Wip/Wip.uxml", 10);
     }
 }

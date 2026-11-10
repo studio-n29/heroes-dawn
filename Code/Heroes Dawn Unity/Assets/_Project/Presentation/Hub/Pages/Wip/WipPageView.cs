@@ -1,21 +1,26 @@
 #nullable enable
-using N29.HeroesDawn.Presentation.Mvp;
-using TMPro;
-using UnityEngine;
+using N29.HeroesDawn.Presentation.UiToolkit;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    public sealed class WipPageView : ViewBase, IWipPageView
+    /// <summary>Page à venir (UI Toolkit) : nom de la fonction, bandeau BIENTÔT, ce qui est prévu.</summary>
+    public sealed class WipPageView : HdView, IWipPageView
     {
-        [SerializeField] TMP_Text featureTitle = null!;
-        [SerializeField] TMP_Text planned = null!;
-        [SerializeField] TMP_Text soon = null!;
+        Label _title = null!, _planned = null!, _soon = null!;
+        WipPageData? _last;
+
+        protected override void Bind()
+        {
+            _title = Q<Label>("featureTitle"); _planned = Q<Label>("planned"); _soon = Q<Label>("soon");
+            if (_last.HasValue) Show(_last.Value);
+        }
 
         public void Show(WipPageData d)
         {
-            featureTitle.text = d.FeatureTitle;
-            planned.text = d.Planned;
-            soon.text = d.Soon;
+            _last = d;
+            if (_title == null) return;
+            _title.text = d.FeatureTitle; _planned.text = d.Planned; _soon.text = d.Soon;
         }
     }
 }
