@@ -317,7 +317,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 };
             }
             var defs = _session.Content.Collection;
-            for (int slot = 0; slot < CollectionRules.CardSlots; slot++)
+            for (int slot = 0; slot < CollectionRules.CardSlots && slot + 2 < tiles.Length; slot++)
             {
                 var card = m != null && slot < m.Cards.Count ? m.Cards[slot] : null;
                 string sub = _loc.F("sheet.skill_card", slot + 3);

@@ -32,7 +32,7 @@ namespace N29.HeroesDawn.Domain.Combat
         int ResetPointAfter(int slotIndex)
             => slotIndex == 0 ? _b.TimelineResetLightPoint
              : slotIndex == 1 ? _b.TimelineResetMediumPoint
-             : slotIndex == 2 || slotIndex == 3 ? _b.TimelineResetHeavyPoint
+             : slotIndex >= 2 ? _b.TimelineResetHeavyPoint
              : _b.TimelineResetLightPoint;
 
         /// <summary>Annonce l'action d'une unité ennemie qui entre en zone de préparation.</summary>

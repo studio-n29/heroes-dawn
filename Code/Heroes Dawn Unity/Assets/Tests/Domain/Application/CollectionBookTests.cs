@@ -44,21 +44,88 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(Code(_app.Collection.UnequipItem(Ancre, vest)), Is.EqualTo("collection.nothing"));
         }
 
-        [Test, Description("Vérifie qu'une carte ne s'équipe que sur un agent de sa catégorie, que l'emplacement 4 exige une carte en 3 et que retirer la carte 3 fait remonter la 4 — parce que le grimoire a ses règles")]
-        public void EquipCard_FollowsTheGrimoireRules()
+        CardId[] Own(params string[] ids)
         {
-            var wall = new CardId("card_glass_wall"); var shackle = new CardId("card_shackle"); var ember = new CardId("card_ember");
-            CollectionOps.AddCard(S, wall); CollectionOps.AddCard(S, shackle); CollectionOps.AddCard(S, ember);
-            Assert.That(Code(_app.Collection.EquipCard(Verre, 0, ember)), Is.EqualTo("collection.family"));
-            Assert.That(Code(_app.Collection.EquipCard(Verre, 1, shackle)), Is.EqualTo("collection.first_card"));
-            Assert.That(_app.Collection.EquipCard(Verre, 0, wall).IsSuccess);
-            Assert.That(_app.Collection.EquipCard(Verre, 1, shackle).IsSuccess);
+            var cards = ids.Select(i => new CardId(i)).ToArray();
+            foreach (var c in cards) CollectionOps.AddCard(S, c);
+            return cards;
+        }
+
+        [Test, Description("Vérifie qu'on équipe une carte d'une autre famille que l'agent — parce que la famille ne limite plus l'équipement, elle donne seulement un bonus")]
+        public void On_equipe_une_carte_d_une_autre_famille()
+        {
+            var ember = Own("card_ember")[0];   // carte Élémentaire sur un agent Matière
+            Assert.That(Code(_app.Collection.EquipCard(Verre, 0, ember)), Is.EqualTo("ok"));
+            Assert.That(S.Find(Verre)!.Cards[0], Is.EqualTo(ember));
+        }
+
+        [Test, Description("Vérifie qu'on équipe trois cartes mais qu'un 4e emplacement n'existe pas — parce que la limite passe de 2 à 3 cartes équipables")]
+        public void On_equipe_trois_cartes_puis_la_quatrieme_emplacement_n_existe_pas()
+        {
+            var c = Own("card_glass_wall", "card_shackle", "card_ember", "card_storm");
+            for (int slot = 0; slot < 3; slot++) Assert.That(Code(_app.Collection.EquipCard(Verre, slot, c[slot])), Is.EqualTo("ok"), "emplacement " + slot);
+            Assert.That(Code(_app.Collection.EquipCard(Verre, 3, c[3])), Is.EqualTo("collection.no_slot"));
+        }
+
+        [Test, Description("Vérifie que la même carte ne s'équipe pas deux fois sur un agent, même avec deux exemplaires — parce que le doublon sur un agent est interdit")]
+        public void Le_meme_carte_deux_fois_sur_un_agent_est_refusee()
+        {
+            var wall = Own("card_glass_wall")[0];
+            CollectionOps.AddCard(S, wall);   // deux exemplaires possédés
+            Assert.That(Code(_app.Collection.EquipCard(Verre, 0, wall)), Is.EqualTo("ok"));
+            Assert.That(Code(_app.Collection.EquipCard(Verre, 1, wall)), Is.EqualTo("collection.duplicate_card"));
+            Assert.That(S.Find(Verre)!.Cards[1], Is.Null);
+        }
+
+        [Test, Description("Vérifie qu'on équipe le 3e emplacement sans avoir rempli les deux premiers — parce que l'équipement est libre")]
+        public void On_peut_equiper_l_emplacement_3_sans_les_deux_premiers()
+        {
+            var wall = Own("card_glass_wall")[0];
+            Assert.That(Code(_app.Collection.EquipCard(Verre, 2, wall)), Is.EqualTo("ok"));
+            Assert.That(S.Find(Verre)!.Cards[2], Is.EqualTo(wall));
+        }
+
+        [Test, Description("Vérifie que retirer une carte fait remonter les suivantes et qu'une carte inconnue est refusée — parce que les cartes restent groupées dans les premiers emplacements")]
+        public void Retirer_une_carte_fait_remonter_les_suivantes()
+        {
+            var c = Own("card_glass_wall", "card_shackle", "card_ember");
+            for (int slot = 0; slot < 3; slot++) _app.Collection.EquipCard(Verre, slot, c[slot]);
             Assert.That(_app.Collection.UnequipCard(Verre, 0).IsSuccess);
             var verre = S.Find(Verre)!;
-            Assert.That(verre.Cards[0], Is.EqualTo(shackle), "la carte 4 monte en 3");
-            Assert.That(verre.Cards[1], Is.Null);
-            Assert.That(Code(_app.Collection.EquipCard(Verre, 1, wall)), Is.EqualTo("ok"));
+            Assert.That(verre.Cards.Select(x => x?.Value), Is.EqualTo(new[] { "card_shackle", "card_ember", null }));
             Assert.That(Code(_app.Collection.EquipCard(Verre, 0, new CardId("absent"))), Is.EqualTo("collection.unknown"));
+        }
+
+        static GameSession ReloadWithCards(params string[] cards)
+        {
+            var profile = new N29.HeroesDawn.Application.Ports.ProfileData();
+            var m = new N29.HeroesDawn.Application.Ports.MemberSave { id = "verre", level = 5, inSquad = true };
+            m.cards.AddRange(cards);
+            profile.team.Add(m);
+            var s = new GameSession(TestContent.Build());
+            s.ApplyProfile(profile);
+            return s;
+        }
+
+        [Test, Description("Vérifie qu'une sauvegarde 0.15.0 à deux cartes donne deux cartes équipées et un 3e emplacement libre — parce que les cartes déjà équipées sont conservées à la migration")]
+        public void Une_sauvegarde_a_deux_cartes_donne_deux_cartes_et_un_emplacement_libre()
+        {
+            var verre = ReloadWithCards("card_glass_wall", "card_shackle").Find(Verre)!;
+            Assert.That(verre.Cards.Select(x => x?.Value), Is.EqualTo(new[] { "card_glass_wall", "card_shackle", null }));
+        }
+
+        [Test, Description("Vérifie que la seconde occurrence d'une carte déjà équipée dans la sauvegarde est ignorée — parce qu'un agent ne porte jamais deux fois la même carte")]
+        public void Un_doublon_dans_la_sauvegarde_est_ignore()
+        {
+            var verre = ReloadWithCards("card_glass_wall", "card_glass_wall", "card_shackle").Find(Verre)!;
+            Assert.That(verre.Cards.Select(x => x?.Value), Is.EqualTo(new[] { "card_glass_wall", "card_shackle", null }));
+        }
+
+        [Test, Description("Vérifie qu'une carte seule en 2e place est remontée en 1re au chargement — parce que les cartes équipées sont toujours groupées au début")]
+        public void Une_carte_seule_en_2e_place_est_remontee_en_1re()
+        {
+            var verre = ReloadWithCards("", "card_shackle").Find(Verre)!;
+            Assert.That(verre.Cards.Select(x => x?.Value), Is.EqualTo(new[] { "card_shackle", null, null }));
         }
 
         [Test, Description("Vérifie que la boutique d'objets débite les Crédits, marque l'offre vendue et se renouvelle le jour suivant — parce que la boutique est à rotation")]

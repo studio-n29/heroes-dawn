@@ -241,6 +241,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["errors.collection_not_owned"] = "Tu n'en as plus de libre en réserve.";
             d["errors.collection_family"] = "Cette carte ne va pas à la catégorie de cet agent.";
             d["errors.collection_first_card"] = "Équipe d'abord la carte de l'emplacement 3.";
+            d["errors.collection_duplicate_card"] = "Cet agent porte déjà cette carte.";
             d["errors.collection_nothing"] = "Rien à retirer.";
             d["errors.collection_sold_out"] = "Offre déjà achetée aujourd'hui.";
             d["errors.collection_no_booster"] = "Aucun booster à ouvrir.";

@@ -74,8 +74,8 @@ namespace N29.HeroesDawn.Application.Session
         public bool InSquad { get; set; }
         /// <summary>Objets equipes (au plus 2).</summary>
         public List<ItemId> Items { get; } = new List<ItemId>();
-        /// <summary>Cartes equipees : emplacement 3 puis 4 (null = pas de carte).</summary>
-        public CardId?[] Cards { get; } = new CardId?[2];
+        /// <summary>Cartes équipées, jusqu à trois (null = emplacement libre).</summary>
+        public CardId?[] Cards { get; } = new CardId?[CollectionRules.CardSlots];
         public bool Exhausted => Fatigue >= 100;
         IReadOnlyList<ItemId> ITeamMemberReadModel.Items => Items;
         IReadOnlyList<CardId?> ITeamMemberReadModel.Cards => Cards;
@@ -302,10 +302,13 @@ namespace N29.HeroesDawn.Application.Session
                 {
                     var id = save.cards[i];
                     if (string.IsNullOrEmpty(id) || !collection.HasCard(new CardId(id))) continue;
-                    if (!CollectionRules.CanEquip(collection.Card(new CardId(id)), member.Def)) continue;
+                    if (!CollectionRules.CanEquip(collection.Card(new CardId(id)), member.Cards)) continue;
                     member.Cards[i] = new CardId(id);
                 }
-            if (member.Cards[0] == null && member.Cards[1] != null) { member.Cards[0] = member.Cards[1]; member.Cards[1] = null; }
+            // Compaction : les cartes équipées remontent vers les premiers emplacements, dans leur ordre.
+            int next = 0;
+            for (int i = 0; i < member.Cards.Length; i++)
+                if (member.Cards[i] != null) { var c = member.Cards[i]; member.Cards[i] = null; member.Cards[next++] = c; }
         }
 
         /// <summary>Restaure la boutique sauvegardée ; une offre dont la recrue n'existe plus est ignorée.</summary>

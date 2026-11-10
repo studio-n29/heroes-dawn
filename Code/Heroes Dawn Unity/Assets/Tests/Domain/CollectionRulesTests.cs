@@ -84,12 +84,12 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(plain.Skills.Count, Is.EqualTo(3));
         }
 
-        [Test, Description("Vérifie qu'une carte d'une autre catégorie n'est pas équipée en combat — parce qu'une carte correspond à une catégorie d'agent")]
-        public void Cards_OfAnotherFamily_AreIgnored()
+        [Test, Description("Vérifie qu une carte d une autre famille est équipée en combat comme les autres — parce que la famille ne limite plus l équipement (elle donne seulement un bonus)")]
+        public void Cards_OfAnotherFamily_AreEquipped()
         {
             var u = Sim(new[] { Ally("verre", cards: new CardId?[] { new CardId("card_ember") }) }, new[] { "brute" }).Unit(0);
             Assert.That(u.Skills.Count, Is.EqualTo(3));
-            Assert.That(u.Skills[2].Id.Value, Is.EqualTo("verre_a3"));
+            Assert.That(u.Skills[2].Id.Value, Is.EqualTo("card_ember"));
         }
 
         [Test, Description("Vérifie que l'agent peut lancer sa 4e compétence (carte), qu elle coûte de l énergie et le replace en fin de frise comme une compétence lourde — parce que la 4e compétence est une vraie action de combat")]

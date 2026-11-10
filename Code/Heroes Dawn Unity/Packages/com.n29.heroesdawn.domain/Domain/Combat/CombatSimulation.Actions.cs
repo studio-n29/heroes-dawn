@@ -27,7 +27,7 @@ namespace N29.HeroesDawn.Domain.Combat
         {
             if (actorId < 0 || actorId >= _units.Count) return false;
             var u = _units[actorId];
-            if (!u.IsReady || slotIndex < 0 || slotIndex >= ActiveSkillCount(u) || slotIndex > 3) return false;
+            if (!u.IsReady || slotIndex < 0 || slotIndex >= ActiveSkillCount(u)) return false;
             if (u.Has(StatusType.Bind) && slotIndex > 0) return false;
             return u.Energy >= u.Skills[slotIndex].Cost;
         }

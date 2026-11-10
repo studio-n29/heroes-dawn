@@ -47,17 +47,17 @@ namespace N29.HeroesDawn.Domain.Combat
 
 
             var usable = new List<int>();
-            for (int i = 0; i < ActiveSkillCount(u) && i < 4; i++) if (CanUseSlot(u, i)) usable.Add(i);
+            for (int i = 0; i < ActiveSkillCount(u); i++) if (CanUseSlot(u, i)) usable.Add(i);
             slot = usable.Count == 0 ? 0 : usable[_rng.Range(0, usable.Count)];
             return (slot, RandomFoe(u.Side));
         }
 
         bool CanUseSlot(CombatUnit u, int slot)
-            => slot < ActiveSkillCount(u) && slot < 4 && u.Energy >= u.Skills[slot].Cost && !(u.Has(StatusType.Bind) && slot > 0);
+            => slot >= 0 && slot < ActiveSkillCount(u) && u.Energy >= u.Skills[slot].Cost && !(u.Has(StatusType.Bind) && slot > 0);
 
         static int FindSlot(CombatUnit u, EffectType t)
         {
-            for (int i = 0; i < u.Skills.Count && i < 4; i++)
+            for (int i = 0; i < u.Skills.Count; i++)
                 foreach (var fx in u.Skills[i].Effects)
                     if (fx.Type == t) return i;
             return -1;

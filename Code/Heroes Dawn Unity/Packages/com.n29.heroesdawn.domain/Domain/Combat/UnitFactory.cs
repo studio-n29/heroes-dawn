@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 
 namespace N29.HeroesDawn.Domain.Combat
@@ -56,26 +57,27 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         /// <summary>
-        /// Compétences de l agent : ses deux compétences de base ; une carte équipée prend la 3e place (carte 1) puis la 4e (carte 2).
-        /// Une carte d'une autre catégorie, absente du jeu ou une carte 2 sans carte 1 est ignorée.
+        /// Compétences de l agent : ses deux compétences de base, puis ses cartes équipées dans l ordre des emplacements (jusqu à cinq compétences).
+        /// Équipement libre : aucune condition de famille. Une carte absente du jeu ou déjà portée dans un emplacement précédent est ignorée.
+        /// Ancien kit de trois compétences : la première carte remplace la 3e.
         /// </summary>
         static IReadOnlyList<SkillDef> SkillsWithCards(MemberDef d, AllyEntry e, CollectionDef? collection)
         {
             if (collection == null || e.Cards.Count == 0) return d.Skills;
-            SkillDef? Pick(int i)
-            {
-                if (i >= e.Cards.Count || !e.Cards[i].HasValue || !collection.HasCard(e.Cards[i]!.Value)) return null;
-                var card = collection.Card(e.Cards[i]!.Value);
-                if (card.Family != d.Family) return null;
-                int lvl = i < e.CardLevels.Count ? e.CardLevels[i] : 1;
-                return CardLevels.SkillAt(card, lvl);
-            }
             var list = new List<SkillDef>(d.Skills);
-            var third = Pick(0);
-            if (third != null && list.Count == 2) list.Add(third);          // deux compétences de base : la carte 1 prend la 3e place
-            else if (third != null && list.Count >= 3) list[2] = third;     // ancien kit de trois compétences : la carte remplace la 3e
-            var fourth = Pick(1);
-            if (fourth != null && list.Count >= 3) list.Add(fourth);
+            var seen = new HashSet<CardId>();
+            bool first = true;
+            for (int i = 0; i < e.Cards.Count; i++)
+            {
+                if (!e.Cards[i].HasValue) continue;
+                var id = e.Cards[i]!.Value;
+                if (!collection.HasCard(id) || !seen.Add(id)) continue;
+                int lvl = i < e.CardLevels.Count ? e.CardLevels[i] : 1;
+                var skill = CardLevels.SkillAt(collection.Card(id), lvl);
+                if (first && list.Count >= 3) list[2] = skill;   // ancien kit de trois compétences : la carte remplace la 3e
+                else list.Add(skill);
+                first = false;
+            }
             return list;
         }
 

@@ -22,7 +22,8 @@ namespace N29.HeroesDawn.Domain.Board
     {
         public const string StandardBooster = BoosterDef.StandardId;
         public const int MaxItems = 2;
-        public const int CardSlots = 2;
+        /// <summary>Cartes équipables par agent (en plus de ses 2 compétences de base : 5 places en combat).</summary>
+        public const int CardSlots = 3;
 
         /// <summary>Poids de rareté d'un objet trouvé en événement : Commun, Rare, Épique, Légendaire.</summary>
         public static readonly IReadOnlyList<int> FoundItemWeights = new[] { 60, 28, 10, 2 };
@@ -133,8 +134,8 @@ namespace N29.HeroesDawn.Domain.Board
             return all[rng.Range(0, all.Count)];
         }
 
-        /// <summary>Une carte ne s'équipe que sur un agent de sa catégorie (famille).</summary>
-        public static bool CanEquip(SkillCardDef card, MemberDef member) => card.Family == member.Family;
+        /// <summary>Équipement libre : n importe quelle carte sur n importe quel agent, mais jamais deux fois la même carte sur un agent.</summary>
+        public static bool CanEquip(SkillCardDef card, IEnumerable<CardId?> equipped) => equipped.All(e => !e.HasValue || !e.Value.Equals(card.Id));
 
         /// <summary>Un objet ne s'équipe pas sur un agent qui porte déjà un objet du même type.</summary>
         public static bool CanEquip(ItemDef item, IEnumerable<ItemDef> equipped) => equipped.All(e => e.Type != item.Type);

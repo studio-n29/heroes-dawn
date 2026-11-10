@@ -20,6 +20,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["booster.received"] = "{0} cards added to the Grimoire",
             ["shop.daily_pass"] = "GIFT · PASS",
             ["game.tagline"] = "New York still holds. For how long?",
+            ["errors.collection_duplicate_card"] = "This agent already carries this card.",
             ["ui.ok"] = "OK", ["ui.cancel"] = "Cancel", ["ui.confirm"] = "Confirm", ["ui.continue"] = "Continue",
             ["ui.close"] = "Close", ["ui.back"] = "Back", ["ui.credits"] = "Credits",
             ["ui.level"] = "Lv. {0}", ["ui.fatigue"] = "Fatigue {0} %", ["ui.saving"] = "Saving…",

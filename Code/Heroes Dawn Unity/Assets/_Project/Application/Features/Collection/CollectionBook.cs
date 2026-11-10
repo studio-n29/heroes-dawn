@@ -21,6 +21,7 @@ namespace N29.HeroesDawn.Application.Features.Collection
         public static readonly DomainError NotOwned = new DomainError("collection.not_owned", "errors.collection_not_owned");
         public static readonly DomainError WrongFamily = new DomainError("collection.family", "errors.collection_family");
         public static readonly DomainError NeedFirstCard = new DomainError("collection.first_card", "errors.collection_first_card");
+        public static readonly DomainError DuplicateCard = new DomainError("collection.duplicate_card", "errors.collection_duplicate_card");
         public static readonly DomainError NothingEquipped = new DomainError("collection.nothing", "errors.collection_nothing");
         public static readonly DomainError SoldOut = new DomainError("collection.sold_out", "errors.collection_sold_out");
         public static readonly DomainError NoBooster = new DomainError("collection.no_booster", "errors.collection_no_booster");
@@ -142,15 +143,16 @@ namespace N29.HeroesDawn.Application.Features.Collection
 
         // ------------------------------------------------------------------ Cartes équipées
 
-        /// <summary>Équipe une carte en emplacement 3 (<paramref name="slot"/> 0) ou 4 (1) ; l'emplacement 4 demande une carte en 3.</summary>
+        /// <summary>Équipe une carte dans l emplacement <paramref name="slot"/> (0 à 2) : équipement libre, sans condition de famille ni d ordre ; jamais deux fois la même carte sur un agent.</summary>
         public Result EquipCard(MemberId member, int slot, CardId card)
         {
             var m = Member(member);
             if (m == null) return Result.Fail(CollectionErrors.UnknownMember);
             if (slot < 0 || slot >= m.Cards.Length) return Result.Fail(CollectionErrors.NoSlot);
             if (!Defs.HasCard(card)) return Result.Fail(CollectionErrors.UnknownThing);
-            if (!CollectionRules.CanEquip(Defs.Card(card), m.Def)) return Result.Fail(CollectionErrors.WrongFamily);
-            if (slot == 1 && !m.Cards[0].HasValue) return Result.Fail(CollectionErrors.NeedFirstCard);
+            var others = new List<CardId?>(m.Cards);
+            others.RemoveAt(slot);
+            if (!CollectionRules.CanEquip(Defs.Card(card), others)) return Result.Fail(CollectionErrors.DuplicateCard);
             if (m.Cards[slot] != card && CollectionOps.AvailableCards(Session, card) <= 0) return Result.Fail(CollectionErrors.NotOwned);
             m.Cards[slot] = card;
             Changed(true);
@@ -163,7 +165,7 @@ namespace N29.HeroesDawn.Application.Features.Collection
             if (m == null) return Result.Fail(CollectionErrors.UnknownMember);
             if (slot < 0 || slot >= m.Cards.Length || !m.Cards[slot].HasValue) return Result.Fail(CollectionErrors.NothingEquipped);
             m.Cards[slot] = null;
-            if (slot == 0 && m.Cards[1].HasValue) { m.Cards[0] = m.Cards[1]; m.Cards[1] = null; }
+            for (int i = slot; i + 1 < m.Cards.Length; i++) { m.Cards[i] = m.Cards[i + 1]; m.Cards[i + 1] = null; }
             Changed(true);
             return Result.Ok();
         }
