@@ -60,6 +60,8 @@ namespace N29.HeroesDawn.Domain.Combat
         /// Compétences de l agent : ses deux compétences de base, puis ses cartes équipées dans l ordre des emplacements (jusqu à cinq compétences).
         /// Équipement libre : aucune condition de famille. Une carte absente du jeu ou déjà portée dans un emplacement précédent est ignorée.
         /// Ancien kit de trois compétences : la première carte remplace la 3e.
+        /// Chaque carte reçoit son bonus de position (+15 %) et de famille (+5 %) après son palier, avant la puissance de compétence des objets.
+        /// Chaque carte reçoit son bonus de position (+15 %) et de famille (+5 %) après son palier, avant la puissance de compétence des objets.
         /// </summary>
         static IReadOnlyList<SkillDef> SkillsWithCards(MemberDef d, AllyEntry e, CollectionDef? collection)
         {
@@ -73,7 +75,8 @@ namespace N29.HeroesDawn.Domain.Combat
                 var id = e.Cards[i]!.Value;
                 if (!collection.HasCard(id) || !seen.Add(id)) continue;
                 int lvl = i < e.CardLevels.Count ? e.CardLevels[i] : 1;
-                var skill = CardLevels.SkillAt(collection.Card(id), lvl);
+                var card = collection.Card(id);
+                var skill = CardBonuses.Apply(CardLevels.SkillAt(card, lvl), CardBonuses.Percent(card, d));
                 if (first && list.Count >= 3) list[2] = skill;   // ancien kit de trois compétences : la carte remplace la 3e
                 else list.Add(skill);
                 first = false;

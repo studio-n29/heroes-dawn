@@ -147,11 +147,11 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(Verre(2).Skills[2].Effects.Count, Is.EqualTo(1));
         }
 
-        [Test, Description("Vérifie qu'avec un objet de puissance (+15 %), la carte niveau 6 a ses dégâts augmentés par le niveau puis par l'objet, et son bouclier de palier par l'objet seulement — parce qu'aucune augmentation ne doit être comptée deux fois")]
+        [Test, Description("Vérifie qu'avec un objet de puissance (+15 %), la carte niveau 6 a ses dégâts augmentés par le niveau, le bonus de famille (+5 %) puis l objet, et son bouclier de palier par l'objet seulement — parce qu'aucune augmentation ne doit être comptée deux fois")]
         public void CardWithItemSkillPower_ScalesOnce()
         {
             var fx = Verre(6, "power_gauntlet").Skills[2].Effects;
-            Assert.That(fx[0].Value, Is.EqualTo(150 * 115 / 100));
+            Assert.That(fx[0].Value, Is.EqualTo(150 * 105 / 100 * 115 / 100), "niveau, puis bonus de famille (+5 %), puis objet");
             Assert.That(fx[2].Value, Is.EqualTo(10 * 115 / 100));
         }
     }
