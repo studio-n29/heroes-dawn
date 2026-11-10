@@ -68,6 +68,11 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             if (Square) ring.type = Image.Type.Sliced;
             ring.color = Theme.FrostEdge;
             ring.raycastTarget = false;
+            if (!Square)
+            {
+                var kitRing = KitArt.Get("Frames/portrait-ally"); // anneau doré du kit Aube tactique
+                if (kitRing != null) { ring.sprite = kitRing; ring.type = Image.Type.Simple; ring.color = Color.white; }
+            }
             var disc = Ui.Img(root, "Disc", Theme.Surface3, Square ? Sprites.Rounded : Sprites.Circle);
             if (Square) disc.type = Image.Type.Sliced;
             disc.rectTransform.Stretch(4, 4, 4, 4);
@@ -87,6 +92,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             var boss = Ui.Img(root, "Boss", Theme.Primary, Sprites.Ring);
             boss.rectTransform.Stretch(-6, -6, -6, -6);
             boss.gameObject.SetActive(false);
+            if (Square)
+            {
+                // Cadre carré doré à coin coupé (kit d'extension) au-dessus du portrait.
+                var kitFrame = KitArt.GetExt("Components/fatigue-portrait");
+                if (kitFrame != null) Ui.Img(root, "KitFrame", Color.white, kitFrame).rectTransform.Stretch();
+            }
             var view = root.gameObject.AddComponent<PortraitView>();
             ctx.Wire(view, "disc", disc);
             ctx.Wire(view, "bust", bust);
@@ -190,24 +201,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Pile des messages éphémères (haut de l'écran).</summary>
+    /// <summary>Toasts : document UI Toolkit (Screens/Toasts/Toasts.uxml).</summary>
     public sealed class ToastsRecipe : IPrefabRecipe
     {
         public string RelativePath => "Common/Toasts.prefab";
         public int Order => 10;
 
         public GameObject Build(PrefabContext ctx)
-        {
-            var root = PrefabContext.NewRoot("Toasts");
-            var stack = Ui.Rect(root, "Stack").At(0.5f, 1f, 0, -110, 900, 400);
-            var v = stack.VLayout(10, 0, TextAnchor.UpperCenter);
-            v.childForceExpandWidth = false;
-            v.childControlWidth = true;
-            var view = root.gameObject.AddComponent<ToastsView>();
-            ctx.Wire(view, "stack", stack);
-            ctx.Wire(view, "toastPrefab", ctx.Asset("Widgets/Toast.prefab").GetComponent<ToastItemView>());
-            return root.gameObject;
-        }
+            => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<ToastsView>("Toasts", "Toasts/Toasts.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ToastOrder);
     }
 
     /// <summary>Couche des modales (les popups y sont instanciées).</summary>
@@ -224,34 +225,14 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         }
     }
 
-    /// <summary>Confirmation : voile, case de BD, bandeau de titre, texte, Annuler / Valider.</summary>
+    /// <summary>Confirmation : document UI Toolkit (Screens/Confirm/Confirm.uxml).</summary>
     public sealed class ConfirmPopupRecipe : IPrefabRecipe
     {
         public string RelativePath => "Popups/ConfirmPopup.prefab";
         public int Order => 10;
 
         public GameObject Build(PrefabContext ctx)
-        {
-            var root = PrefabContext.NewRoot("ConfirmPopup");
-            var group = root.gameObject.AddComponent<CanvasGroup>();
-            var (window, content, title) = PopupKit.Window(root, 980, 480, Theme.Primary);
-            var body = Ui.Txt(content, "", 34, Theme.Text, TextAnchor.MiddleCenter, FontKind.Body, "Body");
-            body.rectTransform.Stretch(0, 120, 0, 10);
-            var row = Ui.Rect(content, "Buttons").BottomBand(96, 0);
-            row.HLayout(40, 0, TextAnchor.MiddleCenter);
-            var cancel = Ui.Btn(row, "", Theme.Surface3, Theme.Text, null!, 36, FontKind.Title, "Cancel");
-            cancel.Rect.Pref(300, 90);
-            var ok = Ui.Btn(row, "", Theme.Primary, Theme.TextDark, null!, 40, FontKind.Title, "Ok");
-            ok.Rect.Pref(340, 90);
-            var view = root.gameObject.AddComponent<ConfirmPopupView>();
-            ctx.Wire(view, "title", title);
-            ctx.Wire(view, "body", body);
-            ctx.Wire(view, "ok", ok);
-            ctx.Wire(view, "cancel", cancel);
-            ctx.Wire(view, "window", window);
-            ctx.Wire(view, "group", group);
-            return root.gameObject;
-        }
+            => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<ConfirmPopupView>("ConfirmPopup", "Confirm/Confirm.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
 
     /// <summary>Gabarit commun des popups (reprise de l'ancienne ModalLayer.Open).</summary>

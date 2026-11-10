@@ -2,48 +2,52 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Presentation.Mvp;
-using TMPro;
-using UnityEngine;
+using N29.HeroesDawn.Presentation.UiToolkit;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Common
 {
-    /// <summary>Confirmation (popup prefab) : titre, texte, Annuler / Valider. Retour = Annuler.</summary>
-    public sealed class ConfirmPopupView : MonoBehaviour, IConfirmPopupView
+    /// <summary>Confirmation (UI Toolkit, planche 16.2) : titre, texte, Annuler / Valider. Retour (B, Échap) = Annuler.</summary>
+    public sealed class ConfirmPopupView : HdPopup, IConfirmPopupView
     {
-        [SerializeField] TMP_Text title = null!;
-        [SerializeField] TMP_Text body = null!;
-        [SerializeField] UiButton ok = null!;
-        [SerializeField] UiButton cancel = null!;
-        [SerializeField] RectTransform window = null!;
-        [SerializeField] CanvasGroup group = null!;
+        UnityEngine.UIElements.Button _ok = null!;
+        UnityEngine.UIElements.Button _cancel = null!;
+        Label _title = null!;
+        Label _body = null!;
         UniTaskCompletionSource<bool>? _answer;
 
-        public bool Cancelable => true;
-        public UiButton OkButton => ok;
-        public UiButton CancelButton => cancel;
+        public HdButtonRef OkButton { get; private set; } = null!;
+        public HdButtonRef CancelButton { get; private set; } = null!;
 
-        void Awake()
+        protected override VisualElement DefaultFocus => _ok;
+
+        protected override void Bind()
         {
-            ok.Button.onClick.AddListener(() => _answer?.TrySetResult(true));
-            cancel.Button.onClick.AddListener(() => _answer?.TrySetResult(false));
+            _title = Q<Label>("title");
+            _body = Q<Label>("body");
+            _ok = Q<UnityEngine.UIElements.Button>("ok");
+            _cancel = Q<UnityEngine.UIElements.Button>("cancel");
+            OkButton = new HdButtonRef(_ok, this);
+            CancelButton = new HdButtonRef(_cancel, this);
+            _ok.clicked += () => _answer?.TrySetResult(true);
+            _cancel.clicked += () => _answer?.TrySetResult(false);
         }
 
         public UniTask<bool> AskAsync(ConfirmData d, CancellationToken ct)
         {
-            title.text = d.Title;
-            body.text = d.Body;
-            ok.SetLabel(d.Ok);
-            ok.SetColors(ToneColors.Of(d.OkTone), Theme.TextDark);
-            cancel.SetLabel(d.Cancel);
-            cancel.gameObject.SetActive(!string.IsNullOrEmpty(d.Cancel)); // un message simple n a qu un bouton
-            group.alpha = 0f;
-            Tween.Fade(group, 1f, 0.15f);
-            Tween.PopIn(window, 0.26f);
+            _title.text = d.Title;
+            _body.text = d.Body;
+            _ok.text = d.Ok;
+            // Une action risquée (quitter, supprimer) prend le bouton rouge ; sinon le bouton principal ivoire.
+            _ok.EnableInClassList("hd-btn--danger", d.OkTone == Tone.Danger);
+            _ok.EnableInClassList("hd-btn--primary", d.OkTone != Tone.Danger);
+            _cancel.text = d.Cancel;
+            _cancel.style.display = string.IsNullOrEmpty(d.Cancel) ? DisplayStyle.None : DisplayStyle.Flex; // un message simple n'a qu'un bouton
             _answer = new UniTaskCompletionSource<bool>();
             ct.Register(() => _answer.TrySetCanceled());
             return _answer.Task;
         }
 
-        public void RequestCancel() => _answer?.TrySetResult(false);
+        public override void RequestCancel() => _answer?.TrySetResult(false);
     }
 }

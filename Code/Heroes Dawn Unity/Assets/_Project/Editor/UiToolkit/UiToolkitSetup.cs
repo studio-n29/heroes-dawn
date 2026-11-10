@@ -10,6 +10,9 @@ namespace N29.HeroesDawn.EditorTools.UiToolkit
     public static class UiToolkitSetup
     {
         public const string PanelSettingsPath = "Assets/_Project/Resources/UiToolkit/HdPanelSettings.asset";
+        /// <summary>Panneau des couches au-dessus de tout le jeu (fenêtres, toasts, tutoriel) : il passe devant les canvas uGUI.</summary>
+        public const string OverlaySettingsPath = "Assets/_Project/Resources/UiToolkit/HdOverlayPanelSettings.asset";
+        public const float OverlayPanelOrder = 50f;
         public const string ThemePath = "Assets/_Project/UIToolkit/Theme/Hd.tss";
         public const string Screens = "Assets/_Project/UIToolkit/Screens/";
 
@@ -17,10 +20,13 @@ namespace N29.HeroesDawn.EditorTools.UiToolkit
         public const int ScreenOrder = 0, ModalOrder = 100, ToastOrder = 200, TutorialOrder = 300;
 
         [MenuItem("Heroes Dawn/Interface/Régler le panneau UI Toolkit")]
-        public static PanelSettings EnsurePanelSettings()
+        public static PanelSettings EnsurePanelSettings() { EnsurePanelSettings(true); return EnsurePanelSettings(false); }
+
+        public static PanelSettings EnsurePanelSettings(bool overlay)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(PanelSettingsPath)!);
-            var settings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
+            string path = overlay ? OverlaySettingsPath : PanelSettingsPath;
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            var settings = AssetDatabase.LoadAssetAtPath<PanelSettings>(path);
             bool created = settings == null;
             if (created) settings = ScriptableObject.CreateInstance<PanelSettings>();
             settings!.themeStyleSheet = AssetDatabase.LoadAssetAtPath<ThemeStyleSheet>(ThemePath);
@@ -30,7 +36,8 @@ namespace N29.HeroesDawn.EditorTools.UiToolkit
             settings.match = 0.5f;
             settings.clearColor = false;
             settings.targetDisplay = 0;
-            if (created) AssetDatabase.CreateAsset(settings, PanelSettingsPath);
+            settings.sortingOrder = overlay ? OverlayPanelOrder : 0f;
+            if (created) AssetDatabase.CreateAsset(settings, path);
             else EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssets();
             return settings;
@@ -41,7 +48,7 @@ namespace N29.HeroesDawn.EditorTools.UiToolkit
         {
             var go = new GameObject(name, typeof(RectTransform));
             var doc = go.AddComponent<UIDocument>();
-            doc.panelSettings = EnsurePanelSettings();
+            doc.panelSettings = EnsurePanelSettings(sortingOrder >= ModalOrder);
             doc.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Screens + uxmlName);
             doc.sortingOrder = sortingOrder;
             go.AddComponent<TView>();

@@ -33,6 +33,9 @@ namespace N29.HeroesDawn.Presentation.UiToolkit
             var root = Root;
             // Hors des zones peintes, les clics traversent vers le jeu en dessous (carte, terrains de mini-jeux).
             root.pickingMode = PickingMode.Ignore;
+            // Plusieurs documents partagent un panneau : chacun couvre tout le panneau, sans partager la hauteur avec ses voisins.
+            root.style.position = Position.Absolute;
+            root.style.left = 0; root.style.top = 0; root.style.right = 0; root.style.bottom = 0;
             foreach (var template in root.Query<TemplateContainer>().ToList())
             {
                 // Le conteneur du modèle remplit le panneau (point de passage commun : les écrans plein cadre en dépendent).

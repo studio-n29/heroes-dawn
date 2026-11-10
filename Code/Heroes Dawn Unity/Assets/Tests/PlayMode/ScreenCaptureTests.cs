@@ -57,15 +57,17 @@ namespace N29.HeroesDawn.Tests.PlayMode
             // Panneaux UI Toolkit : rendus dans une texture le temps de la capture, intercalés entre les canvas uGUI du bas (fond, écrans) et ceux du haut (fenêtres, toasts).
             var uiSettings = Object.FindObjectsByType<UnityEngine.UIElements.UIDocument>(FindObjectsSortMode.None)
                 .Where(d => d.isActiveAndEnabled && d.panelSettings != null).Select(d => d.panelSettings).Distinct().ToList();
-            RenderTexture? uiRt = null;
+            RenderTexture? uiRt = null, uiTopRt = null;
             var savedTargets = new System.Collections.Generic.List<(UnityEngine.UIElements.PanelSettings s, RenderTexture? t, bool clear, Color color)>();
             if (uiSettings.Count > 0)
             {
+                int canvasOrder = Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None).Where(c => c.isRootCanvas).Select(c => c.sortingOrder).DefaultIfEmpty(0).Max();
                 uiRt = new RenderTexture(w, h, 24);
+                uiTopRt = new RenderTexture(w, h, 24);
                 foreach (var ps in uiSettings)
                 {
                     savedTargets.Add((ps, ps.targetTexture, ps.clearColor, ps.colorClearValue));
-                    ps.targetTexture = uiRt; ps.clearColor = true; ps.colorClearValue = new Color(0f, 0f, 0f, 0f);
+                    ps.targetTexture = ps.sortingOrder > canvasOrder ? uiTopRt : uiRt; ps.clearColor = true; ps.colorClearValue = new Color(0f, 0f, 0f, 0f);
                 }
                 for (int i = 0; i < 4; i++) yield return null;
             }
@@ -111,15 +113,19 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 cam.backgroundColor = Color.black; cam.Render(); var onBlack = Read(rt);
                 cam.backgroundColor = Color.white; cam.Render(); var onWhite = Read(rt);
                 var ui = Read(uiRt);
+                var top = Read(uiTopRt!);
                 var result = new Color32[onBlack.Length];
                 for (int i = 0; i < result.Length; i++)
                 {
                     float alpha = 1f - (onWhite[i].g - onBlack[i].g) / 255f; // opacité des canvas à ce pixel
                     float inv = 1f - Mathf.Clamp01(alpha);
+                    float r = onBlack[i].r + ui[i].r * inv, g = onBlack[i].g + ui[i].g * inv, b = onBlack[i].b + ui[i].b * inv;
+                    // Panneaux du dessus (fenêtres, toasts) : couleur déjà multipliée par leur opacité.
+                    float ta = top[i].a / 255f, tinv = 1f - ta;
                     result[i] = new Color32(
-                        (byte)Mathf.Clamp(onBlack[i].r + ui[i].r * inv, 0, 255),
-                        (byte)Mathf.Clamp(onBlack[i].g + ui[i].g * inv, 0, 255),
-                        (byte)Mathf.Clamp(onBlack[i].b + ui[i].b * inv, 0, 255), 255);
+                        (byte)Mathf.Clamp(top[i].r + r * tinv, 0, 255),
+                        (byte)Mathf.Clamp(top[i].g + g * tinv, 0, 255),
+                        (byte)Mathf.Clamp(top[i].b + b * tinv, 0, 255), 255);
                 }
                 composed = new Texture2D(w, h, TextureFormat.RGB24, false);
                 composed.SetPixels32(result);
@@ -138,6 +144,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             rt.Release();
             foreach (var (ps, t, clear, color) in savedTargets) { ps.targetTexture = t; ps.clearColor = clear; ps.colorClearValue = color; }
             if (uiRt != null) uiRt.Release();
+            if (uiTopRt != null) uiTopRt.Release();
         }
 
         /// <summary>Capture après la fin des animations d'entrée (cascade, glissement : temps réel).</summary>

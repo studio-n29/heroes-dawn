@@ -7,8 +7,8 @@ namespace N29.HeroesDawn.Presentation.UiToolkit
     /// <summary>Appel d'un bouton comme « onClick.Invoke() » : envoie la validation de la manette (A) au bouton, comme un vrai appui.</summary>
     public sealed class HdClick
     {
-        readonly Button _button;
-        public HdClick(Button button) => _button = button;
+        readonly UnityEngine.UIElements.Button _button;
+        public HdClick(UnityEngine.UIElements.Button button) => _button = button;
 
         public void Invoke()
         {
@@ -23,18 +23,21 @@ namespace N29.HeroesDawn.Presentation.UiToolkit
     /// </summary>
     public sealed class HdButtonRef
     {
-        readonly Button _button;
+        readonly UnityEngine.UIElements.Button _button;
         readonly Component _owner;
 
-        public HdButtonRef(Button button, Component owner)
+        public HdButtonRef(UnityEngine.UIElements.Button button, Component owner)
         {
             _button = button;
             _owner = owner;
             onClick = new HdClick(button);
         }
 
-        public Button Element => _button;
+        public UnityEngine.UIElements.Button Element => _button;
         public HdClick onClick { get; }
+
+        /// <summary>Forme des anciens boutons habillés (« bouton.Button.onClick ») : le bouton est son propre Button.</summary>
+        public HdButtonRef Button => this;
         public bool interactable { get => _button.enabledSelf; set => _button.SetEnabled(value); }
 
         /// <summary>Objet de la vue (le bouton est un élément, pas un objet : l'activité de la vue fait foi).</summary>

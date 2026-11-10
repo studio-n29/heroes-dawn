@@ -1,0 +1,29 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal">
+        <ui:VisualElement name="window" class="hd-window hd-modal__window">
+            <ui:Label name="title" class="hd-modal__title" />
+            <ui:VisualElement class="hd-modal__buttons hd-tabs">
+                <ui:Button name="tabSignIn" class="hd-tab" />
+                <ui:Button name="tabSignUp" class="hd-tab" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-divider" />
+            <ui:TextField name="email" class="hd-field hd-form__row" />
+            <ui:TextField name="password" password="true" class="hd-field hd-form__row" />
+            <ui:TextField name="name" class="hd-field hd-form__row" />
+            <ui:Label name="message" class="hd-form__message" />
+            <ui:Button name="submit" class="hd-btn hd-btn--primary hd-form__row" />
+            <ui:VisualElement class="hd-modal__buttons hd-form__row">
+                <ui:Button name="google" class="hd-btn hd-btn--secondary hd-btn--small" />
+                <ui:Button name="apple" class="hd-btn hd-btn--secondary hd-btn--small" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-modal__buttons hd-form__row">
+                <ui:Button name="forgot" class="hd-btn hd-btn--ghost hd-btn--small" />
+                <ui:Button name="close" class="hd-btn hd-btn--ghost hd-btn--small" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="busy" class="hd-busy">
+            <ui:Label name="busyText" class="hd-modal__body" />
+            <ui:Button name="busyCancel" class="hd-btn hd-btn--secondary hd-btn--small" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

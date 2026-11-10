@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal">
+        <ui:VisualElement name="window" class="hd-window hd-modal__window">
+            <ui:Label name="title" class="hd-modal__title" />
+            <ui:VisualElement class="hd-divider" />
+            <ui:Label name="hint" class="hd-modal__body hd-choice__hint" />
+            <ui:VisualElement class="hd-choice__cards">
+                <ui:VisualElement class="hd-panel hd-choice__card">
+                    <ui:Label name="deviceHeader" class="hd-choice__header" />
+                    <ui:Label name="deviceSummary" class="hd-choice__summary" />
+                    <ui:Button name="keepDevice" class="hd-btn hd-btn--secondary" />
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-panel hd-choice__card hd-choice__card--account">
+                    <ui:Label name="accountHeader" class="hd-choice__header" />
+                    <ui:Label name="accountSummary" class="hd-choice__summary" />
+                    <ui:Button name="keepAccount" class="hd-btn hd-btn--primary" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-modal__buttons hd-form__row">
+                <ui:Button name="later" class="hd-btn hd-btn--ghost hd-btn--small" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

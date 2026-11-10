@@ -114,10 +114,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             // Plus aucune pièce du QG n est BIENTÔT : le mécanisme (relais de la coque) reste testé avec une fonction encore à venir.
             Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Wip.UiTapRelay>()!.RaiseWip(WipCatalog.MemberArt.Id);
             var expected = Loc.F("wip.toast", Loc.T(WipCatalog.MemberArt.TitleKey));
-            yield return PlayModeHarness.WaitFor(() => Object.FindObjectsByType<ToastItemView>(FindObjectsSortMode.None)
-                .Any(t => t.GetComponentInChildren<TMP_Text>().text == expected));
-            Assert.That(Object.FindObjectsByType<ToastItemView>(FindObjectsSortMode.None)
-                .Any(t => t.GetComponentInChildren<TMP_Text>().text == expected), Is.True, "toast BIENTÔT affiché");
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<ToastsView>()!.Texts().Contains(expected));
+            Assert.That(Object.FindAnyObjectByType<ToastsView>()!.Texts(), Does.Contain(expected), "toast BIENTÔT affiché");
             Assert.That(PlayModeHarness.Visible<QgPageView>(), Is.True, "aucune navigation");
         }
 
