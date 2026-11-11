@@ -15,12 +15,12 @@ namespace N29.HeroesDawn.Presentation.UiToolkit
         RectTransform? _parent;
         TutorialTargetMarker? _marker;
 
-        public static HdTutorialAnchor Attach(Component host, VisualElement element, TutorialTarget id)
+        public static HdTutorialAnchor Attach(Component host, VisualElement element, TutorialTarget id, string suffix = "")
         {
             // Un document recréé (ou une liste reconstruite) repose son ancre : l'ancienne, restée sur un élément détaché, disparaît.
-            var previous = host.transform.Find("Anchor_" + id);
+            var previous = host.transform.Find("Anchor_" + id + suffix);
             if (previous != null) { previous.gameObject.SetActive(false); Destroy(previous.gameObject); }
-            var go = new GameObject("Anchor_" + id, typeof(RectTransform));
+            var go = new GameObject("Anchor_" + id + suffix, typeof(RectTransform));
             go.transform.SetParent(host.transform, false);
             var anchor = go.AddComponent<HdTutorialAnchor>();
             anchor._element = element;

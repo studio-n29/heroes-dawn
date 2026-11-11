@@ -271,9 +271,6 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return new WaitForSecondsRealtime(0.3f);
             Object.FindAnyObjectByType<N29.HeroesDawn.Composition.HubLifetimeScope>()!.Container.Resolve<N29.HeroesDawn.Presentation.Hub.HubNavigator>().Open(HubPage.Tournament);
             yield return CaptureSettled("92b-tournoi");
-            var tournament = Container.Resolve<N29.HeroesDawn.Application.Features.Meta.Tournament>();
-            while (!tournament.Finished) tournament.PlayNext();
-            yield return CaptureSettled("92c-tournoi-fini");
         }
 
         [UnityTest, Explicit("Captures à la demande"), Timeout(180000), Description("Produit les captures de la narration : page Chapitres, dossier d'un agent et fenêtre d'ouverture d'un chapitre — parce que ces écrans se relisent à l'œil (lot G)")]
@@ -485,7 +482,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning);
             yield return CaptureSettled("03-plateau-portee");
 
-            var map = Object.FindAnyObjectByType<BoardMapView>()!;
+            var map = Object.FindAnyObjectByType<BoardView>()!;
             var far = run.Destinations.OrderByDescending(d => d.Value.Cost).First().Key;
             map.NodeButton(far).onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.8f);
