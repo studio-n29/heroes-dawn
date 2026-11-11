@@ -48,3 +48,20 @@ Pour retoucher un écran : ouvrir son prefab (`Prefabs/Screens/…`, `Prefabs/Pa
 
 ## 7. Git
 Le dépôt est à la racine **`Documents/Heroes Dawn/`** (documentation + code). Les fichiers binaires (images, polices, xlsx, docx, pdf) passent par Git LFS.
+
+## 8. Achats intégrés (Unity IAP)
+Le jeu vend sept **produits consommables** (package `com.unity.purchasing` 5.4.3). Sur appareil, `UnityIapGateway` parle au vrai magasin ; dans l'éditeur et les tests, le simulateur `FakePurchaseGateway` ne débite rien.
+
+À déclarer **à la main** (rien n'est créé par le code ni par ce dépôt), avec le **même identifiant** dans Google Play Console et App Store Connect :
+
+| Identifiant | Contenu | Prix de référence |
+|---|---|---|
+| `gems_100` | 100 Gemmes | 0,99 € |
+| `gems_520` | 520 Gemmes | 4,99 € |
+| `gems_1080` | 1 080 Gemmes | 9,99 € |
+| `gems_2250` | 2 250 Gemmes | 19,99 € |
+| `gems_6000` | 6 000 Gemmes | 49,99 € |
+| `welcome` | 500 Gemmes + accélérateur de 8 h (une fois par profil) | 2,99 € |
+| `pass_premium` | pass premium de la saison en cours | 9,99 € |
+
+Puis : créer des testeurs de licence (Google Play) et des comptes bac à sable (App Store Connect), et tester un achat, une annulation et la reprise après fermeture de l'appli sur un appareil réel. Le prix affiché au joueur doit venir du store (taxes par pays). Aucune clé n'est stockée dans le dépôt.

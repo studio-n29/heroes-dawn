@@ -186,14 +186,16 @@ namespace N29.HeroesDawn.Application.Features.Meta
             var paid = await _payments.PurchaseAsync(PassTrack.PremiumProduct, ct);
             ct.ThrowIfCancellationRequested();
             if (paid.IsFailure) return Result.Fail(paid.Error!);
-            GrantPremium();
-            (_payments as IPendingPurchaseSource)?.Confirm(PassTrack.PremiumProduct);
+            var ledger = _payments as IPendingPurchaseSource;
+            GrantPremium(ledger?.TransactionOf(PassTrack.PremiumProduct));
+            ledger?.Confirm(PassTrack.PremiumProduct);
             return Result.Ok();
         }
 
         /// <summary>Active le premium de la saison en cours (achat confirmé ou transaction reprise) ; faux s'il l'était déjà.</summary>
-        public bool GrantPremium()
+        public bool GrantPremium(string? transactionId = null)
         {
+            if (!PurchaseLedger.TryRecord(_c.Meta, transactionId)) return false;
             EnsureSeason();
             if (PremiumOwned) return false;
             _c.Meta.passPremium = true;

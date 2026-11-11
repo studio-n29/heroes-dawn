@@ -21,10 +21,19 @@ namespace N29.HeroesDawn.Application.Features.Meta
     /// </summary>
     public interface IPendingPurchaseSource
     {
-        IReadOnlyList<string> PendingProductIds { get; }
-        /// <summary>Appelé après l'octroi : le store peut clore la transaction.</summary>
+        /// <summary>Transactions payées que personne n'attend (reprises au lancement), de la plus ancienne à la plus récente.</summary>
+        IReadOnlyList<PendingPurchase> Pending { get; }
+        /// <summary>Identifiant de la transaction non confirmée la plus ancienne de ce produit (pour ne jamais octroyer deux fois la même).</summary>
+        string? TransactionOf(string productId);
+        /// <summary>Appelé après l'octroi : confirme la plus ancienne transaction de ce produit, le store peut la clore.</summary>
         void Confirm(string productId);
         event System.Action? PendingChanged;
+    }
+
+    public readonly struct PendingPurchase
+    {
+        public readonly string ProductId, TransactionId;
+        public PendingPurchase(string productId, string transactionId) { ProductId = productId; TransactionId = transactionId; }
     }
 
     public sealed class GemPack
@@ -102,8 +111,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
             var paid = await _payments.PurchaseAsync(pack.Id, ct);
             ct.ThrowIfCancellationRequested();
             if (paid.IsFailure) return Result<int>.Fail(paid.Error!);
-            Deliver(pack);
-            (_payments as IPendingPurchaseSource)?.Confirm(pack.Id);
+            var ledger = _payments as IPendingPurchaseSource;
+            Deliver(pack, ledger?.TransactionOf(pack.Id));
+            ledger?.Confirm(pack.Id);
             return Result<int>.Ok(pack.Gems);
         }
 
@@ -115,8 +125,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
         }
 
         /// <summary>Verse un pack payé (jamais appelé sans confirmation du store). L'offre de bienvenue ajoute son accélérateur et ne se verse qu'une fois.</summary>
-        public void Deliver(GemPack pack)
+        public void Deliver(GemPack pack, string? transactionId = null)
         {
+            if (!PurchaseLedger.TryRecord(_c.Meta, transactionId)) return; // déjà octroyée (arrêt entre l'octroi et la confirmation)
             bool firstWelcome = pack.Id == Welcome.Id && !_c.Meta.welcomeClaimed;
             _c.Grant(new Reward(gems: pack.Gems));
             if (firstWelcome) { _c.Meta.welcomeClaimed = true; _c.Meta.speedUpTokens += WelcomeSpeedUpMinutes; }

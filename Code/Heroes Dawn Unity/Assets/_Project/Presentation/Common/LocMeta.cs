@@ -19,6 +19,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["errors.meta_busy"] = "Déjà occupé.";
             d["errors.meta_no_members"] = "Pas assez de membres libres hors de l'escouade.";
             d["errors.meta_payment"] = "Paiement refusé (simulé). Réessaie.";
+            d["errors.meta_payment_cancelled"] = "Achat annulé. Rien n'a été débité.";
+            d["errors.store_unavailable"] = "Boutique indisponible. Vérifie ta connexion et réessaie.";
             d["errors.meta_done"] = "Déjà fait.";
             d["errors.on_expedition"] = "Ce membre est en expédition.";
             d["wip.soon"] = "BIENTÔT";

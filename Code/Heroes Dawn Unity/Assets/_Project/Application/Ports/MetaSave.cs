@@ -198,6 +198,8 @@ namespace N29.HeroesDawn.Application.Ports
         public List<CounterSave> purchases = new List<CounterSave>();
         /// <summary>Vrai une fois l'offre de bienvenue prise (elle ne s'achète qu'une fois par profil).</summary>
         public bool welcomeClaimed;
+        /// <summary>Identifiants des dernières transactions de store déjà octroyées (les plus récentes) : une transaction reprise au lancement n'est jamais octroyée deux fois.</summary>
+        public List<string> grantedTransactions = new List<string>();
         /// <summary>Accélérateurs d'expédition restants, en minutes (480 pour 8 h) ; dépensés avant les Gemmes.</summary>
         public int speedUpTokens;
         /// <summary>Emplacements d'expédition achetés en Gemmes (0 à 2 : le 4e et le 5e).</summary>

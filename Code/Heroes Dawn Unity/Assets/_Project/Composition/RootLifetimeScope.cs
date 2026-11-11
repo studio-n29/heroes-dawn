@@ -105,7 +105,12 @@ namespace N29.HeroesDawn.Composition
             builder.Register<IProgressBackupStore>(_ => new FileProgressBackupStore(), Lifetime.Singleton);
             builder.Register<ICombatVerifier>(_ => new LocalCombatVerifier(content), Lifetime.Singleton);
             builder.Register<ISceneLoader, UnitySceneLoader>(Lifetime.Singleton);
+            // Achats réels : Unity IAP sur appareil, simulateur dans l'éditeur et les tests.
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+            builder.Register<UnityIapGateway>(_ => new UnityIapGateway(new UnityStoreAdapter()), Lifetime.Singleton).As<IPurchaseGateway>();
+#else
             builder.Register<IPurchaseGateway>(_ => new FakePurchaseGateway(), Lifetime.Singleton);
+#endif
 
             // ---- Flux de jeu (seule autorité sur les scènes)
             builder.Register<GameFlowMachine>(Lifetime.Singleton).AsSelf().As<IGameFlow>();
@@ -170,6 +175,8 @@ namespace N29.HeroesDawn.Composition
             builder.Register<LocalFriendsPort>(Lifetime.Singleton).As<N29.HeroesDawn.Application.Ports.IFriendsPort>();
             builder.Register<ArchiveBook>(Lifetime.Singleton);
             builder.Register<Boutique>(Lifetime.Singleton);
+            builder.Register<PurchaseRecovery>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<PurchaseStartup>();
             builder.Register<CosmeticShop>(c => new CosmeticShop(c.Resolve<MetaContext>(), N29.HeroesDawn.Authoring.CosmeticLibrary.Load()), Lifetime.Singleton);
             builder.Register<Application.Features.Collection.CollectionBook>(Lifetime.Singleton);
             builder.Register<PlayerSettings>(Lifetime.Singleton);

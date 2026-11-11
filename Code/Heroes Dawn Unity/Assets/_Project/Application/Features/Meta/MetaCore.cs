@@ -40,6 +40,8 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public static readonly DomainError NoMembers = new DomainError("meta.no_members", "errors.meta_no_members");
         public static readonly DomainError MaxLevel = new DomainError("meta.max_level", "errors.max_level");
         public static readonly DomainError PaymentFailed = new DomainError("meta.payment", "errors.meta_payment");
+        public static readonly DomainError PaymentCancelled = new DomainError("meta.payment_cancelled", "errors.meta_payment_cancelled");
+        public static readonly DomainError StoreUnavailable = new DomainError("meta.store", "errors.store_unavailable");
         public static readonly DomainError AlreadyDone = new DomainError("meta.done", "errors.meta_done");
         public static readonly DomainError NotEnoughComponents = new DomainError("meta.components", "errors.not_enough_components");
         public static readonly DomainError GradeTooLow = new DomainError("meta.grade_too_low", "errors.grade_too_low");
