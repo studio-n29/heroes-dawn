@@ -16,6 +16,12 @@
 ## Monétisation
 - [ ] Pas de loot box (recrutement au choix) : simplifie la conformité (Belgique, Pays-Bas…).
 - [ ] Prix affichés TTC par pays ; conditions de vente ; remboursements selon store.
+- [ ] **Déclaration des 7 produits consommables** dans Google Play Console et App Store Connect, mêmes identifiants : `gems_100`, `gems_520`, `gems_1080`, `gems_2250`, `gems_6000`, `welcome`, `pass_premium` (voir `Code/SETUP.md` §8).
+- [ ] **Prix TTC par pays** fixés dans chaque store (le jeu affiche le prix local renvoyé par le store, pas le texte du simulateur).
+- [ ] **Politique de confidentialité** mise à jour : identifiants d'achat et de transaction traités par Google / Apple et conservés (anti double octroi) dans la sauvegarde du profil.
+- [ ] **Test en bac à sable** sur appareil : testeurs de licence (Google Play), comptes sandbox (App Store) ; achat, annulation, reprise après fermeture de l'appli.
+- [ ] Mention « pas de loot box » dans la fiche de chaque store ; contenu acheté = temps, confort, cosmétiques (voir `NoPayToWinTests`).
+- [ ] Validation des reçus côté serveur (fonction Supabase) : amélioration hors 1.0.0 (client seul pour l'instant).
 
 ## Propriété intellectuelle
 - [ ] Licences des outils IA et des banques audio (usage commercial).

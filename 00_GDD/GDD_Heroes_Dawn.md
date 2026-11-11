@@ -155,13 +155,13 @@ Chaque fonctionnalité doit servir au moins un pilier.
 - Recharge avec le temps ou via objets.
 
 ## 8. Économie & monétisation
-- Modèle **F2P + pass saisonnier** ; le $ fait **uniquement gagner du temps** (rien d'exclusif hors cosmétiques).
-- **3 monnaies** : Crédits (soft), PR (recrutement), Premium ($).
-- Puits de Crédits : amélioration QG, paliers de compétences, consommables de mission, objets du salon, renouvellement de pool.
-- **Pass** : saisons de 6 semaines, piste gratuite + premium ; XP via objectifs secondaires et missions.
+- Modèle **F2P + pass saisonnier** ; l'argent réel achète du **temps, du confort et des cosmétiques** (rien d'exclusif hors cosmétiques) ; **jamais** de puissance, de Composants, de recettes, de duels ni de loot box.
+- **3 monnaies** : Crédits (soft), PR (recrutement), Gemmes (premium, 100 par euro).
+- Puits de Crédits : amélioration QG, consommables de mission, objets du salon, renouvellement de pool. Puits de Gemmes : accélération des expéditions (20 par heure), emplacements d'expédition (4e 300, 5e 500), renouvellements au-delà de l'échelle en Crédits (10), cosmétiques.
+- **Pass** : saisons de 42 jours, 50 paliers de 1 300 XP, piste gratuite + premium (9,99 €, achat réel) ; XP via missions, objectifs, boss de repaire, tournois et fabrication.
 - **Cosmétiques** (sans effet en jeu) : tenues de recrues, décor du QG, dés et pions ; via pass, boutique, succès et événements.
 - Détail : `01_Game_Design/04_Economie.md`.
-- Valeurs : Agent / Élite / Légende = 150 / 450 / 1 200 PR ; pool de 5 ; renouvellement 3 000 Crédits puis 50 gemmes ; packs de gemmes de 0,99 € à 49,99 € ; pass premium 9,99 €.
+- Valeurs : Agent / Élite / Légende = 150 / 450 / 1 200 PR ; pool de 5 ; renouvellement gratuit puis 100 → 800 Crédits puis 10 Gemmes ; 5 packs de Gemmes de 0,99 € à 49,99 € et offre de bienvenue 2,99 € ; pass premium 9,99 €.
 
 ## 9. Méta / QG
 | Pièce | Rôle |
