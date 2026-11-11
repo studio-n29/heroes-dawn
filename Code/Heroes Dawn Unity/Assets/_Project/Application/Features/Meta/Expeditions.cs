@@ -49,7 +49,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
     /// </summary>
     public sealed class Expeditions
     {
-        public const int Slots = 3;
+        public const int BaseSlots = 3, MaxSlots = 5;
         public const int FatiguePerTrip = 10;
 
         public static readonly IReadOnlyList<ExpeditionTemplate> Templates = new[]
@@ -63,6 +63,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
         readonly PassProgress _pass;
 
         public Expeditions(MetaContext context, PassProgress pass) { _c = context; _pass = pass; }
+
+        /// <summary>Emplacements disponibles : 3 de base, plus ceux achetés en Gemmes (2 au plus).</summary>
+        public static int SlotCount(MetaSave m) => BaseSlots + Math.Min(MaxSlots - BaseSlots, Math.Max(0, m.expeditionSlotsBought));
 
         public static ExpeditionTemplate? Find(string id)
         {
@@ -103,8 +106,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
 
         public IReadOnlyList<ExpeditionSlotView> SlotViews()
         {
-            var list = new List<ExpeditionSlotView>(Slots);
-            for (int i = 0; i < Slots; i++)
+            int slots = SlotCount(_c.Meta);
+            var list = new List<ExpeditionSlotView>(slots);
+            for (int i = 0; i < slots; i++)
             {
                 ExpeditionSave? e = _c.Meta.expeditions.FirstOrDefault(x => x.slot == i);
                 if (e == null) { list.Add(new ExpeditionSlotView(i, null, Array.Empty<string>(), TimeSpan.Zero)); continue; }
@@ -119,7 +123,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public Result Start(int slot, string templateId)
         {
             var t = Find(templateId);
-            if (t == null || slot < 0 || slot >= Slots) return Result.Fail(MetaErrors.Unknown);
+            if (t == null || slot < 0 || slot >= SlotCount(_c.Meta)) return Result.Fail(MetaErrors.Unknown);
             if (_c.Meta.expeditions.Any(e => e.slot == slot)) return Result.Fail(MetaErrors.Busy);
             var free = Available();
             if (free.Count < t.Members) return Result.Fail(MetaErrors.NoMembers);
@@ -143,7 +147,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
             var free = Available();
             foreach (var id in memberIds) if (!free.Any(m => m.Id.Value == id)) return Result.Fail(MetaErrors.NoMembers);
             int slot = -1;
-            for (int i = 0; i < Slots && slot < 0; i++) if (!_c.Meta.expeditions.Any(x => x.slot == i)) slot = i;
+            for (int i = 0; i < SlotCount(_c.Meta) && slot < 0; i++) if (!_c.Meta.expeditions.Any(x => x.slot == i)) slot = i;
             if (slot < 0) return Result.Fail(MetaErrors.Busy);
             var e = new ExpeditionSave { slot = slot, templateId = t.Id, endUtcTicks = (_c.UtcNow + TimeSpan.FromMinutes(t.Minutes)).Ticks };
             foreach (var id in memberIds) e.members.Add(id);
@@ -177,8 +181,11 @@ namespace N29.HeroesDawn.Application.Features.Meta
             return Result<Reward>.Ok(reward);
         }
 
-        /// <summary>Coût en Gemmes pour terminer tout de suite : 1 par tranche de 5 minutes restantes (au moins 1).</summary>
-        public static int SpeedUpCost(TimeSpan left) => Math.Max(1, (int)Math.Ceiling(left.TotalMinutes / 5.0));
+        /// <summary>Minutes restantes, arrondies à la minute supérieure (toute minute entamée compte).</summary>
+        static int MinutesLeft(TimeSpan left) => Math.Max(0, (int)Math.Ceiling(left.TotalMinutes - 1e-9));
+
+        /// <summary>Coût en Gemmes pour terminer tout de suite : 20 par heure (1 par tranche de 3 minutes restantes), minutes arrondies au-dessus, au moins 1.</summary>
+        public static int SpeedUpCost(TimeSpan left) => Math.Max(1, (MinutesLeft(left) + 2) / 3);
 
         public Result SpeedUp(int slot)
         {
@@ -186,7 +193,12 @@ namespace N29.HeroesDawn.Application.Features.Meta
             if (e == null) return Result.Fail(MetaErrors.Unknown);
             var left = new DateTime(e.endUtcTicks, DateTimeKind.Utc) - _c.UtcNow;
             if (left <= TimeSpan.Zero) return Result.Fail(MetaErrors.AlreadyDone);
-            if (!_c.Session.Wallet.TrySpendGems(SpeedUpCost(left))) return Result.Fail(MetaErrors.NotEnoughGems);
+            // Un accélérateur (minutes offertes) est dépensé avant les Gemmes ; un refus n'entame rien.
+            int minutes = MinutesLeft(left);
+            int covered = Math.Min(Math.Max(0, _c.Meta.speedUpTokens), minutes);
+            int gems = covered >= minutes ? 0 : SpeedUpCost(TimeSpan.FromMinutes(minutes - covered));
+            if (gems > 0 && !_c.Session.Wallet.TrySpendGems(gems)) return Result.Fail(MetaErrors.NotEnoughGems);
+            _c.Meta.speedUpTokens -= covered;
             e.endUtcTicks = _c.UtcNow.Ticks;
             _c.PublishWallet();
             _c.Touch(MetaArea.Operations);

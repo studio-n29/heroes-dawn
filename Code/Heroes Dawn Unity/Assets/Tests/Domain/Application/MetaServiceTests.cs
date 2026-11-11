@@ -202,7 +202,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Operations.SlotViews()[0].Empty);
         }
 
-        [Test, Description("Vérifie qu'accélérer une expédition coûte des Gemmes (1 par 5 min restantes, au moins 1) et la rend récupérable — parce que les Gemmes achètent du temps")]
+        [Test, Description("Vérifie qu'accélérer une expédition coûte des Gemmes (20 par heure restante, arrondi à la minute, au moins 1) et la rend récupérable — parce que les Gemmes achètent du temps")]
         public void Operations_SpeedUp_CostsGems()
         {
             FreeMembers(1);
@@ -211,7 +211,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(Code(_app.Operations.SpeedUp(0)), Is.EqualTo("meta.gems"));
             _app.Session.Wallet.SetGems(10);
             Assert.That(_app.Operations.SpeedUp(0).IsSuccess);
-            Assert.That(_app.Session.Wallet.Gems, Is.EqualTo(10 - 3));
+            Assert.That(_app.Session.Wallet.Gems, Is.EqualTo(10 - 5), "15 minutes à 20 Gemmes par heure");
             Assert.That(_app.Operations.Claim(0).IsSuccess);
         }
 

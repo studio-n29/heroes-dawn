@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Hub;
+using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
@@ -35,11 +36,12 @@ namespace N29.HeroesDawn.Application.Features.Shop
                 await _open.ExecuteAsync(ct);
                 return Result.Fail(ShopErrors.Expired);
             }
-            int cost = ShopRules.RerollCost(_s.Shop.Draw, _s.Content.Balance);
+            var (cost, gems) = ShopRules.RerollPrice(_s.Shop.Draw, _s.Content.Balance);
             if (cost > 0 && !_s.Wallet.TrySpend(cost, 0)) return Result.Fail(HubErrors.NotEnoughCredits);
+            if (gems > 0 && !_s.Wallet.TrySpendGems(gems)) return Result.Fail(MetaErrors.NotEnoughGems);
 
             ShopDrawing.Redraw(_s, _s.Shop.Day, _s.Shop.Draw + 1);
-            if (cost > 0) _wallet.PublishWallet(_s);
+            if (cost > 0 || gems > 0) _wallet.PublishWallet(_s);
             _changed.Publish(default);
             _save.RequestSave();
             return Result.Ok();

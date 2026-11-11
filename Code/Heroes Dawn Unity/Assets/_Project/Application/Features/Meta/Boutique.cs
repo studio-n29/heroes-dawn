@@ -70,6 +70,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
             new GemExchange("ex_rest", 10, new Reward(), fullRest: true),
         };
 
+        /// <summary>Prix en Gemmes du n-ième emplacement d'expédition (le 4e et le 5e s'achètent) ; 0 pour les emplacements de base.</summary>
+        public static int SlotPrice(int slotNumber) => slotNumber == 4 ? 300 : slotNumber == 5 ? 500 : 0;
+
         readonly MetaContext _c;
         readonly IPurchaseGateway _payments;
         readonly IPublisher<RosterChanged> _roster;
@@ -119,6 +122,19 @@ namespace N29.HeroesDawn.Application.Features.Meta
             if (firstWelcome) { _c.Meta.welcomeClaimed = true; _c.Meta.speedUpTokens += WelcomeSpeedUpMinutes; }
             _c.Meta.SetCounter(_c.Meta.purchases, pack.Id, _c.Meta.GetCounter(_c.Meta.purchases, pack.Id) + 1);
             _c.Touch(MetaArea.Boutique);
+        }
+
+        /// <summary>Achète le prochain emplacement d'expédition (achat permanent, en Gemmes) ; refusé au maximum ou sans assez de Gemmes, sans rien dépenser.</summary>
+        public Result BuyExpeditionSlot()
+        {
+            int next = Expeditions.SlotCount(_c.Meta) + 1;
+            if (next > Expeditions.MaxSlots) return Result.Fail(MetaErrors.MaxLevel);
+            if (!_c.Session.Wallet.TrySpendGems(SlotPrice(next))) return Result.Fail(MetaErrors.NotEnoughGems);
+            _c.Meta.expeditionSlotsBought = next - Expeditions.BaseSlots;
+            _c.PublishWallet();
+            _c.Touch(MetaArea.Operations);
+            _c.Touch(MetaArea.Boutique);
+            return Result.Ok();
         }
 
         public Result Exchange(string id)

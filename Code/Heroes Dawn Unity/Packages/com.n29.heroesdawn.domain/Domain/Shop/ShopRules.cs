@@ -13,6 +13,10 @@ namespace N29.HeroesDawn.Domain.Shop
         public const int CommonLotPrice = 120;
         public const int RefinedLotPrice = 240;
 
+        /// <summary>Prix du prochain renouvellement : gratuit le premier du jour, puis l'échelle en Crédits (4 paliers), puis des Gemmes.</summary>
+        public static (int Credits, int Gems) RerollPrice(int rerollsToday, BalanceConfig b)
+            => rerollsToday > 4 ? (0, b.ShopRerollGemCost) : (RerollCost(rerollsToday, b), 0);
+
         /// <summary>Coût du prochain renouvellement : le premier du jour est gratuit, puis Cost1..Cost4 (le dernier sert de plafond).</summary>
         public static int RerollCost(int rerollsToday, BalanceConfig b)
         {

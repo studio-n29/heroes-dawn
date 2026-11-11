@@ -87,5 +87,7 @@ namespace N29.HeroesDawn.Definitions
         public int ShopRerollCost2 { get; set; } = 200;
         public int ShopRerollCost3 { get; set; } = 400;
         public int ShopRerollCost4 { get; set; } = 800;
+        /// <summary>Prix en Gemmes d'un renouvellement au-delà du quatrième payant en Crédits.</summary>
+        public int ShopRerollGemCost { get; set; } = 10;
     }
 }

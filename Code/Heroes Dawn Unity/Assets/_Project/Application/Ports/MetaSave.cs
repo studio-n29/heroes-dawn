@@ -199,6 +199,8 @@ namespace N29.HeroesDawn.Application.Ports
         public bool welcomeClaimed;
         /// <summary>Accélérateurs d'expédition restants, en minutes (480 pour 8 h) ; dépensés avant les Gemmes.</summary>
         public int speedUpTokens;
+        /// <summary>Emplacements d'expédition achetés en Gemmes (0 à 2 : le 4e et le 5e).</summary>
+        public int expeditionSlotsBought;
 
         // Réglages et tutoriel
         public SettingsSave settings = new SettingsSave();
