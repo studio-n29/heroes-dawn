@@ -7,25 +7,6 @@ using UnityEngine.UI;
 
 namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 {
-    /// <summary>Bouton d'ingrédient de la potion (étroit, haut, couleur par propriété).</summary>
-    public sealed class IngredientButtonRecipe : IPrefabRecipe
-    {
-        public string RelativePath => "Widgets/IngredientButton.prefab";
-        public int Order => 0;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var holder = PrefabContext.NewRoot("holder", 112, 200);
-            var b = Ui.Btn(holder, "", Theme.Primary, Theme.TextDark, null!, 22, FontKind.Body, "IngredientButton");
-            b.Rect.SetParent(null, false);
-            Object.DestroyImmediate(holder.gameObject);
-            b.Rect.sizeDelta = new Vector2(112, 200);
-            b.Rect.Pref(112, 200);
-            return b.gameObject;
-        }
-    }
-
-    /// <summary>Choix d'un agent de l'arène (large, deux lignes : nom de code et compétences).</summary>
     public sealed class AgentButtonRecipe : IPrefabRecipe
     {
         public string RelativePath => "Widgets/AgentButton.prefab";
@@ -42,74 +23,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
             return b.gameObject;
         }
     }
-
-    /// <summary>La potion magique : livre d'indices à gauche ; ingrédients, quantité, étapes, retour et « Préparer » à droite.</summary>
+    /// <summary>La potion magique : fenêtre UI Toolkit (livre d'indices, ingrédients, quantité, étapes, « Préparer »).</summary>
     public sealed class PotionPopupRecipe : IPrefabRecipe
     {
         public string RelativePath => "Popups/PotionPopup.prefab";
-        public int Order => 11;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var (root, content, title) = CasePopupKit.Build("PotionPopup", 1740, 920, Theme.Success, out var window);
-            var intro = Ui.Txt(content, "", 30, Theme.Text, TextAnchor.MiddleLeft, FontKind.Body, "Intro");
-            intro.rectTransform.At(0f, 1f, 0, 0, 1100, 50);
-            var attempts = Ui.Txt(content, "", 30, Theme.Primary, TextAnchor.MiddleRight, FontKind.Title, "Attempts");
-            attempts.rectTransform.At(1f, 1f, 0, 0, 500, 50);
-
-            var bookFill = Ui.Panel(content, "Book", Theme.WithAlpha(Theme.Primary, 0.18f), 4f, 6f, false);
-            bookFill.Frame().At(0f, 0f, 0, 0, 640, 740);
-            Ui.LocTxt(bookFill.transform, "stage.potion.book_title", 34, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "BookTitle").rectTransform.At(0.5f, 1f, 0, -10, 600, 52);
-            var book = Ui.Txt(bookFill.transform, "", 25, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "BookText");
-            book.rectTransform.Stretch(18, 14, 18, 70);
-
-            var ingredientRow = Ui.Rect(content, "Ingredients").At(1f, 1f, 0, -62, 1000, 210);
-            ingredientRow.HLayout(8, 0, TextAnchor.MiddleLeft);
-
-            var qtyRow = Ui.Rect(content, "QtyRow").At(1f, 1f, 0, -290, 1000, 70);
-            qtyRow.HLayout(14, 0, TextAnchor.MiddleLeft);
-            var minus = Ui.Btn(qtyRow, "-", Theme.Surface3, Theme.Text, null!, 44, FontKind.Title, "QtyMinus");
-            minus.Rect.Pref(70, 70);
-            var qty = Ui.Txt(qtyRow, "", 32, Theme.Text, TextAnchor.MiddleCenter, FontKind.Title, "QtyText");
-            qty.Pref(300, 70);
-            var plus = Ui.Btn(qtyRow, "+", Theme.Surface3, Theme.Text, null!, 44, FontKind.Title, "QtyPlus");
-            plus.Rect.Pref(70, 70);
-
-            var steps = Ui.Txt(content, "", 28, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Steps");
-            steps.rectTransform.At(1f, 1f, 0, -372, 1000, 190);
-            var feedback = Ui.Txt(content, "", 25, Theme.Text, TextAnchor.UpperLeft, FontKind.Body, "Feedback");
-            feedback.rectTransform.At(1f, 1f, 0, -566, 1000, 170);
-
-            var buttons = Ui.Rect(content, "Buttons").At(1f, 0f, 0, 0, 1000, 90);
-            buttons.HLayout(12, 0, TextAnchor.MiddleRight);
-            var undo = Ui.LocBtn(buttons, "stage.potion.undo", Theme.Surface3, Theme.Text, null!, 28, FontKind.Title, "Undo");
-            undo.Rect.Pref(190, 84);
-            var clear = Ui.LocBtn(buttons, "stage.potion.clear", Theme.Surface3, Theme.Text, null!, 28, FontKind.Title, "Clear");
-            clear.Rect.Pref(190, 84);
-            var brew = Ui.LocBtn(buttons, "stage.potion.brew", Theme.Primary, Theme.TextDark, null!, 40, FontKind.Title, "Brew");
-            brew.Rect.Pref(380, 84);
-            RecipeKit.Shine(brew);
-            var quit = Ui.LocBtn(buttons, "stage.quit", Theme.Danger, Color.white, null!, 26, FontKind.Title, "Quit");
-            quit.Rect.Pref(190, 84);
-
-            var view = root.gameObject.AddComponent<PotionPopupView>();
-            CasePopupKit.WireBase(ctx, view, title, window);
-            ctx.Wire(view, "intro", intro);
-            ctx.Wire(view, "book", book);
-            ctx.Wire(view, "ingredientRow", ingredientRow);
-            ctx.Wire(view, "ingredientPrefab", ctx.Asset("Widgets/IngredientButton.prefab").GetComponent<UiButton>());
-            ctx.Wire(view, "qtyMinus", minus);
-            ctx.Wire(view, "qtyPlus", plus);
-            ctx.Wire(view, "qtyText", qty);
-            ctx.Wire(view, "steps", steps);
-            ctx.Wire(view, "attempts", attempts);
-            ctx.Wire(view, "feedback", feedback);
-            ctx.Wire(view, "undoButton", undo);
-            ctx.Wire(view, "clearButton", clear);
-            ctx.Wire(view, "brewButton", brew);
-            ctx.Wire(view, "quitButton", quit);
-            return root.gameObject;
-        }
+        public int Order => 10;
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<PotionPopupView>("PotionPopup", "Popups/Potion.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
 
     /// <summary>Le dialogue : réplique en haut, réponses au choix, réaction et progression.</summary>

@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal">
+        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-pop__wide">
+            <ui:Label name="title" class="hd-modal__title" />
+            <ui:Label name="body" class="hd-pop__text" />
+            <ui:Label name="rules" class="hd-pop__hint" />
+            <ui:VisualElement class="hd-divider" />
+            <ui:VisualElement name="track" class="hd-qte__track">
+                <ui:VisualElement name="zone" class="hd-qte__zone" />
+                <ui:VisualElement name="cursor" class="hd-qte__cursor" />
+            </ui:VisualElement>
+            <ui:Label name="score" class="hd-qte__score" />
+            <ui:VisualElement class="hd-modal__buttons">
+                <ui:Button name="stop" class="hd-btn hd-btn--primary" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

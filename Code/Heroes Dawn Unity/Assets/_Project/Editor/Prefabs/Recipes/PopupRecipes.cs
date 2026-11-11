@@ -77,50 +77,12 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
         public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<N29.HeroesDawn.Presentation.Popups.NarrativePopupView>("NarrativePopup", "Popups/Narrative.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
 
-    /// <summary>Case Mini-jeu (reprise de CasePopups.MiniGame et TimingMiniGame.Build).</summary>
+    /// <summary>Case Mini-jeu : fenêtre UI Toolkit avec le jeu de réflexe (QTE).</summary>
     public sealed class MiniGamePopupRecipe : IPrefabRecipe
     {
         public string RelativePath => "Popups/MiniGamePopup.prefab";
         public int Order => 10;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var (root, content, title) = CasePopupKit.Build("MiniGamePopup", 1200, 700, Theme.Info, out var window);
-            var body = Ui.Txt(content, "", 30, Theme.Text, TextAnchor.UpperCenter, FontKind.Regular, "Body");
-            body.rectTransform.Stretch(10, 400, 10, 10);
-
-            var trackFill = Ui.Panel(content, "Track", Theme.SurfaceDark, 4f, 4f, false);
-            var track = trackFill.Frame().At(0.5f, 0f, 0, 230, 908, 70);
-            var zone = Ui.Img(trackFill.transform, "Zone", Theme.Success, Sprites.RoundedSmall);
-            var zrt = zone.rectTransform;
-            zrt.anchorMin = zrt.anchorMax = new Vector2(0f, 0.5f);
-            zrt.pivot = new Vector2(0.5f, 0.5f);
-            zrt.sizeDelta = new Vector2(180, 56);
-            var cursor = Ui.Img(trackFill.transform, "Cursor", Theme.Primary, Sprites.RoundedSmall);
-            var crt = cursor.rectTransform;
-            crt.anchorMin = crt.anchorMax = new Vector2(0f, 0.5f);
-            crt.pivot = new Vector2(0.5f, 0.5f);
-            crt.sizeDelta = new Vector2(16, 90);
-            cursor.gameObject.AddComponent<Outline>().effectColor = Theme.Ink;
-            var score = Ui.Txt(content, "", 28, Theme.TextMuted, TextAnchor.MiddleCenter, FontKind.Body, "Score");
-            score.rectTransform.At(0.5f, 0f, 0, 170, 900, 40);
-            var stop = Ui.Btn(content, "", Theme.Primary, Theme.TextDark, null!, 52, FontKind.Title, "Stop");
-            stop.Rect.At(0.5f, 0f, 0, 20, 420, 110);
-
-            var game = content.gameObject.AddComponent<TimingMiniGame>();
-            ctx.Wire(game, "track", track);
-            ctx.Wire(game, "cursor", crt);
-            ctx.Wire(game, "zone", zrt);
-            ctx.Wire(game, "zoneImage", zone);
-            ctx.Wire(game, "score", score);
-            ctx.Wire(game, "stop", stop);
-
-            var view = root.gameObject.AddComponent<MiniGamePopupView>();
-            CasePopupKit.WireBase(ctx, view, title, window);
-            ctx.Wire(view, "body", body);
-            ctx.Wire(view, "game", game);
-            return root.gameObject;
-        }
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<N29.HeroesDawn.Presentation.Popups.MiniGamePopupView>("MiniGamePopup", "Popups/MiniGame.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
     }
 
     /// <summary>Activité hors réflexe (potion, survie, pêche, arène, dialogue) : fenêtre de test du framework d'activités.</summary>
