@@ -1,9 +1,13 @@
+#nullable enable
 using System.Collections.Generic;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 
 namespace N29.HeroesDawn.Domain.Combat
 {
+    /// <summary>Qui décide des actions d'un camp : l'IA de la simulation ou une commande reçue de l'extérieur.</summary>
+    public enum SideControl { Ai, External }
+
     public sealed class AllyEntry
     {
         public MemberId Member { get; }
@@ -47,6 +51,26 @@ namespace N29.HeroesDawn.Domain.Combat
         public IReadOnlyList<LinkEntry> Links { get; private set; } = System.Array.Empty<LinkEntry>();
 
         public CombatSetup WithLinks(IReadOnlyList<LinkEntry> links) { Links = links; return this; }
+
+        /// <summary>Équipe d'un autre joueur qui occupe le camp adverse (duel de tournoi) ; vide : combat classique contre des ennemis.</summary>
+        public IReadOnlyList<AllyEntry> OpponentTeam { get; private set; } = System.Array.Empty<AllyEntry>();
+        /// <summary>Niveaux de lien des paires de l'équipe adverse.</summary>
+        public IReadOnlyList<LinkEntry> OpponentLinks { get; private set; } = System.Array.Empty<LinkEntry>();
+        /// <summary>Qui mène le camp adverse : l'IA (par défaut, et pour un duel hors ligne) ou un joueur distant (duel en ligne).</summary>
+        public SideControl EnemyControl { get; private set; } = SideControl.Ai;
+
+        /// <summary>Le camp adverse est cette équipe de joueur, menée par l'IA ou par une commande externe.</summary>
+        public CombatSetup WithOpponentTeam(IReadOnlyList<AllyEntry> team, SideControl control, IReadOnlyList<LinkEntry>? links = null)
+        {
+            OpponentTeam = team; EnemyControl = control; OpponentLinks = links ?? System.Array.Empty<LinkEntry>();
+            return this;
+        }
+
+        public static int LinkLevelIn(IReadOnlyList<LinkEntry> links, MemberId a, MemberId b)
+        {
+            foreach (var l in links) if (l.Is(a, b)) return l.Level;
+            return 1;
+        }
 
         public int LinkLevel(MemberId a, MemberId b)
         {

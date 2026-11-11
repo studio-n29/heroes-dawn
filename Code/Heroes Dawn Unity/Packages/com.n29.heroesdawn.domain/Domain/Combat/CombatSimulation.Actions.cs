@@ -16,6 +16,20 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Enregistre une commande ; elle est appliquée au prochain tick.</summary>
         public void Submit(CombatCommand cmd) => _queue.Enqueue(cmd);
 
+        /// <summary>
+        /// Commande d'un joueur pour son camp (duel de tournoi) : refusée (liste vide, rien n'avance) si ce camp n'a pas la main ou si l'unité visée n'est pas la sienne ;
+        /// sinon appliquée tout de suite, sans avancer la frise, et les événements produits sont renvoyés.
+        /// </summary>
+        public IReadOnlyList<CombatEvent> Submit(CombatCommand cmd, Side from)
+        {
+            if (IsOver || AwaitingSide != from) return Array.Empty<CombatEvent>();
+            if ((cmd.Type == CommandType.Skill || cmd.Type == CommandType.Pass) && (cmd.Actor < 0 || cmd.Actor >= _units.Count || _units[cmd.Actor].Side != from))
+                return Array.Empty<CombatEvent>();
+            if (cmd.Type != CommandType.Skill && cmd.Type != CommandType.Pass) return Array.Empty<CombatEvent>(); // auto et retraite ne passent pas par ici
+            _queue.Enqueue(cmd);
+            return ApplyCommands();
+        }
+
         public static int ActiveSkillCount(CombatUnit u)
         {
             int n = 0;
@@ -48,7 +62,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 if (IsOver) return;
                 var u = _units[i];
                 if (!u.IsReady) continue;
-                if (u.Side == Side.Enemy || Auto) AiAct(u, output);
+                if ((u.Side == Side.Enemy && Setup.EnemyControl == SideControl.Ai) || (u.Side == Side.Ally && Auto)) AiAct(u, output);
             }
         }
 
@@ -65,11 +79,11 @@ namespace N29.HeroesDawn.Domain.Combat
                     return true;
                 case CommandType.Skill:
                     if (!CanUse(cmd.Actor, cmd.SlotIndex)) return false;
-                    if (_units[cmd.Actor].Side != Side.Ally) return false;
+                    if (!IsHumanSide(_units[cmd.Actor].Side)) return false;
                     PerformSkill(_units[cmd.Actor], _units[cmd.Actor].Skills[cmd.SlotIndex], cmd.SlotIndex, cmd.Target, output);
                     return true;
                 case CommandType.Pass:
-                    if (cmd.Actor < 0 || cmd.Actor >= _units.Count || !_units[cmd.Actor].IsReady || _units[cmd.Actor].Side != Side.Ally) return false;
+                    if (cmd.Actor < 0 || cmd.Actor >= _units.Count || !_units[cmd.Actor].IsReady || !IsHumanSide(_units[cmd.Actor].Side)) return false;
                     output.Add(new TurnSkippedEvent(Tick, cmd.Actor));
                     EndOfTurn(_units[cmd.Actor], 0);
                     return true;

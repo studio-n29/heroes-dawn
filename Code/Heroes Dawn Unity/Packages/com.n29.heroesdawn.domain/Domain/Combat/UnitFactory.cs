@@ -24,6 +24,17 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         public static CombatUnit Ally(int id, MemberDef d, AllyEntry e, BalanceConfig b, CollectionDef? collection = null, SynergyBonus synergy = default, PairBonusTotal pair = default)
+            => Agent(Side.Ally, id, d, e, b, collection, synergy, pair);
+
+        /// <summary>Agent d'un autre joueur dans le camp adverse (duel de tournoi) : même calcul qu'un allié, camp <see cref="Side.Enemy"/>, style d'IA selon la position.</summary>
+        public static CombatUnit Opponent(int id, AllyEntry entry, MemberDef def, CollectionDef? collection, BalanceConfig b, SynergyBonus synergy = default, PairBonusTotal pair = default)
+        {
+            var unit = Agent(Side.Enemy, id, def, entry, b, collection, synergy, pair);
+            unit.Style = AiStyles.Default(def.Position);
+            return unit;
+        }
+
+        static CombatUnit Agent(Side side, int id, MemberDef d, AllyEntry e, BalanceConfig b, CollectionDef? collection, SynergyBonus synergy, PairBonusTotal pair)
         {
             int f = FatigueMultiplierPermille(e.FatiguePercent, b);
             var tiers = LevelTiers.BonusAt(e.Level); // paliers de niveau : bonus passifs de l agent
@@ -44,7 +55,7 @@ namespace N29.HeroesDawn.Domain.Combat
                     }
                 }
             int S(int v, int itemPercent) => ScaleStat(v, e.Level, b) * f / 1000 * (100 + e.StatPercent) / 100 * (100 + itemPercent) / 100;
-            var unit = new CombatUnit(id, Side.Ally, d.Id.Value, d.Family, d.Position, false,
+            var unit = new CombatUnit(id, side, d.Id.Value, d.Family, d.Position, false,
                                       S(d.BaseStats.Hp, hpP), S(d.BaseStats.Atk, atkP), S(d.BaseStats.Def, defP), d.BaseStats.Spd * (100 + spdP) / 100,
                                       b.TimelinePoints, EmpoweredSkills(SkillsWithCards(d, e, collection), skillPower));
             unit.MaxEnergy = b.EnergyMax;

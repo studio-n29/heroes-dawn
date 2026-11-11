@@ -36,18 +36,9 @@ namespace N29.HeroesDawn.Domain.Combat
             Setup = setup;
             Auto = setup.Auto;
             _rng = new Pcg32(setup.Seed).Fork(3);
-            int id = 0;
-            var families = new List<Family>();
-            foreach (var a in setup.Allies) families.Add(c.Member(a.Member).Family);
-            var activeSynergies = SynergyRules.Active(families, c.Synergies);
-            var synergy = SynergyRules.Total(System.Linq.Enumerable.Select(activeSynergies,
-                s => (s.Synergy, setup.LinkLevel(setup.Allies[s.A].Member, setup.Allies[s.B].Member))));
-            for (int i = 0; i < setup.Allies.Count; i++)
-                _units.Add(UnitFactory.Ally(id++, c.Member(setup.Allies[i].Member), setup.Allies[i], _b, c.Collection, synergy, PairBonusOf(c, setup, i)));
-            var roles = new List<Position>();
-            foreach (var a in setup.Allies) roles.Add(c.Member(a.Member).Position);
-            ApplyTeamEffects(TeamEffects.Active(families, roles));
-            SpawnWave(0);
+            BuildTeam(setup.Allies, setup.Links, Side.Ally);
+            if (setup.OpponentTeam.Count > 0) BuildTeam(setup.OpponentTeam, setup.OpponentLinks, Side.Enemy); // duel de tournoi : le camp adverse est une équipe de joueur
+            else SpawnWave(0);
             foreach (var u in _units)
             {
                 u.Point = _rng.Range(0, _b.TimelineStartPointMax + 1); // depart entre le point 0 et le point 2
@@ -57,26 +48,47 @@ namespace N29.HeroesDawn.Domain.Combat
 
         public CombatUnit Unit(int id) => _units[id];
 
-        /// <summary>Bonus de paire d'un allié : ceux de chacune de ses paires dans l'escouade (niveau de lien 2 et plus), plafonnés.</summary>
-        static PairBonusTotal PairBonusOf(ContentCatalog c, CombatSetup setup, int index)
+        /// <summary>Fait entrer une équipe d'agents dans un camp : synergies, bonus de paire et effets d'équipe de cette équipe seule.</summary>
+        void BuildTeam(IReadOnlyList<AllyEntry> team, IReadOnlyList<LinkEntry> links, Side side)
         {
-            var me = c.Member(setup.Allies[index].Member);
+            var families = new List<Family>();
+            foreach (var a in team) families.Add(_c.Member(a.Member).Family);
+            var activeSynergies = SynergyRules.Active(families, _c.Synergies);
+            var synergy = SynergyRules.Total(System.Linq.Enumerable.Select(activeSynergies,
+                s => (s.Synergy, CombatSetup.LinkLevelIn(links, team[s.A].Member, team[s.B].Member))));
+            for (int i = 0; i < team.Count; i++)
+            {
+                var def = _c.Member(team[i].Member);
+                var pair = PairBonusOf(_c, team, links, i);
+                _units.Add(side == Side.Ally
+                    ? UnitFactory.Ally(_units.Count, def, team[i], _b, _c.Collection, synergy, pair)
+                    : UnitFactory.Opponent(_units.Count, team[i], def, _c.Collection, _b, synergy, pair));
+            }
+            var roles = new List<Position>();
+            foreach (var a in team) roles.Add(_c.Member(a.Member).Position);
+            ApplyTeamEffects(TeamEffects.Active(families, roles), side);
+        }
+
+        /// <summary>Bonus de paire d'un allié : ceux de chacune de ses paires dans l'escouade (niveau de lien 2 et plus), plafonnés.</summary>
+        static PairBonusTotal PairBonusOf(ContentCatalog c, IReadOnlyList<AllyEntry> team, IReadOnlyList<LinkEntry> links, int index)
+        {
+            var me = c.Member(team[index].Member);
             var bonuses = new List<PairBonus>();
-            for (int j = 0; j < setup.Allies.Count; j++)
+            for (int j = 0; j < team.Count; j++)
             {
                 if (j == index) continue;
-                var other = c.Member(setup.Allies[j].Member);
-                bonuses.AddRange(PairBonusRules.Of(me.Position, other.Position, setup.LinkLevel(me.Id, other.Id)));
+                var other = c.Member(team[j].Member);
+                bonuses.AddRange(PairBonusRules.Of(me.Position, other.Position, CombatSetup.LinkLevelIn(links, me.Id, other.Id)));
             }
             return PairBonusRules.Total(bonuses);
         }
 
         /// <summary>Effets uniques de la composition d équipe, appliqués à chaque allié au début du combat.</summary>
-        void ApplyTeamEffects(IReadOnlyList<TeamEffectKind> effects)
+        void ApplyTeamEffects(IReadOnlyList<TeamEffectKind> effects, Side side)
         {
             foreach (var u in _units)
             {
-                if (u.Side != Side.Ally) continue;
+                if (u.Side != side) continue;
                 foreach (var e in effects)
                     switch (e)
                     {
@@ -106,15 +118,23 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         /// <summary>Vrai tant qu'un allié a atteint 0 et attend l'ordre du joueur : toute la frise est figée.</summary>
-        public bool IsAwaitingAction
+        public bool IsAwaitingAction => AwaitingSide.HasValue;
+
+        /// <summary>Le camp dont une unité est prête et attend une commande (l'allié d'abord ; le camp adverse seulement s'il est mené de l'extérieur) ; nul sinon.</summary>
+        public Side? AwaitingSide
         {
             get
             {
-                if (Auto) return false;
-                foreach (var u in _units) if (u.Side == Side.Ally && u.IsReady) return true;
-                return false;
+                if (Auto) return null;
+                foreach (var u in _units) if (u.Side == Side.Ally && u.IsReady) return Side.Ally;
+                if (Setup.EnemyControl == SideControl.External)
+                    foreach (var u in _units) if (u.Side == Side.Enemy && u.IsReady) return Side.Enemy;
+                return null;
             }
         }
+
+        /// <summary>Un joueur (et non l'IA) mène ce camp.</summary>
+        bool IsHumanSide(Side s) => s == Side.Ally || Setup.EnemyControl == SideControl.External;
 
         void StepOne(List<CombatEvent> output)
         {

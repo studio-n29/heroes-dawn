@@ -38,7 +38,7 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Annonce l'action d'une unité ennemie qui entre en zone de préparation.</summary>
         void PlanIfNeeded(CombatUnit u, List<CombatEvent> output)
         {
-            if (u.Side != Side.Enemy || u.PlannedSlot >= 0 || !u.IsAlive || u.IsReady) return;
+            if (u.Side != Side.Enemy || Setup.EnemyControl == SideControl.External || u.PlannedSlot >= 0 || !u.IsAlive || u.IsReady) return;
             if (u.Point < PlanStartPoint(u)) return;
             var (slot, target) = ChooseAction(u);
             u.PlannedSlot = slot;

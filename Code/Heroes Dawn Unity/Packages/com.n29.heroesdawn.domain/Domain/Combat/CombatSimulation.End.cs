@@ -30,6 +30,7 @@ namespace N29.HeroesDawn.Domain.Combat
             {
                 h.Add(u.Id);
                 h.Add(u.Hp);
+                h.Add(u.Energy);
                 h.Add(u.Point);
                 h.Add(u.PlannedSlot);
                 h.Add(u.BurnRemainder);
