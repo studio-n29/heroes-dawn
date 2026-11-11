@@ -60,7 +60,7 @@ Soit 3 € / 6 € / 10 € pour une tenue ; aucun cosmétique au-delà de 10 �
 | Source | Crédits / jour | PR / jour | XP de pass / jour |
 |---|---|---|---|
 | Campagne | 4 500 | 75 | 450 |
-| Labo de recherche (niv. 1) | — | 48 | — |
+| Labo de recherche (supprimé en 1.0.0) | — | — | — |
 | Expéditions (2 emplacements, 4 h, utilisées à 50 %) | 4 800 | 90 | — |
 | Objectifs secondaires (60 % réalisés) | 3 456 | 43 | 864 |
 | Missions quotidiennes | — | — | 500 |
@@ -125,24 +125,17 @@ Soit 3 € / 6 € / 10 € pour une tenue ; aucun cosmétique au-delà de 10 �
 | Simulateur de combat | +20 % | 6 000 |
 | Salle de réalité augmentée | +35 % | 15 000 |
 
-## Fabrication d'objets (labo de recherche)
+## Atelier de fabrication (Composants, catalyseurs, étoiles)
 
-Le labo fabrique des objets avec des **scraps** laissés par les combats gagnés et des **recettes** obtenues sur les Boss et les Élites. Spec : `Code/docs/specs/2026-10-27-labo-fabrication-design.md`.
+L'Atelier fabrique des objets avec des **Composants** et des **recettes** obtenues en récompense (aventure, repaires, tournois). Le laboratoire de recherche, ses recherches et la compétence de création sont supprimés (bloc B de la 1.0.0). Spec : `Code/docs/specs/2026-11-10-atelier-fabrication-design.md`. Valeurs ⚑ à régler au playtest.
 
-- **Scraps** : un par type d'objet (arme, armure, outil, implant) et le Noyau, rare et commun à tous. Victoire Facile 1-2, Normal 2-3, Élite et Boss 4-6 scraps d'un type tiré au hasard ; Noyaux : Boss 2, Élite 1 une fois sur deux.
-- **Recettes** : 12 (3 par type). Les 4 Communes sont connues au départ. Drop : Boss 60 %, Élite 25 % (recette inconnue tirée au hasard ; si toutes sont connues : 5 scraps de plus).
-- **Coût** : Commune 6 scraps du type (difficulté 1) ; Rare 12 + 2 Noyaux (difficulté 4) ; Épique 20 + 5 Noyaux (difficulté 7).
-- **Qualité** : Grossier, Standard, Soigné, Supérieur, Chef-d'œuvre (stats ×80, 100, 115, 130, 150 %). Elle dépend de l'écart entre le niveau de compétence de création du type d'objet (1 à 10, +40 × n d'expérience par niveau) et la difficulté de la recette.
-
-| Écart compétence − difficulté | Grossier | Standard | Soigné | Supérieur | Chef-d'œuvre |
-|---|---|---|---|---|---|
-| ≤ −3 | 60 | 35 | 5 | 0 | 0 |
-| −2 à −1 | 35 | 50 | 13 | 2 | 0 |
-| 0 | 15 | 50 | 25 | 9 | 1 |
-| +1 à +2 | 5 | 35 | 35 | 20 | 5 |
-| +3 à +4 | 0 | 15 | 40 | 30 | 15 |
-| ≥ +5 | 0 | 5 | 30 | 40 | 25 |
-
-Stats tirées dans la fourchette de la recette (Commune 8-12 %, Rare 8-14 %, Épique 10-16 % + effet spécial), puis multipliées par la qualité. Fabrication instantanée ; l'objet est un exemplaire unique (équipable comme les autres, 2 emplacements, types différents) et n'entre jamais dans la boutique ni dans les drops d'objets.
+- **Composants** : 4 types (arme, armure, outil, implant) × 3 qualités (Commun, Raffiné, Exceptionnel). Une fabrication n'utilise qu'une seule qualité. Après un combat gagné, un type tiré au hasard : Facile 1-2 Commun ; Normal 2-3 Commun ; Élite 3-4 Commun + 1-2 Raffiné ; Boss 3-4 Raffiné + 1 Exceptionnel une fois sur deux.
+- **Catalyseurs** (un par fabrication, optionnel) : Métal → DEF, Énergie → ATQ, Biologique → PV, Cristal → VIT. Drop : Élite 10 %, Boss 30 %. Avec un catalyseur, la statistique orientée est ajoutée (jusqu'à 3 statistiques) ; si la recette la contient déjà, elle est tirée dans la moitié haute de sa plage.
+- **Recettes** : 12 (3 par type). Les 4 Communes sont de départ ; les 8 autres viennent de l'aventure en attendant les repaires (bloc C) et les tournois (bloc D). Drop : Boss 60 %, Élite 25 % (recette inconnue tirée au hasard ; si toutes sont connues : 5 Composants Commun de plus).
+- **Coût** : Commune 6 Composants (Commun minimum) ; Rare 8 (Raffiné minimum) ; Épique 10 (Raffiné minimum).
+- **Étoiles (1 à 6)** : étoile de départ Commun 2, Raffiné 4, Exceptionnel 5, puis tirage −1 (25 %), 0 (50 %), +1 (25 %), bornée de 1 à 6 ; le 6 n'apparaît qu'avec des Composants Exceptionnels. Multiplicateur des statistiques : ★1 80 % · ★2 100 % · ★3 115 % · ★4 130 % · ★5 150 % · ★6 175 %.
+- **Statistiques** : tirées dans la plage de la recette (Commune 8-12 %, Rare 8-14 %, Épique 10-16 % + effet spécial), multipliées par l'étoile, arrondies au plus proche, au moins 1. Fabrication instantanée ; l'objet est un exemplaire unique.
+- **Boutique de Composants** : six lots par jour, renouvelés avec les héros (4 lots de 6 Commun à 120 Crédits, 2 lots de 3 Raffiné à 240 Crédits ⚑).
+- **Migration 0.15.0** : scraps → Composants Commun du même type ; Noyaux → catalyseurs en rotation ; compétences de création supprimées sans remboursement ; recherches du labo supprimées et Crédits dépensés remboursés (500 × (n+1) par niveau n atteint) ; anciens objets fabriqués : ancienne qualité + 1 étoile, statistiques inchangées.
 
 Tous ces paramètres sont dans `05_Equilibrage.xlsx` ou à y ajouter lors de l'intégration Remote Config.

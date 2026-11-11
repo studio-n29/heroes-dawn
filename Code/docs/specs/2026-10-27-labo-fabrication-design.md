@@ -1,3 +1,5 @@
+> **Remplacée par `2026-11-10-atelier-fabrication-design.md`** (bloc B de la 1.0.0) : scraps, Noyau, qualités, compétence de création et recherches du labo n'existent plus.
+
 # Lot E — Labo de recherche : fabrication d'objets (scraps, recettes, qualité aléatoire)
 
 Date : 2026-10-27 · Version 0.14.0 · Source : PDF « N29 HQ » (playtest 0.13.0), point « Le système d'objet/d'équipement (Laboratoire de recherche) ».
