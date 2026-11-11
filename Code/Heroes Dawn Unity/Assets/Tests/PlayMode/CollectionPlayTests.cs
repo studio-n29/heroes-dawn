@@ -81,7 +81,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(popup.Cards.All(x => x.Revealed && x.FaceVisible), Is.True, "toutes les cartes sont retournées");
             popup.ContinueButton.onClick.Invoke();
             Assert.That(popup.Current, Is.EqualTo(BoosterOpeningPopupView.Phase.Summary));
-            Assert.That(popup.GetComponentsInChildren<TMPro.TMP_Text>().Any(t => t.text == N29.HeroesDawn.Presentation.Common.Loc.F("booster.received", 3)), Is.True, "le résumé n'affiche plus l'invite d'ouverture");
+            Assert.That(popup.Hint, Is.EqualTo(N29.HeroesDawn.Presentation.Common.Loc.F("booster.received", 3)), "le résumé n'affiche plus l'invite d'ouverture");
             Assert.That(CollectionOps.Boosters(session, BoosterDef.StandardId), Is.EqualTo(0), "le résumé ne consomme pas un second booster");
             popup.ContinueButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoosterOpeningPopupView>() == null, 120);

@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal hd-intropop">
+        <ui:VisualElement name="cinematicLayer" class="hd-intropop__cine">
+            <ui:Button name="tap" class="hd-intropop__tap" />
+            <ui:Button name="skip" class="hd-btn hd-btn--ghost hd-intropop__skip" />
+        </ui:VisualElement>
+        <ui:VisualElement name="characterLayer" class="hd-intropop__char">
+            <ui:Label name="title" class="hd-intropop__title" />
+            <ui:TextField name="nameField" class="hd-pop__field hd-intropop__name" max-length="20" />
+            <ui:Label name="nameHint" class="hd-intropop__hint" />
+            <ui:VisualElement name="avatars" class="hd-intropop__avatars" />
+            <ui:Button name="confirm" class="hd-btn hd-btn--primary hd-intropop__confirm" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

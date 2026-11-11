@@ -31,6 +31,7 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
         public static void After(VisualElement host, float seconds, Action action) => host.schedule.Execute(action).ExecuteLater((long)(seconds * 1000f));
 
         public static void SetScale(VisualElement e, float s) => e.style.scale = new Scale(new Vector2(s, s));
+        public static void SetScale(VisualElement e, Vector2 s) => e.style.scale = new Scale(s);
         public static void SetRotate(VisualElement e, float degrees) => e.style.rotate = new Rotate(new Angle(degrees, AngleUnit.Degree));
         public static void SetTranslate(VisualElement e, float x, float y) => e.style.translate = new Translate(x, y);
 

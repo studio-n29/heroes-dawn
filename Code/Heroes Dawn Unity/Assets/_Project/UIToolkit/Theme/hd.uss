@@ -709,3 +709,40 @@ Label { flex-shrink: 0; }
 .hd-tut__hint-body { margin-top: 8px; -unity-font: var(--hd-font-body); font-size: 26px; color: var(--hd-ivory); white-space: normal; max-width: 700px; }
 .hd-tut__hint .hd-btn { position: absolute; right: 22px; bottom: 16px; }
 .hd-tut__fx { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+
+/* ---- Ouverture d un booster ---- */
+.hd-boost { background-color: rgba(10, 17, 26, 0.96); align-items: center; }
+.hd-boost__tap { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0); border-width: 0; }
+.hd-boost__title { margin-top: 60px; -unity-font: var(--hd-font-title); font-size: 64px; color: var(--hd-brass); }
+.hd-boost__hint { margin-top: 8px; -unity-font: var(--hd-font-heading); font-size: 34px; color: var(--hd-ivory); }
+.hd-boost__pack { position: absolute; left: 50%; top: 50%; width: 320px; height: 440px; margin-left: -160px; margin-top: -200px; background-color: var(--hd-surface); border-width: 6px; border-color: var(--hd-brass); border-radius: 18px; align-items: center; justify-content: center; }
+.hd-boost__packglyph { -unity-font: var(--hd-font-title); font-size: 160px; color: var(--hd-brass); }
+.hd-boost__cards { position: absolute; left: 0; right: 0; top: 50%; margin-top: -190px; height: 380px; flex-direction: row; justify-content: center; }
+.hd-boost__card { width: 260px; height: 380px; margin: 0 14px; background-color: var(--hd-surface-3); border-width: 5px; border-radius: 14px; }
+.hd-boost__back { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: var(--hd-ink); border-radius: 10px; }
+.hd-boost__face { position: absolute; left: 0; top: 0; right: 0; bottom: 0; padding: 10px; }
+.hd-boost__art { height: 190px; border-radius: 8px; -unity-background-scale-mode: scale-and-crop; background-color: var(--hd-ink-deep); }
+.hd-boost__glyph { -unity-font: var(--hd-font-title); font-size: 96px; color: var(--hd-ivory); -unity-text-align: middle-center; flex-grow: 1; }
+.hd-boost__name { margin-top: 8px; -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-ivory); -unity-text-align: middle-center; white-space: normal; }
+.hd-boost__desc { -unity-font: var(--hd-font-body-regular); font-size: 20px; color: var(--hd-muted); -unity-text-align: upper-center; white-space: normal; flex-shrink: 1; }
+.hd-boost__rarity { position: absolute; left: 0; right: 0; bottom: 8px; -unity-font: var(--hd-font-heading); font-size: 24px; -unity-text-align: middle-center; }
+.hd-boost__new { position: absolute; right: -8px; top: -12px; padding: 2px 12px; background-color: var(--hd-danger); border-radius: 4px; }
+.hd-boost__newtext { -unity-font: var(--hd-font-title); font-size: 22px; color: var(--hd-ivory); }
+.hd-boost__skip { position: absolute; right: 50px; bottom: 50px; height: 64px; min-width: 180px; font-size: 30px; display: none; }
+.hd-boost__continue { position: absolute; left: 50%; bottom: 50px; width: 360px; margin-left: -180px; height: 84px; font-size: 38px; display: none; }
+.hd-boost__flash { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: white; opacity: 0; }
+
+/* ---- Premiere connexion : cinematique et creation du personnage ---- */
+.hd-intropop { background-color: rgba(0, 0, 0, 0); }
+.hd-intropop__cine { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.hd-intropop__tap { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0); border-width: 0; }
+.hd-intropop__skip { position: absolute; right: 20px; top: 16px; height: 64px; min-width: 170px; font-size: 26px; opacity: 0.8; }
+.hd-intropop__char { position: absolute; left: 0; top: 0; right: 0; bottom: 0; align-items: center; }
+.hd-intropop__title { margin-top: 60px; -unity-font: var(--hd-font-title); font-size: 64px; color: var(--hd-ivory); }
+.hd-intropop__name { margin-top: 90px; width: 720px; height: 96px; font-size: 40px; }
+.hd-intropop__hint { margin-top: 10px; -unity-font: var(--hd-font-body-regular); font-size: 26px; color: var(--hd-muted); }
+.hd-intropop__avatars { margin-top: 60px; flex-direction: row; justify-content: center; flex-wrap: wrap; width: 1100px; }
+.hd-intropop__avatar { width: 150px; height: 150px; margin: 0 15px 15px 15px; background-color: var(--hd-surface); border-width: 4px; border-color: var(--hd-brass-dark); border-radius: 12px; align-items: center; justify-content: center; }
+.hd-intropop__avatar--on { border-color: var(--hd-brass-soft); background-color: var(--hd-surface-2); }
+.hd-intropop__avatarnum { -unity-font: var(--hd-font-title); font-size: 64px; color: var(--hd-ivory); }
+.hd-intropop__confirm { position: absolute; bottom: 60px; width: 520px; height: 104px; font-size: 46px; }
