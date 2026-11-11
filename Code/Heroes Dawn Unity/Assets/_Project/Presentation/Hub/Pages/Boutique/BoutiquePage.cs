@@ -239,7 +239,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         }
 
         /// <summary>Icône d'un paquet de gemmes selon sa taille.</summary>
-        static string PackArt(string packId) => packId == "gems_100" ? "gems_small" : packId == "gems_550" ? "gems_medium" : "gems_large";
+        static string PackArt(string packId) => packId == "gems_100" ? "gems_small" : packId == "gems_520" ? "gems_medium" : "gems_large";
 
         static string ExchangeArt(string id) => id == "ex_pr" ? "exchange_pr" : id == "ex_rest" ? "exchange_rest" : "exchange_credits";
 

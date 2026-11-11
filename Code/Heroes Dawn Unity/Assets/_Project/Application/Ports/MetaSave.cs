@@ -191,6 +191,10 @@ namespace N29.HeroesDawn.Application.Ports
         public List<string> archivesRead = new List<string>();
         public string dailyGiftDay = "";
         public List<CounterSave> purchases = new List<CounterSave>();
+        /// <summary>Vrai une fois l'offre de bienvenue prise (elle ne s'achète qu'une fois par profil).</summary>
+        public bool welcomeClaimed;
+        /// <summary>Accélérateurs d'expédition restants, en minutes (480 pour 8 h) ; dépensés avant les Gemmes.</summary>
+        public int speedUpTokens;
 
         // Réglages et tutoriel
         public SettingsSave settings = new SettingsSave();

@@ -131,8 +131,13 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public sealed class InstantPurchase : IPurchaseGateway
         {
             public bool Fail;
+            /// <summary>Produits dont le paiement a été demandé au store (refusés ou non).</summary>
+            public readonly List<string> Calls = new List<string>();
             public UniTask<Result> PurchaseAsync(string productId, CancellationToken ct)
-                => UniTask.FromResult(Fail ? Result.Fail(MetaErrors.PaymentFailed) : Result.Ok());
+            {
+                Calls.Add(productId);
+                return UniTask.FromResult(Fail ? Result.Fail(MetaErrors.PaymentFailed) : Result.Ok());
+            }
         }
 
         public TestApp()
