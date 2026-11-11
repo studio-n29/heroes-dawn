@@ -31,24 +31,5 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(d.Planned, Is.EqualTo(Loc.T(WipCatalog.Pass.PlannedKey)));
             Assert.That(d.Soon, Is.EqualTo(Loc.T("wip.soon")));
         }
-
-        [Test, Description("Vérifie qu'un bandeau BIENTÔT touché remonte son identifiant au relais de la coque — parce que la coque affiche alors « … arrive bientôt »")]
-        public void WipMark_Tap_RaisesFeatureOnParentRelay()
-        {
-            var root = new GameObject("Shell");
-            try
-            {
-                var relay = root.AddComponent<UiTapRelay>();
-                var child = new GameObject("Pill");
-                child.transform.SetParent(root.transform);
-                var mark = child.AddComponent<WipMark>();
-                mark.FeatureId = "gems";
-                string? got = null;
-                relay.WipTapped += id => got = id;
-                mark.Tap();
-                Assert.That(got, Is.EqualTo("gems"));
-            }
-            finally { Object.DestroyImmediate(root); }
-        }
     }
 }

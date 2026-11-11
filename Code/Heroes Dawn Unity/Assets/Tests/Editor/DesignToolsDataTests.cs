@@ -78,7 +78,7 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(lib.Skipped, Is.Empty);
             Assert.That(lib.Members, Is.Not.Null);
             Assert.That(lib.Members!.Count, Is.EqualTo(32));
-            Assert.That(lib.Items!.Count, Is.EqualTo(10));
+            Assert.That(lib.Items!.Count, Is.EqualTo(14), "10 objets d'origine + 4 de l'extension Aube tactique");
             Assert.That(lib.Texts["members.darius_brooks.name"], Is.EqualTo("Darius Brooks"));
         }
 
@@ -194,6 +194,8 @@ namespace N29.HeroesDawn.Tests.Editor
             ["kevlar_vest"] = ItemType.Armor, ["riot_shield"] = ItemType.Armor, ["reactive_plating"] = ItemType.Armor, ["phoenix_core"] = ItemType.Armor,
             ["running_shoes"] = ItemType.Tool, ["adrenaline_patch"] = ItemType.Tool, ["time_shard"] = ItemType.Tool,
             ["power_gauntlet"] = ItemType.Implant, ["arcane_focus"] = ItemType.Implant,
+            // Objets ajoutés avec le kit d'extension Aube tactique.
+            ["ballistic_fabric"] = ItemType.Armor, ["recovery_gel"] = ItemType.Tool, ["energy_cell"] = ItemType.Tool, ["neural_chip"] = ItemType.Implant,
         };
 
         [Test, Description("Vérifie que les cartes et les objets du code ont la nature et le type fixés par la spec du lot B — parce que ces catégories pilotent les filtres et la règle d'équipement")]

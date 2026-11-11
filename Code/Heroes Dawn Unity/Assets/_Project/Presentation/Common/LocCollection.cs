@@ -21,6 +21,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["items.apex_module.name"] = "Module Apex";
             d["items.power_gauntlet.name"] = "Gantelet de puissance";
             d["items.arcane_focus.name"] = "Focalisateur arcanique";
+            d["items.ballistic_fabric.name"] = "Tissu balistique";
+            d["items.recovery_gel.name"] = "Gel de récupération";
+            d["items.energy_cell.name"] = "Cellule d'énergie";
+            d["items.neural_chip.name"] = "Puce neuronale";
             // Cartes (noms de compétence)
             d["skills.card_glass_wall"] = "Mur de verre";
             d["skills.card_shackle"] = "Entrave";

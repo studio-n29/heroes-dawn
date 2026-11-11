@@ -38,8 +38,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             // Sans matériaux : le bouton de fabrication du panneau est grisé.
             page.SelectRowForTest(0);
             yield return null;
-            var craft = page.SideRows.Last();
-            Assert.That(craft.Buttons[0].Interactable, Is.False, "aucun matériau : pas de fabrication");
+            var craft = page.SideRowButton(page.SideRowCount - 1, 0)!;
+            Assert.That(craft.interactable, Is.False, "aucun matériau : pas de fabrication");
 
             // Avec des scraps : fabriquer ajoute l'objet à l'inventaire.
             var type = recipes[0].Recipe.Type;
@@ -47,7 +47,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             CraftingOps.AddComponents(session, N29.HeroesDawn.Definitions.ComponentKinds.For(type), recipes[0].MinGrade, 1000);
             page.SelectRowForTest(0);
             yield return null;
-            page.SideRows.Last().Buttons[0].Button.onClick.Invoke();
+            page.SideRowButton(page.SideRowCount - 1, 0)!.Button.onClick.Invoke();
             yield return null;
             Assert.That(session.OwnedItemCount, Is.GreaterThan(before), "l'objet fabriqué est dans l'inventaire");
             yield return ScreenCaptureTests.Capture("70-atelier");

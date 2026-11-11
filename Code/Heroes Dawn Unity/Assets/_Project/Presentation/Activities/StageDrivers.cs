@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using N29.HeroesDawn.Domain.Activities;
 using N29.HeroesDawn.Domain.Activities.Games;
+using N29.HeroesDawn.Presentation.Characters3D;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
 
@@ -72,7 +73,14 @@ namespace N29.HeroesDawn.Presentation.Activities
         readonly ArenaGame _game;
         readonly ILocalization _loc;
         readonly GameObject _player, _nose;
+        /// <summary>Modèle 3D de l'agent (Agent D, Agent M) ; null : l'agent est une capsule.</summary>
+        readonly Character3DView? _playerModel;
+        Vector2 _lastPlayerPos;
+        float _lastPlayerHp;
         readonly Dictionary<int, GameObject> _enemies = new Dictionary<int, GameObject>();
+        readonly Dictionary<int, Character3DView> _enemyModels = new Dictionary<int, Character3DView>();
+        readonly Dictionary<int, float> _deadFor = new Dictionary<int, float>();
+        readonly Dictionary<int, Vector3> _enemyLast = new Dictionary<int, Vector3>();
         readonly List<GameObject> _bullets = new List<GameObject>();
         readonly List<Flash> _flashes = new List<Flash>();
         readonly Dictionary<int, float> _lastHp = new Dictionary<int, float>();
@@ -86,9 +94,21 @@ namespace N29.HeroesDawn.Presentation.Activities
         {
             _stage = stage; _game = game; _loc = loc;
             _playerColor = ActivityStage.ToColor(stage.Level.Palette.Accent);
-            _player = stage.Spawn(PrimitiveShape.Capsule, _playerColor, new Vector3(0, 0.5f, 0), new Vector3(1f, 1f, 1f));
-            _nose = stage.Spawn(PrimitiveShape.Cube, Color.white, new Vector3(0, 0.6f, 0.6f), new Vector3(0.25f, 0.25f, 0.5f));
+            _playerModel = stage.SpawnModel(game.Agent.MemberId, ModelScale);
+            if (_playerModel != null)
+            {
+                // L'agent a un vrai modèle : la capsule et son nez ne servent plus qu'à porter la position.
+                _player = _playerModel.gameObject;
+                _nose = new GameObject("Nose");
+                _nose.transform.SetParent(_player.transform, false);
+            }
+            else
+            {
+                _player = stage.Spawn(PrimitiveShape.Capsule, _playerColor, new Vector3(0, 0.5f, 0), new Vector3(1f, 1f, 1f));
+                _nose = stage.Spawn(PrimitiveShape.Cube, Color.white, new Vector3(0, 0.6f, 0.6f), new Vector3(0.25f, 0.25f, 0.5f));
+            }
             stage.Frame(Vector3.zero, game.ArenaRadius * 1.9f, game.ArenaRadius * 0.85f);
+            _lastPlayerHp = game.Hp;
         }
 
         public bool Finished => _game.Status != GameStatus.Running || _abandoned;
@@ -123,9 +143,26 @@ namespace N29.HeroesDawn.Presentation.Activities
 
         static Vector3 BaseScale(EnemyType t) => t == EnemyType.Charger ? new Vector3(1.3f, 1.1f, 1.3f) : t == EnemyType.Shooter ? new Vector3(0.9f, 0.65f, 0.9f) : new Vector3(0.9f, 0.5f, 0.9f);
 
+        /// <summary>Modèle 3D de chaque sorte d'ennemi : le tireur est un soldat, le chargeur une créature, les autres des gangsters.</summary>
+        /// <summary>Grossissement des personnages 3D dans l'arène (vue de loin : la taille réelle les rendrait minuscules).</summary>
+        public const float ModelScale = 1.9f;
+
+        public static string ModelOf(EnemyType t) => t == EnemyType.Charger ? "enemy_creature" : t == EnemyType.Shooter ? "enemy_soldier" : "enemy_gangster";
+
         GameObject EnemyObject(ArenaEnemy e)
         {
             if (_enemies.TryGetValue(e.Id, out var go)) return go;
+            var model = _stage.SpawnModel(ModelOf(e.Type), ModelScale * (EnemyPalettes.Load()?.Scale(ModelOf(e.Type)) ?? 1f));
+            if (model != null)
+            {
+                // Un vrai modèle : sa couleur vient de la variante de la palette (réglée dans l'outil « Couleurs des ennemis »).
+                var variant = EnemyPalettes.Load()?.Pick(ModelOf(e.Type), e.Id);
+                if (variant != null) model.SetTint(variant.tint, variant.tintB);
+                _enemyModels[e.Id] = model;
+                _enemies[e.Id] = model.gameObject;
+                _lastHp[e.Id] = e.Hp;
+                return model.gameObject;
+            }
             switch (e.Type)
             {
                 case EnemyType.Charger: go = _stage.Spawn(PrimitiveShape.Cube, new Color(0.95f, 0.5f, 0.15f), Vector3.zero, new Vector3(1.3f, 1.1f, 1.3f)); break;
@@ -143,13 +180,33 @@ namespace N29.HeroesDawn.Presentation.Activities
             _game.Step(dt, new Vec2f(input.Move.x, input.Move.y), null, input.A, input.BPressed || input.B);
             if (_game.Wave != _announcedWave) { _announcedWave = _game.Wave; if (_game.Wave >= 0) _bannerTime = 1.6f; }
 
-            _player.transform.localPosition = StageUtil.P(_game.Position, 0.5f);
-            _nose.transform.localPosition = StageUtil.P(_game.Position + _game.Facing * 0.65f, 0.6f);
-            _stage.SetColor(_player, _game.Dashing ? Color.white : _playerColor);
+            if (_playerModel != null)
+            {
+                _player.transform.localPosition = StageUtil.P(_game.Position, 0f);
+                var face = new Vector3(_game.Facing.X, 0f, _game.Facing.Y);
+                if (face.sqrMagnitude > 0.0001f) _player.transform.localRotation = Quaternion.Slerp(_player.transform.localRotation, Quaternion.LookRotation(face), Mathf.Clamp01(dt * 14f));
+                var pos = new Vector2(_game.Position.X, _game.Position.Y);
+                if (dt > 0f) _playerModel.SetMoveSpeed(Vector2.Distance(pos, _lastPlayerPos) / dt);
+                _lastPlayerPos = pos;
+                if (_game.Hp < _lastPlayerHp - 0.01f) { _playerModel.PlayHit(); _playerModel.Flash(Color.white, 0.12f); }
+                _lastPlayerHp = _game.Hp;
+                if (_game.Status != GameStatus.Running && !_playerModel.Dead && !_game.Result().Success) _playerModel.PlayDeath();
+            }
+            else
+            {
+                _player.transform.localPosition = StageUtil.P(_game.Position, 0.5f);
+                _nose.transform.localPosition = StageUtil.P(_game.Position + _game.Facing * 0.65f, 0.6f);
+                _stage.SetColor(_player, _game.Dashing ? Color.white : _playerColor);
+            }
 
             foreach (var e in _game.Enemies)
             {
                 var go = EnemyObject(e);
+                if (_enemyModels.TryGetValue(e.Id, out var m))
+                {
+                    TickEnemyModel(e, m, dt);
+                    continue;
+                }
                 go.SetActive(e.Alive);
                 if (!e.Alive) continue;
                 go.transform.localPosition = StageUtil.P(e.Position, 0.55f);
@@ -185,8 +242,47 @@ namespace N29.HeroesDawn.Presentation.Activities
             }
         }
 
+        /// <summary>Un ennemi avec un vrai modèle : poursuite (marche ou course), regard sur l'agent, éclat blanc quand il est touché, éclat jaune quand il charge, mort animée.</summary>
+        void TickEnemyModel(ArenaEnemy e, Character3DView m, float dt)
+        {
+            var go = m.gameObject;
+            if (!e.Alive)
+            {
+                if (!m.Dead) { m.PlayDeath(); _deadFor[e.Id] = 1.6f; }
+                float left = (_deadFor.TryGetValue(e.Id, out var dv) ? dv : 0f) - dt;
+                _deadFor[e.Id] = left;
+                go.SetActive(left > 0f);
+                return;
+            }
+            go.SetActive(true);
+            var pos = StageUtil.P(e.Position, 0f);
+            go.transform.localPosition = pos;
+            var toPlayer = StageUtil.P(_game.Position, 0f) - pos;
+            if (toPlayer.sqrMagnitude > 0.0001f) go.transform.localRotation = Quaternion.Slerp(go.transform.localRotation, Quaternion.LookRotation(toPlayer), Mathf.Clamp01(dt * 10f));
+            if (dt > 0f && _enemyLast.TryGetValue(e.Id, out var last)) m.SetMoveSpeed(Vector3.Distance(pos, last) / dt);
+            _enemyLast[e.Id] = pos;
+            if (_lastHp.TryGetValue(e.Id, out var hp) && e.Hp < hp - 0.01f) { m.PlayHit(); m.Flash(Color.white, 0.12f); }
+            _lastHp[e.Id] = e.Hp;
+            if (e.Winding)
+            {
+                if (!_winding.Contains(e.Id)) { _winding.Add(e.Id); m.PlayAttack(); }
+                m.Flash(new Color(1f, 0.9f, 0.2f), 0.1f);
+            }
+            else _winding.Remove(e.Id);
+        }
+
+        readonly HashSet<int> _winding = new HashSet<int>();
+
+        void PlayerFx(ArenaEffect fx)
+        {
+            if (_playerModel == null) return;
+            if (fx.Kind == ArenaEffectKind.Aoe || fx.Kind == ArenaEffectKind.Shot) _playerModel.PlayCast();
+            else _playerModel.PlayAttack();
+        }
+
         void SpawnFlash(ArenaEffect fx)
         {
+            PlayerFx(fx);
             if (fx.Kind == ArenaEffectKind.Shot) return;
             var color = fx.Kind == ArenaEffectKind.Aoe ? new Color(1f, 0.9f, 0.4f) : fx.Kind == ArenaEffectKind.Dash ? new Color(0.7f, 0.9f, 1f) : Color.white;
             var go = fx.Kind == ArenaEffectKind.Melee

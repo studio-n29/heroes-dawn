@@ -43,12 +43,12 @@ namespace N29.HeroesDawn.Tests.PlayMode
             nav.Open(HubPage.MemberSheet, session.Roster[0].Id);
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<MemberSheetView>());
             var sheet = Object.FindAnyObjectByType<MemberSheetView>()!;
-            var loadoutButton = sheet.GetComponentsInChildren<UnityEngine.UI.Button>(true).First(b => b.name == "Loadout");
+            var loadoutButton = sheet.LoadoutButton;
             loadoutButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<LoadoutPageView>() != null);
             var page = Object.FindAnyObjectByType<LoadoutPageView>()!;
             yield return null;
-            var equip = page.GetComponentsInChildren<UnityEngine.UI.Button>(true).FirstOrDefault(b => b.GetComponentInChildren<TMPro.TMP_Text>(true)?.text == "ÉQUIPER");
+            var equip = page.DetailButtonLabelled("ÉQUIPER");
             Assert.That(equip, Is.Not.Null, "un bouton ÉQUIPER pour le gilet");
             equip!.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => session.Roster[0].Items.Count == 1, 120);
@@ -67,7 +67,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<GrimoirePageView>() != null);
             var page = Object.FindAnyObjectByType<GrimoirePageView>()!;
             yield return null;
-            var open = page.GetComponentsInChildren<UnityEngine.UI.Button>(true).First(b => b.GetComponentInChildren<TMPro.TMP_Text>(true)?.text == "OUVRIR UN BOOSTER");
+            var open = new[] { page.HeaderButtonA, page.HeaderButtonB }.First(b => b.Text == "OUVRIR UN BOOSTER");
             open.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoosterOpeningPopupView>() != null, 120);
             var popup = Object.FindAnyObjectByType<BoosterOpeningPopupView>()!;
@@ -81,7 +81,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(popup.Cards.All(x => x.Revealed && x.FaceVisible), Is.True, "toutes les cartes sont retournées");
             popup.ContinueButton.onClick.Invoke();
             Assert.That(popup.Current, Is.EqualTo(BoosterOpeningPopupView.Phase.Summary));
-            Assert.That(popup.GetComponentsInChildren<TMPro.TMP_Text>().Any(t => t.text == N29.HeroesDawn.Presentation.Common.Loc.F("booster.received", 3)), Is.True, "le résumé n'affiche plus l'invite d'ouverture");
+            Assert.That(popup.Hint, Is.EqualTo(N29.HeroesDawn.Presentation.Common.Loc.F("booster.received", 3)), "le résumé n'affiche plus l'invite d'ouverture");
             Assert.That(CollectionOps.Boosters(session, BoosterDef.StandardId), Is.EqualTo(0), "le résumé ne consomme pas un second booster");
             popup.ContinueButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoosterOpeningPopupView>() == null, 120);
@@ -106,7 +106,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             }
             nav.SelectShopTab(ShopTab.Boosters);
             yield return new WaitForSecondsRealtime(0.5f);
-            var open = Object.FindAnyObjectByType<BoutiquePageView>()!.GetComponentsInChildren<UnityEngine.UI.Button>(true).First(b => b.GetComponentInChildren<TMPro.TMP_Text>(true)?.text == "OUVRIR");
+            var boutique = Object.FindAnyObjectByType<BoutiquePageView>()!;
+            var open = Enumerable.Range(0, 3).Select(i => boutique.DetailButton(i)).First(b => b.Text.StartsWith("OUVRIR"));
             open.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoosterOpeningPopupView>() != null, 120);
             var popup = Object.FindAnyObjectByType<BoosterOpeningPopupView>()!;

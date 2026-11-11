@@ -46,7 +46,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return FoggedBoard();
             var run = ActivityGamesPlayTests.Container.Resolve<GameSession>().Run!;
             yield return null;
-            var clouds = Object.FindObjectsByType<FogCloudView>(FindObjectsSortMode.None);
+            var clouds = new System.Collections.Generic.List<FogCloud>(Object.FindAnyObjectByType<BoardView>()!.MapView.FogClouds).ToArray();
             int nodes = run.Graph.AllIds.Count;
             int revealed = run.Fog.Revealed.Count;
             Assert.That(clouds.Length, Is.EqualTo(nodes * 2), "deux nuages par case");
@@ -59,7 +59,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             yield return FoggedBoard();
             var board = Object.FindAnyObjectByType<BoardView>()!;
-            var burst = Object.FindAnyObjectByType<ComicBurstView>()!;
+            var burst = Object.FindAnyObjectByType<BoardView>()!.Burst!;
             bool done = false;
             UniTask.Create(async () =>
             {

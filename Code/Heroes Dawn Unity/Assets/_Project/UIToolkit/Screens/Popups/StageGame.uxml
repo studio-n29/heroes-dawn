@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal">
+        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-stage">
+            <ui:Label name="title" class="hd-modal__title" />
+            <ui:VisualElement name="viewport" class="hd-stage__viewport">
+                <ui:Label name="line1" class="hd-stage__line1" />
+                <ui:Label name="line2" class="hd-stage__line2" />
+                <ui:Label name="banner" class="hd-stage__banner" />
+                <ui:VisualElement name="barRoot" class="hd-stage__bar">
+                    <ui:VisualElement name="barFill" class="hd-stage__barfill" />
+                    <ui:Label name="barLabel" class="hd-stage__barlabel" />
+                </ui:VisualElement>
+                <ui:VisualElement name="controls" class="hd-stage__controls">
+                    <ui:VisualElement name="stick" class="hd-stage__stick"><ui:VisualElement name="knob" class="hd-stage__knob" /></ui:VisualElement>
+                    <ui:VisualElement class="hd-stage__actions">
+                        <ui:Button name="buttonA" class="hd-btn hd-btn--primary hd-stage__action" />
+                        <ui:Button name="buttonB" class="hd-btn hd-btn--secondary hd-stage__action" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="intro" class="hd-stage__intro">
+                    <ui:Label name="introTitle" class="hd-modal__title" />
+                    <ui:Label name="introBody" class="hd-pop__text" />
+                    <ui:VisualElement name="agents" class="hd-stage__agents" />
+                    <ui:Button name="start" class="hd-btn hd-btn--primary" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button name="quit" class="hd-btn hd-btn--danger hd-mg2d__abandon" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

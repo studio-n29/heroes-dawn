@@ -1,39 +1,45 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using N29.HeroesDawn.Presentation.Common;
-using N29.HeroesDawn.Presentation.Feedback;
-using N29.HeroesDawn.Presentation.Mvp;
-using TMPro;
+using N29.HeroesDawn.Presentation.Tutorial;
+using N29.HeroesDawn.Presentation.UiToolkit;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Page Recruter (prefab Pages/Recruit) : règle, compte à rebours, 3 cartes, progression, Renouveler.</summary>
-    public sealed class RecruitPageView : ViewBase, IRecruitPageView
+    /// <summary>Page Recruter (UI Toolkit) : onglets de la boutique, règle, compte à rebours, trois cartes, lots de scraps, Renouveler, fiche du héros choisi.</summary>
+    public sealed class RecruitPageView : HdView, IRecruitPageView
     {
-        [SerializeField] TMP_Text rule = null!;
-        [SerializeField] TMP_Text countdown = null!;
-        [SerializeField] ShopCardView[] cards = Array.Empty<ShopCardView>();
-        [SerializeField] TMP_Text empty = null!;
-        [SerializeField] TMP_Text progress = null!;
-        [SerializeField] UiButton[] scraps = Array.Empty<UiButton>();
-        [SerializeField] UiButton reroll = null!;
-        [SerializeField] UiButton registry = null!;
-        [SerializeField] ShopTabsView shopTabs = null!;
-        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] TMP_Text? detailName;
-        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] TMP_Text? detailRarity;
-        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] TMP_Text? detailRole;
-        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] TMP_Text? detailStats;
-        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] TMP_Text? detailSkills;
-        [SerializeField, N29.HeroesDawn.Presentation.Mvp.OptionalRef] UiButton? detailRecruit;
+        /// <summary>Ce que les tests lisent d'une carte de héros affichée.</summary>
+        public sealed class CardInfo
+        {
+            public HdButtonRef RecruitButton = null!;
+            public HdButtonRef TapButton = null!;
+            public bool Visible;
+            public RecruitCardState State;
+        }
 
-        int _selected;
+        sealed class HeroCard
+        {
+            public VisualElement Root = null!, Art = null!, Body = null!;
+            public Label Name = null!, Rarity = null!, Role = null!, Stats = null!, InTeam = null!;
+            public UnityEngine.UIElements.Button Recruit = null!;
+            public CardInfo Info = new CardInfo();
+        }
 
+        readonly List<HeroCard> _cards = new List<HeroCard>();
+        readonly List<UnityEngine.UIElements.Button> _scraps = new List<UnityEngine.UIElements.Button>();
         readonly int[] _slots = new int[8];
-        readonly Core.MemberId[] _ids = new Core.MemberId[8];
-        readonly bool[] _shown = new bool[8];
-        readonly int[] _scrapSlots = new int[6];
+        readonly int[] _scrapSlots = new int[8];
+        VisualElement _cardsBox = null!, _scrapsBox = null!;
+        Label _rule = null!, _countdown = null!, _empty = null!, _progress = null!;
+        Label _dName = null!, _dRarity = null!, _dRole = null!, _dStats = null!, _dSkills = null!;
+        UnityEngine.UIElements.Button _reroll = null!, _registry = null!, _dRecruit = null!;
+        HdShopTabs? _tabs;
+        RecruitPageData? _last;
+        int _selected, _activeTab = -1;
 
         public event Action<int>? CardTapped;
         public event Action<int>? RecruitClicked;
@@ -42,87 +48,153 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? RegistryClicked;
         public event Action<int>? ShopTabClicked;
 
-        public Button RerollButton => reroll.Button;
-        public ShopCardView Card(int index) => cards[index];
+        public HdButtonRef RerollButton => new HdButtonRef(_reroll, this);
+        public HdButtonRef RegistryButton => new HdButtonRef(_registry, this);
+        public CardInfo Card(int index) => _cards[index].Info;
+        public int VisibleCardCount { get { int n = 0; foreach (var c in _cards) if (c.Info.Visible) n++; return n; } }
         /// <summary>Bandeau d'onglets de la boutique (tests PlayMode).</summary>
-        public ShopTabsView ShopTabs => shopTabs;
+        public HdShopTabs ShopTabs => _tabs!;
 
-        void Awake()
+        protected override void Bind()
         {
-            for (int i = 0; i < cards.Length; i++)
-            {
-                int index = i;
-                cards[i].Tapped += () => { if (_selected == index) CardTapped?.Invoke(_slots[index]); else { _selected = index; ShowDetail(); } };
-                cards[i].RecruitClicked += () => RecruitClicked?.Invoke(_slots[index]);
-            }
-            for (int i = 0; i < scraps.Length; i++)
-            {
-                int index = i;
-                scraps[i].Button.onClick.AddListener(() => ScrapClicked?.Invoke(_scrapSlots[index]));
-            }
-            reroll.Button.onClick.AddListener(() => RerollClicked?.Invoke());
-            if (detailRecruit != null) detailRecruit.Button.onClick.AddListener(() => RecruitClicked?.Invoke(_slots[Mathf.Clamp(_selected, 0, _slots.Length - 1)]));
-            registry.Button.onClick.AddListener(() => RegistryClicked?.Invoke());
-            shopTabs.TabClicked += i => ShopTabClicked?.Invoke(i);
+            _cardsBox = Q<VisualElement>("cards"); _scrapsBox = Q<VisualElement>("scraps");
+            _rule = Q<Label>("rule"); _countdown = Q<Label>("countdown"); _empty = Q<Label>("empty"); _progress = Q<Label>("progress");
+            _dName = Q<Label>("detailName"); _dRarity = Q<Label>("detailRarity"); _dRole = Q<Label>("detailRole");
+            _dStats = Q<Label>("detailStats"); _dSkills = Q<Label>("detailSkills");
+            _reroll = Q<UnityEngine.UIElements.Button>("reroll"); _registry = Q<UnityEngine.UIElements.Button>("registry");
+            _dRecruit = Q<UnityEngine.UIElements.Button>("detailRecruit");
+            _reroll.clicked += () => RerollClicked?.Invoke();
+            _registry.text = Loc.T("agents.open");
+            _registry.clicked += () => RegistryClicked?.Invoke();
+            _dRecruit.clicked += () => RecruitClicked?.Invoke(_slots[Mathf.Clamp(_selected, 0, _slots.Length - 1)]);
+            _tabs = new HdShopTabs(Q<VisualElement>("shopTabs"), this);
+            _tabs.TabClicked += i => ShopTabClicked?.Invoke(i);
+            if (_activeTab >= 0) _tabs.Show(_activeTab);
+            _cards.Clear(); _scraps.Clear();
+            if (_last.HasValue) Show(_last.Value);
         }
 
-        public void ShowShopTab(int active) => shopTabs.Show(active);
-
-        /// <summary>Fiche de l'agent sélectionné (première carte par défaut) : un toucher sur une carte la sélectionne, un second ouvre sa fiche complète.</summary>
-        void ShowDetail()
+        public void ShowShopTab(int active)
         {
-            for (int i = 0; i < cards.Length; i++) cards[i].SetSelected(i == _selected);
-            if (detailName == null || detailRarity == null || detailRole == null || detailStats == null || detailSkills == null || detailRecruit == null) return;
-            var s = cards[Mathf.Clamp(_selected, 0, cards.Length - 1)].State;
-            if (s.Card.Name == null) return;
-            detailName.text = s.Card.Name;
-            detailRarity.text = s.Card.RarityText;
-            detailRarity.color = Theme.RarityColor(s.Rarity);
-            detailRole.text = s.Card.RoleLine;
-            detailStats.text = s.Card.Stats;
-            detailSkills.text = s.Card.Skills;
-            detailRecruit.SetLabel(s.PriceLabel);
-            detailRecruit.SetColors(s.Affordable ? Theme.Primary : Theme.Surface3, s.Affordable ? Theme.TextDark : Theme.Text);
-            detailRecruit.gameObject.SetActive(!s.InTeam);
+            _activeTab = active;
+            _tabs?.Show(active);
         }
 
         public void Show(RecruitPageData d)
         {
-            rule.text = d.Rule;
-            countdown.text = d.Countdown;
-            for (int i = 0; i < cards.Length; i++)
+            _last = d;
+            if (_cardsBox == null) return;
+            _rule.text = d.Rule;
+            _countdown.text = d.Countdown;
+            while (_cards.Count < d.Cards.Length) { var c = NewCard(_cards.Count); _cards.Add(c); _cardsBox.Add(c.Root); }
+            for (int i = 0; i < _cards.Count; i++)
             {
                 bool used = i < d.Cards.Length;
-                if (cards[i].gameObject.activeSelf != used) cards[i].gameObject.SetActive(used);
+                _cards[i].Root.style.display = used ? DisplayStyle.Flex : DisplayStyle.None;
+                _cards[i].Info.Visible = used;
                 if (!used) continue;
                 _slots[i] = d.Cards[i].Slot;
-                // Feedbacks : cascade à la première ouverture, retournement quand l'offre change (renouvellement, 9h00).
-                var id = d.Cards[i].Card.Id;
-                bool changed = _shown[i] && !_ids[i].Equals(id);
-                if (changed) cards[i].ResetState();
-                cards[i].Show(d.Cards[i]);
-                if (!_shown[i]) Fx.PopInAfter(cards[i].transform, Stagger.DelayFor(i));
-                else if (changed) Fx.FlipIn(cards[i].transform, Stagger.DelayFor(i, 0.08f));
-                _ids[i] = id;
-                _shown[i] = true;
+                ShowCard(_cards[i], d.Cards[i], i == _selected);
             }
-            for (int i = 0; i < scraps.Length; i++)
+            while (_scraps.Count < d.Scraps.Length)
+            {
+                int index = _scraps.Count;
+                var b = new UnityEngine.UIElements.Button();
+                b.AddToClassList("hd-btn"); b.AddToClassList("hd-btn--secondary"); b.AddToClassList("hd-btn--small"); b.AddToClassList("hd-recruit__scrap");
+                b.clicked += () => ScrapClicked?.Invoke(_scrapSlots[index]);
+                _scraps.Add(b); _scrapsBox.Add(b);
+            }
+            for (int i = 0; i < _scraps.Count; i++)
             {
                 bool has = i < d.Scraps.Length;
-                if (scraps[i].gameObject.activeSelf != has) scraps[i].gameObject.SetActive(has);
+                _scraps[i].style.display = has ? DisplayStyle.Flex : DisplayStyle.None;
                 if (!has) continue;
                 _scrapSlots[i] = d.Scraps[i].Slot;
-                scraps[i].SetLabel(d.Scraps[i].Text);
-                scraps[i].Interactable = d.Scraps[i].Enabled;
+                _scraps[i].text = d.Scraps[i].Text;
+                _scraps[i].SetEnabled(d.Scraps[i].Enabled);
             }
-            empty.text = d.EmptyText;
-            bool none = d.Cards.Length == 0;
-            if (empty.gameObject.activeSelf != none) empty.gameObject.SetActive(none);
-            progress.text = d.Progress;
-            reroll.SetLabel(d.RerollLabel);
-            reroll.Interactable = d.RerollEnabled;
+            _empty.text = d.EmptyText;
+            _empty.style.display = d.Cards.Length == 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            _progress.text = d.Progress;
+            _reroll.text = d.RerollLabel;
+            _reroll.SetEnabled(d.RerollEnabled);
             if (_selected >= d.Cards.Length) _selected = 0;
             ShowDetail();
+        }
+
+        HeroCard NewCard(int index)
+        {
+            var c = new HeroCard { Root = new UnityEngine.UIElements.Button() };
+            c.Root.RemoveFromClassList("unity-button");
+            c.Root.AddToClassList("hd-hero");
+            c.Art = new VisualElement { pickingMode = PickingMode.Ignore }; c.Art.AddToClassList("hd-hero__art");
+            c.Body = new VisualElement { pickingMode = PickingMode.Ignore }; c.Body.AddToClassList("hd-hero__body");
+            c.Name = new Label { pickingMode = PickingMode.Ignore }; c.Name.AddToClassList("hd-hero__name");
+            c.Rarity = new Label { pickingMode = PickingMode.Ignore }; c.Rarity.AddToClassList("hd-hero__rarity");
+            c.Role = new Label { pickingMode = PickingMode.Ignore }; c.Role.AddToClassList("hd-hero__role");
+            c.Stats = new Label { pickingMode = PickingMode.Ignore }; c.Stats.AddToClassList("hd-hero__stats");
+            c.InTeam = new Label { pickingMode = PickingMode.Ignore }; c.InTeam.AddToClassList("hd-hero__inteam");
+            c.Recruit = new UnityEngine.UIElements.Button();
+            c.Recruit.AddToClassList("hd-btn"); c.Recruit.AddToClassList("hd-btn--small");
+            c.Recruit.clicked += () => RecruitClicked?.Invoke(_slots[index]);
+            c.Body.Add(c.Name); c.Body.Add(c.Rarity); c.Body.Add(c.Role); c.Body.Add(c.Stats);
+            c.Root.Add(c.Art); c.Root.Add(c.Body); c.Root.Add(c.InTeam); c.Root.Add(c.Recruit);
+            void Tap()
+            {
+                if (_selected == index) CardTapped?.Invoke(_slots[index]);
+                else { _selected = index; RefreshSelection(); ShowDetail(); }
+            }
+            c.Root.RegisterCallback<ClickEvent>(e => { if (!(e.target is UnityEngine.UIElements.Button)) Tap(); });
+            c.Root.RegisterCallback<NavigationSubmitEvent>(e => { if (e.target == c.Root) Tap(); });
+            c.Info.RecruitButton = new HdButtonRef(c.Recruit, this);
+            if (index == 0) HdTutorialAnchor.Attach(this, c.Recruit, TutorialTarget.RecruitCard);
+            c.Info.TapButton = new HdButtonRef((UnityEngine.UIElements.Button)c.Root, this);
+            return c;
+        }
+
+        void RefreshSelection()
+        {
+            for (int i = 0; i < _cards.Count; i++) _cards[i].Root.EnableInClassList("hd-hero--selected", i == _selected);
+        }
+
+        static void ShowCard(HeroCard c, RecruitCardState d, bool selected)
+        {
+            var color = Theme.RarityColor(d.Rarity);
+            c.Info.State = d;
+            c.Root.style.borderTopColor = c.Root.style.borderBottomColor = c.Root.style.borderLeftColor = c.Root.style.borderRightColor = color;
+            c.Root.EnableInClassList("hd-hero--legend", d.Halo);
+            c.Root.EnableInClassList("hd-hero--selected", selected);
+            c.Root.EnableInClassList("hd-hero--taken", d.InTeam);
+            var art = d.Card.Portrait.Art;
+            c.Art.style.backgroundImage = art != null ? new StyleBackground(art) : new StyleBackground(StyleKeyword.Null);
+            c.Art.style.borderBottomColor = Theme.FamilyColor(d.Card.Family);
+            c.Name.text = d.Card.Name;
+            c.Rarity.text = d.Card.RarityText; c.Rarity.style.color = color;
+            c.Role.text = d.Card.RoleLine;
+            c.Stats.text = d.Card.Stats;
+            c.Recruit.text = d.PriceLabel;
+            c.Recruit.style.display = d.InTeam ? DisplayStyle.None : DisplayStyle.Flex;
+            c.Recruit.EnableInClassList("hd-btn--primary", d.Affordable);
+            c.Recruit.EnableInClassList("hd-btn--secondary", !d.Affordable);
+            c.InTeam.text = d.InTeamText;
+            c.InTeam.style.display = d.InTeam ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        void ShowDetail()
+        {
+            RefreshSelection();
+            if (_cards.Count == 0) return;
+            var s = _cards[Mathf.Clamp(_selected, 0, _cards.Count - 1)].Info.State;
+            if (s.Card.Name == null) return;
+            _dName.text = s.Card.Name;
+            _dRarity.text = s.Card.RarityText; _dRarity.style.color = Theme.RarityColor(s.Rarity);
+            _dRole.text = s.Card.RoleLine;
+            _dStats.text = s.Card.Stats;
+            _dSkills.text = s.Card.Skills;
+            _dRecruit.text = s.PriceLabel;
+            _dRecruit.style.display = s.InTeam ? DisplayStyle.None : DisplayStyle.Flex;
+            _dRecruit.EnableInClassList("hd-btn--primary", s.Affordable);
+            _dRecruit.EnableInClassList("hd-btn--secondary", !s.Affordable);
         }
     }
 }

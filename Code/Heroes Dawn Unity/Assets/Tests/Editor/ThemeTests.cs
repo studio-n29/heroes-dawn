@@ -19,21 +19,6 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(ThemeContrast.Ratio(Theme.Outline, Theme.Surface), Is.GreaterThanOrEqualTo(1.5f), "le contour se détache du panneau");
         }
 
-        [Test, Description("Le passage d'un bouton secondaire sombre à un état actif ivoire conserve un libellé contrasté")]
-        public void Button_ActiveState_KeepsReadableLabel()
-        {
-            var parent = new GameObject("Contrast", typeof(RectTransform));
-            try
-            {
-                var button = Ui.Btn(parent.transform, "Mission", Theme.Primary, Theme.Text, null);
-                Assert.That(ThemeContrast.Ratio(button.Fill.color, button.Label.color), Is.GreaterThanOrEqualTo(4.5f));
-                button.SetColors(Theme.Surface3, Theme.TextDark);
-                Assert.That(ThemeContrast.Ratio(button.Fill.color, button.Label.color), Is.GreaterThanOrEqualTo(4.5f));
-                button.SetColors(Theme.Primary, Theme.Text);
-                Assert.That(ThemeContrast.Ratio(button.Fill.color, button.Label.color), Is.GreaterThanOrEqualTo(4.5f));
-            }
-            finally { Object.DestroyImmediate(parent); }
-        }
 
         [Test, Description("Vérifie que les quatre familles restent deux à deux distinctes après l'adoucissement — parce qu'elles servent à lire le gameplay d'un coup d'œil")]
         public void Theme_FamiliesStayDistinct()

@@ -1,24 +1,31 @@
 #nullable enable
 using System;
-using UnityEngine;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
     /// <summary>Boutique unique en cartes (onglets Boosters, Objets, Gemmes et crédits, Cadeau ; l'onglet Héros est la page Recruter) : une tuile par offre, achat depuis la fiche à droite.</summary>
-    public sealed class BoutiquePageView : CardGridPageView, IBoutiquePageView
+    public sealed class BoutiquePageView : HdCardGridPageView, IBoutiquePageView
     {
-        [SerializeField] ShopTabsView shopTabs = null!;
+        HdShopTabs? _tabs;
+        int _active = -1;
 
         public event Action<int>? ShopTabClicked;
 
-        public ShopTabsView Tabs => shopTabs;
+        protected override bool HasShopTabs => true;
+        public HdShopTabs Tabs => _tabs!;
 
-        protected override void Awake()
+        protected override void Bind()
         {
-            base.Awake();
-            shopTabs.TabClicked += i => ShopTabClicked?.Invoke(i);
+            base.Bind();
+            _tabs = new HdShopTabs(TabsHost!, this);
+            _tabs.TabClicked += i => ShopTabClicked?.Invoke(i);
+            if (_active >= 0) _tabs.Show(_active);
         }
 
-        public void ShowShopTab(int active) => shopTabs.Show(active);
+        public void ShowShopTab(int active)
+        {
+            _active = active;
+            _tabs?.Show(active);
+        }
     }
 }

@@ -10,6 +10,7 @@ using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
+using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using N29.HeroesDawn.Presentation.Wip;
@@ -37,6 +38,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly MetaOverview? _meta;
         readonly ISubscriber<MetaChanged>? _metaChanged;
         readonly TutorialGuide? _tutorial;
+        readonly IMusicSignals? _music;
         IDisposable? _metaSub;
 
         IHubPageHandle? _page;
@@ -50,9 +52,11 @@ namespace N29.HeroesDawn.Presentation.Hub
                                  ISubscriber<WalletChanged> wallet, ISubscriber<SaveStateChanged> saving, ISubscriber<ShopChanged> shopChanged,
                                  IOpenShopUseCase openShop, IClock clock,
                                  IModalService modals, IToastService toasts, ILocalization loc, IAppQuit quit, BackButtonRouter router,
-                                 MetaOverview? meta = null, ISubscriber<MetaChanged>? metaChanged = null, TutorialGuide? tutorial = null)
+                                 MetaOverview? meta = null, ISubscriber<MetaChanged>? metaChanged = null, TutorialGuide? tutorial = null,
+                                 IMusicSignals? music = null)
             : base(view, router)
         {
+            _music = music;
             _nav = nav; _pages = pages; _session = session; _walletChanged = wallet; _saving = saving; _shopChanged = shopChanged;
             _openShop = openShop; _clock = clock;
             _modals = modals; _toasts = toasts; _loc = loc; _quit = quit;
@@ -89,6 +93,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _wallet?.Dispose();
             _page?.Dispose();
             _page = null;
+            _music?.SetShopOpen(false);
         }
 
         /// <summary>Les pages vivent dans un scope enfant, non tické : la coque leur transmet le tick.</summary>
@@ -115,6 +120,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         void OnNavigated(HubLocation location)
         {
             if (Disposed) return;
+            _music?.SetShopOpen(location.Page == HubPage.Shop);
             _page?.Dispose();
             _page = null;
             int version = ++_navVersion;

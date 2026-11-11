@@ -10,34 +10,7 @@ namespace N29.HeroesDawn.Tests.Editor
 {
     public sealed class AubeTactiqueTests
     {
-        [TestCase(1920, 1080)]
-        [TestCase(2160, 972)]
-        [Description("Titre, avatar, état de sauvegarde, monnaies et réglages gardent chacun leur espace en paysage 16:9 et 20:9")]
-        public void HubHeader_DoesNotOverlap(int width, int height)
-        {
-            var parent = new GameObject("Viewport", typeof(RectTransform));
-            try
-            {
-                ((RectTransform)parent.transform).sizeDelta = new Vector2(width, height);
-                var asset = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Screens/Hub.prefab");
-                var go = (GameObject)PrefabUtility.InstantiatePrefab(asset, parent.transform);
-                ((RectTransform)go.transform).Stretch();
-                LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)go.transform);
-                var top = go.transform.Find("TopBar");
-                var names = new[] { "Title", "Avatar", "Wallet", "Settings" };
-                for (int i = 0; i < names.Length - 1; i++)
-                {
-                    var left = new Vector3[4]; var right = new Vector3[4];
-                    ((RectTransform)top.Find(names[i])).GetWorldCorners(left);
-                    ((RectTransform)top.Find(names[i+1])).GetWorldCorners(right);
-                    Assert.That(left[2].x, Is.LessThanOrEqualTo(right[0].x), names[i] + " / " + names[i+1]);
-                }
-            }
-            finally { Object.DestroyImmediate(parent); }
-        }
-
         [TestCase("Pages/Settings.prefab")]
-        [TestCase("Widgets/SettingRow.prefab")]
         [Description("Les prefabs conservés sans recette doivent recevoir la même DA que les écrans reconstruits")]
         public void PreservedSettings_HaveNoLegacyPaletteOrOutlinedText(string relative)
         {

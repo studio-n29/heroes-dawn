@@ -64,12 +64,21 @@ namespace N29.HeroesDawn.Presentation.Common
         }
 
         /// <summary>Illustration temporaire d une carte (recadrage de l art du Drive, teinté par catégorie) ; à défaut un visuel de capacité.</summary>
-        public static Sprite? Card(string id) => Load("Illustrations/Cards/" + id, 3000, id) ?? Ability(id);
+        public static Sprite? Card(string id) => TacticalArt.Ext("Cards", id) ?? Load("Illustrations/Cards/" + id, 3000, id) ?? Ability(id);
+
+        /// <summary>Agent détouré (fond transparent) du dossier d'extension Aube tactique ; null si l'agent n'en a pas encore.</summary>
+        public static Sprite? Cutout(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            return TacticalArt.Ext("Agents", id + "-cutout") ?? TacticalArt.Ext("Agents", id);
+        }
 
         /// <summary>Une compétence native garde l'illustration de son agent ; une carte équipée garde son propre visuel.</summary>
         public static Sprite? Skill(string id)
         {
             if (string.IsNullOrEmpty(id)) return null;
+            var own = TacticalArt.Ext("Skills", id) ?? TacticalArt.Ext("Cards", id);
+            if (own != null) return own;
             var card = Resources.Load<Sprite>("Illustrations/Cards/" + id);
             if (card != null) return card;
             int suffix = id.LastIndexOf("_a", System.StringComparison.Ordinal);
@@ -105,7 +114,35 @@ namespace N29.HeroesDawn.Presentation.Common
         }
 
         /// <summary>Illustration temporaire d un objet (recadrage de l art du Drive, teinté par statistique) ; null si elle manque.</summary>
-        public static Sprite? Item(string id) => Load("Illustrations/Items/" + id, 4000, id);
+        public static Sprite? Item(string id) => ExtItem(id) ?? Load("Illustrations/Items/" + id, 4000, id);
+
+        /// <summary>Correspondance entre les objets du jeu et les icônes détourées de l'extension Aube tactique.</summary>
+        static readonly Dictionary<string, string> ItemArt = new Dictionary<string, string>
+        {
+            { "steel_knuckles", "reinforced-gloves" },
+            { "titan_gauntlets", "stabilizer-gauntlets" },
+            { "kevlar_vest", "tactical-belt" },
+            { "adrenaline_patch", "medkit" },
+            { "apex_module", "analysis-module" },
+            { "ballistic_fabric", "fabric" },
+            { "recovery_gel", "recovery-gel" },
+            { "energy_cell", "energy-cell" },
+            { "neural_chip", "chip" },
+        };
+
+        static Sprite? ExtItem(string id) => ItemArt.TryGetValue(id, out var file) ? TacticalArt.Ext("Items", file) : null;
+
+        /// <summary>Icône de scrap (arme, armure, outil) de l'extension ; null pour les autres types.</summary>
+        public static Sprite? Scrap(string kind)
+        {
+            switch (kind.ToLowerInvariant())
+            {
+                case "weapon": return TacticalArt.Ext("Items", "weapon-scrap");
+                case "armor": return TacticalArt.Ext("Items", "armor-scrap");
+                case "tool": return TacticalArt.Ext("Items", "tool-scrap");
+                default: return null;
+            }
+        }
 
         static Sprite? Load(string path, int cacheBase, string id)
         {

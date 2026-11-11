@@ -1,95 +1,106 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Domain.Activities;
 using N29.HeroesDawn.Domain.Activities.Games;
 using N29.HeroesDawn.Presentation.Common;
-using N29.HeroesDawn.Presentation.Mvp;
-using N29.HeroesDawn.Presentation.Popups;
-using TMPro;
+using N29.HeroesDawn.Presentation.UiToolkit;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
-    /// <summary>La potion magique (prefab) : le livre, les ingrédients à toucher, la quantité, les étapes déjà ajoutées, « Préparer ».</summary>
-    public sealed class PotionPopupView : PopupViewBase, IPotionPopupView
+    /// <summary>La potion magique (fenêtre UI Toolkit) : le livre, les ingrédients à toucher, la quantité, les étapes déjà ajoutées, « Préparer ».</summary>
+    public sealed class PotionPopupView : HdPopup, IPotionPopupView
     {
-        [SerializeField] TMP_Text intro = null!;
-        [SerializeField] TMP_Text book = null!;
-        [SerializeField] RectTransform ingredientRow = null!;
-        [SerializeField] UiButton ingredientPrefab = null!;
-        [SerializeField] UiButton qtyMinus = null!;
-        [SerializeField] UiButton qtyPlus = null!;
-        [SerializeField] TMP_Text qtyText = null!;
-        [SerializeField] TMP_Text steps = null!;
-        [SerializeField] TMP_Text attempts = null!;
-        [SerializeField] TMP_Text feedback = null!;
-        [SerializeField] UiButton undoButton = null!;
-        [SerializeField] UiButton clearButton = null!;
-        [SerializeField] UiButton brewButton = null!;
-        [SerializeField] UiButton quitButton = null!;
-
+        readonly List<UnityEngine.UIElements.Button> _ingredients = new List<UnityEngine.UIElements.Button>();
+        Label _title = null!, _intro = null!, _book = null!, _qty = null!, _steps = null!, _attempts = null!, _feedback = null!;
+        VisualElement _row = null!;
+        UnityEngine.UIElements.Button _minus = null!, _plus = null!, _undo = null!, _clear = null!, _brew = null!, _quit = null!;
         PotionRequest? _r;
         int _quantity = 1;
         UniTaskCompletionSource<ActivityResult>? _done;
 
-        public int IngredientButtons => ingredientRow.childCount;
-        public UnityEngine.UI.Button IngredientButton(int i) => ingredientRow.GetChild(i).GetComponent<UiButton>().Button;
-        public UnityEngine.UI.Button BrewButton => brewButton.Button;
-        public UnityEngine.UI.Button QuantityPlus => qtyPlus.Button;
-        public UnityEngine.UI.Button QuantityMinus => qtyMinus.Button;
-        public UnityEngine.UI.Button QuitButton => quitButton.Button;
+        public override bool Cancelable => false;
+        public override void RequestCancel() { }
+        protected override VisualElement DefaultFocus => _ingredients.Count > 0 ? _ingredients[0] : _brew;
 
-        public async UniTask<ActivityResult> PlayAsync(PotionRequest r, CancellationToken ct)
+        public int IngredientButtons => _ingredients.Count;
+        public HdButtonRef IngredientButton(int i) => new HdButtonRef(_ingredients[i], this);
+        public HdButtonRef BrewButton { get; private set; } = null!;
+        public HdButtonRef QuantityPlus { get; private set; } = null!;
+        public HdButtonRef QuantityMinus { get; private set; } = null!;
+        public HdButtonRef QuitButton { get; private set; } = null!;
+
+        protected override void Bind()
         {
-            Open(r.Title);
-            _r = r;
-            _quantity = 1;
-            _done = new UniTaskCompletionSource<ActivityResult>();
-            ct.Register(() => _done.TrySetCanceled());
-            intro.text = r.Intro;
-            book.text = r.Book;
-            feedback.text = "";
-            ingredientRow.Clear();
+            _title = Q<Label>("title"); _intro = Q<Label>("intro"); _book = Q<Label>("book"); _qty = Q<Label>("qty");
+            _steps = Q<Label>("steps"); _attempts = Q<Label>("attempts"); _feedback = Q<Label>("feedback");
+            _steps.enableRichText = true; _feedback.enableRichText = true;
+            _row = Q<VisualElement>("ingredients");
+            _minus = Q<UnityEngine.UIElements.Button>("minus"); _plus = Q<UnityEngine.UIElements.Button>("plus");
+            _undo = Q<UnityEngine.UIElements.Button>("undo"); _clear = Q<UnityEngine.UIElements.Button>("clear");
+            _brew = Q<UnityEngine.UIElements.Button>("brew"); _quit = Q<UnityEngine.UIElements.Button>("quit");
+            BrewButton = new HdButtonRef(_brew, this); QuantityPlus = new HdButtonRef(_plus, this);
+            QuantityMinus = new HdButtonRef(_minus, this); QuitButton = new HdButtonRef(_quit, this);
+            _undo.text = Loc.T("stage.potion.undo"); _clear.text = Loc.T("stage.potion.clear");
+            _brew.text = Loc.T("stage.potion.brew"); _quit.text = Loc.T("stage.quit");
+            _minus.clicked += () => SetQuantity(_quantity - 1);
+            _plus.clicked += () => SetQuantity(_quantity + 1);
+            _undo.clicked += () => { if (_r != null) { _r.Game.RemoveLast(); Refresh(); } };
+            _clear.clicked += () => { if (_r != null) { _r.Game.Clear(); Refresh(); } };
+            _brew.clicked += () => Brew().Forget();
+            _quit.clicked += () => _done?.TrySetResult(ActivityResult.Lost());
+            if (_r != null) Fill(_r);
+        }
+
+        void Fill(PotionRequest r)
+        {
+            _title.text = r.Title; _intro.text = r.Intro; _book.text = r.Book;
+            _feedback.text = "";
+            _row.Clear(); _ingredients.Clear();
             for (int i = 0; i < r.IngredientNames.Count; i++)
             {
                 int index = i;
-                var b = Instantiate(ingredientPrefab, ingredientRow);
-                b.SetLabel(r.IngredientNames[i]);
-                b.SetColors(i < r.IngredientColors.Count ? r.IngredientColors[i] : Theme.Primary, Theme.TextDark);
-                b.Button.onClick.AddListener(() => Add(index));
+                var b = new UnityEngine.UIElements.Button { text = r.IngredientNames[i] };
+                b.AddToClassList("hd-btn"); b.AddToClassList("hd-btn--primary"); b.AddToClassList("hd-potion__ingredient");
+                if (i < r.IngredientColors.Count) b.style.unityBackgroundImageTintColor = r.IngredientColors[i];
+                b.clicked += () => Add(index);
+                _row.Add(b); _ingredients.Add(b);
             }
-            qtyMinus.Button.onClick.RemoveAllListeners(); qtyMinus.Button.onClick.AddListener(() => SetQuantity(_quantity - 1));
-            qtyPlus.Button.onClick.RemoveAllListeners(); qtyPlus.Button.onClick.AddListener(() => SetQuantity(_quantity + 1));
-            undoButton.Button.onClick.RemoveAllListeners(); undoButton.Button.onClick.AddListener(() => { r.Game.RemoveLast(); Refresh(); });
-            clearButton.Button.onClick.RemoveAllListeners(); clearButton.Button.onClick.AddListener(() => { r.Game.Clear(); Refresh(); });
-            brewButton.Button.onClick.RemoveAllListeners(); brewButton.Button.onClick.AddListener(() => Brew().Forget());
-            quitButton.Button.onClick.RemoveAllListeners(); quitButton.Button.onClick.AddListener(() => _done.TrySetResult(ActivityResult.Lost()));
             Refresh();
+        }
+
+        public async UniTask<ActivityResult> PlayAsync(PotionRequest r, CancellationToken ct)
+        {
+            _r = r; _quantity = 1;
+            _done = new UniTaskCompletionSource<ActivityResult>();
+            ct.Register(() => _done.TrySetCanceled());
+            if (_title != null) Fill(r);
             return await _done.Task;
         }
 
         void SetQuantity(int q)
         {
-            _quantity = Mathf.Clamp(q, 1, _r!.Game.Recipe.MaxQuantity);
+            if (_r == null) return;
+            _quantity = Mathf.Clamp(q, 1, _r.Game.Recipe.MaxQuantity);
             Refresh();
         }
 
         void Add(int ingredient)
         {
             if (_r == null || !_r.Game.Add(ingredient, _quantity)) return;
-            feedback.text = "";
+            _feedback.text = "";
             Refresh();
         }
 
         async UniTaskVoid Brew()
         {
             var g = _r!.Game;
-            if (!g.Brew()) { feedback.text = _r.Loc.T("stage.potion.incomplete"); return; }
+            if (!g.Brew()) { _feedback.text = _r.Loc.T("stage.potion.incomplete"); return; }
             var sb = new StringBuilder();
             if (g.Status == GameStatus.Won) sb.Append("<color=#6BE88A>").Append(_r.Loc.T("stage.potion.success")).Append("</color>");
             else
@@ -101,7 +112,7 @@ namespace N29.HeroesDawn.Presentation.Activities
                 sb.Append(line);
                 if (g.Status == GameStatus.Lost) sb.Append("<color=#FF6B6B>").Append(_r.Loc.T("stage.potion.fail")).Append("</color>");
             }
-            feedback.text = sb.ToString();
+            _feedback.text = sb.ToString();
             Refresh();
             if (g.Status != GameStatus.Running)
             {
@@ -125,8 +136,8 @@ namespace N29.HeroesDawn.Presentation.Activities
         void Refresh()
         {
             var g = _r!.Game;
-            qtyText.text = _r.Loc.F("stage.potion.quantity", _quantity);
-            attempts.text = _r.Loc.F("stage.potion.attempts", g.AttemptsLeft);
+            _qty.text = _r.Loc.F("stage.potion.quantity", _quantity);
+            _attempts.text = _r.Loc.F("stage.potion.attempts", g.AttemptsLeft);
             var sb = new StringBuilder();
             for (int i = 0; i < g.StepsNeeded; i++)
             {
@@ -135,8 +146,8 @@ namespace N29.HeroesDawn.Presentation.Activities
                 else sb.Append("<color=#888888>...</color>");
                 sb.Append('\n');
             }
-            steps.text = sb.ToString();
-            brewButton.Interactable = g.Status == GameStatus.Running;
+            _steps.text = sb.ToString();
+            _brew.SetEnabled(g.Status == GameStatus.Running);
         }
     }
 }

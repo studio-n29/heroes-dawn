@@ -4,7 +4,6 @@ using N29.HeroesDawn.Domain.Activities.Games;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
@@ -19,7 +18,7 @@ namespace N29.HeroesDawn.Presentation.Activities
 
         readonly FreeThrowGame _game;
         readonly ILocalization _loc;
-        Image? _track, _zone, _cursor, _ball, _target, _targetCore;
+        FieldSprite? _track, _zone, _cursor, _ball, _target, _targetCore;
         float _flight = -1f;
         float _landing;
         bool _flightHit;

@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-team">
+        <ui:VisualElement class="hd-team__main">
+            <ui:VisualElement name="filters" class="hd-team__chips" />
+            <ui:VisualElement name="sorts" class="hd-team__chips" />
+            <ui:ScrollView name="grid" class="hd-list__rows" />
+        </ui:VisualElement>
+        <ui:VisualElement name="side" class="hd-panel hd-team__side">
+            <ui:Label name="squadTitle" class="hd-list__sidetitle" />
+            <ui:VisualElement name="squadRow" class="hd-team__squad" />
+            <ui:Label name="synergiesTitle" class="hd-team__subtitle" />
+            <ui:ScrollView class="hd-team__synergies"><ui:Label name="synergies" class="hd-list__sidetext" /></ui:ScrollView>
+            <ui:VisualElement name="presets" class="hd-team__presets" />
+            <ui:Button name="healAll" class="hd-btn hd-btn--secondary hd-btn--small" />
+            <ui:Label name="missionHint" class="hd-team__hint" />
+            <ui:Button name="mission" class="hd-btn hd-btn--primary" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

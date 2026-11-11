@@ -222,8 +222,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var view = host.Spawn<N29.HeroesDawn.Presentation.Activities.IHeroGamePopupView>();
             var task = view.PlayAsync(request, default);
             var popup = (N29.HeroesDawn.Presentation.Activities.HeroGamePopupView)view;
-            var tap = popup.Field.GetComponent<N29.HeroesDawn.Presentation.Activities.HeroFieldTap>();
-            tap.OnPointerDown(new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current) { position = Vector2.zero });
+            popup.PressAtField(Vector2.zero);
             Assert.That(popup.Started, Is.True, "le premier toucher lance la partie");
             var game = request.Deflect!;
             for (int i = 0; i < 60; i++) { game.Step(0.05f); yield return null; }

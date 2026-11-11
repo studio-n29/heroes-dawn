@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal">
+        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-pop__wide">
+            <ui:Label name="title" class="hd-modal__title" />
+            <ui:Label name="intro" class="hd-pop__text" />
+            <ui:Label name="book" class="hd-pop__hint" />
+            <ui:VisualElement class="hd-divider" />
+            <ui:VisualElement name="ingredients" class="hd-potion__row" />
+            <ui:VisualElement class="hd-potion__qty">
+                <ui:Button name="minus" class="hd-btn hd-btn--secondary hd-btn--small" text="-" />
+                <ui:Label name="qty" class="hd-pop__text" />
+                <ui:Button name="plus" class="hd-btn hd-btn--secondary hd-btn--small" text="+" />
+            </ui:VisualElement>
+            <ui:Label name="steps" class="hd-pop__text" />
+            <ui:Label name="attempts" class="hd-pop__hint" />
+            <ui:Label name="feedback" class="hd-pop__text" />
+            <ui:VisualElement class="hd-modal__buttons">
+                <ui:Button name="quit" class="hd-btn hd-btn--ghost" />
+                <ui:Button name="clear" class="hd-btn hd-btn--secondary" />
+                <ui:Button name="undo" class="hd-btn hd-btn--secondary" />
+                <ui:Button name="brew" class="hd-btn hd-btn--primary" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

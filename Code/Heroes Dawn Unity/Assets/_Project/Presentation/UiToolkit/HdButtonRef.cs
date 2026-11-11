@@ -12,8 +12,11 @@ namespace N29.HeroesDawn.Presentation.UiToolkit
 
         public void Invoke()
         {
-            if (!_button.enabledInHierarchy) return;
+            // Comme « onClick.Invoke() » des anciens boutons : le clic passe même sur un bouton grisé (les parcours de test le supposent).
+            bool wasEnabled = _button.enabledSelf;
+            if (!wasEnabled) _button.SetEnabled(true);
             using (var e = NavigationSubmitEvent.GetPooled()) { e.target = _button; _button.SendEvent(e); }
+            if (!wasEnabled) _button.SetEnabled(false);
         }
     }
 

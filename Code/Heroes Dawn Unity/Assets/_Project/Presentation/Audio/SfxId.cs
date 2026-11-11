@@ -48,5 +48,11 @@ namespace N29.HeroesDawn.Presentation.Audio
         Victory = 69,
         Defeat = 70,
         AllyReady = 71,
+
+        // Récompenses et repos (Aube tactique)
+        XpGain = 80,
+        BoosterOpen = 81,
+        RewardTile = 82,
+        TentRest = 83,
     }
 }

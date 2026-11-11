@@ -2,69 +2,62 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Presentation.Common;
-using TMPro;
-using UnityEngine;
+using N29.HeroesDawn.Presentation.UiToolkit;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Popups
 {
     /// <summary>
-    /// Confirmation d'achat (M31, popup prefab) : héros, synergie phare, solde avant / coût / après ; si le solde ne suffit pas,
+    /// Confirmation d'achat (M31, fenêtre UI Toolkit) : héros, synergie phare, solde avant / coût / après ; si le solde ne suffit pas,
     /// manque en rouge, piste pour gagner des PR et bouton d'achat désactivé. Retour = Annuler.
     /// </summary>
-    public sealed class RecruitConfirmPopupView : MonoBehaviour, IRecruitConfirmPopupView
+    public sealed class RecruitConfirmPopupView : HdPopup, IRecruitConfirmPopupView
     {
-        [SerializeField] TMP_Text title = null!;
-        [SerializeField] PortraitView portrait = null!;
-        [SerializeField] TMP_Text memberName = null!;
-        [SerializeField] TMP_Text rarity = null!;
-        [SerializeField] TMP_Text role = null!;
-        [SerializeField] TMP_Text synergy = null!;
-        [SerializeField] TMP_Text before = null!;
-        [SerializeField] TMP_Text cost = null!;
-        [SerializeField] TMP_Text after = null!;
-        [SerializeField] TMP_Text missing = null!;
-        [SerializeField] TMP_Text howToEarn = null!;
-        [SerializeField] UiButton ok = null!;
-        [SerializeField] UiButton cancel = null!;
-        [SerializeField] RectTransform window = null!;
-        [SerializeField] CanvasGroup group = null!;
+        Label _title = null!, _name = null!, _rarity = null!, _role = null!, _synergy = null!, _before = null!, _cost = null!, _after = null!, _missing = null!, _howToEarn = null!;
+        VisualElement _portrait = null!;
+        UnityEngine.UIElements.Button _ok = null!, _cancel = null!;
         UniTaskCompletionSource<bool>? _answer;
+        RecruitConfirmData? _last;
 
-        public bool Cancelable => true;
-        public UiButton OkButton => ok;
-        public UiButton CancelButton => cancel;
+        public override bool Cancelable => true;
+        public HdButtonRef OkButton { get; private set; } = null!;
+        public HdButtonRef CancelButton { get; private set; } = null!;
+        protected override VisualElement DefaultFocus => _ok.enabledSelf ? _ok : _cancel;
 
-        void Awake()
+        protected override void Bind()
         {
-            ok.Button.onClick.AddListener(() => _answer?.TrySetResult(true));
-            cancel.Button.onClick.AddListener(() => _answer?.TrySetResult(false));
+            _title = Q<Label>("title"); _name = Q<Label>("name"); _rarity = Q<Label>("rarity"); _role = Q<Label>("role");
+            _synergy = Q<Label>("synergy"); _before = Q<Label>("before"); _cost = Q<Label>("cost"); _after = Q<Label>("after");
+            _missing = Q<Label>("missing"); _howToEarn = Q<Label>("howToEarn"); _portrait = Q<VisualElement>("portrait");
+            _ok = Q<UnityEngine.UIElements.Button>("ok"); _cancel = Q<UnityEngine.UIElements.Button>("cancel");
+            OkButton = new HdButtonRef(_ok, this); CancelButton = new HdButtonRef(_cancel, this);
+            _ok.clicked += () => _answer?.TrySetResult(true);
+            _cancel.clicked += () => _answer?.TrySetResult(false);
+            if (_last.HasValue) Fill(_last.Value);
+        }
+
+        void Fill(RecruitConfirmData d)
+        {
+            _title.text = d.Title;
+            HdPopupRows.SetArt(_portrait, d.Card.Portrait.Art);
+            _name.text = d.Card.Name;
+            _rarity.text = d.Card.RarityText; _rarity.style.color = Theme.RarityColor(d.Card.Rarity);
+            _role.text = d.Card.RoleLine; _synergy.text = d.Synergy;
+            _before.text = d.Before; _cost.text = d.Cost; _after.text = d.CanAfford ? d.After : "";
+            _missing.text = d.Missing; _howToEarn.text = d.HowToEarn;
+            _ok.text = d.Ok; _ok.SetEnabled(d.CanAfford);
+            _cancel.text = d.Cancel;
         }
 
         public UniTask<bool> AskAsync(RecruitConfirmData d, CancellationToken ct)
         {
-            title.text = d.Title;
-            portrait.Show(d.Card.Portrait);
-            memberName.text = d.Card.Name;
-            rarity.text = d.Card.RarityText;
-            rarity.color = Theme.RarityColor(d.Card.Rarity);
-            role.text = d.Card.RoleLine;
-            synergy.text = d.Synergy;
-            before.text = d.Before;
-            cost.text = d.Cost;
-            after.text = d.CanAfford ? d.After : "";
-            missing.text = d.Missing;
-            howToEarn.text = d.HowToEarn;
-            ok.SetLabel(d.Ok);
-            ok.Interactable = d.CanAfford;
-            cancel.SetLabel(d.Cancel);
-            group.alpha = 0f;
-            Tween.Fade(group, 1f, 0.15f);
-            Tween.PopIn(window, 0.26f);
+            _last = d;
+            if (_title != null) Fill(d);
             _answer = new UniTaskCompletionSource<bool>();
             ct.Register(() => _answer.TrySetCanceled());
             return _answer.Task;
         }
 
-        public void RequestCancel() => _answer?.TrySetResult(false);
+        public override void RequestCancel() => _answer?.TrySetResult(false);
     }
 }

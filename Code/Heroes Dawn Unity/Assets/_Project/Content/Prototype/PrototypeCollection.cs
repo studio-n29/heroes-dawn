@@ -44,6 +44,11 @@ namespace N29.HeroesDawn.Content.Prototype
                 I("power_gauntlet", ItemType.Implant, ItemRarity.Rare, 1000, atk: 4, perk: ItemPerk.SkillPower, perkValue: 15),
                 I("arcane_focus", ItemType.Implant, ItemRarity.Epic, 2600, hp: 6, perk: ItemPerk.SkillPower, perkValue: 25),
                 I("apex_module", ItemType.Weapon, ItemRarity.Legendary, 0, atk: 18, def: 12, spd: 8, perk: ItemPerk.CritChance, perkValue: 15),
+                // Objets venus des planches Aube tactique (kit d'extension) : tissu balistique, gel de récupération, cellule d'énergie, puce neuronale.
+                I("ballistic_fabric", ItemType.Armor, ItemRarity.Common, 300, def: 8),
+                I("recovery_gel", ItemType.Tool, ItemRarity.Common, 300, hp: 12),
+                I("energy_cell", ItemType.Tool, ItemRarity.Rare, 800, hp: 6, perk: ItemPerk.StartGauge, perkValue: 12),
+                I("neural_chip", ItemType.Implant, ItemRarity.Epic, 2400, spd: 4, perk: ItemPerk.SkillPower, perkValue: 20),
             },
             new List<SkillCardDef>
             {

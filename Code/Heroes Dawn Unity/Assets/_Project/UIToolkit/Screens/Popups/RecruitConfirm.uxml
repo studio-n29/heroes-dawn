@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal">
+        <ui:VisualElement name="window" class="hd-window hd-modal__window">
+            <ui:Label name="title" class="hd-modal__title" />
+            <ui:VisualElement class="hd-divider" />
+            <ui:VisualElement class="hd-pop__hero">
+                <ui:VisualElement name="portrait" class="hd-pop__portrait" />
+                <ui:VisualElement class="hd-pop__herotext">
+                    <ui:Label name="name" class="hd-pop__heroname" />
+                    <ui:Label name="rarity" class="hd-pop__section" />
+                    <ui:Label name="role" class="hd-pop__text" />
+                    <ui:Label name="synergy" class="hd-pop__hint" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="before" class="hd-pop__text" />
+            <ui:Label name="cost" class="hd-pop__text" />
+            <ui:Label name="after" class="hd-pop__text" />
+            <ui:Label name="missing" class="hd-pop__missing" />
+            <ui:Label name="howToEarn" class="hd-pop__hint" />
+            <ui:VisualElement class="hd-modal__buttons">
+                <ui:Button name="cancel" class="hd-btn hd-btn--secondary" />
+                <ui:Button name="ok" class="hd-btn hd-btn--primary" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

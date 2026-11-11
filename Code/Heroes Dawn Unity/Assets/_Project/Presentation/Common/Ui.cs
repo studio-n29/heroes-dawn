@@ -147,6 +147,19 @@ namespace N29.HeroesDawn.Presentation.Common
             hrt.anchorMax = new Vector2(1f, 1f);
             hrt.offsetMin = new Vector2(16f, -2f);
             hrt.offsetMax = new Vector2(-16f, -1f);
+            // Fabrication de prefabs : surface du kit Aube tactique (marine ou ivoire à liseré doré) pour les fonds opaques.
+            var kit = fill.a >= 0.5f ? KitArt.Get(fill.grayscale < 0.45f ? "Surfaces/panel-navy" : "Surfaces/panel-ivory") : null;
+            if (kit != null)
+            {
+                frame.color = new Color(1f, 1f, 1f, 0f);
+                var shadow2 = frame.GetComponent<Shadow>();
+                if (shadow2 != null) UnityEngine.Object.DestroyImmediate(shadow2);
+                inner.sprite = kit;
+                inner.type = Image.Type.Sliced;
+                inner.color = new Color(1f, 1f, 1f, fill.a);
+                inner.rectTransform.Stretch(0, 0, 0, 0);
+                UnityEngine.Object.DestroyImmediate(hi.gameObject);
+            }
             return inner;
         }
 
@@ -209,92 +222,12 @@ namespace N29.HeroesDawn.Presentation.Common
             return g;
         }
 
-        public static UiButton Btn(Transform parent, string label, Color bg, Color fg, Action onClick, int fontSize = 34,
-                                   FontKind font = FontKind.Title, string name = "Button")
-        {
-            var lip = Panel(parent, name, bg, 4f, 3f, true);
-            var frameGo = lip.transform.parent.gameObject;
-            var fill = Img(lip.transform, "Face", bg, Sprites.Panel, true);
-            fill.rectTransform.Stretch();
-            var faceHi = Img(fill.transform, "Hi", Theme.WithAlpha(Theme.Accent, 0.3f));
-            faceHi.rectTransform.anchorMin = new Vector2(0f, 1f);
-            faceHi.rectTransform.anchorMax = new Vector2(1f, 1f);
-            faceHi.rectTransform.offsetMin = new Vector2(14f, -2f);
-            faceHi.rectTransform.offsetMax = new Vector2(-14f, -1f);
-            var button = frameGo.AddComponent<Button>();
-            button.targetGraphic = fill;
-            var colors = button.colors;
-            colors.normalColor = Color.white;
-            colors.highlightedColor = new Color(1f, 1f, 1f, 1f);
-            colors.pressedColor = new Color(0.8f, 0.8f, 0.8f, 1f);
-            colors.selectedColor = Color.white;
-            colors.disabledColor = Color.white;
-            colors.fadeDuration = 0.08f;
-            button.colors = colors;
-            var nav = button.navigation;
-            nav.mode = Navigation.Mode.None;
-            button.navigation = nav;
-
-            if (bg == Theme.Primary)
-            {
-                // Bouton d'action : reflet diagonal clair sur la face jaune.
-                var star = Img(fill.transform, "DawnStar", Theme.AccentDark, Sprites.DawnStar);
-                star.rectTransform.At(0f, 0.5f, 16, 0, 24, 24);
-            }
-            fg = ReadableText(bg, fg);
-            var text = Txt(fill.transform, label, fontSize, fg, TextAnchor.MiddleCenter, font, "Label");
-            text.rectTransform.Stretch(10, 4, 10, 4);
-            text.enableAutoSizing = true;
-            text.fontSizeMin = Mathf.Min(fontSize, Mathf.Max(20, fontSize / 2));
-            text.fontSizeMax = fontSize;
-
-            var ub = frameGo.AddComponent<UiButton>();
-            ub.Init(button, fill, text, bg, fg);
-            if (onClick != null) button.onClick.AddListener(() => onClick());
-            return ub;
-        }
-
         /// <summary>Les états actifs changent de fond à l'exécution : leur texte reste contrasté.</summary>
         public static Color ReadableText(Color background, Color preferred)
         {
             if (background.a < 0.5f || ThemeContrast.Ratio(background, preferred) >= 4.5f) return preferred;
             return ThemeContrast.Ratio(background, Theme.TextDark) > ThemeContrast.Ratio(background, Theme.Text)
                 ? Theme.TextDark : Theme.Text;
-        }
-
-        /// <summary>Bouton à libellé statique localisé (clé portée par <see cref="Mvp.LocalizedText"/>).</summary>
-        public static UiButton LocBtn(Transform parent, string key, Color bg, Color fg, Action onClick, int fontSize = 34,
-                                      FontKind font = FontKind.Title, string name = "Button")
-        {
-            var b = Btn(parent, Loc.T(key), bg, fg, onClick, fontSize, font, name);
-            b.Label.gameObject.AddComponent<Mvp.LocalizedText>().Key = key;
-            return b;
-        }
-
-        public static UiBar Bar(Transform parent, string name, Color fill, Color back, bool withLabel = false, int labelSize = 20)
-        {
-            var bg = Img(parent, name, Theme.Outline, Sprites.PanelSmall);
-            var inner = Img(bg.transform, "Back", back, Sprites.PanelSmall);
-            inner.rectTransform.Stretch(3, 3, 3, 3);
-            var f = Img(inner.transform, "Fill", fill, Sprites.PanelSmall);
-            var frt = f.rectTransform;
-            frt.anchorMin = Vector2.zero;
-            frt.anchorMax = Vector2.one;
-            frt.offsetMin = Vector2.zero;
-            frt.offsetMax = Vector2.zero;
-            TMP_Text label = null;
-            if (withLabel)
-            {
-                // Le nombre reste lisible quelle que soit la proportion pleine/vide de la jauge.
-                var labelBack = Img(bg.transform, "LabelBack", Theme.WithAlpha(Theme.Background, 0.9f), Sprites.PanelSmall);
-                labelBack.rectTransform.Stretch(40, 0, 40, 0);
-                label = Txt(bg.transform, "", labelSize, Color.white, TextAnchor.MiddleCenter, FontKind.Body, "Label");
-                label.rectTransform.Stretch();
-                label.Inked(1.5f);
-            }
-            var bar = bg.gameObject.AddComponent<UiBar>();
-            bar.Init(frt, f, label);
-            return bar;
         }
 
         public static HorizontalLayoutGroup HLayout(this RectTransform rt, float spacing, int pad = 0,

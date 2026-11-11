@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal hd-dlg">
+        <ui:Button name="tap" class="hd-dlg__tap" />
+        <ui:VisualElement name="stage" class="hd-dlg__stage">
+            <ui:VisualElement name="avatarBox" class="hd-dlg__avatarbox">
+                <ui:VisualElement name="avatar" class="hd-dlg__avatar">
+                    <ui:Label name="initial" class="hd-dlg__initial" />
+                </ui:VisualElement>
+                <ui:Label name="speaker" class="hd-dlg__plate" />
+            </ui:VisualElement>
+            <ui:VisualElement name="bubble" class="hd-dlg__bubble">
+                <ui:Label name="body" class="hd-dlg__body" />
+                <ui:Label name="hint" class="hd-dlg__hint" />
+                <ui:Label name="progress" class="hd-dlg__progress" />
+                <ui:VisualElement class="hd-dlg__buttons">
+                    <ui:Button name="auto" class="hd-btn hd-btn--secondary hd-btn--small" />
+                    <ui:Button name="next" class="hd-btn hd-btn--primary hd-btn--small" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="skip" class="hd-btn hd-btn--ghost hd-dlg__skip" />
+    </ui:VisualElement>
+</ui:UXML>

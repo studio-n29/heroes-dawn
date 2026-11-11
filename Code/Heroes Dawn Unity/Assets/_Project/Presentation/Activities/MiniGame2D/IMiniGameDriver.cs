@@ -14,7 +14,7 @@ namespace N29.HeroesDawn.Presentation.Activities
         bool UsesStick { get; }
         IMiniGame Game { get; }
         MiniGameHud Hud { get; }
-        void Build(RectTransform field);
+        void Build(FieldSurface field);
         void Tick(float dt, MiniGameInput input);
         /// <summary>Détruit les éléments créés dans la zone ; peut être appelé plusieurs fois.</summary>
         void Dispose();

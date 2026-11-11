@@ -207,6 +207,7 @@ namespace N29.HeroesDawn.Composition
             var rig = AudioRig.Create(transform, audioCatalog != null ? audioCatalog.Voices : 10);
             builder.RegisterInstance(rig);
             builder.RegisterEntryPoint(c => new AudioService(rig, audioCatalog, c.Resolve<IFrameClock>(), log), Lifetime.Singleton);
+            builder.Register<SessionMusicContext>(Lifetime.Singleton).As<IMusicContext>().As<IMusicSignals>();
             builder.RegisterEntryPoint<MusicDirector>();
             builder.RegisterEntryPoint<VoicePlayer>(Lifetime.Singleton).As<IVoicePlayer>();
             builder.Register<N29.HeroesDawn.Presentation.Login.CinematicReplay>(Lifetime.Singleton);

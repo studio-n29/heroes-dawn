@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="safe" class="hd-tut">
+        <ui:VisualElement name="veil" class="hd-tut__veil">
+            <ui:VisualElement name="veilTop" class="hd-tut__piece" />
+            <ui:VisualElement name="veilBottom" class="hd-tut__piece" />
+            <ui:VisualElement name="veilLeft" class="hd-tut__piece" />
+            <ui:VisualElement name="veilRight" class="hd-tut__piece" />
+            <ui:VisualElement name="ripple" class="hd-tut__ripple" />
+            <ui:VisualElement name="ring" class="hd-tut__ring" />
+            <ui:VisualElement name="bracket0" class="hd-tut__bracket" />
+            <ui:VisualElement name="bracket1" class="hd-tut__bracket" />
+            <ui:VisualElement name="bracket2" class="hd-tut__bracket" />
+            <ui:VisualElement name="bracket3" class="hd-tut__bracket" />
+            <ui:Label name="pointer" class="hd-tut__pointer" text="▲" />
+        </ui:VisualElement>
+        <ui:VisualElement name="bubble" class="hd-tut__bubble">
+            <ui:VisualElement name="medal" class="hd-tut__medal" />
+            <ui:Label name="title" class="hd-tut__title" />
+            <ui:Label name="body" class="hd-tut__body" />
+            <ui:Label name="progress" class="hd-tut__progress" />
+            <ui:VisualElement class="hd-tut__buttons">
+                <ui:Button name="skip" class="hd-btn hd-btn--ghost hd-btn--small" />
+                <ui:Button name="ok" class="hd-btn hd-btn--primary" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="hint" class="hd-tut__hint">
+            <ui:Label name="hintTitle" class="hd-tut__hint-title" />
+            <ui:Label name="hintBody" class="hd-tut__hint-body" />
+            <ui:Button name="hintOk" class="hd-btn hd-btn--primary hd-btn--small" />
+        </ui:VisualElement>
+        <ui:VisualElement name="fx" class="hd-tut__fx" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -45,8 +45,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
         }
 
         /// <summary>Barre de ressources de la coque du hub (compte ses affichages : diagnostic des abonnements).</summary>
-        public static N29.HeroesDawn.Presentation.Common.HubWalletView HubWallet()
-            => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Common.HubWalletView>()!;
+        public static N29.HeroesDawn.Presentation.Hub.HubShellView.WalletBar HubWallet()
+            => Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Hub.HubShellView>()!.Bar;
 
         /// <summary>
         /// Page Recruter affichée : touche « Recruter » sur la première offre payable avec les PR du joueur,
@@ -76,7 +76,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         /// <summary>Toucher réel d'une case de la carte du plateau, puis « S'y rendre » sur sa fiche (le déplacement se valide en deux temps).</summary>
         public static void TapNode(N29.HeroesDawn.Core.CaseId id)
         {
-            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Board.BoardMapView>()!.NodeButton(id).onClick.Invoke();
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Board.BoardView>()!.NodeButton(id).onClick.Invoke();
             Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Board.BoardView>()!.MoveConfirmButton.onClick.Invoke();
         }
 
@@ -98,6 +98,14 @@ namespace N29.HeroesDawn.Tests.PlayMode
         }
 
         /// <summary>MISSION puis DÉPLOYER : la carte de la ville s ouvre entre les deux (zone proposée par défaut).</summary>
+        public static IEnumerator Deploy(N29.HeroesDawn.Presentation.UiToolkit.HdButtonRef mission)
+        {
+            mission.onClick.Invoke();
+            yield return WaitFor(() => Visible<N29.HeroesDawn.Presentation.Hub.CityMapPageView>());
+            DeployNow();
+            yield return DismissChapterIntro();
+        }
+
         public static IEnumerator Deploy(UnityEngine.UI.Button mission)
         {
             mission.onClick.Invoke();

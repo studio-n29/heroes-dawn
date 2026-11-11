@@ -1,0 +1,29 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="shell" class="hd-shell">
+        <ui:VisualElement name="backdrop" class="hd-shell__backdrop" />
+        <ui:VisualElement name="top" class="hd-topbar">
+            <ui:VisualElement name="safeTop" class="hd-topbar__row">
+                <ui:Button name="back" class="hd-btn hd-btn--secondary hd-btn--small hd-topbar__back" />
+                <ui:Label name="title" class="hd-topbar__title" />
+                <ui:VisualElement name="avatar" class="hd-topbar__avatar">
+                    <ui:VisualElement name="avatarPortrait" class="hd-topbar__portrait" />
+                    <ui:VisualElement class="hd-topbar__who">
+                        <ui:Label name="avatarName" class="hd-topbar__name" />
+                        <ui:Label name="avatarRole" class="hd-topbar__role" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-grow" />
+                <ui:VisualElement name="wallet" class="hd-wallet">
+                    <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--credits"><ui:Label name="credits" class="hd-wallet__value" /><ui:Label text="CR" class="hd-wallet__unit" /></ui:VisualElement>
+                    <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--pr"><ui:Label name="pr" class="hd-wallet__value" /><ui:Label text="PR" class="hd-wallet__unit" /></ui:VisualElement>
+                    <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--gems"><ui:Label name="gems" class="hd-wallet__value" /><ui:Label text="G" class="hd-wallet__unit" /></ui:VisualElement>
+                    <ui:Label name="saving" class="hd-wallet__saving" />
+                </ui:VisualElement>
+                <ui:Button name="settings" class="hd-btn hd-btn--secondary hd-btn--small hd-topbar__settings" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="nav" class="hd-navbar">
+            <ui:VisualElement name="tabs" class="hd-navbar__row" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

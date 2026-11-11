@@ -1,0 +1,59 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-sheet">
+        <ui:VisualElement name="artColumn" class="hd-panel hd-sheet__art">
+            <ui:VisualElement name="wideArt" class="hd-sheet__wide" />
+            <ui:VisualElement name="cutout" class="hd-sheet__cutout" />
+            <ui:VisualElement name="strip" class="hd-sheet__strip" />
+        </ui:VisualElement>
+        <ui:VisualElement class="hd-panel hd-sheet__info">
+            <ui:Label name="memberName" class="hd-sheet__name" />
+            <ui:Label name="rarity" class="hd-sheet__rarity" />
+            <ui:Label name="role" class="hd-sheet__role" />
+            <ui:VisualElement name="levelBar" class="hd-bar hd-sheet__bar"><ui:VisualElement name="levelFill" class="hd-bar__fill" /><ui:Label name="levelLabel" class="hd-list__barlabel" /></ui:VisualElement>
+            <ui:ScrollView class="hd-sheet__scroll">
+                <ui:Label name="bio" class="hd-sheet__bio" />
+                <ui:Label name="stats" class="hd-sheet__stats" />
+                <ui:Label name="tiersTitle" class="hd-sheet__section" />
+                <ui:Label name="tiers" class="hd-sheet__tiers" />
+            </ui:ScrollView>
+            <ui:VisualElement name="fatigueBar" class="hd-bar hd-sheet__bar"><ui:VisualElement name="fatigueFill" class="hd-bar__fill" /><ui:Label name="fatigueLabel" class="hd-list__barlabel" /></ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="hd-panel hd-sheet__side">
+            <ui:VisualElement name="skills" class="hd-sheet__tiles" />
+            <ui:VisualElement name="items" class="hd-sheet__tiles" />
+            <ui:VisualElement name="affinityBox" class="hd-sheet__affinity">
+                <ui:Label name="affinityTitle" class="hd-sheet__section" />
+                <ui:VisualElement name="affinity" class="hd-sheet__faces" />
+            </ui:VisualElement>
+            <ui:Label name="primaryReason" class="hd-sheet__reason" />
+            <ui:VisualElement class="hd-sheet__actions">
+                <ui:Button name="heal" class="hd-btn hd-btn--secondary hd-btn--small" />
+                <ui:Button name="dossier" class="hd-btn hd-btn--secondary hd-btn--small" />
+                <ui:Button name="loadout" class="hd-btn hd-btn--secondary hd-btn--small" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-sheet__actions">
+                <ui:Button name="previous" class="hd-btn hd-btn--secondary hd-btn--small" text="&lt;" />
+                <ui:Button name="primary" class="hd-btn hd-btn--primary hd-sheet__primary" />
+                <ui:Button name="next" class="hd-btn hd-btn--secondary hd-btn--small" text="&gt;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="dossierRoot" class="hd-sheet__overlay">
+            <ui:VisualElement class="hd-panel hd-sheet__overlaybox">
+                <ui:Label name="dossierTitle" class="hd-sheet__name" />
+                <ui:ScrollView name="dossierScroll" class="hd-sheet__overlayscroll"><ui:Label name="dossierText" class="hd-pop__text" /></ui:ScrollView>
+                <ui:Button name="dossierClose" class="hd-btn hd-btn--secondary" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="pickerRoot" class="hd-sheet__overlay">
+            <ui:VisualElement class="hd-panel hd-sheet__overlaybox">
+                <ui:Label name="pickerTitle" class="hd-sheet__name" />
+                <ui:Label name="pickerHint" class="hd-pop__hint" />
+                <ui:ScrollView name="pickerTiles" class="hd-sheet__overlayscroll" />
+                <ui:VisualElement class="hd-modal__buttons">
+                    <ui:Button name="pickerRemove" class="hd-btn hd-btn--danger" />
+                    <ui:Button name="pickerClose" class="hd-btn hd-btn--secondary" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
