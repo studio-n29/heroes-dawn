@@ -5,14 +5,16 @@ namespace N29.HeroesDawn.Presentation.Characters3D
 {
     /// <summary>
     /// Un personnage 3D de la scène des activités (héros ou ennemi) : joue ses animations (repos, marche, course, attaque, sort, coup reçu, mort)
-    /// et se teinte. Les états de l'animateur portent les mêmes noms que ces animations ; le passage de l'un à l'autre est piloté ici.
+    /// et se colore : deux teintes (vêtements, équipement) appliquées par zones, la peau restant intacte, et des éclats sur tout le corps.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class Character3DView : MonoBehaviour
     {
         public const string Idle = "Idle", Walk = "Walk", Run = "Run", Attack = "Attack", Cast = "Cast", Hit = "Hit", Death = "Death";
         static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
-        static readonly int Color0 = Shader.PropertyToID("_Color");
+        static readonly int TintBId = Shader.PropertyToID("_TintB");
+        static readonly int FlashColor = Shader.PropertyToID("_FlashColor");
+        static readonly int MaskMap = Shader.PropertyToID("_MaskMap");
 
         [SerializeField] Animator animator = null!;
         [SerializeField] Renderer[] renderers = System.Array.Empty<Renderer>();
@@ -23,13 +25,14 @@ namespace N29.HeroesDawn.Presentation.Characters3D
         string _state = "";
         float _actionLeft;
         float _flashLeft;
-        Color _tint = Color.white, _flash = Color.white;
+        Color _tint = Color.white, _tintB = Color.white, _flash = Color.clear;
         bool _dead;
 
         public bool Dead => _dead;
         /// <summary>État d'animation joué en ce moment (tests).</summary>
         public string State => _state;
         public Color Tint => _tint;
+        public Color TintB => _tintB;
 
         public void Setup(Animator a, Renderer[] r) { animator = a; renderers = r; }
 
@@ -85,29 +88,36 @@ namespace N29.HeroesDawn.Presentation.Characters3D
             else animator.CrossFadeInFixedTime(state, fade, 0, 0f);
         }
 
-        /// <summary>Teinte du personnage (multipliée par sa texture, qui est claire et neutre pour les ennemis).</summary>
-        public void SetTint(Color tint)
+        /// <summary>Couleurs du personnage : vêtements et équipement sombre (la peau n'est pas teintée). Sans zones dans la texture, ces teintes sont sans effet.</summary>
+        public void SetTint(Color clothes, Color gear)
         {
-            _tint = tint;
-            Apply(tint);
+            _tint = clothes; _tintB = gear;
+            Apply();
         }
 
-        /// <summary>Éclat de couleur pendant <paramref name="seconds"/> (coup reçu, charge annoncée), puis retour à la teinte.</summary>
+        public void SetTint(Color tint) => SetTint(tint, tint);
+
+        /// <summary>Éclat de couleur sur tout le corps pendant <paramref name="seconds"/> (coup reçu, charge annoncée), puis retour aux couleurs.</summary>
         public void Flash(Color color, float seconds)
         {
-            _flash = color; _flashLeft = seconds;
-            Apply(color);
+            _flash = new Color(color.r, color.g, color.b, 0.85f); _flashLeft = seconds;
+            Apply();
         }
 
-        void Apply(Color color)
+        /// <summary>Masque de zones propre à ce personnage (aperçu de l'outil de couleurs) ; null : celui de son matériau.</summary>
+        public Texture? MaskOverride { get; set; }
+
+        void Apply()
         {
             foreach (var r in renderers)
             {
                 if (r == null) continue;
                 _block ??= new MaterialPropertyBlock();
                 r.GetPropertyBlock(_block);
-                _block.SetColor(BaseColor, color);
-                _block.SetColor(Color0, color);
+                _block.SetColor(BaseColor, _tint);
+                _block.SetColor(TintBId, _tintB);
+                _block.SetColor(FlashColor, _flashLeft > 0f ? _flash : Color.clear);
+                if (MaskOverride != null) _block.SetTexture(MaskMap, MaskOverride);
                 r.SetPropertyBlock(_block);
             }
         }
@@ -115,7 +125,7 @@ namespace N29.HeroesDawn.Presentation.Characters3D
         void Update()
         {
             float dt = Time.unscaledDeltaTime;
-            if (_flashLeft > 0f && (_flashLeft -= dt) <= 0f) Apply(_tint);
+            if (_flashLeft > 0f && (_flashLeft -= dt) <= 0f) { _flashLeft = 0f; Apply(); }
             if (_actionLeft > 0f && (_actionLeft -= dt) <= 0f && !_dead) { _actionLeft = 0f; Play(Idle, 0.15f, restart: true); }
         }
     }

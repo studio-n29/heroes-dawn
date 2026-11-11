@@ -156,7 +156,8 @@ namespace N29.HeroesDawn.Presentation.Activities
             if (model != null)
             {
                 // Un vrai modèle : sa couleur vient de la variante de la palette (réglée dans l'outil « Couleurs des ennemis »).
-                model.SetTint(EnemyPalettes.Load()?.Tint(ModelOf(e.Type), e.Id) ?? Color.white);
+                var variant = EnemyPalettes.Load()?.Pick(ModelOf(e.Type), e.Id);
+                if (variant != null) model.SetTint(variant.tint, variant.tintB);
                 _enemyModels[e.Id] = model;
                 _enemies[e.Id] = model.gameObject;
                 _lastHp[e.Id] = e.Hp;

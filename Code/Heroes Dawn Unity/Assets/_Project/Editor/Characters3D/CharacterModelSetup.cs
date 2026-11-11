@@ -21,8 +21,8 @@ namespace N29.HeroesDawn.EditorTools.Characters3D
         {
             CharacterImportDiscovery.Run();
             Directory.CreateDirectory(Resources_ + "/Materials");
-            foreach (var name in CharacterImportDiscovery.Names) Build(name);
-            EnsurePalettes();
+            var palettes = EnsurePalettes();
+            foreach (var name in CharacterImportDiscovery.Names) Build(name, palettes);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("[Perso3D] prefabs et palettes générés.");
@@ -40,7 +40,7 @@ namespace N29.HeroesDawn.EditorTools.Characters3D
             imp.SaveAndReimport();
         }
 
-        static void Build(string name)
+        static void Build(string name, EnemyPalettes palettes)
         {
             string dir = CharacterImportDiscovery.Root + "/" + name;
             SetLoops(dir + "/walk.fbx", _ => true);
@@ -49,13 +49,17 @@ namespace N29.HeroesDawn.EditorTools.Characters3D
 
             // ---- Matériau sans éclairage : la scène des activités n'a pas de lumière ; la texture porte déjà les ombres.
             var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(dir + "/Textures/Material_0_baseColor.png");
-            var shader = Shader.Find("Universal Render Pipeline/Unlit");
+            var shader = Shader.Find("HeroesDawn/Character3D");
             string matPath = Resources_ + "/Materials/" + name + ".mat";
             var mat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
             if (mat == null) { mat = new Material(shader); AssetDatabase.CreateAsset(mat, matPath); }
             mat.shader = shader;
             mat.SetTexture("_BaseMap", tex);
             mat.SetColor("_BaseColor", Color.white);
+            mat.SetColor("_TintB", Color.white);
+            var palette = palettes.Find(name);
+            var mask = palette != null ? CharacterMaskBuilder.Write(name, palette.mask) : null;
+            mat.SetTexture("_MaskMap", mask);
             EditorUtility.SetDirty(mat);
 
             // ---- Contrôleur d'animation : un état par animation, le passage de l'un à l'autre est piloté par Character3DView.
@@ -111,10 +115,21 @@ namespace N29.HeroesDawn.EditorTools.Characters3D
         {
             string path = Resources_ + "/EnemyPalettes.asset";
             var assetPalettes = AssetDatabase.LoadAssetAtPath<EnemyPalettes>(path);
-            if (assetPalettes != null) return assetPalettes;
+            if (assetPalettes != null)
+            {
+                if (assetPalettes.version < EnemyPalettes.CurrentVersion)
+                {
+                    // Palettes d'une version sans masque ni deuxième teinte : remplacées par celles d'origine.
+                    assetPalettes.kinds = EnemyPalettes.Defaults();
+                    assetPalettes.version = EnemyPalettes.CurrentVersion;
+                    EditorUtility.SetDirty(assetPalettes);
+                }
+                return assetPalettes;
+            }
             Directory.CreateDirectory(Resources_);
             var created = ScriptableObject.CreateInstance<EnemyPalettes>();
             created.kinds = EnemyPalettes.Defaults();
+            created.version = EnemyPalettes.CurrentVersion;
             AssetDatabase.CreateAsset(created, path);
             return created;
         }
