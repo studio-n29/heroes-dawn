@@ -52,12 +52,12 @@ namespace N29.HeroesDawn.Application.Features.Meta
     {
         public static readonly IReadOnlyList<QuestDef> Catalog = new[]
         {
-            new QuestDef("docks", QuestMetric.CombatsWon, 3, new Reward(credits: 300, passXp: 20)),
-            new QuestDef("reinforcements", QuestMetric.Recruits, 1, new Reward(gems: 5, passXp: 30), "zone_ny_1_1"),
-            new QuestDef("drills", QuestMetric.Trainings, 2, new Reward(pr: 15, passXp: 25), "zone_ny_1_1"),
-            new QuestDef("hostage_aid", QuestMetric.CombatsWon, 8, new Reward(credits: 600, gems: 5, passXp: 35), "zone_ny_1_2"),
-            new QuestDef("coney_watch", QuestMetric.ZonesCleared, 2, new Reward(credits: 800, gems: 8, passXp: 40), "zone_ny_1_3"),
-            new QuestDef("bridge_shield", QuestMetric.CombatsWon, 15, new Reward(credits: 1000, pr: 20, gems: 10, passXp: 60), "zone_ny_1_4"),
+            new QuestDef("docks", QuestMetric.CombatsWon, 3, new Reward(credits: 300, passXp: 200)),
+            new QuestDef("reinforcements", QuestMetric.Recruits, 1, new Reward(gems: 5, passXp: 300), "zone_ny_1_1"),
+            new QuestDef("drills", QuestMetric.Trainings, 2, new Reward(pr: 15, passXp: 250), "zone_ny_1_1"),
+            new QuestDef("hostage_aid", QuestMetric.CombatsWon, 8, new Reward(credits: 600, gems: 5, passXp: 350), "zone_ny_1_2"),
+            new QuestDef("coney_watch", QuestMetric.ZonesCleared, 2, new Reward(credits: 800, gems: 8, passXp: 400), "zone_ny_1_3"),
+            new QuestDef("bridge_shield", QuestMetric.CombatsWon, 15, new Reward(credits: 1000, pr: 20, gems: 10, passXp: 600), "zone_ny_1_4"),
         };
 
         readonly MetaContext _c;

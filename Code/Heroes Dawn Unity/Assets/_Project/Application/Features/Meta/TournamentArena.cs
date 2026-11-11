@@ -149,11 +149,12 @@ namespace N29.HeroesDawn.Application.Features.Meta
         readonly IDuelChannel _channel;
         readonly IReadOnlyList<TournamentDef> _calendar;
         readonly ArenaRewardTable _rewards;
+        readonly PassProgress _pass;
         bool _uploadedThisSession;
 
-        public TournamentArena(MetaContext context, IArenaGateway gateway, IDuelChannel channel, IReadOnlyList<TournamentDef> calendar, ArenaRewardTable rewards)
+        public TournamentArena(MetaContext context, IArenaGateway gateway, IDuelChannel channel, IReadOnlyList<TournamentDef> calendar, ArenaRewardTable rewards, PassProgress pass)
         {
-            _c = context; _gateway = gateway; _channel = channel; _calendar = calendar; _rewards = rewards;
+            _c = context; _gateway = gateway; _channel = channel; _calendar = calendar; _rewards = rewards; _pass = pass;
         }
 
         ArenaSave Save => _c.Meta.arena;
@@ -353,6 +354,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
                     }
                 }
                 report.TotalPoints = total; report.PointsDelta = total - before; report.TierAfter = ArenaRules.TierReached(total);
+                if (counts && (outcome == DuelOutcome.Win || outcome == DuelOutcome.Loss)) _pass.AddXp(PassXp.Duel(outcome == DuelOutcome.Win));
                 _c.Touch(MetaArea.Profile);
             }
             s.Reported = true;

@@ -27,50 +27,18 @@ namespace N29.HeroesDawn.Tests.Domain.Application
 
         // ------------------------------------------------------------------ Pass
 
-        [Test, Description("Vérifie que 100 points font un niveau et que les récompenses d'un niveau atteint ne se prennent qu'une fois — parce que le pass est un barème de progression, pas une fontaine")]
+        [Test, Description("Vérifie que 1 300 points font un niveau et que les récompenses d'un niveau atteint ne se prennent qu'une fois — parce que le pass est un barème de progression, pas une fontaine")]
         public void Pass_LevelsFromXp_ClaimOnlyOnce()
         {
-            _app.Pass.AddXp(250);
+            _app.Pass.AddXp(2 * PassTrack.XpPerLevel + 50);
             Assert.That(_app.Pass.Level, Is.EqualTo(2));
             int before = _app.Session.Wallet.Credits;
             var first = _app.Pass.Claim(1, premium: false);
             Assert.That(first.IsSuccess);
-            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(before + PassTrack.Free(1).Credits));
+            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(before + _app.Pass.Free(1).Credits));
             Assert.That(Code(_app.Pass.Claim(1, false)), Is.EqualTo("meta.claimed"));
             Assert.That(Code(_app.Pass.Claim(3, false)), Is.EqualTo("meta.level_locked"));
-        }
-
-        [Test, Description("Vérifie que la piste premium exige le pass premium (300 Gemmes) et qu'il ne s'achète qu'une fois — parce que la piste gratuite et la piste payante sont distinctes")]
-        public void Pass_Premium_RequiresPurchase_CostsGems_Once()
-        {
-            _app.Pass.AddXp(100);
-            Assert.That(Code(_app.Pass.Claim(1, true)), Is.EqualTo("meta.premium"));
-            Assert.That(Code(_app.Pass.BuyPremium()), Is.EqualTo("meta.gems"));
-            _app.Session.Wallet.SetGems(PassTrack.PremiumCost + 10);
-            Assert.That(_app.Pass.BuyPremium().IsSuccess);
-            Assert.That(_app.Session.Wallet.Gems, Is.EqualTo(10));
-            Assert.That(Code(_app.Pass.BuyPremium()), Is.EqualTo("meta.done"));
-            Assert.That(_app.Pass.Claim(1, true).IsSuccess);
-        }
-
-        [Test, Description("Vérifie que les points s'arrêtent au niveau 30 — parce qu'un pass a un sommet")]
-        public void Pass_Xp_IsCappedAtLevel30()
-        {
-            _app.Pass.AddXp(1_000_000);
-            Assert.That(_app.Pass.Level, Is.EqualTo(PassTrack.Levels));
-            Assert.That(_app.Pass.IsMax);
-        }
-
-        [Test, Description("Vérifie qu'une saison de 30 jours terminée repart de zéro (points, pass premium, récompenses) — parce que le pass est saisonnier")]
-        public void Pass_Season_ResetsAfter30Days()
-        {
-            _app.Pass.AddXp(500);
-            _app.Session.Wallet.SetGems(500);
-            _app.Pass.BuyPremium();
-            _app.Time.LocalNow = _app.Time.LocalNow.AddDays(PassTrack.SeasonDays + 1);
-            _app.Pass.EnsureSeason();
-            Assert.That(_app.Pass.Xp, Is.EqualTo(0));
-            Assert.That(_app.Pass.PremiumOwned, Is.False);
+            Assert.That(Code(_app.Pass.Claim(1, true)), Is.EqualTo("meta.premium"), "la piste premium exige l'achat (voir PassTrackTests)");
         }
 
         // ------------------------------------------------------------------ Missions du jour

@@ -366,5 +366,18 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(v.Def.Id, Is.EqualTo("new_year"));
             Assert.That(v.Start, Is.EqualTo(new DateTime(2026, 12, 29)));
         }
+
+        [Test, Description("Vérifie qu'un duel gagné donne 30 points de pass, un duel perdu 10 et un duel quitté aucun — parce que le tournoi alimente le pass sans récompenser l'abandon")]
+        public void Un_duel_donne_des_points_de_pass_selon_son_issue()
+        {
+            var app = Ready();
+            app.Arena.AddDefense(Rival(app, "rival"));
+            Run(app.Tournament.FinishDuelAsync(Start(app, DuelMode.Offline), DuelOutcome.Win, default));
+            Assert.That(app.Pass.Xp, Is.EqualTo(PassXp.DuelWon));
+            Run(app.Tournament.FinishDuelAsync(Start(app, DuelMode.Offline), DuelOutcome.Loss, default));
+            Assert.That(app.Pass.Xp, Is.EqualTo(PassXp.DuelWon + PassXp.DuelLost));
+            Run(app.Tournament.FinishDuelAsync(Start(app, DuelMode.Offline), DuelOutcome.Quit, default));
+            Assert.That(app.Pass.Xp, Is.EqualTo(PassXp.DuelWon + PassXp.DuelLost), "quitter ne rapporte rien");
+        }
     }
 }

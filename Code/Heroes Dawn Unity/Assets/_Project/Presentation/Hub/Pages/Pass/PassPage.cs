@@ -1,6 +1,8 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Messages;
@@ -40,7 +42,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 ProgressLabel = _pass.IsMax ? Loc.T("pass.max") : Loc.F("pass.xp", _pass.XpInLevel, PassTrack.XpPerLevel),
                 A = _pass.PremiumOwned
                     ? RowButtonData.Of(Loc.T("pass.premium_on"), false, "", 3)
-                    : RowButtonData.Of(Loc.F("pass.buy_premium", PassTrack.PremiumCost), true, "", 1),
+                    : RowButtonData.Of(Loc.F("pass.buy_premium", PremiumPriceText), true, "", 1),
                 B = RowButtonData.Of(claimable > 0 ? Loc.F("pass.claim_all", claimable) : Loc.T("pass.nothing"), claimable > 0, Loc.T("pass.nothing_reason"), 0),
             });
 
@@ -107,8 +109,21 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         protected override void OnHeader(int index)
         {
-            if (index == 0) { if (Report(_pass.BuyPremium(), Loc.T("pass.premium_bought"))) { } }
+            if (index == 0) BuyPremiumAsync().Forget();
             else Report(_pass.ClaimAll(), "pass.claimed");
+        }
+
+        /// <summary>Prix affiché tant que l'écran n'a pas le prix local du store (lot UI) ; le vrai montant vient du store au moment du paiement.</summary>
+        const string PremiumPriceText = "9,99 €";
+
+        async UniTaskVoid BuyPremiumAsync()
+        {
+            try
+            {
+                var r = await _pass.BuyPremiumAsync(Lifetime);
+                if (!Disposed) Report(r, Loc.T("pass.premium_bought"));
+            }
+            catch (OperationCanceledException) { }
         }
 
         protected override void OnRowButton(int row, int button)

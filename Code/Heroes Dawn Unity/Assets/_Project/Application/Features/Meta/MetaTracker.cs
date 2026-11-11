@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
     /// </summary>
     public sealed class MetaTracker : IDisposable
     {
-        public const int XpPerWin = 10, XpPerFirstClear = 50, XpPerReplay = 20, GemsPerFirstClear = 10;
+        public const int XpPerWin = 30, XpPerFirstClear = 300, XpPerReplay = 100, GemsPerFirstClear = 10;
 
         readonly MetaContext _c;
         readonly DailyMissions _daily;
@@ -86,6 +86,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
             if (_c.Session.RunZone != null) _quests.RecordCombatWon(_c.Session.RunZone.Id.Value);
             _quests.Record(QuestMetric.CombatsWon);
             _pass.AddXp(XpPerWin);
+            if (f.Report.Lair != null) _pass.AddXp(PassXp.Lair);
         }
 
         void OnZone(ZoneValidated z)

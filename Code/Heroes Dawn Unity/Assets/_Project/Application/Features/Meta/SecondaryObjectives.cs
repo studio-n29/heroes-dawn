@@ -21,7 +21,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
     {
         public static readonly TimeSpan Duration = TimeSpan.FromHours(3);
         public static readonly TimeSpan Cooldown = TimeSpan.FromMinutes(10);
-        public static readonly Reward Prize = new Reward(credits: 400, gems: 5, passXp: 25);
+        public static readonly Reward Prize = new Reward(credits: 400, gems: 5, passXp: 250);
 
         readonly MetaContext _c;
         readonly PassProgress _pass;

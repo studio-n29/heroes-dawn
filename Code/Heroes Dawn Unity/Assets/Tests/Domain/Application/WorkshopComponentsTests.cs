@@ -153,5 +153,16 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(Enumerable.Range(0, 4).Sum(k => CraftingOps.Catalysts(s, (CatalystKind)k)), Is.GreaterThan(0));
             Assert.That(Recipes.All.Count(r => CraftingOps.Knows(s, r.Id)), Is.GreaterThan(Recipes.Starter.Count));
         }
+
+        [Test, Description("Vérifie qu'une fabrication donne 20 points de pass et qu'un refus n'en donne aucun — parce que l'Atelier est une source de progression du pass")]
+        public void Une_fabrication_donne_20_points_de_pass()
+        {
+            var s = _app.Session;
+            CraftingOps.AddComponents(s, ComponentKind.Weapon, ComponentGrade.Common, 8);
+            Assert.That(_app.Workshop.Craft("scrap_blade", ComponentGrade.Common, CatalystKind.Energy).IsFailure, "pas de catalyseur : refusé");
+            Assert.That(_app.Pass.Xp, Is.EqualTo(0));
+            Assert.That(_app.Workshop.Craft("scrap_blade", ComponentGrade.Common, null).IsSuccess);
+            Assert.That(_app.Pass.Xp, Is.EqualTo(PassXp.Craft));
+        }
     }
 }

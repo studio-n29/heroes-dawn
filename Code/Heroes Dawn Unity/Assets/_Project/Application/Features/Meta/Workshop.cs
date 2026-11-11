@@ -45,7 +45,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
     {
         readonly MetaContext _c;
 
-        public Workshop(MetaContext context) { _c = context; }
+        readonly PassProgress _pass;
+
+        public Workshop(MetaContext context, PassProgress pass) { _c = context; _pass = pass; }
 
         GameSession Session => _c.Session;
 
@@ -74,6 +76,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
             var stats = CraftingRules.RollStats(rng, recipe, stars, catalyst);
             var item = CraftingOps.AddCrafted(Session, recipe, stars, stats);
 
+            _pass.AddXp(PassXp.Craft);
             _c.Touch(MetaArea.Lab);
             _c.Touch(MetaArea.Collection);
             return Result<CraftOutcome>.Ok(new CraftOutcome(item, stars, stats));

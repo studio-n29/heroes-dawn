@@ -29,7 +29,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["pass.season"] = "Fin de la saison dans {0}";
             d["pass.xp"] = "{0} / {1} pts";
             d["pass.max"] = "NIVEAU MAX";
-            d["pass.buy_premium"] = "PASS PREMIUM · {0} GEMMES";
+            d["pass.buy_premium"] = "PASS PREMIUM · {0}";
             d["pass.premium_on"] = "PASS PREMIUM ACTIF";
             d["pass.premium_bought"] = "Pass premium débloqué !";
             d["pass.premium_needed"] = "Le pass premium débloque cette piste.";

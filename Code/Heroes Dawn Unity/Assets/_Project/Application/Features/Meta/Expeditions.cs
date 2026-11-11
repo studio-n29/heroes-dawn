@@ -172,7 +172,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
             int bonus = n == 0 ? 0 : levels / n; // +1 % par niveau moyen
             var reward = t.Reward.Scaled(100 + bonus);
             _c.Grant(reward);
-            _pass.AddXp(10 + t.Minutes / 10);
+            _pass.AddXp(10 * (10 + t.Minutes / 10));
             _c.Touch(MetaArea.Operations);
             return Result<Reward>.Ok(reward);
         }

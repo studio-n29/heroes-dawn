@@ -75,8 +75,8 @@ namespace N29.HeroesDawn.Application.Features.Meta
         }
 
         static Reward RewardOf(ActivitySave a) => a.kind == (int)ActivityKind.ClearZone
-            ? new Reward(credits: 400, pr: 10, passXp: 30)
-            : new Reward(credits: 150 * a.target, passXp: 15 * a.target);
+            ? new Reward(credits: 400, pr: 10, passXp: 300)
+            : new Reward(credits: 150 * a.target, passXp: 150 * a.target);
 
         /// <summary>Un combat vient d'être gagné dans cette zone.</summary>
         public void RecordCombatWon(string zoneId) => Advance(ActivityKind.WinCombats, zoneId);

@@ -169,6 +169,10 @@ namespace N29.HeroesDawn.Application.Ports
         public bool passPremium;
         public List<int> passFreeClaimed = new List<int>();
         public List<int> passPremiumClaimed = new List<int>();
+        /// <summary>Numéro de la saison de pass à laquelle appartiennent les points et les paliers ci-dessus (voir PassTrack.SeasonIndex) ; une saison différente remet le pass à zéro.</summary>
+        public int passSeason = int.MinValue;
+        /// <summary>Cosmétiques possédés (identifiants du catalogue, voir CosmeticOps) : boutique, pass, tournois, succès et événements.</summary>
+        public List<string> cosmetics = new List<string>();
 
         // Missions du jour, objectifs secondaires
         public string dailyDay = "";

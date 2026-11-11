@@ -34,14 +34,14 @@ namespace N29.HeroesDawn.Application.Features.Meta
 
         public static readonly IReadOnlyList<DailyTemplate> Catalog = new[]
         {
-            new DailyTemplate("win2", DailyKind.WinCombats, 2, new Reward(credits: 200, passXp: 15)),
-            new DailyTemplate("win3", DailyKind.WinCombats, 3, new Reward(credits: 300, passXp: 20)),
-            new DailyTemplate("win5", DailyKind.WinCombats, 5, new Reward(credits: 500, gems: 5, passXp: 30)),
-            new DailyTemplate("train1", DailyKind.TrainMember, 1, new Reward(pr: 10, passXp: 20)),
-            new DailyTemplate("train2", DailyKind.TrainMember, 2, new Reward(pr: 15, passXp: 30)),
-            new DailyTemplate("recruit1", DailyKind.RecruitHero, 1, new Reward(gems: 3, passXp: 30)),
-            new DailyTemplate("zone1", DailyKind.ValidateZone, 1, new Reward(credits: 600, gems: 5, passXp: 40)),
-            new DailyTemplate("earn1000", DailyKind.EarnCredits, 1000, new Reward(gems: 5, passXp: 25)),
+            new DailyTemplate("win2", DailyKind.WinCombats, 2, new Reward(credits: 200, passXp: 150)),
+            new DailyTemplate("win3", DailyKind.WinCombats, 3, new Reward(credits: 300, passXp: 200)),
+            new DailyTemplate("win5", DailyKind.WinCombats, 5, new Reward(credits: 500, gems: 5, passXp: 300)),
+            new DailyTemplate("train1", DailyKind.TrainMember, 1, new Reward(pr: 10, passXp: 200)),
+            new DailyTemplate("train2", DailyKind.TrainMember, 2, new Reward(pr: 15, passXp: 300)),
+            new DailyTemplate("recruit1", DailyKind.RecruitHero, 1, new Reward(gems: 3, passXp: 300)),
+            new DailyTemplate("zone1", DailyKind.ValidateZone, 1, new Reward(credits: 600, gems: 5, passXp: 400)),
+            new DailyTemplate("earn1000", DailyKind.EarnCredits, 1000, new Reward(gems: 5, passXp: 250)),
         };
 
         readonly MetaContext _c;

@@ -77,12 +77,12 @@ namespace N29.HeroesDawn.Tests.Presentation
         PassPagePresenter Pass() => Start(new PassPagePresenter(_view, _app.Pass, _app.Daily, _app.Boutique, _loc, _toasts, _app.Subscriber<MetaChanged>(),
                                                                _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time));
 
-        [Test, Description("Vérifie que le pass affiche 30 niveaux, que la récompense gratuite d'un niveau atteint se prend d'un toucher et passe à « PRIS » — parce que c'est le geste central du pass (M40)")]
-        public void Pass_ListsThirtyLevels_ClaimFlipsToTaken()
+        [Test, Description("Vérifie que le pass affiche 50 niveaux, que la récompense gratuite d'un niveau atteint se prend d'un toucher et passe à « PRIS » — parce que c'est le geste central du pass (M40)")]
+        public void Pass_ListsFiftyLevels_ClaimFlipsToTaken()
         {
-            _app.Pass.AddXp(100);
+            _app.Pass.AddXp(PassTrack.XpPerLevel);
             Pass();
-            Assert.That(_view.Rows.Length, Is.EqualTo(30));
+            Assert.That(_view.Rows.Length, Is.EqualTo(PassTrack.Levels));
             Assert.That(_view.Rows[0].A.Enabled, Is.True);
             Assert.That(_view.Rows[1].A.Enabled, Is.False, "niveau 2 pas atteint");
             int credits = _app.Session.Wallet.Credits;
@@ -95,7 +95,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que « Tout récupérer » prend d'un coup toutes les récompenses disponibles — parce qu'on ne veut pas toucher trente fois")]
         public void Pass_ClaimAll_TakesEverything()
         {
-            _app.Pass.AddXp(500);
+            _app.Pass.AddXp(2 * PassTrack.XpPerLevel);
             Pass();
             _view.ClickHeader(1);
             Assert.That(_app.Pass.ClaimableCount(), Is.Zero);

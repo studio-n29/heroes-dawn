@@ -153,7 +153,7 @@ namespace N29.HeroesDawn.Composition
 
             // ---- Méta-progression : pass, missions, opérations, labo, archives, boutique, réglages
             builder.Register<MetaContext>(Lifetime.Singleton);
-            builder.Register<PassProgress>(Lifetime.Singleton);
+            builder.Register<PassProgress>(c => new PassProgress(c.Resolve<MetaContext>(), N29.HeroesDawn.Authoring.PassRewardsLibrary.Load(), c.Resolve<IPurchaseGateway>()), Lifetime.Singleton);
             builder.Register<DailyMissions>(Lifetime.Singleton);
             builder.Register<SecondaryObjectives>(Lifetime.Singleton);
             builder.Register<QuestLog>(Lifetime.Singleton);
@@ -164,7 +164,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<N29.HeroesDawn.Application.Features.World.ChapterBook>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.LairBook>(Lifetime.Singleton);
             builder.Register<TournamentArena>(c => new TournamentArena(c.Resolve<MetaContext>(), c.Resolve<IArenaGateway>(), c.Resolve<IDuelChannel>(),
-                N29.HeroesDawn.Authoring.TournamentLibrary.Load(), N29.HeroesDawn.Authoring.ArenaRewardsLibrary.Load()), Lifetime.Singleton);
+                N29.HeroesDawn.Authoring.TournamentLibrary.Load(), N29.HeroesDawn.Authoring.ArenaRewardsLibrary.Load(), c.Resolve<PassProgress>()), Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.MemoryFragmentBook>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Presentation.Hub.NoFragmentAudio>(Lifetime.Singleton).As<N29.HeroesDawn.Presentation.Hub.IFragmentAudio>();
             builder.Register<LocalFriendsPort>(Lifetime.Singleton).As<N29.HeroesDawn.Application.Ports.IFriendsPort>();

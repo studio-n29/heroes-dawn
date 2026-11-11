@@ -115,6 +115,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public N29.HeroesDawn.Application.Features.World.LairBook Lairs { get; }
         public static readonly System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Definitions.TournamentDef> TestCalendar = N29.HeroesDawn.Authoring.TournamentLibrary.Load();
         public static readonly N29.HeroesDawn.Definitions.ArenaRewardTable TestRewards = N29.HeroesDawn.Authoring.ArenaRewardsLibrary.Load();
+        public static readonly N29.HeroesDawn.Definitions.PassRewardTable TestPassRewards = N29.HeroesDawn.Authoring.PassRewardsLibrary.Load();
         public TournamentArena Tournament { get; }
         public N29.HeroesDawn.Infrastructure.Simulated.InMemoryArenaGateway Arena { get; }
         public N29.HeroesDawn.Infrastructure.Simulated.InMemoryDuelChannel Duels { get; }
@@ -180,11 +181,11 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Account = new AuthUseCases(this);
             Shop = new ShopUseCases(this);
             MetaCtx = new MetaContext(Session, Save, Time, Publisher<WalletChanged>(), Publisher<MetaChanged>());
-            Pass = new PassProgress(MetaCtx);
+            Pass = new PassProgress(MetaCtx, TestPassRewards, Purchases);
             Daily = new DailyMissions(MetaCtx, Pass);
             Secondary = new SecondaryObjectives(MetaCtx, Pass);
             Operations = new Expeditions(MetaCtx, Pass);
-            Workshop = new Workshop(MetaCtx);
+            Workshop = new Workshop(MetaCtx, Pass);
             Friends = new LocalFriendsPort(MetaCtx);
             Profile = new PlayerProfile(MetaCtx, Pass);
             Chapters = new N29.HeroesDawn.Application.Features.World.ChapterBook(MetaCtx);
@@ -192,7 +193,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Lairs = new N29.HeroesDawn.Application.Features.World.LairBook(MetaCtx);
             Arena = new N29.HeroesDawn.Infrastructure.Simulated.InMemoryArenaGateway(() => Time.LocalNow, (rating, seed) => ArenaSnapshots.Fallback(Session.Content, rating, seed, "Repli"));
             Duels = new N29.HeroesDawn.Infrastructure.Simulated.InMemoryDuelChannel();
-            Tournament = new TournamentArena(MetaCtx, Arena, Duels, TestCalendar, TestRewards);
+            Tournament = new TournamentArena(MetaCtx, Arena, Duels, TestCalendar, TestRewards, Pass);
             Archives = new ArchiveBook(MetaCtx);
             Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
             Collection = new N29.HeroesDawn.Application.Features.Collection.CollectionBook(MetaCtx, Publisher<RosterChanged>());
