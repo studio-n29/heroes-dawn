@@ -9,6 +9,17 @@
             <ui:Button name="speed" class="hd-btn hd-btn--secondary hd-hud__btn hd-hud__btn--speed" />
             <ui:Button name="pause" class="hd-btn hd-btn--secondary hd-hud__btn hd-hud__btn--square" />
         </ui:VisualElement>
+        <ui:VisualElement name="boss" class="hd-hud__boss">
+            <ui:Label name="bossName" class="hd-hud__boss-name" />
+            <ui:Label name="bossPhase" class="hd-hud__boss-phase" />
+            <ui:VisualElement class="hd-hud__boss-track">
+                <ui:VisualElement name="bossFill" class="hd-hud__boss-fill" />
+                <ui:VisualElement name="bossMarks" class="hd-hud__boss-marks" />
+                <ui:Label name="bossHp" class="hd-hud__boss-hp" />
+            </ui:VisualElement>
+            <ui:VisualElement name="bossFlash" class="hd-hud__boss-flash" />
+        </ui:VisualElement>
+        <ui:VisualElement name="bonuses" class="hd-hud__bonuses" />
         <ui:Label name="banner" class="hd-hud__banner" />
         <ui:VisualElement name="hintBand" class="hd-hud__hint">
             <ui:Label name="hint" class="hd-hud__hint-text" />

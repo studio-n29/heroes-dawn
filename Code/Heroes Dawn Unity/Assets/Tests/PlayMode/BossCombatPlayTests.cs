@@ -48,10 +48,10 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => SceneManager.GetSceneByName(SceneNames.Combat).isLoaded && !ActivityGamesPlayTests.Flow.IsTransitioning, 900);
 
             var view = Object.FindAnyObjectByType<CombatView>()!;
-            yield return PlayModeHarness.WaitFor(() => view.BossBar.gameObject.activeInHierarchy, 300);
-            Assert.That(view.BossBar.Name, Is.EqualTo("BRICK"));
-            Assert.That(view.BossBar.Phase, Does.Contain("1/3"));
-            Assert.That(view.BossBar.MarkCount, Is.EqualTo(2), "un repère par seuil");
+            yield return PlayModeHarness.WaitFor(() => view.Hud.BossVisible, 300);
+            Assert.That(view.Hud.BossName, Is.EqualTo("BRICK"));
+            Assert.That(view.Hud.BossPhase, Does.Contain("1/3"));
+            Assert.That(view.Hud.BossMarkCount, Is.EqualTo(2), "un repère par seuil");
 
             var sim = c.Resolve<IActiveCombatReadModel>().Simulation!;
             var boss = sim.Units.First(u => u.Side == Side.Enemy && u.IsBoss);
@@ -60,7 +60,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => boss.PhaseReached > 0 || !boss.IsAlive, 3000);
             Assert.That(boss.PhaseReached, Is.EqualTo(1), "la phase 2 s'est ouverte");
             yield return new WaitForSecondsRealtime(0.6f);
-            Assert.That(view.BossBar.Phase, Does.Contain("2/3"));
+            Assert.That(view.Hud.BossPhase, Does.Contain("2/3"));
             yield return ScreenCaptureTests.Capture("17-combat-boss-phase");
         }
     }

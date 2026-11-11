@@ -577,3 +577,17 @@ Label { flex-shrink: 0; }
 .hd-hud__hint-text { -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-ink); -unity-text-align: middle-center; white-space: normal; }
 .hd-hud__log { position: absolute; right: 24px; bottom: 24px; width: 340px; height: 170px; padding: 10px 14px; background-color: rgba(10, 17, 26, 0.6); border-radius: 10px; overflow: hidden; justify-content: flex-end; }
 .hd-hud__log-text { -unity-font: var(--hd-font-body-regular); font-size: 21px; color: var(--hd-muted); white-space: normal; flex-shrink: 0; }
+.hd-hud__boss { position: absolute; top: 236px; left: 50%; translate: -50% 0; width: 960px; height: 104px; background-color: rgba(10, 17, 26, 0.9); border-width: 2px; border-color: var(--hd-brass-dark); border-radius: 8px; display: none; }
+.hd-hud__boss-name { position: absolute; left: 20px; top: 4px; -unity-font: var(--hd-font-title); font-size: 36px; color: var(--hd-brass); }
+.hd-hud__boss-phase { position: absolute; right: 20px; top: 8px; -unity-font: var(--hd-font-heading); font-size: 26px; color: var(--hd-muted); }
+.hd-hud__boss-track { position: absolute; left: 20px; right: 20px; bottom: 10px; height: 36px; background-color: var(--hd-surface-3); border-radius: 6px; overflow: hidden; }
+.hd-hud__boss-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background-color: var(--hd-danger); transition-property: width; transition-duration: 0.3s; }
+.hd-hud__boss-marks { position: absolute; left: 0; right: 0; top: 0; bottom: 0; }
+.hd-hud__boss-mark { position: absolute; top: 0; bottom: 0; width: 5px; background-color: var(--hd-brass); }
+.hd-hud__boss-hp { position: absolute; left: 0; right: 0; top: 0; bottom: 0; -unity-text-align: middle-center; -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-ivory); }
+.hd-hud__boss-flash { position: absolute; left: 0; right: 0; top: 0; bottom: 0; background-color: white; opacity: 0; transition-property: opacity; transition-duration: 0.7s; }
+.hd-hud__boss-flash--on { opacity: 0.85; transition-duration: 0s; }
+.hd-hud__bonuses { position: absolute; left: 36px; bottom: 150px; width: 660px; flex-direction: row; flex-wrap: wrap; }
+.hd-hud__chip { width: 208px; height: 60px; margin: 0 8px 8px 0; padding: 2px 10px; background-color: rgba(10, 17, 26, 0.9); border-left-width: 6px; border-radius: 4px; }
+.hd-hud__chip-name { -unity-font: var(--hd-font-title); font-size: 20px; color: var(--hd-ivory); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hd-hud__chip-effect { -unity-font: var(--hd-font-body-regular); font-size: 20px; color: var(--hd-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

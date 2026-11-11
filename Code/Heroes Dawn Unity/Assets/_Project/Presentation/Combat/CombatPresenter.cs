@@ -155,7 +155,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             CombatIntroFighter Fighter(CombatUnit u)
             {
                 string name = _names.TryGetValue(u.Id, out var n) ? n : u.DefId;
-                string role = _loc.RoleName(u.Role);
+                string role = _loc.RoleName(u.Position);
                 return new CombatIntroFighter(name.ToUpperInvariant(), u.IsBoss ? _loc.F("combat.intro.boss_sub", role) : role,
                                               new PortraitData(name, u.Family, u.IsBoss, u.Side == Side.Ally ? AgentArt.For(u.DefId) : null));
             }
@@ -189,7 +189,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 AddLog(_loc.F("combat.synergy", _loc.SynergyName(a.Synergy), effectText, Name(allies[a.A].Id), Name(allies[a.B].Id)));
                 chips.Add(new BonusChipData { Name = _loc.SynergyName(a.Synergy), Effect = effectText, Color = Theme.Accent });
             }
-            foreach (var effect in TeamEffects.Active(allies.Select(u => u.Family).ToList(), allies.Select(u => u.Role).ToList()))
+            foreach (var effect in TeamEffects.Active(allies.Select(u => u.Family).ToList(), allies.Select(u => u.Position).ToList()))
             {
                 AddLog(_loc.F("combat.team_effect", _loc.TeamEffect(effect)));
                 chips.Add(new BonusChipData { Name = _loc.T("team_effect." + effect + ".name"), Effect = _loc.T("team_effect." + effect + ".short"), Color = Theme.Success });
@@ -200,8 +200,8 @@ namespace N29.HeroesDawn.Presentation.Combat
                 {
                     int level = sim.Setup.LinkLevel(new MemberId(allies[i].DefId), new MemberId(allies[j].DefId));
                     if (level < PairBonusRules.MinLevel) continue;
-                    AddLog(_loc.F("combat.pair", _loc.PairTheme(allies[i].Role, allies[j].Role), Name(allies[i].Id), Name(allies[j].Id), level,
-                                  string.Join(", ", PairBonusRules.Merge(PairBonusRules.Of(allies[i].Role, allies[j].Role, level)).Select(_loc.PairBonusText))));
+                    AddLog(_loc.F("combat.pair", _loc.PairTheme(allies[i].Position, allies[j].Position), Name(allies[i].Id), Name(allies[j].Id), level,
+                                  string.Join(", ", PairBonusRules.Merge(PairBonusRules.Of(allies[i].Position, allies[j].Position, level)).Select(_loc.PairBonusText))));
                 }
             const int MaxChips = 6;
             if (chips.Count > MaxChips)

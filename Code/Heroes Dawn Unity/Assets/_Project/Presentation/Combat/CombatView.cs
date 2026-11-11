@@ -31,8 +31,6 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField, Mvp.OptionalRef] RectTransform? arena;
         [SerializeField, Mvp.OptionalRef] TMP_Text? arenaTitle;
         [SerializeField, Mvp.OptionalRef] UnityEngine.UI.Image? spotlight;
-        [SerializeField] BonusChipView[] bonusChips = null!;
-        [SerializeField] BossBarView bossBar = null!;
 
         readonly Dictionary<int, UnitCardView> _cards = new Dictionary<int, UnitCardView>();
         int _skillUnit = -1;
@@ -306,26 +304,13 @@ namespace N29.HeroesDawn.Presentation.Combat
         }
 
         public void ShowLog(IReadOnlyList<string> lines) => hud.SetLog(lines);
-
-        /// <summary>Barre du boss affichée (tests PlayMode).</summary>
-        public BossBarView BossBar => bossBar;
-
         public void ShowBoss(BossBarData? data, bool phaseChanged = false)
         {
-            bool on = data.HasValue;
-            if (bossBar.gameObject.activeSelf != on) bossBar.gameObject.SetActive(on);
-            if (on) bossBar.Show(data!.Value, phaseChanged);
+            hud.ShowBoss(data, phaseChanged);
+            if (phaseChanged) Tween.Punch(transform, 0.01f, 0.5f);
         }
 
-        public void ShowBonuses(IReadOnlyList<BonusChipData> bonuses)
-        {
-            for (int i = 0; i < bonusChips.Length; i++)
-            {
-                bool on = i < bonuses.Count;
-                if (bonusChips[i].gameObject.activeSelf != on) bonusChips[i].gameObject.SetActive(on);
-                if (on) bonusChips[i].Show(bonuses[i]);
-            }
-        }
+        public void ShowBonuses(IReadOnlyList<BonusChipData> bonuses) => hud.ShowBonuses(bonuses);
 
         public void Float(int unitId, string text, Tone tone, int size)
         {

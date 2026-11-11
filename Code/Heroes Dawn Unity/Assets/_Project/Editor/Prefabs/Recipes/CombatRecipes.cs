@@ -412,29 +412,7 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             allyRow.VLayout(12, 0, TextAnchor.UpperLeft);
             StaggeredRows(allyRow, TextAnchor.UpperRight, TextAnchor.UpperLeft);
 
-            // ---- Bonus actifs de l'équipe (bas gauche, sous les alliés) : jusqu'à six pastilles, 3 par rangée
-            var bonusRow = Ui.Rect(rt, "Bonuses").At(0f, 1f, 36, -726, 640, 128);
-            var bonusChips = new Object[6];
-            for (int i = 0; i < bonusChips.Length; i++)
-            {
-                var chipFill = Ui.Panel(bonusRow, "Bonus" + i, Theme.Surface3, 3f, 4f, false);
-                var chipFrame = chipFill.Frame();
-                chipFrame.At(0f, 1f, (i % 3) * 216, -(i / 3) * 68, 208, 60);
-                var chipName = Ui.Txt(chipFill.transform, "", 20, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Name");
-                chipName.rectTransform.At(0f, 1f, 10, -2, 188, 28);
-                chipName.overflowMode = TextOverflowModes.Ellipsis;
-                var chipEffect = Ui.Txt(chipFill.transform, "", 20, Theme.TextMuted, TextAnchor.MiddleLeft, FontKind.Body, "Effect");
-                chipEffect.rectTransform.At(0f, 0f, 10, 2, 188, 26);
-                chipEffect.overflowMode = TextOverflowModes.Ellipsis;
-                var chip = chipFrame.gameObject.AddComponent<BonusChipView>();
-                ctx.Wire(chip, "frame", chipFrame.GetComponent<Image>());
-                ctx.Wire(chip, "title", chipName);
-                ctx.Wire(chip, "effect", chipEffect);
-                bonusChips[i] = chip;
-                chipFrame.gameObject.SetActive(false);
-            }
-
-            // ---- Frise chronologique : grande bande mise en valeur au centre (100 à gauche → 0 à droite : à 0, c'est le tour)
+            // ---- Frise chronologique : grande bande mise en valeur au centre (100 à gauche → 0 à droite : à 0, c est le tour)
             var glow = Ui.Img(rt, "TimelineGlow", Theme.WithAlpha(Theme.Primary, 0.35f), Sprites.Rounded);
             glow.rectTransform.At(0.5f, 1f, 0, -98, 2100, 88);
             glow.color = Color.clear;
@@ -469,33 +447,6 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             ctx.Wire(timeline, "track", track);
             ctx.Wire(timeline, "prepZone", prep.rectTransform);
             ctx.Wire(timeline, "markerPrefab", ctx.Asset("Widgets/TimelineMarker.prefab").GetComponent<TimelineMarkerView>());
-
-            // ---- Barre de vie du boss : large, au centre sous la frise, visible seulement quand un boss est en vie
-            var bossFill = Ui.Panel(rt, "BossBar", Theme.WithAlpha(Theme.Frost, 0.94f), 4f, 6f, false);
-            var bossFrame = bossFill.Frame().At(0.5f, 1f, 0, -240, 960, 100);
-            var bossName = Ui.Txt(bossFill.transform, "", 36, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Name");
-            bossName.rectTransform.At(0f, 1f, 20, -6, 560, 44);
-            bossName.Inked();
-            var bossPhase = Ui.Txt(bossFill.transform, "", 26, Theme.TextMuted, TextAnchor.MiddleRight, FontKind.Title, "Phase");
-            bossPhase.rectTransform.At(1f, 1f, -20, -10, 520, 36);
-            var bossHp = Ui.Bar(bossFill.transform, "Hp", Theme.Danger, Theme.Surface3, true, 26);
-            ((RectTransform)bossHp.transform).At(0.5f, 0f, 0, 10, 920, 36);
-            var bossMarks = Ui.Rect(bossHp.transform, "Marks");
-            bossMarks.Stretch();
-            var bossFlash = Ui.Img(bossFill.transform, "Flash", Color.white, Sprites.Panel);
-            bossFlash.rectTransform.Stretch();
-            bossFlash.raycastTarget = false;
-            var bossFlashGroup = bossFlash.gameObject.AddComponent<CanvasGroup>();
-            bossFlashGroup.alpha = 0f;
-            bossFlashGroup.blocksRaycasts = false;
-            var bossBar = bossFrame.gameObject.AddComponent<BossBarView>();
-            ctx.Wire(bossBar, "nameText", bossName);
-            ctx.Wire(bossBar, "phaseText", bossPhase);
-            ctx.Wire(bossBar, "bar", bossHp);
-            ctx.Wire(bossBar, "marksRoot", bossMarks);
-            ctx.Wire(bossBar, "flash", bossFlashGroup);
-            bossFrame.gameObject.SetActive(false);
-
 
             // ---- Éventail de compétences (bas centre) : visible seulement pour l'agent dont c'est le tour ; la 1re carte à gauche penche à gauche
             var fanRoot = Ui.Rect(rt, "SkillFan").At(0.5f, 0f, 0, -24, 760, 240);
@@ -544,8 +495,6 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             ctx.Wire(view, "allyCardPrefab", ctx.Asset("Widgets/AllyCard.prefab").GetComponent<UnitCardView>());
             ctx.Wire(view, "fanRoot", fanRoot);
             ctx.WireArray(view, "fan", fan);
-            ctx.WireArray(view, "bonusChips", bonusChips);
-            ctx.Wire(view, "bossBar", bossBar);
             ctx.Wire(view, "fanMarker", fanMarker);
             ctx.Wire(view, "descPanel", descFill.Frame());
             ctx.Wire(view, "descTitle", descTitle);

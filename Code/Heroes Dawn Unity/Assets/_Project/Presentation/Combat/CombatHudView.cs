@@ -54,6 +54,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             _auto.text = Loc.T("combat.auto_hint");
             _debug.text = Loc.T("combat.debug_win");
             _banner.pickingMode = PickingMode.Ignore;
+            BindBossAndBonuses();
             if (_topBar.HasValue) SetTopBar(_topBar.Value);
             SetHint(_hintText);
             _log.text = _logText;
@@ -97,6 +98,81 @@ namespace N29.HeroesDawn.Presentation.Combat
             _bannerOff?.Pause();
             _bannerOff = _banner.schedule.Execute(() => _banner.EnableInClassList("hd-hud__banner--on", false));
             _bannerOff.ExecuteLater(1200);
+        }
+
+        // ---- Barre du boss et pastilles de bonus
+        VisualElement _boss = null!, _bossFill = null!, _bossMarks = null!, _bossFlash = null!, _bonuses = null!;
+        Label _bossName = null!, _bossPhase = null!, _bossHp = null!;
+        readonly List<VisualElement> _chips = new List<VisualElement>();
+        BossBarData? _bossData;
+        IReadOnlyList<BonusChipData> _bonusData = System.Array.Empty<BonusChipData>();
+
+        /// <summary>Barre du boss affichée (tests PlayMode).</summary>
+        public bool BossVisible => _bossData.HasValue;
+        public string BossName => _bossData.HasValue ? _bossData.Value.Name : "";
+        public string BossPhase => _bossData.HasValue ? _bossData.Value.Phase : "";
+        public int BossMarkCount => _bossData.HasValue ? _bossData.Value.Marks.Count : 0;
+        public int BonusCount => _bonusData.Count;
+
+        void BindBossAndBonuses()
+        {
+            _boss = Q<VisualElement>("boss"); _bossFill = Q<VisualElement>("bossFill"); _bossMarks = Q<VisualElement>("bossMarks");
+            _bossFlash = Q<VisualElement>("bossFlash"); _bonuses = Q<VisualElement>("bonuses");
+            _bossName = Q<Label>("bossName"); _bossPhase = Q<Label>("bossPhase"); _bossHp = Q<Label>("bossHp");
+            _bossFlash.pickingMode = PickingMode.Ignore;
+            _chips.Clear(); _bonuses.Clear();
+            for (int i = 0; i < 6; i++)
+            {
+                var chip = new VisualElement(); chip.AddToClassList("hd-hud__chip");
+                var name = new Label(); name.AddToClassList("hd-hud__chip-name");
+                var effect = new Label(); effect.AddToClassList("hd-hud__chip-effect");
+                chip.Add(name); chip.Add(effect);
+                chip.pickingMode = PickingMode.Ignore;
+                _bonuses.Add(chip); _chips.Add(chip);
+            }
+            ShowBoss(_bossData, false);
+            ShowBonuses(_bonusData);
+        }
+
+        public void ShowBoss(BossBarData? data, bool phaseChanged)
+        {
+            _bossData = data;
+            if (_boss == null) return;
+            _boss.style.display = data.HasValue ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!data.HasValue) return;
+            var d = data.Value;
+            _bossName.text = d.Name;
+            _bossPhase.text = d.Phase;
+            _bossPhase.style.display = d.Phase.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            _bossFill.style.width = Length.Percent(UnityEngine.Mathf.Clamp01(d.Hp01) * 100f);
+            _bossHp.text = d.HpText;
+            _bossMarks.Clear();
+            foreach (var m in d.Marks)
+            {
+                var mark = new VisualElement(); mark.AddToClassList("hd-hud__boss-mark");
+                mark.style.left = Length.Percent(UnityEngine.Mathf.Clamp01(m) * 100f);
+                mark.pickingMode = PickingMode.Ignore;
+                _bossMarks.Add(mark);
+            }
+            if (!phaseChanged) return;
+            // Télégraphie du changement de phase : un éclat blanc s'éteint.
+            _bossFlash.EnableInClassList("hd-hud__boss-flash--on", true);
+            _bossFlash.schedule.Execute(() => _bossFlash.EnableInClassList("hd-hud__boss-flash--on", false)).ExecuteLater(60);
+        }
+
+        public void ShowBonuses(IReadOnlyList<BonusChipData> bonuses)
+        {
+            _bonusData = bonuses;
+            if (_bonuses == null) return;
+            for (int i = 0; i < _chips.Count; i++)
+            {
+                bool on = i < bonuses.Count;
+                _chips[i].style.display = on ? DisplayStyle.Flex : DisplayStyle.None;
+                if (!on) continue;
+                _chips[i].style.borderLeftColor = bonuses[i].Color;
+                ((Label)_chips[i][0]).text = bonuses[i].Name;
+                ((Label)_chips[i][1]).text = bonuses[i].Effect;
+            }
         }
     }
 }
