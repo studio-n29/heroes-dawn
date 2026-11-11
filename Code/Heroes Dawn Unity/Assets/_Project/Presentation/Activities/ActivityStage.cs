@@ -85,6 +85,18 @@ namespace N29.HeroesDawn.Presentation.Activities
             return go;
         }
 
+        /// <summary>Place un personnage 3D (prefab du dossier Characters3D) dans le monde de l'activité ; null si le prefab n'existe pas.</summary>
+        public Characters3D.Character3DView? SpawnModel(string id, float scale = 1f)
+        {
+            var prefab = Characters3D.Character3DLibrary.Prefab(id);
+            if (prefab == null) return null;
+            var go = Object.Instantiate(prefab, _root.transform, false);
+            go.name = id;
+            go.transform.localScale = Vector3.one * scale;
+            _owned.Add(go);
+            return go.GetComponent<Characters3D.Character3DView>();
+        }
+
         public void SetColor(GameObject go, Color color)
         {
             var r = go.GetComponent<Renderer>();
