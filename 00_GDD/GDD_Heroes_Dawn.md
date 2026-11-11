@@ -170,6 +170,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 | Infirmerie | Récupération de fatigue accélérée, emplacements limités |
 | Salle des opérations | Lance les expéditions idle ; niveaux = plus d'emplacements |
 | Atelier de fabrication | Fabrique des objets de 1 à 6 étoiles avec des Composants, un catalyseur optionnel et des recettes obtenues en jeu (le labo de recherche est supprimé) ; spec `Code/docs/specs/2026-11-10-atelier-fabrication-design.md` |
+| Tournois (arène) | Duels JcJ hors ligne (équipe capturée d un autre joueur) et en ligne (temps réel), 8 tournois par an, 10 duels par jour, classement et paliers de récompenses ; spec `Code/docs/specs/2026-11-10-tournois-jcj-design.md`, détail dans `01_Game_Design/04_Economie.md` |
 | Archives / Lore | Collection : fiches membres, histoire des villes, scènes débloquées |
 - Pièces améliorables en Crédits.
 - 10 niveaux par pièce (5 000 Crédits pour le niv. 2, ×1,35 ensuite), plafonnés à 2 × l'acte atteint. Effets par niveau : `01_Game_Design/07_QG_Expeditions.md`.

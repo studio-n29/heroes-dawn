@@ -85,3 +85,7 @@ Cette spec, le plan (`Code/docs/plans/2026-10-28-compte-supabase.md`), `Assets/_
 ## 8. Découpage prévu des tâches
 
 Ports et erreurs ; couche HTTP et client Auth (e-mail, session) ; flux OAuth ; port et client de sauvegarde cloud ; migration SQL (accord demandé) ; service de synchronisation et conflits ; fenêtre Compte et titre ; bandeau du profil et choix de progression ; restauration au lancement ; configuration et sélection du simulateur ou de Supabase ; documents, captures et suites complètes ; relecture finale par un agent indépendant.
+
+## 9. Arène des tournois (bloc D de la 1.0.0)
+
+Les tables `hd_arena_defenses`, `hd_arena_scores` et `hd_arena_matches` et leurs fonctions sont dans `Assets/_Project/Backend/Supabase/002_hd_arena.sql` (non appliqué, sur accord explicite). Spec : `Code/docs/specs/2026-11-10-tournois-jcj-design.md`.
