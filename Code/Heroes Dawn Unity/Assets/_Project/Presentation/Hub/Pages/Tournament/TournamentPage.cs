@@ -1,5 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using MessagePipe;
 using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Application.Messages;
@@ -12,14 +14,17 @@ namespace N29.HeroesDawn.Presentation.Hub
     public interface ITournamentPageView : IListPageView { }
 
     /// <summary>
-    /// Page Tournoi (JcJ simulé, 0.15.0) : à gauche le classement (neuf joueurs factices et le joueur), à droite les trois manches du jour avec leur adversaire
-    /// et leur issue. Le bouton du bandeau joue la manche suivante, puis réclame la récompense quand le tournoi est fini ; un tournoi par jour.
+    /// Page Tournoi, version minimale du bloc D (1.0.0) : tournoi actif ou prochain, points, palier et classement (top 100) lus sur le serveur ;
+    /// le bandeau réclame le prochain palier atteint. Le lancement d'un duel, la file d'attente, le duel en ligne, le résumé et la réclamation du classement
+    /// sont à faire dans le lot UI (voir la note de passation du bloc D).
     /// </summary>
     public sealed class TournamentPagePresenter : ListPagePresenter<ITournamentPageView>
     {
-        readonly Tournament _tournament;
+        readonly TournamentArena _tournament;
+        readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        IReadOnlyList<ScoreRow> _board = new List<ScoreRow>();
 
-        public TournamentPagePresenter(ITournamentPageView view, Tournament tournament, ILocalization loc, IToastService toasts, ISubscriber<MetaChanged> meta,
+        public TournamentPagePresenter(ITournamentPageView view, TournamentArena tournament, ILocalization loc, IToastService toasts, ISubscriber<MetaChanged> meta,
                                        ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, IClock clock)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
@@ -28,79 +33,69 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public override string Title => Loc.T("page.tournament");
 
-        static readonly string[] RoundKeys = { "tournament.round.quarter", "tournament.round.semi", "tournament.round.final" };
+        protected override void OnPageShown() => LoadBoardAsync().Forget();
 
-        string NameOf(LeaderboardEntry e) => e.IsPlayer ? Loc.T("tournament.you") : e.Name;
+        async UniTaskVoid LoadBoardAsync()
+        {
+            if (!_tournament.SignedIn) return;
+            var r = await _tournament.LeaderboardAsync(_cts.Token);
+            if (Disposed || r.IsFailure) return;
+            _board = r.Value;
+            Refresh();
+        }
+
+        protected override void OnDispose()
+        {
+            _cts.Cancel();
+            base.OnDispose();
+        }
 
         protected override void Render()
         {
-            int round = _tournament.Round;
-            bool finished = _tournament.Finished;
-            RowButtonData button;
-            if (!finished) button = RowButtonData.Of(Loc.F("tournament.play", Loc.T(RoundKeys[round])), _tournament.CanPlay, Loc.T("errors.meta_no_members"), 0);
-            else if (!_tournament.Claimed) button = RowButtonData.Of(Loc.T("tournament.claim"), true, "", 0);
-            else button = RowButtonData.Of(Loc.T("tournament.tomorrow"), false, Loc.T("tournament.tomorrow_reason"), 0);
-            string state = !finished ? Loc.F("tournament.state.running", round, Tournament.Rounds)
-                         : _tournament.Champion ? Loc.T("tournament.state.champion") : Loc.F("tournament.state.out", round);
+            var v = _tournament.Current();
+            string name = Loc.T(v.Def.NameKey);
+            string line = !v.SignedIn ? Loc.T("tournament.sign_in")
+                        : v.IsActive ? Loc.F("tournament.line", v.Tier, v.Points, Loc.F("tournament.duels_left", v.DuelsLeft))
+                        : Loc.F("tournament.next", name, v.Start.ToString("dd/MM"));
+            RowButtonData button = v.ClaimableTiers.Count > 0
+                ? RowButtonData.Of(Loc.T("tournament.claim"), true, "", 0)
+                : RowButtonData.Of(Loc.T("tournament.claim"), false, Loc.T("tournament.nothing_to_claim"), 0);
             View.ShowHeader(new ListHeaderData
             {
-                Title = Loc.T("tournament.title"),
-                Line = Loc.F("tournament.line", _tournament.PlayerRank, _tournament.Rating, state),
-                Progress = round / (float)Tournament.Rounds,
-                ProgressLabel = round + " / " + Tournament.Rounds,
+                Title = v.IsActive ? name : Loc.T("tournament.title"),
+                Line = line,
+                Progress = v.Tier / 5f,
+                ProgressLabel = v.Tier + " / 5",
                 A = button,
             });
 
-            var board = _tournament.Leaderboard();
-            var rows = new InfoRowData[board.Count];
+            var rows = new InfoRowData[_board.Count];
             for (int i = 0; i < rows.Length; i++)
             {
-                var e = board[i];
-                var r = InfoRowData.Basic(NameOf(e), Loc.F("tournament.points", e.Rating));
+                var e = _board[i];
+                var r = InfoRowData.Basic(e.IsPlayer ? Loc.T("tournament.you") : e.Name, Loc.F("tournament.points", e.Points));
                 r.Tag = e.Rank.ToString();
                 r.TagColor = e.IsPlayer ? Theme.Primary : e.Rank <= 3 ? Theme.Accent : Theme.TextMuted;
                 r.Highlight = e.IsPlayer;
                 rows[i] = r;
             }
             View.ShowRows(rows);
-            ShowRounds(round, finished);
-        }
-
-        void ShowRounds(int round, bool finished)
-        {
-            var opponents = _tournament.Opponents();
-            var side = new List<InfoRowData>();
-            for (int i = 0; i < Tournament.Rounds; i++)
-            {
-                bool won = i < round;
-                bool lost = finished && _tournament.Eliminated && i == round;
-                var r = InfoRowData.Basic(Loc.F("tournament.round_line", Loc.T(RoundKeys[i]), opponents[i].Name),
-                                          won ? Loc.T("tournament.won") : lost ? Loc.T("tournament.lost") : Loc.F("tournament.power", opponents[i].Power));
-                r.Tag = (i + 1).ToString();
-                r.TagColor = won ? Theme.Success : lost ? Theme.Danger : i == round && !finished ? Theme.Primary : Theme.TextMuted;
-                r.Highlight = i == round && !finished;
-                r.Dim = !won && !lost && (i > round || finished);
-                side.Add(r);
-            }
-            var mine = InfoRowData.Basic(Loc.T("tournament.your_power"), Loc.F("tournament.power", _tournament.PlayerPower()));
-            mine.Tag = "A";
-            mine.TagColor = Theme.Info;
-            side.Add(mine);
-            View.ShowSide(new ListSideData { Title = Loc.T("tournament.rounds"), Rows = side.ToArray(), Text = "" });
+            View.ShowSide(new ListSideData { Title = Loc.T("tournament.rewards"), Rows = new InfoRowData[0], Text = "" });
         }
 
         protected override void OnHeader(int index)
         {
             if (index != 0) return;
-            if (_tournament.Finished)
-            {
-                if (!_tournament.Claimed) Report(_tournament.Claim(), "tournament.claimed");
-                return;
-            }
-            var played = _tournament.PlayNext();
-            if (played.IsFailure) { Toasts.Show(Loc.Error(played.Error!), ToastKind.Error); return; }
-            var m = played.Value;
-            Toasts.Show(m.Won ? Loc.F("tournament.toast.win", m.Opponent.Name) : Loc.F("tournament.toast.loss", m.Opponent.Name), m.Won ? ToastKind.Reward : ToastKind.Warning);
+            var v = _tournament.Current();
+            if (v.ClaimableTiers.Count == 0) return;
+            ClaimAsync(v.ClaimableTiers[0]).Forget();
+        }
+
+        async UniTaskVoid ClaimAsync(int tier)
+        {
+            var r = await _tournament.ClaimTierAsync(tier, _cts.Token);
+            if (Disposed) return;
+            if (Report(r, Loc.T("tournament.claimed"))) Refresh();
         }
     }
 }

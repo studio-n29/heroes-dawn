@@ -161,7 +161,7 @@ namespace N29.HeroesDawn.Definitions
             Rare("grapple_rig", ItemType.Tool, Spd, Def, RecipeSource.Lair),
             Epic("chrono_pack", ItemType.Tool, Spd, Hp, ItemPerk.StartGauge, 15),
             Common("neural_chip", ItemType.Implant, Atk),
-            Rare("synapse_coil", ItemType.Implant, Atk, Spd),
+            Rare("synapse_coil", ItemType.Implant, Atk, Spd, RecipeSource.Tournament),
             Epic("apex_core", ItemType.Implant, Atk, Hp, ItemPerk.SkillPower, 10),
         };
 

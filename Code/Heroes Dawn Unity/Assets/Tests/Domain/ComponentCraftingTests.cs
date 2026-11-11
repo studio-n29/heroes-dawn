@@ -190,7 +190,8 @@ namespace N29.HeroesDawn.Tests.Domain
                 Assert.That((r.ComponentCost, r.MinGrade), Is.EqualTo(expected), r.Id);
             }
             Assert.That(Recipes.All.Count(r => r.Source == RecipeSource.Starter), Is.EqualTo(4));
-            Assert.That(Recipes.All.Count(r => r.Source == RecipeSource.Adventure), Is.EqualTo(5));
+            Assert.That(Recipes.All.Count(r => r.Source == RecipeSource.Adventure), Is.EqualTo(4));
+            Assert.That(Recipes.All.Where(r => r.Source == RecipeSource.Tournament).Select(r => r.Id), Is.EquivalentTo(new[] { "synapse_coil" }));
             Assert.That(Recipes.All.Where(r => r.Source == RecipeSource.Lair).Select(r => r.Id), Is.EquivalentTo(new[] { "plated_coat", "grapple_rig", "aegis_plate" }));
         }
 

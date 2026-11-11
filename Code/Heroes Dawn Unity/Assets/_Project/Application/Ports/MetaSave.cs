@@ -93,9 +93,26 @@ namespace N29.HeroesDawn.Application.Ports
         public List<string> members = new List<string>();
     }
 
-    /// <summary>Tournoi simulé : jour en cours, manches gagnées, éliminé ou non, récompense prise, et points du joueur (gardés d'un jour à l'autre).</summary>
+    /// <summary>
+    /// Arène des tournois : édition en cours (« christmas:2026 »), points, duels du jour, paliers réclamés et cosmétiques gagnés (identifiants « cosmetic:… », rangés ici
+    /// jusqu'au catalogue du bloc E). L'édition précédente reste en mémoire pour la réclamation des 7 jours suivant sa fin.
+    /// </summary>
     [Serializable]
-    public sealed class TournamentSave { public string day = ""; public int round; public bool eliminated; public bool claimed; public int rating = 1000; }
+    public sealed class ArenaSave
+    {
+        public string tournamentId = "";
+        public int points;
+        public int duelsToday;
+        public string duelDay = "";
+        public List<int> claimedTiers = new List<int>();
+        public List<string> cosmetics = new List<string>();
+        /// <summary>Dernière capture de défense envoyée (ticks UTC) et son empreinte : on n'envoie que si l'équipe a changé.</summary>
+        public long lastDefenseUploadUtcTicks;
+        public string lastDefenseHash = "";
+        public string previousId = "";
+        public int previousPoints;
+        public List<int> previousClaimedTiers = new List<int>();
+    }
 
     /// <summary>Succès débloqué : identifiant et jour de la première constatation (aaaa-mm-jj).</summary>
     [Serializable]
@@ -224,8 +241,8 @@ namespace N29.HeroesDawn.Application.Ports
         /// <summary>Jour (AAAAMMJJ) de la dernière récompense complète de chaque boss de repaire (id « repaire:case »). Absent d une ancienne sauvegarde : la première récompense est complète.</summary>
         public List<CounterSave> lairRewardDay = new List<CounterSave>();
 
-        /// <summary>Tournoi simulé du jour et points du joueur.</summary>
-        public TournamentSave tournament = new TournamentSave();
+        /// <summary>Arène des tournois : points, duels du jour, paliers réclamés (bloc D de la 1.0.0).</summary>
+        public ArenaSave arena = new ArenaSave();
 
         /// <summary>Entrées en combat déjà vues (clé : les ennemis de l'affrontement) ; une introduction répétée est abrégée.</summary>
         public List<string> seenIntros = new List<string>();

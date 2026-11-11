@@ -113,7 +113,11 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public N29.HeroesDawn.Application.Features.World.ChapterBook Chapters { get; }
         public N29.HeroesDawn.Application.Features.World.MemoryFragmentBook Fragments { get; }
         public N29.HeroesDawn.Application.Features.World.LairBook Lairs { get; }
-        public Tournament Tournament { get; }
+        public static readonly System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Definitions.TournamentDef> TestCalendar = N29.HeroesDawn.Authoring.TournamentLibrary.Load();
+        public static readonly N29.HeroesDawn.Definitions.ArenaRewardTable TestRewards = N29.HeroesDawn.Authoring.ArenaRewardsLibrary.Load();
+        public TournamentArena Tournament { get; }
+        public N29.HeroesDawn.Infrastructure.Simulated.InMemoryArenaGateway Arena { get; }
+        public N29.HeroesDawn.Infrastructure.Simulated.InMemoryDuelChannel Duels { get; }
         public ArchiveBook Archives { get; }
         public MetaTracker Tracker { get; }
         public Boutique Boutique { get; }
@@ -181,7 +185,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Chapters = new N29.HeroesDawn.Application.Features.World.ChapterBook(MetaCtx);
             Fragments = new N29.HeroesDawn.Application.Features.World.MemoryFragmentBook(MetaCtx);
             Lairs = new N29.HeroesDawn.Application.Features.World.LairBook(MetaCtx);
-            Tournament = new Tournament(MetaCtx);
+            Arena = new N29.HeroesDawn.Infrastructure.Simulated.InMemoryArenaGateway(() => Time.LocalNow, (rating, seed) => ArenaSnapshots.Fallback(Session.Content, rating, seed, "Repli"));
+            Duels = new N29.HeroesDawn.Infrastructure.Simulated.InMemoryDuelChannel();
+            Tournament = new TournamentArena(MetaCtx, Arena, Duels, TestCalendar, TestRewards);
             Archives = new ArchiveBook(MetaCtx);
             Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
             Collection = new N29.HeroesDawn.Application.Features.Collection.CollectionBook(MetaCtx, Publisher<RosterChanged>());

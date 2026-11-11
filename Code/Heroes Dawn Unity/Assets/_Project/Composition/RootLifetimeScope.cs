@@ -92,6 +92,10 @@ namespace N29.HeroesDawn.Composition
             {
                 builder.Register<IAccountGateway>(_ => new LocalAccountGateway(), Lifetime.Singleton);
                 builder.Register<ICloudProfileGateway>(_ => new FakeCloudProfileGateway(), Lifetime.Singleton);
+                // Arène des tournois : faux serveur et faux canal en mémoire tant que Supabase n'est pas configuré.
+                builder.Register<IArenaGateway>(c => new InMemoryArenaGateway(() => c.Resolve<IClock>().LocalNow,
+                    (rating, seed) => ArenaSnapshots.Fallback(c.Resolve<GameSession>().Content, rating, seed, "Repli")), Lifetime.Singleton);
+                builder.Register<IDuelChannel>(_ => new InMemoryDuelChannel(), Lifetime.Singleton);
             }
             builder.Register<ICloudSyncStateStore>(_ => new PlayerPrefsSyncStateStore(), Lifetime.Singleton);
             builder.Register<IProgressBackupStore>(_ => new FileProgressBackupStore(), Lifetime.Singleton);
@@ -155,7 +159,8 @@ namespace N29.HeroesDawn.Composition
             builder.Register<PlayerProfile>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.ChapterBook>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.LairBook>(Lifetime.Singleton);
-            builder.Register<Tournament>(Lifetime.Singleton);
+            builder.Register<TournamentArena>(c => new TournamentArena(c.Resolve<MetaContext>(), c.Resolve<IArenaGateway>(), c.Resolve<IDuelChannel>(),
+                N29.HeroesDawn.Authoring.TournamentLibrary.Load(), N29.HeroesDawn.Authoring.ArenaRewardsLibrary.Load()), Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.MemoryFragmentBook>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Presentation.Hub.NoFragmentAudio>(Lifetime.Singleton).As<N29.HeroesDawn.Presentation.Hub.IFragmentAudio>();
             builder.Register<LocalFriendsPort>(Lifetime.Singleton).As<N29.HeroesDawn.Application.Ports.IFriendsPort>();
