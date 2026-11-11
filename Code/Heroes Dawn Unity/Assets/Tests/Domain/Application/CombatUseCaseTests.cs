@@ -110,10 +110,10 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.LinkLevel(new MemberId(engaged[0]), new MemberId(engaged[1])), Is.EqualTo(1), "un seul combat : niveau 1");
         }
 
-        [Test, Description("Vérifie qu'une victoire verse des scraps (renseignés dans le rapport) et qu'une défaite n'en verse pas — parce que les scraps se gagnent en remportant des combats")]
-        public void Finish_Victory_GrantsScraps_Defeat_DoesNot()
+        [Test, Description("Vérifie qu'une victoire verse des Composants (renseignés dans le rapport) et qu'une défaite n'en verse pas — parce que les Composants se gagnent en remportant des combats")]
+        public void Finish_Victory_GrantsComponents_Defeat_DoesNot()
         {
-            int Total() => Enumerable.Range(0, ScrapKinds.Count).Sum(k => N29.HeroesDawn.Application.Features.Meta.CraftingOps.Scraps(_app.Session, (ScrapKind)k));
+            int Total() => Enumerable.Range(0, ComponentKinds.Count * ComponentKinds.GradeCount).Sum(i => N29.HeroesDawn.Application.Features.Meta.CraftingOps.Components(_app.Session, (ComponentKind)(i / ComponentKinds.GradeCount), (ComponentGrade)(i % ComponentKinds.GradeCount)));
             var lost = BeginEasyCombat();
             lost.Submit(CombatCommand.Retreat());
             RunToEnd(lost);
@@ -127,7 +127,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             var victory = C.Finish.ExecuteAsync().GetAwaiter().GetResult().Value;
             Assert.That(victory.Crafting, Is.Not.Null);
             Assert.That(Total(), Is.GreaterThan(0));
-            Assert.That(Total(), Is.EqualTo(victory.Crafting!.Value.Scraps.Sum()));
+            Assert.That(Total(), Is.EqualTo(victory.Crafting!.Value.Components.Sum()));
         }
 
         [Test, Description("Vérifie qu une défaite n ajoute aucune victoire commune — parce que seul le fait de gagner ensemble renforce un lien")]

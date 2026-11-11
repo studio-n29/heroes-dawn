@@ -109,7 +109,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _app.Session.Wallet.Set(0, 5000);
             Make();
             Assert.That(_view.Last.Scraps.Length, Is.GreaterThan(0));
-            Assert.That(_view.Last.Scraps.Length, Is.EqualTo(_app.Session.Shop.Scraps.Count));
+            Assert.That(_view.Last.Scraps.Length, Is.EqualTo(_app.Session.Shop.Components.Count));
             Assert.That(_view.Last.Scraps.All(s => !s.Enabled), Is.True, "sans Crédits, aucun lot n'est achetable");
             _app.Session.Wallet.Set(100000, 5000);
             _app.Publisher<WalletChanged>().Publish(new WalletChanged(100000, 5000));

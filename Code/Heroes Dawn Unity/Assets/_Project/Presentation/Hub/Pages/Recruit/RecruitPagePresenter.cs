@@ -130,7 +130,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         void BuyScrap(int slot)
         {
             if (_action.IsBusy) return;
-            var lots = _session.Shop.Scraps;
+            var lots = _session.Shop.Components;
             if (slot < 0 || slot >= lots.Count || lots[slot].Bought) return;
             BuyScrapAsync(slot, lots[slot].Price, _session.Shop.Day, _session.Shop.Draw).Forget();
         }
@@ -196,7 +196,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Rule = _loc.T("recruit.rule"),
                 Countdown = ShopCountdown.Text(now, s.Content.Balance.ShopResetHour, _loc),
                 Cards = offers.Select((o, i) => Card(o, i)).ToArray(),
-                Scraps = s.Shop.Scraps.Select((lot, i) => Scrap(lot, i)).ToArray(),
+                Scraps = s.Shop.Components.Select((lot, i) => Scrap(lot, i)).ToArray(),
                 EmptyText = offers.Count == 0 ? _loc.T("shop.empty") : "",
                 RerollLabel = rerollCost == 0 ? _loc.T("shop.reroll.free") : _loc.F("shop.reroll.cost", rerollCost),
                 RerollEnabled = offers.Count > 0 && s.Wallet.Credits >= rerollCost,
@@ -204,9 +204,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             });
         }
 
-        RecruitScrapState Scrap(ShopScrapOffer lot, int slot)
+        RecruitScrapState Scrap(ShopComponentOffer lot, int slot)
         {
-            string what = _loc.F("shop.scrap_lot", lot.Count, _loc.T("scrap." + lot.Kind));
+            string what = _loc.F("shop.scrap_lot", lot.Count, _loc.T("component." + lot.Kind + "." + lot.Grade));
             return new RecruitScrapState
             {
                 Slot = slot,

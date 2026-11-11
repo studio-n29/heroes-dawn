@@ -13,91 +13,70 @@ namespace N29.HeroesDawn.Application.Features.Meta
     public readonly struct RecipeView
     {
         public readonly RecipeDef Recipe;
-        public readonly bool CanAfford;
-        public readonly int Skill;
-        /// <summary>Probabilités (%) des cinq qualités au niveau actuel, dans l'ordre de <see cref="CraftQuality"/>.</summary>
-        public readonly IReadOnlyList<int> Odds;
-        public RecipeView(RecipeDef recipe, bool canAfford, int skill, IReadOnlyList<int> odds) { Recipe = recipe; CanAfford = canAfford; Skill = skill; Odds = odds; }
+        readonly GameSession _session;
+
+        /// <summary>Chances (%) du tirage −1 / 0 / +1 sur l'étoile de départ.</summary>
+        public static readonly IReadOnlyList<int> StarOdds = new[] { 25, 50, 25 };
+
+        public RecipeView(RecipeDef recipe, GameSession session) { Recipe = recipe; _session = session; }
+
+        public int Cost => Recipe.ComponentCost;
+        public ComponentGrade MinGrade => Recipe.MinGrade;
+
+        /// <summary>Étoile de départ avec ces Composants (avant le tirage −1 / 0 / +1).</summary>
+        public int BaseStars(ComponentGrade grade) => CraftStars.Base(grade);
+
+        /// <summary>Qualité acceptée et assez de Composants de ce type.</summary>
+        public bool CanCraft(ComponentGrade grade)
+            => grade >= Recipe.MinGrade && CraftingOps.Components(_session, ComponentKinds.For(Recipe.Type), grade) >= Recipe.ComponentCost;
     }
 
-    /// <summary>Niveau de la compétence de création d'un type d'objet et avancement vers le suivant.</summary>
-    public readonly struct SkillView
-    {
-        public readonly ItemType Type;
-        public readonly int Level;
-        public readonly int XpInLevel;
-        public readonly int XpToNext;
-        public bool Maxed => Level >= CraftingRules.MaxSkill;
-        public SkillView(ItemType type, int level, int xpInLevel, int xpToNext) { Type = type; Level = level; XpInLevel = xpInLevel; XpToNext = xpToNext; }
-    }
-
-    /// <summary>Résultat d'une fabrication : l'objet, sa qualité, ses statistiques et la compétence.</summary>
+    /// <summary>Résultat d'une fabrication : l'objet, ses étoiles et ses statistiques.</summary>
     public readonly struct CraftOutcome
     {
         public readonly ItemDef Item;
-        public readonly CraftQuality Quality;
+        public readonly int Stars;
         public readonly CraftedStats Stats;
-        public readonly int NewSkill;
-        public readonly bool LeveledUp;
-        public CraftOutcome(ItemDef item, CraftQuality quality, CraftedStats stats, int newSkill, bool leveledUp)
-        { Item = item; Quality = quality; Stats = stats; NewSkill = newSkill; LeveledUp = leveledUp; }
+        public CraftOutcome(ItemDef item, int stars, CraftedStats stats) { Item = item; Stars = stars; Stats = stats; }
     }
 
-    /// <summary>Atelier du labo : fabrique des objets avec des scraps, selon les recettes connues.</summary>
+    /// <summary>Atelier de fabrication : fabrique des objets avec des Composants (une seule qualité) et un catalyseur optionnel, selon les recettes connues.</summary>
     public sealed class Workshop
     {
-        static readonly ItemType[] Types = { ItemType.Weapon, ItemType.Armor, ItemType.Tool, ItemType.Implant };
-
         readonly MetaContext _c;
 
         public Workshop(MetaContext context) { _c = context; }
 
         GameSession Session => _c.Session;
 
-        public int Scraps(ScrapKind kind) => CraftingOps.Scraps(Session, kind);
-
-        static bool CanAfford(GameSession s, RecipeDef r)
-            => CraftingOps.Scraps(s, ScrapKinds.For(r.Type)) >= r.ScrapCost && CraftingOps.Scraps(s, ScrapKind.Core) >= r.CoreCost;
+        public int Components(ComponentKind kind, ComponentGrade grade) => CraftingOps.Components(Session, kind, grade);
+        public int Catalysts(CatalystKind kind) => CraftingOps.Catalysts(Session, kind);
 
         /// <summary>Recettes connues, dans l'ordre du catalogue.</summary>
         public IReadOnlyList<RecipeView> Recipes()
-            => Definitions.Recipes.All.Where(r => CraftingOps.Knows(Session, r.Id))
-                          .Select(r =>
-                          {
-                              int skill = CraftingOps.Skill(Session, r.Type);
-                              return new RecipeView(r, CanAfford(Session, r), skill, CraftingRules.QualityOdds(skill, r.Difficulty));
-                          }).ToList();
+            => Definitions.Recipes.All.Where(r => CraftingOps.Knows(Session, r.Id)).Select(r => new RecipeView(r, Session)).ToList();
 
-        public IReadOnlyList<SkillView> Skills()
-            => Types.Select(t =>
-            {
-                int xp = CraftingOps.Xp(Session, t), level = CraftingRules.SkillLevel(xp);
-                if (level >= CraftingRules.MaxSkill) return new SkillView(t, level, 0, 0);
-                int from = CraftingRules.XpForLevel(level);
-                return new SkillView(t, level, xp - from, CraftingRules.XpForLevel(level + 1) - from);
-            }).ToList();
-
-        /// <summary>Fabrique l'objet : rien n'est dépensé si la recette est inconnue ou si les scraps manquent.</summary>
-        public Result<CraftOutcome> Craft(string recipeId)
+        /// <summary>Fabrique l'objet : rien n'est dépensé si la recette est inconnue, la qualité trop basse, les Composants ou le catalyseur manquent.</summary>
+        public Result<CraftOutcome> Craft(string recipeId, ComponentGrade grade, CatalystKind? catalyst)
         {
             var recipe = Definitions.Recipes.Find(recipeId);
             if (recipe == null || !CraftingOps.Knows(Session, recipeId) || ReferenceEquals(Session.Content.Collection, CollectionDef.Empty)) return Result<CraftOutcome>.Fail(MetaErrors.Unknown);
-            if (!CanAfford(Session, recipe)) return Result<CraftOutcome>.Fail(MetaErrors.NotEnoughScraps);
+            if (grade < recipe.MinGrade) return Result<CraftOutcome>.Fail(MetaErrors.GradeTooLow);
+            var kind = ComponentKinds.For(recipe.Type);
+            if (CraftingOps.Components(Session, kind, grade) < recipe.ComponentCost) return Result<CraftOutcome>.Fail(MetaErrors.NotEnoughComponents);
+            if (catalyst.HasValue && CraftingOps.Catalysts(Session, catalyst.Value) < 1) return Result<CraftOutcome>.Fail(MetaErrors.NoCatalyst);
 
-            CraftingOps.TrySpendScraps(Session, ScrapKinds.For(recipe.Type), recipe.ScrapCost);
-            if (recipe.CoreCost > 0) CraftingOps.TrySpendScraps(Session, ScrapKind.Core, recipe.CoreCost);
+            CraftingOps.TrySpendComponents(Session, kind, grade, recipe.ComponentCost);
+            if (catalyst.HasValue) CraftingOps.AddCatalyst(Session, catalyst.Value, -1);
 
-            int skillBefore = CraftingOps.Skill(Session, recipe.Type);
             var rng = new Pcg32(CollectionRules.Seed(Session.Account?.PlayerId ?? "local", "craft", Session.Meta.craftedNext));
-            var quality = CraftingRules.RollQuality(rng, skillBefore, recipe.Difficulty);
-            var stats = CraftingRules.RollStats(rng, recipe, quality);
-            CraftingOps.AddXp(Session, recipe.Type, CraftingRules.XpGain(skillBefore, recipe.Difficulty));
-            var item = CraftingOps.AddCrafted(Session, recipe, quality, stats);
-            int skillAfter = CraftingOps.Skill(Session, recipe.Type);
+            int stars = CraftingRules.RollStars(rng, grade);
+            var stats = CraftingRules.RollStats(rng, recipe, stars, catalyst);
+            var item = CraftingOps.AddCrafted(Session, recipe, stars, stats);
 
             _c.Touch(MetaArea.Lab);
             _c.Touch(MetaArea.Collection);
-            return Result<CraftOutcome>.Ok(new CraftOutcome(item, quality, stats, skillAfter, skillAfter > skillBefore));
+            return Result<CraftOutcome>.Ok(new CraftOutcome(item, stars, stats));
         }
     }
 }

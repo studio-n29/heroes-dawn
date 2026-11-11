@@ -78,9 +78,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["qg.state.open"] = "ACCESSIBLE";
             d["qg.ops.running"] = "{0} expédition(s) en cours";
             d["qg.ops.idle"] = "Envoie des membres en expédition";
-            d["qg.lab.ready"] = "Recherche terminée !";
-            d["qg.lab.running"] = "Recherche en cours · {0}";
-            d["qg.lab.idle"] = "Lance une recherche";
+            d["qg.lab.idle"] = "Fabrique des objets";
             d["qg.archives.new"] = "{0} nouvelle(s) fiche(s)";
             d["qg.archives.none"] = "Aucune nouveauté";
 
@@ -171,29 +169,9 @@ namespace N29.HeroesDawn.Presentation.Common
             d["lab.side.none"] = "Choisis une recette";
             d["lab.state.ok"] = "Fabrication possible.";
             d["lab.state.missing"] = "Composants insuffisants.";
-            d["lab.provenance"] = "Scraps : lots de la boutique du jour et butin des combats.";
+            d["lab.provenance"] = "Composants : lots de la boutique du jour et butin des combats.";
             d["lab.have"] = "Possédé : {0}";
             d["lab.missing"] = "Manque {0}";
-            d["lab.title"] = "RECHERCHES";
-            d["lab.idle"] = "Aucune recherche en cours.";
-            d["lab.running"] = "En cours : {0} · {1}";
-            d["lab.level"] = "{0} · niv. {1}/{2}";
-            d["lab.training"] = "Méthodes d'entraînement";
-            d["lab.training.desc"] = "Entraînement moins cher : -4 % de Crédits par niveau.";
-            d["lab.loot"] = "Récupération de butin";
-            d["lab.loot.desc"] = "Combats plus rentables : +5 % de Crédits par niveau.";
-            d["lab.recovery"] = "Médecine de terrain";
-            d["lab.recovery.desc"] = "Repos plus rapide hors mission : +1 fatigue récupérée par minute et par niveau.";
-            d["lab.logistics"] = "Logistique";
-            d["lab.logistics.desc"] = "Zones plus généreuses : +5 % de récompense de validation par niveau.";
-            d["lab.start"] = "RECHERCHER · {0} CR";
-            d["lab.time"] = "durée {0}";
-            d["lab.max"] = "NIVEAU MAX";
-            d["lab.busy"] = "Une recherche est déjà en cours.";
-            d["lab.speed"] = "ACCÉLÉRER · {0} GEMMES";
-            d["lab.started"] = "Recherche lancée !";
-            d["lab.sped"] = "Recherche accélérée !";
-            d["lab.done"] = "Recherche terminée : {0}";
 
             // --- Archives
             d["page.archives"] = "Profil";

@@ -4,12 +4,12 @@ using NUnit.Framework;
 
 namespace N29.HeroesDawn.Tests.Domain
 {
-    /// <summary>Scraps, qualités et catalogue des recettes de fabrication du labo.</summary>
+    /// <summary>Composants, étoiles et catalogue des recettes de l'Atelier.</summary>
     public sealed class CraftingDefsTests
     {
         static readonly ItemType[] AllTypes = { ItemType.Weapon, ItemType.Armor, ItemType.Tool, ItemType.Implant };
 
-        [Test, Description("Vérifie que le catalogue compte 12 recettes, trois par type d'objet (Commune, Rare, Épique) avec la difficulté et le coût de la spec — parce que chaque type d'objet doit offrir une progression de fabrication")]
+        [Test, Description("Vérifie que le catalogue compte 12 recettes, trois par type d'objet (Commune, Rare, Épique) avec le coût en Composants et la qualité minimale de la spec — parce que chaque type d'objet doit offrir une progression de fabrication")]
         public void Catalog_Has12Recipes_3PerType_OneOfEachRarity()
         {
             Assert.That(Recipes.All.Count, Is.EqualTo(12));
@@ -21,13 +21,13 @@ namespace N29.HeroesDawn.Tests.Domain
                 var common = ofType.Single(r => r.Rarity == ItemRarity.Common);
                 var rare = ofType.Single(r => r.Rarity == ItemRarity.Rare);
                 var epic = ofType.Single(r => r.Rarity == ItemRarity.Epic);
-                Assert.That((common.Difficulty, common.ScrapCost, common.CoreCost), Is.EqualTo((1, 6, 0)), common.Id);
-                Assert.That((rare.Difficulty, rare.ScrapCost, rare.CoreCost), Is.EqualTo((4, 12, 2)), rare.Id);
-                Assert.That((epic.Difficulty, epic.ScrapCost, epic.CoreCost), Is.EqualTo((7, 20, 5)), epic.Id);
+                Assert.That((common.ComponentCost, common.MinGrade), Is.EqualTo((6, ComponentGrade.Common)), common.Id);
+                Assert.That((rare.ComponentCost, rare.MinGrade), Is.EqualTo((8, ComponentGrade.Refined)), rare.Id);
+                Assert.That((epic.ComponentCost, epic.MinGrade), Is.EqualTo((10, ComponentGrade.Refined)), epic.Id);
             }
         }
 
-        [Test, Description("Vérifie que les fourchettes de stats suivent la spec (Commune 1 stat de 8 à 12, Rare 2 stats de 8 à 14, Épique 2 stats de 10 à 16 et un effet spécial) — parce que la qualité multiplie ces fourchettes")]
+        [Test, Description("Vérifie que les fourchettes de stats suivent la spec (Commune 1 stat de 8 à 12, Rare 2 stats de 8 à 14, Épique 2 stats de 10 à 16 et un effet spécial) — parce que l'étoile multiplie ces fourchettes")]
         public void StatRanges_MatchTheSpec()
         {
             foreach (var r in Recipes.All)
@@ -54,15 +54,18 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(Recipes.Find("nope"), Is.Null);
         }
 
-        [Test, Description("Vérifie les multiplicateurs de qualité (80, 100, 115, 130, 150 %) et la correspondance type d'objet → scrap — parce que la qualité change les stats tirées et que chaque type consomme son scrap")]
-        public void QualityPercents_AndScrapKinds()
+        [Test, Description("Vérifie les multiplicateurs d'étoiles (80, 100, 115, 130, 150, 175 %), l'étoile de départ par qualité (2, 4, 5) et la correspondance type d'objet → type de Composant — parce que l'étoile change les stats tirées et que chaque type consomme son Composant")]
+        public void StarPercents_AndComponentKinds()
         {
-            Assert.That(System.Enum.GetValues(typeof(CraftQuality)).Cast<CraftQuality>().Select(CraftQualities.Percent), Is.EqualTo(new[] { 80, 100, 115, 130, 150 }));
-            Assert.That(ScrapKinds.Count, Is.EqualTo(5));
-            Assert.That(ScrapKinds.For(ItemType.Weapon), Is.EqualTo(ScrapKind.Weapon));
-            Assert.That(ScrapKinds.For(ItemType.Armor), Is.EqualTo(ScrapKind.Armor));
-            Assert.That(ScrapKinds.For(ItemType.Tool), Is.EqualTo(ScrapKind.Tool));
-            Assert.That(ScrapKinds.For(ItemType.Implant), Is.EqualTo(ScrapKind.Implant));
+            Assert.That(Enumerable.Range(CraftStars.Min, 6).Select(CraftStars.Percent), Is.EqualTo(new[] { 80, 100, 115, 130, 150, 175 }));
+            Assert.That(CraftStars.Base(ComponentGrade.Common), Is.EqualTo(2));
+            Assert.That(CraftStars.Base(ComponentGrade.Refined), Is.EqualTo(4));
+            Assert.That(CraftStars.Base(ComponentGrade.Exceptional), Is.EqualTo(5));
+            Assert.That(ComponentKinds.Count, Is.EqualTo(4));
+            Assert.That(ComponentKinds.For(ItemType.Weapon), Is.EqualTo(ComponentKind.Weapon));
+            Assert.That(ComponentKinds.For(ItemType.Armor), Is.EqualTo(ComponentKind.Armor));
+            Assert.That(ComponentKinds.For(ItemType.Tool), Is.EqualTo(ComponentKind.Tool));
+            Assert.That(ComponentKinds.For(ItemType.Implant), Is.EqualTo(ComponentKind.Implant));
         }
     }
 }

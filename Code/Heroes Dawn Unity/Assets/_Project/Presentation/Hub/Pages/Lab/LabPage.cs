@@ -7,36 +7,34 @@ using N29.HeroesDawn.Application.Messages;
 using N29.HeroesDawn.Application.Ports;
 using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Definitions;
-using N29.HeroesDawn.Domain.Board;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
-using UnityEngine;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
     public interface ILabPageView : IListPageView, IFilterBarView { }
 
+    /// <summary>
+    /// Atelier de fabrication, version minimale (l'écran définitif est un lot UI) : recettes connues, fabrication avec la plus basse qualité de Composants
+    /// possible et sans catalyseur.
+    /// </summary>
     public sealed class LabPagePresenter : ListPagePresenter<ILabPageView>
     {
-        readonly ResearchLab _lab;
-        readonly ISessionReadModel _session;
         readonly Workshop _workshop;
         IReadOnlyList<RecipeView> _recipes = new List<RecipeView>();
 
-        public LabPagePresenter(ILabPageView view, ResearchLab lab, ISessionReadModel session, ILocalization loc, IToastService toasts,
+        public LabPagePresenter(ILabPageView view, ISessionReadModel session, ILocalization loc, IToastService toasts,
                                 ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet, ISubscriber<RosterChanged> roster, IClock clock,
                                 Workshop workshop)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
-            _lab = lab; _session = session; _workshop = workshop;
+            _workshop = workshop;
         }
 
         public override string Title => Loc.T("page.lab");
-        protected override bool HasTimers => true;
 
-        /// <summary>Filtres des recettes : catégorie (0 = toutes, sinon 1 + le type d'objet) et qualité possible (0 = toutes, sinon 1 + la qualité).</summary>
-        int _category, _quality;
-        bool _research;
+        /// <summary>Filtres des recettes : catégorie (0 = toutes, sinon 1 + le type d'objet) et qualité minimale (0 = toutes, sinon 1 + la qualité).</summary>
+        int _category, _grade;
 
         protected override void OnStart()
         {
@@ -52,15 +50,15 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         void OnFilter(int group, int option)
         {
-            if (group == 0) _category = option; else _quality = option;
+            if (group == 0) _category = option; else _grade = option;
             _selected = 0;
             Refresh();
         }
 
-        /// <summary>Recettes connues, filtrées par catégorie et par qualité possible.</summary>
+        /// <summary>Recettes connues, filtrées par catégorie et par qualité minimale.</summary>
         IReadOnlyList<RecipeView> FilteredRecipes() => _workshop.Recipes()
             .Where(v => _category == 0 || (int)v.Recipe.Type == _category - 1)
-            .Where(v => _quality == 0 || (_quality - 1 < v.Odds.Count && v.Odds[_quality - 1] > 0))
+            .Where(v => _grade == 0 || (int)v.MinGrade == _grade - 1)
             .ToList();
 
         void ShowFilters()
@@ -75,73 +73,39 @@ namespace N29.HeroesDawn.Presentation.Hub
                 },
                 new FilterGroupData
                 {
-                    Labels = new[] { all }.Concat(System.Enum.GetValues(typeof(CraftQuality)).Cast<CraftQuality>().Select(q => CollectionText.QualityName(Loc, q))).ToArray(),
-                    Selected = _quality,
+                    Labels = new[] { all }.Concat(System.Enum.GetValues(typeof(ComponentGrade)).Cast<ComponentGrade>().Select(g => Loc.T("grade." + g))).ToArray(),
+                    Selected = _grade,
                 },
             });
         }
 
-        protected override void OnPageShown() => Finish();
-
-        void Finish()
+        /// <summary>Qualité utilisée : la plus basse acceptée par la recette dont le joueur a assez de Composants, sinon la qualité minimale.</summary>
+        static ComponentGrade GradeFor(RecipeView v)
         {
-            var done = _lab.Refresh();
-            if (done != null) Toasts.Show(Loc.F("lab.done", Loc.T("lab." + done.Id)), ToastKind.Reward);
+            for (var g = v.MinGrade; g <= ComponentGrade.Exceptional; g++)
+                if (v.CanCraft(g)) return g;
+            return v.MinGrade;
         }
 
         protected override void Render()
         {
-            Finish();
             _recipes = FilteredRecipes();
             if (_selected >= _recipes.Count) _selected = 0;
-            if (_research) View.ShowFilters(System.Array.Empty<FilterGroupData>());
-            else ShowFilters();
-            var views = _lab.Views();
-            var active = views.FirstOrDefault(v => v.Active);
+            ShowFilters();
             View.ShowHeader(new ListHeaderData
             {
-                // Centre de l'écran : l'objet choisi (la qualité et les matériaux sont dans le panneau de droite).
-                Title = _selected >= 0 && _selected < _recipes.Count ? Loc.T(_recipes[_selected].Recipe.NameKey) : Loc.T("lab.title"),
-                Line = active.Tech != null ? Loc.F("lab.running", Loc.T("lab." + active.Tech.Id), MetaFormat.Duration(active.Left)) : Loc.T("lab.idle"),
+                // Centre de l'écran : l'objet choisi (les Composants sont dans le panneau de droite).
+                Title = _selected >= 0 && _selected < _recipes.Count ? Loc.T(_recipes[_selected].Recipe.NameKey) : Loc.T("page.lab"),
+                Line = "",
                 Progress = -1f,
-                B = RowButtonData.Of(Loc.T(_research ? "lab.mode.craft" : "lab.mode.research"), true, "", 3),
-                A = active.Tech != null
-                    ? RowButtonData.Of(Loc.F("lab.speed", ResearchLab.SpeedUpCost(active.Left)), _session.Wallet.Gems >= ResearchLab.SpeedUpCost(active.Left), Loc.T("errors.not_enough_gems"), 1)
-                    : default,
             });
-            var rows = new InfoRowData[views.Count];
-            for (int i = 0; i < rows.Length; i++)
-            {
-                var v = views[i];
-                var r = InfoRowData.Basic(Loc.F("lab.level", Loc.T("lab." + v.Tech.Id), v.Level, v.Tech.MaxLevel), Loc.T("lab." + v.Tech.Id + ".desc"));
-                r.Tag = v.Level.ToString();
-                r.TagColor = v.Maxed ? Theme.Success : Theme.Info;
-                r.Highlight = v.Active;
-                if (v.Active)
-                {
-                    int minutes = v.Tech.MinutesFor(v.Level);
-                    r.Progress = Mathf.Clamp01(1f - (float)(v.Left.TotalMinutes / minutes));
-                    r.ProgressLabel = MetaFormat.Duration(v.Left);
-                }
-                if (v.Maxed) r.A = RowButtonData.Of(Loc.T("lab.max"), false, "", 3);
-                else
-                {
-                    int cost = v.Tech.CostFor(v.Level);
-                    bool busy = active.Tech != null;
-                    bool afford = _session.Wallet.Credits >= cost;
-                    r.A = RowButtonData.Of(Loc.F("lab.start", cost), !busy && afford, busy ? Loc.T("lab.busy") : Loc.F("hub.train.missing", cost - _session.Wallet.Credits), 0);
-                    r.Subtitle += " · " + Loc.F("lab.time", MetaFormat.Duration(System.TimeSpan.FromMinutes(v.Tech.MinutesFor(v.Level))));
-                }
-                rows[i] = r;
-            }
-            var all = _research ? new List<InfoRowData>(rows) : new List<InfoRowData>();
-            if (!_research) AddWorkshopRows(all);
-            View.ShowRows(all.ToArray());
-            if (_research) View.ShowSide(new ListSideData { Title = Loc.T("lab.mode.research"), Rows = System.Array.Empty<InfoRowData>(), Text = Loc.T("lab.mode.research_hint") });
-            else ShowSide();
+            var rows = new List<InfoRowData>();
+            AddWorkshopRows(rows);
+            View.ShowRows(rows.ToArray());
+            ShowSide();
         }
 
-        /// <summary>Panneau de droite : la recette choisie, ses matériaux (possédés et manquants), l'état et le bouton Fabriquer.</summary>
+        /// <summary>Panneau de droite : la recette choisie, ses Composants (possédés et manquants), l'état et le bouton Fabriquer.</summary>
         void ShowSide()
         {
             if (_selected < 0 || _selected >= _recipes.Count)
@@ -150,35 +114,25 @@ namespace N29.HeroesDawn.Presentation.Hub
                 return;
             }
             var v = _recipes[_selected];
-            var rows = new List<InfoRowData> { MaterialRow(ScrapKinds.For(v.Recipe.Type), v.Recipe.ScrapCost) };
-            if (v.Recipe.CoreCost > 0) rows.Add(MaterialRow(ScrapKind.Core, v.Recipe.CoreCost));
+            var grade = GradeFor(v);
+            var rows = new List<InfoRowData> { MaterialRow(ComponentKinds.For(v.Recipe.Type), grade, v.Cost) };
             var craft = InfoRowData.Basic(Loc.T("lab.craft"), "");
-            craft.A = RowButtonData.Of(Loc.T("lab.craft"), v.CanAfford, Loc.T("errors.not_enough_scraps"), 0);
+            craft.A = RowButtonData.Of(Loc.T("lab.craft"), v.CanCraft(grade), Loc.T("errors.not_enough_components"), 0);
             rows.Add(craft);
-            // Qualités possibles : chaque ligne dans la couleur de sa qualité (commun, rare, épique, légendaire).
-            var quality = new List<string>();
-            for (int q = 0; q < v.Odds.Count; q++)
-            {
-                if (v.Odds[q] <= 0) continue;
-                var c = (CraftQuality)q;
-                // Pastille de qualité : initiale de la qualité (C, R, E, L), dans sa couleur.
-                string line = "[" + c.ToString().Substring(0, 1) + "] " + Loc.F("lab.odds", CollectionText.QualityName(Loc, c), v.Odds[q]);
-                quality.Add("<color=#" + ColorUtility.ToHtmlStringRGB(CollectionText.QualityColor(c)) + ">" + line + "</color>");
-            }
             View.ShowSide(new ListSideData
             {
                 Title = Loc.T(v.Recipe.NameKey),
                 Rows = rows.ToArray(),
-                Text = Loc.T(v.CanAfford ? "lab.state.ok" : "lab.state.missing") + "\n" + string.Join("\n", quality) + "\n" + Loc.T("lab.provenance"),
+                Text = Loc.T(v.CanCraft(grade) ? "lab.state.ok" : "lab.state.missing") + "\n" + Loc.T("lab.provenance"),
             });
         }
 
         /// <summary>Une matière : ce qu'on possède, ou ce qui manque pour fabriquer.</summary>
-        InfoRowData MaterialRow(ScrapKind kind, int need)
+        InfoRowData MaterialRow(ComponentKind kind, ComponentGrade grade, int need)
         {
-            int have = _workshop.Scraps(kind);
+            int have = _workshop.Components(kind, grade);
             bool enough = have >= need;
-            var r = InfoRowData.Basic(CollectionText.Scrap(Loc, kind, need), enough ? Loc.F("lab.have", have) : Loc.F("lab.missing", need - have));
+            var r = InfoRowData.Basic(CollectionText.Component(Loc, kind, grade, need), enough ? Loc.F("lab.have", have) : Loc.F("lab.missing", need - have));
             r.Tag = enough ? "OK" : "KO";
             r.TagColor = enough ? Theme.Success : Theme.Danger;
             return r;
@@ -186,91 +140,61 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         protected override void OnRowSelected(int row)
         {
-            if (_research) return;
-            int recipe = row - _firstRecipeRow;
-            if (recipe < 0 || recipe >= _recipes.Count) return;
-            _selected = recipe;
-            Refresh(); // recalcule les matériaux possédés avant d'afficher le panneau
+            if (row < 0 || row >= _recipes.Count) return;
+            _selected = row;
+            Refresh(); // recalcule les Composants possédés avant d'afficher le panneau
         }
 
         protected override void OnSideButton(int row, int button)
         {
             if (_selected < 0 || _selected >= _recipes.Count) return;
-            Craft(_recipes[_selected].Recipe.Id);
+            Craft(_recipes[_selected]);
         }
 
-        /// <summary>Atelier : titre (avec les scraps), une rangée par compétence de création, une par recette connue.</summary>
+        /// <summary>Atelier : une rangée par recette connue, puis un titre qui récapitule les Composants possédés.</summary>
         void AddWorkshopRows(List<InfoRowData> rows)
         {
-            var scraps = new List<string>();
-            for (int k = 0; k < ScrapKinds.Count; k++) scraps.Add(CollectionText.Scrap(Loc, (ScrapKind)k, _workshop.Scraps((ScrapKind)k)));
-            var title = InfoRowData.Basic(Loc.T("lab.workshop"), string.Join(" · ", scraps));
-            title.Dim = true;
-            rows.Add(title);
-            foreach (var s in _workshop.Skills())
-            {
-                var r = InfoRowData.Basic(Loc.F("lab.skill", CollectionText.ItemTypeName(Loc, s.Type), s.Level, CraftingRules.MaxSkill), Loc.T("lab.skill.desc"));
-                r.Tag = s.Level.ToString();
-                r.TagColor = s.Maxed ? Theme.Success : Theme.Info;
-                if (!s.Maxed) { r.Progress = Mathf.Clamp01(s.XpInLevel / (float)s.XpToNext); r.ProgressLabel = s.XpInLevel + " / " + s.XpToNext; }
-                rows.Add(r);
-            }
-            var recipeRows = new List<InfoRowData>();
-            _firstRecipeRow = 0;
+            int index = 0;
             foreach (var v in _recipes)
             {
                 string name = Loc.T(v.Recipe.NameKey);
-                var r = InfoRowData.Basic(name, RecipeLine(v));
+                var grade = GradeFor(v);
+                var r = InfoRowData.Basic(name, RecipeLine(v, grade));
                 r.Tag = CollectionText.Tag(name);
                 r.TagColor = CollectionText.RarityColor(v.Recipe.Rarity);
-                r.A = RowButtonData.Of(Loc.T("lab.craft"), v.CanAfford, Loc.T("errors.not_enough_scraps"), 0);
-                r.Highlight = recipeRows.Count == _selected;
-                recipeRows.Add(r);
+                r.A = RowButtonData.Of(Loc.T("lab.craft"), v.CanCraft(grade), Loc.T("errors.not_enough_components"), 0);
+                r.Highlight = index++ == _selected;
+                rows.Add(r);
             }
-            rows.InsertRange(0, recipeRows);
+            var stock = new List<string>();
+            for (int k = 0; k < ComponentKinds.Count; k++)
+                for (int g = 0; g < ComponentKinds.GradeCount; g++)
+                {
+                    int n = _workshop.Components((ComponentKind)k, (ComponentGrade)g);
+                    if (n > 0) stock.Add(CollectionText.Component(Loc, (ComponentKind)k, (ComponentGrade)g, n));
+                }
+            var title = InfoRowData.Basic(Loc.T("lab.workshop"), string.Join(" · ", stock));
+            title.Dim = true;
+            rows.Add(title);
         }
 
-        string RecipeLine(RecipeView v)
-        {
-            var cost = CollectionText.Scrap(Loc, ScrapKinds.For(v.Recipe.Type), v.Recipe.ScrapCost);
-            if (v.Recipe.CoreCost > 0) cost += " + " + CollectionText.Scrap(Loc, ScrapKind.Core, v.Recipe.CoreCost);
-            var odds = new List<string>();
-            for (int q = 0; q < v.Odds.Count; q++)
-                if (v.Odds[q] > 0) odds.Add(Loc.F("lab.odds", CollectionText.QualityName(Loc, (CraftQuality)q), v.Odds[q]));
-            return Loc.F("lab.recipe_sub", cost, v.Recipe.Difficulty, string.Join(" · ", odds));
-        }
-
-        protected override void OnHeader(int index)
-        {
-            if (index == 1) { _research = !_research; Refresh(); }
-            else Report(_lab.SpeedUp(), Loc.T("lab.sped"));
-        }
+        string RecipeLine(RecipeView v, ComponentGrade grade)
+            => Loc.F("lab.recipe_sub", CollectionText.Component(Loc, ComponentKinds.For(v.Recipe.Type), grade, v.Cost), Loc.T("grade." + v.MinGrade), CollectionText.StarsText(Loc, v.BaseStars(grade)));
 
         protected override void OnRowButton(int row, int button)
         {
-            if (row < 0) return;
-            if (!_research)
-            {
-                int recipe = row - _firstRecipeRow;
-                if (recipe >= 0 && recipe < _recipes.Count) Craft(_recipes[recipe].Recipe.Id);
-                return;
-            }
-            Report(_lab.Start(ResearchLab.Techs[row].Id), Loc.T("lab.started"));
+            if (row >= 0 && row < _recipes.Count) Craft(_recipes[row]);
         }
 
-        // Rangée de la première recette, relevée au rendu (après les recherches, le titre de l'atelier et les compétences).
-        int _firstRecipeRow = int.MaxValue;
-
-        /// <summary>Recette affichée dans le panneau de droite (index dans les recettes connues).</summary>
+        /// <summary>Recette affichée dans le panneau de droite (index dans les recettes filtrées).</summary>
         int _selected;
 
-        void Craft(string recipeId)
+        void Craft(RecipeView v)
         {
-            var r = _workshop.Craft(recipeId);
+            var r = _workshop.Craft(v.Recipe.Id, GradeFor(v), null);
             if (r.IsFailure) { Report(r); return; }
             var o = r.Value;
             Toasts.Show(Loc.F("lab.crafted", CollectionText.ItemName(Loc, o.Item), CollectionText.ItemEffects(Loc, o.Item)), ToastKind.Reward);
-            if (o.LeveledUp) Toasts.Show(Loc.F("lab.skill_up", CollectionText.ItemTypeName(Loc, o.Item.Type), o.NewSkill), ToastKind.Reward);
         }
     }
 }

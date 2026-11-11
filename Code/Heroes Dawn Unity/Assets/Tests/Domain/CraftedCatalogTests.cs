@@ -16,8 +16,8 @@ namespace N29.HeroesDawn.Tests.Domain
             return new CollectionDef(c.Items, c.Cards, c.Boosters);
         }
 
-        static ItemDef Crafted(int n, string recipeId = "patch_vest", CraftQuality q = CraftQuality.Fine)
-            => CraftedItems.ToDef(CraftedItems.IdPrefix + n, Recipes.Find(recipeId)!, q, new CraftedStats(11, 0, 0, 0));
+        static ItemDef Crafted(int n, string recipeId = "patch_vest", int stars = 3)
+            => CraftedItems.ToDef(CraftedItems.IdPrefix + n, Recipes.Find(recipeId)!, stars, new CraftedStats(11, 0, 0, 0));
 
         [Test, Description("Vérifie qu'un objet enregistré est retrouvé par HasItem/Item et listé dans AllItems mais pas dans le catalogue Items — parce que les objets fabriqués s'équipent comme les autres sans entrer dans la boutique")]
         public void Registered_ItemIsFound_ButNotInTheCatalogue()
@@ -54,8 +54,8 @@ namespace N29.HeroesDawn.Tests.Domain
         public void Register_SameIdReplaces()
         {
             var defs = Fresh();
-            defs.Register(Crafted(1, "patch_vest", CraftQuality.Rough));
-            var second = Crafted(1, "patch_vest", CraftQuality.Masterwork);
+            defs.Register(Crafted(1, "patch_vest", 1));
+            var second = Crafted(1, "patch_vest", 5);
             defs.Register(second);
             Assert.That(defs.Crafted.Count, Is.EqualTo(1));
             Assert.That(defs.Item(second.Id).NameKey, Is.EqualTo(second.NameKey));
@@ -65,7 +65,7 @@ namespace N29.HeroesDawn.Tests.Domain
         public void ShopAndDrops_NeverOfferCrafted()
         {
             var defs = Fresh();
-            for (int i = 1; i <= 5; i++) defs.Register(Crafted(i, i % 2 == 0 ? "aegis_plate" : "patch_vest", CraftQuality.Masterwork));
+            for (int i = 1; i <= 5; i++) defs.Register(Crafted(i, i % 2 == 0 ? "aegis_plate" : "patch_vest", 5));
             for (int i = 0; i < 300; i++)
                 Assert.That(CollectionRules.RollItem(defs, new Pcg32(CollectionRules.Seed("p", "drop", i)))!.Id.Value, Does.Not.StartWith(CraftedItems.IdPrefix));
             for (int day = 1; day <= 30; day++)
@@ -77,13 +77,13 @@ namespace N29.HeroesDawn.Tests.Domain
         public void ToDef_CopiesRecipeAndRolledStats()
         {
             var recipe = Recipes.Find("aegis_plate")!;
-            var def = CraftedItems.ToDef("crafted_7", recipe, CraftQuality.Superior, new CraftedStats(15, 0, 12, 0));
+            var def = CraftedItems.ToDef("crafted_7", recipe, 4, new CraftedStats(15, 0, 12, 0));
             Assert.That(def.Id.Value, Is.EqualTo("crafted_7"));
             Assert.That((def.Type, def.Rarity, def.Perk, def.PerkValue), Is.EqualTo((ItemType.Armor, ItemRarity.Epic, ItemPerk.OpeningShield, 10)));
             Assert.That((def.HpPercent, def.AtkPercent, def.DefPercent, def.SpdPercent), Is.EqualTo((15, 0, 12, 0)));
             Assert.That(def.Price, Is.EqualTo(0));
-            Assert.That(CraftedItems.TryParseNameKey(def.NameKey, out var recipeId, out var quality), Is.True);
-            Assert.That((recipeId, quality), Is.EqualTo(("aegis_plate", CraftQuality.Superior)));
+            Assert.That(CraftedItems.TryParseNameKey(def.NameKey, out var recipeId, out int stars), Is.True);
+            Assert.That((recipeId, stars), Is.EqualTo(("aegis_plate", 4)));
             Assert.That(CraftedItems.TryParseNameKey("item.kevlar_vest", out _, out _), Is.False);
         }
     }

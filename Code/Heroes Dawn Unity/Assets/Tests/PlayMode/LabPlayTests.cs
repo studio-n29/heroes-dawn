@@ -13,13 +13,13 @@ using VContainer;
 
 namespace N29.HeroesDawn.Tests.PlayMode
 {
-    /// <summary>Atelier de fabrication (L4) : on y va depuis le QG, on fabrique avec des scraps, l'objet arrive dans l'inventaire.</summary>
+    /// <summary>Atelier de fabrication (L4) : on y va depuis le QG, on fabrique avec des Composants, l'objet arrive dans l'inventaire.</summary>
     public sealed class LabPlayTests
     {
         [UnityTearDown]
         public IEnumerator TearDown() => PlayModeHarness.TearDown();
 
-        [UnityTest, Timeout(300000), Description("Vérifie que l'atelier s'ouvre depuis le QG, que Fabriquer est grisé sans matériaux, et qu'avec des scraps l'objet entre dans l'inventaire — parce que c'est la version jouable du lot L4")]
+        [UnityTest, Timeout(300000), Description("Vérifie que l'atelier s'ouvre depuis le QG, que Fabriquer est grisé sans matériaux, et qu'avec des Composants l'objet entre dans l'inventaire — parce que c'est la version jouable du lot L4")]
         public IEnumerator Craft_FromWorkshop_AddsItemToInventory()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
@@ -44,8 +44,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             // Avec des scraps : fabriquer ajoute l'objet à l'inventaire.
             var type = recipes[0].Recipe.Type;
             int before = session.OwnedItemCount;
-            CraftingOps.AddScraps(session, N29.HeroesDawn.Definitions.ScrapKinds.For(type), 1000);
-            CraftingOps.AddScraps(session, N29.HeroesDawn.Definitions.ScrapKind.Core, 1000);
+            CraftingOps.AddComponents(session, N29.HeroesDawn.Definitions.ComponentKinds.For(type), recipes[0].MinGrade, 1000);
             page.SelectRowForTest(0);
             yield return null;
             page.SideRows.Last().Buttons[0].Button.onClick.Invoke();

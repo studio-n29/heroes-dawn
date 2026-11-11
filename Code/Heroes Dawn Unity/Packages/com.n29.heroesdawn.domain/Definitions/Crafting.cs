@@ -1,43 +1,82 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace N29.HeroesDawn.Definitions
 {
-    /// <summary>Matière première de la fabrication : un scrap par type d'objet, et le Noyau, rare et commun à tous.</summary>
-    public enum ScrapKind { Weapon, Armor, Tool, Implant, Core }
+    /// <summary>Type de Composant : un par type d'objet (correspond à <see cref="ItemType"/>).</summary>
+    public enum ComponentKind { Weapon, Armor, Tool, Implant }
 
-    public static class ScrapKinds
+    /// <summary>Qualité d'un Composant : une fabrication n'engage qu'une seule qualité.</summary>
+    public enum ComponentGrade { Common, Refined, Exceptional }
+
+    /// <summary>Catalyseur thématique (optionnel, un par fabrication) qui oriente les statistiques.</summary>
+    public enum CatalystKind { Metal, Energy, Bio, Crystal }
+
+    /// <summary>D'où vient une recette : départ, aventure, repaires (bloc C) ou tournois (bloc D).</summary>
+    public enum RecipeSource { Starter, Adventure, Lair, Tournament }
+
+    public static class ComponentKinds
     {
-        public const int Count = 5;
+        public const int Count = 4;
+        public const int GradeCount = 3;
+        public const int CatalystCount = 4;
 
-        public static ScrapKind For(ItemType type)
+        public static ComponentKind For(ItemType type)
         {
             switch (type)
             {
-                case ItemType.Weapon: return ScrapKind.Weapon;
-                case ItemType.Armor: return ScrapKind.Armor;
-                case ItemType.Tool: return ScrapKind.Tool;
-                default: return ScrapKind.Implant;
+                case ItemType.Weapon: return ComponentKind.Weapon;
+                case ItemType.Armor: return ComponentKind.Armor;
+                case ItemType.Tool: return ComponentKind.Tool;
+                default: return ComponentKind.Implant;
             }
         }
+
+        /// <summary>Index d'un stock dans un tableau de <see cref="Count"/> × <see cref="GradeCount"/> entiers (<c>kind × 3 + grade</c>).</summary>
+        public static int Index(ComponentKind kind, ComponentGrade grade) => (int)kind * GradeCount + (int)grade;
     }
 
-    /// <summary>Qualité d'un objet fabriqué : multiplie les statistiques tirées.</summary>
-    public enum CraftQuality { Rough, Standard, Fine, Superior, Masterwork }
-
-    public static class CraftQualities
+    /// <summary>Étoiles d'un objet fabriqué (1 à 6) : étoile de départ selon la qualité des Composants, multiplicateur de statistiques, statistique orientée par un catalyseur.</summary>
+    public static class CraftStars
     {
-        /// <summary>Multiplicateur des statistiques, en % (80, 100, 115, 130, 150).</summary>
-        public static int Percent(CraftQuality quality)
+        public const int Min = 1, Max = 6;
+
+        /// <summary>Étoile de départ avant le tirage −1 / 0 / +1 : Commun 2, Raffiné 4, Exceptionnel 5.</summary>
+        public static int Base(ComponentGrade grade)
         {
-            switch (quality)
+            switch (grade)
             {
-                case CraftQuality.Rough: return 80;
-                case CraftQuality.Fine: return 115;
-                case CraftQuality.Superior: return 130;
-                case CraftQuality.Masterwork: return 150;
+                case ComponentGrade.Refined: return 4;
+                case ComponentGrade.Exceptional: return 5;
+                default: return 2;
+            }
+        }
+
+        /// <summary>Multiplicateur des statistiques, en % (80, 100, 115, 130, 150, 175).</summary>
+        public static int Percent(int stars)
+        {
+            switch (Math.Max(Min, Math.Min(Max, stars)))
+            {
+                case 1: return 80;
+                case 3: return 115;
+                case 4: return 130;
+                case 5: return 150;
+                case 6: return 175;
                 default: return 100;
+            }
+        }
+
+        /// <summary>Métal → DEF, Énergie → ATQ, Biologique → PV, Cristal → VIT.</summary>
+        public static RecipeStatKind Oriented(CatalystKind catalyst)
+        {
+            switch (catalyst)
+            {
+                case CatalystKind.Metal: return RecipeStatKind.Def;
+                case CatalystKind.Energy: return RecipeStatKind.Atk;
+                case CatalystKind.Bio: return RecipeStatKind.Hp;
+                default: return RecipeStatKind.Spd;
             }
         }
     }
@@ -52,12 +91,13 @@ namespace N29.HeroesDawn.Definitions
         public CraftedStats(int hp, int atk, int def, int spd) { Hp = hp; Atk = atk; Def = def; Spd = spd; }
     }
 
-    /// <summary>Ce qu'un combat gagné laisse pour le labo : scraps par <see cref="ScrapKind"/> (5 entiers) et recette apprise éventuelle.</summary>
+    /// <summary>Ce qu'un combat gagné laisse pour l'Atelier : Composants (12 entiers, voir <see cref="ComponentKinds.Index"/>), catalyseur et recette apprise éventuels.</summary>
     public readonly struct CraftDrops
     {
-        public IReadOnlyList<int> Scraps { get; }
+        public IReadOnlyList<int> Components { get; }
+        public CatalystKind? Catalyst { get; }
         public string? NewRecipe { get; }
-        public CraftDrops(IReadOnlyList<int> scraps, string? newRecipe) { Scraps = scraps; NewRecipe = newRecipe; }
+        public CraftDrops(IReadOnlyList<int> components, CatalystKind? catalyst, string? newRecipe) { Components = components; Catalyst = catalyst; NewRecipe = newRecipe; }
     }
 
     public enum RecipeStatKind { Hp, Atk, Def, Spd }
@@ -71,7 +111,7 @@ namespace N29.HeroesDawn.Definitions
         public RecipeStat(RecipeStatKind stat, int min, int max) { Stat = stat; Min = min; Max = max; }
     }
 
-    /// <summary>Recette du labo : ce qu'elle coûte, sa difficulté et ce que l'objet fabriqué peut valoir.</summary>
+    /// <summary>Recette de l'Atelier : Composants demandés, qualité minimale, plages de statistiques et origine.</summary>
     public sealed class RecipeDef
     {
         public string Id { get; }
@@ -79,37 +119,35 @@ namespace N29.HeroesDawn.Definitions
         public string NameKey => "craft.recipe." + Id;
         public ItemType Type { get; }
         public ItemRarity Rarity { get; }
-        /// <summary>De 1 à 10 : à comparer au niveau de compétence du type d'objet.</summary>
-        public int Difficulty { get; }
-        /// <summary>Scraps du type de la recette.</summary>
-        public int ScrapCost { get; }
-        /// <summary>Noyaux.</summary>
-        public int CoreCost { get; }
+        /// <summary>Composants du type de la recette.</summary>
+        public int ComponentCost { get; }
+        public ComponentGrade MinGrade { get; }
         public IReadOnlyList<RecipeStat> Stats { get; }
         public ItemPerk Perk { get; }
         public int PerkValue { get; }
+        public RecipeSource Source { get; }
 
-        public RecipeDef(string id, ItemType type, ItemRarity rarity, int difficulty, int scrapCost, int coreCost,
-                         IReadOnlyList<RecipeStat> stats, ItemPerk perk = ItemPerk.None, int perkValue = 0)
+        public RecipeDef(string id, ItemType type, ItemRarity rarity, int componentCost, ComponentGrade minGrade,
+                         IReadOnlyList<RecipeStat> stats, ItemPerk perk = ItemPerk.None, int perkValue = 0, RecipeSource source = RecipeSource.Adventure)
         {
-            Id = id; Type = type; Rarity = rarity; Difficulty = difficulty; ScrapCost = scrapCost; CoreCost = coreCost;
-            Stats = stats; Perk = perk; PerkValue = perkValue;
+            Id = id; Type = type; Rarity = rarity; ComponentCost = componentCost; MinGrade = minGrade;
+            Stats = stats; Perk = perk; PerkValue = perkValue; Source = source;
         }
     }
 
-    /// <summary>Catalogue des 12 recettes (3 par type d'objet : Commune, Rare, Épique).</summary>
+    /// <summary>Catalogue des 12 recettes (3 par type d'objet : Commune, Rare, Épique). Les Communes sont de départ ; les autres viennent de l'aventure en attendant les repaires et les tournois.</summary>
     public static class Recipes
     {
         const RecipeStatKind Hp = RecipeStatKind.Hp, Atk = RecipeStatKind.Atk, Def = RecipeStatKind.Def, Spd = RecipeStatKind.Spd;
 
         static RecipeDef Common(string id, ItemType type, RecipeStatKind a)
-            => new RecipeDef(id, type, ItemRarity.Common, 1, 6, 0, new[] { new RecipeStat(a, 8, 12) });
+            => new RecipeDef(id, type, ItemRarity.Common, 6, ComponentGrade.Common, new[] { new RecipeStat(a, 8, 12) }, source: RecipeSource.Starter);
 
         static RecipeDef Rare(string id, ItemType type, RecipeStatKind a, RecipeStatKind b)
-            => new RecipeDef(id, type, ItemRarity.Rare, 4, 12, 2, new[] { new RecipeStat(a, 8, 14), new RecipeStat(b, 8, 14) });
+            => new RecipeDef(id, type, ItemRarity.Rare, 8, ComponentGrade.Refined, new[] { new RecipeStat(a, 8, 14), new RecipeStat(b, 8, 14) });
 
         static RecipeDef Epic(string id, ItemType type, RecipeStatKind a, RecipeStatKind b, ItemPerk perk, int perkValue)
-            => new RecipeDef(id, type, ItemRarity.Epic, 7, 20, 5, new[] { new RecipeStat(a, 10, 16), new RecipeStat(b, 10, 16) }, perk, perkValue);
+            => new RecipeDef(id, type, ItemRarity.Epic, 10, ComponentGrade.Refined, new[] { new RecipeStat(a, 10, 16), new RecipeStat(b, 10, 16) }, perk, perkValue);
 
         public static readonly IReadOnlyList<RecipeDef> All = new[]
         {
@@ -128,7 +166,7 @@ namespace N29.HeroesDawn.Definitions
         };
 
         /// <summary>Recettes connues dès le début : les quatre Communes.</summary>
-        public static readonly IReadOnlyList<string> Starter = All.Where(r => r.Rarity == ItemRarity.Common).Select(r => r.Id).ToList();
+        public static readonly IReadOnlyList<string> Starter = All.Where(r => r.Source == RecipeSource.Starter).Select(r => r.Id).ToList();
 
         public static RecipeDef? Find(string id)
         {

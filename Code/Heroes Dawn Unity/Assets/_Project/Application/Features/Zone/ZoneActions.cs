@@ -69,9 +69,8 @@ namespace N29.HeroesDawn.Application.Features.Zone
                         validated = first
                             ? new ZoneRewards(b.ZoneValidationCredits, b.ZoneValidationPr, true)
                             : new ZoneRewards(MetaRules.ZoneReplayCredits, 0, false);
-                        int pct = Meta.LabBonuses.ZoneRewardPercent(s.Meta);
                         var joined = s.RunZone != null ? AgentUnlocks.OnZoneValidated(s, s.Run, s.RunZone.Id, (fx.Clock?.LocalNow ?? System.DateTime.Now)) : (System.Collections.Generic.IReadOnlyList<Definitions.MemberDef>)System.Array.Empty<Definitions.MemberDef>();
-                        validated = new ZoneRewards(validated.Credits * pct / 100, validated.Pr * pct / 100, validated.FirstClear, first ? 1 : 0, joined.Select(m => m.Id).ToList());
+                        validated = new ZoneRewards(validated.Credits, validated.Pr, validated.FirstClear, first ? 1 : 0, joined.Select(m => m.Id).ToList());
                         if (joined.Count > 0) rosterChanged = true;
                         if (first) { Collection.CollectionOps.AddBooster(s, Definitions.BoosterDef.StandardId); collection = true; }
                         if (s.RunZone != null && s.RunZone.IsLair) World.LairBook.RecordClear(s.Meta, zoneId);

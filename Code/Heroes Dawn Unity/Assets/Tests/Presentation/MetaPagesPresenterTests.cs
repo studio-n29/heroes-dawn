@@ -321,19 +321,6 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que lancer une recherche l'affiche en cours avec sa barre, et qu'une seconde est refusée avec la raison — parce que le labo ne fait qu'une recherche à la fois")]
-        public void Lab_StartShowsProgress_SecondRefused()
-        {
-            _app.Session.Wallet.Set(10_000, 0);
-            var p = Start(new LabPagePresenter(_view, _app.Lab, _app.Session, _loc, _toasts, _app.Subscriber<MetaChanged>(),
-                                               _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Workshop));
-            _view.ClickHeader(1); // mode Recherches
-            _view.ClickRow(0);
-            Assert.That(_view.Rows[0].Progress, Is.GreaterThanOrEqualTo(0f));
-            Assert.That(_view.Rows[1].A.Enabled, Is.False);
-            Assert.That(_view.Rows[1].A.Reason, Is.EqualTo(_loc.T("lab.busy")));
-            p.Dispose();
-        }
 
         [Test, Description("Vérifie que lire une fiche des archives retire son badge « NOUVEAU » et affiche son texte à droite — parce que la pastille doit refléter ce qu'il reste à lire")]
         public void Archives_SelectingEntry_ShowsTextAndMarksRead()

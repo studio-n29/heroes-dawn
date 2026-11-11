@@ -227,12 +227,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             return running > 0 ? _loc.F("qg.ops.running", running) : _loc.T("qg.ops.idle");
         }
 
-        string LabInfo()
-        {
-            if (_meta.Lab.IsReady) return _loc.T("qg.lab.ready");
-            var active = _meta.Lab.Views().FirstOrDefault(v => v.Active);
-            return active.Tech != null ? _loc.F("qg.lab.running", MetaFormat.Duration(active.Left)) : _loc.T("qg.lab.idle");
-        }
+        string LabInfo() => _loc.T("qg.lab.idle");
 
         string ArchivesInfo()
         {

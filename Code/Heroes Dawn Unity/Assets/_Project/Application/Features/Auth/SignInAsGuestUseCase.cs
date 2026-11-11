@@ -62,7 +62,7 @@ namespace N29.HeroesDawn.Application.Features.Auth
             else
             {
                 _session.ApplyProfile(data);
-                recovered = FatigueRecovery.Apply(_session.Roster, _clock.UtcNow, data.lastSeenUtcTicks, Meta.LabBonuses.RecoveryPerMinute(_session.Meta));
+                recovered = FatigueRecovery.Apply(_session.Roster, _clock.UtcNow, data.lastSeenUtcTicks);
             }
             if (!string.IsNullOrEmpty(_session.Meta.onboarding.pseudo)) _session.Account = new PlayerAccount(account.PlayerId, _session.Meta.onboarding.pseudo); // le pseudo choisi remplace le nom d invité
             account = _session.Account!;

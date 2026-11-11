@@ -35,7 +35,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
         public bool ReturnedToHq { get; }
         /// <summary>Objet laissé par ce combat gagné (aucun : null).</summary>
         public ItemId? Drop { get; }
-        /// <summary>Scraps et recette laissés par ce combat gagné pour le labo (défaite : null).</summary>
+        /// <summary>Composants, catalyseur et recette laissés par ce combat gagné pour l'Atelier (défaite : null).</summary>
         public CraftDrops? Crafting { get; }
 
         public CombatReport(bool victory, int credits, CombatRank rank, bool boss, IReadOnlyList<FatigueChange> fatigue,

@@ -8,38 +8,41 @@ using NUnit.Framework;
 
 namespace N29.HeroesDawn.Tests.Presentation
 {
-    /// <summary>Noms, qualités et textes des objets fabriqués au labo (lot E de la 0.14.0).</summary>
+    /// <summary>Noms, étoiles et textes des objets fabriqués à l'Atelier.</summary>
     public sealed class CraftingTextTests
     {
         readonly LocLocalization _loc = new LocLocalization();
 
-        static ItemDef Crafted(string recipeId, CraftQuality q) => CraftedItems.ToDef("crafted_1", Recipes.Find(recipeId)!, q, new CraftedStats(10, 0, 0, 0));
+        static ItemDef Crafted(string recipeId, int stars) => CraftedItems.ToDef("crafted_1", Recipes.Find(recipeId)!, stars, new CraftedStats(10, 0, 0, 0));
 
-        [Test, Description("Vérifie que le nom d'un objet fabriqué est celui de la recette suivi de sa qualité entre parenthèses, et qu'un objet du catalogue garde son nom — parce que le joueur doit voir la qualité de ce qu'il fabrique")]
-        public void ItemName_OfACraftedItem_ShowsRecipeAndQuality()
+        [Test, Description("Vérifie que le nom d'un objet fabriqué est celui de la recette suivi de ses étoiles entre parenthèses, et qu'un objet du catalogue garde son nom — parce que le joueur doit voir les étoiles de ce qu'il fabrique")]
+        public void ItemName_OfACraftedItem_ShowsRecipeAndStars()
         {
-            Assert.That(CollectionText.ItemName(_loc, Crafted("patch_vest", CraftQuality.Fine)), Is.EqualTo("Gilet rapiécé (Soigné)"));
-            Assert.That(CollectionText.ItemName(_loc, Crafted("scrap_blade", CraftQuality.Masterwork)), Is.EqualTo("Lame de fortune (Chef-d'œuvre)"));
+            Assert.That(CollectionText.ItemName(_loc, Crafted("patch_vest", 3)), Is.EqualTo("Gilet rapiécé (★★★)"));
+            Assert.That(CollectionText.ItemName(_loc, Crafted("scrap_blade", 6)), Is.EqualTo("Lame de fortune (★★★★★★)"));
             var vest = new ItemDef(new ItemId("test_vest"), "item.test", ItemRarity.Common, hp: 10);
             Assert.That(CollectionText.ItemName(_loc, vest), Is.EqualTo(_loc.T("item.test")));
         }
 
-        [Test, Description("Vérifie que toutes les clés de texte de la fabrication (12 recettes, 5 qualités, 5 scraps, nom composé, erreur) sont traduites — parce qu'une clé nue s'afficherait telle quelle à l'écran")]
+        [Test, Description("Vérifie que toutes les clés de texte de l'Atelier (12 recettes, 6 étoiles, 12 Composants, 4 catalyseurs, 3 qualités, nom composé, 3 erreurs) sont traduites — parce qu'une clé nue s'afficherait telle quelle à l'écran")]
         public void EveryCraftKey_IsTranslated()
         {
+            var kinds = System.Enum.GetValues(typeof(ComponentKind)).Cast<ComponentKind>().ToList();
+            var grades = System.Enum.GetValues(typeof(ComponentGrade)).Cast<ComponentGrade>().ToList();
             var keys = Recipes.All.Select(r => r.NameKey)
-                .Concat(System.Enum.GetValues(typeof(CraftQuality)).Cast<CraftQuality>().Select(q => "craft.quality." + q.ToString().ToLowerInvariant()))
-                .Concat(System.Enum.GetValues(typeof(ScrapKind)).Cast<ScrapKind>().Select(k => "scrap." + k))
-                .Concat(new[] { "craft.name", "errors.not_enough_scraps" });
+                .Concat(Enumerable.Range(CraftStars.Min, 6).Select(s => "craft.stars." + s))
+                .Concat(kinds.SelectMany(k => grades.Select(g => "component." + k + "." + g)))
+                .Concat(System.Enum.GetValues(typeof(CatalystKind)).Cast<CatalystKind>().Select(c => "catalyst." + c))
+                .Concat(grades.Select(g => "grade." + g))
+                .Concat(new[] { "craft.name", "errors.not_enough_components", "errors.grade_too_low", "errors.no_catalyst", "combat.craft_catalyst" });
             foreach (var key in keys) Assert.That(_loc.T(key), Is.Not.EqualTo(key), key);
-            Assert.That(_loc.T("scrap.Core"), Is.EqualTo("Noyaux"));
         }
 
         [Test, Description("Vérifie qu'un objet fabriqué emprunte l'illustration d'un objet du catalogue de même type (et qu'un objet du catalogue garde la sienne) — parce que les objets fabriqués n'ont pas d'illustration propre")]
         public void ArtId_OfACraftedItem_IsACatalogueItemOfTheSameType()
         {
             var c = N29.HeroesDawn.Content.Prototype.PrototypeCollection.Build();
-            var crafted = Crafted("patch_vest", CraftQuality.Fine);
+            var crafted = Crafted("patch_vest", 3);
             string art = CollectionText.ArtId(crafted, c);
             Assert.That(c.HasItem(new ItemId(art)), Is.True);
             Assert.That(c.Item(new ItemId(art)).Type, Is.EqualTo(ItemType.Armor));
@@ -48,14 +51,14 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(CollectionText.ArtId(plain, c), Is.EqualTo(plain.Id.Value));
         }
 
-        [Test, Description("Vérifie que les cinq qualités ont cinq couleurs distinctes et que la qualité se lit sur l'objet — parce que la couleur de l'étiquette distingue les objets fabriqués")]
-        public void QualityColor_DiffersByTier_AndQualityIsReadFromTheItem()
+        [Test, Description("Vérifie que les étoiles 3 à 6 ont quatre couleurs distinctes et que les étoiles se lisent sur l'objet — parce que la couleur de l'étiquette distingue les objets fabriqués")]
+        public void StarsColor_DiffersByTier_AndStarsAreReadFromTheItem()
         {
-            var colors = System.Enum.GetValues(typeof(CraftQuality)).Cast<CraftQuality>().Select(CollectionText.QualityColor).ToList();
-            Assert.That(colors.Distinct().Count(), Is.EqualTo(5));
-            Assert.That(CollectionText.QualityOf(Crafted("patch_vest", CraftQuality.Superior)), Is.EqualTo(CraftQuality.Superior));
-            Assert.That(CollectionText.QualityOf(new ItemDef(new ItemId("test_vest"), "item.test", ItemRarity.Common, hp: 10)), Is.Null);
-            Assert.That(CollectionText.QualityName(_loc, CraftQuality.Rough), Is.EqualTo("Grossier"));
+            var colors = Enumerable.Range(3, 4).Select(CollectionText.StarsColor).ToList();
+            Assert.That(colors.Distinct().Count(), Is.EqualTo(4));
+            Assert.That(CollectionText.StarsOf(Crafted("patch_vest", 5)), Is.EqualTo(5));
+            Assert.That(CollectionText.StarsOf(new ItemDef(new ItemId("test_vest"), "item.test", ItemRarity.Common, hp: 10)), Is.Null);
+            Assert.That(CollectionText.StarsText(_loc, 4), Is.EqualTo("★★★★"));
         }
     }
 }

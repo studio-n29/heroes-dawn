@@ -34,13 +34,13 @@ namespace N29.HeroesDawn.Application.Features.Shop
                 await _open.ExecuteAsync(ct);
                 return Result.Fail(ShopErrors.Expired);
             }
-            var lots = _s.Shop.Scraps;
+            var lots = _s.Shop.Components;
             if (slot < 0 || slot >= lots.Count) return Result.Fail(ShopErrors.UnknownSlot);
             var lot = lots[slot];
             if (lot.Bought) return Result.Fail(ShopErrors.AlreadyBought);
             if (!_s.Wallet.TrySpend(lot.Price, 0)) return Result.Fail(HubErrors.NotEnoughCredits);
 
-            CraftingOps.AddScraps(_s, lot.Kind, lot.Count);
+            CraftingOps.AddComponents(_s, lot.Kind, lot.Grade, lot.Count);
             lot.Bought = true;
             _wallet.PublishWallet(_s);
             _changed.Publish(default);

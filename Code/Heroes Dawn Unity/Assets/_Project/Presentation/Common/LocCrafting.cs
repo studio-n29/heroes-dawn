@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace N29.HeroesDawn.Presentation.Common
 {
-    /// <summary>Textes de la fabrication au labo (lot E) : recettes, qualités, scraps.</summary>
+    /// <summary>Textes de l'Atelier de fabrication : recettes, étoiles, Composants, catalyseurs.</summary>
     public static partial class Loc
     {
         static partial void ExtendCrafting(Dictionary<string, string> d)
@@ -20,27 +20,32 @@ namespace N29.HeroesDawn.Presentation.Common
             d["craft.recipe.neural_chip"] = "Puce neurale";
             d["craft.recipe.synapse_coil"] = "Bobine synaptique";
             d["craft.recipe.apex_core"] = "Noyau d'Apex";
-            d["craft.quality.rough"] = "Grossier";
-            d["craft.quality.standard"] = "Standard";
-            d["craft.quality.fine"] = "Soigné";
-            d["craft.quality.superior"] = "Supérieur";
-            d["craft.quality.masterwork"] = "Chef-d'œuvre";
             d["craft.name"] = "{0} ({1})";
-            d["scrap.Weapon"] = "Scraps d'arme";
-            d["scrap.Armor"] = "Scraps d'armure";
-            d["scrap.Tool"] = "Scraps d'outil";
-            d["scrap.Implant"] = "Scraps d'implant";
-            d["scrap.Core"] = "Noyaux";
-            d["errors.not_enough_scraps"] = "Il manque des scraps.";
             d["lab.workshop"] = "Atelier";
-            d["lab.skill"] = "Fabrication · {0} · niveau {1}/{2}";
-            d["lab.skill.desc"] = "Monte en fabriquant : plus le niveau dépasse la difficulté, meilleure est la qualité.";
-            d["lab.recipe_sub"] = "Coût : {0} · difficulté {1} · {2}";
             d["lab.odds"] = "{0} {1} %";
             d["lab.craft"] = "Fabriquer";
             d["lab.crafted"] = "Fabriqué : {0} · {1}";
-            d["lab.skill_up"] = "Fabrication {0} : niveau {1} !";
-            d["combat.craft_drop"] = "Scraps : {0}";
+            d["lab.recipe_sub"] = "Coût : {0} · qualité min. {1} · départ {2}";
+            d["errors.not_enough_components"] = "Il manque des Composants.";
+            d["errors.grade_too_low"] = "Ces Composants sont de trop faible qualité.";
+            d["errors.no_catalyst"] = "Tu n'as pas ce catalyseur.";
+            for (int s = 1; s <= 6; s++) d["craft.stars." + s] = new string('★', s);
+            string[] kinds = { "arme", "armure", "outil", "implant" };
+            string[] kindNames = { "Weapon", "Armor", "Tool", "Implant" };
+            string[] grades = { "Common", "Refined", "Exceptional" };
+            string[] gradeNames = { "Commun", "Raffiné", "Exceptionnel" };
+            for (int k = 0; k < kinds.Length; k++)
+                for (int g = 0; g < grades.Length; g++)
+                    d["component." + kindNames[k] + "." + grades[g]] = "Composants d'" + kinds[k] + " (" + gradeNames[g] + ")";
+            d["catalyst.Metal"] = "Catalyseur Métal (DEF)";
+            d["catalyst.Energy"] = "Catalyseur Énergie (ATQ)";
+            d["catalyst.Bio"] = "Catalyseur Biologique (PV)";
+            d["catalyst.Crystal"] = "Catalyseur Cristal (VIT)";
+            d["grade.Common"] = "Commun";
+            d["grade.Refined"] = "Raffiné";
+            d["grade.Exceptional"] = "Exceptionnel";
+            d["combat.craft_drop"] = "Composants : {0}";
+            d["combat.craft_catalyst"] = "Catalyseur : {0}";
             d["combat.craft_recipe"] = "Recette apprise : {0}";
         }
     }

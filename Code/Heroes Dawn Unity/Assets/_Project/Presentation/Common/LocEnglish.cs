@@ -14,8 +14,6 @@ namespace N29.HeroesDawn.Presentation.Common
             // --- Général ---
             ["booster.next"] = "NEXT",
             ["lab.mode.craft"] = "CRAFTING",
-            ["lab.mode.research"] = "RESEARCH",
-            ["lab.mode.research_hint"] = "Choose a research project. Its cost and duration are shown before starting. Only one project can run at a time.",
             ["booster.summary"] = "BOOSTER SUMMARY",
             ["booster.received"] = "{0} cards added to the Grimoire",
             ["shop.daily_pass"] = "GIFT · PASS",
@@ -89,14 +87,12 @@ namespace N29.HeroesDawn.Presentation.Common
             ["ach.craft_1.name"] = "First tinkering", ["ach.craft_1.desc"] = "Craft an item.",
             ["ach.friend_1.name"] = "First ally", ["ach.friend_1.desc"] = "Add a friend.",
             ["lab.side.none"] = "Pick a recipe", ["lab.state.ok"] = "Crafting possible.", ["lab.state.missing"] = "Not enough components.",
-            ["lab.provenance"] = "Scraps: daily shop lots and combat loot.", ["lab.have"] = "Owned: {0}", ["lab.missing"] = "Missing {0}",
+            ["lab.provenance"] = "Components: daily shop lots and combat loot.", ["lab.have"] = "Owned: {0}", ["lab.missing"] = "Missing {0}",
             ["qg.daily.banner"] = "{0} activity(ies) today",["qg.state.locked"] = "LOCKED", ["qg.lock.tutorial"] = "Finish the tutorial", ["qg.lock.zone"] = "Clear chapter {0}",
             ["settings.unlock_all"] = "Unlock everything (test)", ["settings.unlock_all.hint"] = "Opens every QG room, without tutorial or chapter.",
             ["inventory.sort.rarity"] = "Rarity", ["inventory.sort.name"] = "Name", ["inventory.sort.count"] = "Quantity",
             ["shop.scrap_lot"] = "{0} × {1}", ["shop.scrap_sold"] = "BOUGHT",
             ["shop.scrap.confirm.title"] = "Buy this lot?", ["shop.scrap.confirm.body"] = "{0} Credits will be spent.",
-            ["scrap.Weapon"] = "Weapon scraps", ["scrap.Armor"] = "Armor scraps", ["scrap.Tool"] = "Tool scraps",
-            ["scrap.Implant"] = "Implant scraps", ["scrap.Core"] = "Cores",
 
             // --- Paramètres ---
             ["settings.cat.Audio"] = "AUDIO",

@@ -58,12 +58,16 @@ namespace N29.HeroesDawn.Domain.Shop
         }
 
 
-        /// <summary>Tirage des lots de scraps du jour : famille uniforme, quantité et prix fixés par <see cref="ShopRules"/>.</summary>
-        public static System.Collections.Generic.List<ScrapLot> DrawScrapLots(IRandom rng, int count)
+        /// <summary>Tirage des lots de Composants du jour : type uniforme ; les derniers lots sont Raffinés, les autres Communs (quantité et prix fixés par <see cref="ShopRules"/>).</summary>
+        public static System.Collections.Generic.List<ComponentLot> DrawComponentLots(IRandom rng, int count)
         {
-            var lots = new System.Collections.Generic.List<ScrapLot>();
+            var lots = new System.Collections.Generic.List<ComponentLot>();
             for (int i = 0; i < count; i++)
-                lots.Add(new ScrapLot((ScrapKind)rng.Range(0, ScrapKinds.Count), ShopRules.ScrapLotCount, ShopRules.ScrapLotPrice));
+                {
+                bool refined = i >= count - ShopRules.RefinedLotsPerDay;
+                lots.Add(new ComponentLot((ComponentKind)rng.Range(0, ComponentKinds.Count), refined ? ComponentGrade.Refined : ComponentGrade.Common,
+                    refined ? ShopRules.RefinedLotCount : ShopRules.CommonLotCount, refined ? ShopRules.RefinedLotPrice : ShopRules.CommonLotPrice));
+            }
             return lots;
         }
 

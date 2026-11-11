@@ -107,7 +107,6 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public DailyMissions Daily { get; }
         public SecondaryObjectives Secondary { get; }
         public Expeditions Operations { get; }
-        public ResearchLab Lab { get; }
         public Workshop Workshop { get; }
         public LocalFriendsPort Friends { get; }
         public PlayerProfile Profile { get; }
@@ -176,7 +175,6 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Daily = new DailyMissions(MetaCtx, Pass);
             Secondary = new SecondaryObjectives(MetaCtx, Pass);
             Operations = new Expeditions(MetaCtx, Pass);
-            Lab = new ResearchLab(MetaCtx);
             Workshop = new Workshop(MetaCtx);
             Friends = new LocalFriendsPort(MetaCtx);
             Profile = new PlayerProfile(MetaCtx, Pass);
@@ -188,7 +186,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
             Collection = new N29.HeroesDawn.Application.Features.Collection.CollectionBook(MetaCtx, Publisher<RosterChanged>());
             Quests = new QuestLog(MetaCtx, Pass);
-            Overview = new MetaOverview(Pass, Daily, Secondary, Operations, Lab, Archives, Boutique, Quests);
+            Overview = new MetaOverview(Pass, Daily, Secondary, Operations, Archives, Boutique, Quests);
             Settings = new PlayerSettings(MetaCtx);
             Tutorial = new TutorialGuide(MetaCtx);
             Tracker = new MetaTracker(MetaCtx, Daily, Pass, Secondary, Quests, Subscriber<CombatFinished>(), Subscriber<ZoneValidated>(), Subscriber<RosterChanged>(),

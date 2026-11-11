@@ -23,8 +23,8 @@ namespace N29.HeroesDawn.Application.Features.Shop
             var ids = ShopDraw.Draw(new Pcg32(seed), eligible, ShopWeights.From(s.Content.Balance))
                 .OrderByDescending(id => s.Content.Member(id).Rank).ToList();
             s.Shop.Replace(day, draw, ids.Select(id => new ShopOffer(id)));
-            var lots = ShopDraw.DrawScrapLots(new Pcg32(ShopSeed.For(s.Account?.PlayerId ?? "", day + "/scraps", draw)), ShopRules.ScrapLotsPerDay);
-            s.Shop.ReplaceScraps(lots.Select(l => new ShopScrapOffer(l.Kind, l.Count, l.Price)));
+            var lots = ShopDraw.DrawComponentLots(new Pcg32(ShopSeed.For(s.Account?.PlayerId ?? "", day + "/components", draw)), ShopRules.ComponentLotsPerDay);
+            s.Shop.ReplaceComponents(lots.Select(l => new ShopComponentOffer(l.Kind, l.Grade, l.Count, l.Price)));
         }
     }
 }

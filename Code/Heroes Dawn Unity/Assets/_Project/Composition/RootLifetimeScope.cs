@@ -151,7 +151,6 @@ namespace N29.HeroesDawn.Composition
             builder.Register<QuestLog>(Lifetime.Singleton);
             builder.Register<PlaytestFeedback>(Lifetime.Singleton);
             builder.Register<Expeditions>(Lifetime.Singleton);
-            builder.Register<ResearchLab>(Lifetime.Singleton);
             builder.Register<Workshop>(Lifetime.Singleton);
             builder.Register<PlayerProfile>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.ChapterBook>(Lifetime.Singleton);

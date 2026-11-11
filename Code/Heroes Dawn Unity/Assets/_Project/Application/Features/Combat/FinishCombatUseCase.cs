@@ -60,7 +60,6 @@ namespace N29.HeroesDawn.Application.Features.Combat
                 credits = boss ? MetaRules.BossCredits
                         : pending.Rank == CombatRank.Easy ? b.CreditsEasy
                         : pending.Rank == CombatRank.Normal ? b.CreditsNormal : b.CreditsElite;
-                credits = credits * Meta.LabBonuses.CombatCreditsPercent(s.Meta) / 100;
                 s.Wallet.Add(credits, 0);
                 drop = RollDrop(s, pending.Rank, boss);
                 crafting = Meta.CraftingOps.GrantDrops(s, pending.Rank, boss);

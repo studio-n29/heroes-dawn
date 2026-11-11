@@ -30,7 +30,7 @@ namespace N29.HeroesDawn.Tests.Presentation
 
         LabPagePresenter Lab()
         {
-            var p = new LabPagePresenter(_view, _app.Lab, _app.Session, _loc, _toasts, _app.Subscriber<MetaChanged>(),
+            var p = new LabPagePresenter(_view, _app.Session, _loc, _toasts, _app.Subscriber<MetaChanged>(),
                                          _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time, _app.Workshop);
             _view.Show();
             ((VContainer.Unity.IStartable)p).Start();
@@ -50,8 +50,8 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que Fabriquer est grisé sans les matériaux et devient possible dès que les scraps sont là, avec la raison affichée — parce que le joueur doit savoir ce qui manque avant d'appuyer")]
-        public void Lab_Fabricate_DisabledWithoutMaterials_EnabledWithScraps()
+        [Test, Description("Vérifie que Fabriquer est grisé sans les Composants et devient possible dès qu'ils sont là, avec la raison affichée — parce que le joueur doit savoir ce qui manque avant d'appuyer")]
+        public void Lab_Fabricate_DisabledWithoutMaterials_EnabledWithComponents()
         {
             var p = Lab();
             var recipes = _app.Workshop.Recipes();
@@ -60,11 +60,10 @@ namespace N29.HeroesDawn.Tests.Presentation
             var type = recipes[0].Recipe.Type;
             var craft = _view.Side.Rows.Last();
             Assert.That(craft.A.Enabled, Is.False, "aucun matériau");
-            Assert.That(craft.A.Reason, Is.EqualTo(_loc.T("errors.not_enough_scraps")));
-            CraftingOps.AddScraps(_app.Session, N29.HeroesDawn.Definitions.ScrapKinds.For(type), 1000);
-            CraftingOps.AddScraps(_app.Session, ScrapKind.Core, 1000);
+            Assert.That(craft.A.Reason, Is.EqualTo(_loc.T("errors.not_enough_components")));
+            CraftingOps.AddComponents(_app.Session, ComponentKinds.For(type), recipes[0].MinGrade, 1000);
             _view.SelectRow(firstRecipe);
-            Assert.That(_view.Side.Rows.Last().A.Enabled, Is.True, "avec des scraps, la fabrication est possible");
+            Assert.That(_view.Side.Rows.Last().A.Enabled, Is.True, "avec des Composants, la fabrication est possible");
             p.Dispose();
         }
     }

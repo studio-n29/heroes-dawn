@@ -13,10 +13,10 @@ namespace N29.HeroesDawn.Presentation.Hub
     /// <summary>Textes et couleurs des objets et des cartes : nom, rareté, effets en une ligne.</summary>
     public static class CollectionText
     {
-        /// <summary>Nom d'un objet : celui du catalogue, ou « recette (qualité) » pour un objet fabriqué.</summary>
+        /// <summary>Nom d'un objet : celui du catalogue, ou « recette (étoiles) » pour un objet fabriqué.</summary>
         public static string ItemName(ILocalization loc, ItemDef item)
-            => CraftedItems.TryParseNameKey(item.NameKey, out var recipeId, out var quality)
-                ? loc.F("craft.name", loc.T("craft.recipe." + recipeId), QualityName(loc, quality))
+            => CraftedItems.TryParseNameKey(item.NameKey, out var recipeId, out int stars)
+                ? loc.F("craft.name", loc.T("craft.recipe." + recipeId), StarsText(loc, stars))
                 : loc.T(item.NameKey);
 
         /// <summary>Identifiant dont on charge l'illustration : celui de l'objet, ou pour un objet fabriqué (sans illustration propre) le premier objet du catalogue de même type.</summary>
@@ -27,35 +27,39 @@ namespace N29.HeroesDawn.Presentation.Hub
             return same != null ? same.Id.Value : item.Id.Value;
         }
 
-        /// <summary>Qualité d'un objet fabriqué ; null pour un objet du catalogue.</summary>
-        public static CraftQuality? QualityOf(ItemDef item)
-            => CraftedItems.TryParseNameKey(item.NameKey, out _, out var quality) ? quality : (CraftQuality?)null;
+        /// <summary>Étoiles (1 à 6) d'un objet fabriqué ; null pour un objet du catalogue.</summary>
+        public static int? StarsOf(ItemDef item)
+            => CraftedItems.TryParseNameKey(item.NameKey, out _, out int stars) ? stars : (int?)null;
 
-        /// <summary>« 6 Scraps d'armure ».</summary>
-        public static string Scrap(ILocalization loc, ScrapKind kind, int count) => count + " " + loc.T("scrap." + kind);
+        /// <summary>« 6 Composants d'armure (Commun) ».</summary>
+        public static string Component(ILocalization loc, ComponentKind kind, ComponentGrade grade, int count) => count + " " + loc.T("component." + kind + "." + grade);
 
-        /// <summary>Ce qu'un combat gagné laisse pour le labo : une ligne de scraps, puis la recette apprise s'il y en a une.</summary>
+        /// <summary>Ce qu'un combat gagné laisse pour l'Atelier : une ligne de Composants, le catalyseur, puis la recette apprise s'il y en a une.</summary>
         public static string CraftDropLines(ILocalization loc, CraftDrops drops)
         {
             var parts = new List<string>();
-            for (int k = 0; k < ScrapKinds.Count && k < drops.Scraps.Count; k++)
-                if (drops.Scraps[k] > 0) parts.Add(Scrap(loc, (ScrapKind)k, drops.Scraps[k]));
+            for (int k = 0; k < drops.Components.Count; k++)
+                if (drops.Components[k] > 0)
+                    parts.Add(Component(loc, (ComponentKind)(k / ComponentKinds.GradeCount), (ComponentGrade)(k % ComponentKinds.GradeCount), drops.Components[k]));
             var lines = new List<string>();
             if (parts.Count > 0) lines.Add(loc.F("combat.craft_drop", string.Join(", ", parts)));
+            if (drops.Catalyst.HasValue) lines.Add(loc.F("combat.craft_catalyst", loc.T("catalyst." + drops.Catalyst.Value)));
             if (drops.NewRecipe != null) lines.Add(loc.F("combat.craft_recipe", loc.T("craft.recipe." + drops.NewRecipe)));
             return string.Join(System.Environment.NewLine, lines);
         }
 
-        public static string QualityName(ILocalization loc, CraftQuality quality) => loc.T("craft.quality." + quality.ToString().ToLowerInvariant());
+        /// <summary>« ★★★ » : les étoiles d'un objet fabriqué (1 à 6).</summary>
+        public static string StarsText(ILocalization loc, int stars) => loc.T("craft.stars." + Mathf.Clamp(stars, CraftStars.Min, CraftStars.Max));
 
-        public static Color QualityColor(CraftQuality quality)
+        /// <summary>Couleur des étoiles d'un objet fabriqué : de plus en plus vive avec le nombre d'étoiles.</summary>
+        public static Color StarsColor(int stars)
         {
-            switch (quality)
+            switch (stars)
             {
-                case CraftQuality.Masterwork: return Theme.Accent;
-                case CraftQuality.Superior: return Theme.Perception;
-                case CraftQuality.Fine: return Theme.Info;
-                case CraftQuality.Standard: return Theme.Text;
+                case 6: return Theme.Accent;
+                case 5: return Theme.Perception;
+                case 4: return Theme.Info;
+                case 3: return Theme.Text;
                 default: return Theme.TextMuted;
             }
         }

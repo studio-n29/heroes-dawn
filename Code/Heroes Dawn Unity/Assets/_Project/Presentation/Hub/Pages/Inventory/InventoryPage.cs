@@ -104,8 +104,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                                   + (wearers.Count > 0 ? "\n" + Loc.F("inventory.worn", string.Join(", ", wearers)) : "");
                 var r = InfoRowData.Basic(CollectionText.ItemName(Loc, it), subtitle);
                 r.Tag = CollectionText.Tag(CollectionText.ItemName(Loc, it));
-                var quality = CollectionText.QualityOf(it);
-                r.TagColor = quality.HasValue ? CollectionText.QualityColor(quality.Value) : CollectionText.RarityColor(it.Rarity);
+                var stars = CollectionText.StarsOf(it);
+                r.TagColor = stars.HasValue ? CollectionText.StarsColor(stars.Value) : CollectionText.RarityColor(it.Rarity);
                 r.Badge = CollectionText.ItemTypeChip(Loc, it.Type) + " " + Loc.F("inventory.count", count);
                 r.Art = AgentArt.Item(CollectionText.ArtId(it, defs));
                 rows.Add(r);

@@ -110,13 +110,14 @@ namespace N29.HeroesDawn.Application.Ports
         public int wins;
     }
 
-    /// <summary>Un objet fabriqué au labo : sa recette, sa qualité (<see cref="N29.HeroesDawn.Definitions.CraftQuality"/>) et les statistiques tirées (en %).</summary>
+    /// <summary>Un objet fabriqué à l'Atelier : sa recette, ses étoiles (1 à 6) et les statistiques tirées (en %). <c>quality</c> est l'ancienne qualité (0 à 4), lue seulement par la migration quand <c>stars</c> vaut 0.</summary>
     [Serializable]
     public sealed class CraftedItemSave
     {
         public string id = "";
         public string recipeId = "";
         public int quality;
+        public int stars;
         public int hp, atk, def, spd;
     }
 
@@ -163,7 +164,7 @@ namespace N29.HeroesDawn.Application.Ports
         public List<ActivitySave> activities = new List<ActivitySave>();
         public long secondaryNextUtcTicks;
 
-        // Opérations, labo
+        // Opérations ; labo de recherche supprimé (1.0.0) : les trois champs ci-dessous ne servent plus qu'à la migration (remboursement des Crédits)
         public List<ExpeditionSave> expeditions = new List<ExpeditionSave>();
         public List<CounterSave> labLevels = new List<CounterSave>();
         public string labActive = "";
@@ -186,16 +187,20 @@ namespace N29.HeroesDawn.Application.Ports
         // Objets, grimoire, boosters
         public CollectionSave collection = new CollectionSave();
 
-        // Fabrication au labo (lot E) : scraps, recettes apprises (hors recettes de départ), expérience par type d'objet, objets fabriqués
-        /// <summary>Scraps possédés (nom de <see cref="N29.HeroesDawn.Definitions.ScrapKind"/>, nombre).</summary>
+        // Atelier de fabrication : Composants, catalyseurs, recettes apprises (hors recettes de départ), objets fabriqués ; scraps et craftXp sont d'anciens champs lus par la migration
+        /// <summary>Ancien : scraps possédés (Weapon, Armor, Tool, Implant, Core) ; vidé par <see cref="N29.HeroesDawn.Application.Features.Meta.MetaMigration"/>.</summary>
         public List<CounterSave> scraps = new List<CounterSave>();
+        /// <summary>Composants possédés (id « Weapon.Common » : type et qualité, nombre).</summary>
+        public List<CounterSave> components = new List<CounterSave>();
+        /// <summary>Catalyseurs possédés (nom de <see cref="N29.HeroesDawn.Definitions.CatalystKind"/>, nombre).</summary>
+        public List<CounterSave> catalysts = new List<CounterSave>();
         public List<string> recipes = new List<string>();
-        /// <summary>Expérience de création (nom de <see cref="N29.HeroesDawn.Definitions.ItemType"/>, expérience totale).</summary>
+        /// <summary>Ancien : expérience de création ; supprimée par la migration, sans remboursement.</summary>
         public List<CounterSave> craftXp = new List<CounterSave>();
         public List<CraftedItemSave> crafted = new List<CraftedItemSave>();
         /// <summary>Nombre d'objets fabriqués : numéro du prochain exemplaire et graine de chaque fabrication.</summary>
         public int craftedNext;
-        /// <summary>Nombre de tirages de scraps après combat : fait varier la graine de chacun.</summary>
+        /// <summary>Nombre de tirages de Composants après combat : fait varier la graine de chacun.</summary>
         public int scrapDrops;
 
         // Profil (lot F) : compteurs de statistiques (combatsWon, combatsLost, creditsEarned) et tags des amis (liste simulée locale)

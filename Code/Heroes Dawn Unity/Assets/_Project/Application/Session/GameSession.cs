@@ -154,8 +154,8 @@ namespace N29.HeroesDawn.Application.Session
 
         public bool Owns(MemberId id) => Find(id) != null;
 
-        /// <summary>Prix d entraînement avec la réduction du labo.</summary>
-        public int TrainCostFor(int level) => Math.Max(1, MetaRules.TrainCost(level) * Features.Meta.LabBonuses.TrainCostPercent(Meta) / 100);
+        /// <summary>Prix d entraînement (plus de réduction depuis la suppression du labo de recherche).</summary>
+        public int TrainCostFor(int level) => MetaRules.TrainCost(level);
 
         public int SquadAverageLevel()
         {
@@ -214,6 +214,8 @@ namespace N29.HeroesDawn.Application.Session
             if (data.completedZones != null) foreach (var z in data.completedZones) CompletedZones.Add(z);
             AutoCombat = data.autoCombat;
             Meta = data.meta ?? new MetaSave();
+            Features.Meta.MetaMigration.ToComponents(Meta, null, out int refunded);
+            if (refunded > 0) Wallet.Add(refunded, 0);
             Features.Meta.CraftingOps.RegisterSaved(this);
             Wallet.SetGems(Meta.gems);
             Roster.Clear();

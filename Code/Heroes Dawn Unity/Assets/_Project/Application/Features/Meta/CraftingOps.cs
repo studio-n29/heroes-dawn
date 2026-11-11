@@ -10,7 +10,7 @@ using N29.HeroesDawn.Domain.Board;
 
 namespace N29.HeroesDawn.Application.Features.Meta
 {
-    /// <summary>Scraps, recettes connues, compétences de création et objets fabriqués dans le profil (comme <see cref="CollectionOps"/> pour les objets).</summary>
+    /// <summary>Composants, catalyseurs, recettes connues et objets fabriqués dans le profil (comme <see cref="CollectionOps"/> pour les objets).</summary>
     public static class CraftingOps
     {
         static int Get(List<CounterSave> list, string id)
@@ -25,17 +25,24 @@ namespace N29.HeroesDawn.Application.Features.Meta
             list.Add(new CounterSave { id = id, value = value });
         }
 
-        // ---- Scraps
-        public static int Scraps(GameSession s, ScrapKind kind) => Get(s.Meta.scraps, kind.ToString());
+        // ---- Composants (id « Weapon.Common ») et catalyseurs
+        static string Key(ComponentKind kind, ComponentGrade grade) => kind + "." + grade;
 
-        public static void AddScraps(GameSession s, ScrapKind kind, int count) => Set(s.Meta.scraps, kind.ToString(), Math.Max(0, Scraps(s, kind) + count));
+        public static int Components(GameSession s, ComponentKind kind, ComponentGrade grade) => Get(s.Meta.components, Key(kind, grade));
 
-        public static bool TrySpendScraps(GameSession s, ScrapKind kind, int count)
+        public static void AddComponents(GameSession s, ComponentKind kind, ComponentGrade grade, int count)
+            => Set(s.Meta.components, Key(kind, grade), Math.Max(0, Components(s, kind, grade) + count));
+
+        public static bool TrySpendComponents(GameSession s, ComponentKind kind, ComponentGrade grade, int count)
         {
-            if (Scraps(s, kind) < count) return false;
-            AddScraps(s, kind, -count);
+            if (Components(s, kind, grade) < count) return false;
+            AddComponents(s, kind, grade, -count);
             return true;
         }
+
+        public static int Catalysts(GameSession s, CatalystKind kind) => Get(s.Meta.catalysts, kind.ToString());
+
+        public static void AddCatalyst(GameSession s, CatalystKind kind, int count) => Set(s.Meta.catalysts, kind.ToString(), Math.Max(0, Catalysts(s, kind) + count));
 
         // ---- Recettes : les quatre Communes sont connues d'emblée, sans écriture dans la sauvegarde
         public static bool Knows(GameSession s, string recipeId) => Recipes.Starter.Contains(recipeId) || s.Meta.recipes.Contains(recipeId);
@@ -45,33 +52,27 @@ namespace N29.HeroesDawn.Application.Features.Meta
             if (!Knows(s, recipeId)) s.Meta.recipes.Add(recipeId);
         }
 
-        // ---- Compétence de création, un niveau par type d'objet
-        public static int Xp(GameSession s, ItemType type) => Get(s.Meta.craftXp, type.ToString());
-
-        public static void AddXp(GameSession s, ItemType type, int xp) => Set(s.Meta.craftXp, type.ToString(), Math.Min(CraftingRules.XpForLevel(CraftingRules.MaxSkill), Xp(s, type) + xp));
-
-        public static int Skill(GameSession s, ItemType type) => CraftingRules.SkillLevel(Xp(s, type));
-
-        /// <summary>Tire et verse les scraps d'une victoire, et apprend la recette obtenue (déterministe selon le joueur et le nombre de tirages).</summary>
+        /// <summary>Tire et verse les Composants et le catalyseur d'une victoire, et apprend la recette obtenue (déterministe selon le joueur et le nombre de tirages).</summary>
         public static CraftDrops GrantDrops(GameSession s, CombatRank rank, bool boss)
         {
             var unknown = Recipes.All.Where(r => !Knows(s, r.Id)).Select(r => r.Id).ToList();
-            var rng = new Core.Pcg32(CollectionRules.Seed(s.Account?.PlayerId ?? "local", "scrap", s.Meta.scrapDrops++));
+            var rng = new Core.Pcg32(CollectionRules.Seed(s.Account?.PlayerId ?? "local", "components", s.Meta.scrapDrops++));
             var drops = CraftingRules.RollDrops(rng, rank, boss, unknown);
-            for (int k = 0; k < ScrapKinds.Count; k++)
-                if (drops.Scraps[k] > 0) AddScraps(s, (ScrapKind)k, drops.Scraps[k]);
+            for (int k = 0; k < drops.Components.Count; k++)
+                if (drops.Components[k] > 0) AddComponents(s, (ComponentKind)(k / ComponentKinds.GradeCount), (ComponentGrade)(k % ComponentKinds.GradeCount), drops.Components[k]);
+            if (drops.Catalyst.HasValue) AddCatalyst(s, drops.Catalyst.Value, 1);
             if (drops.NewRecipe != null) Learn(s, drops.NewRecipe);
             return drops;
         }
 
         // ---- Objets fabriqués
         /// <summary>Crée l'exemplaire <c>crafted_N</c> : l'enregistre dans le catalogue de la session, dans la sauvegarde et dans l'inventaire.</summary>
-        public static ItemDef AddCrafted(GameSession s, RecipeDef recipe, CraftQuality quality, CraftedStats stats)
+        public static ItemDef AddCrafted(GameSession s, RecipeDef recipe, int stars, CraftedStats stats)
         {
             var m = s.Meta;
             string id = CraftedItems.IdPrefix + (++m.craftedNext);
-            m.crafted.Add(new CraftedItemSave { id = id, recipeId = recipe.Id, quality = (int)quality, hp = stats.Hp, atk = stats.Atk, def = stats.Def, spd = stats.Spd });
-            var def = CraftedItems.ToDef(id, recipe, quality, stats);
+            m.crafted.Add(new CraftedItemSave { id = id, recipeId = recipe.Id, stars = stars, hp = stats.Hp, atk = stats.Atk, def = stats.Def, spd = stats.Spd });
+            var def = CraftedItems.ToDef(id, recipe, stars, stats);
             s.Content.Collection.Register(def);
             CollectionOps.AddItem(s, def.Id);
             return def;
@@ -90,8 +91,8 @@ namespace N29.HeroesDawn.Application.Features.Meta
             {
                 var recipe = Recipes.Find(c.recipeId);
                 if (recipe == null || string.IsNullOrEmpty(c.id)) continue;
-                var quality = (CraftQuality)Math.Max(0, Math.Min((int)CraftQuality.Masterwork, c.quality));
-                collection.Register(CraftedItems.ToDef(c.id, recipe, quality, new CraftedStats(c.hp, c.atk, c.def, c.spd)));
+                int stars = Math.Max(CraftStars.Min, Math.Min(CraftStars.Max, c.stars > 0 ? c.stars : c.quality + 1));
+                collection.Register(CraftedItems.ToDef(c.id, recipe, stars, new CraftedStats(c.hp, c.atk, c.def, c.spd)));
             }
         }
     }

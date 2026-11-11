@@ -282,39 +282,34 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(list.All(a => !a.Member.InSquad));
         }
 
-        // ------------------------------------------------------------------ Labo
+        // ------------------------------------------------------------------ Labo de recherche supprimé
 
-        [Test, Description("Vérifie qu'une recherche coûte des Crédits, dure plusieurs minutes, n'a lieu qu'une à la fois et améliore le niveau à son terme — parce que le labo est un investissement à long terme")]
-        public void Lab_ResearchCostsTimeAndCredits_OneAtATime()
-        {
-            _app.Session.Wallet.Set(0, 0);
-            Assert.That(Code(_app.Lab.Start(ResearchLab.Training)), Is.EqualTo("meta.credits"));
-            _app.Session.Wallet.Set(10_000, 0);
-            Assert.That(_app.Lab.Start(ResearchLab.Training).IsSuccess);
-            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(10_000 - 500));
-            Assert.That(Code(_app.Lab.Start(ResearchLab.Loot)), Is.EqualTo("meta.busy"));
-            Assert.That(_app.Lab.Refresh(), Is.Null);
-            _app.Time.UtcNow = _app.Time.UtcNow.AddMinutes(11);
-            Assert.That(_app.Lab.Refresh()?.Id, Is.EqualTo(ResearchLab.Training));
-            Assert.That(LabBonuses.Level(_app.Session.Meta, ResearchLab.Training), Is.EqualTo(1));
-        }
-
-        [Test, Description("Vérifie que la recherche d'entraînement réduit le prix de 4 % par niveau dans le cas d'usage réel — parce qu'un bonus affiché doit s'appliquer")]
-        public void Lab_TrainingBonus_ReducesTrainCost()
+        [Test, Description("Vérifie que le prix d'entraînement n'a plus de réduction, même avec d'anciens niveaux de recherche restés dans la sauvegarde — parce que le labo de recherche est supprimé")]
+        public void Le_prix_d_entrainement_n_a_plus_de_reduction()
         {
             int level = 10;
+            _app.Session.Meta.SetCounter(_app.Session.Meta.labLevels, "training", 2);
             Assert.That(_app.Session.TrainCostFor(level), Is.EqualTo(MetaRules.TrainCost(level)));
-            _app.Session.Meta.SetCounter(_app.Session.Meta.labLevels, ResearchLab.Training, 2);
-            Assert.That(_app.Session.TrainCostFor(level), Is.EqualTo(MetaRules.TrainCost(level) * 92 / 100));
         }
 
-        [Test, Description("Vérifie qu'on ne dépasse pas le niveau maximum d'une recherche — parce que chaque recherche a 5 niveaux")]
-        public void Lab_MaxLevel_Refused()
+        [Test, Description("Vérifie que la récupération de fatigue à la connexion reste à la valeur de base malgré d'anciens niveaux de recherche — parce que les bonus du labo ont disparu")]
+        public void La_recuperation_revient_a_la_base()
         {
-            _app.Session.Meta.SetCounter(_app.Session.Meta.labLevels, ResearchLab.Loot, 5);
-            _app.Session.Wallet.Set(1_000_000, 0);
-            Assert.That(Code(_app.Lab.Start(ResearchLab.Loot)), Is.EqualTo("meta.max_level"));
+            foreach (var m in _app.Session.Roster) m.Fatigue = 50;
+            _app.Session.Meta.SetCounter(_app.Session.Meta.labLevels, "recovery", 5);
+            long ago = _app.Time.UtcNow.AddMinutes(-20).Ticks;
+            int recovered = N29.HeroesDawn.Application.Features.Auth.FatigueRecovery.Apply(_app.Session.Roster, _app.Time.UtcNow, ago);
+            Assert.That(recovered, Is.EqualTo(_app.Session.Roster.Count * 20 * MetaRules.FatigueRecoveryPerMinute), "1 point par minute, sans bonus de recherche");
         }
+
+        [Test, Description("Vérifie que le type ResearchLab n'existe plus dans l'application — parce qu'aucun service de recherche ne doit être enregistré")]
+        public void Plus_aucun_service_de_recherche_n_est_enregistre()
+        {
+            var assembly = typeof(MetaOverview).Assembly;
+            Assert.That(assembly.GetType("N29.HeroesDawn.Application.Features.Meta.ResearchLab"), Is.Null);
+            Assert.That(assembly.GetType("N29.HeroesDawn.Application.Features.Meta.LabBonuses"), Is.Null);
+        }
+
 
         // ------------------------------------------------------------------ Archives
 
