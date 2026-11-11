@@ -1,41 +1,23 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using N29.HeroesDawn.Presentation.Combat.Hud;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace N29.HeroesDawn.Presentation.Combat
 {
-    /// <summary>Combat (prefab Screens/Combat) : arène (ennemis en haut, alliés en bas), compétences, journal, bandeau.</summary>
+    /// <summary>Combat (prefab Screens/Combat) : fond uGUI et HUD UI Toolkit (<see cref="CombatHudView"/>) portant l'arène, les cartes, la frise, l'éventail, le journal et le bandeau.</summary>
     public sealed partial class CombatView : ViewBase, ICombatView
     {
         [SerializeField] CombatHudView hud = null!;
-        [SerializeField] TimelineView timeline = null!;
-        [SerializeField] RectTransform enemyRow = null!;
-        [SerializeField] RectTransform allyRow = null!;
-        [SerializeField] UnitCardView unitCardPrefab = null!;
-        [SerializeField] UnitCardView allyCardPrefab = null!;
-        [SerializeField] RectTransform fanRoot = null!;
-        [SerializeField] SkillIconView[] fan = Array.Empty<SkillIconView>();
-        [SerializeField, Mvp.OptionalRef] Tutorial.TutorialTargetMarker? fanMarker;
-        [SerializeField] RectTransform descPanel = null!;
-        [SerializeField] TMP_Text descTitle = null!;
-        [SerializeField] TMP_Text descText = null!;
-        [SerializeField, Mvp.OptionalRef] RectTransform? dropZone;
-        [SerializeField, Mvp.OptionalRef] RectTransform? arena;
-        [SerializeField, Mvp.OptionalRef] TMP_Text? arenaTitle;
-        [SerializeField, Mvp.OptionalRef] UnityEngine.UI.Image? spotlight;
 
-        readonly Dictionary<int, UnitCardView> _cards = new Dictionary<int, UnitCardView>();
         int _skillUnit = -1;
         IReadOnlyList<UnitStateData> _lastStates = Array.Empty<UnitStateData>();
-        Vector2[] _fanHome = Array.Empty<Vector2>();
         int _fanUnit = -1;
 
         public event Action? RetreatClicked;
@@ -52,32 +34,27 @@ namespace N29.HeroesDawn.Presentation.Combat
         /// <summary>Boutons Auto et vitesse (tests PlayMode : clics réels).</summary>
         public UiToolkit.HdButtonRef AutoButton => hud.AutoButton;
         public UiToolkit.HdButtonRef SpeedButton => hud.SpeedButton;
-        /// <summary>HUD UI Toolkit (barre du haut, bandeau, consigne, journal ; tests PlayMode).</summary>
+        /// <summary>HUD UI Toolkit (barre du haut, terrain, frise, éventail ; tests PlayMode).</summary>
         public CombatHudView Hud => hud;
-        public TimelineView Timeline => timeline;
+        public TimelineHud Timeline => hud.Timeline;
 
-        /// <summary>Icône de la compétence <paramref name="i"/> de l'agent prêt (tests PlayMode : clics réels).</summary>
-        public UnityEngine.UI.Button SkillButton(int i) => fan[i].Button;
-
-        /// <summary>Carte de l'éventail (visible seulement pour l'agent dont c'est le tour ; tests PlayMode).</summary>
-        public SkillIconView SkillCard(int i) => fan[i];
+        /// <summary>Carte de compétence de l'agent prêt (visible seulement pour l'agent dont c'est le tour ; tests PlayMode).</summary>
+        public SkillCardHud SkillCard(int i) => hud.SkillCard(i);
 
         /// <summary>L'éventail de compétences est-il affiché ? (tests PlayMode)</summary>
-        public bool FanVisible => fanRoot.gameObject.activeSelf;
+        public bool FanVisible => hud.FanVisible;
         /// <summary>Les animations de combat (éventail, cartes jouées) sont-elles permises ? Faux avec « réduire les mouvements ».</summary>
-        public bool AnimationsAllowed => !Feedback.MotionSettings.Reduced && UnityEngine.Application.isPlaying;
-        /// <summary>Racine de l'éventail (tests PlayMode).</summary>
-        public Transform FanRootForTests => fanRoot;
+        public bool AnimationsAllowed => HudAnim.Allowed;
 
         /// <summary>Description affichée pendant l'appui maintenu sur une carte (tests PlayMode).</summary>
-        public bool DescriptionVisible => descPanel.gameObject.activeSelf;
-        public string DescriptionText => descText.text;
+        public bool DescriptionVisible => hud.DescriptionVisible;
+        public string DescriptionText => hud.DescriptionText;
 
         /// <summary>Cartes ennemies (tests PlayMode : cibler au toucher).</summary>
-        public IReadOnlyList<UnitCardView> EnemyCards()
+        public IReadOnlyList<UnitCardHud> EnemyCards()
         {
-            var list = new List<UnitCardView>();
-            foreach (var c in enemyRow.GetComponentsInChildren<UnitCardView>(true)) list.Add(c);
+            var list = new List<UnitCardHud>();
+            foreach (var c in hud.Cards) if (c.Root.name.StartsWith("Enemy_", StringComparison.Ordinal)) list.Add(c);
             return list;
         }
 
@@ -88,74 +65,51 @@ namespace N29.HeroesDawn.Presentation.Combat
             hud.SpeedClicked += () => SpeedClicked?.Invoke();
             hud.DebugWinClicked += () => DebugWinClicked?.Invoke();
             hud.PauseClicked += () => PauseClicked?.Invoke();
-            for (int i = 0; i < fan.Length; i++)
-            {
-                int slot = i;
-                fan[i].Holding += ShowDescription;
-                fan[i].DragBegan += card => OnDragBegan(slot, card);
-                fan[i].DragEnded += (card, at) => OnDragEnded(slot, at);
-            }
-            descPanel.gameObject.SetActive(false);
-            _fanHome = new Vector2[fan.Length];
-            for (int i = 0; i < fan.Length; i++) _fanHome[i] = ((RectTransform)fan[i].transform).anchoredPosition;
-            fanRoot.gameObject.SetActive(false);
+            hud.UnitTapped += id => UnitTapped?.Invoke(id);
+            hud.SkillHolding += ShowDescription;
+            hud.SkillDragBegan += OnDragBegan;
+            hud.SkillDragEnded += (card, at) => OnDragEnded(SlotOf(card), at);
         }
 
-        void OnDragBegan(int slot, SkillIconView card)
+        int SlotOf(SkillCardHud card)
         {
-            descPanel.gameObject.SetActive(false);
-            if (dropZone != null) dropZone.gameObject.SetActive(!card.Data.NeedsTarget);
-            SkillDragBegan?.Invoke(slot);
+            for (int i = 0; i < 4; i++) if (hud.SkillCard(i) == card) return i;
+            return -1;
+        }
+
+        void OnDragBegan(SkillCardHud card)
+        {
+            hud.SetDescription(false, "", "");
+            hud.SetDropZone(!card.Data.NeedsTarget);
+            SkillDragBegan?.Invoke(SlotOf(card));
         }
 
         void OnDragEnded(int slot, Vector2 screenPos)
         {
-            if (dropZone != null) dropZone.gameObject.SetActive(false);
+            hud.SetDropZone(false);
             SkillDropped?.Invoke(slot, ResolveDrop(screenPos));
         }
 
         /// <summary>Où la carte est lâchée : sur l'éventail (annule), sur une carte d'unité (sa cible) ou dans le vide.</summary>
         int ResolveDrop(Vector2 screenPos)
         {
-            var canvas = GetComponentInParent<Canvas>();
-            var cam = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
-            if (RectTransformUtility.RectangleContainsScreenPoint(fanRoot, screenPos, cam)) return ICombatView.DropCancel;
+            if (hud.IsOverFan(screenPos)) return ICombatView.DropCancel;
             return UnitAt(screenPos) ?? ICombatView.DropTerrain;
         }
 
         /// <summary>Identifiant de l'unité dont la carte est sous ce point de l'écran (tests et dépose), null si aucune.</summary>
-        public int? UnitAt(Vector2 screenPos)
-        {
-            var es = UnityEngine.EventSystems.EventSystem.current;
-            if (es == null) return null;
-            var hits = new List<UnityEngine.EventSystems.RaycastResult>();
-            es.RaycastAll(new UnityEngine.EventSystems.PointerEventData(es) { position = screenPos }, hits);
-            foreach (var h in hits)
-            {
-                var c = h.gameObject.GetComponentInParent<UnitCardView>();
-                if (c != null) return c.UnitId;
-            }
-            return null;
-        }
+        public int? UnitAt(Vector2 screenPos) => hud.UnitAt(screenPos);
 
         /// <summary>Position de l'écran du centre de la carte d'une unité (tests PlayMode : glisser sur une cible).</summary>
-        public Vector2 UnitScreenPoint(int unitId)
-        {
-            var rt = (RectTransform)_cards[unitId].transform;
-            var canvas = GetComponentInParent<Canvas>();
-            var cam = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
-            return RectTransformUtility.WorldToScreenPoint(cam, rt.TransformPoint(rt.rect.center));
-        }
+        public Vector2 UnitScreenPoint(int unitId) => hud.TryCard(unitId, out var c) ? c.ScreenCenter() : Vector2.zero;
 
         /// <summary>Appui maintenu sur une carte : description de l'effet au-dessus de l'éventail, jusqu'au relâchement.</summary>
-        void ShowDescription(SkillIconView card, bool held)
+        void ShowDescription(SkillCardHud card, bool held)
         {
-            descPanel.gameObject.SetActive(held && card.Data.Visible && !card.Data.Locked);
-            if (!held) return;
+            bool show = held && card.Data.Visible && !card.Data.Locked;
             var label = card.Data.Label ?? "";
             int close = label.IndexOf(']');
-            descTitle.text = (close >= 0 ? label.Substring(close + 1) : label).Trim();
-            descText.text = card.Data.Description ?? "";
+            hud.SetDescription(show, (close >= 0 ? label.Substring(close + 1) : label).Trim(), card.Data.Description ?? "");
         }
 
         void Update()
@@ -172,37 +126,14 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         public void BuildUnits(IReadOnlyList<UnitCardData> units)
         {
-            ClearRows(enemyRow);
-            ClearRows(allyRow);
-            timeline.Clear();
-            _cards.Clear();
-            int allies = 0, enemies = 0;
-            foreach (var u in units)
-            {
-                int index = u.Ally ? allies++ : enemies++;
-                var card = Instantiate(u.Ally ? allyCardPrefab : unitCardPrefab, RowFor(u.Ally ? allyRow : enemyRow, index));
-                card.Setup(u);
-                card.Tapped += id => UnitTapped?.Invoke(id);
-                _cards[u.Id] = card;
-                if (u.Ally && allies == 1) Spotlight(card.PortraitArt);
-            }
-        }
-
-        /// <summary>Chaque camp est un bloc de deux rangées de deux cartes (croquis du combat) ; sans rangées, les cartes sont posées dans le bloc.</summary>
-        static RectTransform RowFor(RectTransform block, int index)
-            => block.childCount == 0 ? block : (RectTransform)block.GetChild(Mathf.Min(block.childCount >= 4 ? index : index / 2, block.childCount - 1));
-
-        static void ClearRows(RectTransform block)
-        {
-            if (block.childCount == 0) return;
-            for (int i = 0; i < block.childCount; i++) block.GetChild(i).Clear();
+            hud.ClearTimeline();
+            hud.BuildUnits(units);
         }
 
         public void ShowUnits(IReadOnlyList<UnitStateData> states)
         {
             _lastStates = states;
-            foreach (var s in states)
-                if (_cards.TryGetValue(s.Id, out var c)) c.Refresh(s);
+            hud.ShowStates(states);
         }
 
         public void ShowSkills(SkillPanelData d)
@@ -212,86 +143,17 @@ namespace N29.HeroesDawn.Presentation.Combat
             SkillSlotData[]? skills = null;
             foreach (var s in _lastStates) if (s.Id == _skillUnit) skills = s.Skills;
             bool show = d.Visible && skills != null;
-            bool opening = show && (!fanRoot.gameObject.activeSelf || _fanUnit != _skillUnit);
+            bool opening = show && (!hud.FanVisible || _fanUnit != _skillUnit);
             _fanUnit = show ? _skillUnit : -1;
-            if (fanRoot.gameObject.activeSelf != show) fanRoot.gameObject.SetActive(show);
-            if (!show) { descPanel.gameObject.SetActive(false); if (fanMarker != null) fanMarker.enabled = false; return; }
             bool usable = false;
-            for (int i = 0; i < fan.Length; i++)
-            {
-                var slotData = i < skills!.Length ? skills[i] : default;
-                fan[i].Show(slotData, i);
-                // Trois cartes en éventail ; la 4e (carte du grimoire) n apparaît que si elle existe.
-                if (i >= 3) fan[i].gameObject.SetActive(slotData.Visible && !slotData.Locked);
-                usable |= slotData.Enabled || slotData.Pending;
-            }
-            if (fanMarker != null) fanMarker.enabled = usable;
-            if (opening) AnimateFanIn();
-        }
-
-        /// <summary>Début du tour d'un agent : les cartes montent du bas de l'écran et s'ouvrent en éventail, l'une après l'autre.</summary>
-        void AnimateFanIn()
-        {
-            if (!AnimationsAllowed) return;
-            for (int i = 0; i < fan.Length && i < _fanHome.Length; i++)
-            {
-                var rt = (RectTransform)fan[i].transform;
-                var home = _fanHome[i];
-                rt.anchoredPosition = home + new Vector2(0f, -300f);
-                rt.localScale = Vector3.one * 0.8f;
-                Tween.Delay(i * 0.05f, () =>
-                {
-                    if (rt == null) return;
-                    Tween.Run(0.28f, k =>
-                    {
-                        if (rt == null) return;
-                        rt.anchoredPosition = Vector2.LerpUnclamped(home + new Vector2(0f, -300f), home, k);
-                        rt.localScale = Vector3.one * Mathf.LerpUnclamped(0.8f, 1f, k);
-                    }, () => { if (rt != null) { rt.anchoredPosition = home; rt.localScale = Vector3.one; } }, rt, Tween.EaseOutBack);
-                }, rt);
-            }
+            if (show) foreach (var slot in skills!) usable |= slot.Enabled || slot.Pending;
+            hud.ShowFan(show, skills, opening, usable);
         }
 
         /// <summary>Une carte est jouée : un double s'envole de l'éventail vers sa cible (ou le terrain), grossit puis s'éteint dans un éclat.</summary>
-        public void PlayCard(int slot, int targetUnitId)
-        {
-            if (!AnimationsAllowed || slot < 0 || slot >= fan.Length) return;
-            var src = fan[slot];
-            if (!src.gameObject.activeInHierarchy) return;
-            var canvas = GetComponentInParent<Canvas>();
-            var layer = canvas != null ? canvas.rootCanvas.transform : transform;
-            var ghost = Instantiate(src.gameObject, layer, false);
-            foreach (var mb in ghost.GetComponentsInChildren<MonoBehaviour>(true))
-                if (!(mb is UnityEngine.UI.Graphic) && !(mb is TMP_Text)) Destroy(mb);
-            var grt = (RectTransform)ghost.transform;
-            grt.position = src.transform.position;
-            grt.rotation = src.transform.rotation;
-            grt.localScale = src.transform.localScale;
-            var cg = ghost.GetComponent<CanvasGroup>() ?? ghost.AddComponent<CanvasGroup>();
-            cg.blocksRaycasts = false;
-            RectTransform? targetRect = null;
-            Vector3 to = enemyRow.position;
-            if (targetUnitId >= 0 && _cards.TryGetValue(targetUnitId, out var tc)) { targetRect = (RectTransform)tc.transform; to = targetRect.TransformPoint(targetRect.rect.center); }
-            var from = grt.position;
-            var fromRot = grt.rotation;
-            Tween.Run(0.32f, k =>
-            {
-                if (grt == null) return;
-                grt.position = Vector3.LerpUnclamped(from, to, k);
-                grt.rotation = Quaternion.Slerp(fromRot, Quaternion.identity, k);
-                grt.localScale = Vector3.one * Mathf.Lerp(1f, 1.35f, k);
-            }, () =>
-            {
-                if (grt == null) return;
-                Feedback.Fx.Sparks(targetRect != null ? targetRect : enemyRow, Theme.Glow, 12, 130f, 18f);
-                Tween.Fade(cg, 0f, 0.14f, () => { if (ghost != null) Destroy(ghost); });
-            }, grt, Tween.EaseOutCubic);
-        }
+        public void PlayCard(int slot, int targetUnitId) => hud.PlayCard(slot, targetUnitId, hud.EnemyCenterPanel());
 
-        public void ShowTimeline(TimelineData d)
-        {
-            timeline.Show(d);
-        }
+        public void ShowTimeline(TimelineData d) => hud.ShowTimeline(d);
 
         public void ShowTopBar(CombatTopBarData d) => hud.SetTopBar(d);
 
@@ -304,6 +166,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         }
 
         public void ShowLog(IReadOnlyList<string> lines) => hud.SetLog(lines);
+
         public void ShowBoss(BossBarData? data, bool phaseChanged = false)
         {
             hud.ShowBoss(data, phaseChanged);
@@ -314,23 +177,16 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         public void Float(int unitId, string text, Tone tone, int size)
         {
-            if (_cards.TryGetValue(unitId, out var c)) c.Float(text, ToneColors.Of(tone), size);
+            if (hud.TryCard(unitId, out var c)) c.Float(text, ToneColors.Of(tone), size);
         }
 
-        public void Hit(int unitId) { if (_cards.TryGetValue(unitId, out var c)) c.Hit(); }
+        public void Hit(int unitId) { if (hud.TryCard(unitId, out var c)) c.Hit(hud.FxLayer); }
+
         public void Act(int unitId)
         {
-            if (!_cards.TryGetValue(unitId, out var c)) return;
+            if (!hud.TryCard(unitId, out var c)) return;
             c.Act();
-            Spotlight(c.PortraitArt);
-        }
-
-        /// <summary>Grande illustration de l'unité qui agit, au centre du terrain (planche 8.2) ; masquée sans illustration.</summary>
-        void Spotlight(Sprite? art)
-        {
-            if (spotlight == null || art == null) return;
-            spotlight.sprite = art;
-            spotlight.gameObject.SetActive(true);
+            hud.Spotlight(c.PortraitArt);
         }
 
         public UniTask PauseAsync(float seconds, CancellationToken ct)

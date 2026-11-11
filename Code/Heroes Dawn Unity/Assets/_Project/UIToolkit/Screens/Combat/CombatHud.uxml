@@ -1,5 +1,19 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="safe" class="hd-hud">
+        <ui:VisualElement name="arena" class="hd-hud__arena">
+            <ui:VisualElement name="spotlight" class="hd-hud__spotlight" />
+            <ui:Label name="arenaTitle" class="hd-hud__arena-title" />
+        </ui:VisualElement>
+        <ui:VisualElement name="allies" class="hd-hud__col hd-hud__col--allies" />
+        <ui:VisualElement name="enemies" class="hd-hud__col hd-hud__col--enemies" />
+        <ui:VisualElement name="timeline" class="hd-tl">
+            <ui:Label name="axisStart" class="hd-tl__axis-start" text="100" />
+            <ui:VisualElement name="track" class="hd-tl__track">
+                <ui:VisualElement name="prep" class="hd-tl__prep" />
+            </ui:VisualElement>
+            <ui:Label name="axisEnd" class="hd-tl__axis-end" text="0" />
+            <ui:Label name="axisLabel" class="hd-tl__axis-label" />
+        </ui:VisualElement>
         <ui:VisualElement class="hd-hud__top">
             <ui:Button name="retreat" class="hd-btn hd-btn--danger hd-hud__btn" />
             <ui:Label name="title" class="hd-hud__title" />
@@ -26,6 +40,17 @@
         </ui:VisualElement>
         <ui:VisualElement class="hd-hud__log">
             <ui:Label name="log" class="hd-hud__log-text" />
+        </ui:VisualElement>
+        <ui:VisualElement name="fx" class="hd-hud__fx" />
+        <ui:VisualElement name="description" class="hd-hud__desc">
+            <ui:Label name="descTitle" class="hd-hud__desc-title" />
+            <ui:Label name="descText" class="hd-hud__desc-text" />
+        </ui:VisualElement>
+        <ui:VisualElement name="dropZone" class="hd-hud__drop">
+            <ui:Label name="dropText" class="hd-hud__drop-text" />
+        </ui:VisualElement>
+        <ui:VisualElement name="fan" class="hd-hud__fan">
+            <ui:VisualElement name="fanAnchor" class="hd-hud__fan-anchor" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

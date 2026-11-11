@@ -12,7 +12,7 @@ namespace N29.HeroesDawn.Presentation.Combat
     /// HUD du combat (UI Toolkit) posé sur l'arène uGUI : barre du haut (retraite, titre, AUTO, vitesse, pause), bandeau central,
     /// consigne et journal. Les clics des zones vides traversent vers l'arène. Rejoue le dernier état à chaque activation.
     /// </summary>
-    public sealed class CombatHudView : HdView
+    public sealed partial class CombatHudView : HdView
     {
         UnityEngine.UIElements.Button _retreat = null!, _auto = null!, _speed = null!, _pause = null!, _debug = null!;
         Label _title = null!, _banner = null!, _hint = null!, _log = null!;
@@ -55,6 +55,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             _debug.text = Loc.T("combat.debug_win");
             _banner.pickingMode = PickingMode.Ignore;
             BindBossAndBonuses();
+            BindBoard();
             if (_topBar.HasValue) SetTopBar(_topBar.Value);
             SetHint(_hintText);
             _log.text = _logText;
