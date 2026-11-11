@@ -27,7 +27,8 @@ namespace N29.HeroesDawn.Content.Prototype
             => new EnemyDef(new EnemyId(id), "enemies." + id + ".name", r, f, st, skills, boss);
 
         /// <summary>Palier de boss : sous <paramref name="pct"/> % de PV, bonus permanents de force, de défense et de vitesse (en %).</summary>
-        static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd) => new BossPhaseDef(pct, nameKey, atk, def, spd);
+        static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd, SkillDef[] skills = null, AiStyle? style = null)
+            => new BossPhaseDef(pct, nameKey, atk, def, spd, skills, style);
 
         static EnemyDef Phased(EnemyDef d, params BossPhaseDef[] phases)
             => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases, d.Style);
@@ -46,17 +47,39 @@ namespace N29.HeroesDawn.Content.Prototype
                 S("canal_chief_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110)),
                 S("canal_chief_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(80), St(StatusType.Corrosion, 2, 40)),
                 S("canal_chief_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(20)));
+            // Phase 1 défensive (provocation et bouclier) ; phase 2 équilibrée avec une onde de choc de zone ; phase 3 agressive, un gros coup.
             yield return Phased(E("bridge_titan", Position.FrontLine, Family.PhysicalBio, new StatBlock(5600, 120, 140, 95), true,
                 S("bridge_titan_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(125)),
                 S("bridge_titan_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(12)),
                 S("bridge_titan_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(95), St(StatusType.Shock, 1, 35))),
-                Phase(66, "enemies.bridge_titan.phase2", 10, 0, 5), Phase(33, "enemies.bridge_titan.phase3", 25, -10, 10));
-            // Crocodile (Antonio Kribelchi), mafieux méta-humain : boss de Coney Island. Morsure, coup de queue, cuirasse d'écailles.
-            yield return Phased(E("crocodile", Position.Attacker, Family.PhysicalBio, new StatBlock(5200, 135, 120, 100), true,
+                Phase(66, "enemies.bridge_titan.phase2", 10, 0, 5,
+                    new[]
+                    {
+                        S("bridge_titan_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(125)),
+                        S("bridge_titan_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(12)),
+                        S("bridge_titan_p2_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(110), St(StatusType.Shock, 1, 50)),
+                    }, AiStyle.Balanced),
+                Phase(33, "enemies.bridge_titan.phase3", 25, -10, 10,
+                    new[]
+                    {
+                        S("bridge_titan_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(125)),
+                        S("bridge_titan_p3_a2", SkillSlot.A2, 4, TargetRule.SingleEnemy, Dmg(200)),
+                        S("bridge_titan_p2_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(110), St(StatusType.Shock, 1, 50)),
+                    }, AiStyle.Aggressive));
+            // Crocodile (Antonio Kribelchi), mafieux méta-humain : boss de Coney Island. Phase 1 : il entrave les plus rapides ; phase 2 : morsure broyeuse.
+            yield return Styled(Phased(E("crocodile", Position.Attacker, Family.PhysicalBio, new StatBlock(5200, 135, 120, 100), true,
                 S("crocodile_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(130)),
                 S("crocodile_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(90), St(StatusType.Shock, 1, 30)),
-                S("crocodile_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(25), St(StatusType.Taunt, 1))),
-                Phase(66, "enemies.crocodile.phase2", 10, 0, 5), Phase(33, "enemies.crocodile.phase3", 25, -10, 10));
+                S("crocodile_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(25), St(StatusType.Taunt, 1)),
+                S("crocodile_a4", SkillSlot.A4, 4, TargetRule.SingleEnemy, Dmg(70), St(StatusType.Bind, 1, 60))),
+                Phase(66, "enemies.crocodile.phase2", 10, 0, 5,
+                    new[]
+                    {
+                        S("crocodile_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(130)),
+                        S("crocodile_p2_a2", SkillSlot.A2, 3, TargetRule.SingleEnemy, Dmg(160), St(StatusType.Corrosion, 2)),
+                        S("crocodile_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(25), St(StatusType.Taunt, 1)),
+                    }, AiStyle.Aggressive),
+                Phase(33, "enemies.crocodile.phase3", 25, -10, 10)), AiStyle.Control);
             // Troupes de l'AMIF (zone 1.4) : soldat, tireur, capitaine.
             yield return Styled(E("amif_trooper", Position.Attacker, Family.Matter, new StatBlock(1300, 120, 70, 105), false,
                 S("amif_trooper_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100)),

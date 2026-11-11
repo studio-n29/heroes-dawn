@@ -56,7 +56,8 @@ namespace N29.HeroesDawn.Content.Prototype
             => new EnemyDef(new EnemyId(id), "enemies." + id + ".name", r, f, st, skills, boss);
 
         /// <summary>Palier de boss : sous <paramref name="pct"/> % de PV, bonus permanents de force, de défense et de vitesse (en %).</summary>
-        static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd) => new BossPhaseDef(pct, nameKey, atk, def, spd);
+        static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd, SkillDef[] skills = null, AiStyle? style = null)
+            => new BossPhaseDef(pct, nameKey, atk, def, spd, skills, style);
 
         static EnemyDef Phased(EnemyDef d, params BossPhaseDef[] phases)
             => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases, d.Style);
@@ -103,7 +104,20 @@ namespace N29.HeroesDawn.Content.Prototype
                     S("brick_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(120)),
                     S("brick_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(10)),
                     S("brick_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(90), St(StatusType.Shock, 1, 30))),
-                    Phase(66, "enemies.brick.phase2", 10, 0, 5), Phase(33, "enemies.brick.phase3", 25, -10, 10)),
+                    // Phase 2 : le mur se fissure, il frappe en zone. Phase 3 : plus de défense, deux gros coups.
+                    Phase(66, "enemies.brick.phase2", 10, 0, 5,
+                        new[]
+                        {
+                            S("brick_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(120)),
+                            S("brick_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(10)),
+                            S("brick_p2_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(110), St(StatusType.Shock, 1)),
+                        }, AiStyle.Aggressive),
+                    Phase(33, "enemies.brick.phase3", 25, -10, 10,
+                        new[]
+                        {
+                            S("brick_p3_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(150)),
+                            S("brick_p3_a2", SkillSlot.A2, 4, TargetRule.SingleEnemy, Dmg(190), St(StatusType.Vulnerable, 2)),
+                        }, AiStyle.Aggressive)),
             };
 
             var synergies = new List<SynergyDef>

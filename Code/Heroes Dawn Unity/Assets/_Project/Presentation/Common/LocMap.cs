@@ -93,6 +93,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["skills.bridge_titan_a1"] = "Poing d'acier";
             d["skills.bridge_titan_a2"] = "Pile du pont";
             d["skills.bridge_titan_a3"] = "Rupture de câble";
+            // Compétences des phases de boss (bloc C de la 1.0.0).
+            d["skills.brick_p2_a3"] = "Séisme de briques"; d["skills.brick_p3_a1"] = "Poing de granit"; d["skills.brick_p3_a2"] = "Écrasement final";
+            d["skills.crocodile_a4"] = "Étreinte du caïman"; d["skills.crocodile_p2_a2"] = "Morsure broyeuse";
+            d["skills.bridge_titan_p2_a3"] = "Onde de choc du pont"; d["skills.bridge_titan_p3_a2"] = "Chute du tablier";
         }
     }
 }
