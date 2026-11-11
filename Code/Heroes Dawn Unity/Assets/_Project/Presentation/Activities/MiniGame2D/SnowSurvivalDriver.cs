@@ -5,7 +5,6 @@ using N29.HeroesDawn.Domain.Activities.Games;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
@@ -17,13 +16,13 @@ namespace N29.HeroesDawn.Presentation.Activities
     {
         const float ViewMeters = 22f;
 
-        sealed class Item { public Image Image = null!; public Vec2f Center; public Vec2f Size; }
+        sealed class Item { public FieldSprite FieldSprite = null!; public Vec2f Center; public Vec2f Size; }
 
         readonly SnowSurvivalMiniGame _game;
         readonly ActivityLevel _level;
         readonly ILocalization _loc;
         readonly List<Item> _items = new List<Item>();
-        Image? _player, _arrow, _barBack, _barFill, _targetRing;
+        FieldSprite? _player, _arrow, _barBack, _barFill, _targetRing;
         Vec2f _target;
         float _clock, _scale;
 
@@ -69,7 +68,7 @@ namespace N29.HeroesDawn.Presentation.Activities
 
         Item AddItem(Sprite? sprite, Color color, Vec2f center, Vec2f size)
         {
-            var it = new Item { Image = Img("Item" + _items.Count, sprite, color, Vector2.one), Center = center, Size = size };
+            var it = new Item { FieldSprite = Img("Item" + _items.Count, sprite, color, Vector2.one), Center = center, Size = size };
             _items.Add(it);
             return it;
         }
@@ -84,8 +83,8 @@ namespace N29.HeroesDawn.Presentation.Activities
             _game.Step(dt);
             foreach (var it in _items)
             {
-                it.Image.rectTransform.anchoredPosition = Rel(it.Center);
-                it.Image.rectTransform.sizeDelta = new Vector2(it.Size.X * _scale, it.Size.Y * _scale);
+                it.FieldSprite.rectTransform.anchoredPosition = Rel(it.Center);
+                it.FieldSprite.rectTransform.sizeDelta = new Vector2(it.Size.X * _scale, it.Size.Y * _scale);
             }
             float pulse = 1f + 0.12f * Mathf.Sin(_clock * 5f);
             _targetRing!.rectTransform.anchoredPosition = Rel(_target);

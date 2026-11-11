@@ -4,7 +4,6 @@ using N29.HeroesDawn.Domain.Activities.Games;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
@@ -18,8 +17,8 @@ namespace N29.HeroesDawn.Presentation.Activities
 
         readonly DnaAnalysisGame _game;
         readonly ILocalization _loc;
-        Image[] _nodes = new Image[0];
-        Image[] _links = new Image[0];
+        FieldSprite[] _nodes = new FieldSprite[0];
+        FieldSprite[] _links = new FieldSprite[0];
         float _clock;
 
         public DnaDriver(ActivityPlan plan, ILocalization loc)
@@ -35,16 +34,17 @@ namespace N29.HeroesDawn.Presentation.Activities
         {
             int n = _game.Nodes.Count;
             // Les liens (brins et barreaux) sont sous les nœuds.
-            _links = new Image[(n - 2) + (n - 1) / 2 + 1];
-            for (int i = 0; i < _links.Length; i++) _links[i] = Img("Link" + i, null, new Color(1f, 1f, 1f, 0.35f), new Vector2(10, 6));
-            _nodes = new Image[n];
+            _links = new FieldSprite[(n - 2) + (n - 1) / 2 + 1];
+            var link = TacticalArt.Ext("MiniGames", "molecule-link");
+            for (int i = 0; i < _links.Length; i++) _links[i] = Img("Link" + i, link, link != null ? new Color(1f, 1f, 1f, 0.75f) : new Color(1f, 1f, 1f, 0.35f), new Vector2(10, 6));
+            _nodes = new FieldSprite[n];
             for (int i = 0; i < n; i++) _nodes[i] = Img("Node" + i, Sprites.Circle, Healthy, Vector2.one * 60f);
             Tick(0f, default);   // mise en page avant le début
         }
 
         Vector2 PosOf(int i) => ToField(_game.Nodes[i].X, _game.Nodes[i].Y);
 
-        static void Line(Image img, Vector2 a, Vector2 b)
+        static void Line(FieldSprite img, Vector2 a, Vector2 b)
         {
             var d = b - a;
             img.rectTransform.sizeDelta = new Vector2(d.magnitude, 6f);

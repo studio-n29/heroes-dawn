@@ -77,6 +77,29 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
             }
         }
 
+        /// <summary>Étincelles autour d'un point (coordonnées locales de <paramref name="layer"/>, y vers le bas).</summary>
+        public static void Sparks(VisualElement layer, Vector2 localCenter, Color color, int count, float speed, float size)
+        {
+            if (!Allowed) return;
+            for (int i = 0; i < count; i++)
+            {
+                var spark = new VisualElement { pickingMode = PickingMode.Ignore };
+                spark.style.position = Position.Absolute;
+                spark.style.width = size; spark.style.height = size;
+                spark.style.backgroundColor = color;
+                spark.style.borderTopLeftRadius = spark.style.borderTopRightRadius = spark.style.borderBottomLeftRadius = spark.style.borderBottomRightRadius = size;
+                layer.Add(spark);
+                float angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f), dist = UnityEngine.Random.Range(0.4f, 1f) * speed;
+                var dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * dist;
+                Run(spark, 0.45f, k =>
+                {
+                    spark.style.left = localCenter.x + dir.x * k - size * 0.5f;
+                    spark.style.top = localCenter.y + dir.y * k - size * 0.5f;
+                    spark.style.opacity = 1f - k;
+                }, () => spark.RemoveFromHierarchy(), EaseOutCubic);
+            }
+        }
+
         public static void Flash(VisualElement e)
         {
             if (!Allowed) return;

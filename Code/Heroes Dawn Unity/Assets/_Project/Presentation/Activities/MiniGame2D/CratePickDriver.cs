@@ -4,7 +4,6 @@ using N29.HeroesDawn.Domain.Activities.Games;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
@@ -19,9 +18,9 @@ namespace N29.HeroesDawn.Presentation.Activities
 
         readonly CratePickGame _game;
         readonly ILocalization _loc;
-        Image[] _crates = new Image[0];
-        Image[] _locks = new Image[0];
-        Image? _cursor, _beam, _chargeBack, _chargeFill;
+        FieldSprite[] _crates = new FieldSprite[0];
+        FieldSprite[] _locks = new FieldSprite[0];
+        FieldSprite? _cursor, _beam, _chargeBack, _chargeFill;
         float _flash;
         int _flashCrate = -1;
         Color _flashColor;
@@ -38,8 +37,8 @@ namespace N29.HeroesDawn.Presentation.Activities
 
         protected override void OnBuild()
         {
-            _crates = new Image[CratePickGame.Crates];
-            _locks = new Image[CratePickGame.Crates];
+            _crates = new FieldSprite[CratePickGame.Crates];
+            _locks = new FieldSprite[CratePickGame.Crates];
             for (int i = 0; i < _crates.Length; i++)
             {
                 _crates[i] = Img("Crate" + i, Sprites.Rounded, new Color(0.62f, 0.42f, 0.22f), new Vector2(260, 260));

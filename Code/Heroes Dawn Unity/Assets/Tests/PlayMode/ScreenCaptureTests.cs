@@ -351,7 +351,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 if (driver.UsesStick) { popup.Input.PressAt(new Vector2(0.5f, 0.5f)); popup.Input.DragTo(new Vector2(0.58f, 0.5f)); }
                 if (driver.Game is N29.HeroesDawn.Domain.Activities.Games.RescueEngineeringGame rescue)
                 {
-                    var panel = popup.GetComponentInChildren<RescuePanelView>(true);
+                    var panel = popup.Rescue!;
                     yield return null;
                     for (int i = 0; i < 2; i++) panel.PoolButton(System.Linq.Enumerable.ToList(rescue.Pool).IndexOf(rescue.Solution[i])).Button.onClick.Invoke();
                 }

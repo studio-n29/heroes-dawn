@@ -4,7 +4,6 @@ using N29.HeroesDawn.Domain.Activities.Games;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
@@ -14,13 +13,15 @@ namespace N29.HeroesDawn.Presentation.Activities
     public sealed class RhythmDriver : MiniGameDriverBase
     {
         const float HitY = 0.85f;
+        static readonly string[] LaneNames = { "amber", "cyan", "pink" };
+        static bool HasNoteArt => TacticalArt.Ext("MiniGames", "rhythm-note-amber") != null;
         static readonly Color[] LaneColors = { Theme.Info, Theme.Primary, Theme.Success, Theme.Danger };
 
         readonly RhythmGame _game;
         readonly ILocalization _loc;
-        Image[] _lanes = new Image[0];
-        Image[] _notes = new Image[0];
-        Image? _hitLine;
+        FieldSprite[] _lanes = new FieldSprite[0];
+        FieldSprite[] _notes = new FieldSprite[0];
+        FieldSprite? _hitLine;
 
         public RhythmDriver(ActivityPlan plan, ILocalization loc)
         {
@@ -33,13 +34,19 @@ namespace N29.HeroesDawn.Presentation.Activities
 
         protected override void OnBuild()
         {
-            _lanes = new Image[_game.Lanes];
+            _lanes = new FieldSprite[_game.Lanes];
             for (int l = 0; l < _lanes.Length; l++)
-                _lanes[l] = Img("Lane" + l, null, new Color(1f, 1f, 1f, l % 2 == 0 ? 0.06f : 0.12f), Vector2.one);
+                {
+                var laneSprite = TacticalArt.Ext("MiniGames", "rhythm-lane-" + LaneNames[l % LaneNames.Length]);
+                _lanes[l] = Img("Lane" + l, laneSprite, laneSprite != null ? new Color(1f, 1f, 1f, 0.9f) : new Color(1f, 1f, 1f, l % 2 == 0 ? 0.06f : 0.12f), Vector2.one);
+            }
             _hitLine = Img("HitLine", null, Theme.WithAlpha(Theme.Accent, 0.9f), Vector2.one);
-            _notes = new Image[_game.Notes.Count];
+            _notes = new FieldSprite[_game.Notes.Count];
             for (int i = 0; i < _notes.Length; i++)
-                _notes[i] = Img("Note" + i, Sprites.Circle, LaneColors[_game.Notes[i].Lane % LaneColors.Length], new Vector2(110, 110));
+                {
+                var noteSprite = TacticalArt.Ext("MiniGames", "rhythm-note-" + LaneNames[_game.Notes[i].Lane % LaneNames.Length]);
+                _notes[i] = Img("Note" + i, noteSprite != null ? noteSprite : Sprites.Circle, noteSprite != null ? Color.white : LaneColors[_game.Notes[i].Lane % LaneColors.Length], new Vector2(110, 110));
+            }
             Layout();
         }
 
@@ -83,7 +90,7 @@ namespace N29.HeroesDawn.Presentation.Activities
                 if (!visible) continue;
                 float y = (1f - (n.Time - _game.Song) / RhythmGame.Lead) * HitY;
                 img.rectTransform.anchoredPosition = ToField((n.Lane + 0.5f) / _game.Lanes, y);
-                img.color = n.State == NoteState.Missed ? Theme.WithAlpha(Color.gray, 0.5f) : LaneColors[n.Lane % LaneColors.Length];
+                img.color = n.State == NoteState.Missed ? Theme.WithAlpha(Color.gray, 0.5f) : (HasNoteArt ? Color.white : LaneColors[n.Lane % LaneColors.Length]);
             }
         }
     }

@@ -4,7 +4,6 @@ using N29.HeroesDawn.Domain.Activities.Games;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
@@ -16,8 +15,8 @@ namespace N29.HeroesDawn.Presentation.Activities
     {
         readonly GearsGame _game;
         readonly ILocalization _loc;
-        Image[] _gears = new Image[0];
-        Image[] _rings = new Image[0];
+        FieldSprite[] _gears = new FieldSprite[0];
+        FieldSprite[] _rings = new FieldSprite[0];
         bool[] _synced = new bool[0];
         float _angle;
 
@@ -37,8 +36,8 @@ namespace N29.HeroesDawn.Presentation.Activities
         protected override void OnBuild()
         {
             int n = _game.Gears.Count;
-            _gears = new Image[n];
-            _rings = new Image[n];
+            _gears = new FieldSprite[n];
+            _rings = new FieldSprite[n];
             _synced = new bool[n];
             for (int i = 0; i < n; i++)
             {

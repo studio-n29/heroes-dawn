@@ -818,3 +818,30 @@ Label { flex-shrink: 0; }
 .hd-board__fog { position: absolute; -unity-background-scale-mode: stretch-to-fill; }
 .hd-board__pawn { position: absolute; width: 70px; height: 70px; border-radius: 35px; border-width: 4px; background-color: var(--hd-surface); -unity-background-scale-mode: scale-and-crop; overflow: hidden; }
 .hd-board__pawninitial { -unity-font: var(--hd-font-title); font-size: 36px; color: var(--hd-ivory); -unity-text-align: middle-center; flex-grow: 1; }
+
+/* ---- Mini-jeux 2D ---- */
+.hd-mg2d { width: 1280px; height: 900px; max-height: 96%; }
+.hd-mg2d__hud { flex-direction: row; justify-content: space-between; align-items: center; height: 56px; }
+.hd-mg2d__score { -unity-font: var(--hd-font-title); font-size: 40px; color: var(--hd-brass); }
+.hd-mg2d__time { -unity-font: var(--hd-font-title); font-size: 44px; color: var(--hd-ivory); }
+.hd-mg2d__lives { -unity-font: var(--hd-font-title); font-size: 44px; color: var(--hd-danger); }
+.hd-mg2d__field { flex-grow: 1; margin: 8px 0; background-color: var(--hd-ink-deep); border-width: 3px; border-color: var(--hd-brass-dark); border-radius: 6px; overflow: hidden; }
+.hd-mg2d__bg { position: absolute; left: 0; top: 0; right: 0; bottom: 0; -unity-background-scale-mode: stretch-to-fill; }
+.hd-mg2d__ring { position: absolute; width: 250px; height: 250px; border-radius: 125px; border-width: 6px; border-color: rgba(255, 255, 255, 0.35); display: none; }
+.hd-mg2d__knob { position: absolute; width: 110px; height: 110px; border-radius: 55px; background-color: rgba(214, 175, 91, 0.8); display: none; }
+.hd-mg2d__briefing { position: absolute; left: 26px; top: 26px; right: 26px; bottom: 26px; background-color: rgba(10, 17, 26, 0.97); border-radius: 8px; align-items: center; justify-content: center; padding: 40px 60px; }
+.hd-mg2d__overlay { -unity-font: var(--hd-font-title); font-size: 40px; color: var(--hd-ivory); -unity-text-align: middle-center; white-space: normal; }
+.hd-mg2d__abandon { align-self: center; height: 80px; min-width: 340px; font-size: 30px; }
+.hd-mg2d__rescuehost { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.hd-rescue { position: absolute; left: 0; top: 0; right: 0; bottom: 0; flex-direction: row; padding: 24px; }
+.hd-rescue__left { width: 40%; margin-right: 3%; }
+.hd-rescue__manual { padding: 14px 18px; background-color: rgba(0, 0, 0, 0.45); border-radius: 6px; -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-ivory); white-space: normal; }
+.hd-rescue__slots { flex-direction: row; flex-wrap: wrap; margin-top: 12px; }
+.hd-rescue__slot { width: 23%; height: 56px; margin: 0 1% 8px 1%; background-color: rgba(255, 255, 255, 0.16); border-radius: 8px; align-items: center; justify-content: center; }
+.hd-rescue__slottext { -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-ivory); white-space: normal; -unity-text-align: middle-center; }
+.hd-rescue__status { -unity-font: var(--hd-font-body); font-size: 28px; color: var(--hd-brass-soft); margin-top: 6px; }
+.hd-rescue__right { flex-grow: 1; }
+.hd-rescue__pool { flex-direction: row; flex-wrap: wrap; }
+.hd-rescue__part { width: 23%; height: 96px; margin: 0 1% 8px 1%; font-size: 24px; white-space: normal; padding: 0 4px; }
+.hd-rescue__actions { flex-direction: row; margin-top: 10px; }
+.hd-rescue__actions .hd-btn { flex-grow: 1; height: 96px; margin: 0 6px; font-size: 28px; }

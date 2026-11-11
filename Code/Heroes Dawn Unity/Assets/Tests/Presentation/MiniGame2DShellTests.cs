@@ -43,7 +43,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             public bool UsesStick => false;
             public IMiniGame Game => Stub;
             public MiniGameHud Hud => new MiniGameHud("3 / 5", -1f, -1);
-            public void Build(RectTransform field) { }
+            public void Build(FieldSurface field) { }
             public void Tick(float dt, MiniGameInput input) { }
             public void Dispose() => Disposed++;
         }
