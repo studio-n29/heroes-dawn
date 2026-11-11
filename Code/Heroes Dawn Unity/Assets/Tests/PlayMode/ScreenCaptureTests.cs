@@ -91,7 +91,6 @@ namespace N29.HeroesDawn.Tests.PlayMode
             // Let canvas scalers and responsive layouts observe the render target's aspect.
             yield return null;
             Canvas.ForceUpdateCanvases();
-            foreach (var layout in Object.FindObjectsByType<TacticalPageLayout>(FindObjectsSortMode.None)) layout.Reflow();
             Canvas.ForceUpdateCanvases();
             Texture2D? composed = null;
             if (uiRt == null) cam.Render();

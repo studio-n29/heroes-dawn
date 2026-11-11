@@ -31,14 +31,6 @@ namespace N29.HeroesDawn.EditorTools.Assets
                         text.font = old.Contains("ExtraBold") || old.Contains("Bangers") ? Ui.TitleFont : old.Contains("Regular") ? Ui.RegularFont : Ui.BodyFont;
                         text.fontSharedMaterial = text.font.material;
                     }
-                    foreach (var button in root.GetComponentsInChildren<UiButton>(true))
-                    {
-                        var serialized = new SerializedObject(button);
-                        Color bg = Map(serialized.FindProperty("_bg").colorValue);
-                        Color fg = Map(serialized.FindProperty("_fg").colorValue);
-                        button.SetColors(bg, fg);
-                        button.Fill.material = null;
-                    }
                     foreach (var image in root.GetComponentsInChildren<Image>(true))
                     {
                         if (image.name == "Fill" && image.transform.parent.TryGetComponent<Image>(out var frame) && image.sprite == Sprites.Panel)
@@ -46,7 +38,6 @@ namespace N29.HeroesDawn.EditorTools.Assets
                             image.rectTransform.Stretch(1.4f, 1.4f, 1.4f, 1.4f);
                             frame.color = Theme.FrostEdge;
                         }
-                        if (image.name == "Face" && image.GetComponentInParent<UiButton>() != null) image.rectTransform.Stretch();
                         if (image.name == "Hi")
                         {
                             image.color = Theme.WithAlpha(Theme.Accent, 0.22f);

@@ -19,21 +19,6 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(ThemeContrast.Ratio(Theme.Outline, Theme.Surface), Is.GreaterThanOrEqualTo(1.5f), "le contour se détache du panneau");
         }
 
-        [Test, Description("Le passage d'un bouton secondaire sombre à un état actif ivoire conserve un libellé contrasté")]
-        public void Button_ActiveState_KeepsReadableLabel()
-        {
-            var parent = new GameObject("Contrast", typeof(RectTransform));
-            try
-            {
-                var button = Ui.Btn(parent.transform, "Mission", Theme.Primary, Theme.Text, null);
-                Assert.That(ThemeContrast.Ratio(button.Fill.color, button.Label.color), Is.GreaterThanOrEqualTo(4.5f));
-                button.SetColors(Theme.Surface3, Theme.TextDark);
-                Assert.That(ThemeContrast.Ratio(button.Fill.color, button.Label.color), Is.GreaterThanOrEqualTo(4.5f));
-                button.SetColors(Theme.Primary, Theme.Text);
-                Assert.That(ThemeContrast.Ratio(button.Fill.color, button.Label.color), Is.GreaterThanOrEqualTo(4.5f));
-            }
-            finally { Object.DestroyImmediate(parent); }
-        }
 
         [Test, Description("Vérifie que les quatre familles restent deux à deux distinctes après l'adoucissement — parce qu'elles servent à lire le gameplay d'un coup d'œil")]
         public void Theme_FamiliesStayDistinct()
@@ -44,10 +29,10 @@ namespace N29.HeroesDawn.Tests.Editor
                 Assert.That(Distance(Theme.FamilyColor(fam[i]), Theme.FamilyColor(fam[j])), Is.GreaterThanOrEqualTo(0.2f), fam[i] + "/" + fam[j]);
         }
 
-        [Test, Description("Vérifie que les trois raretés restent distinctes — parce que le joueur doit les reconnaître sans lire")]
+        [Test, Description("Vérifie que les couleurs de rang (1, 3 et 5) restent distinctes — parce que le joueur doit les reconnaître sans lire")]
         public void Theme_RarityStaysDistinct()
         {
-            var r = new[] { Rarity.Legend, Rarity.Elite, Rarity.Agent };
+            var r = new[] { 5, 3, 1 };
             for (int i = 0; i < r.Length; i++)
             for (int j = i + 1; j < r.Length; j++)
                 Assert.That(Distance(Theme.RarityColor(r[i]), Theme.RarityColor(r[j])), Is.GreaterThanOrEqualTo(0.15f), r[i] + "/" + r[j]);

@@ -5,30 +5,6 @@ using UnityEngine;
 
 namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
 {
-    /// <summary>Ligne de fatigue des résultats (reprise de l'ancien CombatScreen.ShowResults).</summary>
-    public sealed class FatigueRowRecipe : IPrefabRecipe
-    {
-        public string RelativePath => "Widgets/FatigueRow.prefab";
-        public int Order => 0;
-
-        public GameObject Build(PrefabContext ctx)
-        {
-            var row = PrefabContext.NewRoot("FatigueRow", 900, 52);
-            row.Pref(900, 52);
-            var n = Ui.Txt(row, "", 28, Theme.Text, TextAnchor.MiddleLeft, FontKind.Title, "Name");
-            n.rectTransform.At(0f, 0.5f, 0, 0, 220, 50);
-            var bar = Ui.Bar(row, "Bar", Theme.Success, Theme.SurfaceDark, true, 20);
-            ((RectTransform)bar.transform).At(0f, 0.5f, 230, 0, 520, 30);
-            var delta = Ui.Txt(row, "", 26, Theme.Fatigue, TextAnchor.MiddleRight, FontKind.Title, "Delta");
-            delta.rectTransform.At(1f, 0.5f, 0, 0, 130, 50);
-            var view = row.gameObject.AddComponent<FatigueRowView>();
-            ctx.Wire(view, "memberName", n);
-            ctx.Wire(view, "bar", bar);
-            ctx.Wire(view, "delta", delta);
-            return row.gameObject;
-        }
-    }
-
     /// <summary>Résultats du combat (reprise de l'ancien CombatScreen.ShowResults).</summary>
     public sealed class CombatResultsPopupRecipe : IPrefabRecipe
     {
