@@ -381,20 +381,12 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
             ScreenKit.ArtBackdrop(rt, Sprites.BackgroundLandscape, 1f, 0.72f);
 
             // ---- Barre du haut
-            var top = Ui.Panel(rt, "TopBar", Theme.WithAlpha(Theme.Frost, 0.94f), 0f, 0f, true).Frame().TopBand(90);
-            var retreat = Ui.LocBtn(top, "combat.retreat", Theme.Surface3, Theme.Danger, null!, 30, FontKind.Title, "Retreat");
-            retreat.Rect.At(0f, 0.5f, 20, 0, 230, 64);
-            var title = Ui.Txt(top, "", 44, Theme.Primary, TextAnchor.MiddleLeft, FontKind.Title, "Title");
-            title.rectTransform.At(0f, 0.5f, 270, 0, 800, 64);
-            title.Inked();
-            var pause = Ui.LocBtn(top, "combat.pause", Theme.Surface2, Theme.Text, null!, 34, FontKind.Title, "Pause");
-            pause.Rect.At(1f, 0.5f, -20, 0, 74, 74);
-            var speed = Ui.Btn(top, "", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Speed");
-            speed.Rect.At(1f, 0.5f, -114, 0, 150, 64);
-            var auto = Ui.LocBtn(top, "combat.auto_hint", Theme.Surface3, Theme.Text, null!, 30, FontKind.Title, "Auto");
-            auto.Rect.At(1f, 0.5f, -284, 0, 190, 64);
-            var debug = Ui.LocBtn(top, "combat.debug_win", Theme.Navy, Color.white, null!, 20, FontKind.Body, "DebugWin");
-            debug.Rect.At(1f, 0.5f, -500, 0, 200, 46);
+            // HUD UI Toolkit (barre du haut, bandeau, consigne, journal) posé sur l'arène uGUI.
+            var hudGo = N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<CombatHudView>("Hud", "Combat/CombatHud.uxml", 10);
+            hudGo.transform.SetParent(rt, false);
+            var hudRt = (RectTransform)hudGo.transform;
+            hudRt.anchorMin = Vector2.zero; hudRt.anchorMax = Vector2.one; hudRt.offsetMin = hudRt.offsetMax = Vector2.zero;
+            var hud = hudGo.GetComponent<CombatHudView>();
 
             // ---- Terrain central (là où se joueront les animations de compétence), alliés à gauche et ennemis à droite :
             // deux rangées décalées de deux cartes (croquis du 2026-10-23).
@@ -439,24 +431,6 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
                 bonusChips[i] = chip;
                 chipFrame.gameObject.SetActive(false);
             }
-
-            // ---- Journal (haut droite, discret)
-            var logFill = Ui.Panel(rt, "Log", Theme.WithAlpha(Theme.Frost, 0.55f), 3f, 0f, false);
-            logFill.Frame().At(1f, 0f, -24, 24, 330, 170);
-            logFill.gameObject.AddComponent<RectMask2D>();
-            var logText = Ui.Txt(logFill.transform, "", 21, Theme.TextMuted, TextAnchor.LowerLeft, FontKind.Regular, "Lines");
-            logText.rectTransform.Stretch(14, 10, 14, 10);
-
-            // ---- Bandeau central, consigne
-            var banner = Ui.Txt(rt, "", 76, Theme.Primary, TextAnchor.MiddleCenter, FontKind.Title, "Banner");
-            banner.rectTransform.At(0.5f, 0.5f, 0, 40, 1000, 120);
-            banner.Inked();
-            var bannerGroup = banner.gameObject.AddComponent<CanvasGroup>();
-            bannerGroup.blocksRaycasts = false;
-            var hintBand = Ui.Img(rt, "HintBand", Theme.WithAlpha(Theme.Primary, 0.9f), Sprites.RoundedSmall);
-            hintBand.rectTransform.At(0.5f, 0f, 0, 380, 900, 52);
-            var hint = Ui.Txt(hintBand.transform, "", 30, Theme.TextDark, TextAnchor.MiddleCenter, FontKind.Title, "Hint");
-            hint.rectTransform.Stretch(10, 0, 10, 0);
 
             // ---- Frise chronologique : grande bande mise en valeur au centre (100 à gauche → 0 à droite : à 0, c'est le tour)
             var glow = Ui.Img(rt, "TimelineGlow", Theme.WithAlpha(Theme.Primary, 0.35f), Sprites.Rounded);
@@ -560,17 +534,8 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
 
             var view = rt.gameObject.AddComponent<CombatView>();
             ScreenKit.WireFade(ctx, view);
-            ctx.Wire(view, "retreat", retreat);
-            ctx.Wire(view, "auto", auto);
-            ctx.Wire(view, "speed", speed);
-            ctx.Wire(view, "debugWin", debug);
-            ctx.Wire(view, "pause", pause);
+            ctx.Wire(view, "hud", hud);
             ctx.Wire(view, "timeline", timeline);
-            ctx.Wire(view, "title", title);
-            ctx.Wire(view, "hint", hint);
-            ctx.Wire(view, "logText", logText);
-            ctx.Wire(view, "banner", banner);
-            ctx.Wire(view, "bannerGroup", bannerGroup);
             ctx.Wire(view, "enemyRow", enemyRow);
             ctx.Wire(view, "allyRow", allyRow);
             ctx.Wire(view, "unitCardPrefab", ctx.Asset("Widgets/AllyCard.prefab").GetComponent<UnitCardView>());

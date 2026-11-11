@@ -15,17 +15,8 @@ namespace N29.HeroesDawn.Presentation.Combat
     /// <summary>Combat (prefab Screens/Combat) : arène (ennemis en haut, alliés en bas), compétences, journal, bandeau.</summary>
     public sealed partial class CombatView : ViewBase, ICombatView
     {
-        [SerializeField] UiButton retreat = null!;
-        [SerializeField] UiButton auto = null!;
-        [SerializeField] UiButton speed = null!;
-        [SerializeField] UiButton debugWin = null!;
-        [SerializeField] UiButton pause = null!;
+        [SerializeField] CombatHudView hud = null!;
         [SerializeField] TimelineView timeline = null!;
-        [SerializeField] TMP_Text title = null!;
-        [SerializeField] TMP_Text hint = null!;
-        [SerializeField] TMP_Text logText = null!;
-        [SerializeField] TMP_Text banner = null!;
-        [SerializeField] CanvasGroup bannerGroup = null!;
         [SerializeField] RectTransform enemyRow = null!;
         [SerializeField] RectTransform allyRow = null!;
         [SerializeField] UnitCardView unitCardPrefab = null!;
@@ -44,7 +35,6 @@ namespace N29.HeroesDawn.Presentation.Combat
         [SerializeField] BossBarView bossBar = null!;
 
         readonly Dictionary<int, UnitCardView> _cards = new Dictionary<int, UnitCardView>();
-        Coroutine? _bannerFade;
         int _skillUnit = -1;
         IReadOnlyList<UnitStateData> _lastStates = Array.Empty<UnitStateData>();
         Vector2[] _fanHome = Array.Empty<Vector2>();
@@ -62,8 +52,10 @@ namespace N29.HeroesDawn.Presentation.Combat
         public event Action<int>? UnitTapped;
 
         /// <summary>Boutons Auto et vitesse (tests PlayMode : clics réels).</summary>
-        public UnityEngine.UI.Button AutoButton => auto.Button;
-        public UnityEngine.UI.Button SpeedButton => speed.Button;
+        public UiToolkit.HdButtonRef AutoButton => hud.AutoButton;
+        public UiToolkit.HdButtonRef SpeedButton => hud.SpeedButton;
+        /// <summary>HUD UI Toolkit (barre du haut, bandeau, consigne, journal ; tests PlayMode).</summary>
+        public CombatHudView Hud => hud;
         public TimelineView Timeline => timeline;
 
         /// <summary>Icône de la compétence <paramref name="i"/> de l'agent prêt (tests PlayMode : clics réels).</summary>
@@ -93,11 +85,11 @@ namespace N29.HeroesDawn.Presentation.Combat
 
         void Awake()
         {
-            retreat.Button.onClick.AddListener(() => RetreatClicked?.Invoke());
-            auto.Button.onClick.AddListener(() => AutoClicked?.Invoke());
-            speed.Button.onClick.AddListener(() => SpeedClicked?.Invoke());
-            debugWin.Button.onClick.AddListener(() => DebugWinClicked?.Invoke());
-            pause.Button.onClick.AddListener(() => PauseClicked?.Invoke());
+            hud.RetreatClicked += () => RetreatClicked?.Invoke();
+            hud.AutoClicked += () => AutoClicked?.Invoke();
+            hud.SpeedClicked += () => SpeedClicked?.Invoke();
+            hud.DebugWinClicked += () => DebugWinClicked?.Invoke();
+            hud.PauseClicked += () => PauseClicked?.Invoke();
             for (int i = 0; i < fan.Length; i++)
             {
                 int slot = i;
@@ -303,33 +295,17 @@ namespace N29.HeroesDawn.Presentation.Combat
             timeline.Show(d);
         }
 
-        public void ShowTopBar(CombatTopBarData d)
-        {
-            title.text = d.Title;
-            auto.SetColors(d.AutoOn ? Theme.Primary : Theme.Surface3, d.AutoOn ? Theme.TextDark : Theme.Text);
-            speed.SetLabel(d.SpeedText);
-            retreat.Interactable = d.RetreatEnabled;
-            if (debugWin.gameObject.activeSelf != d.DebugVisible) debugWin.gameObject.SetActive(d.DebugVisible);
-        }
+        public void ShowTopBar(CombatTopBarData d) => hud.SetTopBar(d);
 
-        public void SetHint(string text)
-        {
-            hint.text = text;
-            hint.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(text));
-        }
+        public void SetHint(string text) => hud.SetHint(text);
 
         public void ShowBanner(string text, Tone tone)
         {
-            banner.text = text;
-            banner.color = ToneColors.Of(tone);
+            hud.ShowBanner(text, ToneColors.Of(tone));
             if (tone == Tone.Danger || tone == Tone.Primary) Tween.Punch(transform, 0.018f, 0.3f); // coup de caméra sur COMBO / VICTOIRE
-            Tween.PopIn(banner.rectTransform, 0.3f);
-            bannerGroup.alpha = 1f;
-            if (_bannerFade != null) Tween.Stop(_bannerFade);
-            _bannerFade = Tween.Delay(1.2f, () => Tween.Fade(bannerGroup, 0f, 0.4f), banner);
         }
 
-        public void ShowLog(IReadOnlyList<string> lines) => logText.text = string.Join("\n", lines);
+        public void ShowLog(IReadOnlyList<string> lines) => hud.SetLog(lines);
 
         /// <summary>Barre du boss affichée (tests PlayMode).</summary>
         public BossBarView BossBar => bossBar;
