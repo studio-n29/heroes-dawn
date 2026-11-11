@@ -382,7 +382,9 @@ var costBadge = Ui.Img(root, "CostBadge", Theme.Text, Sprites.Circle);          
 
             // ---- Barre du haut
             // HUD UI Toolkit (barre du haut, bandeau, consigne, journal) posé sur l'arène uGUI.
-            var hudGo = N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<CombatHudView>("Hud", "Combat/CombatHud.uxml", 10);
+            var hudGo = N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<CombatHudView>("Hud", "Combat/CombatHud.uxml", N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.ModalOrder);
+            // Panneau superposé (le fond uGUI du combat recouvrirait le panneau d'écran), mais sous les fenêtres modales.
+            hudGo.GetComponent<UnityEngine.UIElements.UIDocument>().sortingOrder = 50;
             hudGo.transform.SetParent(rt, false);
             var hudRt = (RectTransform)hudGo.transform;
             hudRt.anchorMin = Vector2.zero; hudRt.anchorMax = Vector2.one; hudRt.offsetMin = hudRt.offsetMax = Vector2.zero;
