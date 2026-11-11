@@ -143,11 +143,11 @@ namespace N29.HeroesDawn.Definitions
         static RecipeDef Common(string id, ItemType type, RecipeStatKind a)
             => new RecipeDef(id, type, ItemRarity.Common, 6, ComponentGrade.Common, new[] { new RecipeStat(a, 8, 12) }, source: RecipeSource.Starter);
 
-        static RecipeDef Rare(string id, ItemType type, RecipeStatKind a, RecipeStatKind b)
-            => new RecipeDef(id, type, ItemRarity.Rare, 8, ComponentGrade.Refined, new[] { new RecipeStat(a, 8, 14), new RecipeStat(b, 8, 14) });
+        static RecipeDef Rare(string id, ItemType type, RecipeStatKind a, RecipeStatKind b, RecipeSource source = RecipeSource.Adventure)
+            => new RecipeDef(id, type, ItemRarity.Rare, 8, ComponentGrade.Refined, new[] { new RecipeStat(a, 8, 14), new RecipeStat(b, 8, 14) }, source: source);
 
-        static RecipeDef Epic(string id, ItemType type, RecipeStatKind a, RecipeStatKind b, ItemPerk perk, int perkValue)
-            => new RecipeDef(id, type, ItemRarity.Epic, 10, ComponentGrade.Refined, new[] { new RecipeStat(a, 10, 16), new RecipeStat(b, 10, 16) }, perk, perkValue);
+        static RecipeDef Epic(string id, ItemType type, RecipeStatKind a, RecipeStatKind b, ItemPerk perk, int perkValue, RecipeSource source = RecipeSource.Adventure)
+            => new RecipeDef(id, type, ItemRarity.Epic, 10, ComponentGrade.Refined, new[] { new RecipeStat(a, 10, 16), new RecipeStat(b, 10, 16) }, perk, perkValue, source);
 
         public static readonly IReadOnlyList<RecipeDef> All = new[]
         {
@@ -155,10 +155,10 @@ namespace N29.HeroesDawn.Definitions
             Rare("arc_baton", ItemType.Weapon, Atk, Spd),
             Epic("pulse_rifle", ItemType.Weapon, Atk, Spd, ItemPerk.CritChance, 8),
             Common("patch_vest", ItemType.Armor, Hp),
-            Rare("plated_coat", ItemType.Armor, Hp, Def),
-            Epic("aegis_plate", ItemType.Armor, Hp, Def, ItemPerk.OpeningShield, 10),
+            Rare("plated_coat", ItemType.Armor, Hp, Def, RecipeSource.Lair),
+            Epic("aegis_plate", ItemType.Armor, Hp, Def, ItemPerk.OpeningShield, 10, RecipeSource.Lair),
             Common("spring_boots", ItemType.Tool, Spd),
-            Rare("grapple_rig", ItemType.Tool, Spd, Def),
+            Rare("grapple_rig", ItemType.Tool, Spd, Def, RecipeSource.Lair),
             Epic("chrono_pack", ItemType.Tool, Spd, Hp, ItemPerk.StartGauge, 15),
             Common("neural_chip", ItemType.Implant, Atk),
             Rare("synapse_coil", ItemType.Implant, Atk, Spd),

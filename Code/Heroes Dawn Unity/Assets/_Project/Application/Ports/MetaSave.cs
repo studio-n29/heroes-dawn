@@ -221,6 +221,9 @@ namespace N29.HeroesDawn.Application.Ports
         /// <summary>Boss de repaire déjà vaincus (« repaire:case »), gardés d'une partie à l'autre ; les compteurs lair_clears:{repaire} comptent les repaires terminés.</summary>
         public List<string> lairBosses = new List<string>();
 
+        /// <summary>Jour (AAAAMMJJ) de la dernière récompense complète de chaque boss de repaire (id « repaire:case »). Absent d une ancienne sauvegarde : la première récompense est complète.</summary>
+        public List<CounterSave> lairRewardDay = new List<CounterSave>();
+
         /// <summary>Tournoi simulé du jour et points du joueur.</summary>
         public TournamentSave tournament = new TournamentSave();
 

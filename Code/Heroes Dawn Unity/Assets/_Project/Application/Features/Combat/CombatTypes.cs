@@ -37,11 +37,13 @@ namespace N29.HeroesDawn.Application.Features.Combat
         public ItemId? Drop { get; }
         /// <summary>Composants, catalyseur et recette laissés par ce combat gagné pour l'Atelier (défaite : null).</summary>
         public CraftDrops? Crafting { get; }
+        /// <summary>Récompense du boss de repaire vaincu (Composants, catalyseur, recette) ; nulle hors repaire.</summary>
+        public World.LairGrant? Lair { get; }
 
         public CombatReport(bool victory, int credits, CombatRank rank, bool boss, IReadOnlyList<FatigueChange> fatigue,
-                            IReadOnlyList<BoardEvent> boardEvents, bool returnedToHq, ItemId? drop = null, CraftDrops? crafting = null)
+                            IReadOnlyList<BoardEvent> boardEvents, bool returnedToHq, ItemId? drop = null, CraftDrops? crafting = null, World.LairGrant? lair = null)
         {
-            Victory = victory; Credits = credits; Rank = rank; Boss = boss; Fatigue = fatigue; BoardEvents = boardEvents; ReturnedToHq = returnedToHq; Drop = drop; Crafting = crafting;
+            Victory = victory; Credits = credits; Rank = rank; Boss = boss; Fatigue = fatigue; BoardEvents = boardEvents; ReturnedToHq = returnedToHq; Drop = drop; Crafting = crafting; Lair = lair;
         }
     }
 }

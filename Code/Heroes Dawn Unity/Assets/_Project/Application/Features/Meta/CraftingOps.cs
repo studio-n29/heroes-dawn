@@ -55,7 +55,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         /// <summary>Tire et verse les Composants et le catalyseur d'une victoire, et apprend la recette obtenue (déterministe selon le joueur et le nombre de tirages).</summary>
         public static CraftDrops GrantDrops(GameSession s, CombatRank rank, bool boss)
         {
-            var unknown = Recipes.All.Where(r => !Knows(s, r.Id)).Select(r => r.Id).ToList();
+            var unknown = Recipes.All.Where(r => r.Source == RecipeSource.Adventure && !Knows(s, r.Id)).Select(r => r.Id).ToList();
             var rng = new Core.Pcg32(CollectionRules.Seed(s.Account?.PlayerId ?? "local", "components", s.Meta.scrapDrops++));
             var drops = CraftingRules.RollDrops(rng, rank, boss, unknown);
             for (int k = 0; k < drops.Components.Count; k++)

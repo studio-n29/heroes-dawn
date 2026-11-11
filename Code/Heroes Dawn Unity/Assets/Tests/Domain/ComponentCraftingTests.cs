@@ -180,7 +180,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That((a.Catalyst, a.NewRecipe), Is.EqualTo((b.Catalyst, b.NewRecipe)));
         }
 
-        [Test, Description("Vérifie que les 12 recettes coûtent 6 Commun, 8 Raffiné ou 10 Raffiné selon leur rareté, que les 4 Communes sont de départ et que les 8 autres viennent de l'aventure — parce que les repaires et les tournois les répartiront plus tard")]
+        [Test, Description("Vérifie que les 12 recettes coûtent 6 Commun, 8 Raffiné ou 10 Raffiné selon leur rareté, que les 4 Communes sont de départ, que 3 viennent du repaire de l AMIF et que les 5 autres viennent de l aventure — parce que les tournois répartiront les dernières au bloc D")]
         public void Les_12_recettes_gardent_leurs_couts()
         {
             Assert.That(Recipes.All.Count, Is.EqualTo(12));
@@ -190,7 +190,8 @@ namespace N29.HeroesDawn.Tests.Domain
                 Assert.That((r.ComponentCost, r.MinGrade), Is.EqualTo(expected), r.Id);
             }
             Assert.That(Recipes.All.Count(r => r.Source == RecipeSource.Starter), Is.EqualTo(4));
-            Assert.That(Recipes.All.Count(r => r.Source == RecipeSource.Adventure), Is.EqualTo(8));
+            Assert.That(Recipes.All.Count(r => r.Source == RecipeSource.Adventure), Is.EqualTo(5));
+            Assert.That(Recipes.All.Where(r => r.Source == RecipeSource.Lair).Select(r => r.Id), Is.EquivalentTo(new[] { "plated_coat", "grapple_rig", "aegis_plate" }));
         }
 
         [Test, Description("Vérifie que le nom d'un objet fabriqué se relit (recette et étoiles) et qu'une clé invalide est refusée — parce que la présentation en tire le nom affiché")]

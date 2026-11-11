@@ -78,7 +78,12 @@ namespace N29.HeroesDawn.Application.Features.Combat
             }
 
             if (victory) TeamLinks.RecordVictory(s.Meta, _active.FighterMembers.Select(m => m.Id.Value).ToList());
-            if (victory && s.RunZone != null && s.RunZone.IsLair) World.LairBook.RecordBossDefeat(s.Meta, s.RunZone.Id.Value, pending.Case.Value);
+            World.LairGrant? lairGrant = null;
+            if (victory && s.RunZone != null && s.RunZone.IsLair)
+            {
+                World.LairBook.RecordBossDefeat(s.Meta, s.RunZone.Id.Value, pending.Case.Value);
+                lairGrant = World.LairBook.GrantForCase(s, s.RunZone.Id.Value, pending.Case.Value, (_fx.Clock?.LocalNow ?? DateTime.Now).ToString("yyyy-MM-dd"));
+            }
 
             var res = ZoneActions.Apply(_fx, r => r.ResolveCombat(victory));
             IReadOnlyList<BoardEvent> boardEvents = res.IsSuccess ? res.Value : Array.Empty<BoardEvent>();
@@ -91,7 +96,7 @@ namespace N29.HeroesDawn.Application.Features.Combat
             }
 
             Meta.Stats.RecordCombat(s.Meta, sim);
-            var report = new CombatReport(victory, credits, pending.Rank, boss, changes, boardEvents, toHq, drop, crafting);
+            var report = new CombatReport(victory, credits, pending.Rank, boss, changes, boardEvents, toHq, drop, crafting, lairGrant);
             _fx.Log.Info($"Combat terminé : {(victory ? "victoire" : "défaite")} en {sim.Tick} ticks, +{credits} Crédits" + (drop.HasValue ? ", objet " + drop.Value.Value : ""));
             _fx.Wallet.PublishWallet(s);
             _roster.PublishRoster();
