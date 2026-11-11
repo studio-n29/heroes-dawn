@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-list">
+        <ui:VisualElement class="hd-list__main">
+            <ui:VisualElement name="header" class="hd-panel hd-list__header">
+                <ui:VisualElement class="hd-list__headtext">
+                    <ui:Label name="headerTitle" class="hd-list__title" />
+                    <ui:Label name="headerLine" class="hd-list__line" />
+                    <ui:VisualElement name="headerBar" class="hd-bar hd-list__bar"><ui:VisualElement name="headerFill" class="hd-bar__fill" /><ui:Label name="headerBarLabel" class="hd-list__barlabel" /></ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button name="headerB" class="hd-btn hd-btn--secondary hd-btn--small hd-list__headbtn" />
+                <ui:Button name="headerA" class="hd-btn hd-btn--primary hd-btn--small hd-list__headbtn" />
+            </ui:VisualElement>
+            <ui:VisualElement name="filters" class="hd-list__filters" />
+            <ui:ScrollView name="rows" class="hd-list__rows" />
+        </ui:VisualElement>
+        <ui:VisualElement name="side" class="hd-panel hd-list__side">
+            <ui:Label name="sideTitle" class="hd-list__sidetitle" />
+            <ui:Label name="sideText" class="hd-list__sidetext" />
+            <ui:ScrollView name="sideRows" class="hd-list__rows" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

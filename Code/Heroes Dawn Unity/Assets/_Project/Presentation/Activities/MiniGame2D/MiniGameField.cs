@@ -1,34 +1,43 @@
 #nullable enable
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
     /// <summary>
-    /// Zone de jeu tactile : transforme toucher, glissé et relâchement en <see cref="MiniGameInput"/> (une lecture par image avec <see cref="Poll"/>).
+    /// Zone de jeu tactile (UI Toolkit) : transforme toucher, glissé et relâchement en <see cref="MiniGameInput"/> (une lecture par image avec <see cref="Poll"/>).
     /// Le joystick est flottant : son origine est le point où le doigt se pose, sa portée <see cref="StickRadius"/> (en fraction de la largeur).
-    /// Un doigt qui sort de la zone, ou une zone désactivée, émet un relâchement : jamais d'appui fantôme.
+    /// Un doigt qui sort de la zone émet un relâchement : jamais d'appui fantôme.
     /// </summary>
-    public sealed class MiniGameField : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler, IPointerExitHandler
+    public sealed class MiniGameField
     {
         public const float StickRadius = 0.12f;
 
+        readonly VisualElement _element;
         bool _held, _pressed, _released;
         Vector2 _pos, _origin;
+
+        public MiniGameField(VisualElement element)
+        {
+            _element = element;
+            element.RegisterCallback<PointerDownEvent>(e => { element.CapturePointer(e.pointerId); PressAt(Normalize(e.position)); });
+            element.RegisterCallback<PointerMoveEvent>(e => { if (_held) _pos = Normalize(e.position); });
+            element.RegisterCallback<PointerUpEvent>(e => { element.ReleasePointer(e.pointerId); ReleaseNow(); });
+            element.RegisterCallback<PointerCancelEvent>(_ => ReleaseNow());
+            element.RegisterCallback<DetachFromPanelEvent>(_ => OnDisable());
+        }
 
         public bool Held => _held;
         /// <summary>Origine du joystick, normalisée dans la zone (0..1, y vers le bas).</summary>
         public Vector2 StickOrigin => _origin;
         public Vector2 Position => _pos;
 
-        public void OnPointerDown(PointerEventData e) => PressAt(Normalize(e));
-        public void OnDrag(PointerEventData e) { if (_held) _pos = Normalize(e); }
-        public void OnPointerUp(PointerEventData e) => ReleaseNow();
-        public void OnPointerExit(PointerEventData e) { if (_held) ReleaseNow(); }
+        /// <summary>Le doigt sort de la zone (tests PlayMode : mêmes effets que l'événement).</summary>
+        public void PointerLeft() { if (_held) ReleaseNow(); }
 
         void OnDisable()
         {
-            // Une zone désactivée en plein appui : le relâchement est émis pour le prochain lecteur, jamais perdu.
+            // Une zone retirée en plein appui : le relâchement est émis pour le prochain lecteur, jamais perdu.
             if (_held) { _held = false; _released = true; }
             _pressed = false;
         }
@@ -57,11 +66,12 @@ namespace N29.HeroesDawn.Presentation.Activities
         /// <summary>L'entrée de l'image courante ; les drapeaux « Down » et « Up » sont consommés. Stick : x vers la droite, y vers le bas.</summary>
         public MiniGameInput Poll()
         {
-            var rect = ((RectTransform)transform).rect;
+            var size = _element.layout.size;
+            if (size.x <= 1f) size = new Vector2(1208f, 604f);
             var stick = Vector2.zero;
-            if (_held && rect.width > 1f)
+            if (_held)
             {
-                var delta = new Vector2((_pos.x - _origin.x) * rect.width, (_pos.y - _origin.y) * rect.height) / (StickRadius * rect.width);
+                var delta = new Vector2((_pos.x - _origin.x) * size.x, (_pos.y - _origin.y) * size.y) / (StickRadius * size.x);
                 stick = Vector2.ClampMagnitude(delta, 1f);
             }
             var input = new MiniGameInput { Down = _pressed, Up = _released, Held = _held, Pos = _pos, Stick = stick };
@@ -70,12 +80,11 @@ namespace N29.HeroesDawn.Presentation.Activities
             return input;
         }
 
-        Vector2 Normalize(PointerEventData e)
+        Vector2 Normalize(Vector2 panelPos)
         {
-            var rt = (RectTransform)transform;
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, e.position, e.pressEventCamera, out var local)) return _pos;
-            var r = rt.rect;
-            return new Vector2(Mathf.Clamp01((local.x - r.xMin) / r.width), Mathf.Clamp01(1f - (local.y - r.yMin) / r.height));
+            var r = _element.worldBound;
+            if (r.width <= 1f || r.height <= 1f) return _pos;
+            return new Vector2(Mathf.Clamp01((panelPos.x - r.xMin) / r.width), Mathf.Clamp01((panelPos.y - r.yMin) / r.height));
         }
     }
 }

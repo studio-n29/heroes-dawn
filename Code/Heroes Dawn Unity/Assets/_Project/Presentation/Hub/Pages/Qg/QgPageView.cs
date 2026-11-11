@@ -1,40 +1,28 @@
 #nullable enable
 using System;
 using N29.HeroesDawn.Presentation.Common;
-using N29.HeroesDawn.Presentation.Feedback;
-using N29.HeroesDawn.Presentation.Mvp;
+using N29.HeroesDawn.Presentation.Tutorial;
+using N29.HeroesDawn.Presentation.UiToolkit;
 using N29.HeroesDawn.Presentation.Wip;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Page QG (prefab Pages/Qg) : pièces illustrées, activités du jour, icônes d'alerte, quête principale, MISSION.</summary>
-    public sealed class QgPageView : ViewBase, IQgPageView
+    /// <summary>Page QG (UI Toolkit) : pièces illustrées, activités du jour, icônes d'alerte, quête principale, MISSION.</summary>
+    public sealed class QgPageView : HdView, IQgPageView
     {
-        [SerializeField] RoomCardView[] rooms = Array.Empty<RoomCardView>();
-        [SerializeField] Button dailyCard = null!;
-        [SerializeField] TMP_Text dailyBody = null!;
-        [SerializeField] TMP_Text dailyBadge = null!;
-        /// <summary>Bandeau « n activités aujourd'hui » ; le panneau latéral (dailyDrawer) en donne le détail.</summary>
-        [SerializeField] TMP_Text dailyCount = null!;
-        [SerializeField] GameObject dailyDrawer = null!;
-        [SerializeField] Button dailyClose = null!;
-        [SerializeField] Button secondaryCard = null!;
-        [SerializeField] Button shopAlertButton = null!;
-        [SerializeField] TMP_Text shopAlertBadge = null!;
-        [SerializeField] GameObject secondaryDot = null!;
-        [SerializeField] UiButton mission = null!;
-        [SerializeField] TMP_Text missionSub = null!;
-        [SerializeField] TMP_Text missionHint = null!;
-        /// <summary>Bandeau compact de la quête principale : ouvre le suivi ; MISSION conserve le déploiement.</summary>
-        [SerializeField] Button banner = null!;
-        [SerializeField] TMP_Text bannerTitle = null!;
-        [SerializeField] TMP_Text bannerLine = null!;
+        const int MaxRooms = 5;
 
-        readonly HubPage[] _pages = new HubPage[8];
-        bool _cascaded;
+        readonly HubPage[] _pages = new HubPage[MaxRooms];
+        readonly UnityEngine.UIElements.Button[] _rooms = new UnityEngine.UIElements.Button[MaxRooms];
+        readonly HdButtonRef[] _roomRefs = new HdButtonRef[MaxRooms];
+        readonly string?[] _wip = new string?[MaxRooms];
+        readonly System.Collections.Generic.List<HdTutorialAnchor> _anchors = new System.Collections.Generic.List<HdTutorialAnchor>();
+        Label _bannerTitle = null!, _bannerLine = null!, _dailyCount = null!, _dailyBody = null!, _dailyBadge = null!, _shopBadge = null!, _hint = null!, _sub = null!;
+        UnityEngine.UIElements.Button _mission = null!, _banner = null!;
+        VisualElement _dailyBadgeBox = null!, _shopBadgeBox = null!, _secondaryDot = null!, _roomsRow = null!;
+        QgPageData? _last;
 
         public event Action<HubPage>? RoomClicked;
         public event Action? MissionClicked;
@@ -44,57 +32,118 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? QuestsClicked;
 
         /// <summary>Bouton MISSION (tests PlayMode : clic réel).</summary>
-        public Button MissionButton => mission.Button;
-        public Button QuestsButton => banner;
+        public HdButtonRef MissionButton { get; private set; } = null!;
+        public HdButtonRef QuestsButton { get; private set; } = null!;
 
         /// <summary>Bouton d'une pièce (tests PlayMode), selon le dernier affichage.</summary>
-        public Button? RoomButton(HubPage page)
+        public HdButtonRef? RoomButton(HubPage page)
         {
-            for (int i = 0; i < rooms.Length; i++) if (_pages[i] == page) return rooms[i].Button.Button;
+            for (int i = 0; i < MaxRooms; i++) if (_roomRefs[i] != null && _pages[i] == page && _rooms[i].resolvedStyle.display != DisplayStyle.None) return _roomRefs[i];
             return null;
         }
 
-        void Awake()
+        protected override void Bind()
         {
-            for (int i = 0; i < rooms.Length; i++)
+            _bannerTitle = Q<Label>("bannerTitle"); _bannerLine = Q<Label>("bannerLine");
+            _dailyCount = Q<Label>("dailyCount"); _dailyBody = Q<Label>("dailyBody"); _dailyBadge = Q<Label>("dailyBadge");
+            _shopBadge = Q<Label>("shopAlertBadge"); _hint = Q<Label>("missionHint"); _sub = Q<Label>("missionSub");
+            _mission = Q<UnityEngine.UIElements.Button>("mission"); _banner = Q<UnityEngine.UIElements.Button>("banner");
+            _dailyBadgeBox = Q<VisualElement>("dailyBadgeBox"); _shopBadgeBox = Q<VisualElement>("shopAlertBadgeBox");
+            _secondaryDot = Q<VisualElement>("secondaryDot"); _roomsRow = Q<VisualElement>("rooms");
+            MissionButton = new HdButtonRef(_mission, this); QuestsButton = new HdButtonRef(_banner, this);
+
+            Q<Label>("roomsTitle").text = Loc.T("qg.rooms");
+            Q<Label>("dailyTitle").text = Loc.T("qg.daily");
+            Q<Label>("shopAlertLabel").text = Loc.T("nav.shop");
+            Q<Label>("secondaryLabel").text = Loc.T("qg.daily");
+            _mission.text = Loc.T("qg.mission");
+            var nextArt = TacticalArt.Load("combat-red-hook");
+            if (nextArt != null) Q<VisualElement>("nextArt").style.backgroundImage = new StyleBackground(nextArt);
+
+            _mission.clicked += () => MissionClicked?.Invoke();
+            _banner.clicked += () => QuestsClicked?.Invoke();
+            Q<UnityEngine.UIElements.Button>("daily").clicked += () => DailyClicked?.Invoke();
+            Q<UnityEngine.UIElements.Button>("secondary").clicked += () => SecondaryClicked?.Invoke();
+            Q<UnityEngine.UIElements.Button>("shopAlert").clicked += () => ShopAlertClicked?.Invoke();
+
+            _roomsRow.Clear();
+            for (int i = 0; i < MaxRooms; i++)
             {
                 int index = i;
-                rooms[i].Clicked += () => RoomClicked?.Invoke(_pages[index]);
+                var room = new UnityEngine.UIElements.Button();
+                room.AddToClassList("hd-room");
+                room.clicked += () =>
+                {
+                    if (_wip[index] != null) GetComponentInParent<UiTapRelay>(true)?.RaiseWip(_wip[index]!);
+                    else RoomClicked?.Invoke(_pages[index]);
+                };
+                _rooms[i] = room;
+                _roomRefs[i] = new HdButtonRef(room, this);
+                _roomsRow.Add(room);
             }
-            mission.Button.onClick.AddListener(() => MissionClicked?.Invoke());
-            banner.onClick.AddListener(() => QuestsClicked?.Invoke());
-            dailyDrawer.SetActive(true); // liste du jour toujours visible (planche 3.1)
-            secondaryCard.onClick.AddListener(() => SecondaryClicked?.Invoke());
-            shopAlertButton.onClick.AddListener(() => ShopAlertClicked?.Invoke());
+
+            foreach (var old in _anchors) if (old != null) Destroy(old.gameObject);
+            _anchors.Clear();
+            _anchors.Add(HdTutorialAnchor.Attach(this, Q<VisualElement>("page"), TutorialTarget.QgPage));
+            _anchors.Add(HdTutorialAnchor.Attach(this, _mission, TutorialTarget.QgMission));
+            if (_last.HasValue) Show(_last.Value);   // le document est recréé à chaque activation : on réaffiche la dernière donnée
         }
 
         public void Show(QgPageData d)
         {
-            for (int i = 0; i < rooms.Length; i++)
+            _last = d;
+            for (int i = 0; i < MaxRooms; i++)
             {
+                var room = _rooms[i];
                 bool used = i < d.Rooms.Length;
-                if (rooms[i].gameObject.activeSelf != used) rooms[i].gameObject.SetActive(used);
+                room.style.display = used ? DisplayStyle.Flex : DisplayStyle.None;
                 if (!used) continue;
-                _pages[i] = d.Rooms[i].Page;
-                rooms[i].Show(d.Rooms[i]);
-                if (!_cascaded) Fx.PopInAfter(rooms[i].transform, Stagger.DelayFor(i));
+                var r = d.Rooms[i];
+                _pages[i] = r.Page;
+                _wip[i] = r.WipId;
+                room.Clear();
+                var art = new VisualElement { pickingMode = PickingMode.Ignore };
+                art.AddToClassList("hd-room__art");
+                if (r.Art != null) art.style.backgroundImage = new StyleBackground(r.Art);
+                room.Add(art);
+                var state = new Label(r.State) { pickingMode = PickingMode.Ignore };
+                state.AddToClassList("hd-room__state");
+                room.Add(state);
+                var title = new Label(r.Title) { pickingMode = PickingMode.Ignore };
+                title.AddToClassList("hd-room__title");
+                room.Add(title);
+                var info = new Label(r.Info) { pickingMode = PickingMode.Ignore };
+                info.AddToClassList("hd-room__info");
+                room.Add(info);
+                if (r.WipId != null)
+                {
+                    var wip = new Label(Loc.T("wip.soon")) { pickingMode = PickingMode.Ignore };
+                    wip.AddToClassList("hd-room__wip");
+                    room.Add(wip);
+                }
+                if (r.Badge > 0)
+                {
+                    var badge = new VisualElement { pickingMode = PickingMode.Ignore };
+                    badge.AddToClassList("hd-badge");
+                    badge.Add(new Label(r.Badge.ToString()) { pickingMode = PickingMode.Ignore });
+                    room.Add(badge);
+                }
+                room.SetEnabled(!r.Locked);
             }
-            dailyBody.text = string.Join("\n", d.DailyLines);
-            dailyCount.text = d.DailyBanner;
-            dailyBadge.text = d.DailyBadge;
-            dailyBadge.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(d.DailyBadge));
-            secondaryDot.SetActive(d.SecondaryActive);
-            shopAlertBadge.text = d.ShopAlertBadge;
-            shopAlertBadge.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(d.ShopAlertBadge));
-            mission.SetLabel(d.MissionTitle);
-            mission.Interactable = d.MissionEnabled;
-            mission.DisabledReason = d.MissionHint;
-            missionSub.text = d.MissionSub;
-            missionHint.text = d.MissionHint;
-            bannerTitle.text = d.MainTitle;
-            bannerLine.text = d.MissionSub;
-            banner.interactable = true;
-            _cascaded = true;
+            _dailyBody.text = string.Join("\n", d.DailyLines);
+            _dailyCount.text = d.DailyBanner;
+            _dailyBadge.text = d.DailyBadge;
+            _dailyBadgeBox.style.display = string.IsNullOrEmpty(d.DailyBadge) ? DisplayStyle.None : DisplayStyle.Flex;
+            _secondaryDot.style.display = d.SecondaryActive ? DisplayStyle.Flex : DisplayStyle.None;
+            _shopBadge.text = d.ShopAlertBadge;
+            _shopBadgeBox.style.display = string.IsNullOrEmpty(d.ShopAlertBadge) ? DisplayStyle.None : DisplayStyle.Flex;
+            _mission.text = d.MissionTitle;
+            _mission.SetEnabled(d.MissionEnabled);
+            _sub.text = d.MissionSub;
+            _hint.text = d.MissionHint;
+            _hint.style.display = string.IsNullOrEmpty(d.MissionHint) ? DisplayStyle.None : DisplayStyle.Flex;
+            _bannerTitle.text = d.MainTitle;
+            _bannerLine.text = d.MissionSub;
         }
     }
 }

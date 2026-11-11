@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal">
+        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-pop__wide">
+            <ui:Label name="title" class="hd-modal__title" />
+            <ui:Label name="intro" class="hd-pop__hint" />
+            <ui:VisualElement class="hd-divider" />
+            <ui:ScrollView class="hd-pop__scroll">
+                <ui:VisualElement name="questions" />
+                <ui:Label name="commentLabel" class="hd-pop__section" />
+                <ui:TextField name="comment" multiline="true" class="hd-pop__field hd-pop__comment" max-length="400" />
+                <ui:Label name="commentHint" class="hd-pop__hint" />
+            </ui:ScrollView>
+            <ui:VisualElement class="hd-modal__buttons">
+                <ui:Button name="later" class="hd-btn hd-btn--secondary" />
+                <ui:Button name="send" class="hd-btn hd-btn--primary" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

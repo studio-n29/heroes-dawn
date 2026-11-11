@@ -1,0 +1,38 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-qg">
+        <ui:VisualElement class="hd-qg__left">
+            <ui:Button name="banner" class="hd-panel hd-qg__banner">
+                <ui:Label name="bannerTitle" class="hd-qg__banner-title" />
+                <ui:Label name="bannerLine" class="hd-qg__banner-line" />
+            </ui:Button>
+            <ui:VisualElement class="hd-qg__alerts">
+                <ui:Button name="shopAlert" class="hd-panel hd-qg__alert">
+                    <ui:VisualElement class="hd-qg__alert-icon hd-icon--shop" />
+                    <ui:Label name="shopAlertLabel" class="hd-qg__alert-label" />
+                    <ui:VisualElement name="shopAlertBadgeBox" class="hd-badge"><ui:Label name="shopAlertBadge" /></ui:VisualElement>
+                </ui:Button>
+                <ui:Button name="secondary" class="hd-panel hd-qg__alert">
+                    <ui:VisualElement class="hd-qg__alert-icon hd-icon--quest" />
+                    <ui:Label name="secondaryLabel" class="hd-qg__alert-label" />
+                    <ui:VisualElement name="secondaryDot" class="hd-badge"><ui:Label text="!" /></ui:VisualElement>
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-grow" />
+            <ui:Label name="roomsTitle" class="hd-qg__section" />
+            <ui:VisualElement name="rooms" class="hd-qg__rooms" />
+        </ui:VisualElement>
+        <ui:VisualElement class="hd-qg__right">
+            <ui:Button name="daily" class="hd-panel hd-qg__daily">
+                <ui:Label name="dailyTitle" class="hd-qg__banner-title" />
+                <ui:Label name="dailyCount" class="hd-qg__banner-line" />
+                <ui:VisualElement name="dailyBadgeBox" class="hd-badge"><ui:Label name="dailyBadge" /></ui:VisualElement>
+            </ui:Button>
+            <ui:VisualElement class="hd-panel hd-qg__drawer"><ui:Label name="dailyBody" class="hd-qg__daily-body" /></ui:VisualElement>
+            <ui:VisualElement class="hd-grow" />
+            <ui:VisualElement name="nextArt" class="hd-panel hd-qg__next"><ui:VisualElement class="hd-qg__next-shade" /></ui:VisualElement>
+            <ui:Label name="missionHint" class="hd-qg__hint" />
+            <ui:Label name="missionSub" class="hd-qg__sub" />
+            <ui:Button name="mission" class="hd-btn hd-btn--primary hd-qg__mission" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

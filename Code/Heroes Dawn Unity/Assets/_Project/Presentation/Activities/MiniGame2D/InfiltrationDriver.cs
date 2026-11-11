@@ -4,7 +4,6 @@ using N29.HeroesDawn.Domain.Activities.Games;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace N29.HeroesDawn.Presentation.Activities
 {
@@ -18,10 +17,11 @@ namespace N29.HeroesDawn.Presentation.Activities
         readonly InfiltrationGame _game;
         readonly ILocalization _loc;
         readonly float _detectMs;
-        Image[] _walls = new Image[0];
-        Image[][] _rays = new Image[0][];
-        Image[] _guardDiscs = new Image[0];
-        Image? _player, _exit, _barBack, _barFill;
+        FieldSprite[] _walls = new FieldSprite[0];
+        FieldSprite[][] _rays = new FieldSprite[0][];
+        FieldSprite[] _guardDiscs = new FieldSprite[0];
+        FieldSprite?[] _cones = new FieldSprite?[0];
+        FieldSprite? _player, _exit, _barBack, _barFill;
         float _scale;
 
         public InfiltrationDriver(ActivityPlan plan, ILocalization loc)
@@ -40,14 +40,22 @@ namespace N29.HeroesDawn.Presentation.Activities
         protected override void OnBuild()
         {
             _exit = Img("Exit", Sprites.Ring, Theme.Success, Vector2.one);
-            _walls = new Image[_game.Walls.Count];
+            _walls = new FieldSprite[_game.Walls.Count];
             for (int i = 0; i < _walls.Length; i++) _walls[i] = Img("Wall" + i, Sprites.Rounded, new Color(0.55f, 0.55f, 0.62f), Vector2.one);
-            _rays = new Image[_game.Guards.Count][];
-            _guardDiscs = new Image[_game.Guards.Count];
+            _rays = new FieldSprite[_game.Guards.Count][];
+            _guardDiscs = new FieldSprite[_game.Guards.Count];
+            _cones = new FieldSprite?[_game.Guards.Count];
+            var coneSprite = TacticalArt.Ext("MiniGames", "vision-cone");
             for (int g = 0; g < _rays.Length; g++)
             {
-                _rays[g] = new Image[Rays];
+                _rays[g] = new FieldSprite[Rays];
                 for (int r = 0; r < Rays; r++) _rays[g][r] = Img("Ray" + g + "_" + r, null, new Color(1f, 0.9f, 0.3f, 0.35f), new Vector2(10, 8));
+                if (coneSprite != null)
+                {
+                    _cones[g] = Img("Cone" + g, coneSprite, new Color(1f, 0.9f, 0.3f, 0.5f), new Vector2(100, 100));
+                    _cones[g]!.rectTransform.pivot = new Vector2(0.5f, 1f);
+                    for (int r = 0; r < Rays; r++) _rays[g][r].gameObject.SetActive(false);
+                }
                 _guardDiscs[g] = Img("Guard" + g, Sprites.Circle, Theme.Danger, Vector2.one * 46f);
             }
             _player = Img("Player", Sprites.Circle, Theme.Accent, Vector2.one * 44f);
@@ -106,6 +114,21 @@ namespace N29.HeroesDawn.Presentation.Activities
                     img.rectTransform.anchoredPosition = a + new Vector2(Mathf.Cos(angle), -Mathf.Sin(angle)) * len * 0.5f;
                     img.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -angle * Mathf.Rad2Deg);
                     img.color = alert ? new Color(1f, 0.25f, 0.2f, 0.7f) : new Color(1f, 0.9f, 0.3f, 0.35f);
+                }
+                // Cône de vision du kit : apex sur le garde, long comme le rayon le plus long, large selon le champ de vision.
+                var cone = _cones[g];
+                if (cone != null)
+                {
+                    float coneLen = 0f;
+                    for (int r = 0; r < Rays; r++)
+                    {
+                        float a2 = guard.Facing + (r / (float)(Rays - 1) - 0.5f) * InfiltrationGame.Fov;
+                        coneLen = Mathf.Max(coneLen, RayLength(guard.Pos, a2) * _scale);
+                    }
+                    cone.rectTransform.sizeDelta = new Vector2(2f * coneLen * Mathf.Tan(InfiltrationGame.Fov * 0.5f), coneLen);
+                    cone.rectTransform.anchoredPosition = ToWorld(guard.Pos);
+                    cone.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -guard.Facing * Mathf.Rad2Deg + 90f);
+                    cone.color = alert ? new Color(1f, 0.25f, 0.2f, 0.8f) : new Color(1f, 0.85f, 0.25f, 0.55f);
                 }
             }
             var p = ToWorld(_game.Player);

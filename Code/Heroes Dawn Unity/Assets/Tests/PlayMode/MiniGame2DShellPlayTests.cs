@@ -41,7 +41,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             public bool UsesStick => true;
             public IMiniGame Game => Stub;
             public MiniGameHud Hud => new MiniGameHud("2 / 5", 30f, 3);
-            public void Build(RectTransform field) { }
+            public void Build(FieldSurface field) { }
             public void Tick(float dt, MiniGameInput input) { Ticks++; Last = input; if (input.Down) Downs++; if (input.Up) Ups++; }
             public void Dispose() => Disposed++;
         }
@@ -88,7 +88,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             MiniGame2DPopupView? popup = null; UniTask<ActivityResult> task = default;
             var open = Open(driver, default, (v, t) => { popup = v; task = t; });
             while (open.MoveNext()) yield return open.Current;
-            popup!.AbandonButton.Button.onClick.Invoke();
+            popup!.AbandonButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => task.Status.IsCompleted());
             Assert.That(task.GetAwaiter().GetResult().Success, Is.False);
         }
@@ -119,7 +119,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(driver.Downs, Is.EqualTo(0));
             driver.Stub.Status = GameStatus.Won;
             yield return PlayModeHarness.WaitFor(() => task.Status.IsCompleted());
-            popup.AbandonButton.Button.onClick.Invoke();
+            popup.AbandonButton.onClick.Invoke();
             yield return null;
             Assert.That(task.GetAwaiter().GetResult().Success, Is.True, "le résultat rendu reste celui de la fin de partie");
             Assert.That(driver.Stub.Status, Is.EqualTo(GameStatus.Won));
@@ -143,11 +143,11 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return null;
             Assert.That(driver.Last.Held, Is.True);
             Assert.That(driver.Last.Stick.magnitude, Is.InRange(0.99f, 1.001f), "le joystick est borné à 1");
-            field.OnPointerExit(new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current));
+            field.PointerLeft();
             yield return null;
             Assert.That(driver.Ups, Is.EqualTo(upsBefore + 1), "la sortie de la zone émet un relâchement");
             Assert.That(driver.Last.Stick, Is.EqualTo(Vector2.zero), "joystick nul au repos");
-            popup.AbandonButton.Button.onClick.Invoke();
+            popup.AbandonButton.onClick.Invoke();
         }
 
         [UnityTest, Timeout(240000), Description("Vérifie que l'ingénierie de secours se joue sur la vraie fenêtre : le panneau du prefab est affiché, les pièces choisies dans l'ordre du manuel puis Valider donnent la victoire, et une mauvaise séquence coûte un essai — parce que ce jeu repose sur des boutons du prefab")]
@@ -162,8 +162,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var task = view.PlayAsync(request, default);
             var popup = (MiniGame2DPopupView)view;
             var game = (RescueEngineeringGame)driver.Game;
-            var panel = popup.GetComponentInChildren<RescuePanelView>(true);
-            Assert.That(panel.gameObject.activeInHierarchy, Is.True, "le panneau est affiché pour ce jeu");
+            var panel = popup.Rescue!;
+            Assert.That(panel.Root.style.display.value, Is.EqualTo(UnityEngine.UIElements.DisplayStyle.Flex), "le panneau est affiché pour ce jeu");
             popup.Input.PressAt(new Vector2(0.5f, 0.5f));
             yield return null;
             popup.Input.ReleaseNow();

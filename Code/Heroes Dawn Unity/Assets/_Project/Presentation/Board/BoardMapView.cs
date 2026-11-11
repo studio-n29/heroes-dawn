@@ -5,102 +5,296 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Domain.Maps;
+using N29.HeroesDawn.Presentation.Combat.Hud;
 using N29.HeroesDawn.Presentation.Common;
+using N29.HeroesDawn.Presentation.Feedback;
+using N29.HeroesDawn.Presentation.Tutorial;
+using N29.HeroesDawn.Presentation.UiToolkit;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Board
 {
-    /// <summary>
-    /// Carte du plateau : instancie les cases (BoardNode) et les liens (BoardLink) d'après les données de la partie,
-    /// place le pion (Pawn) et l'anime case par case. Plateau agrandi dans une fenêtre à caméra : glisser pour se déplacer,
-    /// molette / boutons pour zoomer, flèches ou croix directionnelle pour naviguer d'une case à l'autre, dézoom automatique
-    /// sur le chemin prévisualisé. Ne calcule jamais une règle de jeu.
-    /// </summary>
-    public sealed class BoardMapView : MonoBehaviour, IBoardMapView, IDragHandler, IScrollHandler
+    /// <summary>Tracé des chemins du plateau (UI Toolkit) : une polyligne par lien, avec contour, couleur et épaisseur par lien.</summary>
+    public sealed class BoardLinksElement : VisualElement
     {
-        /// <summary>Espacement des cases (agrandi pour la lisibilité).</summary>
-        const float StepX = 170f;
-        const float StepY = 250f;
-        const float MinZoom = 0.4f;
-        const float MaxZoom = 1.6f;
-        const float DefaultZoom = 0.9f;
+        /// <summary>Boîte de dessin centrée sur l'origine de la carte (en pixels).</summary>
+        public const float HalfWidth = 5000f, HalfHeight = 4000f;
+
+        public sealed class Line
+        {
+            public Vector2[] Points = Array.Empty<Vector2>();
+            public Color Color;
+            public float Thickness = 12f;
+            public bool Visible = true;
+        }
+
+        public readonly List<Line> Lines = new List<Line>();
+
+        public BoardLinksElement()
+        {
+            pickingMode = PickingMode.Ignore;
+            style.position = Position.Absolute;
+            style.left = -HalfWidth; style.top = -HalfHeight;
+            style.width = HalfWidth * 2f; style.height = HalfHeight * 2f;
+            generateVisualContent += Paint;
+        }
+
+        static Vector2 Local(Vector2 p) => new Vector2(p.x + HalfWidth, -p.y + HalfHeight);
+
+        void Paint(MeshGenerationContext ctx)
+        {
+            var painter = ctx.painter2D;
+            painter.lineJoin = LineJoin.Round; painter.lineCap = LineCap.Round;
+            foreach (var pass in new[] { 0, 1 })
+                foreach (var l in Lines)
+                {
+                    if (!l.Visible || l.Points.Length < 2) continue;
+                    painter.lineWidth = pass == 0 ? l.Thickness + 4f : l.Thickness;
+                    painter.strokeColor = pass == 0 ? Theme.Ink : l.Color;
+                    painter.BeginPath();
+                    painter.MoveTo(Local(l.Points[0]));
+                    for (int i = 1; i < l.Points.Length; i++) painter.LineTo(Local(l.Points[i]));
+                    painter.Stroke();
+                }
+        }
+    }
+
+    /// <summary>Case du plateau (UI Toolkit) : disque coloré par type, glyphe, rang, objectif, surbrillance, coût et anneau de navigation.</summary>
+    public sealed class BoardNodeHud
+    {
+        public const float Size = 86f;
+        public VisualElement Root { get; } = new VisualElement();
+        public UnityEngine.UIElements.Button Frame { get; } = new UnityEngine.UIElements.Button();
+        readonly VisualElement _highlight = new VisualElement(), _focus = new VisualElement(), _objective = new VisualElement(), _disc = new VisualElement(), _icon = new VisualElement(), _cost = new VisualElement(), _anchor = new VisualElement();
+        readonly Label _glyph = new Label(), _sub = new Label(), _tag = new Label(), _costText = new Label();
+        bool _pulse, _isObjective;
+
+        public bool Focused { get; private set; }
+
+        public BoardNodeHud(BoardMapNode n)
+        {
+            _isObjective = n.IsObjective;
+            Root.name = "Node_" + n.Id.Value;
+            Root.AddToClassList("hd-board__node");
+            _highlight.AddToClassList("hd-board__hl"); _focus.AddToClassList("hd-board__focus"); _objective.AddToClassList("hd-board__obj");
+            Frame.RemoveFromClassList("unity-button"); Frame.AddToClassList("hd-board__frame");
+            _disc.AddToClassList("hd-board__disc"); _glyph.AddToClassList("hd-board__glyph"); _icon.AddToClassList("hd-board__icon");
+            _sub.AddToClassList("hd-board__sub"); _tag.AddToClassList("hd-board__tag"); _cost.AddToClassList("hd-board__nodecost"); _costText.AddToClassList("hd-board__nodecosttext");
+            _anchor.AddToClassList("hd-board__anchor");
+            _disc.Add(_glyph); _disc.Add(_icon); Frame.Add(_disc); _cost.Add(_costText); Frame.Add(_anchor);
+            foreach (var e in new VisualElement[] { _highlight, _focus, _objective, Frame, _sub, _tag, _cost }) Root.Add(e);
+            foreach (var e in new VisualElement[] { _highlight, _focus, _objective, _disc, _glyph, _icon, _sub, _tag, _cost, _costText, _anchor }) e.pickingMode = PickingMode.Ignore;
+            _highlight.style.display = DisplayStyle.None; _focus.style.display = DisplayStyle.None; _cost.style.display = DisplayStyle.None;
+            _objective.style.display = n.IsObjective ? DisplayStyle.Flex : DisplayStyle.None; _tag.style.display = n.IsObjective ? DisplayStyle.Flex : DisplayStyle.None;
+            _anchor.style.display = DisplayStyle.None;
+        }
+
+        public VisualElement AnchorElement => _anchor;
+
+        public void SetFocused(bool on) { Focused = on; _focus.style.display = on ? DisplayStyle.Flex : DisplayStyle.None; }
+
+        public void Tick()
+        {
+            if (!_pulse) return;
+            if (MotionSettings.Reduced) { HudAnim.SetScale(_highlight, 1f); return; }
+            float k = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 5f);
+            HudAnim.SetScale(_highlight, 1f + 0.08f * k);
+            _highlight.style.opacity = 0.65f + 0.35f * k;
+        }
+
+        static void Border(VisualElement e, Color c) => e.style.borderTopColor = e.style.borderBottomColor = e.style.borderLeftColor = e.style.borderRightColor = c;
+
+        public void Apply(BoardNodeState s)
+        {
+            bool fogReach = s.Mark == NodeMark.FogDestination;
+            if (!s.Revealed)
+            {
+                _disc.style.backgroundColor = Theme.WithAlpha(Theme.Surface2, fogReach ? 0.85f : 0.55f);
+                Border(Frame, fogReach ? Theme.Info : Theme.WithAlpha(Theme.Ink, 0.5f));
+                _glyph.text = "?";
+                Icon("?");
+                _glyph.style.color = fogReach ? Theme.Info : Theme.WithAlpha(Theme.TextMuted, 0.6f);
+                _sub.text = "";
+            }
+            else
+            {
+                var c = Theme.CaseColor(s.Type, s.Rank);
+                if (s.Spent) c = Color.Lerp(c, Theme.Surface3, 0.65f);
+                _disc.style.backgroundColor = c;
+                Border(Frame, Theme.Ink);
+                _glyph.style.color = Color.white;
+                _glyph.text = s.Glyph;
+                Icon(s.Glyph);
+                _sub.text = s.Sub;
+                _sub.style.color = s.SubElite ? Theme.Primary : Theme.TextMuted;
+            }
+            if (_isObjective)
+            {
+                var oc = s.ObjectiveDone ? Theme.Success : Theme.Primary;
+                Border(_objective, oc);
+                _tag.style.color = oc;
+                _tag.text = s.ObjectiveDone ? "OK" : "OBJ";
+            }
+            bool marked = s.Mark != NodeMark.None;
+            _highlight.style.display = marked ? DisplayStyle.Flex : DisplayStyle.None;
+            if (marked) Border(_highlight, HighlightColor(s.Mark));
+            _pulse = s.Mark == NodeMark.Destination;
+            if (!_pulse) { HudAnim.SetScale(_highlight, 1f); _highlight.style.opacity = 1f; }
+            _anchor.style.display = s.Mark == NodeMark.Destination ? DisplayStyle.Flex : DisplayStyle.None; // le tutoriel désigne les cases à portée
+            bool real = s.Mark == NodeMark.Destination || s.Mark == NodeMark.Target;
+            bool badge = s.DestinationCost >= 0 && (real || fogReach);
+            _cost.style.display = badge ? DisplayStyle.Flex : DisplayStyle.None;
+            if (badge) _costText.text = s.DestinationCost.ToString();
+        }
+
+        /// <summary>Pictogramme de l'extension Aube tactique à la place des lettres (VS, MJ, !, $, Zz) ; les lettres restent en repli.</summary>
+        void Icon(string glyph)
+        {
+            string? file = glyph == "VS" ? "crossed-swords" : glyph == "!" ? "node-alert" : glyph == "$" ? "node-crate" : glyph == "Zz" ? "tent" : glyph == "MJ" ? "target" : null;
+            var sprite = file != null ? TacticalArt.Ext("Icons", file) : null;
+            _icon.style.backgroundImage = sprite != null ? new StyleBackground(Background.FromSprite(sprite)) : new StyleBackground(StyleKeyword.None);
+            _icon.style.display = sprite != null ? DisplayStyle.Flex : DisplayStyle.None;
+            _glyph.style.display = sprite == null ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        static Color HighlightColor(NodeMark m)
+        {
+            switch (m)
+            {
+                case NodeMark.FogDestination: return Theme.WithAlpha(Theme.Info, 0.8f);
+                case NodeMark.Path: return Theme.WithAlpha(Theme.Info, 0.9f);
+                case NodeMark.Target: return Color.white;
+                default: return Theme.Reach;
+            }
+        }
+    }
+
+    /// <summary>Nuage de brouillard de guerre : dérive lentement au-dessus d'une case cachée, se dissipe quand elle est révélée.</summary>
+    public sealed class FogCloud
+    {
+        const float MaxAlpha = 0.78f, FadeSpeed = 1.4f;
+        public VisualElement Root { get; } = new VisualElement();
+        Vector2 _home;
+        float _phase, _alpha, _target, _w, _h;
+        Color _tint = Color.white;
+
+        public bool Visible => _alpha > 0.01f || _target > 0f;
+        public bool Fogged => _target > 0f;
+        public float Alpha => _alpha;
+
+        public FogCloud(Vector2 home, float size, float phase, Color tint, bool fogged)
+        {
+            _home = home; _phase = phase; _tint = tint;
+            _w = size; _h = size * 0.72f;
+            Root.AddToClassList("hd-board__fog"); Root.pickingMode = PickingMode.Ignore;
+            Root.style.width = _w; Root.style.height = _h;
+            Root.style.backgroundImage = new StyleBackground(Background.FromSprite(Sprites.Cloud));
+            _target = fogged ? 1f : 0f; _alpha = _target;
+            Place(Vector2.zero);
+            Apply();
+        }
+
+        public void SetFogged(bool fogged) => _target = fogged ? 1f : 0f;
+
+        void Place(Vector2 drift)
+        {
+            Root.style.left = _home.x + drift.x - _w * 0.5f;
+            Root.style.top = -(_home.y + drift.y) - _h * 0.5f;
+        }
+
+        public void Tick()
+        {
+            _alpha = Mathf.MoveTowards(_alpha, _target, FadeSpeed * Time.unscaledDeltaTime);
+            if (!MotionSettings.Reduced && _alpha > 0.01f)
+            {
+                float t = Time.unscaledTime;
+                Place(new Vector2(Mathf.Sin(t * 0.30f + _phase) * 22f, Mathf.Cos(t * 0.23f + _phase * 1.3f) * 14f));
+            }
+            Apply();
+        }
+
+        void Apply()
+        {
+            Root.style.unityBackgroundImageTintColor = new Color(_tint.r, _tint.g, _tint.b, _alpha * MaxAlpha);
+            Root.style.display = _alpha > 0.003f ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+    }
+
+    /// <summary>
+    /// Carte du plateau (UI Toolkit) : instancie les cases et les liens d'après les données de la partie, place le pion et l'anime case par case.
+    /// Plateau agrandi dans une fenêtre à caméra : glisser pour se déplacer, molette / boutons pour zoomer, flèches ou croix directionnelle pour
+    /// naviguer d'une case à l'autre, dézoom automatique sur le chemin prévisualisé. Ne calcule jamais une règle de jeu.
+    /// </summary>
+    public sealed class BoardMapView : IBoardMapView
+    {
+        const float StepX = 170f, StepY = 250f;
+        const float MinZoom = 0.4f, MaxZoom = 1.6f, DefaultZoom = 0.9f;
         /// <summary>Largeur laissée libre à droite pour la carte d'information quand on dézoome sur un chemin.</summary>
         const float PreviewInset = 560f;
         const float FitPadding = 170f;
+        const float PawnSpeed = 900f;
+        static readonly Vector2 PawnOffset = new Vector2(0, 22);
 
-        [SerializeField] RectTransform content = null!;
-        [SerializeField] RectTransform linkLayer = null!;
-        [SerializeField] RectTransform nodeLayer = null!;
-        [SerializeField] BoardNodeView nodePrefab = null!;
-        [SerializeField] Image linkPrefab = null!;
-        [SerializeField] BoardLinkCostView linkCostPrefab = null!;
-        [SerializeField] FogCloudView fogPrefab = null!;
-        [SerializeField] PortraitView pawnPrefab = null!;
-        [SerializeField] Button zoomIn = null!;
-        [SerializeField] Button zoomOut = null!;
-        [SerializeField] Button recenter = null!;
-        [SerializeField] Button prevCase = null!;
-        [SerializeField] Button nextCase = null!;
-
-        readonly Dictionary<CaseId, BoardNodeView> _nodes = new Dictionary<CaseId, BoardNodeView>();
+        readonly VisualElement _viewport, _content, _nodeLayer, _fogLayer, _costLayer, _pawn;
+        readonly BoardLinksElement _links;
+        readonly Component _owner;
+        readonly Dictionary<CaseId, BoardNodeHud> _nodes = new Dictionary<CaseId, BoardNodeHud>();
         readonly Dictionary<CaseId, Vector2> _positions = new Dictionary<CaseId, Vector2>();
         readonly Dictionary<CaseId, List<(CaseId To, int Link)>> _neighbors = new Dictionary<CaseId, List<(CaseId To, int Link)>>();
-        readonly Dictionary<CaseId, List<FogCloudView>> _fog = new Dictionary<CaseId, List<FogCloudView>>();
-        RectTransform? _fogLayer;
-        readonly List<Image[]> _links = new List<Image[]>();
-        readonly List<BoardLinkCostView> _costs = new List<BoardLinkCostView>();
-        /// <summary>Tracé de chaque chemin en pixels, dans le sens A vers B puis B vers A.</summary>
+        readonly Dictionary<CaseId, List<FogCloud>> _fog = new Dictionary<CaseId, List<FogCloud>>();
+        readonly List<Label> _costs = new List<Label>();
         readonly Dictionary<(CaseId, CaseId), Vector2[]> _curves = new Dictionary<(CaseId, CaseId), Vector2[]>();
-        readonly List<bool> _linkVisible = new List<bool>();
         readonly List<CaseId> _cycle = new List<CaseId>();
-        RectTransform? _pawn;
-        Image? _background;
-        Coroutine? _move;
-        Coroutine? _camera;
-        bool _animating;
+        readonly Label _pawnInitial = new Label();
+        VisualElement? _background;
+        bool _animating, _dragging, _down;
         float _zoom = DefaultZoom;
+        Vector2 _pan;
         Rect _bounds;
         CaseId _pawnAt;
         CaseId? _focused;
+        Vector2 _pawnPos, _downAt;
+        int _cameraToken;
 
         public event Action<CaseId>? NodeTapped;
 
-        /// <summary>Case sélectionnée au clavier / à la manette (anneau blanc), s'il y en a une.</summary>
+        public BoardMapView(VisualElement viewport, Component owner)
+        {
+            _viewport = viewport; _owner = owner;
+            _content = new VisualElement { pickingMode = PickingMode.Ignore };
+            _content.style.position = Position.Absolute; _content.style.left = Length.Percent(50); _content.style.top = Length.Percent(50);
+            _content.style.width = 0; _content.style.height = 0;
+            _links = new BoardLinksElement();
+            _costLayer = new VisualElement { pickingMode = PickingMode.Ignore };
+            _fogLayer = new VisualElement { pickingMode = PickingMode.Ignore };
+            _nodeLayer = new VisualElement { pickingMode = PickingMode.Ignore };
+            _pawn = new VisualElement { pickingMode = PickingMode.Ignore };
+            _pawn.AddToClassList("hd-board__pawn"); _pawnInitial.AddToClassList("hd-board__pawninitial"); _pawn.Add(_pawnInitial);
+            foreach (var e in new VisualElement[] { _links, _costLayer, _fogLayer, _nodeLayer }) _content.Add(e);
+            viewport.Add(_content);
+            viewport.RegisterCallback<PointerDownEvent>(OnDown);
+            viewport.RegisterCallback<PointerMoveEvent>(OnMove);
+            viewport.RegisterCallback<PointerUpEvent>(OnUp);
+            viewport.RegisterCallback<WheelEvent>(e => { if (Mathf.Abs(e.delta.y) > 0.01f) ZoomBy(e.delta.y < 0 ? 1.15f : 1f / 1.15f); e.StopPropagation(); });
+        }
+
         public CaseId? Focused => _focused;
-
-        /// <summary>Zoom courant de la caméra (tests).</summary>
         public float Zoom => _zoom;
-
-        /// <summary>Bouton d'une case (tests PlayMode : toucher réel).</summary>
-        public Button NodeButton(CaseId id) => _nodes[id].Button;
-
-        static Vector2 PosOf(BoardMapNode n) => GridToPixels(n.X, n.Y);
+        public IEnumerable<FogCloud> FogClouds { get { foreach (var l in _fog.Values) foreach (var c in l) yield return c; } }
+        public HdButtonRef NodeButton(CaseId id) => new HdButtonRef(_nodes[id].Frame, _owner);
 
         static Vector2 GridToPixels(float x, float y) => new Vector2((x - 8f) * StepX, (y - 2f) * StepY);
-
-        void Awake()
-        {
-            if (zoomIn != null) zoomIn.onClick.AddListener(() => ZoomBy(1.25f));
-            if (zoomOut != null) zoomOut.onClick.AddListener(() => ZoomBy(0.8f));
-            if (recenter != null) recenter.onClick.AddListener(() => CenterOn(_pawnAt, true));
-            if (prevCase != null) prevCase.onClick.AddListener(() => CycleFocus(-1));
-            if (nextCase != null) nextCase.onClick.AddListener(() => CycleFocus(1));
-        }
+        static Vector2 PosOf(BoardMapNode n) => GridToPixels(n.X, n.Y);
+        Vector2 PawnPos(CaseId id) => _positions[id] + PawnOffset;
+        Vector2 ViewSize => _viewport.layout.size.x > 1f ? _viewport.layout.size : new Vector2(1880f, 780f);
 
         public void Build(BoardMapData d)
         {
             BuildBackground(d);
-            linkLayer.Clear();
-            nodeLayer.Clear();
-            _nodes.Clear();
-            _positions.Clear();
-            _neighbors.Clear();
-            _links.Clear();
-            _linkVisible.Clear();
-            _cycle.Clear();
+            _links.Lines.Clear(); _costLayer.Clear(); _nodeLayer.Clear(); _fogLayer.Clear();
+            _nodes.Clear(); _positions.Clear(); _neighbors.Clear(); _fog.Clear(); _costs.Clear(); _cycle.Clear(); _curves.Clear();
             _focused = null;
             foreach (var n in d.Nodes) _positions[n.Id] = PosOf(n);
             ComputeBounds();
@@ -109,95 +303,70 @@ namespace N29.HeroesDawn.Presentation.Board
                 var l = d.Links[i];
                 var points = CurvePixels(l.Curve);
                 _curves[(l.A, l.B)] = points;
-                var reversed = (Vector2[])points.Clone();
-                Array.Reverse(reversed);
+                var reversed = (Vector2[])points.Clone(); Array.Reverse(reversed);
                 _curves[(l.B, l.A)] = reversed;
-                var segments = new Image[points.Length - 1];
-                for (int s = 0; s < segments.Length; s++)
-                {
-                    Vector2 p = points[s], q = points[s + 1];
-                    var seg = Instantiate(linkPrefab, linkLayer);
-                    var rt = seg.rectTransform;
-                    rt.anchoredPosition = (p + q) * 0.5f;
-                    rt.sizeDelta = new Vector2(Vector2.Distance(p, q) + 3f, 12f);
-                    rt.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(q.y - p.y, q.x - p.x) * Mathf.Rad2Deg);
-                    segments[s] = seg;
-                }
-                var badge = Instantiate(linkCostPrefab, linkLayer);
-                ((RectTransform)badge.transform).anchoredPosition = CurvePoint(points, 0.5f);
-                badge.Show(l.Cost);
-                badge.name = "LinkCost_" + l.A.Value + "_" + l.B.Value;
-                _costs.Add(badge);
-                _links.Add(segments);
-                _linkVisible.Add(true);
-                AddNeighbor(l.A, l.B, i);
-                AddNeighbor(l.B, l.A, i);
+                _links.Lines.Add(new BoardLinksElement.Line { Points = points, Color = Theme.Surface3 });
+                var badge = new Label(l.Cost + " PM") { name = "LinkCost_" + l.A.Value + "_" + l.B.Value, pickingMode = PickingMode.Ignore };
+                badge.AddToClassList("hd-board__cost");
+                var mid = CurvePoint(points, 0.5f);
+                badge.style.left = mid.x - 52f; badge.style.top = -mid.y - 26f;
+                _costLayer.Add(badge); _costs.Add(badge);
+                AddNeighbor(l.A, l.B, i); AddNeighbor(l.B, l.A, i);
             }
-            foreach (var c in _costs) c.transform.SetAsLastSibling();
-            BuildFog(d);
-            foreach (var n in d.Nodes)
-            {
-                var node = Instantiate(nodePrefab, nodeLayer);
-                ((RectTransform)node.transform).anchoredPosition = _positions[n.Id];
-                node.name = "Node_" + n.Id.Value;
-                node.Init(n);
-                var id = n.Id;
-                node.Button.onClick.AddListener(() => NodeTapped?.Invoke(id));
-                _nodes.Add(id, node);
-            }
-            var pawn = Instantiate(pawnPrefab, nodeLayer);
-            pawn.Show(d.Pawn);
-            _pawn = (RectTransform)pawn.transform;
-            _pawnAt = d.PawnAt;
-            _pawn.anchoredPosition = PawnPos(d.PawnAt);
-            _zoom = DefaultZoom;
-            CenterOn(d.PawnAt, false);
-        }
-
-        /// <summary>Brouillard de guerre : deux nuages par case, entre les chemins et les cases ; ils se dissipent quand la case est révélée.</summary>
-        void BuildFog(BoardMapData d)
-        {
-            var go = new GameObject("FogLayer", typeof(RectTransform));
-            _fogLayer = (RectTransform)go.transform;
-            _fogLayer.SetParent(content, false);
-            _fogLayer.anchorMin = linkLayer.anchorMin; _fogLayer.anchorMax = linkLayer.anchorMax; _fogLayer.pivot = linkLayer.pivot;
-            _fogLayer.anchoredPosition = linkLayer.anchoredPosition; _fogLayer.sizeDelta = linkLayer.sizeDelta;
-            _fogLayer.SetSiblingIndex(nodeLayer.GetSiblingIndex());
+            _links.MarkDirtyRepaint();
             var tint = new Color(0.46f, 0.54f, 0.66f, 1f);
             int k = 0;
             foreach (var n in d.Nodes)
             {
-                var list = new List<FogCloudView>();
+                var list = new List<FogCloud>();
                 for (int i = 0; i < 2; i++, k++)
                 {
-                    var cloud = Instantiate(fogPrefab, _fogLayer);
-                    var off = new Vector2(i == 0 ? -46f : 52f, i == 0 ? 30f : -38f);
-                    cloud.Init(_positions[n.Id] + off, i == 0 ? 470f : 400f, k * 1.7f, tint, true);
-                    list.Add(cloud);
+                    var cloud = new FogCloud(_positions[n.Id] + new Vector2(i == 0 ? -46f : 52f, i == 0 ? 30f : -38f), i == 0 ? 470f : 400f, k * 1.7f, tint, true);
+                    _fogLayer.Add(cloud.Root); list.Add(cloud);
                 }
                 _fog[n.Id] = list;
             }
+            foreach (var n in d.Nodes)
+            {
+                var node = new BoardNodeHud(n);
+                node.Root.style.left = _positions[n.Id].x - BoardNodeHud.Size * 0.5f - 20f;
+                node.Root.style.top = -_positions[n.Id].y - BoardNodeHud.Size * 0.5f - 20f;
+                var id = n.Id;
+                node.Frame.clicked += () => { if (!_dragging) NodeTapped?.Invoke(id); };
+                HdTutorialAnchor.Attach(_owner, node.AnchorElement, TutorialTarget.BoardDestination, id.Value);
+                _nodeLayer.Add(node.Root); _nodes.Add(id, node);
+            }
+            HdPortrait.Fill(_pawn, _pawnInitial, d.Pawn);
+            _nodeLayer.Add(_pawn);
+            _pawnAt = d.PawnAt;
+            SetPawn(PawnPos(d.PawnAt));
+            _zoom = DefaultZoom;
+            CenterOn(d.PawnAt, false);
+        }
+
+        void SetPawn(Vector2 p)
+        {
+            _pawnPos = p;
+            _pawn.style.left = p.x - 35f; _pawn.style.top = -p.y - 70f;
         }
 
         /// <summary>Fond de carte généré par l'outil de level design : une image derrière les liens, cadrée sur la grille qu'elle couvre.</summary>
         void BuildBackground(BoardMapData d)
         {
-            if (_background != null) Destroy(_background.gameObject);
+            _background?.RemoveFromHierarchy();
             _background = null;
             if (string.IsNullOrEmpty(d.BackgroundKey)) return;
             var sprite = Resources.Load<Sprite>("Zones/" + d.BackgroundKey);
             if (sprite == null) return;
-            var go = new GameObject("Background", typeof(RectTransform), typeof(Image));
-            var rt = (RectTransform)go.transform;
-            rt.SetParent(content, false);
-            rt.SetAsFirstSibling();
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = new Vector2(((d.BgMinX + d.BgMaxX) / 2f - 8f) * StepX, ((d.BgMinY + d.BgMaxY) / 2f - 2f) * StepY);
-            rt.sizeDelta = new Vector2((d.BgMaxX - d.BgMinX) * StepX, (d.BgMaxY - d.BgMinY) * StepY);
-            _background = go.GetComponent<Image>();
-            _background.sprite = sprite;
-            _background.raycastTarget = false;
-            _background.color = new Color(0.55f, 0.6f, 0.7f, 0.3f); // l'illustration Aube tactique de l'écran reste visible derrière le plateau
+            var bg = new VisualElement { pickingMode = PickingMode.Ignore };
+            float w = (d.BgMaxX - d.BgMinX) * StepX, h = (d.BgMaxY - d.BgMinY) * StepY;
+            float cx = ((d.BgMinX + d.BgMaxX) / 2f - 8f) * StepX, cy = ((d.BgMinY + d.BgMaxY) / 2f - 2f) * StepY;
+            bg.style.position = Position.Absolute;
+            bg.style.left = cx - w * 0.5f; bg.style.top = -cy - h * 0.5f; bg.style.width = w; bg.style.height = h;
+            bg.style.backgroundImage = new StyleBackground(Background.FromSprite(sprite));
+            bg.style.unityBackgroundImageTintColor = new Color(0.55f, 0.6f, 0.7f, 0.3f); // l'illustration de l'écran reste visible derrière le plateau
+            _background = bg;
+            _content.Insert(0, bg);
         }
 
         void AddNeighbor(CaseId from, CaseId to, int link)
@@ -213,13 +382,10 @@ namespace N29.HeroesDawn.Presentation.Board
             foreach (var p in _positions.Values)
             {
                 if (first) { min = max = p; first = false; continue; }
-                min = Vector2.Min(min, p);
-                max = Vector2.Max(max, p);
+                min = Vector2.Min(min, p); max = Vector2.Max(max, p);
             }
             _bounds = Rect.MinMaxRect(min.x, min.y, max.x, max.y);
         }
-
-        Vector2 PawnPos(CaseId id) => _positions[id] + PawnOffset;
 
         public void Refresh(IReadOnlyList<BoardNodeState> nodes, IReadOnlyList<BoardLinkState> links, CaseId pawnAt, bool movePawn)
         {
@@ -231,32 +397,25 @@ namespace N29.HeroesDawn.Presentation.Board
                 if (_fog.TryGetValue(s.Id, out var clouds)) foreach (var cloud in clouds) cloud.SetFogged(!s.Revealed);
                 if (s.Mark == NodeMark.Destination || s.Mark == NodeMark.FogDestination || s.Mark == NodeMark.Target) _cycle.Add(s.Id);
             }
-            for (int i = 0; i < links.Count && i < _links.Count; i++)
+            for (int i = 0; i < links.Count && i < _links.Lines.Count; i++)
             {
                 var l = links[i];
-                _linkVisible[i] = l.Visible;
-                float thickness = l.Mark == LinkMark.Path ? 22f : l.Mark == LinkMark.Beyond ? 16f : 12f;
-                var color = l.Mark == LinkMark.Path ? Theme.Info
-                          : l.Mark == LinkMark.Beyond ? Theme.WithAlpha(Theme.Info, 0.5f)
-                          : l.Dim ? Theme.WithAlpha(Theme.Surface3, 0.3f) : Theme.Surface3;
-                foreach (var seg in _links[i])
-                {
-                    seg.gameObject.SetActive(l.Visible);
-                    var rt = seg.rectTransform;
-                    rt.sizeDelta = new Vector2(rt.sizeDelta.x, thickness);
-                    seg.color = color;
-                }
-                _costs[i].gameObject.SetActive(l.Visible);
-                _costs[i].SetHighlighted(l.Mark == LinkMark.Path);
+                var line = _links.Lines[i];
+                line.Visible = l.Visible;
+                line.Thickness = l.Mark == LinkMark.Path ? 22f : l.Mark == LinkMark.Beyond ? 16f : 12f;
+                line.Color = l.Mark == LinkMark.Path ? Theme.Info
+                           : l.Mark == LinkMark.Beyond ? Theme.WithAlpha(Theme.Info, 0.5f)
+                           : l.Dim ? Theme.WithAlpha(Theme.Surface3, 0.3f) : Theme.Surface3;
+                _costs[i].style.display = l.Visible ? DisplayStyle.Flex : DisplayStyle.None;
+                _costs[i].EnableInClassList("hd-board__cost--on", l.Mark == LinkMark.Path);
             }
+            _links.MarkDirtyRepaint();
             _pawnAt = pawnAt;
             if (_focused.HasValue && !_nodes.ContainsKey(_focused.Value)) _focused = null;
-            if (_pawn == null) return;
-            if (movePawn && !_animating) _pawn.anchoredPosition = PawnPos(pawnAt);
-            _pawn.SetAsLastSibling();
+            if (movePawn && !_animating) SetPawn(PawnPos(pawnAt));
+            _pawn.BringToFront();
         }
 
-        /// <summary>Tracé d'un chemin en pixels : segments d'au plus ~40 px, extrémités comprises.</summary>
         static Vector2[] CurvePixels(BezierCurve curve)
         {
             int segments = Mathf.Clamp(Mathf.CeilToInt(curve.Length() * StepX / 40f), 6, 28);
@@ -266,7 +425,6 @@ namespace N29.HeroesDawn.Presentation.Board
             return px;
         }
 
-        /// <summary>Point d'une polyligne à la fraction <paramref name="t"/> de sa longueur.</summary>
         static Vector2 CurvePoint(IReadOnlyList<Vector2> pts, float t)
         {
             float total = 0f;
@@ -281,44 +439,35 @@ namespace N29.HeroesDawn.Presentation.Board
             return pts[0];
         }
 
-        /// <summary>Trajet complet du pion : les tracés des chemins mis bout à bout, sans arrêt aux cases traversées.</summary>
         List<Vector2> TravelPoints(IReadOnlyList<CaseId> path)
         {
             var pts = new List<Vector2>();
             var at = StartOf(path[0]);
             foreach (var step in path)
             {
-                if (_curves.TryGetValue((at, step), out var curve))
-                    foreach (var p in curve) pts.Add(p + PawnOffset);
+                if (_curves.TryGetValue((at, step), out var curve)) foreach (var p in curve) pts.Add(p + PawnOffset);
                 else if (_positions.TryGetValue(step, out var to)) pts.Add(to + PawnOffset);
                 at = step;
             }
             return pts;
         }
 
-        /// <summary>Case d'où part le pion pour atteindre <paramref name="first"/> : la voisine la plus proche de sa position actuelle.</summary>
         CaseId StartOf(CaseId first)
         {
             var best = _pawnAt;
             float bestDist = float.MaxValue;
-            if (_pawn != null && _neighbors.TryGetValue(first, out var list))
+            if (_neighbors.TryGetValue(first, out var list))
                 foreach (var (to, _) in list)
                 {
-                    float d = Vector2.Distance(_pawn.anchoredPosition, PawnPos(to));
+                    float d = Vector2.Distance(_pawnPos, PawnPos(to));
                     if (d < bestDist) { bestDist = d; best = to; }
                 }
             return best;
         }
 
-        static readonly Vector2 PawnOffset = new Vector2(0, 22);
-
-        /// <summary>Vitesse du pion le long des chemins (pixels par seconde).</summary>
-        const float PawnSpeed = 900f;
-
         public async UniTask MovePawnAsync(IReadOnlyList<CaseId> path, CancellationToken ct)
         {
-            if (_move != null) Tween.Stop(_move);
-            if (path.Count == 0 || _pawn == null) return;
+            if (path.Count == 0) return;
             var pts = TravelPoints(path);
             if (pts.Count < 2) return;
             var cumulative = new float[pts.Count];
@@ -329,28 +478,21 @@ namespace N29.HeroesDawn.Presentation.Board
             {
                 var done = new UniTaskCompletionSource();
                 float duration = Mathf.Clamp(total / PawnSpeed, 0.25f, 3f);
-                _pawn.anchoredPosition = pts[0];
-                _move = Tween.Run(duration, k =>
+                SetPawn(pts[0]);
+                HudAnim.Run(_pawn, duration, k =>
                 {
-                    if (_pawn == null) return;
                     float d = total * k;
                     int i = 1;
                     while (i < pts.Count - 1 && cumulative[i] < d) i++;
                     float seg = cumulative[i] - cumulative[i - 1];
-                    _pawn.anchoredPosition = Vector2.Lerp(pts[i - 1], pts[i], seg < 1e-3f ? 1f : Mathf.Clamp01((d - cumulative[i - 1]) / seg));
-                }, () =>
-                {
-                    if (_pawn != null) { _pawn.anchoredPosition = pts[pts.Count - 1]; Tween.Punch(_pawn, 0.1f, 0.12f); }
-                    done.TrySetResult();
-                }, this, Tween.Linear);
+                    SetPawn(Vector2.Lerp(pts[i - 1], pts[i], seg < 1e-3f ? 1f : Mathf.Clamp01((d - cumulative[i - 1]) / seg)));
+                }, () => { SetPawn(pts[pts.Count - 1]); HudAnim.Punch(_pawn, 0.1f, 0.12f); done.TrySetResult(); });
                 await done.Task.AttachExternalCancellation(ct);
             }
             finally { _animating = false; }
         }
 
         // ------------------------------------------------------------------ Caméra
-
-        Vector2 ViewportSize => ((RectTransform)transform).rect.size;
 
         public void CenterOn(CaseId id, bool animate)
         {
@@ -366,49 +508,43 @@ namespace N29.HeroesDawn.Presentation.Board
             {
                 if (!_positions.TryGetValue(id, out var p)) continue;
                 if (first) { min = max = p; first = false; continue; }
-                min = Vector2.Min(min, p);
-                max = Vector2.Max(max, p);
+                min = Vector2.Min(min, p); max = Vector2.Max(max, p);
             }
             if (first) return;
-            min -= Vector2.one * FitPadding;
-            max += Vector2.one * FitPadding;
+            min -= Vector2.one * FitPadding; max += Vector2.one * FitPadding;
             var size = max - min;
-            var view = ViewportSize;
+            var view = ViewSize;
             float effW = Mathf.Max(200f, view.x - PreviewInset);
             float zoom = Mathf.Clamp(Mathf.Min(effW / Mathf.Max(1f, size.x), view.y / Mathf.Max(1f, size.y)), MinZoom, 1.2f);
             Vector2 center = (min + max) * 0.5f;
             MoveCamera(zoom, new Vector2(-PreviewInset * 0.5f, 0f) - center * zoom, animate);
         }
 
-        void ZoomBy(float factor)
+        public void ZoomBy(float factor)
         {
             float zoom = Mathf.Clamp(_zoom * factor, MinZoom, MaxZoom);
-            // Zoom centré sur la fenêtre : le point au centre reste au centre.
-            Vector2 pan = content.anchoredPosition * (zoom / _zoom);
+            Vector2 pan = _pan * (zoom / _zoom);
             MoveCamera(zoom, ClampPan(pan, zoom), true);
         }
 
+        public void Recenter() => CenterOn(_pawnAt, true);
+
         void MoveCamera(float zoom, Vector2 pan, bool animate)
         {
-            if (_camera != null) Tween.Stop(_camera);
-            if (!animate || !isActiveAndEnabled)
-            {
-                Apply(zoom, pan);
-                return;
-            }
+            int token = ++_cameraToken;
+            if (!animate || !HudAnim.Allowed) { Apply(zoom, pan); return; }
             float z0 = _zoom;
-            Vector2 p0 = content.anchoredPosition;
-            _camera = Tween.Run(0.35f, k => Apply(Mathf.Lerp(z0, zoom, k), Vector2.Lerp(p0, pan, k)), null, this, Tween.EaseOutCubic);
+            Vector2 p0 = _pan;
+            HudAnim.Run(_content, 0.35f, k => { if (token == _cameraToken) Apply(Mathf.Lerp(z0, zoom, k), Vector2.Lerp(p0, pan, k)); }, null, HudAnim.EaseOutCubic);
         }
 
         void Apply(float zoom, Vector2 pan)
         {
-            _zoom = zoom;
-            content.localScale = new Vector3(zoom, zoom, 1f);
-            content.anchoredPosition = pan;
+            _zoom = zoom; _pan = pan;
+            HudAnim.SetScale(_content, zoom);
+            HudAnim.SetTranslate(_content, pan.x, -pan.y);
         }
 
-        /// <summary>Le centre de la fenêtre reste dans le plateau (marge d'une case) : on ne peut pas se perdre hors carte.</summary>
         Vector2 ClampPan(Vector2 pan, float zoom)
         {
             if (_positions.Count == 0) return pan;
@@ -418,22 +554,42 @@ namespace N29.HeroesDawn.Presentation.Board
             return -center * zoom;
         }
 
-        public void OnDrag(PointerEventData e)
+        // ------------------------------------------------------------------ Glisser
+
+        void OnDown(PointerDownEvent e)
         {
-            if (_camera != null) { Tween.Stop(_camera); _camera = null; }
-            Apply(_zoom, ClampPan(content.anchoredPosition + e.delta, _zoom));
+            if (e.button != 0) return;
+            _down = true; _dragging = false; _downAt = e.position;
         }
 
-        public void OnScroll(PointerEventData e)
+        void OnMove(PointerMoveEvent e)
         {
-            if (Mathf.Abs(e.scrollDelta.y) < 0.01f) return;
-            ZoomBy(e.scrollDelta.y > 0 ? 1.15f : 1f / 1.15f);
+            if (!_down) return;
+            if (!_dragging)
+            {
+                if (Vector2.Distance(e.position, _downAt) < 10f) return;
+                _dragging = true;
+                _cameraToken++;
+                _viewport.CapturePointer(e.pointerId);
+            }
+            var delta = (Vector2)e.deltaPosition;
+            Apply(_zoom, ClampPan(_pan + new Vector2(delta.x, -delta.y), _zoom));
+        }
+
+        void OnUp(PointerUpEvent e)
+        {
+            if (!_down) return;
+            _down = false;
+            if (_dragging) { _viewport.ReleasePointer(e.pointerId); _viewport.schedule.Execute(() => _dragging = false).ExecuteLater(30); }
         }
 
         // ------------------------------------------------------------------ Navigation case à case
 
-        void Update()
+        /// <summary>Chaque image : pulsation des cases accessibles, brouillard qui dérive, touches de navigation.</summary>
+        public void Tick()
         {
+            foreach (var n in _nodes.Values) n.Tick();
+            foreach (var l in _fog.Values) foreach (var c in l) c.Tick();
             if (_positions.Count == 0) return;
             if (Keys.Pressed(Key.LeftArrow) || Keys.Pressed(Key.A)) Navigate(Vector2.left);
             else if (Keys.Pressed(Key.RightArrow) || Keys.Pressed(Key.D)) Navigate(Vector2.right);
@@ -453,30 +609,21 @@ namespace N29.HeroesDawn.Presentation.Board
             else if (pad.buttonSouth.wasPressedThisFrame) ConfirmFocus();
         }
 
-        /// <summary>Valide la case sélectionnée (comme un toucher sur elle).</summary>
         public void ConfirmFocus()
         {
             if (_focused.HasValue) NodeTapped?.Invoke(_focused.Value);
         }
 
-        /// <summary>
-        /// Déplace la sélection vers la case voisine (par un lien visible) la mieux alignée avec la direction demandée.
-        /// Premier appui : la sélection part du pion.
-        /// </summary>
         public bool Navigate(Vector2 direction)
         {
             var from = _focused ?? _pawnAt;
-            if (!_focused.HasValue)
-            {
-                SetFocus(from);
-                return true;
-            }
+            if (!_focused.HasValue) { SetFocus(from); return true; }
             if (!_neighbors.TryGetValue(from, out var list)) return false;
             CaseId? best = null;
-            float bestScore = 0.3f; // au moins ~72° d'écart toléré
+            float bestScore = 0.3f;
             foreach (var (to, link) in list)
             {
-                if (link < _linkVisible.Count && !_linkVisible[link]) continue;
+                if (link < _links.Lines.Count && !_links.Lines[link].Visible) continue;
                 var delta = (_positions[to] - _positions[from]).normalized;
                 float score = Vector2.Dot(delta, direction.normalized);
                 if (score > bestScore) { bestScore = score; best = to; }
@@ -486,7 +633,6 @@ namespace N29.HeroesDawn.Presentation.Board
             return true;
         }
 
-        /// <summary>Passe à la destination surlignée suivante / précédente (boutons ◄ ►, Tab, épaules de la manette).</summary>
         public void CycleFocus(int delta)
         {
             if (_cycle.Count == 0) return;

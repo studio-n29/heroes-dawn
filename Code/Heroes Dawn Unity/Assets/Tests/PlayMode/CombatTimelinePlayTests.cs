@@ -61,20 +61,13 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => view.Timeline.Markers.Count > 0, 300);
             foreach (var m in view.Timeline.Markers)
             {
-                var images = m.GetComponentsInChildren<UnityEngine.UI.Image>(true);
-                var frame = System.Array.Find(images, i => i.name == "Frame")!;
-                Assert.That(frame.sprite, Is.SameAs(N29.HeroesDawn.Presentation.Common.Sprites.Diamond));
-                Assert.That(frame.color, Is.Not.EqualTo(Color.black));
+                Assert.That(m.Frame.ClassListContains("hd-tl__frame"), Is.True);
+                Assert.That(m.Frame.resolvedStyle.rotate.angle.value, Is.EqualTo(45f).Within(0.5f), "un losange (carré tourné de 45 degrés)");
+                Assert.That(m.Frame.resolvedStyle.backgroundColor, Is.Not.EqualTo(Color.black));
             }
         }
 
-        static void Press(SkillIconView card, bool down)
-        {
-            var frame = card.transform.Find("Frame").gameObject;
-            var e = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current);
-            if (down) UnityEngine.EventSystems.ExecuteEvents.Execute(frame, e, UnityEngine.EventSystems.ExecuteEvents.pointerDownHandler);
-            else UnityEngine.EventSystems.ExecuteEvents.Execute(frame, e, UnityEngine.EventSystems.ExecuteEvents.pointerUpHandler);
-        }
+        static void Press(N29.HeroesDawn.Presentation.Combat.Hud.SkillCardHud card, bool down) => card.Press(down);
 
         [UnityTest, Timeout(300000), Description("Vérifie que l'éventail de compétences n'apparaît que pour l'agent dont c'est le tour, que cet agent a un contour lumineux et que la description d'une carte s'affiche tant qu'on reste appuyé puis disparaît au relâchement — parce que c'est l'organisation de combat voulue")]
         public IEnumerator Fan_ShowsOnAgentTurn_AndHoldShowsDescription()
@@ -95,7 +88,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(view.DescriptionVisible, Is.False, "relâché : la description disparaît");
         }
 
-        float FanCardY(CombatView view, int i) => ((RectTransform)view.SkillCard(i).transform).anchoredPosition.y;
+        float FanCardY(CombatView view, int i) => view.SkillCard(i).OffsetY;
 
         [UnityTest, Timeout(300000), Description("Vérifie que les cartes de l'éventail montent du bas de l'écran à l'ouverture du tour d'un agent — parce que le début du tour doit s'animer")]
         public IEnumerator Fan_OpensWithAnimation()
@@ -121,16 +114,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             finally { N29.HeroesDawn.Presentation.Feedback.MotionSettings.ResetForTests(); }
         }
 
-        internal static void DragCard(SkillIconView card, Vector2 to)
-        {
-            var frame = card.transform.Find("Frame").gameObject;
-            var es = UnityEngine.EventSystems.EventSystem.current;
-            var e = new UnityEngine.EventSystems.PointerEventData(es) { position = to };
-            UnityEngine.EventSystems.ExecuteEvents.Execute(frame, e, UnityEngine.EventSystems.ExecuteEvents.beginDragHandler);
-            UnityEngine.EventSystems.ExecuteEvents.Execute(frame, e, UnityEngine.EventSystems.ExecuteEvents.dragHandler);
-            UnityEngine.EventSystems.ExecuteEvents.Execute(frame, e, UnityEngine.EventSystems.ExecuteEvents.endDragHandler);
-        }
-
+        internal static void DragCard(N29.HeroesDawn.Presentation.Combat.Hud.SkillCardHud card, Vector2 to) => card.SimulateDrag(to);
         [UnityTest, Timeout(300000), Description("Vérifie que glisser une carte de compétence jusqu'à sa cible (ou dans le vide pour une compétence générale) la lance et la fait revenir dans l'éventail — parce que c'est le geste voulu pour jouer ses cartes")]
         public IEnumerator Fan_DragAndDrop_PlaysTheCard()
         {
@@ -146,7 +130,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var enemy = sim.Units.First(u => u.Side == N29.HeroesDawn.Domain.Combat.Side.Enemy && u.IsAlive);
             var target = card.Data.NeedsTarget ? view.UnitScreenPoint(enemy.Id) : new Vector2(Screen.width * 0.92f, Screen.height * 0.2f);
             DragCard(card, target);
-            Assert.That(card.transform.parent, Is.SameAs(view.FanRootForTests), "la carte est revenue dans l'éventail");
+            Assert.That(card.IsDragging, Is.False, "la carte est revenue dans l éventail");
             yield return PlayModeHarness.WaitFor(() => !actor.IsReady, 600);
             Assert.That(actor.IsReady, Is.False, "la compétence a été lancée");
         }
@@ -159,7 +143,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => view.FanVisible, 2400);
             var sim = ActivityGamesPlayTests.Container.Resolve<N29.HeroesDawn.Application.Features.Combat.IActiveCombatReadModel>().Simulation!;
             var actor = sim.Units.First(u => u.Side == N29.HeroesDawn.Domain.Combat.Side.Ally && u.IsReady);
-            for (int i = 0; i < 3; i++) view.SkillCard(i).Button.onClick.Invoke();
+            for (int i = 0; i < 3; i++) view.SkillCard(i).Tap();
             yield return new WaitForSecondsRealtime(0.5f);
             Assert.That(actor.IsReady, Is.True, "aucune compétence n'a été lancée par un appui");
         }

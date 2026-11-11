@@ -9,14 +9,14 @@ using UnityEngine;
 namespace N29.HeroesDawn.Presentation.Activities
 {
     /// <summary>
-    /// « Ingénierie de secours » : remplit le panneau du prefab (<see cref="RescuePanelView"/>) avec le manuel, la réserve de pièces et les emplacements.
+    /// « Ingénierie de secours » : remplit le panneau du prefab (<see cref="RescuePanelHud"/>) avec le manuel, la réserve de pièces et les emplacements.
     /// Les boutons sont inactifs jusqu'au démarrage de la partie : le premier appui sur la fenêtre sert à commencer.
     /// </summary>
     public sealed class RescueDriver : MiniGameDriverBase, IRescuePanelUser
     {
         readonly RescueEngineeringGame _game;
         readonly ILocalization _loc;
-        RescuePanelView? _panel;
+        RescuePanelHud? _panel;
         bool _armed;
 
         public RescueDriver(ActivityPlan plan, ILocalization loc)
@@ -38,7 +38,7 @@ namespace N29.HeroesDawn.Presentation.Activities
             _ => _loc.F("mg2d.rescue.clue.unused", PartName(c.A)),
         };
 
-        public void Bind(RescuePanelView panel) => _panel = panel;
+        public void Bind(RescuePanelHud panel) => _panel = panel;
 
         protected override void OnBuild()
         {

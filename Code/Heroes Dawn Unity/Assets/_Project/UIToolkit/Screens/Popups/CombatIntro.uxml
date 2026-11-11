@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal hd-intro">
+        <ui:Button name="tap" class="hd-intro__tap" />
+        <ui:VisualElement class="hd-intro__cols">
+            <ui:VisualElement class="hd-intro__col hd-intro__col--left">
+                <ui:Label name="allyTitle" class="hd-intro__title" />
+                <ui:VisualElement name="allies" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-intro__col hd-intro__col--right">
+                <ui:Label name="enemyTitle" class="hd-intro__title hd-intro__title--enemy" />
+                <ui:VisualElement name="enemies" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="skip" class="hd-btn hd-btn--ghost hd-intro__skip" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,6 +1,6 @@
 #nullable enable
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Page Tournoi : classement à gauche, manches du jour à droite.</summary>
-    public sealed class TournamentPageView : ListPageView, ITournamentPageView { }
+    /// <summary>Page Tournoi : classement et manches du jour (UI Toolkit).</summary>
+    public sealed class TournamentPageView : HdListPageView, ITournamentPageView { }
 }

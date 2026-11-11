@@ -91,7 +91,6 @@ namespace N29.HeroesDawn.Tests.PlayMode
             // Let canvas scalers and responsive layouts observe the render target's aspect.
             yield return null;
             Canvas.ForceUpdateCanvases();
-            foreach (var layout in Object.FindObjectsByType<TacticalPageLayout>(FindObjectsSortMode.None)) layout.Reflow();
             Canvas.ForceUpdateCanvases();
             Texture2D? composed = null;
             if (uiRt == null) cam.Render();
@@ -221,16 +220,18 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("30-recruter");
             Object.FindAnyObjectByType<RecruitPageView>()!.Card(0).RecruitButton.onClick.Invoke();
             yield return CaptureSettled("31-confirmation");
-            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.RecruitConfirmPopupView>()!.CancelButton.Button.onClick.Invoke();
+            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Popups.RecruitConfirmPopupView>()?.CancelButton.Button.onClick.Invoke();
             yield return null;
 
             yield return Tab(HubPage.Pass);
             yield return CaptureSettled("40-pass");
             yield return Tab(HubPage.Shop);
             yield return CaptureSettled("50-boutique");
+            Object.FindAnyObjectByType<RecruitPageView>()!.ShopTabs.Tab((int)ShopTab.Boosters).Button.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoutiquePageView>() != null);
             foreach (var shopTab in new[] { (ShopTab.Boosters, "50b-boutique-boosters"), (ShopTab.Gems, "50c-boutique-gemmes"), (ShopTab.Gift, "50d-boutique-cadeau") })
             {
-                Object.FindAnyObjectByType<ShopTabsView>()!.Tab((int)shopTab.Item1).Button.onClick.Invoke();
+                Object.FindAnyObjectByType<BoutiquePageView>()!.Tabs.Tab((int)shopTab.Item1).Button.onClick.Invoke();
                 yield return CaptureSettled(shopTab.Item2);
             }
             yield return Tab(HubPage.Qg);
@@ -288,7 +289,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             narrationSession.CompletedZones.Add("zone_ny_1_2");
             Object.FindAnyObjectByType<CityMapPageView>()!.ChaptersButton.onClick.Invoke();
             yield return CaptureSettled("91-chapitres");
-            Object.FindAnyObjectByType<ChaptersPageView>()!.SideRows[0].Buttons[0].Button.onClick.Invoke();
+            Object.FindAnyObjectByType<ChaptersPageView>()!.SideRowButton(0, 0)!.Button.onClick.Invoke();
             yield return CaptureSettled("91b-chapitres-souvenir");
             // Repaire : Brooklyn terminé, Brick déjà vaincu ; le bouton REPAIRE du bandeau ouvre la page, puis ENTRER demande confirmation.
             narrationSession.CompletedZones.Add("zone_ny_1_3");
@@ -349,7 +350,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 if (driver.UsesStick) { popup.Input.PressAt(new Vector2(0.5f, 0.5f)); popup.Input.DragTo(new Vector2(0.58f, 0.5f)); }
                 if (driver.Game is N29.HeroesDawn.Domain.Activities.Games.RescueEngineeringGame rescue)
                 {
-                    var panel = popup.GetComponentInChildren<RescuePanelView>(true);
+                    var panel = popup.Rescue!;
                     yield return null;
                     for (int i = 0; i < 2; i++) panel.PoolButton(System.Linq.Enumerable.ToList(rescue.Pool).IndexOf(rescue.Solution[i])).Button.onClick.Invoke();
                 }
@@ -480,7 +481,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<BoardView>() && !Flow.IsTransitioning);
             yield return CaptureSettled("03-plateau-portee");
 
-            var map = Object.FindAnyObjectByType<BoardMapView>()!;
+            var map = Object.FindAnyObjectByType<BoardView>()!;
             var far = run.Destinations.OrderByDescending(d => d.Value.Cost).First().Key;
             map.NodeButton(far).onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.8f);

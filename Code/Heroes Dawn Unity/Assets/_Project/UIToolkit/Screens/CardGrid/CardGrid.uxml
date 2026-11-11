@@ -1,0 +1,28 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-list">
+        <ui:VisualElement class="hd-list__main">
+            <ui:VisualElement name="header" class="hd-panel hd-list__header">
+                <ui:VisualElement class="hd-list__headtext">
+                    <ui:Label name="headerTitle" class="hd-list__title" />
+                    <ui:Label name="headerLine" class="hd-list__line" />
+                    <ui:VisualElement name="headerBar" class="hd-bar hd-list__bar"><ui:VisualElement name="headerFill" class="hd-bar__fill" /><ui:Label name="headerBarLabel" class="hd-list__barlabel" /></ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button name="headerB" class="hd-btn hd-btn--secondary hd-btn--small hd-list__headbtn" />
+                <ui:Button name="headerA" class="hd-btn hd-btn--primary hd-btn--small hd-list__headbtn" />
+            </ui:VisualElement>
+            <ui:VisualElement name="shopTabs" class="hd-shoptabs" />
+            <ui:TextField name="search" class="hd-grid__search" />
+            <ui:VisualElement name="filters" class="hd-list__filters" />
+            <ui:ScrollView name="grid" class="hd-list__rows" />
+        </ui:VisualElement>
+        <ui:VisualElement name="detail" class="hd-panel hd-list__side hd-grid__detail">
+            <ui:VisualElement name="detailArt" class="hd-grid__detailart" />
+            <ui:Label name="detailTitle" class="hd-list__sidetitle" />
+            <ui:Label name="detailBadge" class="hd-grid__badge" />
+            <ui:ScrollView name="detailScroll" class="hd-grid__detailtext"><ui:Label name="detailText" class="hd-list__sidetext" /></ui:ScrollView>
+            <ui:Button name="detailButton0" class="hd-btn hd-btn--primary hd-grid__detailbtn" />
+            <ui:Button name="detailButton1" class="hd-btn hd-btn--secondary hd-grid__detailbtn" />
+            <ui:Button name="detailButton2" class="hd-btn hd-btn--secondary hd-grid__detailbtn" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

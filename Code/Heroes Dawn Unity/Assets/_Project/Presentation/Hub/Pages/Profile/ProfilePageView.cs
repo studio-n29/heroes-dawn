@@ -1,6 +1,9 @@
 #nullable enable
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Page Profil : tag, statistiques, amis, accès au registre des agents et aux archives.</summary>
-    public sealed class ProfilePageView : ListPageView, IProfilePageView { }
+    /// <summary>Page Profil : tag, statistiques, amis (UI Toolkit).</summary>
+    public sealed class ProfilePageView : HdListPageView, IProfilePageView
+    {
+        protected override bool HasSide => false;
+    }
 }

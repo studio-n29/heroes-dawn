@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-recruit">
+        <ui:VisualElement name="detail" class="hd-panel hd-recruit__detail">
+            <ui:Label name="detailName" class="hd-recruit__dname" />
+            <ui:Label name="detailRarity" class="hd-recruit__drarity" />
+            <ui:Label name="detailRole" class="hd-recruit__drole" />
+            <ui:Label name="detailStats" class="hd-recruit__dstats" />
+            <ui:ScrollView class="hd-recruit__dscroll"><ui:Label name="detailSkills" class="hd-recruit__dskills" /></ui:ScrollView>
+            <ui:Button name="detailRecruit" class="hd-btn hd-btn--primary" />
+        </ui:VisualElement>
+        <ui:VisualElement class="hd-recruit__main">
+            <ui:VisualElement name="shopTabs" class="hd-shoptabs" />
+            <ui:VisualElement class="hd-recruit__info">
+                <ui:Label name="countdown" class="hd-recruit__countdown" />
+                <ui:Label name="rule" class="hd-recruit__rule" />
+            </ui:VisualElement>
+            <ui:Label name="empty" class="hd-recruit__empty" />
+            <ui:VisualElement name="cards" class="hd-recruit__cards" />
+            <ui:VisualElement name="scraps" class="hd-recruit__scraps" />
+            <ui:VisualElement class="hd-recruit__actions">
+                <ui:Label name="progress" class="hd-recruit__progress" />
+                <ui:Button name="reroll" class="hd-btn hd-btn--primary hd-btn--small" />
+                <ui:Button name="registry" class="hd-btn hd-btn--secondary hd-btn--small" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

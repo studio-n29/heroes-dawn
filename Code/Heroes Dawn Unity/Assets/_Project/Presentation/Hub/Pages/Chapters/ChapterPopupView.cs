@@ -1,11 +1,10 @@
 #nullable enable
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
-using TMPro;
+using N29.HeroesDawn.Presentation.UiToolkit;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
@@ -25,47 +24,44 @@ namespace N29.HeroesDawn.Presentation.Hub
         UniTask ShowAsync(ChapterPopupData data, CancellationToken ct);
     }
 
-    /// <summary>Popup (prefab) : image large (masquée sans illustration), intitulé, texte, bouton Continuer. Retour = Continuer.</summary>
-    public sealed class ChapterPopupView : MonoBehaviour, IChapterPopupView
+    /// <summary>Fenêtre UI Toolkit : image large (masquée sans illustration), intitulé, texte, bouton Continuer. Retour = Continuer.</summary>
+    public sealed class ChapterPopupView : HdPopup, IChapterPopupView
     {
-        [SerializeField] TMP_Text heading = null!;
-        [SerializeField] TMP_Text text = null!;
-        [SerializeField] Image art = null!;
-        [SerializeField] UiButton continueButton = null!;
-        [SerializeField] RectTransform window = null!;
-        [SerializeField] CanvasGroup group = null!;
-
+        Label _heading = null!, _text = null!;
+        VisualElement _art = null!;
+        UnityEngine.UIElements.Button _continue = null!;
         UniTaskCompletionSource? _done;
+        ChapterPopupData? _last;
 
-        public bool Cancelable => true;
-        public UiButton ContinueButton => continueButton;
+        public override bool Cancelable => true;
+        public HdButtonRef ContinueButton { get; private set; } = null!;
+        protected override VisualElement DefaultFocus => _continue;
 
-        void Awake() => continueButton.Button.onClick.AddListener(() => _done?.TrySetResult());
+        protected override void Bind()
+        {
+            _heading = Q<Label>("heading"); _text = Q<Label>("text"); _art = Q<VisualElement>("art");
+            _continue = Q<UnityEngine.UIElements.Button>("continue");
+            ContinueButton = new HdButtonRef(_continue, this);
+            _continue.clicked += () => _done?.TrySetResult();
+            if (_last.HasValue) Fill(_last.Value);
+        }
+
+        void Fill(ChapterPopupData d)
+        {
+            _heading.text = d.Heading; _text.text = d.Text; _continue.text = d.Continue;
+            _art.style.display = d.Art != null ? DisplayStyle.Flex : DisplayStyle.None; // sans illustration, le texte remonte
+            HdPopupRows.SetArt(_art, d.Art);
+        }
 
         public UniTask ShowAsync(ChapterPopupData data, CancellationToken ct)
         {
-            heading.text = data.Heading;
-            text.text = data.Text;
-            continueButton.SetLabel(data.Continue);
-            art.gameObject.SetActive(data.Art != null);
-            // Sans illustration, le texte remonte à la place de l'image.
-            var textRect = text.rectTransform;
-            textRect.anchoredPosition = new Vector2(textRect.anchoredPosition.x, data.Art != null ? -280f : -30f);
-            textRect.sizeDelta = new Vector2(textRect.sizeDelta.x, data.Art != null ? 250f : 500f);
-            if (data.Art != null)
-            {
-                art.sprite = data.Art;
-                var fitter = art.GetComponent<AspectRatioFitter>();
-                if (fitter != null) fitter.aspectRatio = data.Art.rect.width / data.Art.rect.height;
-            }
-            group.alpha = 0f;
-            Tween.Fade(group, 1f, 0.15f);
-            Tween.PopIn(window, 0.26f);
+            _last = data;
+            if (_heading != null) Fill(data);
             _done = new UniTaskCompletionSource();
             ct.Register(() => _done.TrySetCanceled());
             return _done.Task;
         }
 
-        public void RequestCancel() => _done?.TrySetResult();
+        public override void RequestCancel() => _done?.TrySetResult();
     }
 }

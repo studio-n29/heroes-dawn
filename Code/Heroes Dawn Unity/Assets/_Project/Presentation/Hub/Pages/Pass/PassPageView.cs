@@ -1,6 +1,9 @@
 #nullable enable
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Pass saisonnier (M40) : 30 niveaux, pistes gratuite et premium, missions du jour à droite.</summary>
-    public sealed class PassPageView : ListPageView, IPassPageView { }
+    /// <summary>Pass saisonnier : 30 niveaux et missions du jour (UI Toolkit).</summary>
+    public sealed class PassPageView : HdListPageView, IPassPageView
+    {
+        protected override bool WideSide => true;
+    }
 }
