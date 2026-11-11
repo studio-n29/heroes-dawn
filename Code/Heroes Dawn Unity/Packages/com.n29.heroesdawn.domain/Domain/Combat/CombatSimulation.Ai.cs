@@ -23,8 +23,20 @@ namespace N29.HeroesDawn.Domain.Combat
             PerformSkill(u, u.Skills[slot], slot, target, output);
         }
 
-        /// <summary>Choix de la compétence et de la cible selon le rang (même logique qu avant, déplacée pour pouvoir annoncer l action à l avance).</summary>
+        /// <summary>Choix de la compétence et de la cible selon le rang (même logique qu avant, déplacée pour pouvoir annoncer l action à l avance).
+        /// Ennemis : Facile ignore le style ; Normal l applique une fois sur deux ; Élite et Boss toujours (sauf style Équilibré = logique ci-dessous).</summary>
         (int Slot, int Target) ChooseAction(CombatUnit u)
+        {
+            if (u.Side == Side.Enemy && u.Style != AiStyle.Balanced)
+            {
+                if (Setup.Rank == CombatRank.Elite || Setup.Rank == CombatRank.Boss) return ChooseStyledAction(u);
+                if (Setup.Rank == CombatRank.Normal && _rng.Chance(50)) return ChooseStyledAction(u);
+            }
+            return ChooseBalancedAction(u);
+        }
+
+        /// <summary>Logique d origine (alliés, ennemis Équilibrés, repli de la difficulté).</summary>
+        (int Slot, int Target) ChooseBalancedAction(CombatUnit u)
         {
             bool smart = u.Side == Side.Ally || Setup.Rank == CombatRank.Elite || Setup.Rank == CombatRank.Boss;
             int slot;

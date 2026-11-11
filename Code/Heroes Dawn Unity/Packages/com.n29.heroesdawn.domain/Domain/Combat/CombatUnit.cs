@@ -28,6 +28,8 @@ namespace N29.HeroesDawn.Domain.Combat
         public int EnergyRegenBonus { get; set; }
         public List<StatusInstance> Statuses { get; } = new List<StatusInstance>();
         public IReadOnlyList<SkillDef> Skills { get; }
+        /// <summary>Style d IA (ennemis) : priorités de compétence et de cible ; les alliés gardent leur logique.</summary>
+        public AiStyle Style { get; set; }
         /// <summary>Compétence annoncée sur la frise (ennemis, zone de préparation) ; -1 = aucune.</summary>
         public int PlannedSlot { get; set; } = -1;
         public int PlannedTarget { get; set; } = -1;

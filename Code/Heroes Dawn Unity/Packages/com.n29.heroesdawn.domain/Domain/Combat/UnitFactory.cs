@@ -104,6 +104,7 @@ namespace N29.HeroesDawn.Domain.Combat
             unit.MaxEnergy = b.EnergyMax;
             unit.Energy = System.Math.Min(b.EnergyMax, b.EnergyStart);
             unit.Phases = d.Phases;
+            unit.Style = d.Style;
             return unit;
         }
     }
