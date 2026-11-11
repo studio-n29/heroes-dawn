@@ -41,12 +41,50 @@ namespace N29.HeroesDawn.EditorTools.Build
             PlayerSettings.Android.bundleVersionCode = parts[0] * 10000 + parts[1] * 100 + parts[2];
         }
 
-        public static BuildResult Build(string apkPath)
+        /// <summary>
+        /// App Bundle pour le Play Store. -aabPath &lt;fichier.aab&gt; [-appVersion x.y.z]. Sans keystore configuré dans les réglages du joueur,
+        /// Unity signe avec la clé de débogage : le Play Store refuse ce bundle, il faut le signer avec la clé d'envoi.
+        /// </summary>
+        public static void BuildAabBatch()
+        {
+            var args = Environment.GetCommandLineArgs();
+            int i = Array.IndexOf(args, "-aabPath");
+            if (i < 0 || i + 1 >= args.Length) throw new ArgumentException("-aabPath <fichier.aab> manquant");
+            int v = Array.IndexOf(args, "-appVersion");
+            if (v >= 0 && v + 1 < args.Length) ApplyVersion(args[v + 1]);
+            var result = Build(args[i + 1], bundle: true);
+            if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(result == BuildResult.Succeeded ? 0 : 1);
+        }
+
+        /// <summary>Build Windows 64 bits (IL2CPP selon les réglages). -exePath &lt;dossier/HeroesDawn.exe&gt; [-appVersion x.y.z].</summary>
+        public static void BuildWindowsBatch()
+        {
+            var args = Environment.GetCommandLineArgs();
+            int i = Array.IndexOf(args, "-exePath");
+            if (i < 0 || i + 1 >= args.Length) throw new ArgumentException("-exePath <dossier/HeroesDawn.exe> manquant");
+            int v = Array.IndexOf(args, "-appVersion");
+            if (v >= 0 && v + 1 < args.Length) ApplyVersion(args[v + 1]);
+            GameBranding.Apply();
+            if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.StandaloneWindows64)
+                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(args[i + 1]))!);
+            var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
+            {
+                scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray(),
+                locationPathName = args[i + 1],
+                target = BuildTarget.StandaloneWindows64,
+                options = BuildOptions.None,
+            });
+            Debug.Log($"[Heroes Dawn] Windows : {report.summary.result}, {report.summary.totalSize / (1024 * 1024)} Mo, {report.summary.totalErrors} erreur(s) → {args[i + 1]}");
+            if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(report.summary.result == BuildResult.Succeeded ? 0 : 1);
+        }
+
+        public static BuildResult Build(string apkPath, bool bundle = false)
         {
             GameBranding.Apply();
             if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
                 EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
-            EditorUserBuildSettings.buildAppBundle = false;
+            EditorUserBuildSettings.buildAppBundle = bundle;
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(apkPath))!);
             var options = new BuildPlayerOptions
             {
@@ -56,7 +94,7 @@ namespace N29.HeroesDawn.EditorTools.Build
                 options = BuildOptions.None,
             };
             var report = BuildPipeline.BuildPlayer(options);
-            Debug.Log($"[Heroes Dawn] APK : {report.summary.result}, {report.summary.totalSize / (1024 * 1024)} Mo, {report.summary.totalErrors} erreur(s) → {apkPath}");
+            Debug.Log($"[Heroes Dawn] {(bundle ? "AAB" : "APK")} : {report.summary.result}, {report.summary.totalSize / (1024 * 1024)} Mo, {report.summary.totalErrors} erreur(s) → {apkPath}");
             return report.summary.result;
         }
     }

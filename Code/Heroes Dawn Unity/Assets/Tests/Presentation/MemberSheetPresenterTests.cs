@@ -307,7 +307,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             int firstDim = System.Array.FindIndex(options, o => o.Dim);
             int lastFree = System.Array.FindLastIndex(options, o => !o.Dim);
             Assert.That(firstDim < 0 || lastFree < firstDim, Is.True, "équipables d'abord");
-            Assert.That(options.Count(o => !o.Dim), Is.EqualTo(7), "les 7 objets d'un autre type que l'armure portée restent visibles");
+            Assert.That(options.Count(o => !o.Dim), Is.EqualTo(8), "les 8 objets d'un autre type que l'armure portée restent visibles (7 d'origine + la puce neuronale, seul nouvel implant)");
         }
     }
 }

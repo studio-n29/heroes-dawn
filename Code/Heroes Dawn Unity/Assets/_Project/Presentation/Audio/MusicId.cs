@@ -13,5 +13,11 @@ namespace N29.HeroesDawn.Presentation.Audio
         Combat = 4,
         Boss = 5,
         Cinematic = 6,
+        // Plateau par ville (Aube tactique) : Board reste le repli quand la ville est inconnue.
+        BoardNewYork = 7,
+        BoardParis = 8,
+        BoardMoscow = 9,
+        BoardSalem = 10,
+        Shop = 11,
     }
 }
