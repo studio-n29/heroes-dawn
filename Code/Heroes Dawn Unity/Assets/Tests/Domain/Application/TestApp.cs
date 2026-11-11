@@ -116,12 +116,14 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public static readonly System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Definitions.TournamentDef> TestCalendar = N29.HeroesDawn.Authoring.TournamentLibrary.Load();
         public static readonly N29.HeroesDawn.Definitions.ArenaRewardTable TestRewards = N29.HeroesDawn.Authoring.ArenaRewardsLibrary.Load();
         public static readonly N29.HeroesDawn.Definitions.PassRewardTable TestPassRewards = N29.HeroesDawn.Authoring.PassRewardsLibrary.Load();
+        public static readonly System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Definitions.CosmeticDef> TestCosmetics = N29.HeroesDawn.Authoring.CosmeticLibrary.Load();
         public TournamentArena Tournament { get; }
         public N29.HeroesDawn.Infrastructure.Simulated.InMemoryArenaGateway Arena { get; }
         public N29.HeroesDawn.Infrastructure.Simulated.InMemoryDuelChannel Duels { get; }
         public ArchiveBook Archives { get; }
         public MetaTracker Tracker { get; }
         public Boutique Boutique { get; }
+        public CosmeticShop Cosmetics { get; }
         public N29.HeroesDawn.Application.Features.Collection.CollectionBook Collection { get; }
         public MetaOverview Overview { get; }
         public PlayerSettings Settings { get; }
@@ -196,6 +198,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Tournament = new TournamentArena(MetaCtx, Arena, Duels, TestCalendar, TestRewards, Pass);
             Archives = new ArchiveBook(MetaCtx);
             Boutique = new Boutique(MetaCtx, Purchases, Publisher<RosterChanged>());
+            Cosmetics = new CosmeticShop(MetaCtx, TestCosmetics);
             Collection = new N29.HeroesDawn.Application.Features.Collection.CollectionBook(MetaCtx, Publisher<RosterChanged>());
             Quests = new QuestLog(MetaCtx, Pass);
             Overview = new MetaOverview(Pass, Daily, Secondary, Operations, Archives, Boutique, Quests);

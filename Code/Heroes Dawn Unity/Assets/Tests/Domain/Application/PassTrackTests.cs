@@ -148,7 +148,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(m.recipes.Count, Is.EqualTo(recipes));
             Assert.That(m.arena.points, Is.EqualTo(0));
             Assert.That(m.arena.duelsToday, Is.EqualTo(0));
-            Assert.That(m.arena.cosmetics, Is.Empty);
+            Assert.That(m.cosmetics.Any(c => c.StartsWith("cosmetic:")), Is.False, "aucun cosmétique de tournoi");
             var cosmetics = TestApp.TestPassRewards.Free.Concat(TestApp.TestPassRewards.Premium).SelectMany(d => d.Cosmetics);
             Assert.That(cosmetics.Any(c => c.StartsWith("cosmetic:")), Is.False, "les cosmétiques de tournoi ne sont pas dans le pass");
         }

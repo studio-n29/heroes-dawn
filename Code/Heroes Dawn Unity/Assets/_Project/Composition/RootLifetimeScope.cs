@@ -170,6 +170,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<LocalFriendsPort>(Lifetime.Singleton).As<N29.HeroesDawn.Application.Ports.IFriendsPort>();
             builder.Register<ArchiveBook>(Lifetime.Singleton);
             builder.Register<Boutique>(Lifetime.Singleton);
+            builder.Register<CosmeticShop>(c => new CosmeticShop(c.Resolve<MetaContext>(), N29.HeroesDawn.Authoring.CosmeticLibrary.Load()), Lifetime.Singleton);
             builder.Register<Application.Features.Collection.CollectionBook>(Lifetime.Singleton);
             builder.Register<PlayerSettings>(Lifetime.Singleton);
             builder.Register<MetaOverview>(Lifetime.Singleton);

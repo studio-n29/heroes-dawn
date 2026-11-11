@@ -420,7 +420,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
             foreach (var c in r.Cosmetics)
             {
                 string id = c.Replace("{r}", rewardsId);
-                if (!Save.cosmetics.Contains(id)) Save.cosmetics.Add(id);
+                CosmeticOps.Unlock(_c.Meta, id);
             }
             _c.PublishWallet();
         }

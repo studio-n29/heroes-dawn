@@ -14,6 +14,13 @@ namespace N29.HeroesDawn.Application.Features.Meta
         /// <summary>Prix en Crédits du niveau <c>level + 1</c> d'une recherche du labo supprimé : 500 × (niveau + 1).</summary>
         public static int ResearchLevelCost(int level) => 500 * (level + 1);
 
+        /// <summary>Les cosmétiques de tournoi rangés dans l'arène passent dans la liste unique du profil (sans doublon) ; idempotent.</summary>
+        public static void CosmeticsToProfile(MetaSave m)
+        {
+            foreach (var id in m.arena.cosmetics) CosmeticOps.Unlock(m, id);
+            m.arena.cosmetics.Clear();
+        }
+
         /// <param name="costOfLevel">Prix du passage du niveau <c>i</c> au suivant (par défaut <see cref="ResearchLevelCost"/>).</param>
         /// <param name="refundedCredits">Crédits à rendre au portefeuille (0 si rien à migrer).</param>
         public static void ToComponents(MetaSave m, Func<int, int>? costOfLevel, out int refundedCredits)

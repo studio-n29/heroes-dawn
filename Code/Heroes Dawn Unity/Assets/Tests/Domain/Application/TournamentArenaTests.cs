@@ -283,7 +283,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(Run(app.Tournament.ClaimTierAsync(1, default)).IsSuccess, Is.True);
             Assert.That(app.Session.Wallet.Credits, Is.EqualTo(credits + 300));
             Assert.That(N29.HeroesDawn.Application.Features.Meta.CraftingOps.Components(app.Session, ComponentKind.Weapon, ComponentGrade.Common), Is.EqualTo(comps + 4));
-            Assert.That(app.Session.Meta.arena.cosmetics, Is.EqualTo(new[] { "cosmetic:christmas_bronze" }));
+            Assert.That(app.Session.Meta.cosmetics, Is.EqualTo(new[] { "cosmetic:christmas_bronze" }));
             Assert.That(Run(app.Tournament.ClaimTierAsync(1, default)).Error, Is.SameAs(MetaErrors.AlreadyClaimed));
             Assert.That(app.Session.Wallet.Credits, Is.EqualTo(credits + 300), "pas de double récompense");
             Assert.That(app.Tournament.Current().ClaimableTiers, Is.Empty);
@@ -318,7 +318,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             app.Arena.SetPoints(Key, "me", 500);
             Assert.That(Run(app.Tournament.ClaimTierAsync(ArenaRewardTable.TierTop3, default)).IsSuccess, Is.True);
             Assert.That(N29.HeroesDawn.Application.Features.Meta.CraftingOps.Knows(app.Session, "synapse_coil"), Is.True);
-            Assert.That(app.Session.Meta.arena.cosmetics, Does.Contain("cosmetic:christmas_frame"));
+            Assert.That(app.Session.Meta.cosmetics, Does.Contain("cosmetic:christmas_frame"));
             Assert.That(Run(app.Tournament.ClaimTierAsync(ArenaRewardTable.TierTop3, default)).Error, Is.SameAs(MetaErrors.AlreadyClaimed));
         }
 

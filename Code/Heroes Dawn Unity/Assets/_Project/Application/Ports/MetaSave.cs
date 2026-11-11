@@ -95,7 +95,7 @@ namespace N29.HeroesDawn.Application.Ports
 
     /// <summary>
     /// Arène des tournois : édition en cours (« christmas:2026 »), points, duels du jour, paliers réclamés et cosmétiques gagnés (identifiants « cosmetic:… », rangés ici
-    /// jusqu'au catalogue du bloc E). L'édition précédente reste en mémoire pour la réclamation des 7 jours suivant sa fin.
+    /// jusqu'au catalogue du bloc E (désormais dans MetaSave.cosmetics)). L'édition précédente reste en mémoire pour la réclamation des 7 jours suivant sa fin.
     /// </summary>
     [Serializable]
     public sealed class ArenaSave
@@ -105,6 +105,7 @@ namespace N29.HeroesDawn.Application.Ports
         public int duelsToday;
         public string duelDay = "";
         public List<int> claimedTiers = new List<int>();
+        /// <summary>Ancien : cosmétiques de tournoi rangés ici avant le catalogue ; vidé par <see cref="N29.HeroesDawn.Application.Features.Meta.MetaMigration"/> vers <see cref="MetaSave.cosmetics"/>.</summary>
         public List<string> cosmetics = new List<string>();
         /// <summary>Dernière capture de défense envoyée (ticks UTC) et son empreinte : on n'envoie que si l'équipe a changé.</summary>
         public long lastDefenseUploadUtcTicks;

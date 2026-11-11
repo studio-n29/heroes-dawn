@@ -214,6 +214,7 @@ namespace N29.HeroesDawn.Application.Session
             if (data.completedZones != null) foreach (var z in data.completedZones) CompletedZones.Add(z);
             AutoCombat = data.autoCombat;
             Meta = data.meta ?? new MetaSave();
+            Features.Meta.MetaMigration.CosmeticsToProfile(Meta);
             Features.Meta.MetaMigration.ToComponents(Meta, null, out int refunded);
             if (refunded > 0) Wallet.Add(refunded, 0);
             Features.Meta.CraftingOps.RegisterSaved(this);
