@@ -113,7 +113,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return WaitStep(TutorialStep.OpenTeam);
             Assert.That(session.Roster.Count, Is.EqualTo(session.Content.StarterTeam.Count + 1), "les trois recrues de départ et l'agent gratuit");
             Assert.That(session.CompletedZones, Is.Empty, "le niveau tutoriel ne compte pas dans la progression");
-            Assert.That(Overlay.FrameSprite, Is.SameAs(N29.HeroesDawn.Presentation.Common.Sprites.PanelFrame), "la mise en valeur est un rectangle à coins coupés, pas un rond");
+            Assert.That(Overlay.VisibleBrackets, Is.EqualTo(4), "la mise en valeur est un cadre rectangulaire cerné de quatre équerres");
             Object.FindAnyObjectByType<HubShellView>()!.TabButton(HubPage.Team).Button.onClick.Invoke();
             yield return WaitStep(TutorialStep.Squad);
             Overlay.OkButton.Button.onClick.Invoke();

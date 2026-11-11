@@ -653,3 +653,59 @@ Label { flex-shrink: 0; }
 .hd-hud__desc-text { -unity-font: var(--hd-font-body); font-size: 26px; color: var(--hd-ivory); white-space: normal; }
 .hd-hud__drop { position: absolute; left: 50%; bottom: 262px; width: 1000px; height: 120px; margin-left: -500px; background-color: rgba(231, 207, 152, 0.35); border-width: 3px; border-color: var(--hd-brass); border-radius: 8px; align-items: center; justify-content: center; display: none; }
 .hd-hud__drop-text { -unity-font: var(--hd-font-title); font-size: 44px; color: var(--hd-ivory); }
+
+/* ---- Entree en combat et dialogue de narration ---- */
+.hd-intro { background-color: rgba(10, 17, 26, 0.96); }
+.hd-intro__col > VisualElement { width: 100%; }
+.hd-intro__tap { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0); border-width: 0; }
+.hd-intro__cols { position: absolute; left: 0; top: 0; right: 0; bottom: 0; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 40px; }
+.hd-intro__col { width: 46%; }
+.hd-intro__col--right { align-items: flex-end; }
+.hd-intro__title { -unity-font: var(--hd-font-title); font-size: 36px; color: var(--hd-brass); margin-bottom: 12px; }
+.hd-intro__title--enemy { color: var(--hd-danger); }
+.hd-intro__banner { flex-direction: row; align-items: center; width: 100%; height: 120px; margin-bottom: 12px; padding: 0 24px 0 22px; background-color: rgba(38, 59, 76, 0.95); border-radius: 6px; }
+.hd-intro__banner--right { flex-direction: row-reverse; padding: 0 22px 0 24px; }
+.hd-intro__accent { position: absolute; left: 0; top: 0; bottom: 0; width: 8px; }
+.hd-intro__banner--right .hd-intro__accent { left: auto; right: 0; }
+.hd-intro__portrait { width: 96px; height: 96px; border-radius: 48px; border-width: 4px; -unity-background-scale-mode: scale-and-crop; overflow: hidden; }
+.hd-intro__initial { -unity-font: var(--hd-font-title); font-size: 54px; color: var(--hd-ivory); -unity-text-align: middle-center; flex-grow: 1; }
+.hd-intro__text { flex-grow: 1; margin: 0 24px; }
+.hd-intro__banner--right .hd-intro__text { align-items: flex-end; }
+.hd-intro__name { -unity-font: var(--hd-font-title); font-size: 40px; color: var(--hd-ivory); }
+.hd-intro__sub { -unity-font: var(--hd-font-body); font-size: 24px; color: var(--hd-muted); }
+.hd-intro__skip { position: absolute; right: 40px; bottom: 40px; height: 64px; min-width: 180px; font-size: 30px; }
+
+.hd-dlg { background-color: rgba(10, 17, 26, 0.55); }
+.hd-dlg__tap { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0); border-width: 0; }
+.hd-dlg__stage { position: absolute; left: 30px; right: 30px; bottom: 30px; height: 420px; flex-direction: row; align-items: flex-end; }
+.hd-dlg__avatarbox { width: 350px; align-items: center; margin-right: 24px; }
+.hd-dlg__stage--right .hd-dlg__avatarbox { margin-right: 0; margin-left: 24px; }
+.hd-dlg__avatar { width: 300px; height: 330px; border-radius: 16px; border-width: 4px; -unity-background-scale-mode: scale-and-crop; overflow: hidden; }
+.hd-dlg__initial { -unity-font: var(--hd-font-title); font-size: 140px; color: var(--hd-ivory); -unity-text-align: middle-center; flex-grow: 1; }
+.hd-dlg__plate { margin-top: -22px; padding: 6px 28px; -unity-font: var(--hd-font-title); font-size: 36px; color: var(--hd-ink); border-radius: 6px; }
+.hd-dlg__bubble { flex-grow: 1; height: 330px; padding: 24px 32px; background-color: var(--hd-ivory); border-width: 4px; border-color: var(--hd-ink); border-radius: 18px; }
+.hd-dlg__body { -unity-font: var(--hd-font-body); font-size: 34px; color: var(--hd-ink); white-space: normal; flex-grow: 1; }
+.hd-dlg__hint { position: absolute; left: 32px; bottom: 16px; -unity-font: var(--hd-font-heading); font-size: 24px; color: var(--hd-brass-dark); }
+.hd-dlg__progress { position: absolute; right: 32px; top: 8px; -unity-font: var(--hd-font-heading); font-size: 22px; color: var(--hd-brass-dark); }
+.hd-dlg__buttons { position: absolute; right: 24px; bottom: 16px; flex-direction: row; }
+.hd-dlg__skip { position: absolute; right: 30px; top: 30px; height: 56px; min-width: 150px; font-size: 26px; }
+
+/* ---- Tutoriel : voile, designation, bulle de Rayner, astuce ---- */
+.hd-tut { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.hd-tut__veil { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none; }
+.hd-tut__piece { position: absolute; background-color: rgba(10, 17, 26, 0.5); }
+.hd-tut__ring { position: absolute; border-width: 4px; border-color: var(--hd-brass); border-radius: 6px; }
+.hd-tut__ripple { position: absolute; border-width: 3px; border-color: var(--hd-brass); border-radius: 8px; }
+.hd-tut__bracket { position: absolute; width: 26px; height: 26px; border-left-width: 6px; border-top-width: 6px; border-color: var(--hd-ivory); }
+.hd-tut__pointer { position: absolute; width: 40px; height: 40px; -unity-text-align: middle-center; font-size: 36px; color: var(--hd-brass); }
+.hd-tut__bubble { position: absolute; left: 50%; width: 1060px; margin-left: -530px; height: 300px; padding: 14px 20px 14px 170px; background-color: var(--hd-ink); border-width: 4px; border-color: var(--hd-brass); border-radius: 14px; display: none; }
+.hd-tut__medal { position: absolute; left: 22px; top: 86px; width: 128px; height: 128px; border-radius: 64px; border-width: 4px; border-color: var(--hd-info); background-color: var(--hd-surface-3); -unity-background-scale-mode: scale-and-crop; }
+.hd-tut__title { align-self: flex-start; padding: 4px 18px; background-color: var(--hd-brass); -unity-font: var(--hd-font-title); font-size: 34px; color: var(--hd-ink); border-radius: 4px; }
+.hd-tut__body { margin-top: 10px; -unity-font: var(--hd-font-body); font-size: 28px; color: var(--hd-ivory); white-space: normal; flex-shrink: 1; max-width: 840px; }
+.hd-tut__progress { position: absolute; right: 20px; top: 14px; -unity-font: var(--hd-font-body-regular); font-size: 22px; color: var(--hd-muted); }
+.hd-tut__buttons { position: absolute; left: 22px; right: 20px; bottom: 14px; flex-direction: row; justify-content: space-between; }
+.hd-tut__hint { position: absolute; left: 50%; top: 116px; width: 1000px; margin-left: -500px; min-height: 170px; padding: 14px 24px; background-color: var(--hd-surface); border-width: 3px; border-color: var(--hd-info); border-radius: 10px; display: none; }
+.hd-tut__hint-title { align-self: flex-start; padding: 4px 18px; background-color: var(--hd-info); -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-ink); border-radius: 4px; }
+.hd-tut__hint-body { margin-top: 8px; -unity-font: var(--hd-font-body); font-size: 26px; color: var(--hd-ivory); white-space: normal; max-width: 700px; }
+.hd-tut__hint .hd-btn { position: absolute; right: 22px; bottom: 16px; }
+.hd-tut__fx { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
