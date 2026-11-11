@@ -119,3 +119,5 @@ Rang AMIF : ×1 / ×1,15 / ×1,30 / ×1,45 / ×1,65 sur les statistiques (rangs 
 
 ## Ennemis
 Les compétences des ennemis (Voyou, Gros bras, Pyro de rue, Brick, Crocodile…) sont dans `Content/Prototype/PrototypeContent.cs` et `PrototypeZones.cs` ; elles suivent les mêmes règles d énergie.
+
+Chaque ennemi a un **style d IA** (Agressif, Défensif, Contrôle, Soutien, Équilibré), par défaut selon sa position, et un boss peut changer de jeu de compétences et de style à chaque phase : voir `02_Combat.md`, sections *Styles d IA* et *Boss à phases*. Un boss peut avoir plus de trois compétences (le Crocodile en a quatre en phase 1).

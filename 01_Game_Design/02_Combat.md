@@ -75,7 +75,32 @@ L'IA ne choisit que parmi les compétences **payables** (énergie suffisante) et
 | Facile | Compétences au hasard, cible au hasard |
 | Normal | Utilise A2 dès qu'elle est payable, vise la cible la plus faible 50 % du temps |
 | Élite | Priorités complètes (soin sous 40 % PV, compétence forte, A1 sur la cible la plus faible), vise les soigneurs en premier |
-| Boss | Élite + phases : nouvelle compétence à 50 % PV |
+| Boss | Élite + phases : à chaque seuil de PV (66 % puis 33 % pour les boss de repaire), le boss peut changer de jeu de compétences et de style d'IA |
+
+### Styles d'IA des ennemis (bloc C de la 1.0.0)
+Chaque ennemi a un **style** (`EnemyDef.Style`) ; sans style saisi, il vient de sa position : Attaquant et Précision à distance → Agressif, Première ligne → Défensif, Contrôle → Contrôle, Soutien → Soutien.
+
+| Style | Compétence | Cible |
+|---|---|---|
+| Agressif | la compétence de dégâts la plus lourde, dès qu'elle est payable | l'allié qui a le moins de PV |
+| Défensif | bouclier ou provocation si lui ou le groupe est sous 60 % de PV (et s'il n'est pas déjà protégé) ; sinon attaque | la menace la plus forte (ATQ la plus haute) |
+| Contrôle | statut de contrôle (Entrave, Choc, Gel, Marque, Vulnérabilité, Aveuglement) sur une cible qui n'en a pas ; sinon attaque | la cible la plus rapide sans statut de contrôle |
+| Soutien | soin ou renfort d'un allié sous 50 % de PV ; sinon attaque | l'allié qui a le moins de PV |
+| Équilibré | logique ci-dessus (soin sous 40 %, puis A3, A2, A1) | l'allié qui a le moins de PV |
+
+Un style sans compétence adaptée joue sa compétence de dégâts la plus forte ; un ennemi entravé joue A1. Le **rang du combat** règle la finesse : Facile garde le hasard (style ignoré), Normal applique le style une fois sur deux, Élite et Boss toujours. L'IA des alliés ne change pas.
+
+### Boss à phases
+Un boss a de 2 à 4 phases (1 à 3 seuils de PV, phase initiale comprise). À l'ouverture d'une phase, il gagne ses bonus de force, de défense et de vitesse, et peut **remplacer son jeu de compétences** et **son style** (l'action annoncée sur la frise est annulée ; l'énergie est conservée). Un coup qui franchit deux seuils ouvre les deux phases dans l'ordre. Boss du Repaire de l'AMIF (valeurs de départ ⚑) :
+
+| Boss | Phase 1 | Phase 2 (66 %) | Phase 3 (33 %) |
+|---|---|---|---|
+| Brick | Défensif : coups lourds, provocation + bouclier, choc de zone | Agressif : séisme de zone 110 % + Choc | Agressif : poing 150 %, écrasement 190 % + Vulnérabilité |
+| Crocodile | Contrôle : morsure, Choc de zone, cuirasse, étreinte (Entrave 60 %) | Agressif : morsure broyeuse 160 % + Corrosion | mêmes compétences, plus de force |
+| Titan du pont | Défensif : provocation + bouclier | Équilibré : onde de choc de zone 110 % | Agressif : chute du tablier 200 % |
+
+### Repaires
+Les boss d'un repaire donnent une récompense d'Atelier, **complète une fois par jour et par boss** puis réduite de moitié (Composants arrondis à l'inférieur, chance de catalyseur divisée par deux, pas de recette) : Brick 6 Raffiné + 15 % de catalyseur + recette *Manteau blindé* ; Crocodile 6 Raffiné + 20 % + *Grappin* ; Titan du pont 4 Raffiné + 1 Exceptionnel + 35 % + *Plaque Égide* ⚑. Ces trois recettes ne tombent que dans le repaire. Les repaires de Paris, Moscou et Salem, et le repaire hebdomadaire (LiveOps), sont hors du lot.
 
 ### Niveau et puissance des ennemis
 - Niveau = niveau moyen de l'équipe + écart du rang (Facile −3, Normal 0, Élite +3).
@@ -114,7 +139,7 @@ L'XP de combat s'ajoute à l'XP d'entraînement du salon. Les victoires font aus
 | Voyou | Dégâts | Coup 100 % ; coup lourd 160 % |
 | Gros bras | Tank | Coup 90 % ; Provocation |
 | Pyro de rue | Dégâts | Jet de flammes 90 % + Brûlure ; zone 70 % |
-| Brick (boss, zone 1.1) | Tank | Coups lourds, Provocation, choc de zone |
+| Brick (boss, zone 1.1 et Repaire de l AMIF) | Tank | Coups lourds, Provocation, choc de zone ; 3 phases (voir *Boss à phases*) |
 | Crocodile (boss, zone 1.3) | Mafieux méta-humain | voir `Code/Heroes Dawn Unity/Assets/_Project/Content/Prototype/PrototypeZones.cs` |
 
 Le bestiaire des actes suivants (Paris, Moscou, Salem) reste à écrire avec les zones.
