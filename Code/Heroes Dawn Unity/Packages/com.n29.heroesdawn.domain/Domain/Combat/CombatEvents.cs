@@ -121,7 +121,9 @@ namespace N29.HeroesDawn.Domain.Combat
         public int Phase { get; }
         public int PhaseCount { get; }
         public string NameKey { get; }
-        public BossPhaseChangedEvent(int t, int unit, int phase, int phaseCount, string nameKey) : base(t) { Unit = unit; Phase = phase; PhaseCount = phaseCount; NameKey = nameKey; }
+        /// <summary>Vrai si la phase a remplacé le jeu de compétences du boss (l interface doit rafraîchir ses compétences).</summary>
+        public bool KitChanged { get; }
+        public BossPhaseChangedEvent(int t, int unit, int phase, int phaseCount, string nameKey, bool kitChanged = false) : base(t) { Unit = unit; Phase = phase; PhaseCount = phaseCount; NameKey = nameKey; KitChanged = kitChanged; }
     }
 
     public sealed class CombatEndedEvent : CombatEvent { public bool Victory { get; } public CombatEndedEvent(int t, bool victory) : base(t) { Victory = victory; } }

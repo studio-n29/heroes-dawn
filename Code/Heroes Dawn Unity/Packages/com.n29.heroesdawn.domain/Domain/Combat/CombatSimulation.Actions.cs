@@ -299,8 +299,11 @@ namespace N29.HeroesDawn.Domain.Combat
                 t.Atk += t.Atk * phase.AtkPercent / 100;
                 t.Def += t.Def * phase.DefPercent / 100;
                 t.Spd += t.Spd * phase.SpdPercent / 100;
+                bool kitChanged = phase.Skills != null;
+                if (phase.Skills != null) t.SetKit(phase.Skills);
+                if (phase.Style.HasValue) t.Style = phase.Style.Value;
                 t.PhaseReached++;
-                output.Add(new BossPhaseChangedEvent(Tick, t.Id, t.PhaseReached + 1, t.Phases.Count + 1, phase.NameKey));
+                output.Add(new BossPhaseChangedEvent(Tick, t.Id, t.PhaseReached + 1, t.Phases.Count + 1, phase.NameKey, kitChanged));
             }
         }
 

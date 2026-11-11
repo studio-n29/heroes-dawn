@@ -1,3 +1,6 @@
+#nullable enable
+using System.Collections.Generic;
+
 namespace N29.HeroesDawn.Definitions
 {
     /// <summary>
@@ -13,10 +16,16 @@ namespace N29.HeroesDawn.Definitions
         public int AtkPercent { get; }
         public int DefPercent { get; }
         public int SpdPercent { get; }
+        /// <summary>Nouveau jeu de compétences du boss à l ouverture de la phase ; nul : le jeu précédent est conservé.</summary>
+        public IReadOnlyList<SkillDef>? Skills { get; }
+        /// <summary>Nouveau style d IA à l ouverture de la phase ; nul : le style précédent est conservé.</summary>
+        public AiStyle? Style { get; }
 
-        public BossPhaseDef(int thresholdPercent, string nameKey, int atkPercent, int defPercent, int spdPercent)
+        public BossPhaseDef(int thresholdPercent, string nameKey, int atkPercent, int defPercent, int spdPercent,
+                            IReadOnlyList<SkillDef>? skills = null, AiStyle? style = null)
         {
             ThresholdPercent = thresholdPercent; NameKey = nameKey; AtkPercent = atkPercent; DefPercent = defPercent; SpdPercent = spdPercent;
+            Skills = skills; Style = style;
         }
     }
 }

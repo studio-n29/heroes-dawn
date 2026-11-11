@@ -27,7 +27,7 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Énergie en plus à chaque pas de la frise (effet d équipe).</summary>
         public int EnergyRegenBonus { get; set; }
         public List<StatusInstance> Statuses { get; } = new List<StatusInstance>();
-        public IReadOnlyList<SkillDef> Skills { get; }
+        public IReadOnlyList<SkillDef> Skills { get; private set; }
         /// <summary>Style d IA (ennemis) : priorités de compétence et de cible ; les alliés gardent leur logique.</summary>
         public AiStyle Style { get; set; }
         /// <summary>Compétence annoncée sur la frise (ennemis, zone de préparation) ; -1 = aucune.</summary>
@@ -58,6 +58,14 @@ namespace N29.HeroesDawn.Domain.Combat
         {
             Id = id; Side = side; DefId = defId; Family = family; Position = role; IsBoss = isBoss;
             MaxHp = hp; Hp = hp; Atk = atk; Def = def; Spd = spd; ActionPoint = actionPoint; Skills = skills;
+        }
+
+        /// <summary>Remplace le jeu de compétences (ouverture d une phase de boss) ; l action annoncée est annulée, l ancien emplacement n existe peut-être plus.</summary>
+        internal void SetKit(IReadOnlyList<SkillDef> skills)
+        {
+            Skills = skills;
+            PlannedSlot = -1;
+            PlannedTarget = -1;
         }
 
         public StatusInstance? Find(StatusType t)
