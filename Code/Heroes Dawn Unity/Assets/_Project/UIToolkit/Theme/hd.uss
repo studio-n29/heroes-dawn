@@ -845,3 +845,23 @@ Label { flex-shrink: 0; }
 .hd-rescue__part { width: 23%; height: 96px; margin: 0 1% 8px 1%; font-size: 24px; white-space: normal; padding: 0 4px; }
 .hd-rescue__actions { flex-direction: row; margin-top: 10px; }
 .hd-rescue__actions .hd-btn { flex-grow: 1; height: 96px; margin: 0 6px; font-size: 28px; }
+
+/* ---- Activites 3D et jeu du heros ---- */
+.hd-stage { width: 1840px; height: 1000px; max-height: 96%; }
+.hd-stage__viewport { flex-grow: 1; margin: 8px 0; background-color: var(--hd-ink-deep); border-width: 4px; border-color: var(--hd-brass-dark); border-radius: 6px; overflow: hidden; -unity-background-scale-mode: scale-and-crop; }
+.hd-stage__line1 { position: absolute; left: 24px; top: 16px; -unity-font: var(--hd-font-title); font-size: 36px; color: var(--hd-ivory); }
+.hd-stage__line2 { position: absolute; right: 24px; top: 16px; -unity-font: var(--hd-font-title); font-size: 36px; color: var(--hd-brass); -unity-text-align: upper-right; }
+.hd-stage__banner { position: absolute; left: 0; right: 0; top: 40%; -unity-font: var(--hd-font-title); font-size: 84px; -unity-text-align: middle-center; }
+.hd-stage__bar { position: absolute; left: 25%; right: 25%; top: 68px; height: 34px; background-color: rgba(10, 17, 26, 0.7); border-radius: 6px; overflow: hidden; }
+.hd-stage__barfill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; }
+.hd-stage__barlabel { position: absolute; left: 0; right: 0; top: 0; bottom: 0; -unity-text-align: middle-center; -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-ivory); }
+.hd-stage__controls { position: absolute; left: 0; right: 0; bottom: 0; top: 40%; }
+.hd-stage__stick { position: absolute; left: 40px; bottom: 40px; width: 220px; height: 220px; border-radius: 110px; border-width: 5px; border-color: rgba(255, 255, 255, 0.35); background-color: rgba(10, 17, 26, 0.35); align-items: center; justify-content: center; }
+.hd-stage__knob { width: 90px; height: 90px; border-radius: 45px; background-color: rgba(214, 175, 91, 0.85); }
+.hd-stage__actions { position: absolute; right: 40px; bottom: 40px; flex-direction: row; }
+.hd-stage__action { width: 200px; height: 150px; margin-left: 20px; font-size: 30px; white-space: normal; }
+.hd-stage__intro { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(10, 17, 26, 0.94); align-items: center; justify-content: center; padding: 40px 120px; }
+.hd-stage__agents { flex-direction: row; flex-wrap: wrap; justify-content: center; margin: 20px 0; }
+.hd-stage__agent { width: 420px; height: 110px; margin: 8px; font-size: 28px; white-space: normal; }
+.hd-hero__row { flex-direction: row; justify-content: center; align-items: center; }
+.hd-hero__lane { width: 160px; height: 80px; font-size: 44px; margin: 0 24px; }

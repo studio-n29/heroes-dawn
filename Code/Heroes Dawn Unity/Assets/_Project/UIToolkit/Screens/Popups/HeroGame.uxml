@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="modal" class="hd-modal">
+        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-mg2d">
+            <ui:Label name="title" class="hd-modal__title" />
+            <ui:VisualElement class="hd-mg2d__hud">
+                <ui:Label name="score" class="hd-mg2d__score" />
+                <ui:Label name="time" class="hd-mg2d__time" />
+                <ui:Label name="lives" class="hd-mg2d__lives" />
+            </ui:VisualElement>
+            <ui:VisualElement name="field" class="hd-mg2d__field">
+                <ui:VisualElement name="briefing" class="hd-mg2d__briefing">
+                    <ui:Label name="overlay" class="hd-mg2d__overlay" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-hero__row">
+                <ui:Button name="left" class="hd-btn hd-btn--secondary hd-hero__lane" text="&lt;" />
+                <ui:Button name="abandon" class="hd-btn hd-btn--ghost hd-mg2d__abandon" />
+                <ui:Button name="right" class="hd-btn hd-btn--secondary hd-hero__lane" text="&gt;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

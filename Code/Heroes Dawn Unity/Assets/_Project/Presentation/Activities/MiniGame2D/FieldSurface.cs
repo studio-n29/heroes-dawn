@@ -97,6 +97,7 @@ namespace N29.HeroesDawn.Presentation.Activities
                 Element.style.backgroundImage = new StyleBackground(Background.FromSprite(_sprite));
                 Element.style.backgroundColor = Color.clear;
                 Element.style.unityBackgroundImageTintColor = _color;
+                Element.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
             }
             else
             {
