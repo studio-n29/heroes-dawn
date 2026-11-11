@@ -87,6 +87,10 @@ namespace N29.HeroesDawn.Composition
                 builder.Register<SupabaseAccountGateway>(c => new SupabaseAccountGateway(supabase, new UnityWebRequestHttp(), new PlayerPrefsTokenStore(), c.Resolve<IClock>(),
                                                           c.Resolve<ILogger>(), new UnityBrowserOpener(), new UnityRedirectInbox()), Lifetime.Singleton).As<IAccountGateway>().AsSelf();
                 builder.Register<ICloudProfileGateway>(c => new SupabaseCloudProfileGateway(supabase, new UnityWebRequestHttp(), c.Resolve<SupabaseAccountGateway>()), Lifetime.Singleton);
+                // Arène des tournois : données par PostgREST et fonctions (002_hd_arena.sql, à appliquer sur accord), duels en ligne par Realtime.
+                builder.Register<IArenaGateway>(c => new SupabaseArenaGateway(supabase, new UnityWebRequestHttp(), c.Resolve<SupabaseAccountGateway>(),
+                    (rating, seed) => ArenaSnapshots.Fallback(c.Resolve<GameSession>().Content, rating, seed, "Repli")), Lifetime.Singleton);
+                builder.Register<IDuelChannel>(c => new SupabaseDuelChannel(supabase, c.Resolve<SupabaseAccountGateway>(), () => new ClientWebSocketRealtime(), () => System.DateTime.UtcNow), Lifetime.Singleton);
             }
             else
             {
