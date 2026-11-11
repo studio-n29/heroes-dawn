@@ -30,7 +30,11 @@ namespace N29.HeroesDawn.Content.Prototype
         static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd) => new BossPhaseDef(pct, nameKey, atk, def, spd);
 
         static EnemyDef Phased(EnemyDef d, params BossPhaseDef[] phases)
-            => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases);
+            => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases, d.Style);
+
+        /// <summary>Même ennemi avec un style d IA explicite (sans lui, le style vient de la position).</summary>
+        static EnemyDef Styled(EnemyDef d, AiStyle style)
+            => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, d.Phases, style);
 
         /// <summary>Ennemis ajoutés aux zones 1.2 et 1.3.</summary>
         public static IEnumerable<EnemyDef> Enemies()
@@ -54,16 +58,16 @@ namespace N29.HeroesDawn.Content.Prototype
                 S("crocodile_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(25), St(StatusType.Taunt, 1))),
                 Phase(66, "enemies.crocodile.phase2", 10, 0, 5), Phase(33, "enemies.crocodile.phase3", 25, -10, 10));
             // Troupes de l'AMIF (zone 1.4) : soldat, tireur, capitaine.
-            yield return E("amif_trooper", Position.Attacker, Family.Matter, new StatBlock(1300, 120, 70, 105), false,
+            yield return Styled(E("amif_trooper", Position.Attacker, Family.Matter, new StatBlock(1300, 120, 70, 105), false,
                 S("amif_trooper_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(100)),
-                S("amif_trooper_a2", SkillSlot.A2, 4, TargetRule.AllEnemies, Dmg(60)));
+                S("amif_trooper_a2", SkillSlot.A2, 4, TargetRule.AllEnemies, Dmg(60))), AiStyle.Balanced);
             yield return E("amif_marksman", Position.Ranged, Family.Perception, new StatBlock(950, 140, 55, 115), false,
                 S("amif_marksman_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(115)),
                 S("amif_marksman_a2", SkillSlot.A2, 4, TargetRule.SingleEnemy, Dmg(170), St(StatusType.Mark, 2)));
-            yield return E("amif_captain", Position.FrontLine, Family.Matter, new StatBlock(3000, 120, 120, 100), false,
+            yield return Styled(E("amif_captain", Position.FrontLine, Family.Matter, new StatBlock(3000, 120, 120, 100), false,
                 S("amif_captain_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(115)),
                 S("amif_captain_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(75), St(StatusType.Shock, 1, 25)),
-                S("amif_captain_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(18)));
+                S("amif_captain_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(18))), AiStyle.Control);
         }
 
         public static IEnumerable<ZoneDef> Zones()

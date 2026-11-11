@@ -15,12 +15,16 @@ namespace N29.HeroesDawn.Definitions
         public bool IsBoss { get; }
         /// <summary>Phases d'un boss, de la première à la dernière (seuils décroissants) ; vide : le combat n'a qu'une phase.</summary>
         public IReadOnlyList<BossPhaseDef> Phases { get; }
+        /// <summary>Style d IA de l ennemi ; sans style saisi, celui de sa position.</summary>
+        public AiStyle Style { get; }
 
         public EnemyDef(EnemyId id, string nameKey, Position role, Family family, StatBlock baseStats, IReadOnlyList<SkillDef> skills, bool isBoss = false,
-                        IReadOnlyList<BossPhaseDef> phases = null)
+                        IReadOnlyList<BossPhaseDef> phases = null, AiStyle? style = null)
         {
             Id = id; NameKey = nameKey; Position = role; Family = family; BaseStats = baseStats; Skills = skills; IsBoss = isBoss;
             Phases = phases ?? Array.Empty<BossPhaseDef>();
+            Style = style ?? AiStyles.Default(role);
+            if (Phases.Count > 3) throw new ArgumentException("Un boss a au plus 3 seuils de phase (4 phases avec la phase initiale) : " + id.Value);
             if (Phases.Count > 0 && !isBoss) throw new ArgumentException("Seul un boss a des phases : " + id.Value);
             for (int i = 0; i < Phases.Count; i++)
             {

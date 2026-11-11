@@ -59,7 +59,11 @@ namespace N29.HeroesDawn.Content.Prototype
         static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd) => new BossPhaseDef(pct, nameKey, atk, def, spd);
 
         static EnemyDef Phased(EnemyDef d, params BossPhaseDef[] phases)
-            => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases);
+            => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases, d.Style);
+
+        /// <summary>Même ennemi avec un style d IA explicite (sans lui, le style vient de la position).</summary>
+        static EnemyDef Styled(EnemyDef d, AiStyle style)
+            => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, d.Phases, style);
 
         static SynergyDef C(string id, Family a, Family b, SynergyStat stat, int percent)
             => new SynergyDef(id, "synergies." + id + ".name", a, b, stat, percent);
