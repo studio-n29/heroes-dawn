@@ -65,7 +65,7 @@
 
 - **2A (go) :**
   - [ ] Base commune : jetons, composants, navigation manette, `PlatformProfile`.
-  - [ ] Migrer dans l'ordre du parcours joueur : titre → connexion → hub/QG → équipe/fiche → carte/chapitres → plateau → combat → résultats → boutique/pass → réglages.
+  - [ ] Migrer dans l'ordre du parcours joueur (**titre : fait et validé le 2026-11-12**, déjà en UI Toolkit depuis le lot 1a ; tests `TitleScreenUiToolkitTests` : 4 formats, manette, logotype ; `LocIdentityTests` : pas d'« Aube tactique ») : titre → connexion → hub/QG → équipe/fiche → carte/chapitres → plateau → combat → résultats → boutique/pass → réglages.
   - [ ] Garder en uGUI le plateau, les mini-jeux et les effets (décidé).
   - [ ] Supprimer le code et les prefabs uGUI d'un écran **seulement** après sa migration validée.
 - **2B (repli) :**
