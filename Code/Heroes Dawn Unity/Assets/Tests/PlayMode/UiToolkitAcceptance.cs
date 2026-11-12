@@ -67,7 +67,21 @@ namespace N29.HeroesDawn.Tests.PlayMode
                         if (wb.xMin < panel.xMin - 1 || wb.xMax > panel.xMax + 1 || wb.yMin < panel.yMin - 1 || wb.yMax > panel.yMax + 1)
                             problems.Add($"« {Label(b)} » déborde du panneau ({wb} dans {panel})");
                         if (wb.height < 56f - 0.5f) problems.Add($"« {Label(b)} » sous 56 px de référence de hauteur ({wb.height:F0})");
+                        // Un bouton coupé par un conteneur à débordement masqué (hors liste défilante) est inutilisable.
+                        for (var p = b.parent; p != null; p = p.parent)
+                        {
+                            if (p is ScrollView) break;
+                            bool clips = (p.ClassListContains("hd-list") || p.ClassListContains("hd-list__main") || p.ClassListContains("hd-window")) && p.worldBound.width > 1 // conteneurs à débordement masqué (USS)
+                                         && (wb.xMin < p.worldBound.xMin - 1 || wb.xMax > p.worldBound.xMax + 1 || wb.yMin < p.worldBound.yMin - 1 || wb.yMax > p.worldBound.yMax + 1);
+                            if (clips)
+                            { problems.Add($"« {Label(b)} » est coupé par « {(string.IsNullOrEmpty(p.name) ? string.Join(".", p.GetClasses()) : p.name)} » ({wb} dans {p.worldBound})"); break; }
+                        }
                     }
+                    // Un texte écrasé dans une colonne presque nulle s'affiche lettre par lettre (constaté sur le pass en 4:3).
+                    foreach (var d in UnityEngine.Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None).Where(d => d.isActiveAndEnabled && d.rootVisualElement != null))
+                        foreach (var l in d.rootVisualElement.Query<Label>().ToList())
+                            if (l.text != null && l.text.Length >= 8 && l.resolvedStyle.display != DisplayStyle.None && IsShown(l) && l.worldBound.height > 1 && l.worldBound.width < 40f)
+                                problems.Add($"{name} : le texte « {l.text.Substring(0, Mathf.Min(24, l.text.Length))} » est écrasé ({l.worldBound.width:F0} px de large)");
                     extraChecks?.Invoke(name, problems);
                     Directory.CreateDirectory(folder);
                     // Un fichier par panneau (page, fenêtres et notifications sont des panneaux distincts).

@@ -28,7 +28,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         [UnityTearDown]
         public IEnumerator TearDown() => PlayModeHarness.TearDown();
 
-        static IEnumerator InCombat()
+        internal static IEnumerator InCombat()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
             Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Login.LoginView>()!.PlayButton.onClick.Invoke();
