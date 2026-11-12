@@ -154,6 +154,11 @@ namespace N29.HeroesDawn.Presentation.Board
             finally { _modals.Close(view); }
         }
 
+        /// <summary>Types d'activité jouables par une fenêtre dédiée autre qu'un mini-jeu 2D (la réflexe est lancée avant, potion et dialogue demandent leur contenu).</summary>
+        public static bool HasDedicatedWindow(string kind)
+            => kind == ActivityKinds.Reflex || kind == ActivityKinds.Potion || kind == ActivityKinds.Dialogue || kind == ActivityKinds.Deflect
+               || kind == ActivityKinds.RooftopRun || kind == ActivityKinds.CombatArena;
+
         /// <summary>Joue l'activité avec sa fenêtre : potion, dialogue, survie, pêche ou arène ; un type sans jeu dédié garde la fenêtre générique.</summary>
         async UniTask<ActivityResult> PlayActivityAsync(ActivityPlan plan, CancellationToken ct)
         {
@@ -169,6 +174,8 @@ namespace N29.HeroesDawn.Presentation.Board
                 case ActivityKinds.CombatArena:
                     return await PlayStageAsync(plan, ct);
             }
+            // Filet de sécurité : un type sans jeu dédié ne propose jamais de « simuler » au joueur (verrouillé par ActivityCoverageTests).
+            if (!UnityEngine.Debug.isDebugBuild) { _toasts.Show(_loc.T("activity.unavailable"), ToastKind.Error); return new ActivityResult(false); }
             var view = await _modals.OpenAsync<IActivityPopupView>(ct);
             try { return await view.PlayAsync(ActivityData(plan), ct); }
             finally { _modals.Close(view); }

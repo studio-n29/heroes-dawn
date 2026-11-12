@@ -76,7 +76,7 @@
 
 **Sortie :** plus de WIP visible ; services configurés ; analytics en place.
 
-- [x] Finir ou retirer chaque entrée WIP (2026-11-12) : notifications masquées, objectifs secondaires et contrôles hors périmètre 1.0, mécanisme WIP supprimé. Restent visibles : « BIENTÔT » sur Langue des voix et autres langues (réglages), et le message « Version de test » des activités simulées (`activity.wip`) : à traiter.
+- [x] Finir ou retirer chaque entrée WIP (2026-11-12) : notifications masquées, objectifs secondaires et contrôles hors périmètre 1.0, mécanisme WIP supprimé. Lignes « BIENTÔT » de la langue retirées ; la fenêtre « simuler la réussite » n'existe plus que dans les builds de développement (`ActivityCoverageTests` garantit qu'aucun type d'activité n'y tombe).
 - [ ] **Analytics** (priorité n°1 du plan EA) : événements clés (début de session, zone, combat, achat, abandon) ; lier le projet UGS (`cloudProjectId` vide au dernier relevé, à revérifier).
 - [ ] Supabase : activer « leaked password protection » (tableau de bord, action de votre part) ; **sur accord explicite**, appliquer `002_hd_arena.sql` ; vérifier les quotas Realtime.
 - [ ] Sauvegarde : test de migration d'un profil 0.15.x → 1.0.0 et du conflit appareil/compte.

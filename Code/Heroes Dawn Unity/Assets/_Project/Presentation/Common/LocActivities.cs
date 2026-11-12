@@ -37,7 +37,8 @@ namespace N29.HeroesDawn.Presentation.Common
             d["activity.level"] = "Niveau généré : {0} éléments (graine {1})";
             d["activity.patient"] = "Patient : {0} · {1}";
             d["activity.params"] = "Réglages :";
-            d["activity.wip"] = "Version de test : le jeu complet de cette activité arrive plus tard. Choisis le résultat à simuler.";
+            d["activity.wip"] = "[DEBUG] Activité sans jeu dédié : choisis le résultat à simuler.";
+            d["activity.unavailable"] = "Cette activité n'est pas disponible pour le moment.";
             d["activity.simulate_win"] = "SIMULER LA RÉUSSITE";
             d["activity.simulate_fail"] = "SIMULER L'ÉCHEC";
             d["activity.malus_applied"] = "{0} : -{1} % aux statistiques jusqu'à la fin du plateau ({2}).";

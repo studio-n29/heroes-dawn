@@ -198,8 +198,6 @@ namespace N29.HeroesDawn.Presentation.Hub
                 case SettingsCategory.Language:
                     Add(new SettingRowData { Label = _loc.T("settings.lang.texts"), Kind = SettingKind.Stepper, Value = _loc.T(s.language == "en" ? "settings.lang.en" : "settings.lang.fr") },
                         _ => _settings.Update(x => x.language = x.language == "en" ? "fr" : "en"));
-                    Add(SettingRowData.Info(_loc.T("settings.lang.voice"), _loc.T("wip.soon")));
-                    Add(SettingRowData.Info(_loc.T("settings.lang.more"), _loc.T("wip.soon")));
                     break;
                 case SettingsCategory.Controls:
                     Toggle("settings.show_keys", () => s.showKeys, v => s.showKeys = v);

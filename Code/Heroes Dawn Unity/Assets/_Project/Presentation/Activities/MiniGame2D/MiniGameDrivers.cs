@@ -25,6 +25,9 @@ namespace N29.HeroesDawn.Presentation.Activities
             Map[ActivityKinds.SnowSurvival] = (plan, loc) => new SnowSurvivalDriver(plan, loc);
         }
 
+        /// <summary>Vrai si ce type d'activité a un mini-jeu 2D.</summary>
+        public static bool Has(string kind) => Map.ContainsKey(kind);
+
         public static void Register(string kind, Func<ActivityPlan, ILocalization, IMiniGameDriver> factory) => Map[kind] = factory;
 
         public static void Unregister(string kind) => Map.Remove(kind);

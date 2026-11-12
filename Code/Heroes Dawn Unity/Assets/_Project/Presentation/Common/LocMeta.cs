@@ -23,7 +23,6 @@ namespace N29.HeroesDawn.Presentation.Common
             d["errors.store_unavailable"] = "Boutique indisponible. Vérifie ta connexion et réessaie.";
             d["errors.meta_done"] = "Déjà fait.";
             d["errors.on_expedition"] = "Ce membre est en expédition.";
-            d["wip.soon"] = "BIENTÔT";
 
             // --- Pass
             d["page.pass"] = "Pass · Saison 1";

@@ -107,7 +107,6 @@ namespace N29.HeroesDawn.Presentation.Common
             ["recruit.how_to_earn"] = "Gagne des PR en sécurisant des zones et en remplissant leurs objectifs.",
             ["recruit.synergy"] = "Synergie phare : {0} ({1}) avec {2}", ["recruit.synergy.family"] = "Synergie phare : {0} ({1})",
             // --- Fonctions à venir (WIP) ---
-            ["wip.soon"] = "BIENTÔT",
             ["hub.trained"] = "{0} passe niveau {1} !",
             ["hub.healed"] = "Toute l'équipe a été soignée.",
             ["hub.stats"] = "PV {0} · ATQ {1} · DÉF {2} · VIT {3}",
