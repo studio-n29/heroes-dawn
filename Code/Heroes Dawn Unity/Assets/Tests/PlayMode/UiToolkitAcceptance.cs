@@ -64,7 +64,9 @@ namespace N29.HeroesDawn.Tests.PlayMode
                     foreach (var b in buttons)
                     {
                         var panel = b.panel.visualTree.worldBound; var wb = b.worldBound;
-                        if (wb.xMin < panel.xMin - 1 || wb.xMax > panel.xMax + 1 || wb.yMin < panel.yMin - 1 || wb.yMax > panel.yMax + 1)
+                        // Les boutons d'une liste défilante (réglages, listes) sortent de l'écran par construction : la liste les fait défiler.
+                        bool scrolled = b.GetFirstAncestorOfType<ScrollView>() != null;
+                        if (!scrolled && (wb.xMin < panel.xMin - 1 || wb.xMax > panel.xMax + 1 || wb.yMin < panel.yMin - 1 || wb.yMax > panel.yMax + 1))
                             problems.Add($"« {Label(b)} » déborde du panneau ({wb} dans {panel})");
                         if (wb.height < 56f - 0.5f) problems.Add($"« {Label(b)} » sous 56 px de référence de hauteur ({wb.height:F0})");
                         // Un bouton coupé par un conteneur à débordement masqué (hors liste défilante) est inutilisable.
