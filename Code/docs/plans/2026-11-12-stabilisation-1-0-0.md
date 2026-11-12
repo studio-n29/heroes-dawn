@@ -43,6 +43,7 @@
 - [x] Committer ou écarter l'arbre de travail : `ProjectSettings/*.asset`, `Assets/Settings/PC_RPAsset.asset`, `UniversalRenderPipelineGlobalSettings.asset`, `Editor/Build/WebGLBuilder.cs`, `Data/` (revoir ce qui est généré et à ignorer).
 - [x] Décider du worktree `integration/` (branche `feature/combat-timeline`, 8 modifications non committées) : fusionner, committer ou abandonner, puis `git worktree remove`.
 - [x] Lancer la baseline : EditMode puis PlayMode (`build/run-tests.sh`), noter les chiffres dans `docs/test-reports/`.
+  - Tests non exécutés classés : `docs/test-reports/2026-11-12_tests-non-executes.md` (24 légitimes, 5 conditionnels, 4 à traiter).
 - [ ] Corriger le timeout intermittent de `FullRunTests` (cause racine, pas de relance automatique).
 - [ ] Nettoyer le reste des obsolètes validés par vous (anciens APK, `_deploy/`, `Builds/0.15.3`, anciens rapports non référencés).
 - [ ] Étiqueter `v1.0.0-wip` sur le commit propre.
