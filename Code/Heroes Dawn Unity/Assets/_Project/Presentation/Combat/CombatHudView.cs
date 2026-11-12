@@ -54,6 +54,10 @@ namespace N29.HeroesDawn.Presentation.Combat
             _auto.text = Loc.T("combat.auto_hint");
             _debug.text = Loc.T("combat.debug_win");
             _banner.pickingMode = PickingMode.Ignore;
+            // Mise en page conçue pour 1920×1080 : réduite quand le panneau est plus court ou plus étroit (4:3, 20:9) au lieu de se chevaucher.
+            var fit = Q<VisualElement>("safe");
+            Root.RegisterCallback<GeometryChangedEvent>(_ => HdFit.Apply(fit));
+            fit.schedule.Execute(() => HdFit.Apply(fit));
             BindBossAndBonuses();
             BindBoard();
             if (_topBar.HasValue) SetTopBar(_topBar.Value);

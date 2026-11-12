@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         static string Label(VisualElement b) => string.IsNullOrEmpty(b.name) ? (b is UnityEngine.UIElements.Button bt ? bt.text : b.GetType().Name) : b.name;
 
         /// <summary>Rend les panneaux actifs aux quatre formats : boutons de <paramref name="scope"/> dans le panneau et d'au moins 56 px de référence.</summary>
-        internal static IEnumerator CheckFormats(string folder, string screen, Func<UnityEngine.UIElements.Button, bool> scope, int minButtons)
+        internal static IEnumerator CheckFormats(string folder, string screen, Func<UnityEngine.UIElements.Button, bool> scope, int minButtons, Action<string, List<string>>? extraChecks = null)
         {
             var panels = UnityEngine.Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None).Where(d => d.isActiveAndEnabled && d.panelSettings != null).Select(d => d.panelSettings).Distinct().ToList();
             var saved = panels.Select(p => (p, p.targetTexture)).ToList();
@@ -68,6 +68,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
                             problems.Add($"« {Label(b)} » déborde du panneau ({wb} dans {panel})");
                         if (wb.height < 56f - 0.5f) problems.Add($"« {Label(b)} » sous 56 px de référence de hauteur ({wb.height:F0})");
                     }
+                    extraChecks?.Invoke(name, problems);
                     Directory.CreateDirectory(folder);
                     // Un fichier par panneau (page, fenêtres et notifications sont des panneaux distincts).
                     for (int k = 0; k < rts.Count; k++)
