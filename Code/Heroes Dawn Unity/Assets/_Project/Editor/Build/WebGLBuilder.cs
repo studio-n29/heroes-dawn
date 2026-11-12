@@ -40,7 +40,7 @@ namespace N29.HeroesDawn.EditorTools.Build
             });
             var summary = report.summary;
             Debug.Log($"[Heroes Dawn] Build WebGL : {summary.result}, {summary.totalSize / (1024 * 1024)} Mo, {summary.totalErrors} erreur(s) → {output}");
-            if (Application.isBatchMode) EditorApplication.Exit(summary.result == BuildResult.Succeeded ? 0 : 1);
+            if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(summary.result == BuildResult.Succeeded ? 0 : 1);
         }
 
         /// <summary>Réglages adaptés aux navigateurs mobiles : mémoire bornée (iOS), pas de threads, compression gzip avec décompression JS (aucune config serveur requise).</summary>
