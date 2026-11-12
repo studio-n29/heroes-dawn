@@ -22,13 +22,13 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void ShowsTitleAndPlannedText()
         {
             var view = new FakeWipPageView();
-            var p = new WipPagePresenter(view, new WipPageArgs(WipCatalog.Pass, "page.pass"), new LocLocalization());
+            var p = new WipPagePresenter(view, new WipPageArgs(WipCatalog.SecondaryObjectives, "page.pass"), new LocLocalization());
             view.Show();
             p.Start();
             var d = view.Shown[view.Shown.Count - 1];
             Assert.That(p.Title, Is.EqualTo(Loc.T("page.pass")));
-            Assert.That(d.FeatureTitle, Is.EqualTo(Loc.T(WipCatalog.Pass.TitleKey)));
-            Assert.That(d.Planned, Is.EqualTo(Loc.T(WipCatalog.Pass.PlannedKey)));
+            Assert.That(d.FeatureTitle, Is.EqualTo(Loc.T(WipCatalog.SecondaryObjectives.TitleKey)));
+            Assert.That(d.Planned, Is.EqualTo(Loc.T(WipCatalog.SecondaryObjectives.PlannedKey)));
             Assert.That(d.Soon, Is.EqualTo(Loc.T("wip.soon")));
         }
     }

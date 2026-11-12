@@ -165,8 +165,8 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void WipTapped_ShowsSoonToast_NoNavigation()
         {
             int created = _pages.Created.Count;
-            _view.TapRelay.TapWip("pass");
-            Assert.That(_toasts.Shown.Select(t => t.Text), Does.Contain(WipNotice.Message(new LocLocalization(), "pass")));
+            _view.TapRelay.TapWip("secondary_objectives");
+            Assert.That(_toasts.Shown.Select(t => t.Text), Does.Contain(WipNotice.Message(new LocLocalization(), "secondary_objectives")));
             Assert.That(_pages.Created.Count, Is.EqualTo(created));
         }
 
