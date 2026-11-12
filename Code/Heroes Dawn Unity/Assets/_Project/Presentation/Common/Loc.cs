@@ -108,10 +108,6 @@ namespace N29.HeroesDawn.Presentation.Common
             ["recruit.synergy"] = "Synergie phare : {0} ({1}) avec {2}", ["recruit.synergy.family"] = "Synergie phare : {0} ({1})",
             // --- Fonctions à venir (WIP) ---
             ["wip.soon"] = "BIENTÔT",
-            ["wip.toast"] = "{0} arrive bientôt",
-            ["wip.secondary_objectives.title"] = "Les objectifs secondaires", ["wip.secondary_objectives.planned"] = "Objectifs en temps réel dans les zones déjà validées, avec compte à rebours.",
-            ["wip.settings_notifications.title"] = "Les notifications", ["wip.settings_notifications.planned"] = "Un interrupteur par type de notification et des heures calmes.",
-            ["wip.settings_controls.title"] = "Les contrôles", ["wip.settings_controls.planned"] = "Raccourcis clavier modifiables et réglages de la caméra du plateau (PC).",
             ["hub.trained"] = "{0} passe niveau {1} !",
             ["hub.healed"] = "Toute l'équipe a été soignée.",
             ["hub.stats"] = "PV {0} · ATQ {1} · DÉF {2} · VIT {3}",

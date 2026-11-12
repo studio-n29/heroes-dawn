@@ -161,14 +161,6 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Qg));
         }
 
-        [Test, Description("Vérifie que toucher un élément BIENTÔT affiche un message sans naviguer — parce qu'aucun élément ne doit être un cul-de-sac muet (spec §3.4)")]
-        public void WipTapped_ShowsSoonToast_NoNavigation()
-        {
-            int created = _pages.Created.Count;
-            _view.TapRelay.TapWip("secondary_objectives");
-            Assert.That(_toasts.Shown.Select(t => t.Text), Does.Contain(WipNotice.Message(new LocLocalization(), "secondary_objectives")));
-            Assert.That(_pages.Created.Count, Is.EqualTo(created));
-        }
 
         [Test, Description("Vérifie qu'un bouton grisé touché affiche sa raison — parce que le joueur doit savoir pourquoi il ne peut pas agir (spec §6)")]
         public void ReasonTapped_ShowsReasonToast()

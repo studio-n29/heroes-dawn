@@ -3,7 +3,6 @@ using System;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Tutorial;
 using N29.HeroesDawn.Presentation.UiToolkit;
-using N29.HeroesDawn.Presentation.Wip;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,7 +16,6 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly HubPage[] _pages = new HubPage[MaxRooms];
         readonly UnityEngine.UIElements.Button[] _rooms = new UnityEngine.UIElements.Button[MaxRooms];
         readonly HdButtonRef[] _roomRefs = new HdButtonRef[MaxRooms];
-        readonly string?[] _wip = new string?[MaxRooms];
         readonly System.Collections.Generic.List<HdTutorialAnchor> _anchors = new System.Collections.Generic.List<HdTutorialAnchor>();
         Label _bannerTitle = null!, _bannerLine = null!, _dailyCount = null!, _dailyBody = null!, _dailyBadge = null!, _shopBadge = null!, _hint = null!, _sub = null!;
         UnityEngine.UIElements.Button _mission = null!, _banner = null!;
@@ -72,11 +70,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 int index = i;
                 var room = new UnityEngine.UIElements.Button();
                 room.AddToClassList("hd-room");
-                room.clicked += () =>
-                {
-                    if (_wip[index] != null) GetComponentInParent<UiTapRelay>(true)?.RaiseWip(_wip[index]!);
-                    else RoomClicked?.Invoke(_pages[index]);
-                };
+                room.clicked += () => RoomClicked?.Invoke(_pages[index]);
                 _rooms[i] = room;
                 _roomRefs[i] = new HdButtonRef(room, this);
                 _roomsRow.Add(room);
@@ -100,7 +94,6 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (!used) continue;
                 var r = d.Rooms[i];
                 _pages[i] = r.Page;
-                _wip[i] = r.WipId;
                 room.Clear();
                 var art = new VisualElement { pickingMode = PickingMode.Ignore };
                 art.AddToClassList("hd-room__art");
@@ -115,12 +108,6 @@ namespace N29.HeroesDawn.Presentation.Hub
                 var info = new Label(r.Info) { pickingMode = PickingMode.Ignore };
                 info.AddToClassList("hd-room__info");
                 room.Add(info);
-                if (r.WipId != null)
-                {
-                    var wip = new Label(Loc.T("wip.soon")) { pickingMode = PickingMode.Ignore };
-                    wip.AddToClassList("hd-room__wip");
-                    room.Add(wip);
-                }
                 if (r.Badge > 0)
                 {
                     var badge = new VisualElement { pickingMode = PickingMode.Ignore };

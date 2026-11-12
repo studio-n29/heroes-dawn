@@ -74,7 +74,6 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.TabClicked += OnTabClicked;
             View.BackClicked += OnBackClicked;
             View.SettingsClicked += OpenSettings;
-            View.Relay.WipTapped += OnWipTapped;
             View.Relay.ReasonTapped += OnReasonTapped;
             OnNavigated(_nav.Current);
             OpenShop();
@@ -86,7 +85,6 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.TabClicked -= OnTabClicked;
             View.BackClicked -= OnBackClicked;
             View.SettingsClicked -= OpenSettings;
-            View.Relay.WipTapped -= OnWipTapped;
             View.Relay.ReasonTapped -= OnReasonTapped;
             _shopSub?.Dispose();
             _metaSub?.Dispose();
@@ -231,7 +229,6 @@ namespace N29.HeroesDawn.Presentation.Hub
             finally { _askingQuit = false; }
         }
 
-        void OnWipTapped(string featureId) => _toasts.Show(WipNotice.Message(_loc, featureId), ToastKind.Info);
 
         void OnReasonTapped(string text) => _toasts.Show(text, ToastKind.Warning);
     }

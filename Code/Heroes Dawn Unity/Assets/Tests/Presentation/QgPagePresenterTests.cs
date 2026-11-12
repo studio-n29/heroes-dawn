@@ -8,7 +8,6 @@ using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Mvp;
-using N29.HeroesDawn.Presentation.Wip;
 using N29.HeroesDawn.Tests.Domain.Application;
 using N29.HeroesDawn.Tests.Presentation.Fakes;
 using NUnit.Framework;

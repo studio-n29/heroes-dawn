@@ -3,7 +3,7 @@ using System;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Case de pièce du QG (M10 ③) ; <see cref="WipId"/> non nul = pièce à venir (BIENTÔT).</summary>
+    /// <summary>Case de pièce du QG (M10 ③).</summary>
     public struct RoomCardData
     {
         public HubPage Page;
@@ -14,7 +14,6 @@ namespace N29.HeroesDawn.Presentation.Hub
         public string State;
         /// <summary>Pièce verrouillée (tutoriel ou chapitre pas encore atteint) : non touchable, l'objectif devient la condition.</summary>
         public bool Locked;
-        public string? WipId;
         /// <summary>Pastille de notification (0 : aucune).</summary>
         public int Badge;
         /// <summary>Illustration de la pièce (fond de la carte) ; nulle : fond uni.</summary>

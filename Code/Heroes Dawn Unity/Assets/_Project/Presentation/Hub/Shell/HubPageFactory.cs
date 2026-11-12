@@ -48,9 +48,6 @@ namespace N29.HeroesDawn.Presentation.Hub
             _ => throw new InvalidOperationException("Page du hub pas encore disponible : " + location.Page),
         };
 
-        IHubPageHandle Wip(HubLocation location, WipFeature feature, string titleKey)
-            => Make<WipPageView, IWipPageView, WipPagePresenter>(location, b => b.RegisterInstance(new WipPageArgs(feature, titleKey)));
-
         /// <summary>Instancie la page <typeparamref name="TView"/> et son présentateur, inscrits dans un scope enfant.</summary>
         IHubPageHandle Make<TView, TIView, TPresenter>(HubLocation location, Action<IContainerBuilder>? extra = null)
             where TView : Component, TIView

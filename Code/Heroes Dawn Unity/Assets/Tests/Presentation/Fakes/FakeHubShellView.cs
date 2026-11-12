@@ -10,9 +10,7 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
 {
     public sealed class FakeTapRelay : IUiTapRelay
     {
-        public event Action<string>? WipTapped;
         public event Action<string>? ReasonTapped;
-        public void TapWip(string id) => WipTapped?.Invoke(id);
         public void TapReason(string text) => ReasonTapped?.Invoke(text);
     }
 

@@ -107,18 +107,6 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Assert.That(Flow.Current, Is.EqualTo(GameState.Hub));
         }
 
-        [UnityTest, Description("Vérifie que toucher une pièce BIENTÔT affiche le toast « … arrive bientôt » sans changer de page — parce que les fonctions à venir restent visibles mais inactives (spec §3.5)")]
-        public IEnumerator WipRoom_TapShowsSoonToast_NoNavigation()
-        {
-            yield return OnHub();
-            // Plus aucune pièce du QG n est BIENTÔT : le mécanisme (relais de la coque) reste testé avec une fonction encore à venir.
-            Object.FindAnyObjectByType<N29.HeroesDawn.Presentation.Wip.UiTapRelay>()!.RaiseWip(WipCatalog.SecondaryObjectives.Id);
-            var expected = Loc.F("wip.toast", Loc.T(WipCatalog.SecondaryObjectives.TitleKey));
-            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<ToastsView>()!.Texts().Contains(expected));
-            Assert.That(Object.FindAnyObjectByType<ToastsView>()!.Texts(), Does.Contain(expected), "toast BIENTÔT affiché");
-            Assert.That(PlayModeHarness.Visible<QgPageView>(), Is.True, "aucune navigation");
-        }
-
         [UnityTest, Description("Vérifie qu'un MISSION sur le QG puis un MISSION sur l'Équipe avant le départ du hub ne démarrent la zone qu'une fois — parce qu'un second départ remplacerait la partie (relecture, M5)")]
         public IEnumerator Mission_ThenTeamMissionBeforeUnload_StartsZoneOnce()
         {
@@ -199,7 +187,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Shell.SettingsButton.Button.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<SettingsPageView>());
             var settings = Object.FindAnyObjectByType<SettingsPageView>()!;
-            settings.CategoryButton(6).onClick.Invoke(); // Compte
+            settings.CategoryButton(5).onClick.Invoke(); // Compte
             yield return null;
             settings.ActionButton(N29.HeroesDawn.Presentation.Common.Loc.T("settings.logout"))!.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<LoginView>() && !Flow.IsTransitioning, 600);
