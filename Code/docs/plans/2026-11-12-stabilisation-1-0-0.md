@@ -1,0 +1,140 @@
+# Plan de stabilisation : de la 1.0.0 en cours à une version stable (1.0.x)
+
+> **Pour les agents :** exécuter phase par phase avec `superpowers:executing-plans` ou `superpowers:subagent-driven-development`. Les cases `- [ ]` suivent l'avancement. Chaque phase se termine par un critère de sortie vérifiable.
+
+**Objectif :** livrer une version **stable** de Heroes Dawn : sans bug bloquant, sans fonction affichée « WIP », à la baseline de tests verte, installable sur Windows et Android, et jouable de bout en bout sur Brooklyn.
+
+**Approche :** geler le périmètre, assainir le dépôt, trancher la dette d'interface (UI Toolkit contre uGUI), puis boucler fonctionnel, équilibrage, contenu et QA. Aucune nouvelle fonctionnalité de jeu avant la fin de la phase 4.
+
+**Stack :** Unity 6.6 (6000.6.3f1), URP, VContainer, MessagePipe, UI Toolkit (en migration), Supabase, Unity IAP.
+
+**Sources :** `docs/plans/2026-10-14-plan-early-access.md`, `docs/release-notes-0.15.0.md`, `05_Production/Roadmap.md`, `05_Production/Risques.md`, `docs/specs/2026-11-10-refonte-ui-uitoolkit.md`, point d'état du 2026-11-12.
+
+## Hypothèses (à confirmer)
+
+| # | Hypothèse | Si faux |
+|---|---|---|
+| H1 | « Stable » = **1.0.0-rc puis 1.0.x** : Brooklyn complet, Agent D jouable, Windows + Android. Paris, Moscou, Salem et Agent M sont **hors périmètre**. | Ajouter une phase contenu (zones à créer), +4 à 8 semaines. |
+| H2 | L'Early Access du **14/11** n'est pas tenable (2 jours). Cible réaliste : **rc le ~10/12, stable le 14/12** (date de sortie du plan EA). | Décaler ; la roadmap d'origine vise l'EA en juillet 2027. |
+| H3 | Il n'y a pas d'iOS, de Switch ni d'achats réels côté stores à cette version : l'IAP reste branché mais testé en bac à sable. | Phase légale et stores à ajouter. |
+
+## Contraintes globales
+
+- Tout se passe dans Unity (décision 2026-10-02), pas de projet .NET extérieur.
+- « Aube tactique » n'apparaît **jamais** dans le jeu (test existant à conserver).
+- R7 : ne pas représenter les thèmes sensibles d'Eda. R8 : dire « cryptides », jamais « SCP ».
+- Toute décision validée → une ligne dans `05_Production/Decisions.md`.
+- Pas de migration Supabase appliquée sans accord explicite (`002_hd_arena.sql` en attente).
+
+## Points de vigilance
+
+1. **Régression UI pendant la migration UI Toolkit** : un écran migré perd sa navigation manette ou sa disposition 20:9. Test de capture sur 4 formats exigé (16:9, 20:9, 4:3, 1280×720).
+2. **Sauvegarde cloud** : un ancien profil (0.15.x) doit charger en 1.0.0 sans perte (champs `MetaSave` compatibles).
+3. **Achat interrompu** : reprise au lancement sans double octroi (déjà testée, à retester sur appareil).
+4. **Boss trop faciles** : taux de victoire à 100 % contre 40-60 % visé.
+5. **Hors ligne** : le jeu doit démarrer et se jouer sans réseau (compte optionnel).
+
+---
+
+## Phase 0 — Assainir le dépôt (1-2 jours)
+
+**Sortie :** `develop` propre, baseline de tests connue, build 1.0.0 reproductible.
+
+- [ ] Committer ou écarter l'arbre de travail : `ProjectSettings/*.asset`, `Assets/Settings/PC_RPAsset.asset`, `UniversalRenderPipelineGlobalSettings.asset`, `Editor/Build/WebGLBuilder.cs`, `Data/` (revoir ce qui est généré et à ignorer).
+- [ ] Décider du worktree `integration/` (branche `feature/combat-timeline`, 8 modifications non committées) : fusionner, committer ou abandonner, puis `git worktree remove`.
+- [ ] Lancer la baseline : EditMode puis PlayMode (`build/run-tests.sh`), noter les chiffres dans `docs/test-reports/`.
+- [ ] Corriger le timeout intermittent de `FullRunTests` (cause racine, pas de relance automatique).
+- [ ] Nettoyer le reste des obsolètes validés par vous (anciens APK, `_deploy/`, `Builds/0.15.3`, anciens rapports non référencés).
+- [ ] Étiqueter `v1.0.0-wip` sur le commit propre.
+
+## Phase 1 — Figer le périmètre (1-2 jours)
+
+**Sortie :** trois décisions inscrites dans `Decisions.md`, roadmap alignée.
+
+- [ ] Confirmer H1/H2/H3 (définition de « stable », date, plateformes).
+- [ ] Trancher **UI Toolkit** : faire l'étape 0 de mesures (60 fps sur Android milieu de gamme, mémoire, polices Barlow SDF, cohabitation avec les Canvas uGUI). **Go** → phase 2A ; **no-go** → repli uGUI, phase 2B.
+- [ ] Réconcilier `Roadmap.md` et le plan EA (une seule source de dates).
+- [ ] Auditer `WipCatalog.cs` : pour chaque fonction (pass, boutique, opérations, labo, archives, missions du jour, objectifs, gemmes, illustrations de membres, 5 pages de réglages), classer **retirer l'entrée** / **à finir** / **masquer**. Le labo a été supprimé au Bloc B : retirer son entrée.
+
+## Phase 2 — Interface (A : UI Toolkit, ou B : repli uGUI) (1-2 semaines)
+
+**Sortie :** aucun écran critique cassé ; un seul système d'UI par écran ; captures des 4 formats archivées.
+
+- **2A (go) :**
+  - [ ] Base commune : jetons, composants, navigation manette, `PlatformProfile`.
+  - [ ] Migrer dans l'ordre du parcours joueur : titre → connexion → hub/QG → équipe/fiche → carte/chapitres → plateau → combat → résultats → boutique/pass → réglages.
+  - [ ] Garder en uGUI le plateau, les mini-jeux et les effets (décidé).
+  - [ ] Supprimer le code et les prefabs uGUI d'un écran **seulement** après sa migration validée.
+- **2B (repli) :**
+  - [ ] Écrire la navigation manette et la mise en page adaptative une fois dans la couche commune ; geler les 41 fichiers UXML déjà faits.
+- [ ] Dans les deux cas : test de capture sur 16:9, 20:9, 4:3, 1280×720 ; test d'absence de « Aube tactique » dans les textes.
+
+## Phase 3 — Fonctionnel et services (1 semaine, en parallèle de la phase 2)
+
+**Sortie :** plus de WIP visible ; services configurés ; analytics en place.
+
+- [ ] Finir ou retirer chaque entrée WIP classée « à finir » ; pages de réglages audio, graphismes, accessibilité, notifications, contrôles.
+- [ ] **Analytics** (priorité n°1 du plan EA) : événements clés (début de session, zone, combat, achat, abandon) ; lier le projet UGS (`cloudProjectId` vide au dernier relevé, à revérifier).
+- [ ] Supabase : activer « leaked password protection » (tableau de bord, action de votre part) ; **sur accord explicite**, appliquer `002_hd_arena.sql` ; vérifier les quotas Realtime.
+- [ ] Sauvegarde : test de migration d'un profil 0.15.x → 1.0.0 et du conflit appareil/compte.
+- [ ] Tournois : confirmer le repli hors ligne après 15 s.
+
+## Phase 4 — Équilibrage et playtest (1 semaine)
+
+**Sortie :** valeurs ⚑ validées ou ajustées, consignées dans `05_Equilibrage.xlsx` et `Decisions.md`.
+
+- [ ] Rejouer le simulateur d'équilibrage (`BalanceReports/`) après le Bloc A à E.
+- [ ] Boss : ramener le taux de victoire de l'équipe de test dans **40 à 60 %** (Brick, Crocodile, Titan de l'AMIF), ajuster les bonus de phase.
+- [ ] Valider les ⚑ : énergie (30 / +3), pause de résolution 1,3 s, paliers de lien (3-8-15-25), table des rangs AMIF, coûts de recrutement, paliers de tournoi, boutique de confort, déséquilibre des familles (Perception 9, Élémentaire 6).
+- [ ] 2 à 3 sessions de playtest réel avec le formulaire `docs/playtest-formulaire.md`.
+- [ ] Vérifier la garde anti pay-to-win (test existant) après chaque changement d'économie.
+
+## Phase 5 — Contenu minimal (1-2 semaines, en parallèle)
+
+**Sortie :** Brooklyn jouable de bout en bout sans texte provisoire visible.
+
+- [ ] **Vous :** relire les textes des 4 fragments et du repaire (français), fournir ou valider l'anglais.
+- [ ] **Vous :** décision sur les voix : fiche de casting ElevenLabs, ou sortie sans voix avec sous-titres (état actuel, acceptable pour une rc).
+- [ ] Portraits d'agents et icônes : au minimum ceux du parcours Brooklyn et de l'équipe de départ (Giulia Rossi, Ilona Varga, Lucas Mendes).
+- [ ] Agent M : afficher « bientôt » proprement (pas de bouton mort), ou le livrer si H1 change.
+- [ ] Corriger l'écart connu : consignes d'Ingénierie de secours qui chevauchent le manuel.
+
+## Phase 6 — QA, légal, release (1 semaine)
+
+**Sortie :** release candidate puis tag stable.
+
+- [ ] Régression complète : EditMode et PlayMode verts, aucun test ignoré sans motif écrit.
+- [ ] Recette sur appareils : 2 Android (dont milieu de gamme), 1 PC ; parcours complet nouvelle partie → Brooklyn fini ; reprise après coupure réseau ; achat IAP en bac à sable.
+- [ ] Performances : 60 fps cible sur l'Android de référence, mémoire stable sur 30 min.
+- [ ] Obligations légales (`05_Production/Obligations_Legales.md`) : politique de confidentialité, classification d'âge (IARC/PEGI), mentions des assets générés par IA (R3).
+- [ ] Notes de version 1.0.0 (sur le modèle de `release-notes-0.15.0.md`).
+- [ ] `v1.0.0-rc1`, correctifs bloquants uniquement, puis `v1.0.0`.
+
+---
+
+## Critères de « stable » (définition de terminé)
+
+1. EditMode et PlayMode : 100 % verts sur 3 exécutions consécutives.
+2. Aucune entrée `WipCatalog` visible par le joueur.
+3. Parcours Brooklyn complet réussi sur 2 appareils sans plantage ni blocage.
+4. Aucun écran critique sans navigation (tactile, souris, clavier, manette) sur les 4 formats.
+5. Profil 0.15.x chargé en 1.0.0 sans perte ; aucun double octroi d'achat.
+6. Analytics reçoivent les événements clés.
+7. Boss dans la cible de 40 à 60 % ; valeurs ⚑ consignées.
+8. Dépôt propre : aucun worktree orphelin, aucun fichier temporaire suivi, tags posés.
+
+## Calendrier proposé (à valider avec H2)
+
+| Période | Phase |
+|---|---|
+| 12-14 nov. | 0 et 1 |
+| 15 nov. – 1er déc. | 2 (A ou B), 3 et 5 en parallèle |
+| 25 nov. – 5 déc. | 4 |
+| 5-10 déc. | 6, **rc1 vers le 10/12** |
+| 10-14 déc. | correctifs bloquants, **stable le 14/12** |
+
+## Risques propres à ce plan
+
+- Étape 0 de l'UI Toolkit négative → bascule en 2B, perte de 1 à 2 semaines d'avance.
+- Équipe de 1-2 personnes (R11) : si la phase 2 dépasse le 1er décembre, couper Android ou le JcJ en ligne plutôt que décaler la date.
+- Contenu non disponible (voix, portraits) : sortir avec sous-titres et portraits du parcours seulement.
