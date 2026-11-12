@@ -79,8 +79,8 @@
 - [x] Finir ou retirer chaque entrée WIP (2026-11-12) : notifications masquées, objectifs secondaires et contrôles hors périmètre 1.0, mécanisme WIP supprimé. Lignes « BIENTÔT » de la langue retirées ; la fenêtre « simuler la réussite » n'existe plus que dans les builds de développement (`ActivityCoverageTests` garantit qu'aucun type d'activité n'y tombe).
 - [ ] **Analytics** (priorité n°1 du plan EA) : événements clés (début de session, zone, combat, achat, abandon) ; lier le projet UGS (`cloudProjectId` vide au dernier relevé, à revérifier).
 - [ ] Supabase : activer « leaked password protection » (tableau de bord, action de votre part) ; **sur accord explicite**, appliquer `002_hd_arena.sql` ; vérifier les quotas Realtime.
-- [ ] Sauvegarde : test de migration d'un profil 0.15.x → 1.0.0 et du conflit appareil/compte.
-- [ ] Tournois : confirmer le repli hors ligne après 15 s.
+- [~] Sauvegarde : migration 0.15.0 → 1.0.0 couverte (`MetaMigrationTests`, idempotente, remboursement unique) et conflit appareil/compte (`AccountLinkSafetyTests`). Reste : un profil 0.15.x réel (archive utilisateur) et le test sur appareil.
+- [x] Tournois : repli hors ligne après 15 s confirmé par test (`TournamentArenaTests.Sans_adversaire_apres_15_secondes_le_duel_passe_hors_ligne`, vert le 2026-11-12).
 - [x] Réactiver les 4 tests EditMode « à traiter » de la baseline (fait le 2026-11-12 : `TestApp.ConnectedAccountLink()` fournit un compte connecté de test ; le test de fiche boutique ouvre la vraie boutique) (détail : `docs/test-reports/2026-11-12_tests-non-executes.md`), sans les affaiblir :
   - `FriendAddTests.AddFriend_WithAValidTag_AddsAndToasts` et `FriendAddTests.AddFriend_InvalidOrDuplicate_ShowsTheErrorToast` : réécrire avec un compte de test (faux port `IFriendsPort`/session connectée), au lieu d'un compte réel.
   - `ProfilePagePresenterTests.Header_CopyTag_Toasts` : même approche, tag issu du compte de test.
