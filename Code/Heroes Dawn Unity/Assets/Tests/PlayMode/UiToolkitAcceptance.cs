@@ -29,9 +29,21 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 foreach (var b in d.rootVisualElement.Query<UnityEngine.UIElements.Button>().ToList())
                     if (b.resolvedStyle.display != DisplayStyle.None && b.resolvedStyle.visibility == Visibility.Visible && b.worldBound.width > 1 && b.worldBound.height > 1
                         && b.enabledInHierarchy && b.pickingMode == PickingMode.Position && IsShown(b))
-                        list.Add(b);
+                        if (!list.Contains(b)) list.Add(b); // les documents d un même panneau sont imbriqués : un bouton peut être vu deux fois
             return list;
         }
+
+        /// <summary>Éléments focalisables visibles (boutons, rangées, champs) : étapes possibles d'un parcours à la manette.</summary>
+        internal static List<VisualElement> VisibleFocusables()
+        {
+            var list = new List<VisualElement>();
+            foreach (var d in UnityEngine.Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None).Where(d => d.isActiveAndEnabled && d.rootVisualElement != null))
+                foreach (var e in d.rootVisualElement.Query<VisualElement>().ToList())
+                    if (e.focusable && e.canGrabFocus && e.worldBound.width > 1 && e.worldBound.height > 1 && IsShown(e) && !list.Contains(e)) list.Add(e);
+            return list;
+        }
+
+        static string Path2(VisualElement e) { var s = ""; for (var p = e; p != null && s.Length < 160; p = p.parent) s += (string.IsNullOrEmpty(p.name) ? p.GetType().Name : p.name) + "<"; return s; }
 
         static string Label(VisualElement b) => string.IsNullOrEmpty(b.name) ? (b is UnityEngine.UIElements.Button bt ? bt.text : b.GetType().Name) : b.name;
 
@@ -79,7 +91,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var target = all.Where(scope).ToList();
             Assert.That(target.Count, Is.GreaterThanOrEqualTo(minButtons), screen + " : boutons exposés");
             var edges = new Dictionary<VisualElement, HashSet<VisualElement>>();
-            foreach (var b in all)
+            foreach (var b in VisibleFocusables())
             {
                 edges[b] = new HashSet<VisualElement>();
                 foreach (var dir in new[] { NavigationMoveEvent.Direction.Down, NavigationMoveEvent.Direction.Up, NavigationMoveEvent.Direction.Left, NavigationMoveEvent.Direction.Right, NavigationMoveEvent.Direction.Next, NavigationMoveEvent.Direction.Previous })
@@ -100,7 +112,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 if (!edges.TryGetValue(cur, out var next)) continue;
                 foreach (var n in next) if (reached.Add(n)) queue.Enqueue(n);
             }
-            var unreachable = target.Where(b => !reached.Contains(b)).Select(Label).ToList();
+            var unreachable = target.Where(b => !reached.Contains(b)).Select(b => Label(b) + " #" + b.GetHashCode() + " " + b.worldBound + " chemin " + Path2(b)).ToList();
             Assert.That(unreachable, Is.Empty, $"{screen} : boutons inaccessibles à la manette : {string.Join(", ", unreachable)} (sur {target.Count})");
         }
     }
