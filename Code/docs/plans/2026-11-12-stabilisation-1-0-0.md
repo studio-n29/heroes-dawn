@@ -54,7 +54,7 @@
 
 - [x] Confirmer H1/H2/H3 (validées le 2026-11-12 : H1 et H2 modifiées, voir le tableau des hypothèses).
 - [~] Trancher **UI Toolkit** : faire l'étape 0 de mesures (60 fps sur Android milieu de gamme, mémoire, polices Barlow SDF, cohabitation avec les Canvas uGUI). **Go** → phase 2A ; **no-go** → repli uGUI, phase 2B.
-  - Mesures faites (polices, mémoire, cohabitation : conformes) : `docs/test-reports/2026-11-12_uitk-etape0.md`. **Reste le 60 fps Android** (APK de mesure prêt, procédure dans le rapport). Recommandation : go 2A conditionnel ; décision utilisateur en attente.
+  - Mesures faites (polices, mémoire, cohabitation : conformes) : `docs/test-reports/2026-11-12_uitk-etape0.md`. **Reste le 60 fps Android** (APK de mesure prêt, procédure dans le rapport). **Go 2A validé le 2026-11-12**, conditionnel à la mesure Android.
 - [x] Réconcilier `Roadmap.md` et le plan EA (une seule source de dates).
 - [x] Auditer `WipCatalog.cs` : pour chaque fonction (pass, boutique, opérations, labo, archives, missions du jour, objectifs, gemmes, illustrations de membres, 5 pages de réglages), classer **retirer l'entrée** / **à finir** / **masquer**. Le labo a été supprimé au Bloc B : retirer son entrée.
   - Validé le 2026-11-12 : 11 entrées retirées (pass, shop, operations, lab, archives, daily_missions, gems, member_art, settings_audio, settings_graphics, settings_accessibility). Restent à trancher en phase 3 : `secondary_objectives`, `settings_notifications` (aucun consommateur ; ligne « labo » obsolète), `settings_controls` (lecture seule). Mécanisme WIP (page, relais, toast) à supprimer quand le catalogue sera vide.
