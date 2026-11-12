@@ -11,7 +11,6 @@ using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Hub;
 using N29.HeroesDawn.Presentation.Mvp;
-using N29.HeroesDawn.Presentation.Wip;
 using N29.HeroesDawn.Tests.Domain.Application;
 using N29.HeroesDawn.Tests.Presentation.Fakes;
 using NUnit.Framework;
@@ -55,13 +54,13 @@ namespace N29.HeroesDawn.Tests.Presentation
         }
 
         void Open(int category) { _view.SelectCategory(category); }
-        const int Audio = 0, Graphics = 1, Accessibility = 2, Notifications = 4, Account = 6, Support = 7;
+        const int Audio = 0, Graphics = 1, Accessibility = 2, Account = 5, Support = 6;
 
-        [Test, Description("Vérifie que les huit catégories existent, que l'Audio est ouverte d'emblée et que plus aucune n'est marquée BIENTÔT — parce que tous les réglages fonctionnent dans cette version")]
-        public void EightCategories_AudioFirst()
+        [Test, Description("Vérifie que les sept catégories existent, que l'Audio est ouverte d'emblée et que plus aucune n'est marquée BIENTÔT — parce que tous les réglages fonctionnent dans cette version")]
+        public void SevenCategories_AudioFirst()
         {
             Make();
-            Assert.That(_view.Last.Categories.Length, Is.EqualTo(8));
+            Assert.That(_view.Last.Categories.Length, Is.EqualTo(7));
             Assert.That(_view.Last.Active, Is.EqualTo(Audio));
             Assert.That(_view.Last.CategoryTitle, Is.EqualTo(_loc.T("settings.cat.Audio")));
             Assert.That(_view.Last.Rows.Length, Is.EqualTo(5));
@@ -172,13 +171,13 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_nav.Current.Page, Is.EqualTo(HubPage.Qg));
         }
 
-        [Test, Description("Vérifie que les notifications sont enregistrées même sans rappels hors du jeu — parce que les choix doivent survivre jusqu'à la version en ligne")]
-        public void Notifications_AreStored()
+        [Test, Description("Vérifie que les réglages ne proposent aucune catégorie Notifications — parce qu'aucune notification locale n'existe en 1.0 et qu'un interrupteur sans effet serait trompeur (décision du 2026-11-12)")]
+        public void Notifications_CategoryIsNotListed()
         {
             Make();
-            Open(Notifications);
-            _view.Act(_view.RowOf(_loc.T("settings.notif.shop")));
-            Assert.That(_app.Settings.Current.notifShop, Is.False);
+            Open(Audio);
+            Assert.That(_view.Last.Categories, Has.Length.EqualTo(7));
+            Assert.That(_view.Last.Categories, Does.Not.Contain(_loc.T("settings.cat.Notifications")));
         }
     }
 }

@@ -13,10 +13,10 @@ using VContainer;
 
 namespace N29.HeroesDawn.Tests.PlayMode
 {
-    /// <summary>Critères de sortie de la phase 2A pour les réglages (8 catégories, jeu démarré) : quatre formats, cibles de manette, chemin de focus.</summary>
+    /// <summary>Critères de sortie de la phase 2A pour les réglages (7 catégories, jeu démarré) : quatre formats, cibles de manette, chemin de focus.</summary>
     public sealed class SettingsScreenUiToolkitTests
     {
-        const int Categories = 8;
+        const int Categories = 7;
         static string Folder => Path.GetFullPath(Path.Combine(ScreenCaptureTests.Folder, "../uitk-settings"));
 
         [UnityTearDown]
@@ -42,7 +42,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         static System.Func<UnityEngine.UIElements.Button, bool> InPage()
             => b => b.panel != null && Object.FindAnyObjectByType<SettingsPageView>() is SettingsPageView v && v.GetComponent<UIDocument>().rootVisualElement.Contains(b);
 
-        [UnityTest, Timeout(600000), Description("Vérifie que chacune des 8 catégories de réglages garde ses boutons dans le panneau et à taille de manette sur 16:9, 20:9, 4:3 et 1280×720 — parce que la catégorie Compte est la plus haute et déborde en premier sur les formats courts")]
+        [UnityTest, Timeout(600000), Description("Vérifie que chacune des 7 catégories de réglages garde ses boutons dans le panneau et à taille de manette sur 16:9, 20:9, 4:3 et 1280×720 — parce que la catégorie Compte est la plus haute et déborde en premier sur les formats courts")]
         public IEnumerator Settings_EveryCategory_StaysInsideAndTappable_OnTheFourFormats()
         {
             yield return OpenSettings();
@@ -53,7 +53,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             }
         }
 
-        [UnityTest, Timeout(600000), Description("Vérifie que dans chacune des 8 catégories de réglages tous les boutons sont atteignables à la manette — parce que les curseurs et interrupteurs doivent se régler à la croix directionnelle")]
+        [UnityTest, Timeout(600000), Description("Vérifie que dans chacune des 7 catégories de réglages tous les boutons sont atteignables à la manette — parce que les curseurs et interrupteurs doivent se régler à la croix directionnelle")]
         public IEnumerator Settings_EveryCategory_GamepadReachesEveryButton()
         {
             yield return OpenSettings();

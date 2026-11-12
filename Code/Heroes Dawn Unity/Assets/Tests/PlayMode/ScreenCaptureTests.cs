@@ -166,7 +166,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Shell.SettingsButton.Button.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<SettingsPageView>());
             var settings = Object.FindAnyObjectByType<SettingsPageView>()!;
-            var names = new[] { "80-parametres-audio", "81-parametres-graphismes", "82-parametres-accessibilite", "83-parametres-langue", "84-parametres-notifications", "86-parametres-controles", "87-parametres-compte", "85-parametres-support" };
+            var names = new[] { "80-parametres-audio", "81-parametres-graphismes", "82-parametres-accessibilite", "83-parametres-langue", "86-parametres-controles", "87-parametres-compte", "85-parametres-support" };
             for (int i = 0; i < names.Length; i++)
             {
                 settings.CategoryButton(i).onClick.Invoke();
@@ -255,7 +255,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return CaptureSettled("80-parametres-audio");
             Object.FindAnyObjectByType<SettingsPageView>()!.CategoryButton(2).onClick.Invoke();
             yield return CaptureSettled("82-parametres-accessibilite");
-            Object.FindAnyObjectByType<SettingsPageView>()!.CategoryButton(7).onClick.Invoke();
+            Object.FindAnyObjectByType<SettingsPageView>()!.CategoryButton(6).onClick.Invoke();
             yield return CaptureSettled("85-parametres-support");
             Assert.That(File.Exists(Path.Combine(Folder, "85-parametres-support.png")));
         }

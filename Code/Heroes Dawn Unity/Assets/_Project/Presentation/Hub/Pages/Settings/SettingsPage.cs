@@ -52,14 +52,14 @@ namespace N29.HeroesDawn.Presentation.Hub
 
     /// <summary>
     /// Paramètres (M80-M85) : huit catégories à gauche, réglages à droite, appliqués immédiatement.
-    /// Audio, Graphismes, Accessibilité, Langue, Notifications, Contrôles, Compte & confidentialité, Support & aide.
+    /// Audio, Graphismes, Accessibilité, Langue, Contrôles, Compte & confidentialité, Support & aide (pas de Notifications : aucune notification locale en 1.0, décision du 2026-11-12).
     /// </summary>
     public sealed class SettingsPagePresenter : PresenterBase<ISettingsPageView>, IPageTitle
     {
         static readonly SettingsCategory[] Categories =
         {
             SettingsCategory.Audio, SettingsCategory.Graphics, SettingsCategory.Accessibility, SettingsCategory.Language,
-            SettingsCategory.Notifications, SettingsCategory.Controls, SettingsCategory.Account, SettingsCategory.Support,
+            SettingsCategory.Controls, SettingsCategory.Account, SettingsCategory.Support,
         };
 
         readonly ISessionReadModel _session;
@@ -200,17 +200,6 @@ namespace N29.HeroesDawn.Presentation.Hub
                         _ => _settings.Update(x => x.language = x.language == "en" ? "fr" : "en"));
                     Add(SettingRowData.Info(_loc.T("settings.lang.voice"), _loc.T("wip.soon")));
                     Add(SettingRowData.Info(_loc.T("settings.lang.more"), _loc.T("wip.soon")));
-                    break;
-                case SettingsCategory.Notifications:
-                    Toggle("settings.notif.all", () => s.notifications, v => s.notifications = v, "settings.notif.hint");
-                    Toggle("settings.notif.training", () => s.notifTraining, v => s.notifTraining = v);
-                    Toggle("settings.notif.expedition", () => s.notifExpedition, v => s.notifExpedition = v);
-                    Toggle("settings.notif.lab", () => s.notifLab, v => s.notifLab = v);
-                    Toggle("settings.notif.recovered", () => s.notifRecovered, v => s.notifRecovered = v);
-                    Toggle("settings.notif.shop", () => s.notifShop, v => s.notifShop = v);
-                    Toggle("settings.notif.objectives", () => s.notifObjectives, v => s.notifObjectives = v);
-                    Toggle("settings.notif.season", () => s.notifSeason, v => s.notifSeason = v);
-                    Toggle("settings.notif.quiet", () => s.quietHours, v => s.quietHours = v);
                     break;
                 case SettingsCategory.Controls:
                     Toggle("settings.show_keys", () => s.showKeys, v => s.showKeys = v);
