@@ -36,11 +36,11 @@ namespace N29.HeroesDawn.Tests.Presentation
             _nav = new HubNavigator();
         }
 
-        ProfilePagePresenter Profile()
+        ProfilePagePresenter Profile(bool connected = false)
         {
             var p = new ProfilePagePresenter(_view, _app.Profile, _app.Friends, _nav, _app.Session, _loc, _toasts, _app.Subscriber<MetaChanged>(),
                                              _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time,
-                                             new ModalService(new FakeModalHost()));
+                                             new ModalService(new FakeModalHost()), connected ? _app.ConnectedAccountLink() : null);
             _view.Show();
             ((VContainer.Unity.IStartable)p).Start();
             return p;
@@ -115,11 +115,10 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que le bouton Copier mon tag confirme par un message — parce que la copie dans le presse-papiers ne se voit pas")]
+        [Test, Description("Vérifie que, une fois le compte connecté, le bouton Copier mon tag confirme par un message — parce que la copie dans le presse-papiers ne se voit pas")]
         public void Header_CopyTag_Toasts()
         {
-            Assert.Ignore("Hors ligne : la copie du tag exige un compte connecté. À réécrire avec un compte de test.");
-            var p = Profile();
+            var p = Profile(connected: true);
             _view.ClickHeader(0);
             Assert.That(_toasts.Shown, Has.Some.Matches<(string Text, ToastKind Kind)>(t => t.Text == _loc.T("profile.copied")));
             p.Dispose();

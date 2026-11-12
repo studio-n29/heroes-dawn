@@ -228,6 +228,25 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         /// <summary>Pose un compte sans passer par l'authentification.</summary>
         public void SignInDirect(string playerId) => Session.Account = new PlayerAccount(playerId, "Invité-TEST");
 
+        /// <summary>
+        /// Un lien de compte en état Connecté (compte local simulé et cloud en mémoire) : pour les écrans qui n'offrent le tag, l'ajout d'ami
+        /// et la copie qu'à un joueur connecté.
+        /// </summary>
+        public N29.HeroesDawn.Application.Features.Account.AccountLink ConnectedAccountLink()
+        {
+            var clock = new FixedClock();
+            var cloud = new N29.HeroesDawn.Infrastructure.Simulated.FakeCloudProfileGateway();
+            var state = new N29.HeroesDawn.Infrastructure.Simulated.MemorySyncStateStore();
+            var backups = new N29.HeroesDawn.Infrastructure.Simulated.MemoryProgressBackupStore();
+            var sync = new N29.HeroesDawn.Application.Features.Account.CloudSync(cloud, state, Session, clock, Logger, (t, ct) => { clock.Advance(t); return UniTask.CompletedTask; }, Save);
+            var link = new N29.HeroesDawn.Application.Features.Account.AccountLink(new N29.HeroesDawn.Infrastructure.Simulated.LocalAccountGateway(0), cloud, Session, Save,
+                sync, state, backups, clock, Logger, Publisher<WalletChanged>(), Publisher<RosterChanged>());
+            link.SignUpAsync("moi@exemple.fr", "motdepasse1", "Testeur", CancellationToken.None).GetAwaiter().GetResult();
+            if (link.State != N29.HeroesDawn.Application.Features.Account.AccountState.Connected)
+                throw new InvalidOperationException("le compte de test n'est pas connecté");
+            return link;
+        }
+
         public sealed class ZoneUseCases
         {
             public readonly IStartZoneUseCase Start;

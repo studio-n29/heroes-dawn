@@ -60,8 +60,9 @@ namespace N29.HeroesDawn.Tests.Presentation
         [Test, Description("Vérifie que la fiche d'un héros de la boutique ne propose pas d'équipement — parce qu'on n'équipe que son effectif")]
         public void Loadout_HiddenOnAShopHeroSheet()
         {
-            var offer = _app.Session.Shop.Offers.Count > 0 ? _app.Session.Shop.Offers[0].Id.Value : null;
-            if (offer == null) { Assert.Ignore("pas d'offre de boutique dans ce test"); }
+            _app.Shop.Open.ExecuteAsync().GetAwaiter().GetResult();
+            Assert.That(_app.Session.Shop.Offers, Is.Not.Empty, "la boutique propose au moins un héros");
+            var offer = _app.Session.Shop.Offers[0].Id.Value;
             Make(offer!, fromShop: true);
             Assert.That(_view.Last.ShowLoadout, Is.False);
         }

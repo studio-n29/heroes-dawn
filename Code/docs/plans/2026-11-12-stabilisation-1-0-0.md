@@ -81,7 +81,7 @@
 - [ ] Supabase : activer « leaked password protection » (tableau de bord, action de votre part) ; **sur accord explicite**, appliquer `002_hd_arena.sql` ; vérifier les quotas Realtime.
 - [ ] Sauvegarde : test de migration d'un profil 0.15.x → 1.0.0 et du conflit appareil/compte.
 - [ ] Tournois : confirmer le repli hors ligne après 15 s.
-- [ ] Réactiver les 4 tests EditMode « à traiter » de la baseline (détail : `docs/test-reports/2026-11-12_tests-non-executes.md`), sans les affaiblir :
+- [x] Réactiver les 4 tests EditMode « à traiter » de la baseline (fait le 2026-11-12 : `TestApp.ConnectedAccountLink()` fournit un compte connecté de test ; le test de fiche boutique ouvre la vraie boutique) (détail : `docs/test-reports/2026-11-12_tests-non-executes.md`), sans les affaiblir :
   - `FriendAddTests.AddFriend_WithAValidTag_AddsAndToasts` et `FriendAddTests.AddFriend_InvalidOrDuplicate_ShowsTheErrorToast` : réécrire avec un compte de test (faux port `IFriendsPort`/session connectée), au lieu d'un compte réel.
   - `ProfilePagePresenterTests.Header_CopyTag_Toasts` : même approche, tag issu du compte de test.
   - `MemberSheetPresenterTests.Loadout_HiddenOnAShopHeroSheet` : lui donner une offre de boutique réelle en entrée, puis vérifier que l'équipement est masqué.
