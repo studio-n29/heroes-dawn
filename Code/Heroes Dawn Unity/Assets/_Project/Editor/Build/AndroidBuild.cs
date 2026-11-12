@@ -28,7 +28,8 @@ namespace N29.HeroesDawn.EditorTools.Build
             if (i < 0 || i + 1 >= args.Length) throw new ArgumentException("-apkPath <fichier.apk> manquant");
             int v = Array.IndexOf(args, "-appVersion");
             if (v >= 0 && v + 1 < args.Length) ApplyVersion(args[v + 1]);
-            var result = Build(args[i + 1]);
+            // -development : build de mesure (sonde PerfProbe active, profileur connectable), jamais pour la diffusion.
+            var result = Build(args[i + 1], development: Array.IndexOf(args, "-development") >= 0);
             if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(result == BuildResult.Succeeded ? 0 : 1);
         }
 
@@ -79,7 +80,7 @@ namespace N29.HeroesDawn.EditorTools.Build
             if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(report.summary.result == BuildResult.Succeeded ? 0 : 1);
         }
 
-        public static BuildResult Build(string apkPath, bool bundle = false)
+        public static BuildResult Build(string apkPath, bool bundle = false, bool development = false)
         {
             GameBranding.Apply();
             if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
@@ -91,7 +92,7 @@ namespace N29.HeroesDawn.EditorTools.Build
                 scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray(),
                 locationPathName = apkPath,
                 target = BuildTarget.Android,
-                options = BuildOptions.None,
+                options = development ? BuildOptions.Development :BuildOptions.None,
             };
             var report = BuildPipeline.BuildPlayer(options);
             Debug.Log($"[Heroes Dawn] {(bundle ? "AAB" : "APK")} : {report.summary.result}, {report.summary.totalSize / (1024 * 1024)} Mo, {report.summary.totalErrors} erreur(s) → {apkPath}");
