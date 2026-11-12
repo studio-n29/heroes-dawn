@@ -14,9 +14,9 @@
 
 | # | Hypothèse | Si faux |
 |---|---|---|
-| H1 | « Stable » = **1.0.0-rc puis 1.0.x** : Brooklyn complet, Agent D jouable, Windows + Android. Paris, Moscou, Salem et Agent M sont **hors périmètre**. | Ajouter une phase contenu (zones à créer), +4 à 8 semaines. |
-| H2 | L'Early Access du **14/11** n'est pas tenable (2 jours). Cible réaliste : **rc le ~10/12, stable le 14/12** (date de sortie du plan EA). | Décaler ; la roadmap d'origine vise l'EA en juillet 2027. |
-| H3 | Il n'y a pas d'iOS, de Switch ni d'achats réels côté stores à cette version : l'IAP reste branché mais testé en bac à sable. | Phase légale et stores à ajouter. |
+| H1 | **Validée le 2026-11-12, modifiée.** « Stable » = **1.0.0-rc puis 1.0.x** : Brooklyn complet, **Agent D et Agent M jouables (2 à 4 zones de Moscou à créer)**, Windows + Android. Paris et Salem sont **hors périmètre**. (Proposition initiale : Agent M hors périmètre.) | n/a ; ajoute le contenu de Moscou à la phase 5 (2 à 3 semaines). |
+| H2 | **Validée le 2026-11-12, décalée.** L'Early Access du **14/11** est abandonné. **rc1 vers le 22/01/2027, stable le 29/01/2027.** (Proposition initiale : rc ~10/12, stable 14/12, devenue intenable avec Moscou.) | n/a ; source unique des dates : `05_Production/Roadmap.md`. |
+| H3 | **Validée le 2026-11-12.** Il n'y a pas d'iOS, de Switch ni d'achats réels côté stores à cette version : l'IAP reste branché mais testé en bac à sable. | Phase légale et stores à ajouter. |
 
 ## Contraintes globales
 
@@ -52,10 +52,12 @@
 
 **Sortie :** trois décisions inscrites dans `Decisions.md`, roadmap alignée.
 
-- [ ] Confirmer H1/H2/H3 (définition de « stable », date, plateformes).
-- [ ] Trancher **UI Toolkit** : faire l'étape 0 de mesures (60 fps sur Android milieu de gamme, mémoire, polices Barlow SDF, cohabitation avec les Canvas uGUI). **Go** → phase 2A ; **no-go** → repli uGUI, phase 2B.
-- [ ] Réconcilier `Roadmap.md` et le plan EA (une seule source de dates).
-- [ ] Auditer `WipCatalog.cs` : pour chaque fonction (pass, boutique, opérations, labo, archives, missions du jour, objectifs, gemmes, illustrations de membres, 5 pages de réglages), classer **retirer l'entrée** / **à finir** / **masquer**. Le labo a été supprimé au Bloc B : retirer son entrée.
+- [x] Confirmer H1/H2/H3 (validées le 2026-11-12 : H1 et H2 modifiées, voir le tableau des hypothèses).
+- [~] Trancher **UI Toolkit** : faire l'étape 0 de mesures (60 fps sur Android milieu de gamme, mémoire, polices Barlow SDF, cohabitation avec les Canvas uGUI). **Go** → phase 2A ; **no-go** → repli uGUI, phase 2B.
+  - Mesures faites (polices, mémoire, cohabitation : conformes) : `docs/test-reports/2026-11-12_uitk-etape0.md`. **Reste le 60 fps Android** (APK de mesure prêt, procédure dans le rapport). Recommandation : go 2A conditionnel ; décision utilisateur en attente.
+- [x] Réconcilier `Roadmap.md` et le plan EA (une seule source de dates).
+- [x] Auditer `WipCatalog.cs` : pour chaque fonction (pass, boutique, opérations, labo, archives, missions du jour, objectifs, gemmes, illustrations de membres, 5 pages de réglages), classer **retirer l'entrée** / **à finir** / **masquer**. Le labo a été supprimé au Bloc B : retirer son entrée.
+  - Validé le 2026-11-12 : 11 entrées retirées (pass, shop, operations, lab, archives, daily_missions, gems, member_art, settings_audio, settings_graphics, settings_accessibility). Restent à trancher en phase 3 : `secondary_objectives`, `settings_notifications` (aucun consommateur ; ligne « labo » obsolète), `settings_controls` (lecture seule). Mécanisme WIP (page, relais, toast) à supprimer quand le catalogue sera vide.
 
 ## Phase 2 — Interface (A : UI Toolkit, ou B : repli uGUI) (1-2 semaines)
 
@@ -79,6 +81,11 @@
 - [ ] Supabase : activer « leaked password protection » (tableau de bord, action de votre part) ; **sur accord explicite**, appliquer `002_hd_arena.sql` ; vérifier les quotas Realtime.
 - [ ] Sauvegarde : test de migration d'un profil 0.15.x → 1.0.0 et du conflit appareil/compte.
 - [ ] Tournois : confirmer le repli hors ligne après 15 s.
+- [ ] Réactiver les 4 tests EditMode « à traiter » de la baseline (détail : `docs/test-reports/2026-11-12_tests-non-executes.md`), sans les affaiblir :
+  - `FriendAddTests.AddFriend_WithAValidTag_AddsAndToasts` et `FriendAddTests.AddFriend_InvalidOrDuplicate_ShowsTheErrorToast` : réécrire avec un compte de test (faux port `IFriendsPort`/session connectée), au lieu d'un compte réel.
+  - `ProfilePagePresenterTests.Header_CopyTag_Toasts` : même approche, tag issu du compte de test.
+  - `MemberSheetPresenterTests.Loadout_HiddenOnAShopHeroSheet` : lui donner une offre de boutique réelle en entrée, puis vérifier que l'équipement est masqué.
+  - Sortie : les 4 passent, retrait de leur `[Ignore]`, baseline relancée sans nouvel échec.
 
 ## Phase 4 — Équilibrage et playtest (1 semaine)
 
@@ -128,11 +135,14 @@
 
 | Période | Phase |
 |---|---|
-| 12-14 nov. | 0 et 1 |
-| 15 nov. – 1er déc. | 2 (A ou B), 3 et 5 en parallèle |
-| 25 nov. – 5 déc. | 4 |
-| 5-10 déc. | 6, **rc1 vers le 10/12** |
-| 10-14 déc. | correctifs bloquants, **stable le 14/12** |
+| 12-20 nov. | 0 et 1 |
+| 23 nov. – 18 déc. | 2 (A ou B) et 3 en parallèle |
+| 23 nov. 2026 – 8 janv. 2027 | 5 (contenu : textes Brooklyn, 2 à 4 zones de Moscou) en parallèle |
+| 14 déc. – 8 janv. | 4 (équilibrage et playtest, après stabilisation de l'interface) |
+| 11-22 janv. | 6, **rc1 vers le 22/01/2027** |
+| 22-29 janv. | correctifs bloquants, **stable le 29/01/2027** |
+
+*Mise à jour du 2026-11-12 (H1 et H2 validées) : ancien calendrier, abandonné : 12-14 nov. phases 0 et 1 ; 15 nov. – 1er déc. phases 2, 3 et 5 ; 25 nov. – 5 déc. phase 4 ; rc1 vers le 10/12 ; stable le 14/12. Seules rc1 et stable sont des décisions ; les dates intermédiaires sont des propositions.*
 
 ## Risques propres à ce plan
 

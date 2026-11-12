@@ -5,6 +5,8 @@
 > Répartition : **Moi (Claude)** = code, outils, infrastructure, tests, builds. **Vous** = écriture, assets finaux, comptes et textes légaux (actions que je ne peux ou ne dois pas faire à votre place). Le plan d'illustration est dans `03_Art_UI_UX/04_Pipeline_Illustrations_IA.md`.
 
 
+> **Mise à jour du 2026-11-12 : les dates de ce plan ne font plus foi.** L'Early Access du **14/11/2026** est **abandonné** (Steamworks, analytics et compte Play non prêts) et la sortie du **14/12/2026** est **remplacée** par la 1.0.0 stable : **rc1 vers le 22/01/2027, stable le 29/01/2027** (Agent D et Agent M jouables, Windows + Android). Source unique des dates : `05_Production/Roadmap.md` (section du 2026-11-12) et `2026-11-12-stabilisation-1-0-0.md`. Les chantiers WS-A à WS-H restent la référence de contenu ; le texte ci-dessous est conservé pour l'historique, sans le réécrire.
+
 ## 0. Mise à jour du 2026-10-23 : ce qui a changé depuis le 14 octobre
 
 **Nouveau canon (2026-10-22).** L'organisation du joueur est **The Dawn** ; le joueur choisit **Agent D** (New York) ou **Agent M** (Moscou) ; 30 agents numérotés + 10 cryptides de Salem ; 4 actes (New York, Paris, Moscou, Salem) ; cinématique de lancement de 46 plans. Documents : `02_Lore_Narration/` ; décisions : `05_Production/Decisions.md`.
