@@ -73,7 +73,9 @@ namespace N29.HeroesDawn.Application.Ports
         public bool notifTraining = true, notifExpedition = true, notifLab = true, notifRecovered = true, notifShop = true, notifObjectives = true, notifSeason = true;
         public bool quietHours = true;
         public bool showKeys = true;
-        public bool consentStats = true;
+        /// <summary>Consentement à la mesure d'usage (opt-in : faux par défaut). Sans réponse explicite (<see cref="consentAnswered"/>), rien n'est mesuré.</summary>
+        public bool consentStats;
+        public bool consentAnswered;
     }
 
     [Serializable]

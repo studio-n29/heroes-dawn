@@ -186,6 +186,19 @@ namespace N29.HeroesDawn.Composition
             builder.Register<OnboardingGuide>(Lifetime.Singleton);
             builder.Register<OnboardingFlow>(Lifetime.Singleton).As<IOnboardingFlow>();
             builder.Register<MetaTracker>(Lifetime.Singleton);
+            // Mesure d'usage (UGS Analytics) : opt-in, muette sans consentement ; éditeur et tests sans service.
+            builder.Register<N29.HeroesDawn.Application.Ports.IAnalytics>(c =>
+            {
+                var settings = c.Resolve<PlayerSettings>();
+#if UNITY_EDITOR
+                N29.HeroesDawn.Application.Ports.IAnalytics inner = new N29.HeroesDawn.Application.Features.Analytics.NullAnalytics();
+#else
+                N29.HeroesDawn.Application.Ports.IAnalytics inner = new N29.HeroesDawn.Infrastructure.Analytics.UgsAnalytics(
+                    c.Resolve<N29.HeroesDawn.Application.Ports.ILogger>(), UnityEngine.Application.version, UnityEngine.Application.platform.ToString());
+#endif
+                return new N29.HeroesDawn.Application.Features.Analytics.ConsentGatedAnalytics(inner, () => settings.Current.consentAnswered && settings.Current.consentStats);
+            }, Lifetime.Singleton);
+            builder.Register<N29.HeroesDawn.Application.Features.Analytics.AnalyticsBridge>(Lifetime.Singleton);
 
             // ---- Use cases : combat
             builder.Register<ActiveCombat>(Lifetime.Singleton).AsSelf().As<IActiveCombatReadModel>();
@@ -230,6 +243,7 @@ namespace N29.HeroesDawn.Composition
             builder.RegisterBuildCallback(c =>
             {
                 c.Resolve<MetaTracker>().Start();
+                c.Resolve<N29.HeroesDawn.Application.Features.Analytics.AnalyticsBridge>().Start();
                 Ui = c.Resolve<UiRoot>();
                 Ui.EnsureLayers(screens);
                 UiSoundRelay.Attach(Ui.gameObject, c.Resolve<IAudioService>()); // boutons de Boot : connexion, modales

@@ -232,7 +232,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var a = _session.Account;
             Add(SettingRowData.Info(_loc.T("settings.account.player"), a != null ? _loc.F("settings.player", a.DisplayName, a.PlayerId) : "—"));
             Add(SettingRowData.Info(_loc.T("settings.account.linked"), _loc.T("settings.account.guest"), _loc.T("settings.account.link_hint")));
-            Toggle("settings.consent", () => s.consentStats, v => s.consentStats = v);
+            Toggle("settings.consent", () => s.consentStats, v => { s.consentStats = v; s.consentAnswered = true; });
             Add(new SettingRowData { Label = _loc.T("settings.export"), Kind = SettingKind.Button, Value = _loc.T("settings.export.btn"), Hint = _loc.T("settings.export.hint") },
                 _ => _toasts.Show(_loc.T("settings.export.done"), ToastKind.Info));
             Add(new SettingRowData { Label = _loc.T("settings.logout"), Kind = SettingKind.Button, Value = _loc.T("settings.logout") }, _ => Logout());
