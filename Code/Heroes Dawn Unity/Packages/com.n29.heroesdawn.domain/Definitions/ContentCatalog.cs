@@ -56,6 +56,10 @@ namespace N29.HeroesDawn.Definitions
             return new ContentCatalog(Balance, Members, Enemies, Synergies, merged, Activities, Collection, StarterTeam);
         }
 
+
+        /// <summary>Même contenu avec ces ennemis (même identifiant : remplacés). Sert aux simulations de réglage, jamais au jeu.</summary>
+        public ContentCatalog WithEnemies(IReadOnlyList<EnemyDef> enemies)
+            => new ContentCatalog(Balance, Members, enemies, Synergies, Zones, Activities, Collection, StarterTeam);
         /// <summary>Meme contenu avec ces objets, cartes et boosters.</summary>
         public ContentCatalog WithCollection(CollectionDef collection)
             => new ContentCatalog(Balance, Members, Enemies, Synergies, Zones, Activities, collection, StarterTeam);
