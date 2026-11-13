@@ -46,7 +46,7 @@
   - Tests non exécutés classés : `docs/test-reports/2026-11-12_tests-non-executes.md` (24 légitimes, 5 conditionnels, 4 à traiter).
 - [ ] Corriger le timeout intermittent de `FullRunTests` (cause racine, pas de relance automatique).
 - [ ] Nettoyer le reste des obsolètes validés par vous (anciens APK, `_deploy/`, `Builds/0.15.3`, anciens rapports non référencés).
-- [ ] Étiqueter `v1.0.0-wip` sur le commit propre.
+- [x] Étiqueter `v1.0.0-wip` sur le commit propre (étiquette locale présente, vérifiée le 2026-11-13 ; rien n'est poussé).
 
 ## Phase 1 — Figer le périmètre (1-2 jours)
 
@@ -64,13 +64,13 @@
 **Sortie :** aucun écran critique cassé ; un seul système d'UI par écran ; captures des 4 formats archivées.
 
 - **2A (go) :**
-  - [ ] Base commune : jetons, composants, navigation manette, `PlatformProfile`.
-  - [ ] Migrer dans l'ordre du parcours joueur (**titre : fait et validé le 2026-11-12**, déjà en UI Toolkit depuis le lot 1a ; tests `TitleScreenUiToolkitTests` : 4 formats, manette, logotype ; connexion (fenêtre Compte) : fait le 2026-11-12, `AccountPopupUiToolkitTests` ; hub et QG : fait le 2026-11-12, `HubScreenUiToolkitTests` (4 formats, boutons atteignables à la manette) ; équipe et fiche d'agent : fait le 2026-11-12, `TeamScreenUiToolkitTests` ; carte et chapitres : fait le 2026-11-12, `CityMapScreenUiToolkitTests` ; plateau (HUD) : fait le 2026-11-12, `BoardScreenUiToolkitTests` ; combat (HUD) : fait le 2026-11-12, `CombatScreenUiToolkitTests` (chevauchements en 4:3 corrigés par `HdFit`, réduction de la mise en page 1920×1080 ; reste : cartes de compétence et fiches d'unités non contrôlées individuellement) ; résultats de combat, boutique (Héros, Boosters) et pass : fait le 2026-11-12, `ShopPassResultsUiToolkitTests` (défaut corrigé : en-tête du pass écrasé en 4:3) ; réglages (8 catégories) : fait le 2026-11-12, `SettingsScreenUiToolkitTests` ; `LocIdentityTests` : pas d'« Aube tactique ») : titre → connexion → hub/QG → équipe/fiche → carte/chapitres → plateau → combat → résultats → boutique/pass → réglages.
-  - [ ] Garder en uGUI le plateau, les mini-jeux et les effets (décidé).
-  - [ ] Supprimer le code et les prefabs uGUI d'un écran **seulement** après sa migration validée.
+  - [x] Base commune : jetons, composants, navigation manette, `PlatformProfile` (fait ; `UiLayoutChecker` ajoute le contrôle commun des tests, 2026-11-13).
+  - [x] Migrer dans l'ordre du parcours joueur (**inventaire du 2026-11-13 : plus aucun écran à migrer hors surfaces de jeu**, 16 vues `HdView` et 25 fenêtres `HdPopup` en UI Toolkit, prefabs réduits à des coquilles `UIDocument` ; cartes de compétence et fiches d'unités du combat contrôlées une à une dans `CombatScreenUiToolkitTests` ; ) (**titre : fait et validé le 2026-11-12**, déjà en UI Toolkit depuis le lot 1a ; tests `TitleScreenUiToolkitTests` : 4 formats, manette, logotype ; connexion (fenêtre Compte) : fait le 2026-11-12, `AccountPopupUiToolkitTests` ; hub et QG : fait le 2026-11-12, `HubScreenUiToolkitTests` (4 formats, boutons atteignables à la manette) ; équipe et fiche d'agent : fait le 2026-11-12, `TeamScreenUiToolkitTests` ; carte et chapitres : fait le 2026-11-12, `CityMapScreenUiToolkitTests` ; plateau (HUD) : fait le 2026-11-12, `BoardScreenUiToolkitTests` ; combat (HUD) : fait le 2026-11-12, `CombatScreenUiToolkitTests` (chevauchements en 4:3 corrigés par `HdFit`, réduction de la mise en page 1920×1080 ; reste : cartes de compétence et fiches d'unités non contrôlées individuellement) ; résultats de combat, boutique (Héros, Boosters) et pass : fait le 2026-11-12, `ShopPassResultsUiToolkitTests` (défaut corrigé : en-tête du pass écrasé en 4:3) ; réglages (8 catégories) : fait le 2026-11-12, `SettingsScreenUiToolkitTests` ; `LocIdentityTests` : pas d'« Aube tactique ») : titre → connexion → hub/QG → équipe/fiche → carte/chapitres → plateau → combat → résultats → boutique/pass → réglages.
+  - [x] Garder en uGUI le plateau, les mini-jeux et les effets (décidé ; non touchés).
+  - [x] Supprimer le code et les prefabs uGUI d'un écran **seulement** après sa migration validée (2026-11-13 : les prefabs ne sont plus de la uGUI ; seul `Pulse.cs`, sans aucun consommateur, a été supprimé ; `Ui.cs`, `Tween`, `SafeArea`, `ModalLayer` servent encore le plateau, le combat et la vidéo).
 - **2B (repli) :**
   - [ ] Écrire la navigation manette et la mise en page adaptative une fois dans la couche commune ; geler les 41 fichiers UXML déjà faits.
-- [ ] Dans les deux cas : test de capture sur 16:9, 20:9, 4:3, 1280×720 ; test d'absence de « Aube tactique » dans les textes.
+- [x] Dans les deux cas : test de capture sur 16:9, 20:9, 4:3, 1280×720 ; test d'absence de « Aube tactique » dans les textes (2026-11-13 : `AllWindowsFourFormatsTests` balaie 47 prefabs × 4 formats sans `Explicit` et son contrôleur est prouvé capable d'échouer ; `VisibleTextIdentityTests` couvre UXML, littéraux du code et ressources, en plus de `LocIdentityTests`). **Reste** : la mesure 60 images/s sur Android (vous), qui conditionne le go 2A.
 
 ## Phase 3 — Fonctionnel et services (1 semaine, en parallèle de la phase 2)
 
@@ -106,7 +106,7 @@
 - [ ] **Vous :** relire les textes des 4 fragments et du repaire (français), fournir ou valider l'anglais.
 - [ ] **Vous :** décision sur les voix : fiche de casting ElevenLabs, ou sortie sans voix avec sous-titres (état actuel, acceptable pour une rc).
 - [ ] Portraits d'agents et icônes : au minimum ceux du parcours Brooklyn et de l'équipe de départ (Giulia Rossi, Ilona Varga, Lucas Mendes).
-- [ ] Agent M : afficher « bientôt » proprement (pas de bouton mort), ou le livrer si H1 change.
+- [ ] **Agent M : à livrer (H1)**. Périmètre validé le 2026-11-13 : 4 zones du chapitre Sergueiv, boss le Passeur, ennemis mixtes, mini-jeux réutilisés, 4 fragments, pas de repaire, équipe partagée, fin « à suivre ». Spec `docs/specs/2026-11-13-moscou-agent-m-design.md`, plan `docs/plans/2026-11-13-moscou-agent-m.md` (10 tâches, ≈ 17,5 jours, gel du contenu le 15/01/2027). Rien d'implémenté ; `StoryRoutes.M available` basculé en dernier.
 - [ ] Corriger l'écart connu : consignes d'Ingénierie de secours qui chevauchent le manuel.
 
 ## Phase 6 — QA, légal, release (1 semaine)
