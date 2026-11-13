@@ -149,6 +149,60 @@ namespace N29.HeroesDawn.EditorTools.Balance
             if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(0);
         }
         /// <summary>
+        /// Réglage de Moscou (chapitre Sergueiv) : multiplicateurs d'attaque du Passeur et de l'homme de main, équipe de départ (profils nu, objets, objets forts), niveaux 5 et 10,
+        /// toutes les rencontres des quatre zones de Moscou (les élites et les rencontres normales sont à attaque ×1). N'écrit que le CSV.
+        /// Batchmode : -executeMethod N29.HeroesDawn.EditorTools.Balance.BalanceFullReport.MoscowTuning
+        /// </summary>
+        public static void MoscowTuning() => MoscowTuning(new[] { 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0 }, new[] { 1.0 });
+
+        /// <summary>Grille fine du Passeur (attaque ×1,75 à ×2,75).</summary>
+        public static void MoscowBossTuning() => MoscowTuning(new[] { 1.75, 2.0, 2.25, 2.5, 2.75 }, new[] { 1.0 });
+
+        /// <summary>Grille de l'homme de main (attaque ×1 à ×5), Passeur inchangé.</summary>
+        public static void MoscowEliteTuning() => MoscowTuning(new[] { 1.0 }, new[] { 1.0, 1.5, 2.0, 3.0, 4.0, 5.0 });
+
+        /// <summary>Grille libre : variables d'environnement MOS_PASSEUR et MOS_ENFORCER (listes séparées par des virgules, par exemple « 2,2.1 »). Absentes : ×1.</summary>
+        public static void MoscowTuningFromEnvironment()
+        {
+            double[] Parse(string name) => (System.Environment.GetEnvironmentVariable(name) ?? "1").Split(',').Select(x => double.Parse(x.Trim(), CultureInfo.InvariantCulture)).ToArray();
+            MoscowTuning(Parse("MOS_PASSEUR"), Parse("MOS_ENFORCER"));
+        }
+
+        public static void MoscowTuning(double[] passeurAtk, double[] enforcerAtk)
+        {
+            var baseContent = BuildGameContent();
+            var inv = CultureInfo.InvariantCulture;
+            var team = Teams[0].Ids.Where(id => baseContent.Members.Any(m => m.Id.Value == id)).Select(id => new MemberId(id)).ToArray();
+            var csv = new StringBuilder("zone;encounter;rank;enemies;profile;passeur_atk_x;enforcer_atk_x;level;runs;win_rate_pct;timeouts;avg_seconds_on_win\n");
+            foreach (double atk in passeurAtk)
+            foreach (double eAtk in enforcerAtk)
+            {
+                var content = baseContent.WithEnemies(baseContent.Enemies.Select(e => e.Id.Value == "mos_passeur" ? Scaled(e, 1.0, atk) : e.Id.Value == "mos_enforcer" ? Scaled(e, 1.0, eAtk) : e).ToList());
+                foreach (var zone in content.Zones.Where(z => z.Borough == "sergueiv"))
+                foreach (var profile in new[] { EquipmentProfile.Bare, EquipmentProfile.ItemsOnly, EquipmentProfile.ItemsStrong })
+                foreach (int level in new[] { 5, 10 })
+                {
+                    var stats = BalanceSimulation.Run(content, zone.Id, new SimulationRequest { Team = team, TeamLevel = level, RunsPerEncounter = 200, BaseSeed = 7, Equipment = profile });
+                    foreach (var s in stats)
+                    {
+                        var enc = zone.Encounters[s.EncounterIndex];
+                        bool hasPasseur = enc.Waves.SelectMany(w => w).Any(id => id.Value == "mos_passeur");
+                        bool hasEnforcer = enc.Waves.SelectMany(w => w).Any(id => id.Value == "mos_enforcer");
+                        // Une rencontre sans le Passeur (ou sans l'homme de main) ne dépend pas de son multiplicateur : une seule mesure.
+                        if ((!hasPasseur && atk != passeurAtk[0]) || (!hasEnforcer && eAtk != enforcerAtk[0])) continue;
+                        csv.Append(zone.Id.Value).Append(';').Append(s.EncounterIndex).Append(';').Append(s.Rank).Append(';')
+                           .Append(string.Join("+", enc.Waves.SelectMany(w => w).Select(e => e.Value).Distinct())).Append(';').Append(profile).Append(';')
+                           .Append(hasPasseur ? atk.ToString("0.00", inv) : "-").Append(';').Append(hasEnforcer ? eAtk.ToString("0.00", inv) : "-").Append(';').Append(level).Append(';').Append(s.Runs).Append(';')
+                           .Append(s.Wins * 100 / Math.Max(1, s.Runs)).Append(';').Append(s.Timeouts).Append(';')
+                           .Append((s.AvgTicksOnWin * content.Balance.TickMs / 1000.0).ToString("0.0", inv)).Append('\n');
+                    }
+                }
+            }
+            Debug.Log("[Heroes Dawn] Réglage de Moscou : " + Write("reglage_moscou", csv.ToString()));
+            if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(0);
+        }
+
+        /// <summary>
         /// Grille de réglage des boss sur l'<b>équipe de départ équipée</b> (profils nu, léger, moyen, fort), multiplicateurs d'attaque de 1 à 12.
         /// N'écrit que le CSV : aucune valeur du jeu n'est modifiée.
         /// </summary>

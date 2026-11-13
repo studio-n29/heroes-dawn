@@ -24,12 +24,12 @@ namespace N29.HeroesDawn.Content.Prototype
                 S("mos_smuggler_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(105)),
                 S("mos_smuggler_a2", SkillSlot.A2, 4, TargetRule.SingleEnemy, Dmg(160), St(StatusType.Mark, 2)));
             // Élite : homme de main.
-            yield return PrototypeZones.E("mos_enforcer", Position.Attacker, Family.PhysicalBio, new StatBlock(2800, 125, 100, 100), false,
+            yield return PrototypeZones.E("mos_enforcer", Position.Attacker, Family.PhysicalBio, new StatBlock(2800, 562, 100, 100), false, // ATQ 125 x4,5 : réglage de la tâche 8 (élites à 60-85 % au niveau recommandé), rapport 2026-11-13_equilibrage-moscou
                 S("mos_enforcer_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(110)),
                 S("mos_enforcer_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(80), St(StatusType.Shock, 1, 30)),
                 S("mos_enforcer_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(20)));
             // Boss : le Passeur. Phase 1 « Marchandage » ; sous 66 % « Les clients arrivent » (A2 remplacée par un coup unique) ; sous 33 % « Tout doit partir ».
-            yield return PrototypeZones.Styled(PrototypeZones.Phased(PrototypeZones.E("mos_passeur", Position.Attacker, Family.Matter, new StatBlock(5000, 405, 120, 100), true,
+            yield return PrototypeZones.Styled(PrototypeZones.Phased(PrototypeZones.E("mos_passeur", Position.Attacker, Family.Matter, new StatBlock(5000, 830, 120, 100), true, // ATQ 405 x2,05 : réglage de la tâche 8 (équipe de départ + objets, 30 à 70 % selon le niveau, moyenne 51 %), rapport 2026-11-13_equilibrage-moscou
                 S("mos_passeur_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(120), St(StatusType.Mark, 2)),
                 S("mos_passeur_a2", SkillSlot.A2, 3, TargetRule.Self, Shield(25), St(StatusType.Taunt, 1)),
                 S("mos_passeur_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(90), St(StatusType.Corrosion, 2, 40)),

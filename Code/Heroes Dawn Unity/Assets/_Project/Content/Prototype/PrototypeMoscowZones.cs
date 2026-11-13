@@ -89,7 +89,7 @@ namespace N29.HeroesDawn.Content.Prototype
             {
                 Enc(CombatRank.Easy, "mos_guard", "mos_guard"),
                 Enc(CombatRank.Normal, "mos_guard", "mos_smuggler", "mos_smuggler"),
-                Enc(CombatRank.Elite, "mos_enforcer", "mos_smuggler", "thug"),
+                Enc(CombatRank.Elite, "mos_enforcer", "mos_smuggler", "mos_smuggler"), // spec : + thug ; deux tireurs pour tenir 60-85 % (tâche 8)
             };
             return new ZoneDef(Zone12, "zones.mos_1_2.name", new CaseId("n00"), PrototypeZones.BridgeNodes(null, guardian, exit, "gears_workshop", false, true), PrototypeZones.BridgeLinks(),
                                objectives, encounters, "M1.2", 1, Borough, 6, Requires(Zone12), new ZoneEnvironment(Biome.City, Weather.Fog));
