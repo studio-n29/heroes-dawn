@@ -114,7 +114,7 @@
 
 - [ ] Régression complète : EditMode et PlayMode verts, aucun test ignoré sans motif écrit.
 - [ ] Recette sur appareils : 2 Android (dont milieu de gamme), 1 PC ; parcours complet nouvelle partie → Brooklyn fini ; reprise après coupure réseau ; achat IAP en bac à sable.
-- [ ] Performances : 60 fps cible sur l'Android de référence, mémoire stable sur 30 min.
+- [ ] Performances : 60 fps cible sur l'Android de référence, mémoire stable sur 30 min. **Poids : APK 1,59 Go -> 251 Mo le 2026-11-13** (voir Decisions.md) ; reste à mesurer l'AAB signé (limite de 200 Mo de la base).
 - [ ] Obligations légales (`05_Production/Obligations_Legales.md`) : politique de confidentialité, classification d'âge (IARC/PEGI), mentions des assets générés par IA (R3).
 - [ ] Notes de version 1.0.0 (sur le modèle de `release-notes-0.15.0.md`).
 - [ ] `v1.0.0-rc1`, correctifs bloquants uniquement, puis `v1.0.0`.
