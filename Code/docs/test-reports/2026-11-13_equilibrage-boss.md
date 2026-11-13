@@ -55,3 +55,48 @@ Je ne change aucune valeur sans ton accord : ce sont des choix de conception (va
 - Simuler les cartes équipées et les objets (le simulateur ne les connaît pas) avant de figer les valeurs.
 - Décider du sort de l'élite AMIF (13 à 31 %) : l'assouplir ou la garder comme pic de difficulté assumé.
 - Jouer les 2 à 3 sessions de playtest avec `docs/playtest-formulaire.md`.
+
+## 5. Équipe de départ équipée (choix du 2026-11-13 : « départ + équipement »)
+
+Le simulateur sait équiper les agents (`AllyEntry` : objets et cartes) ; il ne le faisait pas. J'ai ajouté des profils d'équipement tirés de la **collection réelle** du jeu (14 objets, 48 cartes) : `Loadouts.cs`. Équipe : Giulia Rossi, Ilona Varga, Lucas Mendes.
+
+### Constat important : les cartes équipées font s'effondrer les combats en mode auto
+| Profil (zone 1.3, Crocodile, niveau 5, 400 combats) | Victoires |
+|---|---|
+| Nu | 94 % |
+| Objets seuls (2 par agent, communs ou rares) | 98 % |
+| Cartes seules (3 par agent, 1 à 2 étoiles) | **8 %** |
+| Moyen (objets + cartes) | **10 %** |
+
+Zone 1.4 (Titan) : cartes seules 2 %, et avec 1 carte par agent **214 combats sur 400 n'ont pas de fin** (délai de 20 000 ticks dépassé), 188 sur 400 avec le profil fort. Les objets, eux, améliorent légèrement le taux (jusqu'à +4 points).
+
+Deux lectures possibles, **à vérifier avant toute conclusion** :
+1. Défaut de la simulation : l'IA automatique des alliés joue mal les cartes (elle semble choisir des compétences de soutien ou de protection en boucle). Les cartes réelles se jouent à la main.
+2. Défaut du jeu : le bouton AUTO utilise la même IA ; un joueur qui équipe des cartes et laisse AUTO jouer pourrait voir ses combats ne pas se terminer. Si c'est le cas, c'est un défaut de gameplay, pas d'équilibrage.
+Je n'ai pas tranché. Tant que ce n'est pas élucidé, **les cartes sont exclues** des réglages ci-dessous (profils « objets seuls »).
+
+### Multiplicateur d'attaque du boss, équipe de départ avec objets (PV ×1 ; niveau 5 / niveau 10)
+| Attaque × | Brick (1.1) objets moyens | Brick objets forts | Crocodile (1.3) moyens | Crocodile forts | Titan (1.4) moyens | Titan forts |
+|---|---|---|---|---|---|---|
+| 1 | 100 / 100 | 100 / 100 | 98 / 99 | 97 / 99 | 100 / 100 | 100 / 100 |
+| 2 | 100 / 100 | 100 / 100 | 58 / 73 | 77 / 85 | 100 / 100 | 100 / 100 |
+| 3 | 100 / 100 | 100 / 100 | **31 / 48** | **51 / 59** | 99 / 100 | 99 / 99 |
+| 4 | 100 / 100 | 100 / 100 | 18 / 26 | 25 / 35 | 92 / 97 | 90 / 97 |
+| 6 | 100 / 99 | 98 / 99 | 5 / 7 | 6 / 8 | **37 / 60** | **43 / 63** |
+| 8 | 92 / 93 | 87 / 96 | 2 / 3 | 2 / 2 | 19 / 31 | 22 / 35 |
+| 12 | **61 / 69** | 74 / 83 | 0 / 1 | 0 / 0 | 7 / 13 | 13 / 23 |
+| 16 | **56 / 63** | **48 / 74** | 0 / 0 | 0 / 0 | 4 / 13 | 3 / 6 |
+
+(En gras : dans ou près de la cible de 40 à 60 %.)
+
+### Valeurs proposées (à valider)
+| Boss | Attaque × proposée | Taux attendu (équipe de départ + objets) | Remarque |
+|---|---|---|---|
+| Crocodile | **×3** | 31 à 59 % | cible atteinte avec objets moyens ou forts |
+| Titan du pont | **×6** | 37 à 63 % | idem |
+| Brick | ×12 à ×16 | 48 à 74 % | **valeur extrême** : le réglage par l'attaque seule ne convient pas à Brick. Il faut revoir sa conception (puissance de ses compétences, phases, escorte) plutôt qu'un multiplicateur |
+
+Les multiplicateurs de ces trois boss sont très différents (×3, ×6, ×12) alors que leurs attaques de base sont voisines (110 à 120) : les kits (taunt, boucliers, phases) comptent autant que l'attaque. Un multiplicateur unique serait faux.
+
+### Ce que je ne fais pas sans ton accord
+Modifier le contenu des boss (`PrototypeContent.cs`, `PrototypeZones.cs`) : ce sont des valeurs de conception ⚑.

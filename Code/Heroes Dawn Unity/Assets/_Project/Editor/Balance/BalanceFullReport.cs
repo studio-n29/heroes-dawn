@@ -121,5 +121,71 @@ namespace N29.HeroesDawn.EditorTools.Balance
             Debug.Log("[Heroes Dawn] Expérience de réglage des boss : " + Write("reglage_boss", csv.ToString()));
             if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(0);
         }
+
+
+        /// <summary>Diagnostic : la rencontre de chaque boss, attaque ×1, équipe de départ, selon le profil (dont objets seuls et cartes seules), niveaux 5 et 10, 400 combats.</summary>
+        public static void EquipmentDiagnostic()
+        {
+            var content = BuildGameContent();
+            var team = Teams[0].Ids.Select(id => new MemberId(id)).ToArray();
+            var sb = new StringBuilder();
+            foreach (var zone in content.Zones)
+            {
+                var bossIdx = Enumerable.Range(0, zone.Encounters.Count).Where(i => zone.Encounters[i].Waves.SelectMany(w => w).Any(id => content.Enemy(id).IsBoss)).ToList();
+                if (bossIdx.Count == 0) continue;
+                foreach (var profile in new[] { EquipmentProfile.Bare, EquipmentProfile.ItemsOnly, EquipmentProfile.ItemsStrong })
+                {
+                    var stats = BalanceSimulation.Run(content, zone.Id, new SimulationRequest { Team = team, TeamLevel = 5, RunsPerEncounter = 400, BaseSeed = 11, Equipment = profile });
+                    foreach (int ei in bossIdx) sb.Append($"DIAG {zone.Id.Value} enc{ei} {profile} niv5 : {stats[ei].Wins * 100 / stats[ei].Runs} % ({stats[ei].Timeouts} délais)\n");
+                }
+            }
+            var used = new HashSet<string>();
+            foreach (var m in team)
+            {
+                var e = Loadouts.Entry(content, m, 5, 0, EquipmentProfile.Average, used);
+                sb.Append($"DIAG équipement moyen {m.Value} : objets [{string.Join(",", e.Items.Select(i => i.Value))}] cartes [{string.Join(",", e.Cards.Select(c => c?.Value))}]\n");
+            }
+            Debug.Log(sb.ToString());
+            if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(0);
+        }
+        /// <summary>
+        /// Grille de réglage des boss sur l'<b>équipe de départ équipée</b> (profils nu, léger, moyen, fort), multiplicateurs d'attaque de 1 à 12.
+        /// N'écrit que le CSV : aucune valeur du jeu n'est modifiée.
+        /// </summary>
+        public static void BossTuningEquipped()
+        {
+            var baseContent = BuildGameContent();
+            var inv = CultureInfo.InvariantCulture;
+            var team = Teams[0].Ids.Where(id => baseContent.Members.Any(m => m.Id.Value == id)).Select(id => new MemberId(id)).ToArray();
+            Debug.Log($"[Heroes Dawn] Collection : {baseContent.Collection.Items.Count} objets, {baseContent.Collection.Cards.Count} cartes ; équipe {team.Length} agents");
+            var csv = new StringBuilder("boss;zone;encounter;profile;hp_x;atk_x;level;runs;win_rate_pct;avg_seconds_on_win\n");
+            foreach (double hp in new[] { 1.0, 2.0 })
+            foreach (double atk in new[] { 1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 12.0, 16.0 })
+            {
+                var content = baseContent.WithEnemies(baseContent.Enemies.Select(e => e.IsBoss ? Scaled(e, hp, atk) : e).ToList());
+                foreach (var zone in content.Zones)
+                {
+                    var bossIdx = Enumerable.Range(0, zone.Encounters.Count)
+                        .Where(i => zone.Encounters[i].Waves.SelectMany(w => w).Any(id => content.Enemy(id).IsBoss)).ToList();
+                    if (bossIdx.Count == 0) continue;
+                    foreach (var profile in new[] { EquipmentProfile.Bare, EquipmentProfile.ItemsOnly, EquipmentProfile.ItemsStrong })
+                    foreach (int level in new[] { 5, 10 })
+                    {
+                        var req = new SimulationRequest { Team = team, TeamLevel = level, RunsPerEncounter = 200, BaseSeed = 7, Equipment = profile };
+                        var stats = BalanceSimulation.Run(content, zone.Id, req);
+                        foreach (int ei in bossIdx)
+                        {
+                            var s = stats[ei];
+                            var boss = zone.Encounters[ei].Waves.SelectMany(w => w).Select(id => content.Enemy(id)).First(e => e.IsBoss);
+                            csv.Append(boss.Id.Value).Append(';').Append(zone.Id.Value).Append(';').Append(ei).Append(';').Append(profile).Append(';')
+                               .Append(hp.ToString("0.0", inv)).Append(';').Append(atk.ToString("0.0", inv)).Append(';').Append(level).Append(';').Append(s.Runs).Append(';')
+                               .Append(s.Wins * 100 / Math.Max(1, s.Runs)).Append(';').Append((s.AvgTicksOnWin * content.Balance.TickMs / 1000.0).ToString("0.0", inv)).Append('\n');
+                        }
+                    }
+                }
+            }
+            Debug.Log("[Heroes Dawn] Réglage des boss, équipe équipée : " + Write("reglage_boss_equipe", csv.ToString()));
+            if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(0);
+        }
     }
 }

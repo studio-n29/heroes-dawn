@@ -16,6 +16,8 @@ namespace N29.HeroesDawn.EditorTools.Balance
         public int FatiguePercent { get; set; }
         public int RunsPerEncounter { get; set; } = 1000;
         public ulong BaseSeed { get; set; } = 1;
+        /// <summary>Équipement supposé des agents ; nu par défaut (comportement historique du simulateur).</summary>
+        public EquipmentProfile Equipment { get; set; } = EquipmentProfile.Bare;
         public int MaxTicks { get; set; } = 20000;
     }
 
@@ -39,7 +41,8 @@ namespace N29.HeroesDawn.EditorTools.Balance
             var b = content.Balance;
             var encounters = content.Zone(zone).Encounters;
             var allies = new List<AllyEntry>();
-            foreach (var m in req.Team) allies.Add(new AllyEntry(m, req.TeamLevel, req.FatiguePercent));
+            var usedItems = new HashSet<string>();
+            foreach (var m in req.Team) allies.Add(Loadouts.Entry(content, m, req.TeamLevel, req.FatiguePercent, req.Equipment, usedItems));
 
             var result = new List<EncounterStats>();
             for (int e = 0; e < encounters.Count; e++)
