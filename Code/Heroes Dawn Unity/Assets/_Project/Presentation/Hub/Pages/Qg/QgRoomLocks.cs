@@ -26,6 +26,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
         }
 
-        static string? Need(ISessionReadModel s, string zone) => s.CompletedZones.Any(z => z == zone) ? null : zone;
+        static string? Need(ISessionReadModel s, string zone)
+        {
+            zone = N29.HeroesDawn.Application.Features.World.StoryProgress.FirstActEquivalent(s, zone); // 1re, 2e et 3e zones de l'acte I du parcours
+            return s.CompletedZones.Any(z => z == zone) ? null : zone;
+        }
     }
 }

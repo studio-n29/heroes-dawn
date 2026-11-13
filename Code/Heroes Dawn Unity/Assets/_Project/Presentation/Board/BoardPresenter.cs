@@ -140,7 +140,7 @@ namespace N29.HeroesDawn.Presentation.Board
                 _built = run;
             }
             var zone = _session.RunZone;
-            View.SetZoneTitle(zone != null ? _loc.T("zones.ny_1_1.code") + " · " + _loc.T(zone.NameKey) : "");
+            View.SetZoneTitle(zone != null ? _loc.Or(zone.NameKey.Replace(".name", ".code"), "zones.ny_1_1.code") + " · " + _loc.T(zone.NameKey) : "");
             _rosterSub?.Dispose();
             _rosterSub = _roster.Subscribe(_ => RefreshSquad());
             RefreshAll();

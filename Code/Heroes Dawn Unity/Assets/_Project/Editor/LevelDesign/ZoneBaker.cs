@@ -89,7 +89,7 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
                 ZoneAssetConverter.FillFrom(asset, def, key => N29.HeroesDawn.Presentation.Common.Loc.Has(key) ? N29.HeroesDawn.Presentation.Common.Loc.T(key) : "");
                 if (bake) BakeBackground(asset);
                 EditorUtility.SetDirty(asset);
-                campaign.entries.Add(new CampaignEntry { zone = asset, act = def.Act, codeOverride = "", requires = def.Requires.Select(r => r.Value).ToList() });
+                campaign.entries.Add(new CampaignEntry { zone = asset, act = def.Act, codeOverride = def.Borough == PrototypeMoscowZones.Borough ? def.Code : "", requires = def.Requires.Select(r => r.Value).ToList() });
             }
             EditorUtility.SetDirty(campaign);
             AssetDatabase.SaveAssets();

@@ -124,7 +124,7 @@ namespace N29.HeroesDawn.Presentation.Common
         {
             // --- Enemies ---
             d["enemies.mos_guard.name"] = "Mob Guard";
-            d["enemies.mos_smuggler.name"] = "Smuggler";
+            d["enemies.mos_smuggler.name"] = "Trafficker";
             d["enemies.mos_enforcer.name"] = "Enforcer";
             d["enemies.mos_passeur.name"] = "THE SMUGGLER";
             d["enemies.mos_passeur.phase2"] = "The Customers Arrive";

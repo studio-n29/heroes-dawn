@@ -60,6 +60,32 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(ZoneProgress.Recommended(s).Borough, Is.Not.EqualTo("sergueiv"));
         }
 
+        [Test, Description("Vérifie que le journal de quêtes garde les quatre zones (validées) en fin d'acte pour Agent M comme pour Agent D — parce qu'un acte suivant sans zone ne doit pas vider la ligne de quête du QG")]
+        public void QuestLog_Main_KeepsTheLastPlayedCity_AtTheEndOfTheAct()
+        {
+            foreach (var (hero, borough) in new[] { ("agent_m", "sergueiv"), ("agent_d", "brooklyn") })
+            {
+                var app = new TestApp();
+                app.SignInDirect("p1");
+                app.Session.Meta.onboarding.hero = hero;
+                foreach (var z in app.Session.Content.Zones) if (!z.IsTutorial) app.Session.CompletedZones.Add(z.Id.Value);
+                var main = app.Quests.Main();
+                Assert.That(main.Count, Is.EqualTo(4), hero);
+                Assert.That(main.All(m => m.Zone.Borough == borough && m.Status == ZoneStatus.Done), Is.True, hero);
+            }
+        }
+
+        [Test, Description("Vérifie que les quêtes secondaires d'Agent M se débloquent avec ses propres zones (M1.1 pour renforts et exercices) — parce que celles de Brooklyn lui sont fermées")]
+        public void AgentM_SideQuests_UnlockWithMoscowZones()
+        {
+            var app = new TestApp();
+            app.SignInDirect("p1");
+            app.Session.Meta.onboarding.hero = "agent_m";
+            Assert.That(app.Quests.Side().Select(v => v.Quest.Id), Is.EqualTo(new[] { "docks" }));
+            app.Session.CompletedZones.Add("zone_mos_1_1");
+            Assert.That(app.Quests.Side().Select(v => v.Quest.Id), Is.EquivalentTo(new[] { "docks", "reinforcements", "drills" }));
+        }
+
         [Test, Description("Vérifie que le journal de quêtes d'Agent M liste les quatre zones de Moscou (la première en cours) et aucune zone de Brooklyn — parce qu'un profil Agent M ne doit voir aucune zone de Brooklyn")]
         public void AgentM_QuestLog_ListsOnlyMoscow()
         {

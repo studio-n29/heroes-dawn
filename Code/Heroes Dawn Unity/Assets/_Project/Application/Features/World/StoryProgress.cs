@@ -25,6 +25,37 @@ namespace N29.HeroesDawn.Application.Features.World
             return list;
         }
 
+        /// <summary>Ville dont on montre les zones : celle de l'acte en cours si elle en a, sinon la dernière ville déjà jouée du parcours (acte sans zone : fin de contenu).</summary>
+        public static string ZoneCity(ISessionReadModel session)
+        {
+            var cities = session.Route.ActCities;
+            var act = Current(session);
+            string last = cities[0];
+            for (int i = 0; i < cities.Count; i++)
+            {
+                if (ZonesOf(session, cities[i]).Count > 0) last = cities[i];
+                if (i + 1 == act.Number) break;
+            }
+            return act.HasZones ? act.City : last;
+        }
+
+        /// <summary>Zones de l'acte I du parcours (hors repaires), dans l'ordre : leur rang règle les déblocages du QG et des quêtes (Brooklyn pour Agent D, Sergueiv pour Agent M).</summary>
+        public static IReadOnlyList<ZoneDef> FirstActZones(ISessionReadModel session)
+        {
+            var list = new List<ZoneDef>();
+            foreach (var z in ZonesOf(session, session.Route.ActCities[0])) if (!z.IsLair) list.Add(z);
+            return list;
+        }
+
+        /// <summary>Zone de l'acte I du parcours qui a le même rang que cette zone de Brooklyn (identique pour Agent D ; Sergueiv pour Agent M). Identifiant inchangé s'il n'y a pas d'équivalent.</summary>
+        public static string FirstActEquivalent(ISessionReadModel session, string brooklynZoneId)
+        {
+            int rank = -1, i = 0;
+            foreach (var z in session.Content.Zones) if (z.Borough == "brooklyn") { if (z.Id.Value == brooklynZoneId) rank = i; i++; }
+            var first = FirstActZones(session);
+            return rank >= 0 && rank < first.Count ? first[rank].Id.Value : brooklynZoneId;
+        }
+
         /// <summary>Un acte est terminé quand sa ville a des zones et qu'elles sont toutes validées.</summary>
         public static bool IsActDone(ISessionReadModel session, string city)
         {

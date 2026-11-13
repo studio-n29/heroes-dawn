@@ -120,15 +120,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             return act.Number == 1 && act.City == StoryRoutes.NewYork ? _loc.T("map.act1") : _loc.F("map.act_title", act.Number, _loc.T("city." + act.City));
         }
 
-        /// <summary>Ville dont la carte est affichée : celle de l'acte en cours, ou à défaut (acte sans zone) la dernière ville jouée du parcours.</summary>
-        string MapCity()
-        {
-            var act = StoryProgress.Current(_session);
-            if (act.HasZones) return act.City;
-            string last = act.City;
-            foreach (var c in _session.Route.ActCities) if (StoryProgress.ZonesOf(_session, c).Count > 0) { last = c; break; }
-            return last;
-        }
+        /// <summary>Ville dont la carte est affichée (voir <see cref="StoryProgress.ZoneCity"/>).</summary>
+        string MapCity() => StoryProgress.ZoneCity(_session);
 
         string Short(ZoneDef z) => _loc.T(z.NameKey.Replace(".name", ".short"));
 
@@ -160,7 +153,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                     Tag = b.Act > 1 ? _loc.F(tagKey + "_soon", b.Act) : _loc.F(tagKey, b.Act),
                     LabelAt = b.LabelAt,
                 }).ToArray(),
-                Points = SpotsFor(layout.Spots).Select(p => PointOf(p, sel)).ToArray(),
+                Points = SpotsFor(layout.Spots, city).Select(p => PointOf(p, sel)).ToArray(),
                 Rows = zones.Select(z => RowOf(z, sel)).ToArray(),
                 Detail = DetailOf(sel),
             });
@@ -170,7 +163,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// Points de mission : ceux de la mise en page de la ville, repositionnés quand la zone a sa propre position (outil de level design),
         /// plus les zones créées dans l'outil qui ont une position et pas de point prédéfini.
         /// </summary>
-        System.Collections.Generic.IEnumerable<MapSpot> SpotsFor(System.Collections.Generic.IReadOnlyList<MapSpot> spots)
+        System.Collections.Generic.IEnumerable<MapSpot> SpotsFor(System.Collections.Generic.IReadOnlyList<MapSpot> spots, string city)
         {
             var zones = _session.Content.Zones;
             foreach (var spot in spots)
@@ -182,7 +175,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             foreach (var z in zones)
             {
-                if (!z.MapPoint.HasValue || CityMapLayout.SpotOf(z.Id.Value).HasValue || StoryRoutes.CityOfBorough(z.Borough) != MapCity()) continue;
+                if (!z.MapPoint.HasValue || CityMapLayout.SpotOf(z.Id.Value).HasValue || StoryRoutes.CityOfBorough(z.Borough) != city) continue;
                 yield return new MapSpot(z.Borough, z.Code, z.Id.Value, new UnityEngine.Vector2(z.MapPoint.Value.XPermille / 1000f, z.MapPoint.Value.YPermille / 1000f));
             }
         }

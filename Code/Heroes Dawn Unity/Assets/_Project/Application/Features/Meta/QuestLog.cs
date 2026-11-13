@@ -74,7 +74,8 @@ namespace N29.HeroesDawn.Application.Features.Meta
         bool Unlocked(QuestDef q)
         {
             if (q.UnlockZone.Length == 0) return true;
-            foreach (var z in _c.Session.CompletedZones) if (z == q.UnlockZone) return true;
+            string need = StoryProgress.FirstActEquivalent(_c.Session, q.UnlockZone); // rang dans l'acte I du parcours
+            foreach (var z in _c.Session.CompletedZones) if (z == need) return true;
             return false;
         }
 
@@ -83,7 +84,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         {
             var list = new List<MainQuestView>();
             // Zones de l'acte courant du parcours (Agent D : Brooklyn, Agent M : Sergueiv), hors repaires.
-            foreach (var z in StoryProgress.ZonesOf(_c.Session, StoryProgress.Current(_c.Session).City)) if (!z.IsLair) list.Add(new MainQuestView(z, ZoneProgress.StatusOf(_c.Session, z)));
+            foreach (var z in StoryProgress.ZonesOf(_c.Session, StoryProgress.ZoneCity(_c.Session))) if (!z.IsLair) list.Add(new MainQuestView(z, ZoneProgress.StatusOf(_c.Session, z)));
             return list;
         }
 
