@@ -27,8 +27,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             var s = FullBrooklyn();
             Assert.That(Status(s, "ny_brooklyn"), Is.EqualTo(ChapterStatus.Current));
-            foreach (var id in new[] { "ny_queens", "ny_harlem", "ny_manhattan", "mos_sergueiv", "mos_kapotnya", "mos_sadovoye", "mos_place_rouge" })
+            foreach (var id in new[] { "ny_queens", "ny_harlem", "ny_manhattan", "mos_kapotnya", "mos_sadovoye", "mos_place_rouge" })
                 Assert.That(Status(s, id), Is.EqualTo(ChapterStatus.Soon), id);
+            Assert.That(Status(s, "mos_sergueiv"), Is.EqualTo(ChapterStatus.Locked), "Sergueiv a ses zones, mais Moscou est l'acte III d'Agent D");
         }
 
         [Test, Description("Vérifie que Brooklyn reste « En cours » tant qu'une de ses zones n'est pas validée et devient « Terminé » quand toutes le sont — parce que le chapitre se termine avec ses zones")]

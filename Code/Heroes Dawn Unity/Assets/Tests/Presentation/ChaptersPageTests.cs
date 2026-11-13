@@ -60,7 +60,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             for (int i = 1; i < 8; i++)
             {
                 Assert.That(_view.Rows[i].Dim, Is.True, "rangée " + i);
-                Assert.That(_view.Rows[i].Subtitle, Does.Contain(_loc.T("chapter.status.Soon")), "rangée " + i);
+                Assert.That(_view.Rows[i].Subtitle, Does.Contain(_loc.T(i == 4 ? "chapter.status.Locked" : "chapter.status.Soon")), "rangée " + i); // Sergueiv (rangée 4) a ses zones, verrouillées pour Agent D
             }
             Assert.That(_view.Rows[4].Title, Is.EqualTo(_loc.T("chapter.mos_sergueiv.title")));
             Assert.That(_view.Header.Line, Is.EqualTo(_loc.F("chapters.line", 0, 8)));

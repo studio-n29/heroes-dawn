@@ -86,7 +86,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var act = StoryProgress.Current(s);
             Assert.That(act.Number, Is.EqualTo(1));
             Assert.That(act.City, Is.EqualTo("moscow"));
-            Assert.That(act.HasZones, Is.False);
+            Assert.That(act.HasZones, Is.True, "les quatre zones de Sergueiv existent");
         }
 
         [Test, Description("Vérifie que les quatre quartiers de Moscou appartiennent à Moscou et Brooklyn à New York — parce que sans cela l'acte de Moscou ne se terminerait jamais (défaut : New York)")]

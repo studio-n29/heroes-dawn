@@ -111,18 +111,41 @@ namespace N29.HeroesDawn.Content.Prototype
             return System.Array.Empty<ZoneId>();
         }
 
-        static NodeDef N(string id, CaseType t, int x, int y, bool fixedNode = false, CombatRank r = CombatRank.Normal, string activity = null, NarrationDef narration = null)
+        internal static NodeDef N(string id, CaseType t, int x, int y, bool fixedNode = false, CombatRank r = CombatRank.Normal, string activity = null, NarrationDef narration = null)
             => new NodeDef(new CaseId(id), t, fixedNode, r, x, y, activity == null ? (ActivityId?)null : new ActivityId(activity), null, narration);
 
-        static List<LinkDef> Links(params (string, string)[] pairs)
+        internal static List<LinkDef> Links(params (string, string)[] pairs)
         {
             var links = new List<LinkDef>();
             foreach (var (a, b) in pairs) links.Add(new LinkDef(new CaseId(a), new CaseId(b)));
             return links;
         }
 
-        static NarrationLineDef L(string zone, string node, string phase, int i, string speaker)
+        internal static NarrationLineDef L(string zone, string node, string phase, int i, string speaker)
             => new NarrationLineDef(speaker, "narration." + zone + "." + node + "." + phase + "." + i);
+
+        /// <summary>Graphe A (Brownsville, réutilisé par Moscou) : 20 cases, 2 embranchements, élite fixe en n14, sortie fixe en n19, mini-jeu fixe en n13.</summary>
+        internal static List<NodeDef> BrownsvilleNodes(NarrationDef eliteTalk, NarrationDef exitTalk, string miniGameActivity = null)
+        {
+            return new List<NodeDef>
+            {
+                N("n00", CaseType.Entry, 0, 2, true),
+                N("n01", CaseType.Resource, 1, 2), N("n02", CaseType.Combat, 2, 2, r: CombatRank.Easy),
+                N("n03", CaseType.Narrative, 3, 3), N("n04", CaseType.Resource, 4, 3), N("n05", CaseType.Combat, 5, 3),
+                N("n06", CaseType.Resource, 3, 1), N("n07", CaseType.Empty, 4, 1), N("n08", CaseType.Combat, 5, 1, r: CombatRank.Easy),
+                N("n09", CaseType.Rest, 6, 2), N("n10", CaseType.Combat, 7, 2),
+                N("n11", CaseType.Resource, 8, 3), N("n12", CaseType.Narrative, 9, 3),
+                N("n13", CaseType.MiniGame, 8, 1, true, activity: miniGameActivity), N("n14", CaseType.Combat, 9, 1, true, CombatRank.Elite, narration: eliteTalk),
+                N("n15", CaseType.Empty, 10, 2), N("n16", CaseType.Resource, 11, 2), N("n17", CaseType.Combat, 12, 2),
+                N("n18", CaseType.Rest, 13, 2), N("n19", CaseType.Empty, 14, 2, true, narration: exitTalk),
+            };
+        }
+
+        internal static List<LinkDef> BrownsvilleLinks()
+            => Links(("n00", "n01"), ("n01", "n02"), ("n02", "n03"), ("n02", "n06"), ("n03", "n04"), ("n04", "n05"),
+                              ("n06", "n07"), ("n07", "n08"), ("n05", "n09"), ("n08", "n09"), ("n09", "n10"), ("n10", "n11"),
+                              ("n10", "n13"), ("n11", "n12"), ("n13", "n14"), ("n12", "n15"), ("n14", "n15"), ("n15", "n16"),
+                              ("n16", "n17"), ("n17", "n18"), ("n18", "n19"));
 
         /// <summary>Brownsville : 20 cases, 2 embranchements, élite fixe : le lieutenant de Crocodile, qui garde les cellules des otages.</summary>
         static ZoneDef BuildZone12()
@@ -132,22 +155,8 @@ namespace N29.HeroesDawn.Content.Prototype
                 new[] { L("ny_1_2", "n14", "after", 0, "lieutenant") });
             var evacuation = new NarrationDef(null,
                 new[] { L("ny_1_2", "n19", "after", 0, "darius_brooks"), L("ny_1_2", "n19", "after", 1, "darius_brooks") });
-            var nodes = new List<NodeDef>
-            {
-                N("n00", CaseType.Entry, 0, 2, true),
-                N("n01", CaseType.Resource, 1, 2), N("n02", CaseType.Combat, 2, 2, r: CombatRank.Easy),
-                N("n03", CaseType.Narrative, 3, 3), N("n04", CaseType.Resource, 4, 3), N("n05", CaseType.Combat, 5, 3),
-                N("n06", CaseType.Resource, 3, 1), N("n07", CaseType.Empty, 4, 1), N("n08", CaseType.Combat, 5, 1, r: CombatRank.Easy),
-                N("n09", CaseType.Rest, 6, 2), N("n10", CaseType.Combat, 7, 2),
-                N("n11", CaseType.Resource, 8, 3), N("n12", CaseType.Narrative, 9, 3),
-                N("n13", CaseType.MiniGame, 8, 1, true), N("n14", CaseType.Combat, 9, 1, true, CombatRank.Elite, narration: lieutenant),
-                N("n15", CaseType.Empty, 10, 2), N("n16", CaseType.Resource, 11, 2), N("n17", CaseType.Combat, 12, 2),
-                N("n18", CaseType.Rest, 13, 2), N("n19", CaseType.Empty, 14, 2, true, narration: evacuation),
-            };
-            var links = Links(("n00", "n01"), ("n01", "n02"), ("n02", "n03"), ("n02", "n06"), ("n03", "n04"), ("n04", "n05"),
-                              ("n06", "n07"), ("n07", "n08"), ("n05", "n09"), ("n08", "n09"), ("n09", "n10"), ("n10", "n11"),
-                              ("n10", "n13"), ("n11", "n12"), ("n13", "n14"), ("n12", "n15"), ("n14", "n15"), ("n15", "n16"),
-                              ("n16", "n17"), ("n17", "n18"), ("n18", "n19"));
+            var nodes = BrownsvilleNodes(lieutenant, evacuation);
+            var links = BrownsvilleLinks();
             var objectives = new List<ObjectiveDef>
             {
                 new ObjectiveDef("obj_infiltrate", ObjectiveType.ReachCase, new CaseId("n03"), "objectives.ny12.infiltrate"),
@@ -167,7 +176,10 @@ namespace N29.HeroesDawn.Content.Prototype
         }
 
         /// <summary>Graphe commun aux zones 1.3 et 1.4 : 19 cases, un élite fixe à gauche du dernier embranchement, un boss fixe au bout.</summary>
-        static List<NodeDef> BridgeNodes(NarrationDef bossTalk)
+        static List<NodeDef> BridgeNodes(NarrationDef bossTalk) => BridgeNodes(bossTalk, null, null, "rooftop_rescue", true);
+
+        /// <summary>Graphe B généralisé (Moscou) : sans boss, la case finale n18 est une sortie fixe (narration éventuelle) ; n11 prend le mini-jeu donné ; n14 peut porter une narration d élite.</summary>
+        internal static List<NodeDef> BridgeNodes(NarrationDef bossTalk, NarrationDef eliteTalk, NarrationDef exitTalk, string n11Activity, bool bossAtEnd)
             => new List<NodeDef>
             {
                 N("n00", CaseType.Entry, 0, 2, true),
@@ -175,13 +187,13 @@ namespace N29.HeroesDawn.Content.Prototype
                 N("n03", CaseType.Resource, 3, 3), N("n04", CaseType.Narrative, 4, 3), N("n05", CaseType.Combat, 5, 3),
                 N("n06", CaseType.MiniGame, 3, 1, activity: "potion_field"), N("n07", CaseType.Combat, 4, 1, r: CombatRank.Easy), N("n08", CaseType.Resource, 5, 1),
                 N("n09", CaseType.Rest, 6, 2), N("n10", CaseType.Combat, 7, 2),
-                N("n11", CaseType.MiniGame, 8, 3, true, activity: "rooftop_rescue"), N("n12", CaseType.Resource, 9, 3),
-                N("n13", CaseType.Narrative, 8, 1), N("n14", CaseType.Combat, 9, 1, true, CombatRank.Elite),
+                N("n11", CaseType.MiniGame, 8, 3, true, activity: n11Activity), N("n12", CaseType.Resource, 9, 3),
+                N("n13", CaseType.Narrative, 8, 1), N("n14", CaseType.Combat, 9, 1, true, CombatRank.Elite, narration: eliteTalk),
                 N("n15", CaseType.Empty, 10, 2, true), N("n16", CaseType.Resource, 11, 2), N("n17", CaseType.Rest, 12, 2),
-                N("n18", CaseType.Combat, 13, 2, true, CombatRank.Boss, narration: bossTalk),
+                bossAtEnd ? N("n18", CaseType.Combat, 13, 2, true, CombatRank.Boss, narration: bossTalk) : N("n18", CaseType.Empty, 13, 2, true, narration: exitTalk),
             };
 
-        static List<LinkDef> BridgeLinks()
+        internal static List<LinkDef> BridgeLinks()
             => Links(("n00", "n01"), ("n01", "n02"), ("n02", "n03"), ("n02", "n06"), ("n03", "n04"), ("n04", "n05"),
                      ("n06", "n07"), ("n07", "n08"), ("n05", "n09"), ("n08", "n09"), ("n09", "n10"), ("n10", "n11"),
                      ("n10", "n13"), ("n11", "n12"), ("n13", "n14"), ("n12", "n15"), ("n14", "n15"), ("n15", "n16"),
