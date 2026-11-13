@@ -97,6 +97,36 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
             return campaign;
         }
 
+        /// <summary>
+        /// Importe seulement les zones du prototype retenues par le filtre, sans toucher aux autres assets ni à l'ordre de la campagne
+        /// (les zones de Brooklyn ont été retouchées dans l'outil : un import complet écraserait leurs mini-jeux). Une zone absente de la campagne y est ajoutée.
+        /// </summary>
+        public static CampaignAsset ImportZones(System.Func<ZoneDef, bool> filter, bool bake = true)
+        {
+            var content = PrototypeContent.Build();
+            var campaign = AssetDatabase.LoadAssetAtPath<CampaignAsset>(Folder + "/Campaign.asset") ?? NewCampaign();
+            foreach (var def in content.Zones.Where(filter))
+            {
+                string path = Folder + "/" + def.Id.Value + ".asset";
+                var asset = AssetDatabase.LoadAssetAtPath<ZoneAsset>(path) ?? NewZone(def.Id.Value);
+                ZoneAssetConverter.FillFrom(asset, def, key => N29.HeroesDawn.Presentation.Common.Loc.Has(key) ? N29.HeroesDawn.Presentation.Common.Loc.T(key) : "");
+                if (bake) BakeBackground(asset);
+                EditorUtility.SetDirty(asset);
+                var requires = def.Requires.Select(r => r.Value).ToList();
+                var entry = campaign.entries.FirstOrDefault(e => e.zone == asset);
+                // Le code d'affichage (« M1.1 ») est imposé : le code calculé par la campagne (rang dans l'acte) donnerait « 1.5 » et entrerait en collision avec Brooklyn.
+                if (entry == null) campaign.entries.Add(new CampaignEntry { zone = asset, act = def.Act, codeOverride = def.Code, requires = requires });
+                else { entry.act = def.Act; entry.codeOverride = def.Code; entry.requires = requires; }
+            }
+            EditorUtility.SetDirty(campaign);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            return campaign;
+        }
+
+        /// <summary>Entrée en ligne de commande : <c>-executeMethod N29.HeroesDawn.EditorTools.LevelDesign.ZoneBaker.ImportMoscowBatch -quit</c> (les quatre zones de Sergueiv).</summary>
+        public static void ImportMoscowBatch() => ImportZones(z => z.Borough == PrototypeMoscowZones.Borough);
+
         /// <summary>Entrée en ligne de commande : <c>-executeMethod N29.HeroesDawn.EditorTools.LevelDesign.ZoneBaker.ImportPrototypeBatch -quit</c>.</summary>
         public static void ImportPrototypeBatch() => ImportPrototype();
     }

@@ -397,6 +397,20 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Last.Boroughs.All(b => b.Name.Length > 0 && !b.Name.StartsWith("[")), Is.True, "noms de quartiers traduits");
         }
 
+        [Test, Description("Vérifie qu'après le Passeur la carte d'Agent M montre toujours Moscou (zones rejouables), annonce l'acte II de Paris et ne propose ni Brooklyn ni bouton mort — parce que le parcours se termine sur l'écran « acte suivant bientôt »")]
+        public void Presenter_AgentM_AfterThePasseur_StaysOnMoscow_ActTwoParis()
+        {
+            _app.Session.Meta.onboarding.hero = "agent_m";
+            foreach (var z in _app.Session.Content.Zones.Where(z => z.Borough == "sergueiv")) _app.Session.CompletedZones.Add(z.Id.Value);
+            var p = Make();
+            Assert.That(_view.Last.Rows.Select(r => r.ZoneId), Is.EqualTo(new[] { "zone_mos_1_1", "zone_mos_1_2", "zone_mos_1_3", "zone_mos_1_4" }));
+            Assert.That(_view.Last.Rows.All(r => r.Status == N29.HeroesDawn.Application.Features.World.ZoneStatus.Done), Is.True);
+            Assert.That(_view.Last.ActTitle, Does.Contain(_loc.T("city.paris")));
+            Assert.That(p.Title, Does.Contain(_loc.T("city.paris")));
+            Assert.That(_view.Last.Detail.ButtonEnabled, Is.True, "les zones validées se rejouent");
+            Assert.That(_view.Last.Boroughs.Select(b => b.Id), Does.Not.Contain("brooklyn"));
+        }
+
         [Test, Description("Vérifie que la carte d'Agent D reste celle de New York, avec les quatre zones de Brooklyn — parce que le parcours d'Agent D ne change pas")]
         public void Presenter_AgentD_ShowsNewYorkMap()
         {

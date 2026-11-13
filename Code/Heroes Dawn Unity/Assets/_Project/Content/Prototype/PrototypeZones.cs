@@ -125,13 +125,13 @@ namespace N29.HeroesDawn.Content.Prototype
             => new NarrationLineDef(speaker, "narration." + zone + "." + node + "." + phase + "." + i);
 
         /// <summary>Graphe A (Brownsville, réutilisé par Moscou) : 20 cases, 2 embranchements, élite fixe en n14, sortie fixe en n19, mini-jeu fixe en n13.</summary>
-        internal static List<NodeDef> BrownsvilleNodes(NarrationDef eliteTalk, NarrationDef exitTalk, string miniGameActivity = null)
+        internal static List<NodeDef> BrownsvilleNodes(NarrationDef eliteTalk, NarrationDef exitTalk, string miniGameActivity = null, bool n03Fixed = false)
         {
             return new List<NodeDef>
             {
                 N("n00", CaseType.Entry, 0, 2, true),
                 N("n01", CaseType.Resource, 1, 2), N("n02", CaseType.Combat, 2, 2, r: CombatRank.Easy),
-                N("n03", CaseType.Narrative, 3, 3), N("n04", CaseType.Resource, 4, 3), N("n05", CaseType.Combat, 5, 3),
+                N("n03", CaseType.Narrative, 3, 3, n03Fixed), N("n04", CaseType.Resource, 4, 3), N("n05", CaseType.Combat, 5, 3),
                 N("n06", CaseType.Resource, 3, 1), N("n07", CaseType.Empty, 4, 1), N("n08", CaseType.Combat, 5, 1, r: CombatRank.Easy),
                 N("n09", CaseType.Rest, 6, 2), N("n10", CaseType.Combat, 7, 2),
                 N("n11", CaseType.Resource, 8, 3), N("n12", CaseType.Narrative, 9, 3),
@@ -179,12 +179,12 @@ namespace N29.HeroesDawn.Content.Prototype
         static List<NodeDef> BridgeNodes(NarrationDef bossTalk) => BridgeNodes(bossTalk, null, null, "rooftop_rescue", true);
 
         /// <summary>Graphe B généralisé (Moscou) : sans boss, la case finale n18 est une sortie fixe (narration éventuelle) ; n11 prend le mini-jeu donné ; n14 peut porter une narration d élite.</summary>
-        internal static List<NodeDef> BridgeNodes(NarrationDef bossTalk, NarrationDef eliteTalk, NarrationDef exitTalk, string n11Activity, bool bossAtEnd)
+        internal static List<NodeDef> BridgeNodes(NarrationDef bossTalk, NarrationDef eliteTalk, NarrationDef exitTalk, string n11Activity, bool bossAtEnd, bool n04Fixed = false)
             => new List<NodeDef>
             {
                 N("n00", CaseType.Entry, 0, 2, true),
                 N("n01", CaseType.Resource, 1, 2), N("n02", CaseType.Combat, 2, 2),
-                N("n03", CaseType.Resource, 3, 3), N("n04", CaseType.Narrative, 4, 3), N("n05", CaseType.Combat, 5, 3),
+                N("n03", CaseType.Resource, 3, 3), N("n04", CaseType.Narrative, 4, 3, n04Fixed), N("n05", CaseType.Combat, 5, 3),
                 N("n06", CaseType.MiniGame, 3, 1, activity: "potion_field"), N("n07", CaseType.Combat, 4, 1, r: CombatRank.Easy), N("n08", CaseType.Resource, 5, 1),
                 N("n09", CaseType.Rest, 6, 2), N("n10", CaseType.Combat, 7, 2),
                 N("n11", CaseType.MiniGame, 8, 3, true, activity: n11Activity), N("n12", CaseType.Resource, 9, 3),

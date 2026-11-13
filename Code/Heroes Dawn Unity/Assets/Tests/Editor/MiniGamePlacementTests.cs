@@ -41,6 +41,22 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(placed, Is.EqualTo(Expected.OrderBy(x => x).ToList()));
         }
 
+        [Test, Description("Vérifie que les cases Mini-jeu de Moscou (importées) lancent les mini-jeux existants prévus, et que chacune se planifie avec un pilote 2D — parce qu'une case sans jeu bloquerait le plateau")]
+        public void MoscowMiniGames_ArePlacedAndPlayable()
+        {
+            var content = Content();
+            var loc = new LocLocalization();
+            var cases = content.Zones.Where(z => z.Borough == "sergueiv").SelectMany(z => z.Nodes.Where(n => n.Type == CaseType.MiniGame && n.Activity.HasValue && n.Activity.Value.Value != "potion_field").Select(n => (z, n))).ToList();
+            Assert.That(cases.Select(x => (x.z.Id.Value, x.n.Id.Value, x.n.Activity.Value.Value)).OrderBy(x => x),
+                Is.EqualTo(new[] { ("zone_mos_1_1", "n13", "infiltration_camp"), ("zone_mos_1_2", "n11", "gears_workshop"), ("zone_mos_1_3", "n11", "rooftop_rescue"), ("zone_mos_1_4", "n11", "crate_pick_depot") }));
+            foreach (var (zone, node) in cases)
+            {
+                var def = content.Activity(node.Activity.Value);
+                var plan = ActivityPlanner.Plan(ActivityRegistry.Default, def, zone.Environment, 11UL, node.Id, 1, new[] { new MemberId("ancre") });
+                Assert.That(MiniGameDrivers.Create(plan, loc) != null || N29.HeroesDawn.Presentation.Board.CasePopupPresenter.HasDedicatedWindow(def.Kind), Is.True, zone.Id.Value + "/" + node.Id.Value + " : ni pilote 2D ni fenêtre dédiée");
+            }
+        }
+
         [Test, Description("Vérifie que chaque zone de Brooklyn a au moins deux mini-jeux et que les neuf activités placées sont toutes différentes — parce que le test public doit varier les jeux")]
         public void EveryBrooklynZone_HasAtLeastTwoMiniGames_AndAllDistinct()
         {

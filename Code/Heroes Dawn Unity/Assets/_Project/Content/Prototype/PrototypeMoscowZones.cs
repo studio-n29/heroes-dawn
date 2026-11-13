@@ -67,7 +67,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 Enc(CombatRank.Normal, "brute", "mos_smuggler", "mos_guard"),
                 Enc(CombatRank.Elite, "mos_enforcer", "mos_guard", "mos_smuggler"),
             };
-            return new ZoneDef(Zone11, "zones.mos_1_1.name", new CaseId("n00"), PrototypeZones.BrownsvilleNodes(enforcer, exit, "infiltration_camp"), PrototypeZones.BrownsvilleLinks(),
+            return new ZoneDef(Zone11, "zones.mos_1_1.name", new CaseId("n00"), PrototypeZones.BrownsvilleNodes(enforcer, exit, "infiltration_camp", true), PrototypeZones.BrownsvilleLinks(),
                                objectives, encounters, "M1.1", 1, Borough, 5, Requires(Zone11), new ZoneEnvironment(Biome.City, Weather.Day));
         }
 
@@ -91,7 +91,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 Enc(CombatRank.Normal, "mos_guard", "mos_smuggler", "mos_smuggler"),
                 Enc(CombatRank.Elite, "mos_enforcer", "mos_smuggler", "thug"),
             };
-            return new ZoneDef(Zone12, "zones.mos_1_2.name", new CaseId("n00"), PrototypeZones.BridgeNodes(null, guardian, exit, "gears_workshop", false), PrototypeZones.BridgeLinks(),
+            return new ZoneDef(Zone12, "zones.mos_1_2.name", new CaseId("n00"), PrototypeZones.BridgeNodes(null, guardian, exit, "gears_workshop", false, true), PrototypeZones.BridgeLinks(),
                                objectives, encounters, "M1.2", 1, Borough, 6, Requires(Zone12), new ZoneEnvironment(Biome.City, Weather.Fog));
         }
 
