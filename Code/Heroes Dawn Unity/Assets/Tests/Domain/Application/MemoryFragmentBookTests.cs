@@ -16,13 +16,28 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         [Test, Description("Vérifie que chaque fragment pointe vers un chapitre et une zone qui existent — parce qu'un fragment orphelin ne se débloquerait jamais")]
         public void EveryFragment_HasItsChapterAndZone()
         {
-            var zones = TestContent.Build().Zones.Concat(PrototypeZones.Zones()).Select(z => z.Id.Value).ToList();
+            var zones = TestContent.Build().Zones.Concat(PrototypeZones.Zones()).Concat(PrototypeMoscowZones.Zones()).Select(z => z.Id.Value).ToList();
             foreach (var f in MemoryFragments.All)
             {
                 Assert.That(Chapters.Find(f.ChapterId), Is.Not.Null, f.Id);
                 Assert.That(zones, Does.Contain(f.UnlockZone), f.Id);
             }
             Assert.That(MemoryFragments.All.Select(f => f.Id).Distinct().Count(), Is.EqualTo(MemoryFragments.All.Count));
+        }
+
+        [Test, Description("Vérifie que le chapitre Sergueiv compte quatre souvenirs, un par zone M1.1 à M1.4, débloqués en validant leur zone — parce que chaque zone de Moscou donne un fragment")]
+        public void Fragments_OfSergueiv_AreFour_UnlockedByTheirZone()
+        {
+            var f = MemoryFragments.OfChapter("mos_sergueiv");
+            Assert.That(f.Select(x => x.Id), Is.EqualTo(new[] { "mos_maglev_welcome", "mos_monastery_register", "mos_convoy_crates", "mos_depot_passeur" }));
+            Assert.That(f.Select(x => x.UnlockZone), Is.EqualTo(new[] { "zone_mos_1_1", "zone_mos_1_2", "zone_mos_1_3", "zone_mos_1_4" }));
+            var app = new TestApp();
+            app.SignInDirect("p1");
+            Assert.That(app.Fragments.UnlockedCount("mos_sergueiv"), Is.EqualTo(0));
+            app.Session.CompletedZones.Add("zone_mos_1_1");
+            app.Session.CompletedZones.Add("zone_mos_1_4");
+            Assert.That(app.Fragments.UnlockedCount("mos_sergueiv"), Is.EqualTo(2));
+            Assert.That(app.Fragments.UnlockedCount("ny_brooklyn"), Is.EqualTo(0));
         }
 
         [Test, Description("Vérifie qu'un fragment se débloque quand sa zone est validée et que les compteurs du chapitre suivent — parce que la page Chapitres s'appuie dessus")]

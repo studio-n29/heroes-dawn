@@ -95,6 +95,20 @@ namespace N29.HeroesDawn.Presentation.Common
             d["narration.mos_1_4.n18.after.0"] = "« Vous croyez avoir trouvé quelque chose ? On vous a laissé trouver. L'accueil, c'est moi qui l'ai organisé. »";
             d["narration.mos_1_4.n18.after.1"] = "« Alors c'était pour nous tenir loin de Kapotnya. »";
             d["narration.mos_1_4.n18.after.2"] = "« Alors c'est là que nous irons. »";
+
+            // --- Fragments de souvenirs (annexe B de la spec) et archives de zone ---
+            d["fragment.mos_maglev_welcome.title"] = "L'accueil parfait";
+            d["fragment.mos_maglev_welcome.text"] = "Les hologrammes saluaient l'Aube par son nom, les quais étaient balayés, les sourires, parfaits. Un cargo scellé dormait pourtant sur la voie 9, sans nom et sans manifeste. Moscou t'ouvrait grand les bras, et regardait ailleurs.";
+            d["fragment.mos_monastery_register.title"] = "Le registre sous la fresque";
+            d["fragment.mos_monastery_register.text"] = "Tu as restauré mille fresques sans jamais chercher ce qu'elles cachaient. Celle-ci couvrait un registre : des noms, des dates, des livraisons. Quelqu'un avait peint par-dessus une vérité, et l'avait confiée aux saints.";
+            d["fragment.mos_convoy_crates.title"] = "Des caisses marquées";
+            d["fragment.mos_convoy_crates.text"] = "Le convoi filait sous la ville, éclairé comme une fête. Les caisses portaient un code que personne n'utilise plus. Il y avait des mains neuves sur de très vieilles recherches.";
+            d["fragment.mos_depot_passeur.title"] = "Le Passeur";
+            d["fragment.mos_depot_passeur.text"] = "Il ne disait jamais victime, jamais ennemi : seulement client. Dans son dépôt, tout avait un prix, même l'accueil qu'on t'avait réservé. Ce soir, tu as compris que la ville entière avait été invitée à regarder ailleurs.";
+            d["archives.zone.zone_mos_1_1"] = "Gare du maglev : l'accueil de Moscou était trop parfait pour être honnête. Derrière les quais, un cargo scellé et sans manifeste, déposé trois jours avant l'arrivée de l'Aube.";
+            d["archives.zone.zone_mos_1_2"] = "Monastère-archives : la fresque cachait un registre de livraisons, noms et dates compris. C'est la moitié d'une preuve ; l'autre moitié se trouve du côté des raffineries.";
+            d["archives.zone.zone_mos_1_3"] = "Voie du maglev : un convoi qui n'existe pas filait sous la ville. Ses caisses portaient un code d'avant l'Union : quelqu'un déterre de très vieilles recherches.";
+            d["archives.zone.zone_mos_1_4"] = "Dépôt du maglev : le Passeur, qui ne parle que de clients, avait organisé l'accueil pour tenir l'Aube loin de Kapotnya. C'est précisément là qu'elle ira.";
         }
 
         /// <summary>Ajoute les textes anglais de Moscou au dictionnaire anglais (méthode statique sans état : sûre dans un initialiseur de champ).</summary>
@@ -183,6 +197,20 @@ namespace N29.HeroesDawn.Presentation.Common
             d["narration.mos_1_4.n18.after.0"] = "\"You think you found something? We let you find it. I arranged the welcome.\"";
             d["narration.mos_1_4.n18.after.1"] = "\"So that was to keep us away from Kapotnya.\"";
             d["narration.mos_1_4.n18.after.2"] = "\"Then that is where we go.\"";
+
+            // --- Memory fragments (spec appendix B) and zone archives ---
+            d["fragment.mos_maglev_welcome.title"] = "The Perfect Welcome";
+            d["fragment.mos_maglev_welcome.text"] = "Holograms greeted The Dawn by name, the platforms were swept, the smiles flawless. Yet a sealed cargo sat on track 9, with no name and no manifest. Moscow opened its arms wide, and looked the other way.";
+            d["fragment.mos_monastery_register.title"] = "The Ledger Under the Fresco";
+            d["fragment.mos_monastery_register.text"] = "You have restored a thousand frescoes without ever looking for what they hid. This one covered a ledger: names, dates, deliveries. Someone had painted over the truth and entrusted it to the saints.";
+            d["fragment.mos_convoy_crates.title"] = "Marked Crates";
+            d["fragment.mos_convoy_crates.text"] = "The convoy raced beneath the city, lit like a festival. The crates bore a code nobody uses anymore. New hands on very old research.";
+            d["fragment.mos_depot_passeur.title"] = "The Smuggler";
+            d["fragment.mos_depot_passeur.text"] = "He never said victim, never enemy: only customer. In his depot everything had a price, even the welcome prepared for you. Tonight you understood the whole city had been invited to look elsewhere.";
+            d["archives.zone.zone_mos_1_1"] = "Maglev station: Moscow's welcome was too perfect to be honest. Behind the platforms, a sealed cargo with no manifest, left three days before The Dawn arrived.";
+            d["archives.zone.zone_mos_1_2"] = "Monastery archives: the fresco hid a ledger of deliveries, names and dates included. It is half a proof; the other half lies out by the refineries.";
+            d["archives.zone.zone_mos_1_3"] = "Maglev line: a convoy that does not exist raced beneath the city. Its crates carried a pre-Union code: someone is digging up very old research.";
+            d["archives.zone.zone_mos_1_4"] = "Maglev depot: the Smuggler, who speaks only of customers, had arranged the welcome to keep The Dawn away from Kapotnya. That is exactly where it will go.";
             return d;
         }
     }

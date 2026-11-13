@@ -34,6 +34,10 @@ namespace N29.HeroesDawn.Definitions
             new MemoryFragmentDef("brownsville_hostages", "ny_brooklyn", "zone_ny_1_2"),
             new MemoryFragmentDef("coney_trap", "ny_brooklyn", "zone_ny_1_3"),
             new MemoryFragmentDef("dumbo_bridge", "ny_brooklyn", "zone_ny_1_4"),
+            new MemoryFragmentDef("mos_maglev_welcome", "mos_sergueiv", "zone_mos_1_1"),
+            new MemoryFragmentDef("mos_monastery_register", "mos_sergueiv", "zone_mos_1_2"),
+            new MemoryFragmentDef("mos_convoy_crates", "mos_sergueiv", "zone_mos_1_3"),
+            new MemoryFragmentDef("mos_depot_passeur", "mos_sergueiv", "zone_mos_1_4"),
         };
 
         public static MemoryFragmentDef? Find(string id) => All.FirstOrDefault(f => f.Id == id);

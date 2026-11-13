@@ -137,6 +137,17 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(bad, Is.Empty, string.Join(", ", bad));
         }
 
+        [Test, Description("Vérifie que chaque fragment de Sergueiv a un titre et un texte en français ET en anglais, et que chaque zone a son texte d'archives dans les deux langues — parce que la page Chapitres et les archives les lisent")]
+        public void FragmentsAndArchivesTexts_ExistInFrAndEn()
+        {
+            var en = new System.Collections.Generic.HashSet<string>(N29.HeroesDawn.Presentation.Common.Loc.EnglishKeys());
+            var keys = MemoryFragments.OfChapter("mos_sergueiv").SelectMany(f => new[] { f.TitleKey, f.TextKey }).Concat(Zones().Select(z => "archives.zone." + z.Id.Value)).ToList();
+            Assert.That(keys.Count, Is.EqualTo(12));
+            Assert.That(keys.Where(k => !L.Has(k)), Is.Empty, "FR");
+            Assert.That(keys.Where(k => !en.Contains(k)), Is.Empty, "EN");
+            Assert.That(keys.Where(k => L.T(k).Contains("Aube tactique")), Is.Empty);
+        }
+
         [Test, Description("Vérifie que chaque rencontre ne dépasse pas trois ennemis et que chaque rang de combat présent dans le plateau a une rencontre — parce qu'un combat sans table planterait")]
         public void EveryCombatRank_HasAnEncounter()
         {
