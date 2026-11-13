@@ -82,7 +82,8 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public IReadOnlyList<MainQuestView> Main()
         {
             var list = new List<MainQuestView>();
-            foreach (var z in ZoneProgress.InBorough(_c.Session, "brooklyn")) list.Add(new MainQuestView(z, ZoneProgress.StatusOf(_c.Session, z)));
+            // Zones de l'acte courant du parcours (Agent D : Brooklyn, Agent M : Sergueiv), hors repaires.
+            foreach (var z in StoryProgress.ZonesOf(_c.Session, StoryProgress.Current(_c.Session).City)) if (!z.IsLair) list.Add(new MainQuestView(z, ZoneProgress.StatusOf(_c.Session, z)));
             return list;
         }
 

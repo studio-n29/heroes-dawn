@@ -88,5 +88,12 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(act.City, Is.EqualTo("moscow"));
             Assert.That(act.HasZones, Is.False);
         }
+
+        [Test, Description("Vérifie que les quatre quartiers de Moscou appartiennent à Moscou et Brooklyn à New York — parce que sans cela l'acte de Moscou ne se terminerait jamais (défaut : New York)")]
+        public void CityOfBorough_MoscowDistricts_AreMoscow()
+        {
+            foreach (var b in new[] { "sergueiv", "kapotnya", "sadovoye", "place_rouge" }) Assert.That(StoryRoutes.CityOfBorough(b), Is.EqualTo("moscow"), b);
+            Assert.That(StoryRoutes.CityOfBorough("brooklyn"), Is.EqualTo("new_york"));
+        }
     }
 }

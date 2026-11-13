@@ -69,7 +69,7 @@ namespace N29.HeroesDawn.Definitions
             {
                 case "brooklyn": case "queens": case "bronx": case "manhattan": case "staten": return NewYork;
                 case "paris": return Paris;
-                case "moscow": return Moscow;
+                case "moscow": case "sergueiv": case "kapotnya": case "sadovoye": case "place_rouge": return Moscow;
                 case "salem": return Salem;
                 default: return NewYork;
             }

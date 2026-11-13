@@ -30,7 +30,7 @@ namespace N29.HeroesDawn.Application.Features.World
         {
             var zones = ZonesOf(session, city);
             if (zones.Count == 0) return false;
-            foreach (var z in zones) if (ZoneProgress.StatusOf(session, z) != ZoneStatus.Done) return false;
+            foreach (var z in zones) if (ZoneProgress.RawStatusOf(session, z) != ZoneStatus.Done) return false;
             return true;
         }
 

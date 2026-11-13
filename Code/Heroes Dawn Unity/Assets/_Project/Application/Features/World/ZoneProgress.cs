@@ -10,7 +10,16 @@ namespace N29.HeroesDawn.Application.Features.World
     /// <summary>Progression de l'histoire : quelles zones sont ouvertes, laquelle jouer ensuite.</summary>
     public static class ZoneProgress
     {
+        /// <summary>État d'une zone selon l'acte courant du parcours : une zone non validée n'est ouverte que dans la ville de l'acte en cours (Agent D : New York, Agent M : Moscou).</summary>
         public static ZoneStatus StatusOf(ISessionReadModel session, ZoneDef zone)
+        {
+            var raw = RawStatusOf(session, zone);
+            if (raw != ZoneStatus.Available || zone.IsTutorial) return raw; // le tutoriel est jouable quel que soit le parcours
+            return StoryRoutes.CityOfBorough(zone.Borough) == StoryProgress.Current(session).City ? ZoneStatus.Available : ZoneStatus.Locked;
+        }
+
+        /// <summary>État d'une zone selon ses seuls prérequis, sans tenir compte de l'acte courant (sert au calcul de la fin d'un acte).</summary>
+        public static ZoneStatus RawStatusOf(ISessionReadModel session, ZoneDef zone)
         {
             if (Contains(session.CompletedZones, zone.Id.Value)) return ZoneStatus.Done;
             foreach (var req in zone.Requires)
