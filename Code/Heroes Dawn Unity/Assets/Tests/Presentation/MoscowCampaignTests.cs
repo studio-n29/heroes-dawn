@@ -78,6 +78,65 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(codes.Distinct().Count(), Is.EqualTo(codes.Count), string.Join(",", codes));
         }
 
+        static readonly N29.HeroesDawn.Presentation.Mvp.LocLocalization L = new N29.HeroesDawn.Presentation.Mvp.LocLocalization();
+
+        // Toutes les clés de texte de la campagne de Moscou (hors ennemis, couverts par MoscowEnemyTests).
+        static System.Collections.Generic.List<string> CampaignKeys()
+        {
+            var keys = new System.Collections.Generic.List<string>();
+            foreach (var z in Zones())
+            {
+                keys.Add(z.NameKey);
+                keys.Add(z.NameKey.Replace(".name", ".short"));
+                keys.Add(z.NameKey.Replace(".name", ".code"));
+                keys.Add(z.NameKey.Replace(".name", ".desc"));
+                keys.Add("qg.fil." + z.Id.Value);
+                foreach (var o in z.Objectives) keys.Add(o.NameKey);
+                foreach (var n in z.Nodes.Where(n => n.Narration != null))
+                    foreach (var line in n.Narration.Before.Concat(n.Narration.After)) keys.Add(line.TextKey);
+                foreach (var id in z.Encounters.SelectMany(e => e.Enemies).Distinct())
+                {
+                    keys.Add("enemies." + id.Value + ".name");
+                    foreach (var s in C.Enemy(id).Skills) keys.Add("skills." + s.Id.Value);
+                }
+            }
+            return keys.Distinct().ToList();
+        }
+
+        [Test, Description("Vérifie que chaque nom, description, objectif, réplique, ennemi et compétence des quatre zones de Moscou a un texte français — parce qu'une clé manquante s'afficherait telle quelle à l'écran")]
+        public void EveryTextOfTheCampaign_Exists()
+        {
+            var missing = CampaignKeys().Where(k => !L.Has(k)).ToList();
+            Assert.That(missing, Is.Empty, string.Join("\n", missing));
+        }
+
+        [Test, Description("Vérifie que chaque texte propre à Moscou (zones, objectifs, répliques) a aussi une version anglaise — parce que le jeu se joue en anglais sans clé française résiduelle")]
+        public void EveryTextOfTheCampaign_ExistsInEnglish()
+        {
+            var en = new System.Collections.Generic.HashSet<string>(N29.HeroesDawn.Presentation.Common.Loc.EnglishKeys());
+            // Les ennemis réutilisés de Brooklyn (thug, brute, street_pyro) n'ont pas de version anglaise : hors périmètre de Moscou.
+            var missing = CampaignKeys().Where(k => (k.StartsWith("zones.mos") || k.StartsWith("qg.fil.zone_mos") || k.StartsWith("objectives.mos") || k.StartsWith("narration.mos") || k.Contains("mos_")) && !en.Contains(k)).ToList();
+            Assert.That(missing, Is.Empty, string.Join("\n", missing));
+        }
+
+        [Test, Description("Vérifie que chaque personnage qui parle à Moscou a un nom affichable (agent_m, ilona_varga, passeur, enforcer) — parce que la boîte de dialogue montre le nom du locuteur")]
+        public void EverySpeaker_HasADisplayName()
+        {
+            var members = C.Members.Select(m => m.Id.Value).ToHashSet();
+            var speakers = Zones().SelectMany(z => z.Nodes).Where(n => n.Narration != null).SelectMany(n => n.Narration.Before.Concat(n.Narration.After)).Select(l => l.Speaker).Distinct().ToList();
+            Assert.That(speakers, Is.SupersetOf(new[] { "agent_m", "ilona_varga", "passeur", "enforcer" }));
+            var missing = speakers.Where(s => !members.Contains(s) && !L.Has("speaker." + s)).ToList();
+            Assert.That(missing, Is.Empty, string.Join(", ", missing));
+            Assert.That(L.Has("speaker.agent_m"), Is.True);
+        }
+
+        [Test, Description("Vérifie que « Aube tactique » n'apparaît dans aucun texte de Moscou, en français comme en anglais — parce que ce nom ne doit jamais être visible dans le jeu")]
+        public void NoText_ContainsAubeTactique()
+        {
+            var bad = CampaignKeys().Where(k => L.Has(k) && (L.T(k).Contains("Aube tactique") || L.T(k).Contains("Tactical Dawn"))).ToList();
+            Assert.That(bad, Is.Empty, string.Join(", ", bad));
+        }
+
         [Test, Description("Vérifie que chaque rencontre ne dépasse pas trois ennemis et que chaque rang de combat présent dans le plateau a une rencontre — parce qu'un combat sans table planterait")]
         public void EveryCombatRank_HasAnEncounter()
         {
