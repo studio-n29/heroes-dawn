@@ -305,6 +305,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendCinematic(d);
             ExtendMiniGames(d);
             ExtendAccount(d);
+            ExtendMoscow(d);
             return d;
         }
 
@@ -329,6 +330,7 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendCinematic(Dictionary<string, string> d);
         static partial void ExtendMiniGames(Dictionary<string, string> d);
         static partial void ExtendAccount(Dictionary<string, string> d);
+        static partial void ExtendMoscow(Dictionary<string, string> d);
 
         static Func<string> _language = () => "fr";
 

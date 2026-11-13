@@ -135,6 +135,7 @@ namespace N29.HeroesDawn.Content.Prototype
             };
 
             enemies.AddRange(PrototypeZones.Enemies());
+            enemies.AddRange(PrototypeMoscowEnemies.All());
             var zones = new List<ZoneDef> { BuildZone11(), BuildTutorialZone() };
             zones.AddRange(PrototypeZones.Zones());
             return new ContentCatalog(balance, members, enemies, synergies, zones, PrototypeActivities.Build(balance), PrototypeCollection.Build(), starterTeam);

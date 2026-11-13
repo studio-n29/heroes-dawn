@@ -16,25 +16,25 @@ namespace N29.HeroesDawn.Content.Prototype
         /// <summary>Repaire de l'AMIF : donjon à trois boss (Brick, Crocodile, le Titan), ouvert une fois Brooklyn terminé.</summary>
         public static readonly ZoneId ZoneLairAmifVault = new ZoneId("zone_lair_amif_vault");
 
-        static EffectDef Dmg(int pct) => new EffectDef(EffectType.Damage, pct);
-        static EffectDef St(StatusType s, int turns, int chance = 100) => new EffectDef(EffectType.ApplyStatus, 0, s, turns, chance);
-        static EffectDef Shield(int pct, int turns = 2) => new EffectDef(EffectType.Shield, pct, StatusType.Shield, turns);
+        internal static EffectDef Dmg(int pct) => new EffectDef(EffectType.Damage, pct);
+        internal static EffectDef St(StatusType s, int turns, int chance = 100) => new EffectDef(EffectType.ApplyStatus, 0, s, turns, chance);
+        internal static EffectDef Shield(int pct, int turns = 2) => new EffectDef(EffectType.Shield, pct, StatusType.Shield, turns);
 
-        static SkillDef S(string id, SkillSlot slot, int cd, TargetRule t, params EffectDef[] fx)
+        internal static SkillDef S(string id, SkillSlot slot, int cd, TargetRule t, params EffectDef[] fx)
             => new SkillDef(new SkillId(id), slot, cd, t, fx);
 
-        static EnemyDef E(string id, Position r, Family f, StatBlock st, bool boss, params SkillDef[] skills)
+        internal static EnemyDef E(string id, Position r, Family f, StatBlock st, bool boss, params SkillDef[] skills)
             => new EnemyDef(new EnemyId(id), "enemies." + id + ".name", r, f, st, skills, boss);
 
         /// <summary>Palier de boss : sous <paramref name="pct"/> % de PV, bonus permanents de force, de défense et de vitesse (en %).</summary>
-        static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd, SkillDef[] skills = null, AiStyle? style = null)
+        internal static BossPhaseDef Phase(int pct, string nameKey, int atk, int def, int spd, SkillDef[] skills = null, AiStyle? style = null)
             => new BossPhaseDef(pct, nameKey, atk, def, spd, skills, style);
 
-        static EnemyDef Phased(EnemyDef d, params BossPhaseDef[] phases)
+        internal static EnemyDef Phased(EnemyDef d, params BossPhaseDef[] phases)
             => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, phases, d.Style);
 
         /// <summary>Même ennemi avec un style d IA explicite (sans lui, le style vient de la position).</summary>
-        static EnemyDef Styled(EnemyDef d, AiStyle style)
+        internal static EnemyDef Styled(EnemyDef d, AiStyle style)
             => new EnemyDef(d.Id, d.NameKey, d.Position, d.Family, d.BaseStats, d.Skills, d.IsBoss, d.Phases, style);
 
         /// <summary>Ennemis ajoutés aux zones 1.2 et 1.3.</summary>
