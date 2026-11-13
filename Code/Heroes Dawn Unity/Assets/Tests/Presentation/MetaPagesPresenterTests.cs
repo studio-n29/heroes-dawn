@@ -385,6 +385,27 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Last.Points.Count(p => p.ZoneId == null), Is.GreaterThan(0), "points à venir dans les quartiers verrouillés");
         }
 
+        [Test, Description("Vérifie que la carte d'Agent M est celle de Moscou (Sergueiv ouvert, trois quartiers à venir), avec les quatre zones de Moscou dans la liste et la première proposée — parce que le parcours d'Agent M commence à Moscou")]
+        public void Presenter_AgentM_ShowsMoscowMap()
+        {
+            _app.Session.Meta.onboarding.hero = "agent_m";
+            Make();
+            Assert.That(_view.Last.Boroughs.Select(b => b.Id), Is.EquivalentTo(new[] { "sergueiv", "kapotnya", "sadovoye", "place_rouge" }));
+            Assert.That(_view.Last.Boroughs.Where(b => !b.Locked).Select(b => b.Id), Is.EqualTo(new[] { "sergueiv" }));
+            Assert.That(_view.Last.Rows.Select(r => r.ZoneId), Is.EqualTo(new[] { "zone_mos_1_1", "zone_mos_1_2", "zone_mos_1_3", "zone_mos_1_4" }));
+            Assert.That(_view.Last.Points.First(p => p.Selected).ZoneId, Is.EqualTo("zone_mos_1_1"));
+            Assert.That(_view.Last.Boroughs.All(b => b.Name.Length > 0 && !b.Name.StartsWith("[")), Is.True, "noms de quartiers traduits");
+        }
+
+        [Test, Description("Vérifie que la carte d'Agent D reste celle de New York, avec les quatre zones de Brooklyn — parce que le parcours d'Agent D ne change pas")]
+        public void Presenter_AgentD_ShowsNewYorkMap()
+        {
+            _app.Session.Meta.onboarding.hero = "agent_d";
+            Make();
+            Assert.That(_view.Last.Boroughs.Length, Is.EqualTo(5));
+            Assert.That(_view.Last.Rows.Select(r => r.ZoneId), Is.EqualTo(new[] { "zone_ny_1_1", "zone_ny_1_2", "zone_ny_1_3", "zone_ny_1_4" }));
+        }
+
         [Test, Description("Vérifie que la zone proposée est la première non validée et que DÉPLOYER la démarre — parce que MISSION → carte → Déployer remplace le lancement direct")]
         public void Deploy_StartsSelectedZone()
         {

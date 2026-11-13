@@ -109,6 +109,14 @@ namespace N29.HeroesDawn.Presentation.Common
             d["archives.zone.zone_mos_1_2"] = "Monastère-archives : la fresque cachait un registre de livraisons, noms et dates compris. C'est la moitié d'une preuve ; l'autre moitié se trouve du côté des raffineries.";
             d["archives.zone.zone_mos_1_3"] = "Voie du maglev : un convoi qui n'existe pas filait sous la ville. Ses caisses portaient un code d'avant l'Union : quelqu'un déterre de très vieilles recherches.";
             d["archives.zone.zone_mos_1_4"] = "Dépôt du maglev : le Passeur, qui ne parle que de clients, avait organisé l'accueil pour tenir l'Aube loin de Kapotnya. C'est précisément là qu'elle ira.";
+
+            // --- Carte de Moscou ---
+            d["map.borough.sergueiv"] = "SERGUEIV";
+            d["map.borough.kapotnya"] = "KAPOTNYA";
+            d["map.borough.sadovoye"] = "SADOVOYE KOLTSO";
+            d["map.borough.place_rouge"] = "PLACE ROUGE";
+            d["map.chapter"] = "CHAPITRE {0}";
+            d["map.chapter_soon"] = "CHAPITRE {0} · BIENTÔT";
         }
 
         /// <summary>Ajoute les textes anglais de Moscou au dictionnaire anglais (méthode statique sans état : sûre dans un initialiseur de champ).</summary>
@@ -211,6 +219,14 @@ namespace N29.HeroesDawn.Presentation.Common
             d["archives.zone.zone_mos_1_2"] = "Monastery archives: the fresco hid a ledger of deliveries, names and dates included. It is half a proof; the other half lies out by the refineries.";
             d["archives.zone.zone_mos_1_3"] = "Maglev line: a convoy that does not exist raced beneath the city. Its crates carried a pre-Union code: someone is digging up very old research.";
             d["archives.zone.zone_mos_1_4"] = "Maglev depot: the Smuggler, who speaks only of customers, had arranged the welcome to keep The Dawn away from Kapotnya. That is exactly where it will go.";
+
+            // --- Moscow map ---
+            d["map.borough.sergueiv"] = "SERGUEIV";
+            d["map.borough.kapotnya"] = "KAPOTNYA";
+            d["map.borough.sadovoye"] = "SADOVOYE KOLTSO";
+            d["map.borough.place_rouge"] = "RED SQUARE";
+            d["map.chapter"] = "CHAPTER {0}";
+            d["map.chapter_soon"] = "CHAPTER {0} · COMING SOON";
             return d;
         }
     }
