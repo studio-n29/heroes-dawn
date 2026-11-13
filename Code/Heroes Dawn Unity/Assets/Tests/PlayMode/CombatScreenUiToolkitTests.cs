@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections;
 using System.IO;
+using System.Linq;
 using MessagePipe;
 using N29.HeroesDawn.Application.Flow;
 using N29.HeroesDawn.Application.Messages;
@@ -92,6 +93,42 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 }
         }
 
+        /// <summary>Contrôles individuels : chaque carte de compétence et chaque fiche d'unité tient dans le panneau, ses textes ne sont pas écrasés, les fiches d'un même camp ne se recouvrent pas et les cartes de l'éventail ne se masquent pas à plus d'un tiers.</summary>
+        static void CardChecks(string format, System.Collections.Generic.List<string> problems)
+        {
+            var hud = Object.FindAnyObjectByType<CombatHudView>()!.GetComponent<UIDocument>().rootVisualElement;
+            var panel = hud.panel.visualTree.worldBound;
+            var skills = hud.Query<VisualElement>(className: "hd-skill").ToList().Where(e => e.resolvedStyle.display != DisplayStyle.None && e.worldBound.width > 2).ToList();
+            var units = hud.Query<VisualElement>(className: "hd-unit").ToList().Where(e => e.resolvedStyle.display != DisplayStyle.None && e.worldBound.width > 2).ToList();
+            if (skills.Count == 0) problems.Add(format + " : aucune carte de compétence affichée");
+            if (units.Count == 0) problems.Add(format + " : aucune fiche d'unité affichée");
+            foreach (var e in skills.Concat(units))
+            {
+                var b = e.worldBound;
+                if (b.xMin < panel.xMin - 1 || b.xMax > panel.xMax + 1 || b.yMin < panel.yMin - 1 || b.yMax > panel.yMax + 1)
+                    problems.Add($"{format} : carte « {string.Join(".", e.GetClasses())} » hors du panneau ({b} dans {panel})");
+                foreach (var l in e.Query<Label>().ToList())
+                    if (!string.IsNullOrEmpty(l.text) && l.text.Length >= 6 && l.resolvedStyle.display != DisplayStyle.None && l.worldBound.height > 1 && l.worldBound.width < 24f)
+                        problems.Add($"{format} : texte « {l.text} » écrasé dans une carte ({l.worldBound.width:F0} px)");
+            }
+            void NoOverlap(System.Collections.Generic.List<VisualElement> group, string what, float maxShare)
+            {
+                for (int i = 0; i < group.Count; i++)
+                    for (int j = i + 1; j < group.Count; j++)
+                    {
+                        var a = group[i].worldBound; var c = group[j].worldBound;
+                        float w = Mathf.Min(a.xMax, c.xMax) - Mathf.Max(a.xMin, c.xMin), h = Mathf.Min(a.yMax, c.yMax) - Mathf.Max(a.yMin, c.yMin);
+                        if (w <= 2f || h <= 2f) continue;
+                        float share = w * h / Mathf.Min(a.width * a.height, c.width * c.height);
+                        if (share > maxShare) problems.Add($"{format} : deux {what} se recouvrent à {share:P0}");
+                    }
+            }
+            NoOverlap(units, "fiches d'unités", 0.05f);
+            NoOverlap(skills, "cartes de compétence", 0.35f);
+        }
+
+        static void LayoutAndCards(string format, System.Collections.Generic.List<string> problems) { LayoutChecks(format, problems); CardChecks(format, problems); }
+
         /// <summary>Boutons du HUD du combat (le document du HUD).</summary>
         static System.Func<UnityEngine.UIElements.Button, bool> InHud()
             => b => b.panel != null && Object.FindAnyObjectByType<CombatHudView>() is CombatHudView v && v.GetComponent<UIDocument>().rootVisualElement.Contains(b);
@@ -100,7 +137,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator CombatHud_ButtonsStayInsideAndTappable_OnTheFourFormats()
         {
             yield return InCombat();
-            yield return UiToolkitAcceptance.CheckFormats(Folder, "combat", InHud(), 2, LayoutChecks);
+            yield return UiToolkitAcceptance.CheckFormats(Folder, "combat", InHud(), 2, LayoutAndCards);
         }
 
         [UnityTest, Timeout(400000), Description("Vérifie que tous les boutons du HUD du combat sont atteignables à la manette — parce que la retraite, AUTO et la vitesse doivent se jouer à la croix directionnelle")]
