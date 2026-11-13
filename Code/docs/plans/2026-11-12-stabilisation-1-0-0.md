@@ -94,7 +94,7 @@
 
 - [x] Rejouer le simulateur d'équilibrage après le Bloc A à E (2026-11-13 : `BalanceFullReport`, rapport `docs/test-reports/2026-11-13_equilibrage-boss.md`).
 - [~] Boss : ramener le taux de victoire de l'équipe de test dans **40 à 60 %** (Brick, Crocodile, Titan de l'AMIF), ajuster les bonus de phase.
-  - Mesuré le 2026-11-13 : Brick 100 %, Crocodile 93-96 %, Titan 100 % ; l'attaque est le levier (les PV ne changent presque rien). **Décision requise** : équipe de référence par boss, voir le rapport.
+  - Mesuré le 2026-11-13 : Brick 100 %, Crocodile 93-96 %, Titan 100 % ; l'attaque est le levier (les PV ne changent presque rien). **Appliqué** : Crocodile ATQ x3 et Titan x6 (31 à 63 % avec équipe de départ + objets). **Reste** : Brick (conception à revoir), élite AMIF (13 à 31 %), cartes équipées en auto (combats qui ne finissent pas), validation en playtest.
 - [ ] Valider les ⚑ : énergie (30 / +3), pause de résolution 1,3 s, paliers de lien (3-8-15-25), table des rangs AMIF, coûts de recrutement, paliers de tournoi, boutique de confort, déséquilibre des familles (Perception 9, Élémentaire 6).
 - [ ] 2 à 3 sessions de playtest réel avec le formulaire `docs/playtest-formulaire.md`.
 - [ ] Vérifier la garde anti pay-to-win (test existant) après chaque changement d'économie.

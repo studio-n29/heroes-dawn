@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 S("canal_chief_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(80), St(StatusType.Corrosion, 2, 40)),
                 S("canal_chief_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(20)));
             // Phase 1 défensive (provocation et bouclier) ; phase 2 équilibrée avec une onde de choc de zone ; phase 3 agressive, un gros coup.
-            yield return Phased(E("bridge_titan", Position.FrontLine, Family.PhysicalBio, new StatBlock(5600, 120, 140, 95), true,
+            yield return Phased(E("bridge_titan", Position.FrontLine, Family.PhysicalBio, new StatBlock(5600, 720, 140, 95), true, // ATQ 120 x6 : réglage de la phase 4 (équipe de départ + objets, 37 à 63 % de victoires), rapport 2026-11-13
                 S("bridge_titan_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(125)),
                 S("bridge_titan_a2", SkillSlot.A2, 3, TargetRule.Self, St(StatusType.Taunt, 2), Shield(12)),
                 S("bridge_titan_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(95), St(StatusType.Shock, 1, 35))),
@@ -67,7 +67,7 @@ namespace N29.HeroesDawn.Content.Prototype
                         S("bridge_titan_p2_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(110), St(StatusType.Shock, 1, 50)),
                     }, AiStyle.Aggressive));
             // Crocodile (Antonio Kribelchi), mafieux méta-humain : boss de Coney Island. Phase 1 : il entrave les plus rapides ; phase 2 : morsure broyeuse.
-            yield return Styled(Phased(E("crocodile", Position.Attacker, Family.PhysicalBio, new StatBlock(5200, 135, 120, 100), true,
+            yield return Styled(Phased(E("crocodile", Position.Attacker, Family.PhysicalBio, new StatBlock(5200, 405, 120, 100), true, // ATQ 135 x3 : réglage de la phase 4 (31 à 59 % de victoires), rapport 2026-11-13
                 S("crocodile_a1", SkillSlot.A1, 0, TargetRule.SingleEnemy, Dmg(130)),
                 S("crocodile_a2", SkillSlot.A2, 3, TargetRule.AllEnemies, Dmg(90), St(StatusType.Shock, 1, 30)),
                 S("crocodile_a3", SkillSlot.A3, 5, TargetRule.Self, Shield(25), St(StatusType.Taunt, 1)),
