@@ -28,6 +28,16 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Meta.playtestFormAsked, Is.True, "enregistré dans le profil");
         }
 
+        [Test, Description("Vérifie que le formulaire est aussi proposé à la première validation de M1.1 (première zone d'Agent M), une seule fois par profil — parce que les testeurs du parcours de Moscou ne passent jamais par la zone 1.1 de Brooklyn")]
+        public void Asks_OnFirstClearOfTheFirstMoscowZone_Once()
+        {
+            Assert.That(_f.ShouldAsk("zone_mos_1_1", true), Is.True);
+            Assert.That(_f.ShouldAsk("zone_mos_1_1", false), Is.False);
+            Assert.That(_f.ShouldAsk("zone_mos_1_2", true), Is.False);
+            _f.MarkAsked();
+            Assert.That(_f.ShouldAsk("zone_mos_1_1", true), Is.False, "déjà proposé");
+        }
+
         [Test, Description("Vérifie que le formulaire n'est valide qu'avec quatre notes de 1 à 5 — parce qu'un retour partiel fausserait l'analyse")]
         public void Answers_NeedFourRatingsBetweenOneAndFive()
         {

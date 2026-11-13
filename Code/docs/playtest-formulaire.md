@@ -38,3 +38,15 @@ version=
 ```
 
 Refais une build : à l'envoi, le jeu poste les réponses sur `formResponse` (sans compte) et affiche « Ton retour a bien été envoyé ». Si le réseau échoue, le rapport reste copié dans le presse-papiers.
+
+## 5. Playtest de Moscou (parcours d'Agent M)
+
+Le jeu propose aussi le formulaire à la **première validation de la zone M1.1** (une seule fois par profil), pour que les testeurs d'Agent M donnent leur retour sans passer par Brooklyn. Deux sessions de playtest réel sont prévues avant le gel du contenu (15/01/2027), avec un profil neuf choisissant **Agent M** à la première connexion.
+
+À observer pendant la session (noter dans le commentaire du formulaire ou à côté) :
+1. **Parcours** : carte de Moscou affichée (Sergueiv ouvert, trois quartiers « bientôt »), zones M1.1 à M1.4 dans l'ordre, aucune zone de Brooklyn proposée ni dans le journal de quêtes, ni dans le QG.
+2. **Difficulté** : le Passeur (M1.4) doit se jouer entre 40 et 60 % de victoires ; l'élite de M1.4 (homme de main + deux gardes) est la plus dure : vérifier qu'elle n'est pas un mur au niveau 8 à 10. Tester avec **cartes équipées et AUTO** (non simulé).
+3. **Narration** : les répliques s'enchaînent sans clé brute à l'écran en français et en anglais ; noms des locuteurs (Agent M, Ilona Varga, Homme de main, Le Passeur) corrects.
+4. **Fin du chapitre** : après le Passeur, l'écran de l'acte suivant (Paris, « bientôt ») ne propose ni Brooklyn ni bouton mort ; la carte de Moscou reste consultable et les zones se rejouent.
+5. **Souvenirs** : quatre fragments (page Chapitres, chapitre Sergueiv), débloqués zone par zone.
+6. **Mini-jeux** : infiltration (M1.1), engrenages (M1.2), sauvetage sur les toits (M1.3), tri de caisses (M1.4) se lancent et se terminent.

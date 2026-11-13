@@ -18,6 +18,8 @@ namespace N29.HeroesDawn.Application.Features.Meta
     public sealed class PlaytestFeedback
     {
         public const string TriggerZone = "zone_ny_1_1";
+        /// <summary>Première zone du parcours d'Agent M : le retour est demandé une fois, à la première zone terminée de l'un ou l'autre parcours.</summary>
+        public const string TriggerZoneMoscow = "zone_mos_1_1";
         public const int Questions = 4;
         public static readonly string[] QuestionIds = { "fun", "clarity", "difficulty", "tutorial" };
 
@@ -26,7 +28,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public PlaytestFeedback(MetaContext context) { _c = context; }
 
         /// <summary>Vrai à la première validation de la zone 1.1, tant que le formulaire n'a pas été proposé.</summary>
-        public bool ShouldAsk(string zoneId, bool firstClear) => firstClear && zoneId == TriggerZone && !_c.Meta.playtestFormAsked;
+        public bool ShouldAsk(string zoneId, bool firstClear) => firstClear && (zoneId == TriggerZone || zoneId == TriggerZoneMoscow) && !_c.Meta.playtestFormAsked;
 
         public void MarkAsked()
         {
