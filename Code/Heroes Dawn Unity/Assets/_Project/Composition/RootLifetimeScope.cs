@@ -199,6 +199,7 @@ namespace N29.HeroesDawn.Composition
                 return new N29.HeroesDawn.Application.Features.Analytics.ConsentGatedAnalytics(inner, () => settings.Current.consentAnswered && settings.Current.consentStats);
             }, Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.Analytics.AnalyticsBridge>(Lifetime.Singleton);
+            builder.Register<N29.HeroesDawn.Presentation.Account.ConsentPrompt>(Lifetime.Singleton);
 
             // ---- Use cases : combat
             builder.Register<ActiveCombat>(Lifetime.Singleton).AsSelf().As<IActiveCombatReadModel>();

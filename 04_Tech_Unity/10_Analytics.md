@@ -18,7 +18,8 @@ Branchement : `Composition/RootLifetimeScope.cs` (build joueur : `UgsAnalytics` 
 
 - **Opt-in** : `SettingsSave.consentStats` vaut faux par défaut et `consentAnswered` marque une réponse explicite. La mesure exige les deux : un ancien profil dont le réglage valait « vrai » avant l'opt-in n'a **pas** consenti.
 - Retrait : l'interrupteur « Partager des statistiques anonymes » (Réglages ▸ Compte et confidentialité) arrête la collecte (`StopDataCollection`).
-- **Reste à faire** : l'écran de consentement du premier lancement (question explicite, âge déclaré). Tant qu'il n'existe pas, seuls les joueurs qui activent l'interrupteur sont mesurés.
+- **Question de consentement** (`Presentation/Account/ConsentPrompt.cs`) : posée une seule fois par profil, à la première connexion, après la création du personnage et avant le QG. « Accepter » mémorise le oui ; « Refuser » et Retour mémorisent un refus ; la question ne revient pas. Textes `consent.*` (FR et EN).
+- **Reste à faire** : l'âge déclaré (classification d'âge, voir `Obligations_Legales.md`) et le texte définitif validé par le juridique ; la politique de confidentialité doit citer UGS.
 
 ## Événements
 
@@ -29,7 +30,7 @@ Paramètres communs ajoutés par `UgsAnalytics` : `build` (version), `platform`.
 | `state_entered` | `GameStateChanged` | `state` (Boot, Hub, Board, Combat), `from` |
 | `combat_finished` | `CombatFinished` | `victory`, `boss`, `rank`, `credits` |
 | `zone_validated` | `ZoneValidated` | `first_clear`, `credits`, `pr` |
-| `consent_changed` | réservé (écran de consentement) | `granted` |
+| `consent_changed` | réservé (non émis pour l'instant) | `granted` |
 
 ### À ajouter (entonnoir de `05_Production/Live_Ops.md`)
 Prologue étapes 1 à 5, premier recrutement, premier achat (IAP), abandon (sortie du jeu depuis un écran), erreurs et performances (images/s moyennes, temps de chargement). Chaque ajout passe par un message existant ou un nouveau message, jamais par un appel depuis un présentateur.

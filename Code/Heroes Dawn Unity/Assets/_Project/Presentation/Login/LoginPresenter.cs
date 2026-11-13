@@ -28,16 +28,18 @@ namespace N29.HeroesDawn.Presentation.Login
         readonly IAudioService _audio;
         readonly IOnboardingFlow? _onboarding;
         readonly IAccountFlow? _account;
+        readonly ConsentPrompt? _consent;
         bool _accountOpen;
         readonly BusyGate _gate = new BusyGate();
 
         public LoginPresenter(ILoginView view, ISignInAsGuestUseCase signIn, ISessionReadModel session, IPublisher<NavigateRequested> navigate,
-                              IToastService toasts, ILocalization loc, AppLogger log, IAudioService? audio = null, IOnboardingFlow? onboarding = null, IAccountFlow? account = null) : base(view, null)
+                              IToastService toasts, ILocalization loc, AppLogger log, IAudioService? audio = null, IOnboardingFlow? onboarding = null, IAccountFlow? account = null, ConsentPrompt? consent = null) : base(view, null)
         {
             _signIn = signIn; _session = session; _navigate = navigate; _toasts = toasts; _loc = loc; _log = log;
             _audio = audio ?? NullAudioService.Instance;
             _onboarding = onboarding;
             _account = account;
+            _consent = consent;
         }
 
         protected override void OnStart()
@@ -118,6 +120,8 @@ namespace N29.HeroesDawn.Presentation.Login
                 }
                 var report = result.Value;
                 if (_onboarding != null) await _onboarding.RunIfNeededAsync(Lifetime); // première connexion : cinématique, pseudo, campagne
+                if (Disposed) return;
+                if (_consent != null) await _consent.RunIfNeededAsync(Lifetime); // première connexion : mesure d'usage, opt-in
                 if (Disposed) return;
                 _audio.Play(SfxId.LoginStart);
                 var name = _session.Account?.DisplayName ?? "";

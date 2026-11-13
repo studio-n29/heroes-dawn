@@ -18,6 +18,8 @@ namespace N29.HeroesDawn.Tests.PlayMode
         {
             // Les bandeaux d'entrée en combat ont leur propre test ; ailleurs, le combat démarre sans les attendre.
             N29.HeroesDawn.Application.Features.Meta.CombatIntros.DefaultEnabled = false;
+            // La question de consentement à la mesure a son propre test ; ailleurs, elle ne doit pas masquer l'écran.
+            N29.HeroesDawn.Presentation.Account.ConsentPrompt.DefaultEnabled = false;
             using (LifetimeScope.Enqueue(b =>
                    {
                        b.RegisterInstance<IProfileGateway>(profiles);

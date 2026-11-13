@@ -75,6 +75,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["settings.account.guest"] = "Invité";
             d["settings.account.link_hint"] = "Lier un compte arrivera avec la version en ligne.";
             d["settings.consent"] = "Partager des statistiques anonymes";
+            d["consent.title"] = "AIDER À AMÉLIORER LE JEU ?";
+            d["consent.body"] = "Heroes Dawn peut mesurer, de façon anonyme, comment on y joue : écrans visités, combats, zones terminées, version et plateforme. Aucun nom, aucune adresse e-mail, aucun contenu personnel. Tu peux changer d'avis à tout moment dans Réglages ▸ Compte et confidentialité.";
+            d["consent.accept"] = "ACCEPTER";
+            d["consent.decline"] = "REFUSER";
             d["settings.export"] = "Exporter mes données";
             d["settings.export.btn"] = "EXPORTER";
             d["settings.export.hint"] = "Simulé : l'export sera disponible avec la version en ligne.";
