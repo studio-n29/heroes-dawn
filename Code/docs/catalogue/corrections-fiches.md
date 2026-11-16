@@ -86,7 +86,19 @@ Convention de lecture pour les réactions : `sur déclencheur` désigne, pour «
 | card_lingering_mark | Base | `Dmg 115, St Mark 2t, [Réaction 2t : quand un ennemi est vaincu → St Mark 2t sur 1E:fort]` | `Dmg 115, St Mark 2t, [Réaction 2t : quand un ennemi est vaincu → St Mark 2t sur 1E:aléatoire]` | `sur 1E:fort` n'est pas une cible de réaction admise : `sur 1E:aléatoire` |
 | card_lingering_mark | Idée | `Quand une proie tombe, la marque saute sur le plus fort.` | `Quand une proie tombe, la marque saute sur un autre ennemi.` | Idée alignée sur la cible de la réaction |
 
+## Tâche 8 : défauts révélés par la mise en jeu des 250 cartes
+
+Révélés par `AllCardsTests.EveryCardTier_ChangesBehaviour_ForAtLeastOneScenario` (palier comparé à la même carte privée de ce palier, dans sept scénarios, aux niveaux 3, 6 et 10). Fiche corrigée puis réimportée (`ImportCatalogMenu.ImportBatch`).
+
+| Carte | Colonne | Ancienne cellule | Nouvelle cellule | Raison |
+|---|---|---|---|---|
+| card_lifethirst | Niv.6 | `Bounce 50` | `St Corrosion 2t` | Palier inerte : la carte vise ZE (tous les ennemis), le rebond ne frappe qu'un ennemi hors des cibles, il n'y en a jamais. Corrosion : une zone qui « mord et draine » dans la durée |
+
 ## Décisions à valider par le concepteur
+
+- `card_lifethirst` (tâche 8) : Niv.6 `Bounce 50` → `St Corrosion 2t` (voir ci-dessus).
+- `card_torn_veil` (tâche 8, fiche non modifiée) : son Niv.10 `[si cible a Taunt : Dmg 30]` est lu après la `Purge 1` de base, qui retire le bonus le plus récent de la cible ; il ne s'exprime donc que si la cible garde sa Provocation après la purge (au moins deux bonus, la Provocation n'étant pas le plus récent). À revoir si l'intention était de punir toute cible provocatrice.
+- `card_blazing_sprint` (tâche 8, fiche non modifiée) : nature saisie Soutien alors que la nature déduite de son premier effet (bouclier) est Défensive ; gardée en Soutien (intention : accélération) et ajoutée à la liste explicite des tests de nature.
 
 - `card_beating_heart` et `card_launch_ramp` : l'événement « début de tour du porteur » (hors des six formes) est remplacé par « un ennemi est vaincu » ; l'intention change (soin / avance d'équipe à chaque victoire au lieu de chaque tour du porteur).
 - `card_rebirth` : plafond d'échelle d'origine 5 en total avec N = 4 (soit 1,25 carte) arrondi à `max 2` cartes, soit 8 au lieu de 5.
