@@ -82,9 +82,13 @@ namespace N29.HeroesDawn.Presentation.Common
             d["fx.execute"] = "Exécution +{0} % sous {1} % PV";
             // Conditions, modificateurs et ciblage fin des effets (plan P1)
             d["fx.conditional"] = "Si {0} : {1}";
-            d["fx.mod_flat"] = "{0:+0;-0;0} % si {1}";
-            d["fx.mod_always"] = "{0:+0;-0;0} %";
-            d["fx.mod_scaled"] = "{0:+0;-0;0} % par {1} (max {2})";
+            d["fx.mod_flat"] = "{0} si {1}";
+            d["fx.mod_always"] = "{0}";
+            d["fx.mod_scaled"] = "{0} par {1} (max {2})";
+            d["fx.bonus_pct"] = "{0:+0;-0;0} %";
+            d["fx.bonus_damage_raw"] = "{0:+0;-0;0} de dégâts";
+            d["fx.bonus_heal_raw"] = "{0:+0;-0;0} PV de soin";
+            d["fx.bonus_shield_raw"] = "{0:+0;-0;0} de bouclier";
             d["cond.TargetHasStatus"] = "la cible subit {0}";
             d["cond.TargetLacksStatus"] = "la cible ne subit pas {0}";
             d["cond.TargetHpBelow"] = "la cible est sous {1} % PV";
@@ -92,10 +96,10 @@ namespace N29.HeroesDawn.Presentation.Common
             d["cond.CasterHasStatus"] = "le lanceur a {0}";
             d["cond.CasterHpBelow"] = "le lanceur est sous {1} % PV";
             d["cond.AnyAllyHasStatus"] = "un allié a {0}";
-            d["cond.TargetStatusCountAtLeast"] = "la cible a au moins {1} statuts";
+            d["cond.TargetStatusCountAtLeast"] = "la cible a {1} statut(s) ou plus";
             d["cond.TargetPlannedAction"] = "la cible prépare une action";
-            d["cond.EnemiesAliveAtLeast"] = "au moins {1} ennemis sont en vie";
-            d["cond.EnemiesAliveAtMost"] = "au plus {1} ennemis sont en vie";
+            d["cond.EnemiesAliveAtLeast"] = "{1} ennemi(s) ou plus en vie";
+            d["cond.EnemiesAliveAtMost"] = "{1} ennemi(s) ou moins en vie";
             d["scale.TargetStatusCount"] = "statut sur la cible";
             d["scale.EnemiesAlive"] = "ennemi en vie";
             d["scale.AlliesAlive"] = "allié en vie";

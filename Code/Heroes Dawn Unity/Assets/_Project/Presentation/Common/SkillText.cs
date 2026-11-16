@@ -44,21 +44,35 @@ namespace N29.HeroesDawn.Presentation.Common
                 string? line = BaseLine(fx, owner);
                 if (line == null) continue;
                 yield return fx.When != null ? Loc.F("fx.conditional", ConditionText(fx.When), line) : line;
-                foreach (var mod in fx.Mods) yield return ModLine(mod);
+                foreach (var mod in fx.Mods) yield return ModLine(fx, mod, owner);
             }
         }
 
         static string ConditionText(Condition c)
             => Loc.F("cond." + c.Kind, c.Status == StatusType.None ? "" : Loc.StatusName(c.Status), c.Value);
 
-        static string ModLine(ValueMod m)
+        /// <summary>Bonus d'un modificateur dans l'unité de la ligne de base : mêmes conversions (brut avec les stats de l'agent, jauge en dixièmes de point).</summary>
+        static string BonusText(EffectDef fx, int bonus, SkillOwnerStats? owner)
         {
+            switch (fx.Type)
+            {
+                case EffectType.Damage when owner.HasValue: return Loc.F("fx.bonus_damage_raw", owner.Value.Atk * bonus / 100);
+                case EffectType.Heal when owner.HasValue: return Loc.F("fx.bonus_heal_raw", owner.Value.MaxHp * bonus / 100);
+                case EffectType.Shield when owner.HasValue: return Loc.F("fx.bonus_shield_raw", owner.Value.MaxHp * bonus / 100);
+                case EffectType.GaugeDelta: return Loc.F("fx.bonus_pct", bonus / 10);
+                default: return Loc.F("fx.bonus_pct", bonus);
+            }
+        }
+
+        static string ModLine(EffectDef fx, ValueMod m, SkillOwnerStats? owner)
+        {
+            string bonus = BonusText(fx, m.Bonus, owner);
             if (m.Per.HasValue)
             {
-                string scaled = Loc.F("fx.mod_scaled", m.Bonus, Loc.T("scale." + m.Per.Value), m.MaxCount);
+                string scaled = Loc.F("fx.mod_scaled", bonus, Loc.T("scale." + m.Per.Value), m.MaxCount);
                 return m.When != null ? Loc.F("fx.conditional", ConditionText(m.When), scaled) : scaled;
             }
-            return m.When != null ? Loc.F("fx.mod_flat", m.Bonus, ConditionText(m.When)) : Loc.F("fx.mod_always", m.Bonus);
+            return m.When != null ? Loc.F("fx.mod_flat", bonus, ConditionText(m.When)) : Loc.F("fx.mod_always", bonus);
         }
 
         static string? BaseLine(EffectDef fx, SkillOwnerStats? owner)
