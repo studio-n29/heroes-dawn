@@ -7,6 +7,8 @@ namespace N29.HeroesDawn.Definitions
     public enum CombatRank { Easy, Normal, Elite, Boss }
     public enum SkillSlot { A1, A2, A3, Passive, A4 }
     public enum TargetRule { SingleEnemy, AllEnemies, SingleAlly, AllAllies, Self }
+    /// <summary>Choix fin de la cible (SingleEnemy, SingleAlly ; TwoRandom pour AllEnemies). Default : règle historique, cible voulue par le joueur.</summary>
+    public enum TargetPick { Default, LowestHp, HighestHp, StatusHolder, NextToAct, Random, TwoRandom }
     public enum EffectType
     {
         Damage, Heal, ApplyStatus, GaugeDelta, Shield,

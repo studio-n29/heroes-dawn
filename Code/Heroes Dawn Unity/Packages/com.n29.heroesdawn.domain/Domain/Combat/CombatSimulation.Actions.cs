@@ -134,7 +134,7 @@ namespace N29.HeroesDawn.Domain.Combat
 
         void PerformSkill(CombatUnit actor, SkillDef skill, int slotIndex, int preferredTarget, List<CombatEvent> output)
         {
-            var targets = ResolveTargets(actor, skill.Target, preferredTarget);
+            var targets = ResolvePick(actor, skill) ?? ResolveTargets(actor, skill.Target, preferredTarget);
             output.Add(new SkillUsedEvent(Tick, actor.Id, skill.Id, targets.ToArray()));
             actor.Energy = System.Math.Max(0, actor.Energy - skill.Cost);
             ApplyEffects(actor, skill.EffectsOf(AbilityTrigger.OnCast), targets, output);
