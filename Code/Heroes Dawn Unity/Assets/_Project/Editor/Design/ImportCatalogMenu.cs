@@ -78,7 +78,7 @@ namespace N29.HeroesDawn.Editor
         /// <summary>
         /// Fusion pure (sans fichier) : <paramref name="ids"/> sont retrouvés dans <paramref name="rows"/>, convertis, puis ajoutés à la fin de
         /// <paramref name="existingJson"/> (dans l'ordre de la liste) ou, s'ils y sont déjà, remplacés à leur place. Les autres cartes ne sont pas touchées.
-        /// Échoue (<see cref="InvalidOperationException"/>) si le fichier existant est absent, vide ou sans toutes les cartes du code, pour un identifiant inconnu ou de phase P2/P3, une fiche hors grammaire, ou un résultat
+        /// Échoue (<see cref="InvalidOperationException"/>) si le fichier existant est absent, vide ou sans toutes les cartes du code, pour un identifiant inconnu, une fiche hors grammaire (phases P1, P2 et P3 acceptées), ou un résultat
         /// qui ne passe pas <see cref="CardDataLibrary.Validate"/>.
         /// </summary>
         public static string Merge(string existingJson, IReadOnlyList<CatalogRow> rows, IReadOnlyList<string> ids)
@@ -95,7 +95,6 @@ namespace N29.HeroesDawn.Editor
                 if (matches.Count == 0) throw new InvalidOperationException($"{id} : identifiant inconnu (aucune fiche cartes-*.md ne le porte).");
                 if (matches.Count > 1) throw new InvalidOperationException($"{id} : identifiant présent {matches.Count} fois dans les fiches.");
                 var row = matches[0];
-                if (row.Phase != "P1") throw new InvalidOperationException($"{id} : la carte est de phase {row.Phase}, seule la phase P1 se met en jeu.");
                 try { records.Add(CatalogImporter.ToRecord(row)); }
                 catch (CatalogImportException e) { throw new InvalidOperationException("fiche hors grammaire : " + e.Message, e); }
             }

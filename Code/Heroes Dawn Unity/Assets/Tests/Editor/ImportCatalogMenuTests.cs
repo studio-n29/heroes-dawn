@@ -82,14 +82,24 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(ex!.Message, Does.Contain("card_inconnue"));
         }
 
-        [Test, Description("Vérifie qu'une carte de phase P2 ou P3 est refusée avec un message qui parle de sa phase — parce que seules les cartes de la phase P1 sont convertibles")]
-        public void Merge_LaterPhaseCard_FailsWithThePhase()
+        [Test, Description("Vérifie qu'une carte de phase P2 ou P3 est fusionnée comme une carte P1, réaction comprise — parce que l'importeur convertit désormais les trois phases")]
+        public void Merge_LaterPhaseCard_IsMerged()
         {
             foreach (var phase in new[] { "P2", "P3" })
             {
-                var ex = Assert.Throws<InvalidOperationException>(() => ImportCatalogMenu.Merge(ExistingJson(), Rows(Line("card_new_a", phase, "Dmg 100")), OneId));
-                Assert.That(ex!.Message, Does.Contain("card_new_a").And.Contain(phase));
+                var cell = "Dmg 100, [Réaction 2t : quand un ennemi est vaincu → Dmg 20 sur ZE]";
+                var merged = ImportCatalogMenu.Merge(ExistingJson(), Rows(Line("card_new_a", phase, cell)), OneId);
+                var card = CardDataLibrary.FromJson(merged).Single(c => c.Id.Value == "card_new_a");
+                Assert.That(card.Skill.Effects[1].Reaction, Is.Not.Null, phase);
+                Assert.That(CardDataLibrary.Validate(CardDataLibrary.FromJson(merged)), Is.Empty, phase);
             }
+        }
+
+        [Test, Description("Vérifie qu'une carte de phase P2 hors grammaire est refusée avec son identifiant dans le message — parce que l'auteur de la fiche doit savoir laquelle corriger")]
+        public void Merge_BadLaterPhaseSheet_FailsWithTheId()
+        {
+            var ex = Assert.Throws<InvalidOperationException>(() => ImportCatalogMenu.Merge(ExistingJson(), Rows(Line("card_new_a", "P2", "Dmg 100, [Réaction 2t : quand un ennemi saute → Dmg 20]")), OneId));
+            Assert.That(ex!.Message, Does.Contain("card_new_a"));
         }
 
         [Test, Description("Vérifie qu'une fiche hors grammaire échoue en gardant l'identifiant de la carte dans le message — parce que l'auteur de la fiche doit savoir laquelle corriger")]
@@ -130,7 +140,30 @@ namespace N29.HeroesDawn.Tests.Editor
             var rows = Directory.GetFiles(CatalogueFolder, "cartes-*.md").SelectMany(f => CatalogImporter.ReadTable(File.ReadAllText(f))).ToList();
             var asset = UnityEngine.Resources.Load<UnityEngine.TextAsset>("Content/cards");
             Assert.That(asset, Is.Not.Null);
-            Assert.That(ImportCatalogMenu.Merge(asset!.text, rows, ids), Is.EqualTo(asset.text), "cards.json n'est pas à jour : relancer le menu Mettre en jeu les cartes de mise-en-jeu.txt");
+            Assert.That(Canon(ImportCatalogMenu.Merge(asset!.text, rows, ids)), Is.EqualTo(Canon(asset.text)), "cards.json n'est pas à jour : relancer le menu Mettre en jeu les cartes de mise-en-jeu.txt");
+        }
+
+        /// <summary>Fins de ligne normalisées en LF : une copie propre (autocrlf) écrit cards.json en CRLF, le résultat de Merge est toujours en LF.</summary>
+        static string Lf(string text) => text.Replace("\r\n", "\n").Replace('\r', '\n');
+
+        /// <summary>Forme canonique d'un cards.json : fins de ligne LF, cartes relues puis réécrites par le schéma courant (un champ ajouté au schéma depuis l'écriture du fichier n'est pas une différence de contenu).</summary>
+        static string Canon(string json) => CardDataLibrary.ToJson(CardDataLibrary.FromJson(Lf(json)));
+
+        [Test, Description("Vérifie qu'une copie en fins de ligne CRLF du cards.json livré (extraction autocrlf d'une copie propre) se fusionne exactement comme l'original, au saut de ligne près — parce que le test du fichier livré ne doit pas dépendre des fins de ligne de la machine")]
+        public void ShippedFile_InCrlf_BehavesLikeTheLfOne()
+        {
+            var ids = ImportCatalogMenu.ParseIds(File.ReadAllText(Path.Combine(CatalogueFolder, "mise-en-jeu.txt")));
+            var rows = Directory.GetFiles(CatalogueFolder, "cartes-*.md").SelectMany(f => CatalogImporter.ReadTable(File.ReadAllText(f))).ToList();
+            var asset = UnityEngine.Resources.Load<UnityEngine.TextAsset>("Content/cards");
+            Assert.That(asset, Is.Not.Null);
+            var lf = Lf(asset!.text);
+            var crlf = lf.Replace("\n", "\r\n");
+            Assert.That(crlf, Is.Not.EqualTo(lf));
+            Assert.That(Canon(crlf), Is.EqualTo(Canon(lf)), "les cartes lues d'un fichier CRLF diffèrent de celles du fichier LF");
+            var mergedCrlf = ImportCatalogMenu.Merge(crlf, rows, ids);
+            Assert.That(Lf(mergedCrlf), Is.EqualTo(mergedCrlf), "Merge écrit toujours en LF");
+            Assert.That(mergedCrlf, Is.EqualTo(ImportCatalogMenu.Merge(lf, rows, ids)), "la fusion d'une copie CRLF redonne le même texte que celle du fichier LF");
+            Assert.That(Canon(mergedCrlf), Is.EqualTo(Canon(lf)), "cards.json n'est plus à jour");
         }
     }
 }

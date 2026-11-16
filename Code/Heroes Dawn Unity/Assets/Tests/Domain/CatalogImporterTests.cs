@@ -479,13 +479,14 @@ namespace N29.HeroesDawn.Tests.Domain
 
         [TestCase("P2")]
         [TestCase("P3")]
-        [Description("Vérifie que les phases P2 et P3 sont lues mais non converties — parce que leurs briques n'existent pas encore dans le moteur")]
-        public void PhaseP2P3_IsReadButNotConverted(string phase)
+        [Description("Vérifie que les phases P2 et P3 sont lues puis converties (une réaction devient un effet ArmReaction) — parce que leurs briques existent désormais dans le moteur et l'importeur")]
+        public void PhaseP2P3_IsReadAndConverted(string phase)
         {
             var rows = CatalogImporter.ReadTable(Table(RowLine("Dmg 100 [Réaction 2 t : quand un ennemi est vaincu → Heal 10]", phase: phase)));
             Assert.That(rows.Count, Is.EqualTo(1));
             Assert.That(rows[0].Phase, Is.EqualTo(phase));
-            Assert.Throws<NotSupportedException>(() => CatalogImporter.ToRecord(rows[0]));
+            var card = CatalogImporter.ToRecord(rows[0]);
+            Assert.That(card.skill.effects.Select(e => e.type), Is.EqualTo(new[] { EffectType.Damage, EffectType.ArmReaction }));
         }
 
         [Test, Description("Vérifie qu'une phase inconnue est rejetée à la lecture — parce que seules P1, P2 et P3 existent")]
@@ -583,24 +584,23 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.Throws<CatalogImportException>(() => CatalogImporter.ReadTable(Table(RowLine("Dmg 100")) + "\n" + Header + "\n" + Separator + "\n"));
         }
 
-        [Test, Description("Vérifie que TOUTE ligne de phase P1 de toutes les fiches du catalogue s'importe sans exception et que les lignes P2/P3 sont ignorées (NotSupportedException) — parce que les fiches doivent respecter la grammaire et qu'un rejet est une fiche à corriger")]
+        [Test, Description("Vérifie que TOUTE ligne de toutes les fiches du catalogue s'importe sans exception, 196 de phase P1 et 54 de phase P2 ou P3 — parce que les fiches doivent respecter la grammaire et qu'un rejet est une fiche à corriger")]
         public void EveryP1Row_Imports()
         {
             var rejected = new System.Collections.Generic.List<string>();
-            int imported = 0, skipped = 0;
+            int imported = 0, laterPhases = 0;
             foreach (var file in Directory.GetFiles(CatalogueFolder, "cartes-*.md"))
             {
                 foreach (var row in CatalogImporter.ReadTable(File.ReadAllText(file)))
                 {
-                    if (row.Phase != "P1") { Assert.Throws<NotSupportedException>(() => CatalogImporter.ToRecord(row), row.Id); skipped++; continue; }
-                    try { CatalogImporter.ToRecord(row); imported++; }
+                    try { CatalogImporter.ToRecord(row); if (row.Phase == "P1") imported++; else laterPhases++; }
                     catch (CatalogImportException e) { rejected.Add(e.CardId + " : " + e.Message); }
                 }
             }
-            TestContext.Out.WriteLine($"P1 importées : {imported} ; P2/P3 ignorées : {skipped} ; rejetées : {rejected.Count}");
-            Assert.That(rejected, Is.Empty, "fiches P1 hors grammaire :\n" + string.Join("\n", rejected));
+            TestContext.Out.WriteLine($"P1 importées : {imported} ; P2/P3 importées : {laterPhases} ; rejetées : {rejected.Count}");
+            Assert.That(rejected, Is.Empty, "fiches hors grammaire :\n" + string.Join("\n", rejected));
             Assert.That(imported, Is.EqualTo(196), "lignes P1 importées");
-            Assert.That(skipped, Is.EqualTo(54), "lignes P2/P3 ignorées");
+            Assert.That(laterPhases, Is.EqualTo(54), "lignes P2/P3 importées");
         }
     }
 }

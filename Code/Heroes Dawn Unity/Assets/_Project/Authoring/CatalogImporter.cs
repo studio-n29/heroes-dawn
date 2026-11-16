@@ -43,8 +43,8 @@ namespace N29.HeroesDawn.Authoring
     }
 
     /// <summary>
-    /// Importeur des fiches Markdown (docs/catalogue/cartes-*.md) : lit le tableau, puis convertit une ligne de phase P1 en <see cref="CardRecord"/>
-    /// selon la grammaire du plan P1. Analyse à la main (scanneur et descente récursive) : tout texte non compris lève
+    /// Importeur des fiches Markdown (docs/catalogue/cartes-*.md) : lit le tableau, puis convertit une ligne (phases P1, P2, P3) en <see cref="CardRecord"/>
+    /// selon la grammaire du plan P1 étendue par celle du plan P2/P3 (réactions, Consomme, Propage, échelle d'archétype). Analyse à la main (scanneur et descente récursive) : tout texte non compris lève
     /// <see cref="CatalogImportException"/>, rien n'est ignoré ni importé à moitié.
     /// </summary>
     public static class CatalogImporter
@@ -109,11 +109,10 @@ namespace N29.HeroesDawn.Authoring
 
         // ---------------------------------------------------------------- Conversion d'une fiche
 
-        /// <summary>Carte de la fiche (phase P1 seulement : P2 et P3 lèvent <see cref="NotSupportedException"/>).</summary>
+        /// <summary>Carte de la fiche (phases P1, P2 et P3 : la phase n'est qu'une étiquette, la grammaire est la même ; tout texte hors grammaire lève <see cref="CatalogImportException"/>).</summary>
         public static CardRecord ToRecord(CatalogRow row)
         {
             if (row == null) throw new ArgumentNullException(nameof(row));
-            if (row.Phase != "P1") throw new NotSupportedException($"{row.Id} : la phase {row.Phase} n'est pas convertie (seule la phase P1 l'est).");
             var id = row.Id;
             if (id.Length == 0) throw new CatalogImportException(id, "Id", "identifiant vide");
             if (row.Stars < 1 || row.Stars > 5) throw new CatalogImportException(id, "★", $"1 à 5 attendu, {row.Stars} lu");
@@ -285,6 +284,9 @@ namespace N29.HeroesDawn.Authoring
                 return v;
             }
 
+            /// <summary>Le reste du texte (sans espaces aux bords) ; le scanneur est alors en fin de texte.</summary>
+            public string Rest() { Ws(); var rest = _s.Substring(_p).Trim(); _p = _s.Length; return rest; }
+
             public void End()
             {
                 if (!AtEnd) throw _fail($"texte inattendu{Near()}");
@@ -401,6 +403,8 @@ namespace N29.HeroesDawn.Authoring
                     case "Purge": return Make(s, EffectType.Purge, s.Int("valeur"), 0);
                     case "Bounce": return Make(s, EffectType.Bounce, s.Int("valeur"), 1);
                     case "Exec": return Make(s, EffectType.Execute, s.Int("valeur"), 1);
+                    case "Consomme": return ParseConsume(s);
+                    case "Propage": return new EffectRecord { type = EffectType.Spread, status = ParseStatus(s), chance = 100 };
                     case "Gauge":
                     {
                         var sign = s.Peek();
@@ -447,6 +451,111 @@ namespace N29.HeroesDawn.Authoring
                 var name = s.Word("nom de statut");
                 if (Statuses.TryGetValue(name, out var status)) return status;
                 throw s.Fail($"statut inconnu « {name} »");
+            }
+
+            // « Consomme <Statut> : Dmg|Heal N par tour restant (max M) » (M de 1 à 10) : Value = N, Duration = M.
+            static EffectRecord ParseConsume(Scanner s)
+            {
+                var status = ParseStatus(s);
+                s.Expect(':', ":");
+                var kind = s.Word("« Dmg » ou « Heal »");
+                EffectType type;
+                if (kind == "Dmg") type = EffectType.ConsumeDamage;
+                else if (kind == "Heal") type = EffectType.ConsumeHeal;
+                else throw s.Fail($"« Dmg » ou « Heal » attendu après « Consomme {status} : », « {kind} » lu");
+                var value = s.Int("valeur");
+                if (value < 1) throw s.Fail($"valeur d'au moins 1 attendue, {value} lu");
+                s.ExpectWord("par"); s.ExpectWord("tour"); s.ExpectWord("restant");
+                s.Expect('(', "(max M)");
+                s.ExpectWord("max");
+                var max = s.Int("max");
+                s.Expect(')', ")");
+                if (max < 1 || max > 10) throw s.Fail($"max de 1 à 10 tours attendu pour Consomme, {max} lu");
+                return new EffectRecord { type = type, value = value, status = status, duration = max, chance = 100 };
+            }
+
+            static readonly HashSet<EffectType> ReactionEffects = new HashSet<EffectType>
+            {
+                EffectType.Damage, EffectType.Heal, EffectType.Shield, EffectType.ApplyStatus,
+                EffectType.PushBack, EffectType.Advance, EffectType.GaugeDelta, EffectType.Purge,
+            };
+
+            // « Réaction Nt : quand <événement> → <effet> [sur <cible>] » : un effet ArmReaction à la place du crochet.
+            void ApplyReaction(List<Item> items, int index, Scanner s)
+            {
+                s.ExpectWord("Réaction");
+                var turns = s.Int("durée");
+                s.ExpectWord("t");
+                if (turns < 1 || turns > 5) throw s.Fail($"durée de réaction de 1 à 5 tours attendue, {turns} lu");
+                s.Expect(':', ":");
+                s.ExpectWord("quand");
+                var (trigger, status) = ParseEvent(s);
+                if (!s.Try('→')) throw s.Fail("« → » attendu entre l'événement et l'effet de la réaction");
+                var nested = ParseEffect(s);
+                if (!ReactionEffects.Contains(nested.type))
+                    throw s.Fail($"{nested.type} ne peut pas être l'effet d'une réaction (seuls Dmg, Heal, Shield, St, Push, Adv, Gauge et Purge le peuvent)");
+
+                var onTrigger = trigger == ReactionTrigger.EnemyReceivesStatus || trigger == ReactionTrigger.AllyReceivesStatus;
+                var target = TargetRule.Self;
+                var pick = TargetPick.Default;
+                if (s.PeekWord() == "sur")
+                {
+                    s.ExpectWord("sur");
+                    var name = s.Rest();
+                    onTrigger = false;
+                    switch (name)
+                    {
+                        case "Soi": break;
+                        case "ZE": target = TargetRule.AllEnemies; break;
+                        case "ZA": target = TargetRule.AllAllies; break;
+                        case "1E:aléatoire": target = TargetRule.SingleEnemy; pick = TargetPick.Random; break;
+                        case "1E:faible": target = TargetRule.SingleEnemy; pick = TargetPick.LowestHp; break;
+                        case "1A:prochain": target = TargetRule.SingleAlly; pick = TargetPick.NextToAct; break;
+                        case "1A:faible": target = TargetRule.SingleAlly; pick = TargetPick.LowestHp; break;
+                        case "déclencheur": onTrigger = true; break;
+                        default: throw s.Fail($"cible de réaction inconnue « {name} » (attendu : Soi, ZE, ZA, 1E:aléatoire, 1E:faible, 1A:prochain, 1A:faible, déclencheur)");
+                    }
+                }
+                s.End();
+
+                items[index].Extras.Add(new EffectRecord
+                {
+                    type = EffectType.ArmReaction, chance = 100,
+                    hasReaction = true, reactionTrigger = trigger, reactionStatus = status, reactionTurns = turns,
+                    reactionEffectType = nested.type, reactionEffectValue = nested.value, reactionEffectStatus = nested.status,
+                    reactionEffectDuration = nested.duration, reactionEffectChance = nested.chance,
+                    reactionTarget = target, reactionPick = pick, reactionPickStatus = StatusType.None, reactionOnTriggerUnit = onTrigger,
+                });
+            }
+
+            // Les six événements : « un ennemi|allié reçoit <Statut> », « un ennemi|allié est vaincu », « le porteur est touché », « le porteur inflige un critique ».
+            static (ReactionTrigger, StatusType) ParseEvent(Scanner s)
+            {
+                var first = s.Word("« un » ou « le »");
+                if (first == "un")
+                {
+                    var who = s.Word("« ennemi » ou « allié »");
+                    if (who != "ennemi" && who != "allié") throw s.Fail($"« ennemi » ou « allié » attendu, « {who} » lu");
+                    var enemy = who == "ennemi";
+                    var verb = s.Word("« reçoit » ou « est »");
+                    if (verb == "reçoit")
+                        return (enemy ? ReactionTrigger.EnemyReceivesStatus : ReactionTrigger.AllyReceivesStatus, ParseStatus(s));
+                    if (verb == "est")
+                    {
+                        s.ExpectWord("vaincu");
+                        return (enemy ? ReactionTrigger.EnemyDefeated : ReactionTrigger.AllyDefeated, StatusType.None);
+                    }
+                    throw s.Fail($"« reçoit » ou « est » attendu après « un {who} », « {verb} » lu");
+                }
+                if (first == "le")
+                {
+                    s.ExpectWord("porteur");
+                    var verb = s.Word("« est » ou « inflige »");
+                    if (verb == "est") { s.ExpectWord("touché"); return (ReactionTrigger.CarrierHit, StatusType.None); }
+                    if (verb == "inflige") { s.ExpectWord("un"); s.ExpectWord("critique"); return (ReactionTrigger.CarrierCrit, StatusType.None); }
+                    throw s.Fail($"« est » ou « inflige » attendu après « le porteur », « {verb} » lu");
+                }
+                throw s.Fail($"événement de réaction inconnu (« un ennemi… », « un allié… » ou « le porteur… » attendu, « {first} » lu)");
             }
 
             // ------------------------------------------------------------ Crochets
@@ -512,7 +621,8 @@ namespace N29.HeroesDawn.Authoring
             {
                 var s = Scan(text);
                 if (s.Try('+')) { ApplyScale(items, index, s); return; }
-                if (s.PeekWord() != "si") throw Fail($"crochet incompris « [{text.Trim()}] » : « si <condition> : … » ou « +N par … » attendu");
+                if (s.PeekWord() == "Réaction") { ApplyReaction(items, index, s); return; }
+                if (s.PeekWord() != "si") throw Fail($"crochet incompris « [{text.Trim()}] » : « si <condition> : … », « +N par … » ou « Réaction Nt : quand … → … » attendu");
                 s.ExpectWord("si");
                 var cond = ParseCondition(s);
                 s.Expect(':', ":");
@@ -556,10 +666,20 @@ namespace N29.HeroesDawn.Authoring
                 if (bonus < 1) throw s.Fail("bonus d'au moins 1 attendu");
                 s.ExpectWord("par");
                 ScaleKind per;
+                Archetype? archetype = null;
                 var word = s.PeekWord();
                 if (word == "statut") { s.ExpectWord("statut"); s.ExpectWord("de"); s.ExpectWord("la"); s.ExpectWord("cible"); per = ScaleKind.TargetStatusCount; }
                 else if (word == "ennemi") { s.ExpectWord("ennemi"); s.ExpectWord("vivant"); per = ScaleKind.EnemiesAlive; }
                 else if (word == "allié") { s.ExpectWord("allié"); s.ExpectWord("vivant"); per = ScaleKind.AlliesAlive; }
+                else if (word == "carte")
+                {
+                    s.ExpectWord("carte");
+                    var name = s.Word("nom d'archétype");
+                    if (!Archetypes.TryGetValue(name, out var found)) throw s.Fail($"archétype inconnu « {name} » (attendu : {string.Join(", ", Archetypes.Keys)})");
+                    s.ExpectWord("équipée"); s.ExpectWord("dans");
+                    if (!s.TryStr("l'escouade")) throw s.Fail("« l'escouade » attendu après « dans »");
+                    archetype = found; per = ScaleKind.EquippedArchetypeCards;
+                }
                 else
                 {
                     var tenth = s.Int("compte");
@@ -577,7 +697,7 @@ namespace N29.HeroesDawn.Authoring
                 if (max > 10)
                     throw s.Fail($"max > 10 ({max}) : « max » est un nombre d'unités comptées, pas un plafond de total ; mettre {max / bonus} (= {max} / {bonus}) si le total voulu est {max}");
                 if (max < 1) throw s.Fail($"max d'au moins 1 attendu, {max} lu");
-                AddMod(Host(items, index), new ModRecord { bonus = bonus, hasScale = true, per = per, maxCount = max });
+                AddMod(Host(items, index), new ModRecord { bonus = bonus, hasScale = true, per = per, maxCount = max, hasArchetype = archetype.HasValue, perArchetype = archetype ?? default });
             }
 
             // « <Type> +N » : bonus de l'effet de ce type (celui qui précède, sinon l'unique de la cellule) ; sans effet de ce type, effet supplémentaire conditionnel.

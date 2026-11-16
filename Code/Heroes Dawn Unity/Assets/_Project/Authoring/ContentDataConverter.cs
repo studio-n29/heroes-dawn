@@ -12,25 +12,44 @@ namespace N29.HeroesDawn.Authoring
         public static EffectDef ToDef(EffectRecord e)
             => new EffectDef(e.type, e.value, e.status, e.duration, e.chance,
                              e.hasCondition ? new Condition(e.condKind, e.condStatus, e.condValue) : null,
-                             e.mods.Count == 0 ? null : e.mods.Select(ToDef).ToList());
+                             e.mods.Count == 0 ? null : e.mods.Select(ToDef).ToList(),
+                             e.hasReaction ? ToReaction(e) : null);
+
+        /// <summary>Réaction décrite par les champs plats « reaction… » ; son effet imbriqué n'a ni condition, ni modificateur, ni réaction (la validation exige des champs plats seuls).</summary>
+        static ReactionDef ToReaction(EffectRecord e)
+            => new ReactionDef(e.reactionTrigger, e.reactionStatus, e.reactionTurns,
+                               new EffectDef(e.reactionEffectType, e.reactionEffectValue, e.reactionEffectStatus, e.reactionEffectDuration, e.reactionEffectChance),
+                               e.reactionTarget, e.reactionPick, e.reactionPickStatus, e.reactionOnTriggerUnit);
 
         public static EffectRecord FromDef(EffectDef e)
-            => new EffectRecord
+        {
+            var record = new EffectRecord
             {
                 type = e.Type, value = e.Value, status = e.Status, duration = e.Duration, chance = e.ChancePercent,
                 hasCondition = e.When != null, condKind = e.When?.Kind ?? default, condStatus = e.When?.Status ?? StatusType.None, condValue = e.When?.Value ?? 0,
                 mods = e.Mods.Select(FromDef).ToList(),
             };
+            var r = e.Reaction;
+            if (r == null) return record;
+            record.hasReaction = true;
+            record.reactionTrigger = r.Trigger; record.reactionStatus = r.Status; record.reactionTurns = r.Turns;
+            record.reactionEffectType = r.Effect.Type; record.reactionEffectValue = r.Effect.Value; record.reactionEffectStatus = r.Effect.Status;
+            record.reactionEffectDuration = r.Effect.Duration; record.reactionEffectChance = r.Effect.ChancePercent;
+            record.reactionTarget = r.Target; record.reactionPick = r.Pick; record.reactionPickStatus = r.PickStatus; record.reactionOnTriggerUnit = r.OnTriggerUnit;
+            return record;
+        }
 
         public static ValueMod ToDef(ModRecord m)
             => new ValueMod(m.bonus, m.hasCondition ? new Condition(m.condKind, m.condStatus, m.condValue) : null,
-                            m.hasScale ? m.per : (ScaleKind?)null, m.hasScale ? m.maxCount : 0);
+                            m.hasScale ? m.per : (ScaleKind?)null, m.hasScale ? m.maxCount : 0,
+                            m.hasArchetype ? m.perArchetype : (Archetype?)null);
 
         public static ModRecord FromDef(ValueMod m)
             => new ModRecord
             {
                 hasCondition = m.When != null, condKind = m.When?.Kind ?? default, condStatus = m.When?.Status ?? StatusType.None, condValue = m.When?.Value ?? 0,
                 bonus = m.Bonus, hasScale = m.Per.HasValue, per = m.Per ?? default, maxCount = m.MaxCount,
+                hasArchetype = m.PerArchetype.HasValue, perArchetype = m.PerArchetype ?? default,
             };
 
         public static SkillDef ToDef(SkillRecord s)

@@ -24,6 +24,22 @@ namespace N29.HeroesDawn.Authoring
         public int condValue;
         [Tooltip("Modificateurs de la valeur de l'effet (bonus conditionnels ou à échelle).")] public List<ModRecord> mods = new List<ModRecord>();
 
+        // Réaction armée (type ArmReaction) : champs plats (JsonUtility ne sait pas écrire un enregistrement dans lui-même). Les valeurs 0 des enums
+        // sont valides (EnemyReceivesStatus, SingleEnemy, Default…) : « sans réaction » = hasReaction faux, jamais une valeur 0.
+        [Tooltip("Vrai : l'effet arme la réaction décrite par les champs « reaction… » (type ArmReaction seulement).")] public bool hasReaction;
+        public ReactionTrigger reactionTrigger;
+        [Tooltip("Statut attendu (déclencheurs « reçoit un statut »).")] public StatusType reactionStatus;
+        [Tooltip("Durée de la réaction en tours du porteur (1 à 5).")] public int reactionTurns;
+        [Tooltip("Effet de la réaction : type, valeur fixe, statut, durée et chance (un seul effet, sans condition ni modificateur).")] public EffectType reactionEffectType;
+        public int reactionEffectValue;
+        public StatusType reactionEffectStatus;
+        public int reactionEffectDuration;
+        public int reactionEffectChance = 100;
+        public TargetRule reactionTarget;
+        public TargetPick reactionPick;
+        public StatusType reactionPickStatus;
+        [Tooltip("Vrai : la réaction vise l'unité concernée par l'événement au lieu de reactionTarget.")] public bool reactionOnTriggerUnit;
+
         public EffectRecord Clone()
         {
             var copy = (EffectRecord)MemberwiseClone();
@@ -44,6 +60,8 @@ namespace N29.HeroesDawn.Authoring
         [Tooltip("Vrai : le bonus est multiplié par le compte de « per » (plafonné à maxCount).")] public bool hasScale;
         public ScaleKind per;
         public int maxCount;
+        [Tooltip("Vrai : l'échelle EquippedArchetypeCards compte les cartes équipées de l'archétype « perArchetype » (Burn vaut 0 : le booléen distingue « absent »).")] public bool hasArchetype;
+        public Archetype perArchetype;
 
         public ModRecord Clone() => (ModRecord)MemberwiseClone();
     }

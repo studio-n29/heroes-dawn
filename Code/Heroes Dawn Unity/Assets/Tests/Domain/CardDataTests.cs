@@ -17,9 +17,12 @@ namespace N29.HeroesDawn.Tests.Domain
 
         static string Cond(Condition? c) => c == null ? "-" : $"{c.Kind}/{c.Status}/{c.Value}";
 
-        static string Mod(ValueMod m) => $"{Cond(m.When)}|{m.Bonus}|{(m.Per.HasValue ? m.Per.Value.ToString() : "-")}|{m.MaxCount}";
+        static string Mod(ValueMod m) => $"{Cond(m.When)}|{m.Bonus}|{(m.Per.HasValue ? m.Per.Value.ToString() : "-")}|{m.MaxCount}|{(m.PerArchetype.HasValue ? m.PerArchetype.Value.ToString() : "-")}";
 
-        static string Fx(EffectDef e) => $"{e.Type}:{e.Value}:{e.Status}:{e.Duration}:{e.ChancePercent}:{Cond(e.When)}:[{string.Join(";", e.Mods.Select(Mod))}]";
+        static string Rx(ReactionDef? r) => r == null ? "-"
+            : $"{r.Trigger}/{r.Status}/{r.Turns}/{r.Effect.Type}:{r.Effect.Value}:{r.Effect.Status}:{r.Effect.Duration}:{r.Effect.ChancePercent}/{r.Target}/{r.Pick}/{r.PickStatus}/{r.OnTriggerUnit}";
+
+        static string Fx(EffectDef e) => $"{e.Type}:{e.Value}:{e.Status}:{e.Duration}:{e.ChancePercent}:{Cond(e.When)}:[{string.Join(";", e.Mods.Select(Mod))}]:{Rx(e.Reaction)}";
 
         /// <summary>Description complète d'une carte, champ par champ (EffectDef se compare par référence).</summary>
         static string Describe(SkillCardDef c)
@@ -114,6 +117,200 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(changed.Collection.Cards.Count, Is.EqualTo(1));
             Assert.That(changed.Collection.Items, Is.SameAs(cat.Collection.Items));
             Assert.That(changed.Collection.Boosters, Is.SameAs(cat.Collection.Boosters));
+        }
+
+        // ---- Phases P2 et P3 : réactions, Consomme, Propage, échelle d'archétype ----
+
+        static EffectDef Arm(ReactionDef r) => new EffectDef(EffectType.ArmReaction, 0, StatusType.None, 0, 100, null, null, r);
+
+        static SkillCardDef CardOf(string id, EffectDef[] effects, CardTier[]? tiers = null)
+            => new SkillCardDef(new CardId(id), "cards." + id + ".name", Family.Matter, 1,
+                                new SkillDef(new SkillId(id), SkillSlot.A3, 4, TargetRule.SingleEnemy, effects, 40),
+                                CardNature.Offensive, tiers, new Archetype[0], CardRole.Basic);
+
+        /// <summary>Erreurs de l'effet posé en base d'une carte, puis en effet de palier : les deux doivent donner le même verdict.</summary>
+        static (IReadOnlyList<string> inBase, IReadOnlyList<string> inTier) Errors(EffectDef e)
+            => (CardDataLibrary.Validate(new[] { CardOf("c_base", new[] { e }) }),
+                CardDataLibrary.Validate(new[] { CardOf("c_tier", new[] { new EffectDef(EffectType.Damage, 100) }, new[] { new CardTier(3, e) }) }));
+
+        static void AssertRejected(string label, EffectDef e)
+        {
+            var (inBase, inTier) = Errors(e);
+            Assert.That(inBase, Is.Not.Empty, label + " (base)");
+            Assert.That(inTier, Is.Not.Empty, label + " (palier)");
+        }
+
+        static void AssertAccepted(string label, EffectDef e)
+        {
+            var (inBase, inTier) = Errors(e);
+            Assert.That(inBase, Is.Empty, label + " (base) : " + string.Join(" ; ", inBase));
+            Assert.That(inTier, Is.Empty, label + " (palier) : " + string.Join(" ; ", inTier));
+        }
+
+        static ReactionDef React(ReactionTrigger trigger = ReactionTrigger.EnemyDefeated, StatusType status = StatusType.None, int turns = 2, EffectDef? effect = null,
+                                 TargetRule target = TargetRule.Self, TargetPick pick = TargetPick.Default, StatusType pickStatus = StatusType.None, bool onTrigger = false)
+            => new ReactionDef(trigger, status, turns, effect ?? new EffectDef(EffectType.Damage, 50), target, pick, pickStatus, onTrigger);
+
+        [Test, Description("Vérifie que des cartes à réaction survivent au JSON champ par champ, y compris les valeurs 0 (déclencheur EnemyReceivesStatus, cible SingleEnemy, ciblage Default) et l'effet imbriqué avec chance — parce que « absent » et « valeur 0 » se distinguent par hasReaction et jamais par la valeur")]
+        public void RoundTrip_ReactionCards_KeepEveryFieldIncludingZeroValues()
+        {
+            var effects = new[]
+            {
+                new EffectDef(EffectType.Damage, 105),
+                Arm(React(ReactionTrigger.EnemyReceivesStatus, StatusType.Burn, 2, new EffectDef(EffectType.Damage, 45), TargetRule.SingleEnemy, TargetPick.Default, StatusType.None, false)),
+                Arm(React(ReactionTrigger.AllyDefeated, StatusType.None, 4, new EffectDef(EffectType.Heal, 40), TargetRule.SingleAlly, TargetPick.LowestHp)),
+                Arm(React(ReactionTrigger.CarrierHit, StatusType.None, 3, new EffectDef(EffectType.ApplyStatus, 0, StatusType.Burn, 2, 35), TargetRule.Self, TargetPick.Default, StatusType.None, true)),
+                Arm(React(ReactionTrigger.AllyReceivesStatus, StatusType.Haste, 5, new EffectDef(EffectType.Advance, 20), TargetRule.SingleEnemy, TargetPick.StatusHolder, StatusType.Shock)),
+                Arm(React(ReactionTrigger.CarrierCrit, StatusType.None, 1, new EffectDef(EffectType.GaugeDelta, -100), TargetRule.AllEnemies)),
+            };
+            var tier = Arm(React(ReactionTrigger.EnemyDefeated, StatusType.None, 4, new EffectDef(EffectType.Shield, 20, StatusType.Shield, 2), TargetRule.AllAllies));
+            var card = CardOf("card_react", effects, new[] { new CardTier(6, tier) });
+
+            var json = CardDataLibrary.ToJson(new[] { card });
+            var back = CardDataLibrary.FromJson(json);
+
+            AssertSameCards(new[] { card }, back);
+            Assert.That(back[0].Skill.Effects[0].Reaction, Is.Null, "un Damage ne devient pas une réaction");
+            Assert.That(back[0].Skill.Effects[1].Reaction!.Trigger, Is.EqualTo(ReactionTrigger.EnemyReceivesStatus));
+            Assert.That(back[0].Skill.Effects[1].Reaction!.Target, Is.EqualTo(TargetRule.SingleEnemy));
+            Assert.That(back[0].Skill.Effects[3].Reaction!.Effect.ChancePercent, Is.EqualTo(35));
+            Assert.That(back[0].Tiers[0].Effects[0].Reaction!.Effect.Status, Is.EqualTo(StatusType.Shield));
+            Assert.That(CardDataLibrary.Validate(back), Is.Empty);
+            Assert.That(CardDataLibrary.ToJson(back), Is.EqualTo(json), "le JSON relu redonne le même texte");
+        }
+
+        [Test, Description("Vérifie que Consomme (dégâts et soin) et Propage survivent au JSON avec leur statut, leur valeur et leur maximum de tours — parce que la durée porte le « max » du plan")]
+        public void RoundTrip_ConsumeAndSpread_KeepStatusValueAndMax()
+        {
+            var card = CardOf("card_consume", new[]
+            {
+                new EffectDef(EffectType.ConsumeDamage, 30, StatusType.Burn, 4),
+                new EffectDef(EffectType.ConsumeHeal, 18, StatusType.Regen, 4),
+                new EffectDef(EffectType.Spread, 0, StatusType.Mark),
+            });
+            var back = CardDataLibrary.FromJson(CardDataLibrary.ToJson(new[] { card }));
+            AssertSameCards(new[] { card }, back);
+            Assert.That(back[0].Skill.Effects.Select(e => (e.Type, e.Value, e.Status, e.Duration)),
+                        Is.EqualTo(new[] { (EffectType.ConsumeDamage, 30, StatusType.Burn, 4), (EffectType.ConsumeHeal, 18, StatusType.Regen, 4), (EffectType.Spread, 0, StatusType.Mark, 0) }));
+            Assert.That(CardDataLibrary.Validate(back), Is.Empty);
+        }
+
+        [Test, Description("Vérifie que l'échelle d'archétype survit au JSON, que l'archétype Burn (valeur 0) n'est pas pris pour « absent », et qu'une échelle TargetStatusCount (valeur 0) ou une condition de nature 0 ne gagne pas d'archétype — parce que 0 est une valeur valide de chaque enum")]
+        public void RoundTrip_ArchetypeScale_DistinguishesZeroFromAbsent()
+        {
+            var effect = new EffectDef(EffectType.Damage, 60, StatusType.None, 0, 100, new Condition(ConditionKind.TargetHasStatus, StatusType.Burn), new[]
+            {
+                new ValueMod(10, null, ScaleKind.EquippedArchetypeCards, 4, Archetype.Burn),
+                new ValueMod(10, null, ScaleKind.TargetStatusCount, 2),
+                new ValueMod(25, new Condition(ConditionKind.TargetHasStatus, StatusType.Mark)),
+                new ValueMod(8, null, ScaleKind.EquippedArchetypeCards, 3, Archetype.Renewal),
+            });
+            var back = CardDataLibrary.FromJson(CardDataLibrary.ToJson(new[] { CardOf("card_scale", new[] { effect }) }));
+            AssertSameCards(new[] { CardOf("card_scale", new[] { effect }) }, back);
+            var mods = back[0].Skill.Effects[0].Mods;
+            Assert.That(mods[0].PerArchetype, Is.EqualTo(Archetype.Burn));
+            Assert.That(mods[0].Per, Is.EqualTo(ScaleKind.EquippedArchetypeCards));
+            Assert.That(mods[1].PerArchetype, Is.Null);
+            Assert.That(mods[1].Per, Is.EqualTo(ScaleKind.TargetStatusCount));
+            Assert.That(mods[2].Per, Is.Null);
+            Assert.That(mods[2].PerArchetype, Is.Null);
+            Assert.That(mods[2].When!.Kind, Is.EqualTo(ConditionKind.TargetHasStatus));
+            Assert.That(mods[3].PerArchetype, Is.EqualTo(Archetype.Renewal));
+            Assert.That(back[0].Skill.Effects[0].When!.Kind, Is.EqualTo(ConditionKind.TargetHasStatus));
+            Assert.That(CardDataLibrary.Validate(back), Is.Empty);
+        }
+
+        [Test, Description("Vérifie qu'un enregistrement écrit avant P2 (sans hasReaction ni hasArchetype) se relit sans réaction ni archétype et reste valide — parce que les fichiers cards.json déjà écrits doivent rester lisibles")]
+        public void OldRecord_ReadsWithoutReactionOrArchetype()
+        {
+            var cards = CardDataLibrary.FromJson(OldRecordJson);
+            Assert.That(cards[0].Skill.Effects[0].Reaction, Is.Null);
+            Assert.That(cards[0].Tiers[0].Effects[0].Reaction, Is.Null);
+            Assert.That(CardDataLibrary.Validate(cards), Is.Empty);
+        }
+
+        [Test, Description("Vérifie que Validate accepte une réaction par déclencheur, un Consomme, un Propage et une échelle d'archétype bien formés, en base comme en palier — parce que ce sont les formes que l'importeur produit")]
+        public void Validate_AcceptsWellFormedP2P3Data()
+        {
+            foreach (ReactionTrigger t in System.Enum.GetValues(typeof(ReactionTrigger)))
+            {
+                var status = t == ReactionTrigger.EnemyReceivesStatus || t == ReactionTrigger.AllyReceivesStatus ? StatusType.Burn : StatusType.None;
+                AssertAccepted("réaction " + t, Arm(React(t, status)));
+            }
+            foreach (var nested in new[]
+            {
+                new EffectDef(EffectType.Damage, 10), new EffectDef(EffectType.Heal, 10), new EffectDef(EffectType.Shield, 10, StatusType.Shield, 2),
+                new EffectDef(EffectType.ApplyStatus, 0, StatusType.Mark, 2, 30), new EffectDef(EffectType.PushBack, 10), new EffectDef(EffectType.Advance, 10),
+                new EffectDef(EffectType.GaugeDelta, -10), new EffectDef(EffectType.Purge, 1),
+            })
+                AssertAccepted("effet imbriqué " + nested.Type, Arm(React(effect: nested)));
+            AssertAccepted("tours 1", Arm(React(turns: 1)));
+            AssertAccepted("tours 5", Arm(React(turns: 5)));
+            AssertAccepted("ciblage nommé", Arm(React(target: TargetRule.SingleEnemy, pick: TargetPick.Random)));
+            AssertAccepted("Consomme dégâts", new EffectDef(EffectType.ConsumeDamage, 30, StatusType.Burn, 4));
+            AssertAccepted("Consomme soin", new EffectDef(EffectType.ConsumeHeal, 18, StatusType.Regen, 1));
+            AssertAccepted("Propage", new EffectDef(EffectType.Spread, 0, StatusType.Burn));
+            AssertAccepted("échelle d'archétype", new EffectDef(EffectType.Damage, 60, StatusType.None, 0, 100, null, new[] { new ValueMod(10, null, ScaleKind.EquippedArchetypeCards, 4, Archetype.Hunt) }));
+        }
+
+        [Test, Description("Vérifie que Validate refuse un ArmReaction sans réaction, une durée hors de 1 à 5, un effet imbriqué hors des huit types admis, un effet imbriqué qui porte condition, modificateur ou réaction, un déclencheur de statut sans statut, et une réaction posée sur un autre type d'effet — parce que le moteur ne saurait pas les lire")]
+        public void Validate_RejectsInconsistentReactions()
+        {
+            AssertRejected("ArmReaction sans réaction", new EffectDef(EffectType.ArmReaction, 0));
+            foreach (var turns in new[] { 0, -1, 6 }) AssertRejected("tours " + turns, Arm(React(turns: turns)));
+            foreach (var type in new[] { EffectType.Lifesteal, EffectType.Bounce, EffectType.Execute, EffectType.ArmReaction, EffectType.ConsumeDamage, EffectType.ConsumeHeal, EffectType.Spread })
+                AssertRejected("effet imbriqué " + type, Arm(React(effect: new EffectDef(type, 10, StatusType.Burn, 2))));
+            AssertRejected("imbriqué avec condition", Arm(React(effect: new EffectDef(EffectType.Damage, 10, StatusType.None, 0, 100, new Condition(ConditionKind.TargetHasStatus, StatusType.Burn)))));
+            AssertRejected("imbriqué avec modificateur", Arm(React(effect: new EffectDef(EffectType.Damage, 10, StatusType.None, 0, 100, null, new[] { new ValueMod(5) }))));
+            AssertRejected("imbriqué avec réaction", Arm(React(effect: new EffectDef(EffectType.Damage, 10, StatusType.None, 0, 100, null, null, React()))));
+            AssertRejected("EnemyReceivesStatus sans statut", Arm(React(ReactionTrigger.EnemyReceivesStatus)));
+            AssertRejected("AllyReceivesStatus sans statut", Arm(React(ReactionTrigger.AllyReceivesStatus)));
+            foreach (var type in new[] { EffectType.Damage, EffectType.Heal, EffectType.ApplyStatus, EffectType.ConsumeDamage, EffectType.Spread })
+                AssertRejected("réaction sur " + type, new EffectDef(type, 10, StatusType.Burn, 2, 100, null, null, React()));
+            AssertRejected("modificateur sur ArmReaction", new EffectDef(EffectType.ArmReaction, 0, StatusType.None, 0, 100, null, new[] { new ValueMod(5) }, React()));
+            AssertRejected("condition sur ArmReaction", new EffectDef(EffectType.ArmReaction, 0, StatusType.None, 0, 100, new Condition(ConditionKind.TargetHasStatus, StatusType.Burn), null, React()));
+        }
+
+        [Test, Description("Vérifie que Validate refuse toute valeur d'enum hors plage dans une réaction (déclencheur, statut, cible, ciblage, statut de ciblage, type et statut de l'effet imbriqué) — parce que JsonUtility lit un entier quelconque")]
+        public void Validate_RejectsOutOfRangeEnumsInReactions()
+        {
+            AssertRejected("déclencheur", Arm(React((ReactionTrigger)99)));
+            AssertRejected("statut", Arm(React(ReactionTrigger.EnemyReceivesStatus, (StatusType)99)));
+            AssertRejected("cible", Arm(React(target: (TargetRule)99)));
+            AssertRejected("ciblage", Arm(React(pick: (TargetPick)99)));
+            AssertRejected("statut de ciblage", Arm(React(pickStatus: (StatusType)99)));
+            AssertRejected("type imbriqué", Arm(React(effect: new EffectDef((EffectType)99, 10))));
+            AssertRejected("statut imbriqué", Arm(React(effect: new EffectDef(EffectType.ApplyStatus, 0, (StatusType)99, 2))));
+        }
+
+        [Test, Description("Vérifie que Validate refuse un Consomme sans statut, de valeur inférieure à 1 ou de durée (maximum de tours) inférieure à 1, un Propage sans statut, et un modificateur sur l'un ou l'autre — parce que le moteur ne saurait pas les lire")]
+        public void Validate_RejectsInconsistentConsumeAndSpread()
+        {
+            foreach (var type in new[] { EffectType.ConsumeDamage, EffectType.ConsumeHeal })
+            {
+                AssertRejected(type + " sans statut", new EffectDef(type, 30, StatusType.None, 4));
+                AssertRejected(type + " valeur 0", new EffectDef(type, 0, StatusType.Burn, 4));
+                AssertRejected(type + " valeur négative", new EffectDef(type, -5, StatusType.Burn, 4));
+                AssertRejected(type + " durée 0", new EffectDef(type, 30, StatusType.Burn, 0));
+                AssertRejected(type + " durée négative", new EffectDef(type, 30, StatusType.Burn, -1));
+                AssertRejected(type + " avec modificateur", new EffectDef(type, 30, StatusType.Burn, 4, 100, null, new[] { new ValueMod(5) }));
+                AssertRejected(type + " statut hors plage", new EffectDef(type, 30, (StatusType)99, 4));
+            }
+            AssertRejected("Spread sans statut", new EffectDef(EffectType.Spread, 0, StatusType.None));
+            AssertRejected("Spread avec modificateur", new EffectDef(EffectType.Spread, 0, StatusType.Burn, 0, 100, null, new[] { new ValueMod(5) }));
+            AssertRejected("Spread statut hors plage", new EffectDef(EffectType.Spread, 0, (StatusType)99));
+        }
+
+        [Test, Description("Vérifie que Validate refuse une échelle d'archétype sans archétype, un archétype donné pour une autre échelle ou sans échelle, et un archétype hors plage — parce qu'un compte d'archétype sans archétype ne compterait rien")]
+        public void Validate_RejectsInconsistentArchetypeScale()
+        {
+            EffectDef WithMod(ValueMod m) => new EffectDef(EffectType.Damage, 60, StatusType.None, 0, 100, null, new[] { m });
+            AssertRejected("échelle sans archétype", WithMod(new ValueMod(10, null, ScaleKind.EquippedArchetypeCards, 4)));
+            AssertRejected("archétype pour EnemiesAlive", WithMod(new ValueMod(10, null, ScaleKind.EnemiesAlive, 4, Archetype.Burn)));
+            AssertRejected("archétype pour TargetStatusCount", WithMod(new ValueMod(10, null, ScaleKind.TargetStatusCount, 4, Archetype.Tempo)));
+            AssertRejected("archétype sans échelle", WithMod(new ValueMod(10, null, null, 0, Archetype.Burn)));
+            AssertRejected("archétype hors plage", WithMod(new ValueMod(10, null, ScaleKind.EquippedArchetypeCards, 4, (Archetype)99)));
+            AssertRejected("échelle hors plage", WithMod(new ValueMod(10, null, (ScaleKind)99, 4, Archetype.Burn)));
         }
 
         // ---- Validation du chargeur de cartes ----
