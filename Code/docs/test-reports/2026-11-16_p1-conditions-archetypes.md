@@ -30,16 +30,16 @@ Ce sont les mêmes échecs qu'en P0, moins `QgPagePresenterTests` et `QuestLogFl
 ## Garde-fous
 - `combat-golden.txt` (478 lignes) : modifié une seule fois dans ce plan, par le commit `14cadfa2` (tâche 1, ré-enregistrement voulu au départ de P1). `git log b77b5ebd..HEAD -- combat-golden.txt` ne donne que ce commit ; `git diff --stat 14cadfa2 HEAD -- combat-golden.txt` est vide.
 - `combat-golden-p1.txt` (36 empreintes : 12 cartes x niveaux 1, 6, 10) : tel que commité en `e2c1c364`, aucune modification dans l'arbre de travail.
-- `CombatGoldenTests` (classe entière, arbre de l'utilisateur) : 6 réussis, 1 ignoré (`RecordGolden`), 0 échec, y compris `Golden_MatchesTheRecordedDigests`. La dérive notée en P0 (lignes `enemy:*` rouges à cause de `BossPhaseChangedEvent.Lines`) n'existe plus : la référence a été ré-enregistrée en tâche 1 sur l'arbre contenant déjà cette modification. Si l'utilisateur annule ou change cette modification, la classe peut redevenir rouge sur les lignes `enemy:*` ; non vérifié sur une copie propre.
+- `CombatGoldenTests` (classe entière, arbre de l'utilisateur) : 6 réussis, 1 ignoré (`RecordGolden`), 0 échec, y compris `Golden_MatchesTheRecordedDigests`. Cet état dépend de l'arbre de travail : `combat-golden.txt` a été ré-enregistré en tâche 1 sur un arbre qui contenait déjà les modifications non commitées de l'utilisateur sur `BossPhaseChangedEvent` (propriété `Lines` à l'époque de P0, devenue la méthode `GetLines()` dans son arbre actuel). La classe est verte sur cet arbre, mais elle n'a pas été vérifiée sur une copie propre de la branche : si l'utilisateur annule ou modifie ce travail, les lignes `enemy:*` (boss à phases) peuvent redevenir rouges et la référence devra alors être ré-enregistrée sciemment.
 - `WaveGoldenTests` : `WaveGolden_MatchesTheRecordedDigests` et `EveryWaveScenario_CastsTheCardAtLeastOnce` réussis.
 - `RulesVersion.Value` : `"0.2.0"`.
 - Réussis dans cette exécution complète : `AbilityTests`, `AbilityMigrationTests`, `CardData*`, `CatalogImporter*`, `FirstWave*`, `TargetPick*`, `ConditionCombat*`, `SkillTextCondition*`, `CardArchetype*`, `CollectionRules*`, `CardStars*`, `DesignTools*` (aucun échec dans ces classes ni dans un test de carte ou de compétence).
 
 ## Limites du filet de sécurité
-- Seuls les combats seedés de graine 7 sont couverts pour les cartes ; l'empreinte se limite aux événements, à Id/Hp/Énergie par unité et à une sonde du générateur.
+- Pour `combat-golden.txt` (48 cartes d'avant P1) : graines 7 et 11, empreinte = journal d'événements complet, état final des unités (PV, énergie, jauge, statuts) et sonde du générateur. Pour la vague (`combat-golden-p1.txt`) : graine 7 seulement, un seul scénario par carte et par niveau (1, 6, 10) ; le scénario d'origine n'avait qu'une alliée (corrigé par la revue finale : voir plus bas).
 - Golden de Sillage (`card_slipstream`) identique aux trois niveaux (1, 6, 10) : le scénario n'a qu'un seul allié (« verre »), la compétence ciblant « allié prochain » hors lanceur n'a donc aucune cible et ne produit aucun effet.
 - L'IA Auto lance une compétence sans cible valide (énergie dépensée) : non couvert par un test de comportement.
-- Les deux empreintes `SkillPower` sont identiques ; certaines empreintes d'ennemis le sont aussi (équipe de niveau 40 qui les tue avant qu'ils n'agissent) ; 60 des 90 lignes `enemy:*` viennent de contenu de quartiers non commité à l'enregistrement.
+- Les deux objets `SkillPower` donnent des empreintes différentes (test `SkillPowerItems_GiveDifferentDigests`) ; en revanche certaines empreintes d'ennemis sont identiques (équipe de niveau 40 qui les tue avant qu'ils n'agissent) ; 60 des 90 lignes `enemy:*` viennent de contenu de quartiers non commité à l'enregistrement.
 - Fusion (`Merge`) du catalogue : dépend du format canonique de `JsonUtility`.
 - Les mesures de l'équilibre en simulation (taux de victoire, etc.) ne sont pas dans le périmètre de P1.
 
@@ -70,3 +70,37 @@ Sept fiches P1 à cible Soi portent un effet `Adv` ou `Gauge+` sans effet sur le
 
 ## Divers
 - Dettes mineures relevées en revue (non bloquantes) : voir le journal du plan (`progress.md`), notamment des tests de condition dont les bornes exactes ne sont pas testées, la condition évaluée sur une cible déjà vaincue pour le vol de vie et le rebond, et les bonus de jauge non multiples de 10 affichés tronqués.
+
+## Revue finale et corrections
+Revue finale de la branche (`b77b5eb..e065f72`) : « Avec corrections ». Quatre points Important, tous corrigés dans le commit `d9abffc8` (« fix: revue finale de P1 »), plus les mineurs de la liste de corrections.
+
+### Les 4 Important
+1. **Cible ignorée** : l'interface demandait une cible pour une compétence à ciblage fin (`Pick` différent de `Default`) alors que la simulation l'ignore. `NeedsTarget` est désormais faux pour ces compétences ; elles partent sans cible, comme une compétence de zone (test `NeedsTarget_IsFalseForFinePick_TrueForPlainSingleTarget`).
+2. **Deux paliers Niv.10 jamais actifs** : `card_emergency_balm` et `card_designated_target` lisaient, après la base, un état que la base avait déjà changé (PV après un soin d'au moins 35 %, Marque consommée par le coup). Cellules réécrites (voir « À valider »), `cards.json` réimporté (10 lignes modifiées, les 58 autres cartes identiques octet pour octet). Test `EveryWaveTier_ChangesTheDigest` : les empreintes aux niveaux 1, 6 et 10 sont deux à deux différentes pour les 12 cartes.
+3. **Sillage et IA** : `1A:prochain` écarte maintenant aussi les alliés déjà prêts (Advance et Gauge + ne font rien sur eux) ; l'IA Auto ne choisit plus une compétence à ciblage fin sans candidat (`CanUseSlot` filtre, chemin `Pick == Default` inchangé). Scénarios à deux alliés (clés `wave2:`) pour les 5 cartes à cible alliée ou Soi ; les empreintes de Sillage diffèrent aux trois niveaux. Le scénario à une alliée de Sillage (`wave:card_slipstream:*`) est supprimé : l'IA ne la lance plus seule. `combat-golden-p1.txt` : 48 empreintes (33 `wave:` + 15 `wave2:`) ; `combat-golden.txt` intact.
+4. **Export qui écrase le catalogue** : `ExportCardsMenu` (menu et `ExportBatch`) refuse d'écrire si `cards.json` contient des cartes absentes du code ou est illisible ; décision pure `RefusalReason` testée.
+
+### Mineurs corrigés
+`CardDataLibrary.Validate` (conditions sur Lifesteal, Bounce, Execute, Purge ; modificateurs sur les autres types que Damage, Heal, Shield, Advance, PushBack, GaugeDelta ; `maxCount` sans échelle ; niveaux de palier hors 3, 6, 10 ou répétés) ; texte d'un bonus de jauge négative au signe de la base et « le plus en forme (PV en %) » ; `Merge` refuse un `cards.json` absent, vide ou sans les cartes du code (le test `Merge_EmptyExisting_StartsFromNothing` est remplacé par `Merge_EmptyOrIncompleteExisting_IsRefused`) ; ce rapport corrigé ; `verifier-catalogue.ps1` (avertissements) et ligne de grammaire sur `Dmg +N` dans le plan.
+
+Tests existants adaptés (la règle « les alliés prêts ne sont plus visés » change leur situation de départ, pas leur assertion) : `TargetPickTests.NextToAct_OnAllies` (allié non prêt par construction : `Point = ActionPoint / 2` au lieu de 30, que l'allié atteignait déjà), `CardMechanicsTests.AutoMode_CastsEveryCard` et `FirstWaveTests.EveryWaveCard_IsCastInAuto` (un second allié pour les cartes `1A:prochain`).
+
+### À valider par le concepteur
+- `card_emergency_balm` Niv.10 : `[si cible < 30% PV : Shield 15]` devient `Shield 15` (inconditionnel). Sur une cible sous 30 % des PV le soin de base est de 35 % (25 % + le bonus plafonné à 10) et la laisse à 35 % des PV au moins : la condition lue après lui ne pouvait jamais être vraie.
+- `card_designated_target` Niv.10 : `[si cible a Mark : St Vulnerable 2t]` devient `St Vulnerable 2t` (inconditionnel). Le coup de base consomme la Marque avant le palier ; la carte vise de toute façon le porteur de Marque.
+- Règle `1A:prochain` : le lanceur et les alliés déjà prêts sont écartés ; sans candidat, l'IA ne lance pas la compétence (en manuel, elle part encore sans cible et l'énergie est dépensée).
+- Sillage : son palier 10 (`Purge 1`) ne s'exprime que sur un allié affligé ; le scénario de référence donne donc Brûlure à l'allié de départ.
+
+### À corriger avant mise en jeu (P4), relevé par les nouveaux avertissements de `verifier-catalogue.ps1`
+- Cartes Soi à `Adv` ou `Gauge +` inertes : les 7 déjà connues (`card_iron_vest`, `card_stand_firm`, `card_adrenal_shell`, `card_last_gasp`, `card_hardened_post`, `card_adrenaline_surge`, `card_pursuit`) plus `card_blazing_sprint` et `card_marked_bait` ; `card_thorn_hide` (Steal sans coup de base, hors réaction).
+- Conditions de palier qui lisent un état modifié par la base : `card_lingering_mark` et `card_open_wound` (Niv.10, `cible a Mark` après un `Dmg`), `card_torn_veil` (Niv.3, `cible a Shield` après `Purge`), `card_vital_sap` (Niv.10) et `card_harvest` (Niv.6) (`cible < 50% PV` après un `Heal`).
+- `Bounce 1` (1 % de rebond, alors que les autres cartes écrivent 40 à 60) sur `card_saving_bite` Niv.3, `card_hungry_spark` et `card_lifethirst` : probable faute de frappe, fiches non modifiées (hors jeu).
+
+### Exécutions de la revue finale (arbre de l'utilisateur, après `d9abffc8`)
+| Mode | Total / réussis / ignorés / échecs |
+|---|---|
+| EditMode | 1856 / 1849 / 6 / 1 (`BuildBudgetTests.ResourcesTextures_StayWithinTheBuildBudget`, étranger) |
+| PlayMode | 145 / 113 / 28 / 4 (les mêmes quatre échecs étrangers : `CityMapScreenUiToolkitTests` x2, `MoscowFullRunTests`, `QuestLogPlayTests`) |
+| Classes ciblées (305 tests) | 303 réussis, 0 échec, 2 ignorés (`RecordGolden`, `RecordGoldenP1`) |
+
+`verifier-catalogue.ps1` : 0 erreur, 19 avertissements (dont les 12 nouveaux). `CombatGoldenTests` verte, `combat-golden.txt` inchangé depuis `14cadfa2`.
