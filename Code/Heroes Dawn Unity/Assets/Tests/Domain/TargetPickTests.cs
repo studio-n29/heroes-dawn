@@ -126,6 +126,53 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(skipDead, Is.EqualTo(new[] { 4 }), "seuls les vivants sont candidats");
         }
 
+        /// <summary>Valeur de sonde du générateur après avoir consommé <paramref name="extraDraws"/> tirages de plus (chaque sonde fait avancer le générateur d'un tirage).</summary>
+        static uint ProbeAfter(CombatSimulation sim, int extraDraws)
+        {
+            for (int i = 0; i < extraDraws; i++) sim.RngProbeForTests();
+            return sim.RngProbeForTests();
+        }
+
+        /// <summary>Vérifie qu'un lancer Random a consommé exactement un tirage de plus qu'un lancer Default de même graine (ni 0, ni 2).</summary>
+        static void AssertExactlyOneExtraDraw(string[] enemies, Action<CombatSimulation>? before = null, TargetPick pick = TargetPick.Random)
+        {
+            var reference = Cast(TargetRule.SingleEnemy, TargetPick.Default, enemies, out _, before, seed: 5);
+            var picked = Cast(TargetRule.SingleEnemy, pick, enemies, out _, before, seed: 5);
+            var p = picked.RngProbeForTests();
+            Assert.That(p, Is.EqualTo(ProbeAfter(Cast(TargetRule.SingleEnemy, TargetPick.Default, enemies, out _, before, seed: 5), 1)), "exactement un tirage de plus");
+            Assert.That(p, Is.Not.EqualTo(ProbeAfter(reference, 0)), "pas zéro tirage");
+            Assert.That(p, Is.Not.EqualTo(ProbeAfter(Cast(TargetRule.SingleEnemy, TargetPick.Default, enemies, out _, before, seed: 5), 2)), "pas deux tirages");
+        }
+
+        [Test, Description("Vérifie que Random consomme exactement un tirage du générateur de plus qu'un lancer Default de même graine — parce que ni zéro ni deux tirages ne sont permis")]
+        public void Random_ConsumesExactlyOneDraw() => AssertExactlyOneExtraDraw(Three);
+
+        [Test, Description("Vérifie que Random consomme encore un tirage quand un seul ennemi est vivant — parce que le tirage unique est le choix défini, même sans alternative")]
+        public void Random_WithOneCandidate_StillConsumesOneDraw() => AssertExactlyOneExtraDraw(new[] { "brute" });
+
+        [Test, Description("Vérifie que Random sous Provocation ne consomme aucun tirage et vise le provocateur — parce que la Provocation répond avant tout tirage")]
+        public void TauntPlusRandom_ConsumesNoDraw()
+        {
+            Action<CombatSimulation> taunt = s => s.Unit(4).Statuses.Add(new StatusInstance(StatusType.Taunt, 3, 0));
+            var def = Cast(TargetRule.SingleEnemy, TargetPick.Default, Three, out _, taunt, seed: 5);
+            var rnd = Cast(TargetRule.SingleEnemy, TargetPick.Random, Three, out var t, taunt, seed: 5);
+            Assert.That(t, Is.EqualTo(new[] { 4 }));
+            Assert.That(rnd.RngProbeForTests(), Is.EqualTo(def.RngProbeForTests()));
+        }
+
+        [Test, Description("Vérifie qu'un choix fin sans aucun ennemi vivant renvoie une liste vide sans consommer de tirage — parce qu'on ne tire jamais quand il n'y a rien à choisir")]
+        public void NoCandidate_ReturnsEmpty_WithoutDrawing()
+        {
+            Action<CombatSimulation> dead = s => { s.Unit(2).Hp = 0; s.Unit(3).Hp = 0; s.Unit(4).Hp = 0; };
+            uint reference = Cast(TargetRule.SingleEnemy, TargetPick.Default, Three, out _, dead, seed: 5).RngProbeForTests();
+            foreach (var (rule, pick) in new[] { (TargetRule.SingleEnemy, TargetPick.Random), (TargetRule.SingleEnemy, TargetPick.LowestHp), (TargetRule.AllEnemies, TargetPick.TwoRandom) })
+            {
+                var sim = Cast(rule, pick, Three, out var t, dead, seed: 5);
+                Assert.That(t, Is.Empty, pick.ToString());
+                Assert.That(sim.RngProbeForTests(), Is.EqualTo(reference), pick + " : aucun tirage");
+            }
+        }
+
         [Test, Description("Vérifie que TwoRandom sur AllEnemies vise deux ennemis distincts vivants, un seul s'il est seul — parce que le tirage se fait sans remise")]
         public void TwoRandom_PicksTwoDistinctEnemies_OrOneWhenAlone()
         {
