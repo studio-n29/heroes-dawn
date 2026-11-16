@@ -85,3 +85,10 @@ Convention de lecture pour les réactions : `sur déclencheur` désigne, pour «
 | card_final_verdict | Base | `Dmg 110, [+8 par carte Traque équipée dans l’escouade (max 40)], [si cible < 30% PV : Exec 60]` | `Dmg 110, [+8 par carte Traque équipée dans l'escouade (max 5)], [si cible < 30% PV : Dmg +60]` | Apostrophe → `'` ; `max` 40 / 8 = 5 cartes ; `Exec` n'admet pas de condition : bonus de Dmg équivalent |
 | card_lingering_mark | Base | `Dmg 115, St Mark 2t, [Réaction 2t : quand un ennemi est vaincu → St Mark 2t sur 1E:fort]` | `Dmg 115, St Mark 2t, [Réaction 2t : quand un ennemi est vaincu → St Mark 2t sur 1E:aléatoire]` | `sur 1E:fort` n'est pas une cible de réaction admise : `sur 1E:aléatoire` |
 | card_lingering_mark | Idée | `Quand une proie tombe, la marque saute sur le plus fort.` | `Quand une proie tombe, la marque saute sur un autre ennemi.` | Idée alignée sur la cible de la réaction |
+
+## Décisions à valider par le concepteur
+
+- `card_beating_heart` et `card_launch_ramp` : l'événement « début de tour du porteur » (hors des six formes) est remplacé par « un ennemi est vaincu » ; l'intention change (soin / avance d'équipe à chaque victoire au lieu de chaque tour du porteur).
+- `card_rebirth` : plafond d'échelle d'origine 5 en total avec N = 4 (soit 1,25 carte) arrondi à `max 2` cartes, soit 8 au lieu de 5.
+- `card_citadel` (8 / 3 arrondi à 3 cartes, soit 9), `card_squad_garden` (5 / 3 arrondi à 2, soit 6) et `card_kinetic_charge` (30 / 8 arrondi à 4, soit 32) : plafonds arrondis, donc légèrement différents de l'original.
+- Risque de puissance de `card_moment_master` et `card_runaway_pace` : une réaction « un allié reçoit Haste » peut se déclencher jusqu'à 4 fois avec le Haste de Niv.3 posé sur ZA ; à surveiller à l'équilibrage.

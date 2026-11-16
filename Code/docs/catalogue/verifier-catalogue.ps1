@@ -47,6 +47,9 @@ function Test-P2P3Cell($cell, $isP23) {
     elseif ($t -match 'Consomme|Propage') { $msgs.Add("Consomme/Propage ne peut pas être entre crochets : $t") }
   }
   $rest = [regex]::Replace($cell, '\[[^\]]*\]', '§')
+  # Mot-clé de réaction ou d'échelle d'archétype hors de sa forme exacte (réaction sans crochets, « → » ou « quand » égarés, « par carte » hors crochets)
+  if ($rest -match 'Réaction|quand |→|par carte|équipée dans l') { $msgs.Add("réaction ou échelle d'archétype hors crochets : $($rest -replace '\s*§','')") }
+  if ($cell -match '\[[^\]]*\[|\][^\[]*\]') { $msgs.Add('crochets imbriqués ou mal appariés') }
   foreach ($el in ($rest -split ',\s+|\s+;\s+' | ForEach-Object { $_.Trim() })) {
     if ($el -match 'Consomme|Propage') {
       $e2 = ($el -replace '\s*§', '').Trim()
