@@ -30,25 +30,20 @@ namespace N29.HeroesDawn.Definitions
         public static SkillDef SkillAt(SkillCardDef card, int level)
         {
             var scaled = Scale(card.Skill, level);
-            var extra = new List<EffectDef>();
-            foreach (var t in card.Tiers) if (t.Level <= level) extra.AddRange(t.Effects);
-            if (extra.Count == 0) return scaled;
-            var list = new List<EffectDef>(scaled.Effects);
-            list.AddRange(extra);
-            return new SkillDef(scaled.Id, scaled.Slot, scaled.Cooldown, scaled.Target, list, scaled.Cost);
+            var extra = new List<Ability>();
+            foreach (var t in card.Tiers) if (t.Level <= level) extra.AddRange(t.Abilities);
+            return extra.Count == 0 ? scaled : scaled.WithAbilities(extra);
         }
 
         /// <summary>La compétence avec dégâts, soins et boucliers à <paramref name="pct"/> % (100 : inchangée).</summary>
         public static SkillDef ScalePercent(SkillDef skill, int pct)
         {
             if (pct == 100) return skill;
-            var list = new List<EffectDef>(skill.Effects.Count);
-            foreach (var e in skill.Effects)
+            return skill.MapEffects(e =>
             {
                 bool scaled = e.Type == EffectType.Damage || e.Type == EffectType.Heal || e.Type == EffectType.Shield;
-                list.Add(scaled ? new EffectDef(e.Type, e.Value * pct / 100, e.Status, e.Duration, e.ChancePercent) : e);
-            }
-            return new SkillDef(skill.Id, skill.Slot, skill.Cooldown, skill.Target, list, skill.Cost);
+                return scaled ? new EffectDef(e.Type, e.Value * pct / 100, e.Status, e.Duration, e.ChancePercent) : e;
+            });
         }
     }
 }

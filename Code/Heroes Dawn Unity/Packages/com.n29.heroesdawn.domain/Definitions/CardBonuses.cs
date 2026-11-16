@@ -28,8 +28,7 @@ namespace N29.HeroesDawn.Definitions
         {
             if (bonusPercent <= 0) return skill;
             int pct = 100 + bonusPercent;
-            var list = new List<EffectDef>(skill.Effects.Count);
-            foreach (var e in skill.Effects)
+            return skill.MapEffects(e =>
             {
                 switch (e.Type)
                 {
@@ -39,18 +38,14 @@ namespace N29.HeroesDawn.Definitions
                     case EffectType.PushBack:
                     case EffectType.Advance:
                     case EffectType.GaugeDelta:
-                        list.Add(new EffectDef(e.Type, e.Value * pct / 100, e.Status, e.Duration, e.ChancePercent));
-                        break;
+                        return new EffectDef(e.Type, e.Value * pct / 100, e.Status, e.Duration, e.ChancePercent);
                     case EffectType.ApplyStatus:
                         int chance = e.ChancePercent >= 100 ? e.ChancePercent : System.Math.Min(100, e.ChancePercent * pct / 100);
-                        list.Add(new EffectDef(e.Type, e.Value, e.Status, (e.Duration * pct + 50) / 100, chance));
-                        break;
+                        return new EffectDef(e.Type, e.Value, e.Status, (e.Duration * pct + 50) / 100, chance);
                     default:
-                        list.Add(e);
-                        break;
+                        return e;
                 }
-            }
-            return new SkillDef(skill.Id, skill.Slot, skill.Cooldown, skill.Target, list, skill.Cost);
+            });
         }
     }
 }

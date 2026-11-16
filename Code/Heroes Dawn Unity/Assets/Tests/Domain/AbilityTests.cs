@@ -86,5 +86,53 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(s.Cost, Is.EqualTo(20));
             Assert.That(s.BaseEffect, Is.SameAs(A));
         }
+
+        static (EffectType, int, StatusType, int, int) Key(EffectDef e) => (e.Type, e.Value, e.Status, e.Duration, e.ChancePercent);
+
+        static SkillCardDef Ember() => N29.HeroesDawn.Content.Prototype.PrototypeCollection.Build().Card(new CardId("card_ember"));
+
+        [Test, Description("Vérifie que SkillAt ajoute une capacité par palier atteint (1 au niveau 2, 3 au niveau 6, 4 au niveau 10) et que Effects reste les effets de base augmentés puis ceux des paliers non augmentés, dans l'ordre — parce que les niveaux passent désormais par les capacités sans changer le résultat")]
+        public void SkillAt_AddsOneAbilityPerReachedTier()
+        {
+            var card = Ember();
+            Assert.That(CardLevels.SkillAt(card, 2).Abilities.Count, Is.EqualTo(1));
+            Assert.That(CardLevels.SkillAt(card, 6).Abilities.Count, Is.EqualTo(3));
+            Assert.That(CardLevels.SkillAt(card, 10).Abilities.Count, Is.EqualTo(4));
+            foreach (int level in new[] { 2, 6, 10 })
+            {
+                var expected = CardLevels.Scale(card.Skill, level).Effects.ToList();
+                foreach (var t in card.Tiers) if (t.Level <= level) expected.AddRange(t.Effects);
+                Assert.That(CardLevels.SkillAt(card, level).Effects.Select(Key), Is.EqualTo(expected.Select(Key)), "niveau " + level);
+            }
+        }
+
+        [Test, Description("Vérifie que CardBonuses.Apply conserve le nombre de capacités et applique les mêmes valeurs qu'avant — parce que seul le conteneur des effets change")]
+        public void CardBonusesApply_PreservesAbilityCount_AndScalesEffects()
+        {
+            var s = SkillDef.FromAbilities(new SkillId("t"), SkillSlot.A3, 1, TargetRule.SingleEnemy, new[]
+            {
+                new Ability(AbilityTrigger.OnCast, new[] { new EffectDef(EffectType.Damage, 120) }),
+                new Ability(AbilityTrigger.OnCast, new[] { new EffectDef(EffectType.ApplyStatus, 0, StatusType.Burn, 2, 50) }),
+            });
+            var r = CardBonuses.Apply(s, 20);
+            Assert.That(r.Abilities.Count, Is.EqualTo(2));
+            Assert.That(r.Abilities[0].Effects[0].Value, Is.EqualTo(144));
+            Assert.That(r.Abilities[1].Effects[0].ChancePercent, Is.EqualTo(60));
+            Assert.That(r.Abilities[1].Effects[0].Duration, Is.EqualTo((2 * 120 + 50) / 100));
+        }
+
+        [Test, Description("Vérifie que ScalePercent conserve la structure des capacités et n'augmente que dégâts, soins et boucliers — parce que le niveau ne doit pas changer la forme de la compétence")]
+        public void ScalePercent_PreservesAbilityStructure()
+        {
+            var s = SkillDef.FromAbilities(new SkillId("t"), SkillSlot.A3, 1, TargetRule.SingleEnemy, new[]
+            {
+                new Ability(AbilityTrigger.OnCast, new[] { A, B }),
+                new Ability(AbilityTrigger.OnCast, new[] { C }),
+            });
+            var r = CardLevels.ScalePercent(s, 150);
+            Assert.That(r.Abilities.Count, Is.EqualTo(2));
+            Assert.That(r.Abilities[0].Effects.Select(e => e.Value), Is.EqualTo(new[] { 150, 30 }));
+            Assert.That(r.Abilities[1].Effects.Select(e => e.Value), Is.EqualTo(new[] { 45 }));
+        }
     }
 }

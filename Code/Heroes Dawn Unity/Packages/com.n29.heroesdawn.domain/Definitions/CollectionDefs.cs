@@ -121,7 +121,14 @@ namespace N29.HeroesDawn.Definitions
         public int Level { get; }
         public IReadOnlyList<EffectDef> Effects { get; }
 
-        public CardTier(int level, params EffectDef[] effects) { Level = level; Effects = effects; }
+        /// <summary>Le palier comme capacité(s) : une capacité OnCast portant ses effets.</summary>
+        public IReadOnlyList<Ability> Abilities { get; }
+
+        public CardTier(int level, params EffectDef[] effects)
+        {
+            Level = level; Effects = effects;
+            Abilities = new[] { new Ability(AbilityTrigger.OnCast, effects) };
+        }
     }
 
     /// <summary>Booster de cartes : nombre de cartes, poids des étoiles (★1 à ★5), carte au moins ★3 garantie tous les N boosters.</summary>
