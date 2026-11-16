@@ -26,6 +26,12 @@ namespace N29.HeroesDawn.Definitions
         Execute,
         /// <summary>Réaction : arme <see cref="EffectDef.Reaction"/> sur le lanceur (quelle que soit la cible de la compétence) ; Value inutilisé.</summary>
         ArmReaction,
+        /// <summary>Consomme : retire le statut <see cref="EffectDef.Status"/> de la cible puis la frappe d'un coup de puissance Value × min(tours restants, Duration) ; sans le statut, rien (aucun tirage). Pas de modificateurs.</summary>
+        ConsumeDamage,
+        /// <summary>Consomme : retire le statut de la cible puis la soigne de Value × min(tours restants, Duration) % de ses PV max ; sans le statut, rien (aucun tirage).</summary>
+        ConsumeHeal,
+        /// <summary>Propage : copie le statut de la cible (mêmes tours et valeur) sur tous les autres ennemis vivants du lanceur ; sans le statut, rien.</summary>
+        Spread,
     }
     /// <summary>Famille d une compétence : Dégâts, Soins, Protection, Boost, Gestion du temps.</summary>
     public enum SkillCategory { Damage, Heal, Protection, Boost, TimeManagement }

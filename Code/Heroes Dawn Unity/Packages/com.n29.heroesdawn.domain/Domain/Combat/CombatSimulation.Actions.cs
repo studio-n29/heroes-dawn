@@ -162,6 +162,8 @@ namespace N29.HeroesDawn.Domain.Combat
                     if (!t.IsAlive && fx.Type != EffectType.Lifesteal && fx.Type != EffectType.Bounce) continue;
                     // Condition fausse : effet sauté sans consommer son tirage de chance.
                     if (fx.When != null && !Holds(fx.When, actor, t)) continue;
+                    // Consomme / Propage : sans le statut sur la cible, rien du tout (ni événement ni tirage de chance).
+                    if ((fx.Type == EffectType.ConsumeDamage || fx.Type == EffectType.ConsumeHeal || fx.Type == EffectType.Spread) && !t.Has(fx.Status)) continue;
                     if (!_rng.Chance(fx.ChancePercent)) continue;
                     int v = ValueOf(fx, actor, t); // base + modificateurs (Bounce, Execute, Lifesteal : valeur de base)
                     switch (fx.Type)
@@ -174,6 +176,17 @@ namespace N29.HeroesDawn.Domain.Combat
                             break;
                         case EffectType.Purge:
                             Purge(actor, t, fx.Value, output);
+                            break;
+                        case EffectType.ConsumeDamage:
+                            dealt += HitWithDamage(actor, t, ConsumedPower(t, fx, output), executeBonus, output, out missed);
+                            break;
+                        case EffectType.ConsumeHeal:
+                            int healed = Math.Min(t.MaxHp * ConsumedPower(t, fx, output) / 100, t.MaxHp - t.Hp);
+                            t.Hp += healed;
+                            output.Add(new HealEvent(Tick, t.Id, healed));
+                            break;
+                        case EffectType.Spread:
+                            Spread(actor, t, fx.Status, output);
                             break;
                         case EffectType.Lifesteal:
                             if (dealt <= 0 || !actor.IsAlive) break;
@@ -251,6 +264,29 @@ namespace N29.HeroesDawn.Domain.Combat
             int dealt = DealDamage(t, dmg, crit, output);
             if (_reactionsArmed && dealt > 0) NoteHitter(output, at, actor.Id); // auteur du coup, pour les réactions (aucun tirage)
             return dealt;
+        }
+
+        /// <summary>Consomme : retire le statut de la cible (événement d'expiration habituel) et rend Value × min(tours restants, Duration) ; la Marque, sans compte à rebours, compte un tour. Appelé seulement si la cible porte le statut.</summary>
+        int ConsumedPower(CombatUnit t, EffectDef fx, List<CombatEvent> output)
+        {
+            var st = t.Find(fx.Status)!;
+            int turns = fx.Status == StatusType.Mark ? 1 : st.TurnsLeft;
+            int power = fx.Value * Math.Min(turns, Math.Max(1, fx.Duration));
+            RemoveStatus(t, fx.Status, output);
+            return power;
+        }
+
+        /// <summary>Propage : copie le statut de la source (mêmes tours et valeur) sur chaque autre ennemi vivant du lanceur, par l'application normale (événement, recul sur la frise ; le maximum de tours est gardé). Sans tirage.</summary>
+        void Spread(CombatUnit actor, CombatUnit source, StatusType status, List<CombatEvent> output)
+        {
+            var st = source.Find(status);
+            if (st == null) return;
+            int turns = st.TurnsLeft, value = st.Value;
+            foreach (var u in _units)
+            {
+                if (u == source || u.Side == actor.Side || !u.IsAlive) continue;
+                ApplyStatus(u, status, turns, value, output);
+            }
         }
 
         /// <summary>Rebond : un autre ennemi vivant (hors des cibles) tiré au sort subit le premier effet de dégâts à <paramref name="percent"/> %. Sans candidat ni dégâts : aucun tirage.</summary>
