@@ -9,7 +9,7 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>
         /// Ciblage fin (<see cref="SkillDef.Pick"/>). Renvoie null quand il ne s'applique pas (Pick par défaut, ou règle incompatible) :
         /// l'appelant suit alors le chemin historique sans aucun tirage. La cible voulue est ignorée ; la Provocation d'un ennemi prime
-        /// pour les choix à cible unique. Une liste vide signifie « personne à viser » (aucun tirage n'a eu lieu).
+        /// pour les choix à cible unique. Une liste vide signifie « personne à viser » (aucun tirage n'a eu lieu). Côté allié, NextToAct écarte le lanceur et les alliés déjà prêts.
         /// </summary>
         List<int>? ResolvePick(CombatUnit actor, SkillDef skill)
         {
@@ -52,6 +52,28 @@ namespace N29.HeroesDawn.Domain.Combat
             }
         }
 
+        /// <summary>
+        /// Vrai si <see cref="ResolvePick"/> trouverait au moins une cible, sans aucun tirage (l'IA ne choisit pas une compétence qui partirait dans le vide).
+        /// Pick par défaut, règle ou choix que Pick n'affecte pas : vrai (chemin historique inchangé).
+        /// </summary>
+        bool PickHasTarget(CombatUnit actor, SkillDef skill)
+        {
+            if (skill.Pick == TargetPick.Default) return true;
+            Side foe = actor.Side == Side.Ally ? Side.Enemy : Side.Ally;
+            switch (skill.Target)
+            {
+                case TargetRule.SingleEnemy:
+                    return skill.Pick == TargetPick.TwoRandom || LivingIds(foe).Count > 0;
+                case TargetRule.SingleAlly:
+                    if (skill.Pick == TargetPick.TwoRandom) return true;
+                    return skill.Pick == TargetPick.NextToAct ? NextToActOf(actor.Side, actor.Id, true) >= 0 : LivingIds(actor.Side).Count > 0;
+                case TargetRule.AllEnemies:
+                    return skill.Pick != TargetPick.TwoRandom || LivingIds(foe).Count > 0;
+                default:
+                    return true;
+            }
+        }
+
         List<int> LivingIds(Side side)
         {
             var ids = new List<int>();
@@ -66,7 +88,7 @@ namespace N29.HeroesDawn.Domain.Combat
             {
                 case TargetPick.LowestHp: return LowestHpRatio(side);
                 case TargetPick.HighestHp: return HighestHpRatio(side);
-                case TargetPick.NextToAct: return NextToActOf(side, except);
+                case TargetPick.NextToAct: return NextToActOf(side, except, ally);
                 case TargetPick.StatusHolder:
                 {
                     foreach (var u in _units) if (u.Side == side && u.IsAlive && u.Has(status)) return u.Id;
@@ -96,13 +118,13 @@ namespace N29.HeroesDawn.Domain.Combat
             return best;
         }
 
-        /// <summary>Le vivant du camp le plus proche de son point d'action : plus grand rapport Point / ActionPoint, comparé en produits croisés. <paramref name="except"/> : unité écartée (le lanceur d'une carte « 1A:prochain », qui agit déjà).</summary>
-        int NextToActOf(Side side, int except = -1)
+        /// <summary>Le vivant du camp le plus proche de son point d'action : plus grand rapport Point / ActionPoint, comparé en produits croisés. <paramref name="except"/> : unité écartée (le lanceur d'une carte « 1A:prochain », qui agit déjà). <paramref name="skipReady"/> : écarte aussi les unités déjà prêtes (côté allié : Advance et Gauge + ne font rien sur elles).</summary>
+        int NextToActOf(Side side, int except = -1, bool skipReady = false)
         {
             CombatUnit? best = null;
             foreach (var u in _units)
             {
-                if (u.Side != side || !u.IsAlive || u.Id == except) continue;
+                if (u.Side != side || !u.IsAlive || u.Id == except || (skipReady && u.IsReady)) continue;
                 if (best == null || (long)u.Point * best.ActionPoint > (long)best.Point * u.ActionPoint) best = u;
             }
             return best == null ? -1 : best.Id;

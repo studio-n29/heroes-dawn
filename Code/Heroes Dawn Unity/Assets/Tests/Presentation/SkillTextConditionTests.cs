@@ -86,6 +86,23 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(Lines(g), Is.EqualTo(new[] { "Jauge +8 %", "+1 % par allié en vie (max 4)", "+4 % si la cible subit Brûlure", "0 %" }));
         }
 
+        [Test, Description("Vérifie que le bonus d'une jauge négative (ralentissement) garde le signe de la base — parce que le moteur AUGMENTE le ralentissement avec un bonus positif et que « +4 % » se lirait comme un ralentissement plus faible")]
+        public void GaugeMod_OnASlowdown_KeepsTheSignOfTheBase()
+        {
+            var slow = new EffectDef(EffectType.GaugeDelta, -80, mods: new[] { new ValueMod(10, null, ScaleKind.AlliesAlive, 4), new ValueMod(40, new Condition(ConditionKind.TargetHasStatus, StatusType.Burn)), new ValueMod(5) });
+            Assert.That(Lines(slow), Is.EqualTo(new[] { "Jauge -8 %", "-1 % par allié en vie (max 4)", "-4 % si la cible subit Brûlure", "0 %" }));
+            var speed = new EffectDef(EffectType.GaugeDelta, 80, mods: new[] { new ValueMod(40, new Condition(ConditionKind.TargetHasStatus, StatusType.Burn)) });
+            Assert.That(Lines(speed), Is.EqualTo(new[] { "Jauge +8 %", "+4 % si la cible subit Brûlure" }));
+        }
+
+        [Test, Description("Vérifie que le texte du ciblage « PV les plus hauts » ne parle plus du « plus vaillant » — parce que ce mot subjectif ne dit pas qu'il s'agit du pourcentage de PV le plus haut")]
+        public void HighestHpPickText_IsClear()
+        {
+            var text = Loc.T("pick.HighestHp");
+            Assert.That(text, Does.Not.Contain("vaillant"));
+            Assert.That(text, Does.Contain("PV"), "le texte dit sur quoi porte le choix");
+        }
+
         [Test, Description("Vérifie qu'avec les statistiques de l'agent les bonus sont convertis en montants bruts comme la ligne de base (dégâts, soin, bouclier), échelle comprise, et restent en % sans elles — parce que « +40 % » à côté de « Dégâts 196 » serait ambigu")]
         public void OwnerMode_ConvertsModsToRaw_AndPercentOtherwise()
         {

@@ -45,7 +45,7 @@ namespace N29.HeroesDawn.Authoring
             return fallback();
         }
 
-        /// <summary>Erreurs du catalogue : liste vide, identifiant vide ou en double, valeur d'enum hors plage (JsonUtility lit un entier quelconque). Liste vide = valide.</summary>
+        /// <summary>Erreurs du catalogue : liste vide, identifiant vide ou en double, valeur d'enum hors plage (JsonUtility lit un entier quelconque), condition ou modificateur sur un effet qui ne les lit pas, plafond sans échelle, niveau de palier autre que 3, 6, 10 ou répété. Liste vide = valide.</summary>
         public static IReadOnlyList<string> Validate(IReadOnlyList<SkillCardDef> cards)
         {
             var errors = new List<string>();
@@ -67,19 +67,38 @@ namespace N29.HeroesDawn.Authoring
                 CheckEnum(errors, who, "statut de ciblage", c.Skill.PickStatus);
                 foreach (var e in c.Skill.Effects) CheckEffect(errors, who, e);
                 foreach (var t in c.Tiers) foreach (var e in t.Effects) CheckEffect(errors, who, e);
+                var levels = new HashSet<int>();
+                foreach (var t in c.Tiers)
+                {
+                    if (!TierLevels.Contains(t.Level)) errors.Add(who + " : palier de niveau " + t.Level + " (seuls 3, 6 et 10 existent)");
+                    else if (!levels.Add(t.Level)) errors.Add(who + " : palier de niveau " + t.Level + " en double");
+                }
             }
             return errors;
         }
+
+        static readonly HashSet<int> TierLevels = new HashSet<int> { 3, 6, 10 };
+
+        /// <summary>Types d'effet dont le moteur lit la condition (Lifesteal, Bounce, Execute et Purge ne la lisent pas comme les autres).</summary>
+        static readonly HashSet<EffectType> ConditionTypes = new HashSet<EffectType>
+            { EffectType.Damage, EffectType.Heal, EffectType.Shield, EffectType.Advance, EffectType.PushBack, EffectType.GaugeDelta, EffectType.ApplyStatus };
+
+        /// <summary>Types d'effet dont le moteur lit les modificateurs de valeur.</summary>
+        static readonly HashSet<EffectType> ModTypes = new HashSet<EffectType>
+            { EffectType.Damage, EffectType.Heal, EffectType.Shield, EffectType.Advance, EffectType.PushBack, EffectType.GaugeDelta };
 
         static void CheckEffect(List<string> errors, string who, EffectDef e)
         {
             CheckEnum(errors, who, "type d'effet", e.Type);
             CheckEnum(errors, who, "statut", e.Status);
+            if (e.When != null && !ConditionTypes.Contains(e.Type)) errors.Add(who + " : une condition sur " + e.Type + " n'est pas lue par le moteur");
+            if (e.Mods.Count > 0 && !ModTypes.Contains(e.Type)) errors.Add(who + " : un modificateur sur " + e.Type + " n'est pas lu par le moteur");
             CheckCondition(errors, who, e.When);
             foreach (var m in e.Mods)
             {
                 CheckCondition(errors, who, m.When);
                 if (m.Per.HasValue) CheckEnum(errors, who, "échelle", m.Per.Value);
+                else if (m.MaxCount != 0) errors.Add(who + " : un plafond (maxCount " + m.MaxCount + ") sur un modificateur sans échelle");
             }
         }
 

@@ -82,8 +82,9 @@ namespace N29.HeroesDawn.Tests.Domain
             foreach (var id in WaveCardIds)
             {
                 var card = Card(id);
-                var ally = new AllyEntry(new MemberId("verre"), 5, 0, 0, null, new CardId?[] { card.Id }, new[] { 1 });
-                var sim = new CombatSimulation(TestContent.Build(), new CombatSetup(7, CombatRank.Normal, new[] { ally },
+                var allies = new List<AllyEntry> { new AllyEntry(new MemberId("verre"), 5, 0, 0, null, new CardId?[] { card.Id }, new[] { 1 }) };
+                if (WaveGoldenTests.TwoAllyCardIds.Contains(id)) allies.Add(new AllyEntry(new MemberId("givre"), 5, 0)); // cartes à cible alliée : un allié à viser (Sillage ne se lance pas seule)
+                var sim = new CombatSimulation(TestContent.Build(), new CombatSetup(7, CombatRank.Normal, allies.ToArray(),
                     new[] { new EnemyEntry(new EnemyId("brute"), 5), new EnemyEntry(new EnemyId("brute"), 5) }, true));
                 sim.Unit(0).Energy = sim.Unit(0).MaxEnergy;
                 for (int i = 0; i < 3000 && !sim.IsOver; i++) sim.Step(1);

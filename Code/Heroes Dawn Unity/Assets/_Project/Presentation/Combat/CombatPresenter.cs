@@ -567,7 +567,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                     Affordable = u.Energy >= s.Cost,
                     Pending = active && _pendingSlot == i,
                     Enabled = active && sim.CanUse(u.Id, i),
-                    NeedsTarget = NeedsTarget(s.Target),
+                    NeedsTarget = NeedsTarget(s),
                 };
             }
             return slots;
@@ -608,16 +608,24 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             var sim = _sim;
             if (!CanCommand || _selected < 0 || !sim!.CanUse(_selected, slot)) return;
-            var rule = sim.Unit(_selected).Skills[slot].Target;
-            if (rule == TargetRule.SingleEnemy && AliveCount(Side.Enemy) == 1) Submit(CombatCommand.UseSkill(_selected, slot, FirstAlive(Side.Enemy)));
+            var skill = sim.Unit(_selected).Skills[slot];
+            var rule = skill.Target;
+            if (skill.Pick != TargetPick.Default) Submit(CombatCommand.UseSkill(_selected, slot, -1)); // ciblage fin : la simulation choisit, la cible voulue serait ignorée
+            else if (rule == TargetRule.SingleEnemy && AliveCount(Side.Enemy) == 1) Submit(CombatCommand.UseSkill(_selected, slot, FirstAlive(Side.Enemy)));
             else if (rule == TargetRule.SingleEnemy || rule == TargetRule.SingleAlly) _pendingSlot = _pendingSlot == slot ? -1 : slot; // re-toucher annule
             else Submit(CombatCommand.UseSkill(_selected, slot, -1));
             RefreshAll();
         }
 
-        /// <summary>Une compétence se pose sur une cible s'il faut en choisir une (un seul ennemi vivant : la cible est évidente).</summary>
-        bool NeedsTarget(TargetRule rule)
-            => (rule == TargetRule.SingleEnemy && AliveCount(Side.Enemy) > 1) || rule == TargetRule.SingleAlly;
+        /// <summary>Une compétence se pose sur une cible s'il faut en choisir une (un seul ennemi vivant : la cible est évidente). Une compétence à ciblage fin (<see cref="SkillDef.Pick"/> non défaut) choisit sa cible elle-même : elle part sans en demander, comme une compétence de zone.</summary>
+        bool NeedsTarget(SkillDef skill) => NeedsTarget(skill, AliveCount(Side.Enemy));
+
+        internal static bool NeedsTarget(SkillDef skill, int aliveEnemies)
+        {
+            if (skill.Pick != TargetPick.Default) return false;
+            var rule = skill.Target;
+            return (rule == TargetRule.SingleEnemy && aliveEnemies > 1) || rule == TargetRule.SingleAlly;
+        }
 
         /// <summary>Carte prise : une compétence ciblée allume ses cibles valides, une générale attend d'être lâchée dans le vide.</summary>
         void SkillDragBegan(int slot)
@@ -625,7 +633,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             var sim = _sim;
             if (!CanCommand || _selected < 0 || !sim!.CanUse(_selected, slot)) return;
             _dragSlot = slot;
-            if (NeedsTarget(sim.Unit(_selected).Skills[slot].Target)) _pendingSlot = slot;
+            if (NeedsTarget(sim.Unit(_selected).Skills[slot])) _pendingSlot = slot;
             RefreshAll();
         }
 
@@ -641,8 +649,9 @@ namespace N29.HeroesDawn.Presentation.Combat
                 RefreshAll();
                 return;
             }
-            var rule = sim.Unit(_selected).Skills[slot].Target;
-            if (!NeedsTarget(rule)) { Skill(slot); return; }
+            var skill = sim.Unit(_selected).Skills[slot];
+            var rule = skill.Target;
+            if (!NeedsTarget(skill)) { Skill(slot); return; }
             if (where >= 0 && IsValidTarget(rule, sim.Unit(where)) && _pendingSlot == slot) { UnitTapped(where); return; }
             _pendingSlot = -1;
             RefreshAll();

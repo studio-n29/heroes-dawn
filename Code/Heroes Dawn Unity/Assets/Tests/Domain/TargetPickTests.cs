@@ -99,8 +99,50 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test, Description("Vérifie que NextToAct vise l'allié le plus avancé sur la frise pour SingleAlly — parce que la règle vaut aussi pour le camp du lanceur")]
         public void NextToAct_OnAllies()
         {
-            Cast(TargetRule.SingleAlly, TargetPick.NextToAct, new[] { "brute" }, out var t, s => s.Unit(1).Point = 30);
+            Cast(TargetRule.SingleAlly, TargetPick.NextToAct, new[] { "brute" }, out var t, s => s.Unit(1).Point = s.Unit(1).ActionPoint / 2);
             Assert.That(t, Is.EqualTo(new[] { 1 }));
+        }
+
+        [Test, Description("Vérifie que NextToAct allié écarte le lanceur et les alliés déjà prêts (ils n'avancent plus), que sans autre allié la liste est vide sans tirage, et que pour les ennemis un ennemi prêt reste visé — parce que Advance et Gauge + ne font rien sur un allié prêt")]
+        public void NextToAct_OnAllies_ExcludesTheCasterAndReadyAllies()
+        {
+            Cast(TargetRule.SingleAlly, TargetPick.NextToAct, new[] { "brute" }, out var t, s => s.Unit(1).Point = s.Unit(1).ActionPoint / 2);
+            Assert.That(t, Is.EqualTo(new[] { 1 }), "un allié non prêt est visé");
+            var reference = Cast(TargetRule.SingleAlly, TargetPick.NextToAct, new[] { "brute" }, out _, s => s.Unit(1).Hp = 0, seed: 5); // aucun candidat du tout : référence sans tirage
+            var ready = Cast(TargetRule.SingleAlly, TargetPick.NextToAct, new[] { "brute" }, out var none, s => s.Unit(1).Point = s.Unit(1).ActionPoint, seed: 5);
+            Assert.That(none, Is.Empty, "le seul autre allié est prêt : personne à viser (le lanceur est exclu)");
+            Assert.That(ready.RngProbeForTests(), Is.EqualTo(reference.RngProbeForTests()), "aucun tirage");
+            Cast(TargetRule.SingleAlly, TargetPick.NextToAct, new[] { "brute" }, out var alone, s => s.Unit(1).Hp = 0);
+            Assert.That(alone, Is.Empty, "aucun autre allié vivant");
+            Cast(TargetRule.SingleEnemy, TargetPick.NextToAct, Three, out var foe, s => { s.Unit(2).Point = s.Unit(2).ActionPoint; s.Unit(3).Point = 10; });
+            Assert.That(foe, Is.EqualTo(new[] { 2 }), "un ennemi prêt reste le plus avancé");
+        }
+
+        /// <summary>Combat Auto : « verre » lance le Sillage de test (1A:prochain, coût 0) ; l'allié « givre » est présent ou non.</summary>
+        static CombatSimulation AutoWithSlipstream(bool withAlly, out List<SkillUsedEvent> casts)
+        {
+            var c = TestContent.Build();
+            var col = c.Collection;
+            var skill = new SkillDef(new SkillId("card_test"), SkillSlot.A3, 0, TargetRule.SingleAlly, new[] { new EffectDef(EffectType.Advance, 30) }, 0, TargetPick.NextToAct);
+            var card = new SkillCardDef(new CardId("card_test"), "cards.card_test.name", Family.Matter, 1, skill);
+            var catalog = c.WithCollection(new CollectionDef(col.Items, col.Cards.Concat(new[] { card }).ToList(), col.Boosters));
+            var allies = new List<AllyEntry> { new AllyEntry(new MemberId("verre"), 5, 0, 0, null, new CardId?[] { new CardId("card_test") }) };
+            if (withAlly) allies.Add(new AllyEntry(new MemberId("givre"), 5, 0));
+            var sim = new CombatSimulation(catalog, new CombatSetup(7, CombatRank.Normal, allies.ToArray(), new[] { new EnemyEntry(new EnemyId("brute"), 5) }, true));
+            sim.Unit(0).Energy = sim.Unit(0).MaxEnergy;
+            for (int i = 0; i < 600 && !sim.IsOver; i++) sim.Step(1);
+            casts = sim.Log.OfType<SkillUsedEvent>().Where(e => e.Actor == 0 && e.Skill.Value == "card_test").ToList();
+            return sim;
+        }
+
+        [Test, Description("Vérifie qu'en Auto un lanceur seul n'utilise jamais une compétence 1A:prochain faute de cible, alors qu'avec un allié non prêt il la lance — parce que l'énergie et le tour ne se dépensent pas dans le vide")]
+        public void Ai_DoesNotCastAPickWithNoCandidate()
+        {
+            AutoWithSlipstream(false, out var alone);
+            Assert.That(alone, Is.Empty, "seul : aucune cible, la compétence n'est jamais choisie");
+            AutoWithSlipstream(true, out var withAlly);
+            Assert.That(withAlly, Is.Not.Empty, "avec un allié non prêt : elle est lancée");
+            Assert.That(withAlly.All(e => e.Targets.Length == 1 && e.Targets[0] == 1));
         }
 
         [Test, Description("Vérifie que la Provocation d'un ennemi l'emporte sur un choix fin à cible unique — parce que Taunt prime sur tout ciblage unique")]

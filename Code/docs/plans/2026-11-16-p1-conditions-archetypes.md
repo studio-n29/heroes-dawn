@@ -39,6 +39,7 @@
 - Valeur de `Gauge` : en points sur 1 000, signe respecté (`Gauge -N` ralentit).
 - Colonne `Cible` : `1E` `ZE` `1A` `ZA` `Soi` ; ciblage fin `1E:faible|fort|prochain|aléatoire|<Statut>` et `1A:faible|prochain|<Statut>` ; `2E:aléatoires`. Correspondance : `1E:*` → `SingleEnemy` ; `1A:*` → `SingleAlly` ; `2E:aléatoires` → `AllEnemies` + `TwoRandom` ; `faible` → `LowestHp`, `fort` → `HighestHp`, `prochain` → `NextToAct`, `aléatoire` → `Random`, `<Statut>` → `StatusHolder`.
 - Les modificateurs et conditions ne sont admis que sur `Damage`, `Heal`, `Shield`, `Advance`, `PushBack`, `GaugeDelta` et `ApplyStatus` (condition seule). Toute autre combinaison est une erreur d'import.
+- `Dmg +N` dans une cellule de palier sans `Dmg` dans la même cellule = **second coup indépendant** (jet de coup, critique, Marque et défense à nouveau), pas un bonus du coup de base.
 
 ## Points d'attention de la relecture (Review Focus)
 1. Une condition fausse ne consomme aucun tirage (chance non tirée) → tâche 3.

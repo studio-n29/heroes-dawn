@@ -106,7 +106,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["scale.TargetMissingHpTenths"] = "10 % de PV manquants de la cible";
             d["scale.CasterMissingHpTenths"] = "10 % de PV manquants du lanceur";
             d["pick.LowestHp"] = "Cible : le plus faible en PV";
-            d["pick.HighestHp"] = "Cible : le plus vaillant en PV";
+            d["pick.HighestHp"] = "Cible : le plus en forme (PV en %)";
             d["pick.StatusHolder"] = "Cible : porteur de {0}";
             d["pick.NextToAct"] = "Cible : le prochain à agir";
             d["pick.Random"] = "Cible : au hasard";

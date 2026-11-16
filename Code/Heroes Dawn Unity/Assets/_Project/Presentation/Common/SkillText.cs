@@ -59,7 +59,7 @@ namespace N29.HeroesDawn.Presentation.Common
                 case EffectType.Damage when owner.HasValue: return Loc.F("fx.bonus_damage_raw", owner.Value.Atk * bonus / 100);
                 case EffectType.Heal when owner.HasValue: return Loc.F("fx.bonus_heal_raw", owner.Value.MaxHp * bonus / 100);
                 case EffectType.Shield when owner.HasValue: return Loc.F("fx.bonus_shield_raw", owner.Value.MaxHp * bonus / 100);
-                case EffectType.GaugeDelta: return Loc.F("fx.bonus_pct", bonus / 10);
+                case EffectType.GaugeDelta: return Loc.F("fx.bonus_pct", fx.Value < 0 ? -(bonus / 10) : bonus / 10); // ralentissement : le bonus l'AUGMENTE, le signe de la base est repris
                 default: return Loc.F("fx.bonus_pct", bonus);
             }
         }

@@ -83,6 +83,21 @@ namespace N29.HeroesDawn.Tests.Presentation
             return -1;
         }
 
+        [Test, Description("Vérifie qu'une compétence à ciblage fin ne demande jamais de cible alors qu'une compétence mono-cible sans choix en demande une — parce que la simulation ignore la cible voulue quand le choix fin décide")]
+        public void NeedsTarget_IsFalseForFinePick_TrueForPlainSingleTarget()
+        {
+            SkillDef Skill(TargetRule rule, TargetPick pick, StatusType status = StatusType.None)
+                => new SkillDef(new SkillId("card_t"), SkillSlot.A3, 0, rule, new[] { new EffectDef(EffectType.Damage, 1) }, 0, pick, status);
+            Assert.That(CombatPresenter.NeedsTarget(Skill(TargetRule.SingleEnemy, TargetPick.Default), 3), Is.True, "1E sans pick");
+            Assert.That(CombatPresenter.NeedsTarget(Skill(TargetRule.SingleEnemy, TargetPick.Default), 1), Is.False, "un seul ennemi : cible évidente");
+            Assert.That(CombatPresenter.NeedsTarget(Skill(TargetRule.SingleAlly, TargetPick.Default), 3), Is.True, "1A sans pick");
+            foreach (var pick in new[] { TargetPick.LowestHp, TargetPick.HighestHp, TargetPick.StatusHolder, TargetPick.NextToAct, TargetPick.Random })
+            {
+                Assert.That(CombatPresenter.NeedsTarget(Skill(TargetRule.SingleEnemy, pick), 3), Is.False, "1E " + pick);
+                Assert.That(CombatPresenter.NeedsTarget(Skill(TargetRule.SingleAlly, pick), 3), Is.False, "1A " + pick);
+            }
+        }
+
         [Test, Description("Vérifie qu'une carte est construite par unité du combat — parce que chaque allié et chaque ennemi a son portrait, ses PV et sa jauge (W11a)")]
         public void Shown_BuildsOneCardPerUnit()
         {

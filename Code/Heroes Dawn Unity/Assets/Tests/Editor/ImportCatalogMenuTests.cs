@@ -108,11 +108,18 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(ex!.Message, Does.Contain("Validate").Or.Contain("invalide"));
         }
 
-        [Test, Description("Vérifie que Merge accepte un fichier existant vide ou absent et part alors d'un catalogue vide — parce que le premier import d'un nouveau projet ne doit pas échouer")]
-        public void Merge_EmptyExisting_StartsFromNothing()
+        [Test, Description("Vérifie que Merge refuse un fichier existant vide, absent ou privé des cartes du code, et que le message le dit — parce qu'on obtiendrait sinon un catalogue réduit aux seules cartes importées")]
+        public void Merge_EmptyOrIncompleteExisting_IsRefused()
         {
-            var merged = ImportCatalogMenu.Merge("", Rows(Line("card_new_a", "P1", "Dmg 100")), OneId);
-            Assert.That(CardDataLibrary.FromJson(merged).Select(c => c.Id.Value), Is.EqualTo(OneId));
+            var rows = Rows(Line("card_new_a", "P1", "Dmg 100"));
+            foreach (var existing in new[] { "", "  ", "{\"cards\":[]}" })
+            {
+                var ex = Assert.Throws<InvalidOperationException>(() => ImportCatalogMenu.Merge(existing, rows, OneId));
+                Assert.That(ex!.Message, Does.Contain("incomplet").And.Contain("48"), "« " + existing + " »");
+            }
+            var partial = CardDataLibrary.ToJson(CardDataLibrary.FromJson(ExistingJson()).Take(40).ToList());
+            var ex2 = Assert.Throws<InvalidOperationException>(() => ImportCatalogMenu.Merge(partial, rows, OneId));
+            Assert.That(ex2!.Message, Does.Contain("8"), "il manque 8 cartes du code");
         }
 
         [Test, Description("Vérifie que mise-en-jeu.txt liste les 12 cartes de la vague 1, que toutes se convertissent depuis les fiches et que cards.json les contient déjà à l'identique — parce que le fichier de données doit être le résultat exact de l'outil")]

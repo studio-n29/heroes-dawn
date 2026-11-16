@@ -88,6 +88,23 @@ foreach ($r in $all) {
     }
   }
   if (($cells -join ' ') -match 'Bounce' -and $r.Base -notmatch 'Dmg') { Err "$w : Bounce sans Dmg de base" }
+  # Avertissements (n'arrêtent pas la vérification) : effets inertes ou conditions jamais vraies, faciles à écrire sans le voir
+  $coreCells = @($cells | ForEach-Object { $_ -replace 'Réaction[^\]]*', '' })   # une réaction est un effet différé : elle ne compte ni comme coup de base ni comme Adv immédiat
+  $hasDmg = $coreCells[0] -match '\bDmg\b'
+  if ($r.Cible -match '^Soi(:|$)') {
+    # Le lanceur est déjà prêt quand il joue : Adv et Gauge + ne font rien sur lui ; Steal et Bounce n'ont rien à voler ou à rebondir sans coup de base.
+    foreach ($cell in $coreCells) {
+      if ($cell -match '\bAdv\b|Gauge \+') { Warn "$w : cible Soi avec Adv ou Gauge + (inerte sur le lanceur, déjà prêt) : '$cell'"; break }
+    }
+    if (-not $hasDmg -and ($coreCells -join ' ') -match '\b(Steal|Bounce)\b') { Warn "$w : cible Soi avec Steal ou Bounce sans Dmg en base (rien à voler ni à faire rebondir)" }
+  }
+  # Un palier s'exécute après la base : une condition qui lit un état que la base vient de modifier est fausse ou toujours vraie.
+  foreach ($t in @(@('Niv.3', $r.T3), @('Niv.6', $r.T6), @('Niv.10', $r.T10))) {
+    $cell = $t[1]
+    if ($cell -match '\[si cible a Mark\b' -and $hasDmg) { Warn "$w : $($t[0]) lit « cible a Mark » mais le Dmg de base consomme la Marque avant : '$cell'" }
+    if ($cell -match '\[si cible a Shield\b' -and $r.Base -match '\bPurge\b') { Warn "$w : $($t[0]) lit « cible a Shield » mais le Purge de base l'a retiré avant : '$cell'" }
+    if ($cell -match '\[si cible < \d+ ?% PV' -and $r.Base -match '\bHeal\b') { Warn "$w : $($t[0]) lit « cible < N% PV » mais le Heal de base a déjà soigné la cible : '$cell'" }
+  }
 }
 
 # Totaux par étoile et par famille

@@ -196,6 +196,53 @@ namespace N29.HeroesDawn.Tests.Domain
             AssertSameCards(legacy, CardDataLibrary.Load(() => json, () => legacy));
         }
 
+        static SkillCardDef WithTiers(string id, params CardTier[] tiers)
+            => new SkillCardDef(new CardId(id), "cards." + id + ".name", Family.Matter, 1,
+                                new SkillDef(new SkillId(id), SkillSlot.A3, 4, TargetRule.SingleEnemy, new[] { new EffectDef(EffectType.Damage, 100) }, 40),
+                                CardNature.Offensive, tiers, new Archetype[0], CardRole.Basic);
+
+        [Test, Description("Vérifie que Validate refuse une condition sur Lifesteal, Bounce, Execute ou Purge (en base comme en palier) mais l'accepte sur Damage — parce que le moteur ne lit pas la condition de ces effets de la même façon et l'ignorerait ou la lirait mal")]
+        public void Validate_RejectsAConditionOnUnsupportedEffects()
+        {
+            var cond = new Condition(ConditionKind.TargetHasStatus, StatusType.Burn);
+            foreach (var type in new[] { EffectType.Lifesteal, EffectType.Bounce, EffectType.Execute, EffectType.Purge })
+            {
+                Assert.That(CardDataLibrary.Validate(new[] { Card("c_" + type, effect: new EffectDef(type, 10, StatusType.None, 0, 100, cond)) }), Has.Count.EqualTo(1), "base " + type);
+                Assert.That(CardDataLibrary.Validate(new[] { WithTiers("t_" + type, new CardTier(3, new EffectDef(type, 10, StatusType.None, 0, 100, cond))) }), Has.Count.EqualTo(1), "palier " + type);
+            }
+            Assert.That(CardDataLibrary.Validate(new[] { Card("c_dmg", effect: new EffectDef(EffectType.Damage, 10, StatusType.None, 0, 100, cond)) }), Is.Empty);
+        }
+
+        [Test, Description("Vérifie que Validate refuse un modificateur de valeur sur un type autre que Damage, Heal, Shield, Advance, PushBack, GaugeDelta — parce que le moteur ne lit les modificateurs que sur ces effets")]
+        public void Validate_RejectsAModifierOnUnsupportedEffects()
+        {
+            var mod = new[] { new ValueMod(5) };
+            foreach (var type in new[] { EffectType.ApplyStatus, EffectType.Lifesteal, EffectType.Purge, EffectType.Bounce, EffectType.Execute })
+                Assert.That(CardDataLibrary.Validate(new[] { Card("c_" + type, effect: new EffectDef(type, 10, StatusType.None, 0, 100, null, mod)) }), Has.Count.EqualTo(1), type.ToString());
+            foreach (var type in new[] { EffectType.Damage, EffectType.Heal, EffectType.Shield, EffectType.Advance, EffectType.PushBack, EffectType.GaugeDelta })
+                Assert.That(CardDataLibrary.Validate(new[] { Card("ok_" + type, effect: new EffectDef(type, 10, StatusType.None, 0, 100, null, mod)) }), Is.Empty, type.ToString());
+        }
+
+        [Test, Description("Vérifie que Validate refuse un maxCount non nul sur un modificateur sans échelle — parce que seul un modificateur à échelle plafonne un compte")]
+        public void Validate_RejectsAMaxCountWithoutAScale()
+        {
+            var bad = new EffectDef(EffectType.Damage, 10, StatusType.None, 0, 100, null, new[] { new ValueMod(5, null, null, 3) });
+            Assert.That(CardDataLibrary.Validate(new[] { Card("c_max", effect: bad) }), Has.Count.EqualTo(1));
+            var scaled = new EffectDef(EffectType.Damage, 10, StatusType.None, 0, 100, null, new[] { new ValueMod(5, null, ScaleKind.EnemiesAlive, 3) });
+            Assert.That(CardDataLibrary.Validate(new[] { Card("c_ok", effect: scaled) }), Is.Empty);
+            Assert.Throws<System.ArgumentException>(() => new ValueMod(5, null, ScaleKind.EnemiesAlive, 0), "une échelle sans plafond ne se construit même pas");
+        }
+
+        [Test, Description("Vérifie que Validate refuse un palier de niveau autre que 3, 6 ou 10 et un niveau répété — parce que les paliers se débloquent à ces seuls niveaux et un doublon s'appliquerait deux fois")]
+        public void Validate_RejectsBadTierLevels()
+        {
+            var fx = new EffectDef(EffectType.Damage, 10);
+            Assert.That(CardDataLibrary.Validate(new[] { WithTiers("t_ok", new CardTier(3, fx), new CardTier(6, fx), new CardTier(10, fx)) }), Is.Empty);
+            Assert.That(CardDataLibrary.Validate(new[] { WithTiers("t_4", new CardTier(4, fx)) }), Has.Count.EqualTo(1), "niveau 4");
+            Assert.That(CardDataLibrary.Validate(new[] { WithTiers("t_0", new CardTier(0, fx)) }), Has.Count.EqualTo(1), "niveau 0");
+            Assert.That(CardDataLibrary.Validate(new[] { WithTiers("t_dup", new CardTier(3, fx), new CardTier(3, fx)) }), Has.Count.EqualTo(1), "niveau répété");
+        }
+
         [Test, Description("Vérifie que Validate accepte les cartes du code et refuse une liste vide — parce que le catalogue livré doit toujours passer la validation et qu'un catalogue vide est une erreur")]
         public void Validate_AcceptsTheCodeCards_AndRejectsAnEmptyList()
         {

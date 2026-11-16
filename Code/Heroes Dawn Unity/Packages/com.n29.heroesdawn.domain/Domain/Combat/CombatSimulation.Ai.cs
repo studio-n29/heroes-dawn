@@ -65,7 +65,8 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         bool CanUseSlot(CombatUnit u, int slot)
-            => slot >= 0 && slot < ActiveSkillCount(u) && u.Energy >= u.Skills[slot].Cost && !(u.Has(StatusType.Bind) && slot > 0);
+            => slot >= 0 && slot < ActiveSkillCount(u) && u.Energy >= u.Skills[slot].Cost && !(u.Has(StatusType.Bind) && slot > 0)
+               && PickHasTarget(u, u.Skills[slot]); // un ciblage fin sans candidat (Sillage sans autre allié à faire avancer) n'est pas choisi : ni énergie ni tour dépensés pour rien
 
         static int FindSlot(CombatUnit u, EffectType t)
         {

@@ -220,8 +220,10 @@ namespace N29.HeroesDawn.Tests.Domain
             foreach (var card in c.Collection.Cards)
             {
                 var member = c.Members.First(m => m.Family == card.Family);
-                var ally = new AllyEntry(member.Id, 10, 0, 0, null, new CardId?[] { card.Id }, new[] { 10 });
-                var setup = new CombatSetup(17UL, CombatRank.Normal, new[] { ally },
+                var allies = new List<AllyEntry> { new AllyEntry(member.Id, 10, 0, 0, null, new CardId?[] { card.Id }, new[] { 10 }) };
+                // Un ciblage « 1A:prochain » demande un autre allié à viser : l'IA ne lance plus une compétence sans cible.
+                if (card.Skill.Target == TargetRule.SingleAlly && card.Skill.Pick == TargetPick.NextToAct) allies.Add(new AllyEntry(c.Members.First(m => m.Id != member.Id).Id, 10, 0));
+                var setup = new CombatSetup(17UL, CombatRank.Normal, allies.ToArray(),
                     new[] { new EnemyEntry(new EnemyId("brute"), 8), new EnemyEntry(new EnemyId("brute"), 8) }, true);
                 var sim = new CombatSimulation(c, setup);
                 sim.Unit(0).Energy = sim.Unit(0).MaxEnergy; // énergie pleine : les Légendaires (70) sont lançables avant la fin d'un combat court
