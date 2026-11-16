@@ -42,7 +42,7 @@ namespace N29.HeroesDawn.Definitions
             return skill.MapEffects(e =>
             {
                 bool scaled = e.Type == EffectType.Damage || e.Type == EffectType.Heal || e.Type == EffectType.Shield;
-                return scaled ? new EffectDef(e.Type, e.Value * pct / 100, e.Status, e.Duration, e.ChancePercent) : e;
+                return scaled ? e.With(value: e.Value * pct / 100) : e;
             });
         }
     }

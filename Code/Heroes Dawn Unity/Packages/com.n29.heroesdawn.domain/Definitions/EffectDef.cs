@@ -1,3 +1,7 @@
+#nullable enable
+using System;
+using System.Collections.Generic;
+
 namespace N29.HeroesDawn.Definitions
 {
     public sealed class EffectDef
@@ -8,10 +12,20 @@ namespace N29.HeroesDawn.Definitions
         public StatusType Status { get; }
         public int Duration { get; }
         public int ChancePercent { get; }
+        /// <summary>Condition d'application de l'effet ; nulle : toujours appliqué.</summary>
+        public Condition? When { get; }
+        /// <summary>Modificateurs de la valeur de base (liste vide par défaut).</summary>
+        public IReadOnlyList<ValueMod> Mods { get; }
 
-        public EffectDef(EffectType type, int value, StatusType status = StatusType.None, int duration = 0, int chancePercent = 100)
+        public EffectDef(EffectType type, int value, StatusType status = StatusType.None, int duration = 0, int chancePercent = 100,
+            Condition? when = null, IReadOnlyList<ValueMod>? mods = null)
         {
             Type = type; Value = value; Status = status; Duration = duration; ChancePercent = chancePercent;
+            When = when; Mods = mods ?? Array.Empty<ValueMod>();
         }
+
+        /// <summary>Copie avec valeur, durée et/ou chance remplacées ; tous les autres champs (dont condition et modificateurs) sont conservés.</summary>
+        public EffectDef With(int? value = null, int? duration = null, int? chance = null)
+            => new EffectDef(Type, value ?? Value, Status, duration ?? Duration, chance ?? ChancePercent, When, Mods);
     }
 }

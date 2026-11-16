@@ -38,10 +38,10 @@ namespace N29.HeroesDawn.Definitions
                     case EffectType.PushBack:
                     case EffectType.Advance:
                     case EffectType.GaugeDelta:
-                        return new EffectDef(e.Type, e.Value * pct / 100, e.Status, e.Duration, e.ChancePercent);
+                        return e.With(value: e.Value * pct / 100);
                     case EffectType.ApplyStatus:
                         int chance = e.ChancePercent >= 100 ? e.ChancePercent : System.Math.Min(100, e.ChancePercent * pct / 100);
-                        return new EffectDef(e.Type, e.Value, e.Status, (e.Duration * pct + 50) / 100, chance);
+                        return e.With(duration: (e.Duration * pct + 50) / 100, chance: chance);
                     default:
                         return e;
                 }
