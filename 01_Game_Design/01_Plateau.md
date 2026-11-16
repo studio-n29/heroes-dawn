@@ -1,7 +1,7 @@
 # Plateau (graphe, dé, brouillard de guerre)
 
 > Résumé dans le GDD : `00_GDD/GDD_Heroes_Dawn.md` §5 · Statut : **v1 complète**
-> ⚑ = recommandation qui touche le feeling, à confirmer en prototype.
+> ⚑ = recommandation d'origine ; **toutes validées le 2026-11-16** (voir `05_Production/Decisions.md`).
 
 ## Objectif du système
 Porter le pilier **« Chaque lancer compte »** : à chaque lancer, le joueur a un vrai choix (quel chemin, quelle case, utiliser ou garder le dé bonus). Le plateau rythme les sessions courtes : 2 à 4 lancers et un combat tiennent en 5-10 minutes.

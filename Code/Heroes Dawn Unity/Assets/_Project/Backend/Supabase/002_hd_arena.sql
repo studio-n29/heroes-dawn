@@ -1,7 +1,5 @@
 -- Bloc D (1.0.0) : arène des tournois JcJ.
--- ┌───────────────────────────────────────────────────────────────────────────────────────────────┐
--- │ SCRIPT NON APPLIQUÉ. À relire, puis à appliquer uniquement sur accord explicite de l'équipe.  │
--- └───────────────────────────────────────────────────────────────────────────────────────────────┘
+-- Appliqué sur N29 HQ le 2026-11-16 (migration « 002_hd_arena »), sur accord explicite ; suivi de 003_hd_arena_durcissement.sql.
 -- Les tables du jeu portent le préfixe hd_ : les tables hq_* (N29 HQ) appartiennent à un autre outil et ne sont jamais touchées.
 -- Aucune clé service_role n'est utilisée ni requise : le client n'a que la clé anon et le jeton du joueur.
 --

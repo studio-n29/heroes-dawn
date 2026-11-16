@@ -3,7 +3,7 @@
 > Résumé dans le GDD : `00_GDD/GDD_Heroes_Dawn.md` §6 · Statut : **réaligné sur la version 0.10.1 (2026-10-23)**
 > Kits des agents : `06_Kits_Competences.md` · Roster : `03_Metahumains.md` et `02_Lore_Narration/04_Agents_The_Dawn.md` · Valeurs : `05_Equilibrage.xlsx` et `BalanceConfig` dans le code
 > Spécifications détaillées : `Code/docs/specs/` (frise, énergie, synergie, deux compétences, pause de résolution, disposition).
-> ⚑ = valeur proposée, à équilibrer en playtest.
+> ⚑ = valeur proposée à l'origine ; **toutes validées le 2026-11-16** (voir `05_Production/Decisions.md`).
 > Les anciennes règles (jauge ATB, combos de famille, duos légendaires, compétences d'avatar) ont été remplacées ; leur ancienne description est dans l'historique git.
 
 ## Objectif du système

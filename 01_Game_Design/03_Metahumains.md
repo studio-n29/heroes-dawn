@@ -1,7 +1,7 @@
 # Méta-humains : familles, positions, rangs AMIF, synergies, progression
 
 > Résumé dans le GDD : `00_GDD/GDD_Heroes_Dawn.md` §7 · Statut : **réaligné sur la version 0.10.1 (2026-10-23)**
-> ⚑ = valeur proposée, à confirmer en playtest.
+> ⚑ = valeur proposée à l'origine ; **toutes validées le 2026-11-16** (voir `05_Production/Decisions.md`).
 > Kits : `06_Kits_Competences.md` · Fiches de lore : `02_Lore_Narration/04_Agents_The_Dawn.md` · Synergies chiffrées : `02_Combat.md` · Stats : tableur, onglet Stats
 > L'organisation du joueur s'appelle **The Dawn** (l'Aube) ; l'ancienne « Guilde » et son roster de 35 recrues de New York sont archivés dans `02_Lore_Narration/Archive_v1/`.
 
@@ -134,4 +134,4 @@ Eda et Brie Rayner sont rang 5 mais non recrutables (PNJ, allié d'arc ou boss).
 
 **Bonus des cartes équipées** : +15 % d'efficacité si le type de la carte est boosté par la position de l'agent, +5 % si la carte est de sa famille ; les deux se cumulent (jusqu'à +20 %). Les ennemis n'en reçoivent jamais.
 
-**Table des rangs** (⚑ à valider) : rang 5 : Agent D, Agent M, Victor Sorel · rang 4 : Odile Ferrand, Ada Okonkwo, Eero Nieminen, Astrid Hallström, Louis Dubois · rang 3 : Yelena Ivanova, Marco Bellini, Zofia Kowalczyk, Mateo Vasquez, Clément Lefèvre, Youssef Haddad · rang 2 : Ilona Varga, Haruto Nakamura, Noah Kaplan, Céleste Moreau, Rin Takeda, Giulia Rossi, Kwame Abara, Mei-Lin Chen · rang 1 : Darius Brooks, Freya Lindqvist, Lucas Mendes, Amara Hughes, Fatou Diallo, Séverine Morel, Sam Okafor, Tunde Oyelaran, Ji-Hoon Park, Anna Petrov. Cryptides de Salem (provisoire) : S5 rang 4 ; S1, S3, S6, S9 rang 3 ; S2, S4, S7, S8, S10 rang 2.
+**Table des rangs** (validée le 2026-11-16) : rang 5 : Agent D, Agent M, Victor Sorel · rang 4 : Odile Ferrand, Ada Okonkwo, Eero Nieminen, Astrid Hallström, Louis Dubois · rang 3 : Yelena Ivanova, Marco Bellini, Zofia Kowalczyk, Mateo Vasquez, Clément Lefèvre, Youssef Haddad · rang 2 : Ilona Varga, Haruto Nakamura, Noah Kaplan, Céleste Moreau, Rin Takeda, Giulia Rossi, Kwame Abara, Mei-Lin Chen · rang 1 : Darius Brooks, Freya Lindqvist, Lucas Mendes, Amara Hughes, Fatou Diallo, Séverine Morel, Sam Okafor, Tunde Oyelaran, Ji-Hoon Park, Anna Petrov. Cryptides de Salem (provisoire) : S5 rang 4 ; S1, S3, S6, S9 rang 3 ; S2, S4, S7, S8, S10 rang 2.

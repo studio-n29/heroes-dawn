@@ -216,7 +216,7 @@ Chaque fonctionnalité doit servir au moins un pilier.
 - [x] Kits : 2 compétences de base uniques par agent (noms et statuts), énergie ✔ ; **effets sur mesure par agent et cartes du grimoire à compléter**
 - [x] Lieutenants des Actes 2 à 4 ; mentors de l'Apex Unit par acte
 - [ ] **Calage en playtest** des valeurs de départ (`01_Game_Design/05_Equilibrage.xlsx`) — à faire pendant le prototype et l'alpha
-- [ ] **Recommandations ⚑ à confirmer en playtest** : énergie (départ 30, régénération 3), pause de résolution 1,3 s, paliers des liens (3, 8, 15, 25 victoires), plafond de niveau par acte, déséquilibre des familles (Perception 9, Élémentaire 6)
+- [x] **Recommandations ⚑ validées le 2026-11-16** : énergie (départ 30, régénération 3), pause de résolution 1,3 s, paliers des liens (3, 8, 15, 25 victoires), plafond de niveau par acte, déséquilibre des familles (Perception 9, Élémentaire 6)
 
 ## 12. Index des specs détaillées
 | Système | Fichier |

@@ -79,7 +79,7 @@
 - [x] Finir ou retirer chaque entrée WIP (2026-11-12) : notifications masquées, objectifs secondaires et contrôles hors périmètre 1.0, mécanisme WIP supprimé. Lignes « BIENTÔT » de la langue retirées ; la fenêtre « simuler la réussite » n'existe plus que dans les builds de développement (`ActivityCoverageTests` garantit qu'aucun type d'activité n'y tombe).
 - [~] **Analytics** (priorité n°1 du plan EA) : événements clés (début de session, zone, combat, achat, abandon) ; lier le projet UGS (`cloudProjectId` vide au dernier relevé, à revérifier).
   - Fait le 2026-11-12 : voie UGS Analytics, port `IAnalytics`, portail de consentement opt-in, passerelle `AnalyticsBridge` (état, combat, zone), `UgsAnalytics` muet sans projet lié, schéma `04_Tech_Unity/10_Analytics.md`, 6 tests. **Reste** : lier le projet UGS (vous), âge déclaré et texte juridique du consentement (la question du premier lancement existe), événements de l'entonnoir (prologue, premier achat, abandon, performances), vérification de bout en bout dans le Dashboard.
-- [ ] Supabase : activer « leaked password protection » (tableau de bord, action de votre part) ; **sur accord explicite**, appliquer `002_hd_arena.sql` ; vérifier les quotas Realtime.
+- [ ] Supabase : `002_hd_arena.sql` et `003_hd_arena_durcissement.sql` **appliqués le 2026-11-16**, quotas Realtime notés (README du backend). **Reste (vous)** : activer « leaked password protection » dans le tableau de bord (Authentication ▸ Attack Protection).
 - [~] Sauvegarde : migration 0.15.0 → 1.0.0 couverte (`MetaMigrationTests`, idempotente, remboursement unique) et conflit appareil/compte (`AccountLinkSafetyTests`). Reste : un profil 0.15.x réel (archive utilisateur) et le test sur appareil.
 - [x] Tournois : repli hors ligne après 15 s confirmé par test (`TournamentArenaTests.Sans_adversaire_apres_15_secondes_le_duel_passe_hors_ligne`, vert le 2026-11-12).
 - [x] Réactiver les 4 tests EditMode « à traiter » de la baseline (fait le 2026-11-12 : `TestApp.ConnectedAccountLink()` fournit un compte connecté de test ; le test de fiche boutique ouvre la vraie boutique) (détail : `docs/test-reports/2026-11-12_tests-non-executes.md`), sans les affaiblir :
@@ -95,7 +95,7 @@
 - [x] Rejouer le simulateur d'équilibrage après le Bloc A à E (2026-11-13 : `BalanceFullReport`, rapport `docs/test-reports/2026-11-13_equilibrage-boss.md`).
 - [~] Boss : ramener le taux de victoire de l'équipe de test dans **40 à 60 %** (Brick, Crocodile, Titan de l'AMIF), ajuster les bonus de phase.
   - Mesuré le 2026-11-13 : Brick 100 %, Crocodile 93-96 %, Titan 100 % ; l'attaque est le levier (les PV ne changent presque rien). **Appliqué** : Crocodile ATQ x3 et Titan x6 (31 à 63 % avec équipe de départ + objets). **Reste** : Brick (conception à revoir), élite AMIF (13 à 31 %), cartes équipées en auto (combats qui ne finissent pas), validation en playtest.
-- [ ] Valider les ⚑ : énergie (30 / +3), pause de résolution 1,3 s, paliers de lien (3-8-15-25), table des rangs AMIF, coûts de recrutement, paliers de tournoi, boutique de confort, déséquilibre des familles (Perception 9, Élémentaire 6).
+- [x] (validées en bloc le 2026-11-16, voir `Decisions.md`) Valider les ⚑ : énergie (30 / +3), pause de résolution 1,3 s, paliers de lien (3-8-15-25), table des rangs AMIF, coûts de recrutement, paliers de tournoi, boutique de confort, déséquilibre des familles (Perception 9, Élémentaire 6).
 - [ ] 2 à 3 sessions de playtest réel avec le formulaire `docs/playtest-formulaire.md`.
 - [ ] Vérifier la garde anti pay-to-win (test existant) après chaque changement d'économie.
 
@@ -106,7 +106,7 @@
 - [ ] **Vous :** relire les textes des 4 fragments et du repaire (français), fournir ou valider l'anglais.
 - [ ] **Vous :** décision sur les voix : fiche de casting ElevenLabs, ou sortie sans voix avec sous-titres (état actuel, acceptable pour une rc).
 - [ ] Portraits d'agents et icônes : au minimum ceux du parcours Brooklyn et de l'équipe de départ (Giulia Rossi, Ilona Varga, Lucas Mendes).
-- [ ] **Agent M : à livrer (H1)**. Périmètre validé le 2026-11-13 : 4 zones du chapitre Sergueiv, boss le Passeur, ennemis mixtes, mini-jeux réutilisés, 4 fragments, pas de repaire, équipe partagée, fin « à suivre ». Spec `docs/specs/2026-11-13-moscou-agent-m-design.md`, plan `docs/plans/2026-11-13-moscou-agent-m.md` (10 tâches, ≈ 17,5 jours, gel du contenu le 15/01/2027). Rien d'implémenté ; `StoryRoutes.M available` basculé en dernier.
+- [x] **Agent M livré (H1)** le 2026-11-13 : 4 zones du chapitre Sergueiv jouables (voir `Code/docs/specs/2026-11-13-moscou-agent-m-design.md`). Reste : relecture des textes, playtests.
 - [ ] Corriger l'écart connu : consignes d'Ingénierie de secours qui chevauchent le manuel.
 
 ## Phase 6 — QA, légal, release (1 semaine)
@@ -117,7 +117,7 @@
 - [ ] Recette sur appareils : 2 Android (dont milieu de gamme), 1 PC ; parcours complet nouvelle partie → Brooklyn fini ; reprise après coupure réseau ; achat IAP en bac à sable.
 - [ ] Performances : 60 fps cible sur l'Android de référence, mémoire stable sur 30 min. **Poids : APK 1,59 Go -> 251 Mo le 2026-11-13** (voir Decisions.md) ; AAB de test (clé de débogage, ARM64) : 251 Mo, donc encore au-dessus de la limite de 200 Mo de la base Google Play : réduire encore (blocs ASTC plus larges, groupes d illustrations) ou passer par Play Asset Delivery.
 - [ ] Obligations légales (`05_Production/Obligations_Legales.md`) : politique de confidentialité, classification d'âge (IARC/PEGI), mentions des assets générés par IA (R3).
-- [ ] Notes de version 1.0.0 (sur le modèle de `release-notes-0.15.0.md`).
+- [x] Notes de version 1.0.0 : `Code/docs/release-notes-1.0.0.md` (2026-11-16).
 - [ ] `v1.0.0-rc1`, correctifs bloquants uniquement, puis `v1.0.0`.
 
 ---

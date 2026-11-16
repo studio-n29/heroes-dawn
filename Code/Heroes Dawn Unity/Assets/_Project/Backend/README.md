@@ -36,6 +36,10 @@ Le jeu passe par deux ports : `IAccountGateway` (e-mail, Google, Apple, session,
 ### Base de données
 Migration `Supabase/001_hd_profiles.sql` (appliquée sur N29 HQ le 2026-10-28) : table `hd_profiles` (une ligne par joueur : `user_id`, `profile` jsonb, `schema_version`, `updated_at` posée par le serveur), sécurité par ligne (le joueur ne lit, n'insère et ne modifie que sa ligne ; aucune suppression), profil limité à 512 Ko. L'écriture est conditionnelle sur `updated_at` : si le compte a changé depuis la dernière lecture, rien n'est écrasé et le joueur choisit quelle progression garder (l'autre est gardée dans une sauvegarde de secours sur l'appareil).
 
+Arène des tournois : `Supabase/002_hd_arena.sql` puis `Supabase/003_hd_arena_durcissement.sql` (appliqués sur N29 HQ le 2026-11-16). Tables `hd_arena_defenses`, `hd_arena_scores`, `hd_arena_matches`, sécurité par ligne active ; scores et journal ne s'écrivent que par les fonctions `hd_submit_duel` et `hd_claim_tier`. Le conseiller de sécurité signale ces cinq fonctions `security definer` appelables par un joueur connecté : c'est voulu (elles vérifient `auth.uid()`, les plafonds et les bornes), aucun accès anonyme.
+
+Realtime (duels en ligne) : diffusion seule (`broadcast`), aucune table publiée. Limites du palier gratuit à surveiller avant une ouverture large : 200 connexions simultanées, 100 messages par seconde, 2 millions de messages par mois. Un duel occupe 2 connexions ; au-delà, le jeu se replie sur le duel hors ligne après 15 s.
+
 ### À régler dans le tableau de bord Supabase (Authentication)
 1. **Providers ▸ Google** : activer, renseigner l'identifiant et le secret du client OAuth créé dans la console Google Cloud (type « Application Web » ; URI de redirection autorisée : l'adresse de rappel indiquée par Supabase, `https://ulwbghlrglwccozbdlvr.supabase.co/auth/v1/callback`).
 2. **Providers ▸ Apple** : activer, renseigner le Services ID, l'identifiant d'équipe, l'identifiant de clé et la clé privée (.p8) du compte développeur Apple ; mêmes adresses de rappel.
