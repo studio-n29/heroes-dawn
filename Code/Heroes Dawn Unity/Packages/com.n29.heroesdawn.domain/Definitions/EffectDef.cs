@@ -16,16 +16,18 @@ namespace N29.HeroesDawn.Definitions
         public Condition? When { get; }
         /// <summary>Modificateurs de la valeur de base (liste vide par défaut).</summary>
         public IReadOnlyList<ValueMod> Mods { get; }
+        /// <summary>Réaction armée par un effet <see cref="EffectType.ArmReaction"/> ; nulle pour les autres effets. Son effet garde sa valeur fixe (jamais remis à l'échelle).</summary>
+        public ReactionDef? Reaction { get; }
 
         public EffectDef(EffectType type, int value, StatusType status = StatusType.None, int duration = 0, int chancePercent = 100,
-            Condition? when = null, IReadOnlyList<ValueMod>? mods = null)
+            Condition? when = null, IReadOnlyList<ValueMod>? mods = null, ReactionDef? reaction = null)
         {
             Type = type; Value = value; Status = status; Duration = duration; ChancePercent = chancePercent;
-            When = when; Mods = mods ?? Array.Empty<ValueMod>();
+            When = when; Mods = mods ?? Array.Empty<ValueMod>(); Reaction = reaction;
         }
 
-        /// <summary>Copie avec valeur, durée et/ou chance remplacées ; tous les autres champs (dont condition et modificateurs) sont conservés.</summary>
+        /// <summary>Copie avec valeur, durée et/ou chance remplacées ; tous les autres champs (dont condition, modificateurs et réaction, non remise à l'échelle) sont conservés.</summary>
         public EffectDef With(int? value = null, int? duration = null, int? chance = null)
-            => new EffectDef(Type, value ?? Value, Status, duration ?? Duration, chance ?? ChancePercent, When, Mods);
+            => new EffectDef(Type, value ?? Value, Status, duration ?? Duration, chance ?? ChancePercent, When, Mods, Reaction);
     }
 }

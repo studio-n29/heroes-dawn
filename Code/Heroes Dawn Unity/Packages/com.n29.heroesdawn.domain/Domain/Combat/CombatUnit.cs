@@ -27,6 +27,8 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Énergie en plus à chaque pas de la frise (effet d équipe).</summary>
         public int EnergyRegenBonus { get; set; }
         public List<StatusInstance> Statuses { get; } = new List<StatusInstance>();
+        /// <summary>Réactions armées sur cette unité, dans l'ordre d'armement.</summary>
+        public List<ReactionInstance> Reactions { get; } = new List<ReactionInstance>();
         public IReadOnlyList<SkillDef> Skills { get; private set; }
         /// <summary>Style d IA (ennemis) : priorités de compétence et de cible ; les alliés gardent leur logique.</summary>
         public AiStyle Style { get; set; }

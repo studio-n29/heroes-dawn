@@ -24,6 +24,8 @@ namespace N29.HeroesDawn.Definitions
         Bounce,
         /// <summary>Exécution : dégâts de la compétence +Value % sur une cible sous le seuil de PV (BalanceConfig.ExecuteThresholdPercent).</summary>
         Execute,
+        /// <summary>Réaction : arme <see cref="EffectDef.Reaction"/> sur le lanceur (quelle que soit la cible de la compétence) ; Value inutilisé.</summary>
+        ArmReaction,
     }
     /// <summary>Famille d une compétence : Dégâts, Soins, Protection, Boost, Gestion du temps.</summary>
     public enum SkillCategory { Damage, Heal, Protection, Boost, TimeManagement }

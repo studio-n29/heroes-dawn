@@ -112,7 +112,12 @@ namespace N29.HeroesDawn.Domain.Combat
         public IReadOnlyList<CombatEvent> Step(int ticks)
         {
             var output = new List<CombatEvent>();
-            for (int i = 0; i < ticks && !IsOver; i++) StepOne(output);
+            for (int i = 0; i < ticks && !IsOver; i++)
+            {
+                int from = output.Count;
+                StepOne(output);
+                ProcessReactions(output, from); // réactions sur les seuls événements de ce pas
+            }
             _log.AddRange(output);
             return output;
         }
@@ -182,6 +187,7 @@ namespace N29.HeroesDawn.Domain.Combat
             ProcessCommands(output);
             ActReadyUnits(output);
             CheckEnd(output);
+            ProcessReactions(output, 0); // commandes appliquées hors frise (Submit(cmd, from), fenêtre d'interruption)
             _log.AddRange(output);
             return output;
         }

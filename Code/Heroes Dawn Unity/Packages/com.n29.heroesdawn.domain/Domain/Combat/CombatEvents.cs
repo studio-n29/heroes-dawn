@@ -127,4 +127,24 @@ namespace N29.HeroesDawn.Domain.Combat
     }
 
     public sealed class CombatEndedEvent : CombatEvent { public bool Victory { get; } public CombatEndedEvent(int t, bool victory) : base(t) { Victory = victory; } }
+
+    /// <summary>Une réaction est armée (ou réarmée : durée remise à <c>Turns</c>) sur le porteur.</summary>
+    public sealed class ReactionArmedEvent : CombatEvent
+    {
+        public int Carrier { get; }
+        public ReactionTrigger Trigger { get; }
+        public int Turns { get; }
+        public ReactionArmedEvent(int t, int carrier, ReactionTrigger trigger, int turns) : base(t) { Carrier = carrier; Trigger = trigger; Turns = turns; }
+    }
+
+    /// <summary>Une réaction se déclenche : <c>TriggerUnit</c> est l'unité concernée par l'événement (-1 si inconnue), <c>Targets</c> les cibles de son effet (qui suit).</summary>
+    public sealed class ReactionTriggeredEvent : CombatEvent
+    {
+        public int Carrier { get; }
+        public ReactionTrigger Trigger { get; }
+        public int TriggerUnit { get; }
+        public int[] Targets { get; }
+        public ReactionTriggeredEvent(int t, int carrier, ReactionTrigger trigger, int triggerUnit, int[] targets) : base(t)
+        { Carrier = carrier; Trigger = trigger; TriggerUnit = triggerUnit; Targets = targets; }
+    }
 }

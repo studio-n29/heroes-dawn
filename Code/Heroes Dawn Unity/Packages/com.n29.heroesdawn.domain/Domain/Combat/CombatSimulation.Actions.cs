@@ -102,6 +102,8 @@ namespace N29.HeroesDawn.Domain.Combat
                 if (h > 0) output.Add(new HealEvent(Tick, u.Id, h));
             }
 
+            TickReactions(u);
+
             bool shocked = u.Has(StatusType.Shock);
             for (int i = u.Statuses.Count - 1; i >= 0; i--)
             {
@@ -146,6 +148,7 @@ namespace N29.HeroesDawn.Domain.Combat
             // Exécution : bonus lu avant la boucle, pour qu'il compte où qu'il soit placé dans la liste.
             int executeBonus = 0;
             foreach (var fx in effects) if (fx.Type == EffectType.Execute) executeBonus += fx.Value;
+            List<EffectDef>? armed = null; // réactions déjà armées par cet appel (une compétence de zone n'arme qu'une fois)
             foreach (var tid in targets)
             {
                 var t = _units[tid];
@@ -213,6 +216,11 @@ namespace N29.HeroesDawn.Domain.Combat
                             if (t.PlannedSlot >= 0 && t.Point < PlanStartPoint(t)) CancelPlan(t, InterruptReason.PushBack, output);
 
                             break;
+                        case EffectType.ArmReaction:
+                            if (fx.Reaction == null || !actor.IsAlive || (armed != null && armed.Contains(fx))) break;
+                            (armed ??= new List<EffectDef>()).Add(fx);
+                            ArmReaction(actor, fx.Reaction, output);
+                            break;
                     }
                 }
             }
@@ -243,7 +251,10 @@ namespace N29.HeroesDawn.Domain.Combat
                 dmg = dmg * (100 + executeBonus) / 100;
                 output.Add(new ExecutedEvent(Tick, t.Id));
             }
-            return DealDamage(t, dmg, crit, output);
+            int at = output.Count;
+            int dealt = DealDamage(t, dmg, crit, output);
+            if (_reactionsArmed && dealt > 0) NoteHitter(output, at, actor.Id); // auteur du coup, pour les réactions (aucun tirage)
+            return dealt;
         }
 
         /// <summary>Rebond : un autre ennemi vivant (hors des cibles) tiré au sort subit le premier effet de dégâts à <paramref name="percent"/> %. Sans candidat ni dégâts : aucun tirage.</summary>

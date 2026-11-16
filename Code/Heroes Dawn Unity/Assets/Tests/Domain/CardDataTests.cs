@@ -258,7 +258,8 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             // Les enums sont sérialisés en entiers dans cards.json : n'ajouter une valeur qu'en fin d'enum.
             Assert.That(EnumTable<StatusType>(), Is.EqualTo("None=0,Burn=1,Freeze=2,Shock=3,Corrosion=4,Blind=5,Vulnerable=6,Bind=7,Mark=8,Taunt=9,Shield=10,Regen=11,Haste=12,Evade=13,Anchor=14"));
-            Assert.That(EnumTable<EffectType>(), Is.EqualTo("Damage=0,Heal=1,ApplyStatus=2,GaugeDelta=3,Shield=4,PushBack=5,Advance=6,Lifesteal=7,Purge=8,Bounce=9,Execute=10"));
+            Assert.That(EnumTable<EffectType>(), Is.EqualTo("Damage=0,Heal=1,ApplyStatus=2,GaugeDelta=3,Shield=4,PushBack=5,Advance=6,Lifesteal=7,Purge=8,Bounce=9,Execute=10,ArmReaction=11"));
+            Assert.That(EnumTable<ReactionTrigger>(), Is.EqualTo("EnemyReceivesStatus=0,AllyReceivesStatus=1,EnemyDefeated=2,AllyDefeated=3,CarrierHit=4,CarrierCrit=5"));
             Assert.That(EnumTable<TargetRule>(), Is.EqualTo("SingleEnemy=0,AllEnemies=1,SingleAlly=2,AllAllies=3,Self=4"));
             Assert.That(EnumTable<TargetPick>(), Is.EqualTo("Default=0,LowestHp=1,HighestHp=2,StatusHolder=3,NextToAct=4,Random=5,TwoRandom=6"));
             Assert.That(EnumTable<ConditionKind>(), Is.EqualTo("TargetHasStatus=0,TargetLacksStatus=1,TargetHpBelow=2,TargetHpAbove=3,CasterHasStatus=4,CasterHpBelow=5,AnyAllyHasStatus=6,TargetStatusCountAtLeast=7,TargetPlannedAction=8,EnemiesAliveAtLeast=9,EnemiesAliveAtMost=10"));

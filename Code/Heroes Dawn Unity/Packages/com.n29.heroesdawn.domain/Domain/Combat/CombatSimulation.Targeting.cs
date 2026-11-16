@@ -11,26 +11,28 @@ namespace N29.HeroesDawn.Domain.Combat
         /// l'appelant suit alors le chemin historique sans aucun tirage. La cible voulue est ignorée ; la Provocation d'un ennemi prime
         /// pour les choix à cible unique. Une liste vide signifie « personne à viser » (aucun tirage n'a eu lieu). Côté allié, NextToAct écarte le lanceur et les alliés déjà prêts.
         /// </summary>
-        List<int>? ResolvePick(CombatUnit actor, SkillDef skill)
+        List<int>? ResolvePick(CombatUnit actor, SkillDef skill) => ResolvePick(actor, skill.Target, skill.Pick, skill.PickStatus);
+
+        /// <summary>Même ciblage fin pour une règle et un choix donnés (cible nommée d'une réaction, lancée par son porteur).</summary>
+        List<int>? ResolvePick(CombatUnit actor, TargetRule target, TargetPick pick, StatusType pickStatus)
         {
-            var pick = skill.Pick;
             if (pick == TargetPick.Default) return null;
             Side foe = actor.Side == Side.Ally ? Side.Enemy : Side.Ally;
             var list = new List<int>();
-            switch (skill.Target)
+            switch (target)
             {
                 case TargetRule.SingleEnemy:
                 {
                     if (pick == TargetPick.TwoRandom) return null;
                     foreach (var u in _units) if (u.Side == foe && u.IsAlive && u.Has(StatusType.Taunt)) { list.Add(u.Id); return list; }
-                    int t = PickOne(foe, pick, skill.PickStatus, false);
+                    int t = PickOne(foe, pick, pickStatus, false);
                     if (t >= 0) list.Add(t);
                     return list;
                 }
                 case TargetRule.SingleAlly:
                 {
                     if (pick == TargetPick.TwoRandom) return null;
-                    int t = PickOne(actor.Side, pick, skill.PickStatus, true, actor.Id);
+                    int t = PickOne(actor.Side, pick, pickStatus, true, actor.Id);
                     if (t >= 0) list.Add(t);
                     return list;
                 }
