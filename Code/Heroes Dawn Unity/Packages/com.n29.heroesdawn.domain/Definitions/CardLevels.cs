@@ -41,15 +41,19 @@ namespace N29.HeroesDawn.Definitions
             return extra.Count == 0 ? scaled : scaled.WithAbilities(extra);
         }
 
-        /// <summary>La compétence avec dégâts, soins et boucliers à <paramref name="pct"/> % (100 : inchangée).</summary>
+        /// <summary>
+        /// La compétence avec dégâts, soins et boucliers à <paramref name="pct"/> % (100 : inchangée), y compris l'effet d'une réaction armée (même formule).
+        /// Les modificateurs de valeur ne sont pas remis à l'échelle.
+        /// </summary>
         public static SkillDef ScalePercent(SkillDef skill, int pct)
         {
             if (pct == 100) return skill;
-            return skill.MapEffects(e =>
+            EffectDef One(EffectDef e)
             {
                 bool scaled = e.Type == EffectType.Damage || e.Type == EffectType.Heal || e.Type == EffectType.Shield;
                 return scaled ? e.With(value: e.Value * pct / 100) : e;
-            });
+            }
+            return skill.MapEffects(e => e.Type == EffectType.ArmReaction ? e.ScaleReaction(One) : One(e));
         }
     }
 }

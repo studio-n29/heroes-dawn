@@ -68,8 +68,9 @@ namespace N29.HeroesDawn.Tests.Domain
         [Description("Vérifie que chaque cible nommée de « sur <cible> » donne la règle, le ciblage fin ou le drapeau « déclencheur » prévus — parce qu'une réaction vise comme une compétence lancée par le porteur")]
         public void NamedTarget_MapsToTargetRulePickOrTheTriggerUnit(string target, string expected)
         {
-            var e = Convert($"Dmg 105, [Réaction 3t : quand un ennemi est vaincu → Dmg 50 sur {target}]").skill.effects[1];
-            Assert.That(Rx(e), Is.EqualTo($"EnemyDefeated/None/3/Damage:50:None:0:100/{expected}"));
+            // « le porteur est touché » : la cible « déclencheur » est refusée sur « est vaincu » (unité morte, voir Reaction_TriggerUnitOnADefeat_IsRejected)
+            var e = Convert($"Dmg 105, [Réaction 3t : quand le porteur est touché → Dmg 50 sur {target}]").skill.effects[1];
+            Assert.That(Rx(e), Is.EqualTo($"CarrierHit/None/3/Damage:50:None:0:100/{expected}"));
         }
 
         [Test, Description("Vérifie qu'une cible nommée l'emporte sur la cible par défaut d'un événement « reçoit un statut » — parce que « sur ZE » ne doit pas rester sur l'unité déclencheuse")]
@@ -321,6 +322,15 @@ namespace N29.HeroesDawn.Tests.Domain
         [TestCase("sur Déclencheur")]
         [Description("Vérifie qu'une cible nommée hors de la liste fermée (huit cibles) est rejetée — parce que la réaction ne comprend que Soi, ZE, ZA, 1E:aléatoire, 1E:faible, 1A:prochain, 1A:faible et déclencheur")]
         public void Reaction_UnknownTarget_IsRejected(string target) => Rejects("Dmg 100, [Réaction 2t : quand un ennemi est vaincu → Dmg 10 " + target + "]");
+
+        [TestCase("un ennemi est vaincu")]
+        [TestCase("un allié est vaincu")]
+        [Description("Vérifie que la cible « déclencheur » est rejetée sur « un ennemi est vaincu » et « un allié est vaincu » — parce que l'unité concernée est morte : la réaction ne partirait jamais")]
+        public void Reaction_TriggerUnitOnADefeat_IsRejected(string evt)
+        {
+            var ex = Rejects("Dmg 100, [Réaction 2t : quand " + evt + " → Dmg 10 sur déclencheur]");
+            Assert.That(ex.Message, Does.Contain("déclencheur"));
+        }
 
         [TestCase("Steal 10")]
         [TestCase("Bounce 40")]

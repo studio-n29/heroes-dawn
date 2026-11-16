@@ -351,6 +351,33 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
+        [Test, Description("Vérifie que le bouton Améliorer d'une carte ★5 annonce honnêtement le coût mixte (doublons d'autres ★5 et de cartes ★4, en nombre), et que sans assez de doublons il annonce le taux de 3 pour 1 pour les ★5 ou ★4, mais seulement la même étoile pour une ★3 — parce que le joueur doit savoir ce qui sera consommé")]
+        public void UpgradeText_MentionsTheMixedCost()
+        {
+            var defs = _app.Session.Content.Collection;
+            CardId First(int stars, int skip = 0) => defs.Cards.Where(c => c.Stars == stars).Select(c => c.Id).OrderBy(i => i.Value, StringComparer.Ordinal).Skip(skip).First();
+            string NameOf(CardId id) => _loc.SkillName(defs.Card(id).Skill);
+            _app.Session.Wallet.Add(10000, 0);
+            var five = First(5); var three = First(3);
+            CollectionOps.AddCard(_app.Session, five);
+            CollectionOps.AddCard(_app.Session, three);
+            var p = Grimoire();
+            var none = _view.Rows[RowOf(NameOf(five))].A;
+            Assert.That(none.Label, Does.Contain("ou 3 doublons d'autres cartes ★5 ou ★4 par exemplaire manquant"), none.Label);
+            Assert.That(none.Reason, Does.Contain("3 doublons d'autres cartes ★5 ou ★4 en valent un"), none.Reason);
+            var low = _view.Rows[RowOf(NameOf(three))].A;
+            Assert.That(low.Label, Does.Contain("ou 3 doublons d'autres cartes ★3 par exemplaire manquant").And.Not.Contain("★2"), low.Label);
+            p.Dispose();
+
+            CollectionOps.AddCard(_app.Session, First(5, 1), 2); // 1 doublon d'une autre ★5
+            CollectionOps.AddCard(_app.Session, First(4), 3);    // 2 doublons d'une ★4
+            p = Grimoire();
+            var mixed = _view.Rows[RowOf(NameOf(five))].A;
+            Assert.That(mixed.Label, Is.EqualTo("AMÉLIORER (0 doublon(s) + 1 doublon(s) d'autres cartes ★5 + 2 doublon(s) de cartes ★4 + 200 Cr)"));
+            Assert.That(mixed.Enabled, Is.True);
+            p.Dispose();
+        }
+
         [Test, Description("Vérifie que le badge d'une carte possédée affiche son niveau sur 10 — parce que les cartes montent désormais jusqu'au niveau 10")]
         public void Grimoire_Badge_ShowsLevelOutOf10()
         {

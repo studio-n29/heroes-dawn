@@ -16,7 +16,7 @@ namespace N29.HeroesDawn.Definitions
         public Condition? When { get; }
         /// <summary>Modificateurs de la valeur de base (liste vide par défaut).</summary>
         public IReadOnlyList<ValueMod> Mods { get; }
-        /// <summary>Réaction armée par un effet <see cref="EffectType.ArmReaction"/> ; nulle pour les autres effets. Son effet garde sa valeur fixe (jamais remis à l'échelle).</summary>
+        /// <summary>Réaction armée par un effet <see cref="EffectType.ArmReaction"/> ; nulle pour les autres effets. Son effet est mis à l'échelle comme le reste de la carte (<see cref="ScaleReaction"/>).</summary>
         public ReactionDef? Reaction { get; }
 
         public EffectDef(EffectType type, int value, StatusType status = StatusType.None, int duration = 0, int chancePercent = 100,
@@ -26,8 +26,21 @@ namespace N29.HeroesDawn.Definitions
             When = when; Mods = mods ?? Array.Empty<ValueMod>(); Reaction = reaction;
         }
 
-        /// <summary>Copie avec valeur, durée et/ou chance remplacées ; tous les autres champs (dont condition, modificateurs et réaction, non remise à l'échelle) sont conservés.</summary>
+        /// <summary>Copie avec valeur, durée et/ou chance remplacées ; tous les autres champs (dont condition, modificateurs et réaction, telle quelle) sont conservés.</summary>
         public EffectDef With(int? value = null, int? duration = null, int? chance = null)
             => new EffectDef(Type, value ?? Value, Status, duration ?? Duration, chance ?? ChancePercent, When, Mods, Reaction);
+
+        /// <summary>
+        /// Effet <see cref="EffectType.ArmReaction"/> dont l'effet de la réaction passe par <paramref name="scale"/> (même formule qu'un effet de base de son type) ;
+        /// la réaction est reconstruite (tout le reste copié) seulement si l'effet change. Tout autre effet est rendu tel quel.
+        /// </summary>
+        public EffectDef ScaleReaction(Func<EffectDef, EffectDef> scale)
+        {
+            if (Type != EffectType.ArmReaction || Reaction == null) return this;
+            var e = Reaction.Effect;
+            var n = scale(e);
+            if (n.Value == e.Value && n.Duration == e.Duration && n.ChancePercent == e.ChancePercent) return this; // inchangé : même réaction (réarmement par référence)
+            return new EffectDef(Type, Value, Status, Duration, ChancePercent, When, Mods, Reaction.WithEffect(n));
+        }
     }
 }

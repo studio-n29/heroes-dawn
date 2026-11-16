@@ -40,15 +40,26 @@ namespace N29.HeroesDawn.Application.Features.Collection
         public OpenedCard(CardId id, bool isNew) { Id = id; IsNew = isNew; }
     }
 
-    /// <summary>Ce qu'une amélioration consomme : <see cref="Own"/> exemplaires de la carte, et <see cref="Others"/> doublons d'autres cartes de la même étoile (<see cref="Missing"/> exemplaires manquants × 3).</summary>
+    /// <summary>
+    /// Ce qu'une amélioration consomme : <see cref="Own"/> exemplaires de la carte, et <see cref="Others"/> doublons d'autres cartes
+    /// (<see cref="Missing"/> exemplaires manquants × <see cref="CardLevels.OthersPerCopy"/>) : <see cref="SameStarDuplicates"/> de la même étoile,
+    /// puis <see cref="LowerStarDuplicates"/> de l'étoile juste en dessous (cartes ★4 et ★5 seulement).
+    /// </summary>
     public sealed class UpgradePlan
     {
         public int Needed { get; }
         public int Own { get; }
         public int Missing { get; }
         public IReadOnlyList<KeyValuePair<CardId, int>> Others { get; }
-        public UpgradePlan(int needed, int own, int missing, IReadOnlyList<KeyValuePair<CardId, int>> others)
-        { Needed = needed; Own = own; Missing = missing; Others = others; }
+        /// <summary>Étoile de la carte améliorée.</summary>
+        public int Stars { get; }
+        public int SameStarDuplicates { get; }
+        public int LowerStarDuplicates { get; }
+        public UpgradePlan(int needed, int own, int missing, IReadOnlyList<KeyValuePair<CardId, int>> others, int stars = 0, int sameStarDuplicates = 0, int lowerStarDuplicates = 0)
+        {
+            Needed = needed; Own = own; Missing = missing; Others = others;
+            Stars = stars; SameStarDuplicates = sameStarDuplicates; LowerStarDuplicates = lowerStarDuplicates;
+        }
     }
 
     public sealed class ItemOffer
@@ -98,9 +109,15 @@ namespace N29.HeroesDawn.Application.Features.Collection
         /// <summary>Exemplaires qu'une carte peut céder : tous sauf celui qui la possède et ceux équipés.</summary>
         static int Spare(GameSession s, CardId id) => System.Math.Max(0, OwnedCards(s, id) - System.Math.Max(1, EquippedCards(s, id)));
 
+        /// <summary>Étoile la plus basse à partir de laquelle l'étoile inférieure complète une carte (★4 et ★5).</summary>
+        public const int LowerStarFrom = 4;
+
         /// <summary>
         /// Le coût de la prochaine amélioration de la carte : ses exemplaires propres d'abord, puis, pour chaque exemplaire manquant,
-        /// <see cref="CardLevels.OthersPerCopy"/> doublons d'autres cartes de la même étoile (par identifiant croissant, sans descendre une carte sous un exemplaire).
+        /// <see cref="CardLevels.OthersPerCopy"/> doublons d'autres cartes de la même étoile ; pour une carte ★4 ou ★5 seulement, si ceux-ci ne suffisent pas,
+        /// des doublons de cartes de l'étoile juste en dessous (au même taux ; jamais d'autre étoile). Dans chaque étoile, les autres cartes sont prises
+        /// dans cet ordre : d'abord celles déjà au niveau maximum (leurs doublons ne leur servent plus), puis celles qui ont le plus d'exemplaires en trop,
+        /// puis par identifiant croissant ; aucune ne descend sous max(1, exemplaires équipés).
         /// <c>null</c> si la carte est inconnue, absente, au niveau maximal ou si les doublons ne suffisent pas.
         /// </summary>
         public static UpgradePlan? PlanUpgrade(GameSession s, CardId card)
@@ -114,20 +131,34 @@ namespace N29.HeroesDawn.Application.Features.Collection
             int missing = needed - own;
             var taken = new List<KeyValuePair<CardId, int>>();
             int toTake = missing * CardLevels.OthersPerCopy;
+            int stars = defs.Card(card).Stars;
+            int sameStar = 0, lowerStar = 0;
             if (toTake > 0)
             {
-                int stars = defs.Card(card).Stars;
-                foreach (var other in defs.Cards.Where(c => c.Stars == stars && c.Id != card).OrderBy(c => c.Id.Value, System.StringComparer.Ordinal))
-                {
-                    int n = System.Math.Min(toTake, Spare(s, other.Id));
-                    if (n <= 0) continue;
-                    taken.Add(new KeyValuePair<CardId, int>(other.Id, n));
-                    toTake -= n;
-                    if (toTake == 0) break;
-                }
+                sameStar = Take(s, defs, card, stars, ref toTake, taken);
+                if (toTake > 0 && stars >= LowerStarFrom) lowerStar = Take(s, defs, card, stars - 1, ref toTake, taken);
                 if (toTake > 0) return null;
             }
-            return new UpgradePlan(needed, own, missing, taken);
+            return new UpgradePlan(needed, own, missing, taken, stars, sameStar, lowerStar);
+        }
+
+        /// <summary>Prend jusqu'à <paramref name="toTake"/> doublons d'autres cartes de l'étoile <paramref name="stars"/>, dans l'ordre de <see cref="PlanUpgrade"/> ; rend le nombre pris.</summary>
+        static int Take(GameSession s, CollectionDef defs, CardId card, int stars, ref int toTake, List<KeyValuePair<CardId, int>> taken)
+        {
+            int total = 0;
+            var pool = defs.Cards.Where(c => c.Stars == stars && c.Id != card)
+                .Select(c => (Id: c.Id, Spare: Spare(s, c.Id), Max: CardLevel(s, c.Id) >= CardLevels.Max))
+                .Where(c => c.Spare > 0)
+                .OrderBy(c => c.Max ? 0 : 1).ThenByDescending(c => c.Spare).ThenBy(c => c.Id.Value, System.StringComparer.Ordinal);
+            foreach (var other in pool)
+            {
+                if (toTake == 0) break;
+                int n = System.Math.Min(toTake, other.Spare);
+                taken.Add(new KeyValuePair<CardId, int>(other.Id, n));
+                toTake -= n;
+                total += n;
+            }
+            return total;
         }
 
         // ---- Boosters

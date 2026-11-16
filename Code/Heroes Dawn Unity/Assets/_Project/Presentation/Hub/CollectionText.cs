@@ -122,12 +122,15 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Effets d'un palier en une ligne (« Rebond 50 % », « Brûlure 2 t + Purge (1) »).</summary>
         public static string TierEffects(CardTier tier) => string.Join(" + ", SkillText.Effects(tier.Effects));
 
+        /// <summary>Effets d'un palier en une ligne, connaissant la cible de la carte (une réaction d'une carte ZA ou 1A précise que seul le lanceur riposte).</summary>
+        public static string TierEffects(CardTier tier, TargetRule cardTarget) => string.Join(" + ", SkillText.Effects(tier.Effects, null, cardTarget));
+
         /// <summary>Paliers d'une carte, un par ligne : atteint en vert précédé de « ● », à venir grisé.</summary>
         public static string TierLines(ILocalization loc, SkillCardDef card, int level)
             => string.Join("\n", card.Tiers.Select(t =>
             {
                 bool reached = t.Level <= level;
-                string line = loc.F("grimoire.tier_line", t.Level, TierEffects(t));
+                string line = loc.F("grimoire.tier_line", t.Level, TierEffects(t, card.Skill.Target));
                 return "<color=#" + ColorUtility.ToHtmlStringRGB(reached ? Theme.Success : Theme.TextMuted) + ">" + (reached ? "● " : "") + line + "</color>";
             }));
 

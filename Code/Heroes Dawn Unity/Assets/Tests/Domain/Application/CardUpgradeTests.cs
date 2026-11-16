@@ -156,7 +156,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(credits));
         }
 
-        [Test, Description("Vérifie, au niveau 4 (2 exemplaires), que l'amélioration prend le doublon propre puis les doublons des autres cartes par identifiant croissant sans descendre une carte sous un exemplaire — parce que c'est l'ordre promis et que chaque carte garde celle qui la possède")]
+        [Test, Description("Vérifie, au niveau 4 (2 exemplaires), que l'amélioration prend le doublon propre puis les doublons des autres cartes, la plus fournie d'abord, sans descendre une carte sous un exemplaire — parce que c'est l'ordre promis et que chaque carte garde celle qui la possède")]
         public void Upgrade_ConsumesExactlyTheCopiesNeeded()
         {
             var others = SameStars();
@@ -164,12 +164,121 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             CollectionOps.SetCardLevel(_app.Session, Wall, 4);
             CollectionOps.AddCard(_app.Session, Wall, 2);
             CollectionOps.AddCard(_app.Session, a, 3);
-            CollectionOps.AddCard(_app.Session, b, 5);
+            CollectionOps.AddCard(_app.Session, b, 3);
             Assert.That(_app.Collection.UpgradeCard(Wall).IsSuccess);
             Assert.That(CollectionOps.CardLevel(_app.Session, Wall), Is.EqualTo(5));
             Assert.That(Owned(Wall), Is.EqualTo(1), "un doublon propre");
-            Assert.That(Owned(a), Is.EqualTo(1), "2 doublons, la carte garde son exemplaire");
-            Assert.That(Owned(b), Is.EqualTo(4), "le 3e doublon seulement");
+            Assert.That(Owned(a), Is.EqualTo(1), "2 doublons (égalité : identifiant croissant), la carte garde son exemplaire");
+            Assert.That(Owned(b), Is.EqualTo(2), "le 3e doublon seulement");
+        }
+
+        // ------------------------------------------------------------------ Ordre de consommation et étoile inférieure (revue finale)
+
+        List<CardId> CardsOfStars(int stars) => Defs.Cards.Where(c => c.Stars == stars).Select(c => c.Id).OrderBy(i => i.Value, System.StringComparer.Ordinal).ToList();
+
+        UpgradePlan Plan(CardId card) => CollectionOps.PlanUpgrade(_app.Session, card)!;
+
+        static IEnumerable<(CardId, int)> Taken(UpgradePlan plan) => plan.Others.Select(o => (o.Key, o.Value));
+
+        [Test, Description("Vérifie que les doublons d'une carte déjà au niveau maximum sont pris d'abord, même quand une autre carte en a plus et un identifiant plus petit — parce que les doublons d'une carte au niveau 10 ne lui servent plus")]
+        public void Plan_PrefersDuplicatesOfMaxLevelCards()
+        {
+            var others = SameStars();
+            var a = others[0]; var b = others[1];
+            CollectionOps.AddCard(_app.Session, Wall);
+            CollectionOps.AddCard(_app.Session, a, 6);
+            CollectionOps.AddCard(_app.Session, b, 4);
+            CollectionOps.SetCardLevel(_app.Session, b, CardLevels.Max);
+            Assert.That(Taken(Plan(Wall)), Is.EqualTo(new[] { (b, 3) }));
+        }
+
+        [Test, Description("Vérifie qu'entre cartes qui ne sont pas au niveau maximum, la carte qui a le plus d'exemplaires en trop est prise d'abord, puis la suivante — parce qu'on entame le stock le plus fourni avant les autres")]
+        public void Plan_ThenCardsWithTheMostSpare()
+        {
+            var others = SameStars();
+            var a = others[0]; var b = others[1];
+            CollectionOps.SetCardLevel(_app.Session, Wall, 4); // 2 exemplaires : 6 doublons d'autres cartes
+            CollectionOps.AddCard(_app.Session, Wall);
+            CollectionOps.AddCard(_app.Session, a, 3);
+            CollectionOps.AddCard(_app.Session, b, 6);
+            Assert.That(Taken(Plan(Wall)), Is.EqualTo(new[] { (b, 5), (a, 1) }), "b (5 en trop) puis a (2 en trop)");
+        }
+
+        [Test, Description("Vérifie qu'une autre carte équipée par plusieurs agents garde autant d'exemplaires qu'elle est équipée — parce qu'on ne retire jamais une carte équipée du stock")]
+        public void Plan_ProtectsEquippedOtherCards()
+        {
+            var others = SameStars();
+            var a = others[0]; var b = others[1];
+            var roster = _app.Session.Roster.Take(2).ToList();
+            Assert.That(roster.Count, Is.EqualTo(2), "deux agents dans l'équipe de départ");
+            CollectionOps.AddCard(_app.Session, Wall);
+            CollectionOps.AddCard(_app.Session, a, 4);
+            CollectionOps.AddCard(_app.Session, b, 2);
+            foreach (var m in roster) m.Cards[0] = a; // a équipée deux fois : 2 exemplaires en trop
+            Assert.That(Taken(Plan(Wall)), Is.EqualTo(new[] { (a, 2), (b, 1) }));
+            Assert.That(_app.Collection.UpgradeCard(Wall).IsSuccess);
+            Assert.That(Owned(a), Is.EqualTo(2), "a garde ses deux exemplaires équipés");
+            Assert.That(Owned(b), Is.EqualTo(1));
+        }
+
+        [Test, Description("Vérifie qu'une carte ★5 se complète d'abord avec les doublons d'autres ★5, puis avec ceux de cartes ★4 (trois pour un), jamais ★3 — parce que les ★5 sont trop rares pour se compléter avec leur seule étoile")]
+        public void Star5_AcceptsStar4Duplicates_ThreeForOne()
+        {
+            var five = CardsOfStars(5); var four = CardsOfStars(4); var three = CardsOfStars(3);
+            var card = five[0];
+            CollectionOps.AddCard(_app.Session, card);
+            CollectionOps.AddCard(_app.Session, three[0], 10);
+            Assert.That(Code(_app.Collection.UpgradeCard(card)), Is.EqualTo("collection.copies"), "les ★3 ne comptent jamais");
+            CollectionOps.AddCard(_app.Session, five[1], 2);
+            CollectionOps.AddCard(_app.Session, four[0], 4);
+            Assert.That(Taken(Plan(card)), Is.EqualTo(new[] { (five[1], 1), (four[0], 2) }), "★5 d'abord, puis ★4");
+            Assert.That(_app.Collection.UpgradeCard(card).IsSuccess);
+            Assert.That(CollectionOps.CardLevel(_app.Session, card), Is.EqualTo(2));
+            Assert.That((Owned(five[1]), Owned(four[0]), Owned(three[0])), Is.EqualTo((1, 2, 10)));
+        }
+
+        [Test, Description("Vérifie qu'une carte ★4 sans autre ★4 se complète avec trois doublons de cartes ★3 — parce que l'étoile juste en dessous compte pour les ★4 et ★5")]
+        public void Star4_AcceptsStar3Duplicates_ThreeForOne()
+        {
+            var four = CardsOfStars(4); var three = CardsOfStars(3);
+            var card = four[0];
+            CollectionOps.AddCard(_app.Session, card);
+            CollectionOps.AddCard(_app.Session, three[0], 2);
+            CollectionOps.AddCard(_app.Session, three[1], 3);
+            Assert.That(Taken(Plan(card)), Is.EqualTo(new[] { (three[1], 2), (three[0], 1) }), "même ordre de choix : la plus fournie d'abord");
+            Assert.That(_app.Collection.UpgradeCard(card).IsSuccess);
+            Assert.That((Owned(three[0]), Owned(three[1])), Is.EqualTo((1, 1)));
+        }
+
+        [Test, Description("Vérifie qu'une carte ★3 refuse les doublons de cartes ★2 — parce que l'étoile inférieure ne compte que pour les ★4 et ★5")]
+        public void Star3_DoesNotAcceptLowerStars()
+        {
+            var card = CardsOfStars(3)[0];
+            var two = CardsOfStars(2)[0];
+            CollectionOps.AddCard(_app.Session, card);
+            CollectionOps.AddCard(_app.Session, two, 10);
+            Assert.That(CollectionOps.PlanUpgrade(_app.Session, card), Is.Null);
+            Assert.That(Code(_app.Collection.UpgradeCard(card)), Is.EqualTo("collection.copies"));
+            Assert.That(Owned(two), Is.EqualTo(10));
+        }
+
+        [Test, Description("Vérifie que le plan est le même d'un appel à l'autre et d'une session à une autre de même contenu, et qu'à égalité l'identifiant croissant départage — parce que le coût affiché doit être exactement celui consommé")]
+        public void Plan_IsDeterministic()
+        {
+            var others = SameStars();
+            void Fill(GameSession s)
+            {
+                CollectionOps.AddCard(s, Wall);
+                foreach (var o in others.Take(4)) CollectionOps.AddCard(s, o, 2);
+            }
+            Fill(_app.Session);
+            var first = Taken(Plan(Wall)).ToList();
+            Assert.That(first, Is.EqualTo(new[] { (others[0], 1), (others[1], 1), (others[2], 1) }), "égalité : identifiant croissant");
+            Assert.That(Taken(Plan(Wall)), Is.EqualTo(first), "même plan au second appel");
+            var other = new TestApp();
+            other.SignInDirect("p2");
+            Fill(other.Session);
+            Assert.That(CollectionOps.PlanUpgrade(other.Session, Wall)!.Others.Select(o => (o.Key, o.Value)), Is.EqualTo(first), "même plan dans une autre session");
         }
 
         [Test, Description("Vérifie que le plan d'amélioration annonce les exemplaires propres et les doublons d'autres cartes sans rien consommer, et vaut null quand les doublons ne suffisent pas — parce que le grimoire affiche ce coût avant l'achat")]

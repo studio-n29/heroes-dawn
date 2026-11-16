@@ -91,11 +91,11 @@ namespace N29.HeroesDawn.Tests.Domain
         public void MissingFile_FallsBackToCode()
         {
             var legacy = PrototypeCollection.LegacyCards();
-            UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Warning, new System.Text.RegularExpressions.Regex("cards.json"));
+            UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Error, new System.Text.RegularExpressions.Regex("cards.json"));
             AssertSameCards(legacy, CardDataLibrary.Load(() => null, () => legacy));
-            UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Warning, new System.Text.RegularExpressions.Regex("cards.json"));
+            UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Error, new System.Text.RegularExpressions.Regex("cards.json"));
             AssertSameCards(legacy, CardDataLibrary.Load(() => "", () => legacy));
-            UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Warning, new System.Text.RegularExpressions.Regex("cards"));
+            UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Error, new System.Text.RegularExpressions.Regex("cards"));
             AssertSameCards(legacy, CardDataLibrary.Load(() => "{ ceci n'est pas du json", () => legacy));
         }
 
@@ -313,6 +313,43 @@ namespace N29.HeroesDawn.Tests.Domain
             AssertRejected("échelle hors plage", WithMod(new ValueMod(10, null, (ScaleKind)99, 4, Archetype.Burn)));
         }
 
+        [Test, Description("Vérifie que Validate refuse la cible « déclencheur » sur « un ennemi est vaincu » et « un allié est vaincu », mais l'accepte sur les quatre autres événements — parce que l'unité concernée est morte et que la réaction ne partirait jamais")]
+        public void Validate_RejectsTriggerUnitOnDefeatEvents()
+        {
+            AssertRejected("EnemyDefeated sur déclencheur", Arm(React(ReactionTrigger.EnemyDefeated, onTrigger: true)));
+            AssertRejected("AllyDefeated sur déclencheur", Arm(React(ReactionTrigger.AllyDefeated, onTrigger: true)));
+            AssertAccepted("EnemyReceivesStatus sur déclencheur", Arm(React(ReactionTrigger.EnemyReceivesStatus, StatusType.Burn, onTrigger: true)));
+            AssertAccepted("AllyReceivesStatus sur déclencheur", Arm(React(ReactionTrigger.AllyReceivesStatus, StatusType.Burn, onTrigger: true)));
+            AssertAccepted("CarrierHit sur déclencheur", Arm(React(ReactionTrigger.CarrierHit, onTrigger: true)));
+            AssertAccepted("CarrierCrit sur déclencheur", Arm(React(ReactionTrigger.CarrierCrit, onTrigger: true)));
+        }
+
+        [Test, Description("Vérifie que Validate refuse un statut attendu sur un déclencheur qui n'est pas « reçoit un statut », et une valeur, un statut ou une durée portés par l'effet ArmReaction lui-même — parce que le moteur ignorerait ces champs en silence")]
+        public void Validate_RejectsFieldsTheEngineIgnores_OnReactions()
+        {
+            foreach (var t in new[] { ReactionTrigger.EnemyDefeated, ReactionTrigger.AllyDefeated, ReactionTrigger.CarrierHit, ReactionTrigger.CarrierCrit })
+                AssertRejected("statut sur " + t, Arm(React(t, StatusType.Burn)));
+            AssertRejected("valeur sur ArmReaction", new EffectDef(EffectType.ArmReaction, 5, StatusType.None, 0, 100, null, null, React()));
+            AssertRejected("statut sur ArmReaction", new EffectDef(EffectType.ArmReaction, 0, StatusType.Burn, 0, 100, null, null, React()));
+            AssertRejected("durée sur ArmReaction", new EffectDef(EffectType.ArmReaction, 0, StatusType.None, 2, 100, null, null, React()));
+            AssertAccepted("ArmReaction nu", Arm(React()));
+        }
+
+        [TestCase(TargetRule.Self), TestCase(TargetRule.SingleAlly), TestCase(TargetRule.AllAllies)]
+        [Description("Vérifie que Validate refuse Propage (en base comme en palier) dans une compétence qui vise le lanceur ou des alliés — parce que la propagation va aux ennemis du lanceur, depuis un statut de la cible")]
+        public void Validate_RejectsSpreadOnAnAllyTargetedSkill(TargetRule target)
+        {
+            SkillCardDef With(TargetRule t, EffectDef[] fx, CardTier[]? tiers = null)
+                => new SkillCardDef(new CardId("c_spread"), "cards.c_spread.name", Family.Matter, 1, new SkillDef(new SkillId("c_spread"), SkillSlot.A3, 4, t, fx, 40),
+                                    CardNature.Offensive, tiers, new Archetype[0], CardRole.Basic);
+            var spread = new EffectDef(EffectType.Spread, 0, StatusType.Burn);
+            var heal = new EffectDef(EffectType.Heal, 10);
+            Assert.That(CardDataLibrary.Validate(new[] { With(target, new[] { heal, spread }) }), Is.Not.Empty, "base");
+            Assert.That(CardDataLibrary.Validate(new[] { With(target, new[] { heal }, new[] { new CardTier(3, spread) }) }), Is.Not.Empty, "palier");
+            foreach (var foe in new[] { TargetRule.SingleEnemy, TargetRule.AllEnemies })
+                Assert.That(CardDataLibrary.Validate(new[] { With(foe, new[] { new EffectDef(EffectType.Damage, 10), spread }) }), Is.Empty, foe.ToString());
+        }
+
         // ---- Validation du chargeur de cartes ----
 
         static SkillCardDef Card(string id, Family family = Family.Matter, EffectDef? effect = null, CardRole role = CardRole.Basic, Archetype[]? archetypes = null)
@@ -326,6 +363,10 @@ namespace N29.HeroesDawn.Tests.Domain
 
         static void ExpectCardsWarning(string pattern = "cards.json")
             => UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Warning, new System.Text.RegularExpressions.Regex(pattern));
+
+        /// <summary>Le repli sur les cartes du code est une erreur (pas un simple avertissement) : un catalogue manquant ou rejeté ne doit pas passer inaperçu.</summary>
+        static void ExpectCardsError(string pattern = "cards.json")
+            => UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Error, new System.Text.RegularExpressions.Regex(pattern));
 
         [Test, Description("Vérifie qu'un ancien enregistrement sans les champs de condition, de modificateurs ni de ciblage fin se relit en effet sans condition ni modificateur — parce que les fichiers cards.json déjà écrits doivent rester lisibles")]
         public void OldRecord_WithoutTheNewFields_ReadsAsAnUnconditionalEffect()
@@ -346,6 +387,7 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             var legacy = PrototypeCollection.LegacyCards();
             ExpectCardsWarning();
+            ExpectCardsError("rejeté");
             AssertSameCards(legacy, CardDataLibrary.Load(() => "{\"cards\":[]}", () => legacy));
         }
 
@@ -353,9 +395,9 @@ namespace N29.HeroesDawn.Tests.Domain
         public void AbsentOrBlankFile_WarnsBeforeFallingBack()
         {
             var legacy = PrototypeCollection.LegacyCards();
-            ExpectCardsWarning();
+            ExpectCardsError();
             AssertSameCards(legacy, CardDataLibrary.Load(() => null, () => legacy));
-            ExpectCardsWarning();
+            ExpectCardsError();
             AssertSameCards(legacy, CardDataLibrary.Load(() => "  ", () => legacy));
         }
 
@@ -369,6 +411,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var legacy = PrototypeCollection.LegacyCards();
             var json = CardDataLibrary.ToJson(new[] { Card("card_a"), Card("card_a") });
             ExpectCardsWarning("card_a");
+            ExpectCardsError("rejeté");
             AssertSameCards(legacy, CardDataLibrary.Load(() => json, () => legacy));
         }
 
@@ -390,6 +433,7 @@ namespace N29.HeroesDawn.Tests.Domain
             var legacy = PrototypeCollection.LegacyCards();
             var json = CardDataLibrary.ToJson(new[] { Card("card_bad", (Family)9) });
             ExpectCardsWarning("card_bad");
+            ExpectCardsError("rejeté");
             AssertSameCards(legacy, CardDataLibrary.Load(() => json, () => legacy));
         }
 

@@ -23,12 +23,13 @@ namespace N29.HeroesDawn.Definitions
         /// <summary>
         /// La compétence avec sa valeur principale augmentée de <paramref name="bonusPercent"/> % : dégâts, soins, boucliers,
         /// recul, élan et jauge ; chance des altérations (plafonnée à 100 %) et durée (arrondie). 0 : inchangée.
+        /// L'effet d'une réaction armée suit les mêmes formules selon son type ; les modificateurs de valeur ne sont pas remis à l'échelle.
         /// </summary>
         public static SkillDef Apply(SkillDef skill, int bonusPercent)
         {
             if (bonusPercent <= 0) return skill;
             int pct = 100 + bonusPercent;
-            return skill.MapEffects(e =>
+            EffectDef One(EffectDef e)
             {
                 switch (e.Type)
                 {
@@ -42,10 +43,13 @@ namespace N29.HeroesDawn.Definitions
                     case EffectType.ApplyStatus:
                         int chance = e.ChancePercent >= 100 ? e.ChancePercent : System.Math.Min(100, e.ChancePercent * pct / 100);
                         return e.With(duration: (e.Duration * pct + 50) / 100, chance: chance);
+                    case EffectType.ArmReaction:
+                        return e.ScaleReaction(One);
                     default:
                         return e;
                 }
-            });
+            }
+            return skill.MapEffects(One);
         }
     }
 }

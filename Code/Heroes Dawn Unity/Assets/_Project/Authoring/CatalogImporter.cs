@@ -512,7 +512,11 @@ namespace N29.HeroesDawn.Authoring
                         case "1E:faible": target = TargetRule.SingleEnemy; pick = TargetPick.LowestHp; break;
                         case "1A:prochain": target = TargetRule.SingleAlly; pick = TargetPick.NextToAct; break;
                         case "1A:faible": target = TargetRule.SingleAlly; pick = TargetPick.LowestHp; break;
-                        case "déclencheur": onTrigger = true; break;
+                        case "déclencheur":
+                            if (trigger == ReactionTrigger.EnemyDefeated || trigger == ReactionTrigger.AllyDefeated)
+                                throw s.Fail("cible « déclencheur » impossible sur « est vaincu » : l'unité concernée est morte, la réaction ne partirait jamais");
+                            onTrigger = true;
+                            break;
                         default: throw s.Fail($"cible de réaction inconnue « {name} » (attendu : Soi, ZE, ZA, 1E:aléatoire, 1E:faible, 1A:prochain, 1A:faible, déclencheur)");
                     }
                 }

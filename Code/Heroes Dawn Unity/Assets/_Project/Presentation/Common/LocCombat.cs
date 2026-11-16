@@ -109,33 +109,56 @@ namespace N29.HeroesDawn.Presentation.Common
             // Archétypes, réactions armées, Consomme et Propage (plan P2-P4)
             d["archetype.Burn"] = "Brûlure"; d["archetype.Restrain"] = "Entrave"; d["archetype.Hunt"] = "Traque";
             d["archetype.Tempo"] = "Tempo"; d["archetype.Bulwark"] = "Rempart"; d["archetype.Renewal"] = "Renouveau";
-            d["reaction.line"] = "Réaction {0} t : quand {1} → {2}";
-            d["reaction.line_target"] = "Réaction {0} t : quand {1} → {2} sur {3}";
+            // Réaction armée : « lanceur » comme les conditions ; la cible s'écrit toujours, avec sa préposition. {0} = tours, {1} = événement, {2} = effet, {3} = cible
+            d["reaction.line"] = "Riposte du lanceur ({0} de ses tours) : quand {1} → {2} {3}";
+            d["reaction.line_solo"] = "Riposte du lanceur ({0} de ses tours, seul le lanceur riposte) : quand {1} → {2} {3}"; // carte à cible ZA ou 1A
             d["reaction.trigger.EnemyReceivesStatus"] = "un ennemi reçoit {0}";
-            d["reaction.trigger.AllyReceivesStatus"] = "un allié reçoit {0}";
+            d["reaction.trigger.AllyReceivesStatus"] = "un allié (lanceur compris) reçoit {0}";
             d["reaction.trigger.EnemyDefeated"] = "un ennemi est vaincu";
-            d["reaction.trigger.AllyDefeated"] = "un allié est vaincu";
-            d["reaction.trigger.CarrierHit"] = "le porteur est touché";
-            d["reaction.trigger.CarrierCrit"] = "le porteur inflige un critique";
-            // Cibles d'une réaction : zones et soi tels quels ; pour une cible unique, {0} = nom de l'unité, {1} = avec article défini, {2} = statut du choix, et reaction.pick.* en fait un groupe nominal
-            d["reaction.target.trigger"] = "le déclencheur";
-            d["reaction.target.Self"] = "soi";
-            d["reaction.target.AllEnemies"] = "tous les ennemis";
-            d["reaction.target.AllAllies"] = "toute l'équipe";
-            d["reaction.target.SingleEnemy"] = "ennemi";
-            d["reaction.target.SingleAlly"] = "allié";
-            d["reaction.the.SingleEnemy"] = "l'ennemi"; d["reaction.the.SingleAlly"] = "l'allié"; // article défini élidé : « {1} » des choix reaction.pick.*
-            d["reaction.pick.Default"] = "un {0}";
-            d["reaction.pick.LowestHp"] = "{1} le plus faible";
-            d["reaction.pick.HighestHp"] = "{1} le plus en forme";
-            d["reaction.pick.StatusHolder"] = "un {0} porteur de {2}";
-            d["reaction.pick.NextToAct"] = "le prochain {0} à agir";
-            d["reaction.pick.Random"] = "un {0} au hasard";
-            d["reaction.pick.TwoRandom"] = "deux {0}s au hasard";
-            // Valeurs en % même avec les statistiques de l'agent (par tour restant, ou fixes d'une réaction : jamais en montant brut)
-            d["fx.consume_damage"] = "Consomme {0} : Dégâts {1} % par tour restant (max {2})";
-            d["fx.consume_heal"] = "Consomme {0} : Soin {1} % PV par tour restant (max {2})";
-            d["fx.spread"] = "Propage {0}";
+            d["reaction.trigger.AllyDefeated"] = "un autre allié est vaincu"; // le moteur exclut le lanceur (il ne réagit plus une fois vaincu)
+            d["reaction.trigger.CarrierHit"] = "le lanceur est frappé";
+            d["reaction.trigger.CarrierCrit"] = "le lanceur réussit un coup critique";
+            // Cible « déclencheur » : l'unité concernée par l'événement
+            d["reaction.trigger_unit.EnemyReceivesStatus"] = "à cet ennemi";
+            d["reaction.trigger_unit.AllyReceivesStatus"] = "à cet allié";
+            d["reaction.trigger_unit.EnemyDefeated"] = "à l'ennemi vaincu";
+            d["reaction.trigger_unit.AllyDefeated"] = "à l'allié vaincu";
+            d["reaction.trigger_unit.CarrierHit"] = "à l'attaquant";
+            d["reaction.trigger_unit.CarrierCrit"] = "à l'ennemi touché";
+            // Cible nommée : règle, puis choix pour une cible unique ({0} = statut du choix « porteur de »)
+            d["reaction.to.Self"] = "au lanceur";
+            d["reaction.to.AllEnemies"] = "à tous les ennemis";
+            d["reaction.to.AllEnemies.TwoRandom"] = "à deux ennemis au hasard";
+            d["reaction.to.AllAllies"] = "à toute l'équipe";
+            d["reaction.to.SingleEnemy.Default"] = "à un ennemi";
+            d["reaction.to.SingleEnemy.LowestHp"] = "à l'ennemi le plus faible";
+            d["reaction.to.SingleEnemy.HighestHp"] = "à l'ennemi le plus en forme";
+            d["reaction.to.SingleEnemy.StatusHolder"] = "à un ennemi porteur de {0}";
+            d["reaction.to.SingleEnemy.NextToAct"] = "au prochain ennemi à agir";
+            d["reaction.to.SingleEnemy.Random"] = "à un ennemi au hasard";
+            d["reaction.to.SingleEnemy.TwoRandom"] = "à deux ennemis au hasard";
+            d["reaction.to.SingleAlly.Default"] = "à un allié";
+            d["reaction.to.SingleAlly.LowestHp"] = "à l'allié le plus faible";
+            d["reaction.to.SingleAlly.HighestHp"] = "à l'allié le plus en forme";
+            d["reaction.to.SingleAlly.StatusHolder"] = "à un allié porteur de {0}";
+            d["reaction.to.SingleAlly.NextToAct"] = "au prochain allié à agir";
+            d["reaction.to.SingleAlly.Random"] = "à un allié au hasard";
+            d["reaction.to.SingleAlly.TwoRandom"] = "à deux alliés au hasard";
+            // Effets de réaction sans « la cible » (la cible suit en fin de phrase)
+            d["fx.reaction_advance"] = "Avance {0} % sur la frise";
+            d["fx.reaction_pushback"] = "Recule de {0} % sur la frise";
+            // Valeurs en % même avec les statistiques de l'agent (par tour restant : jamais en montant brut)
+            d["fx.consume_damage"] = "Retire {0} de la cible : Dégâts {1} % par tour qu'il lui restait (au plus {2} tours)";
+            d["fx.consume_damage_one"] = "Retire {0} de la cible : Dégâts {1} % par tour qu'il lui restait (au plus 1 tour)";
+            d["fx.consume_heal"] = "Retire {0} de la cible : Soin {1} % PV par tour qu'il lui restait (au plus {2} tours)";
+            d["fx.consume_heal_one"] = "Retire {0} de la cible : Soin {1} % PV par tour qu'il lui restait (au plus 1 tour)";
+            d["fx.spread"] = "Copie {0} de la cible (mêmes tours restants) sur tous les autres ennemis";
+            // Échelle d'archétype : {0} = bonus, {1} = archétype (distinct du statut du même nom), {2} = nombre maximal de cartes comptées
+            d["fx.mod_archetype"] = "{0} par carte d'archétype {1} équipée dans l'escouade, celle-ci comprise (au plus {2} cartes)";
+            d["fx.mod_archetype_one"] = "{0} par carte d'archétype {1} équipée dans l'escouade, celle-ci comprise (au plus 1 carte)";
+            // Statut sans durée (Marque : jusqu'au prochain coup reçu)
+            d["fx.status_untimed"] = "{0}";
+            d["fx.status_untimed_chance"] = "{0} ({1} %)";
             d["pick.LowestHp"] = "Cible : le plus faible en PV";
             d["pick.HighestHp"] = "Cible : le plus en forme (PV en %)";
             d["pick.StatusHolder"] = "Cible : porteur de {0}";

@@ -12,7 +12,7 @@ namespace N29.HeroesDawn.Domain.Combat
         public int TurnsLeft { get; set; }
         /// <summary>Rang d'armement dans le combat (croissant) : départage les réactions d'un même porteur.</summary>
         public int Order { get; }
-        /// <summary>Indice, dans la liste d'événements du pas en cours, à partir duquel la réaction écoute (armée en cours de pas) ; 0 ensuite.</summary>
+        /// <summary>Indice, dans la liste d'événements du pas en cours, à partir duquel la réaction écoute (armée en cours de pas : début du lancer de sa carte) ; 0 ensuite.</summary>
         internal int ListensFrom { get; set; }
 
         public ReactionInstance(ReactionDef def, int turnsLeft, int order) { Def = def; TurnsLeft = turnsLeft; Order = order; }
@@ -33,34 +33,56 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Vrai dès qu'une réaction a été armée dans ce combat ; faux : le traitement des réactions est sauté.</summary>
         bool _reactionsArmed;
         int _reactionOrder;
-        /// <summary>Auteur de chaque coup du pas en cours (tenu seulement quand une réaction est armée), vidé après le traitement.</summary>
-        readonly Dictionary<CombatEvent, int> _hitBy = new Dictionary<CombatEvent, int>();
+        /// <summary>
+        /// Coups du pas en cours, repérés par leur PREMIER événement (<see cref="ShieldAbsorbedEvent"/> si le bouclier absorbe, sinon <see cref="DamageEvent"/>) :
+        /// auteur et critique. Tenu seulement quand une réaction est armée ou en cours d'armement (<see cref="NotesBlows"/>) ; vidé après le traitement.
+        /// </summary>
+        readonly Dictionary<CombatEvent, (int Attacker, bool Crit)> _hitBy = new Dictionary<CombatEvent, (int Attacker, bool Crit)>();
+        /// <summary>Lancers en cours dont la liste d'effets arme une réaction : leurs coups sont notés avant même l'armement (la réaction entend sa carte).</summary>
+        int _armingCasts;
+
+        /// <summary>Vrai s'il faut noter les coups (aucun tirage, aucun événement) : une réaction est armée, ou une carte qui en arme une est en cours de lancer.</summary>
+        bool NotesBlows => _reactionsArmed || _armingCasts > 0;
+
+        static bool ArmsAReaction(IReadOnlyList<EffectDef> effects)
+        {
+            foreach (var fx in effects) if (fx.Type == EffectType.ArmReaction && fx.Reaction != null) return true;
+            return false;
+        }
 
         /// <summary>
         /// Effets <see cref="EffectType.ArmReaction"/> d'un lancer : traités une seule fois, APRÈS la boucle des cibles, sur le lanceur, quels que soient
-        /// le nombre de cibles, leur mort ou un raté. La réaction n'entend donc pas les effets de la carte qui l'arme (elle écoute à partir de son armement).
+        /// le nombre de cibles, leur mort ou un raté. La réaction écoute pourtant à partir du DÉBUT du lancer (<paramref name="listenFrom"/> : indice du premier
+        /// événement que les effets de la carte ont pu produire) : elle entend la carte qui l'arme, au premier armement comme au réarmement.
         /// Chance : un seul tirage, et seulement si elle est sous 100 % (<c>Chance(100)</c> ne tire pas). Condition : évaluée sur le lanceur (lanceur = cible).
         /// Sans ArmReaction dans la liste : aucun travail ni tirage.
         /// </summary>
-        void ArmReactions(CombatUnit actor, IReadOnlyList<EffectDef> effects, List<CombatEvent> output)
+        void ArmReactions(CombatUnit actor, IReadOnlyList<EffectDef> effects, List<CombatEvent> output, int listenFrom)
         {
             foreach (var fx in effects)
             {
                 if (fx.Type != EffectType.ArmReaction || fx.Reaction == null || !actor.IsAlive) continue;
                 if (fx.When != null && !Holds(fx.When, actor, actor)) continue;
                 if (!_rng.Chance(fx.ChancePercent)) continue;
-                ArmReaction(actor, fx.Reaction, output);
+                ArmReaction(actor, fx.Reaction, output, listenFrom);
             }
         }
 
-        /// <summary>Arme (ou réarme : durée remise à Turns, même rang, sans doublon) la réaction sur le porteur.</summary>
-        void ArmReaction(CombatUnit carrier, ReactionDef def, List<CombatEvent> output)
+        /// <summary>
+        /// Arme (ou réarme : durée remise à Turns, même rang, sans doublon) la réaction sur le porteur ; elle écoute à partir de <paramref name="listenFrom"/>.
+        /// Déjà armée, elle écoutait déjà le pas : elle garde le plus petit des deux indices.
+        /// </summary>
+        void ArmReaction(CombatUnit carrier, ReactionDef def, List<CombatEvent> output, int listenFrom)
         {
             _reactionsArmed = true;
             ReactionInstance? existing = null;
             foreach (var r in carrier.Reactions) if (ReferenceEquals(r.Def, def)) { existing = r; break; }
-            if (existing != null) existing.TurnsLeft = def.Turns;
-            else carrier.Reactions.Add(new ReactionInstance(def, def.Turns, _reactionOrder++) { ListensFrom = output.Count });
+            if (existing != null)
+            {
+                existing.TurnsLeft = def.Turns;
+                existing.ListensFrom = System.Math.Min(existing.ListensFrom, listenFrom);
+            }
+            else carrier.Reactions.Add(new ReactionInstance(def, def.Turns, _reactionOrder++) { ListensFrom = listenFrom });
             output.Add(new ReactionArmedEvent(Tick, carrier.Id, def.Trigger, def.Turns));
         }
 
@@ -71,17 +93,23 @@ namespace N29.HeroesDawn.Domain.Combat
                 if (--u.Reactions[i].TurnsLeft <= 0) u.Reactions.RemoveAt(i);
         }
 
-        /// <summary>Retient l'auteur du coup dont le DamageEvent vient d'être ajouté à partir de <paramref name="from"/>.</summary>
-        void NoteHitter(List<CombatEvent> output, int from, int actor)
+        /// <summary>
+        /// Retient l'auteur et le critique d'un coup qui a porté (ni esquivé ni raté), sur son PREMIER événement ajouté à partir de <paramref name="from"/> :
+        /// <see cref="ShieldAbsorbedEvent"/> si le bouclier absorbe (tout ou partie), sinon <see cref="DamageEvent"/>. Un coup ne compte ainsi qu'une fois.
+        /// </summary>
+        void NoteBlow(List<CombatEvent> output, int from, int actor, bool crit)
         {
             for (int i = from; i < output.Count; i++)
-                if (output[i] is DamageEvent) { _hitBy[output[i]] = actor; return; }
+                if (output[i] is ShieldAbsorbedEvent || output[i] is DamageEvent) { _hitBy[output[i]] = (actor, crit); return; }
         }
+
+        /// <summary>Unité touchée par un événement de coup (bouclier ou dégâts), -1 pour un autre événement.</summary>
+        static int BlowTarget(CombatEvent ev) => ev is DamageEvent d ? d.Target : ev is ShieldAbsorbedEvent s ? s.Target : -1;
 
         /// <summary>Déclenche les réactions sur les événements <paramref name="output"/>[<paramref name="fromIndex"/>..] présents à l'appel (voir le résumé de la classe).</summary>
         internal void ProcessReactions(List<CombatEvent> output, int fromIndex)
         {
-            if (!_reactionsArmed) return;
+            if (!_reactionsArmed) { _hitBy.Clear(); return; } // coups notés pour une carte dont l'armement n'a pas eu lieu (chance, condition)
             int end = output.Count;
             bool fired = false;
             for (int i = fromIndex; i < end && !IsOver; i++)
@@ -130,15 +158,17 @@ namespace N29.HeroesDawn.Domain.Combat
                 }
                 case ReactionTrigger.CarrierHit:
                 {
-                    // Seulement un coup dont l'auteur est connu (ennemi ou allié) : jamais la brûlure, qui mord à chaque point de frise.
-                    if (!(ev is DamageEvent h) || h.Target != carrier.Id || !_hitBy.TryGetValue(h, out int attacker)) return false;
-                    unit = attacker;
+                    // Un coup d'une unité (ennemi ou allié) qui porte sur le porteur, même entièrement absorbé par son bouclier, une fois par coup
+                    // (seul son premier événement est noté) ; jamais la brûlure, qui mord à chaque point de frise sans être un coup.
+                    if (BlowTarget(ev) != carrier.Id || !_hitBy.TryGetValue(ev, out var blow)) return false;
+                    unit = blow.Attacker;
                     return true;
                 }
                 case ReactionTrigger.CarrierCrit:
                 {
-                    if (!(ev is DamageEvent h) || !h.Crit || !_hitBy.TryGetValue(h, out int attacker) || attacker != carrier.Id) return false;
-                    unit = h.Target;
+                    // Le critique noté sur le coup, même quand le bouclier de la cible absorbe tout.
+                    if (!_hitBy.TryGetValue(ev, out var blow) || !blow.Crit || blow.Attacker != carrier.Id) return false;
+                    unit = BlowTarget(ev);
                     return true;
                 }
                 default: return false;
@@ -146,7 +176,7 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         /// <summary>
-        /// Applique l'effet de la réaction (valeur fixe, porteur comme lanceur : critique et défense s'appliquent). Cible « déclencheur » : l'unité concernée
+        /// Applique l'effet de la réaction (mis à l'échelle avec sa carte, porteur comme lanceur : critique et défense s'appliquent). Cible « déclencheur » : l'unité concernée
         /// si elle est vivante ; sinon la règle nommée, comme une compétence du porteur (un choix aléatoire tire une fois). Sans cible : rien, sans tirage.
         /// </summary>
         bool FireReaction(CombatUnit carrier, ReactionDef d, int unit, List<CombatEvent> output)

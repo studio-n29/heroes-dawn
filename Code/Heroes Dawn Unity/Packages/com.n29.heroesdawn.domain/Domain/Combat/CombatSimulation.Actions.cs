@@ -145,6 +145,10 @@ namespace N29.HeroesDawn.Domain.Combat
 
         void ApplyEffects(CombatUnit actor, IReadOnlyList<EffectDef> effects, List<int> targets, List<CombatEvent> output)
         {
+            // Réaction armée par ces effets : elle écoute à partir d'ici (avant le premier événement des effets) et les coups sont notés dès maintenant.
+            int listenFrom = output.Count;
+            bool arms = ArmsAReaction(effects);
+            if (arms) _armingCasts++;
             // Exécution : bonus lu avant la boucle, pour qu'il compte où qu'il soit placé dans la liste.
             int executeBonus = 0;
             foreach (var fx in effects) if (fx.Type == EffectType.Execute) executeBonus += fx.Value;
@@ -232,7 +236,11 @@ namespace N29.HeroesDawn.Domain.Combat
                     }
                 }
             }
-            ArmReactions(actor, effects, output);
+            if (arms)
+            {
+                _armingCasts--;
+                ArmReactions(actor, effects, output, listenFrom);
+            }
         }
 
         /// <summary>
@@ -262,7 +270,7 @@ namespace N29.HeroesDawn.Domain.Combat
             }
             int at = output.Count;
             int dealt = DealDamage(t, dmg, crit, output);
-            if (_reactionsArmed && dealt > 0) NoteHitter(output, at, actor.Id); // auteur du coup, pour les réactions (aucun tirage)
+            if (NotesBlows) NoteBlow(output, at, actor.Id, crit); // coup qui porte, même tout absorbé : auteur et critique, pour les réactions (aucun tirage)
             return dealt;
         }
 

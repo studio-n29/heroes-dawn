@@ -20,14 +20,15 @@ namespace N29.HeroesDawn.Authoring
 
         /// <summary>
         /// Cartes de la source JSON donnée, sinon celles du repli : une source absente, vide, illisible, sans carte ou invalide (voir <see cref="Validate"/>)
-        /// avertit (un avertissement par erreur) puis se replie.
+        /// signale une erreur (précédée d'un avertissement par erreur de validation) puis se replie.
         /// </summary>
         public static IReadOnlyList<SkillCardDef> Load(Func<string?> readJson, Func<IReadOnlyList<SkillCardDef>> fallback)
         {
             var json = readJson();
+            // Le repli est une erreur (pas un simple avertissement) : un catalogue absent ou rejeté ne doit pas passer inaperçu ; le repli est gardé.
             if (string.IsNullOrWhiteSpace(json))
             {
-                Debug.LogWarning("cards.json est absent ou vide : repli sur les cartes du code.");
+                Debug.LogError("cards.json est absent ou vide : repli sur les cartes du code.");
                 return fallback();
             }
             try
@@ -36,16 +37,16 @@ namespace N29.HeroesDawn.Authoring
                 var errors = Validate(cards);
                 if (errors.Count == 0) return cards;
                 foreach (var error in errors) Debug.LogWarning("cards.json invalide : " + error);
-                Debug.LogWarning("cards.json rejeté (" + errors.Count + " erreur(s)) : repli sur les cartes du code.");
+                Debug.LogError("cards.json rejeté (" + errors.Count + " erreur(s)) : repli sur les cartes du code.");
             }
             catch (Exception e)
             {
-                Debug.LogWarning("cards.json illisible, repli sur les cartes du code : " + e.Message);
+                Debug.LogError("cards.json illisible, repli sur les cartes du code : " + e.Message);
             }
             return fallback();
         }
 
-        /// <summary>Erreurs du catalogue : liste vide, identifiant vide ou en double, valeur d'enum hors plage (JsonUtility lit un entier quelconque), condition ou modificateur sur un effet qui ne les lit pas, plafond sans échelle, échelle d'archétype sans archétype (ou archétype pour une autre échelle), réaction incohérente (absente, durée hors de 1 à 5, effet imbriqué interdit), Consomme ou Propage sans statut ou sans valeur ni maximum de tours, niveau de palier autre que 3, 6, 10 ou répété. Liste vide = valide.</summary>
+        /// <summary>Erreurs du catalogue : liste vide, identifiant vide ou en double, valeur d'enum hors plage (JsonUtility lit un entier quelconque), condition ou modificateur sur un effet qui ne les lit pas, plafond sans échelle, échelle d'archétype sans archétype (ou archétype pour une autre échelle), réaction incohérente (absente, durée hors de 1 à 5, effet imbriqué interdit, statut sur un déclencheur qui n'en lit pas, cible « déclencheur » sur une défaite, valeur/statut/durée portés par l'ArmReaction lui-même), Consomme ou Propage sans statut ou sans valeur ni maximum de tours, Propage dans une compétence qui vise le lanceur ou des alliés, niveau de palier autre que 3, 6, 10 ou répété. Liste vide = valide.</summary>
         public static IReadOnlyList<string> Validate(IReadOnlyList<SkillCardDef> cards)
         {
             var errors = new List<string>();
@@ -65,8 +66,8 @@ namespace N29.HeroesDawn.Authoring
                 CheckEnum(errors, who, "cible", c.Skill.Target);
                 CheckEnum(errors, who, "ciblage fin", c.Skill.Pick);
                 CheckEnum(errors, who, "statut de ciblage", c.Skill.PickStatus);
-                foreach (var e in c.Skill.Effects) CheckEffect(errors, who, e);
-                foreach (var t in c.Tiers) foreach (var e in t.Effects) CheckEffect(errors, who, e);
+                foreach (var e in c.Skill.Effects) CheckEffect(errors, who, e, c.Skill.Target);
+                foreach (var t in c.Tiers) foreach (var e in t.Effects) CheckEffect(errors, who, e, c.Skill.Target);
                 var levels = new HashSet<int>();
                 foreach (var t in c.Tiers)
                 {
@@ -91,7 +92,7 @@ namespace N29.HeroesDawn.Authoring
         static readonly HashSet<EffectType> ReactionEffectTypes = new HashSet<EffectType>
             { EffectType.Damage, EffectType.Heal, EffectType.Shield, EffectType.ApplyStatus, EffectType.PushBack, EffectType.Advance, EffectType.GaugeDelta, EffectType.Purge };
 
-        static void CheckEffect(List<string> errors, string who, EffectDef e)
+        static void CheckEffect(List<string> errors, string who, EffectDef e, TargetRule skillTarget)
         {
             CheckEnum(errors, who, "type d'effet", e.Type);
             CheckEnum(errors, who, "statut", e.Status);
@@ -115,6 +116,8 @@ namespace N29.HeroesDawn.Authoring
                 if (e.Duration < 1) errors.Add(who + " : " + e.Type + " sans maximum de tours (durée " + e.Duration + ", 1 au moins attendu)");
             }
             if (e.Type == EffectType.Spread && e.Status == StatusType.None) errors.Add(who + " : Spread sans statut à propager");
+            if (e.Type == EffectType.Spread && (skillTarget == TargetRule.Self || skillTarget == TargetRule.SingleAlly || skillTarget == TargetRule.AllAllies))
+                errors.Add(who + " : Spread dans une compétence qui vise " + skillTarget + " (la propagation va aux ennemis du lanceur, depuis un statut de la cible)");
         }
 
         static void CheckReaction(List<string> errors, string who, EffectDef e)
@@ -131,8 +134,13 @@ namespace N29.HeroesDawn.Authoring
             CheckEnum(errors, who, "cible de réaction", r.Target);
             CheckEnum(errors, who, "ciblage de réaction", r.Pick);
             CheckEnum(errors, who, "statut de ciblage de réaction", r.PickStatus);
-            if ((r.Trigger == ReactionTrigger.EnemyReceivesStatus || r.Trigger == ReactionTrigger.AllyReceivesStatus) && r.Status == StatusType.None)
-                errors.Add(who + " : le déclencheur " + r.Trigger + " exige un statut");
+            bool statusEvent = r.Trigger == ReactionTrigger.EnemyReceivesStatus || r.Trigger == ReactionTrigger.AllyReceivesStatus;
+            if (statusEvent && r.Status == StatusType.None) errors.Add(who + " : le déclencheur " + r.Trigger + " exige un statut");
+            if (!statusEvent && r.Status != StatusType.None) errors.Add(who + " : le déclencheur " + r.Trigger + " ne lit pas de statut (" + r.Status + ")");
+            if (r.OnTriggerUnit && (r.Trigger == ReactionTrigger.EnemyDefeated || r.Trigger == ReactionTrigger.AllyDefeated))
+                errors.Add(who + " : cible « déclencheur » sur " + r.Trigger + " : l'unité concernée est vaincue, la réaction ne partirait jamais");
+            if (e.Type == EffectType.ArmReaction && (e.Value != 0 || e.Status != StatusType.None || e.Duration != 0))
+                errors.Add(who + " : valeur, statut ou durée portés par l'ArmReaction lui-même (seule la réaction compte)");
             if (r.Turns < 1 || r.Turns > 5) errors.Add(who + " : réaction de " + r.Turns + " tour(s) (1 à 5 attendus)");
             var n = r.Effect;
             CheckEnum(errors, who, "type d'effet de réaction", n.Type);

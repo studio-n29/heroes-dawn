@@ -148,16 +148,19 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             if (level >= CardLevels.Max) return RowButtonData.Of(Loc.T("grimoire.max_level"), false, Loc.T("errors.collection_max_level"), 3);
             int copies = CardLevels.CopiesToUpgrade(level), credits = CardLevels.CreditsToUpgrade(level);
-            // Le coût en doublons : exemplaires propres d'abord, puis l'équivalent en autres cartes de la même étoile.
+            // Le coût en doublons : exemplaires propres d'abord, puis les doublons d'autres cartes de la même étoile, et de l'étoile juste en dessous pour une ★4 ou ★5.
             var plan = CollectionOps.PlanUpgrade(_session, card.Id);
-            string reason = plan == null ? Loc.F("grimoire.upgrade_copies", copies, card.Stars)
+            bool lower = card.Stars >= CollectionOps.LowerStarFrom;
+            int per = CardLevels.OthersPerCopy;
+            string reason = plan == null ? (lower ? Loc.F("grimoire.upgrade_copies_lower", copies, per, card.Stars, card.Stars - 1) : Loc.F("grimoire.upgrade_copies", copies, per, card.Stars))
                           : _session.Wallet.Credits < credits ? Loc.F("grimoire.upgrade_credits", credits - _session.Wallet.Credits) : "";
-            string cost = plan == null ? Loc.F("grimoire.upgrade_equiv", copies, card.Stars, credits)
-                        : plan.Missing > 0 ? Loc.F("grimoire.upgrade_mix", plan.Own, plan.Missing * CardLevels.OthersPerCopy, card.Stars, credits)
+            string cost = plan == null ? (lower ? Loc.F("grimoire.upgrade_equiv_lower", copies, per, card.Stars, card.Stars - 1, credits) : Loc.F("grimoire.upgrade_equiv", copies, per, card.Stars, credits))
+                        : plan.LowerStarDuplicates > 0 ? Loc.F("grimoire.upgrade_mix_lower", plan.Own, plan.SameStarDuplicates, card.Stars, plan.LowerStarDuplicates, card.Stars - 1, credits)
+                        : plan.Missing > 0 ? Loc.F("grimoire.upgrade_mix", plan.Own, plan.SameStarDuplicates, card.Stars, credits)
                         : Loc.F("grimoire.upgrade", copies, credits);
             // L'amélioration fait atteindre un palier : le bouton l'annonce.
             var tier = card.Tiers.FirstOrDefault(t => t.Level == level + 1);
-            string label = cost + (tier != null ? " " + Loc.F("grimoire.upgrade_unlocks", CollectionText.TierEffects(tier)) : "");
+            string label = cost + (tier != null ? " " + Loc.F("grimoire.upgrade_unlocks", CollectionText.TierEffects(tier, card.Skill.Target)) : "");
             return RowButtonData.Of(label, reason.Length == 0, reason, 1);
         }
 
