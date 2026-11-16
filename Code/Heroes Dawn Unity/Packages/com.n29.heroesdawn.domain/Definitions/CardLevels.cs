@@ -14,8 +14,14 @@ namespace N29.HeroesDawn.Definitions
         /// <summary>Niveaux qui débloquent un palier d'effets secondaires.</summary>
         public static readonly int[] TierLevels = { 3, 6, 10 };
 
+        /// <summary>Exemplaires consommés pour passer du niveau 1 au 2, puis 2 au 3, etc. (18 au total pour le niveau 10).</summary>
+        static readonly int[] CopiesTable = { 1, 1, 1, 2, 2, 2, 3, 3, 3 };
+
+        /// <summary>Doublons d'autres cartes de la même étoile qui valent un exemplaire manquant de la carte.</summary>
+        public const int OthersPerCopy = 3;
+
         /// <summary>Exemplaires en doublon consommés pour passer du niveau <paramref name="level"/> au suivant.</summary>
-        public static int CopiesToUpgrade(int level) => (level + 1) / 2;
+        public static int CopiesToUpgrade(int level) => CopiesTable[System.Math.Min(CopiesTable.Length, System.Math.Max(1, level)) - 1];
 
         /// <summary>Crédits dépensés pour passer du niveau <paramref name="level"/> au suivant.</summary>
         public static int CreditsToUpgrade(int level) => 200 * level;

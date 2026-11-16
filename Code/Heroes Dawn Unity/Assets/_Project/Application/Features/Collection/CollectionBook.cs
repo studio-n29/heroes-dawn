@@ -40,6 +40,17 @@ namespace N29.HeroesDawn.Application.Features.Collection
         public OpenedCard(CardId id, bool isNew) { Id = id; IsNew = isNew; }
     }
 
+    /// <summary>Ce qu'une amélioration consomme : <see cref="Own"/> exemplaires de la carte, et <see cref="Others"/> doublons d'autres cartes de la même étoile (<see cref="Missing"/> exemplaires manquants × 3).</summary>
+    public sealed class UpgradePlan
+    {
+        public int Needed { get; }
+        public int Own { get; }
+        public int Missing { get; }
+        public IReadOnlyList<KeyValuePair<CardId, int>> Others { get; }
+        public UpgradePlan(int needed, int own, int missing, IReadOnlyList<KeyValuePair<CardId, int>> others)
+        { Needed = needed; Own = own; Missing = missing; Others = others; }
+    }
+
     public sealed class ItemOffer
     {
         public ItemDef Item { get; }
@@ -82,6 +93,41 @@ namespace N29.HeroesDawn.Application.Features.Collection
         {
             foreach (var c in Save(s).cardLevels) if (c.id == id.Value) { c.value = level; return; }
             Save(s).cardLevels.Add(new CounterSave { id = id.Value, value = level });
+        }
+
+        /// <summary>Exemplaires qu'une carte peut céder : tous sauf celui qui la possède et ceux équipés.</summary>
+        static int Spare(GameSession s, CardId id) => System.Math.Max(0, OwnedCards(s, id) - System.Math.Max(1, EquippedCards(s, id)));
+
+        /// <summary>
+        /// Le coût de la prochaine amélioration de la carte : ses exemplaires propres d'abord, puis, pour chaque exemplaire manquant,
+        /// <see cref="CardLevels.OthersPerCopy"/> doublons d'autres cartes de la même étoile (par identifiant croissant, sans descendre une carte sous un exemplaire).
+        /// <c>null</c> si la carte est inconnue, absente, au niveau maximal ou si les doublons ne suffisent pas.
+        /// </summary>
+        public static UpgradePlan? PlanUpgrade(GameSession s, CardId card)
+        {
+            var defs = s.Content.Collection;
+            if (!defs.HasCard(card) || OwnedCards(s, card) <= 0) return null;
+            int level = CardLevel(s, card);
+            if (level >= CardLevels.Max) return null;
+            int needed = CardLevels.CopiesToUpgrade(level);
+            int own = System.Math.Min(needed, Spare(s, card));
+            int missing = needed - own;
+            var taken = new List<KeyValuePair<CardId, int>>();
+            int toTake = missing * CardLevels.OthersPerCopy;
+            if (toTake > 0)
+            {
+                int stars = defs.Card(card).Stars;
+                foreach (var other in defs.Cards.Where(c => c.Stars == stars && c.Id != card).OrderBy(c => c.Id.Value, System.StringComparer.Ordinal))
+                {
+                    int n = System.Math.Min(toTake, Spare(s, other.Id));
+                    if (n <= 0) continue;
+                    taken.Add(new KeyValuePair<CardId, int>(other.Id, n));
+                    toTake -= n;
+                    if (toTake == 0) break;
+                }
+                if (toTake > 0) return null;
+            }
+            return new UpgradePlan(needed, own, missing, taken);
         }
 
         // ---- Boosters
@@ -182,11 +228,11 @@ namespace N29.HeroesDawn.Application.Features.Collection
             if (owned <= 0) return Result.Fail(CollectionErrors.NotOwned);
             int level = CollectionOps.CardLevel(Session, card);
             if (level >= CardLevels.Max) return Result.Fail(CollectionErrors.MaxLevel);
-            int copies = CardLevels.CopiesToUpgrade(level);
-            int keep = System.Math.Max(1, CollectionOps.EquippedCards(Session, card));
-            if (owned - copies < keep) return Result.Fail(CollectionErrors.NeedCopies);
+            var plan = CollectionOps.PlanUpgrade(Session, card);
+            if (plan == null) return Result.Fail(CollectionErrors.NeedCopies);
             if (!Session.Wallet.TrySpend(CardLevels.CreditsToUpgrade(level), 0)) return Result.Fail(MetaErrors.NotEnoughCredits);
-            CollectionOps.AddCard(Session, card, -copies);
+            CollectionOps.AddCard(Session, card, -plan.Own);
+            foreach (var other in plan.Others) CollectionOps.AddCard(Session, other.Key, -other.Value);
             CollectionOps.SetCardLevel(Session, card, level + 1);
             _c.PublishWallet();
             Changed(true);

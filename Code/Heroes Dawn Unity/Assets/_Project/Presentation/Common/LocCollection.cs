@@ -160,11 +160,13 @@ namespace N29.HeroesDawn.Presentation.Common
             d["grimoire.card_line"] = "{0} · {1} · {2}";
             d["grimoire.owned_level"] = "×{0} · Niv. {1}/{2}";
             d["grimoire.upgrade"] = "AMÉLIORER ({0} doublon(s) + {1} Cr)";
+            d["grimoire.upgrade_mix"] = "AMÉLIORER ({0} doublon(s) + {1} autres cartes ★{2} + {3} Cr)";
+            d["grimoire.upgrade_equiv"] = "AMÉLIORER ({0} doublon(s), ou 3 autres cartes ★{1} par exemplaire manquant, + {2} Cr)";
             d["grimoire.upgrade_unlocks"] = "» débloque {0}";
             d["grimoire.tiers"] = "Paliers";
             d["grimoire.tier_line"] = "Niv. {0} · {1}";
             d["grimoire.max_level"] = "NIVEAU MAX";
-            d["grimoire.upgrade_copies"] = "Il faut {0} exemplaire(s) en doublon.";
+            d["grimoire.upgrade_copies"] = "Il faut {0} exemplaire(s) en doublon (3 doublons d'autres cartes ★{1} en valent un).";
             d["grimoire.upgrade_credits"] = "Il manque {0} Crédits.";
             d["grimoire.upgraded"] = "Carte améliorée !";
             d["grimoire.opened_title"] = "BOOSTER OUVERT !";

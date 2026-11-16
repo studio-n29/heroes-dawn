@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
 using N29.HeroesDawn.Application.Features.Collection;
+using N29.HeroesDawn.Application.Session;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Domain.Combat;
@@ -63,12 +65,12 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(Code(_app.Collection.UpgradeCard(Wall)), Is.EqualTo("collection.max_level"));
         }
 
-        [Test, Description("Vérifie le prix des 9 améliorations (doublons 1,1,2,2,3,3,4,4,5 soit 25 ; Crédits 200 × niveau soit 9 000) et la puissance (100 %, 140 % au niveau 5, 190 % au niveau 10) — parce que l'économie des cartes est calibrée sur ces valeurs")]
+        [Test, Description("Vérifie le prix des 9 améliorations (doublons 1,1,1,2,2,2,3,3,3 soit 18 ; Crédits 200 × niveau soit 9 000) et la puissance (100 %, 140 % au niveau 5, 190 % au niveau 10) — parce que l'économie des cartes est calibrée sur ces valeurs")]
         public void CardLevels_Economy_Over10Levels()
         {
             var copies = new int[9]; int credits = 0;
             for (int l = 1; l <= 9; l++) { copies[l - 1] = CardLevels.CopiesToUpgrade(l); credits += CardLevels.CreditsToUpgrade(l); }
-            Assert.That(copies, Is.EqualTo(new[] { 1, 1, 2, 2, 3, 3, 4, 4, 5 }));
+            Assert.That(copies, Is.EqualTo(new[] { 1, 1, 1, 2, 2, 2, 3, 3, 3 }));
             Assert.That(credits, Is.EqualTo(9000));
             Assert.That(CardLevels.EffectPercent(1), Is.EqualTo(100));
             Assert.That(CardLevels.EffectPercent(5), Is.EqualTo(140));
@@ -93,6 +95,118 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(l3.Effects[0].Value, Is.EqualTo(120));
             Assert.That(l3.Effects[1].ChancePercent, Is.EqualTo(50));
             Assert.That(CardLevels.Scale(skill, 1), Is.SameAs(skill));
+        }
+
+        // ------------------------------------------------------------------ Économie des doublons (autres cartes de la même étoile)
+
+        CollectionDef Defs => _app.Session.Content.Collection;
+
+        /// <summary>Les autres cartes de la même étoile que <see cref="Wall"/>, par identifiant croissant.</summary>
+        List<CardId> SameStars() => Defs.Cards.Where(c => c.Stars == Defs.Card(Wall).Stars && c.Id != Wall)
+            .Select(c => c.Id).OrderBy(i => i.Value, System.StringComparer.Ordinal).ToList();
+
+        CardId OtherStars() => Defs.Cards.First(c => c.Stars != Defs.Card(Wall).Stars).Id;
+
+        int Owned(CardId c) => CollectionOps.OwnedCards(_app.Session, c);
+
+        [Test, Description("Vérifie que les exemplaires propres de la carte sont consommés avant toute autre carte — parce que les doublons d'autres cartes ne servent qu'en complément")]
+        public void Upgrade_UsesOwnCopiesFirst()
+        {
+            var a = SameStars()[0];
+            CollectionOps.AddCard(_app.Session, Wall, 2);
+            CollectionOps.AddCard(_app.Session, a, 5);
+            Assert.That(_app.Collection.UpgradeCard(Wall).IsSuccess);
+            Assert.That(Owned(Wall), Is.EqualTo(1));
+            Assert.That(Owned(a), Is.EqualTo(5));
+        }
+
+        [Test, Description("Vérifie que sans doublon propre trois doublons d'une autre carte de la même étoile valent un exemplaire manquant — parce que c'est le taux de conversion de l'économie des doublons")]
+        public void Upgrade_CompletesWithOtherCardsOfTheSameStars_ThreeForOne()
+        {
+            var a = SameStars()[0];
+            CollectionOps.AddCard(_app.Session, Wall);
+            CollectionOps.AddCard(_app.Session, a, 4);
+            Assert.That(_app.Collection.UpgradeCard(Wall).IsSuccess);
+            Assert.That(CollectionOps.CardLevel(_app.Session, Wall), Is.EqualTo(2));
+            Assert.That(Owned(Wall), Is.EqualTo(1));
+            Assert.That(Owned(a), Is.EqualTo(1));
+        }
+
+        [Test, Description("Vérifie que les doublons d'une carte d'une autre étoile ne comptent jamais — parce qu'une carte ne se complète qu'avec des cartes de sa propre étoile")]
+        public void Upgrade_RefusesOtherStars()
+        {
+            var other = OtherStars();
+            CollectionOps.AddCard(_app.Session, Wall);
+            CollectionOps.AddCard(_app.Session, other, 10);
+            Assert.That(Code(_app.Collection.UpgradeCard(Wall)), Is.EqualTo("collection.copies"));
+            Assert.That(Owned(other), Is.EqualTo(10));
+        }
+
+        [Test, Description("Vérifie qu'un manque (3 doublons d'autres cartes valent moins que l'exemplaire manquant) refuse sans rien consommer ni dépenser — parce qu'un échec ne doit rien coûter")]
+        public void Upgrade_RefusesWhenNotEnough_AndChangesNothing()
+        {
+            var a = SameStars()[0];
+            CollectionOps.AddCard(_app.Session, Wall);
+            CollectionOps.AddCard(_app.Session, a, 3);
+            int credits = _app.Session.Wallet.Credits;
+            Assert.That(Code(_app.Collection.UpgradeCard(Wall)), Is.EqualTo("collection.copies"));
+            Assert.That(Owned(Wall), Is.EqualTo(1));
+            Assert.That(Owned(a), Is.EqualTo(3));
+            Assert.That(CollectionOps.CardLevel(_app.Session, Wall), Is.EqualTo(1));
+            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(credits));
+        }
+
+        [Test, Description("Vérifie, au niveau 4 (2 exemplaires), que l'amélioration prend le doublon propre puis les doublons des autres cartes par identifiant croissant sans descendre une carte sous un exemplaire — parce que c'est l'ordre promis et que chaque carte garde celle qui la possède")]
+        public void Upgrade_ConsumesExactlyTheCopiesNeeded()
+        {
+            var others = SameStars();
+            var a = others[0]; var b = others[1];
+            CollectionOps.SetCardLevel(_app.Session, Wall, 4);
+            CollectionOps.AddCard(_app.Session, Wall, 2);
+            CollectionOps.AddCard(_app.Session, a, 3);
+            CollectionOps.AddCard(_app.Session, b, 5);
+            Assert.That(_app.Collection.UpgradeCard(Wall).IsSuccess);
+            Assert.That(CollectionOps.CardLevel(_app.Session, Wall), Is.EqualTo(5));
+            Assert.That(Owned(Wall), Is.EqualTo(1), "un doublon propre");
+            Assert.That(Owned(a), Is.EqualTo(1), "2 doublons, la carte garde son exemplaire");
+            Assert.That(Owned(b), Is.EqualTo(4), "le 3e doublon seulement");
+        }
+
+        [Test, Description("Vérifie que le plan d'amélioration annonce les exemplaires propres et les doublons d'autres cartes sans rien consommer, et vaut null quand les doublons ne suffisent pas — parce que le grimoire affiche ce coût avant l'achat")]
+        public void PlanUpgrade_AnnouncesTheCost_WithoutConsuming()
+        {
+            var a = SameStars()[0];
+            CollectionOps.AddCard(_app.Session, Wall);
+            Assert.That(CollectionOps.PlanUpgrade(_app.Session, Wall), Is.Null);
+            CollectionOps.AddCard(_app.Session, a, 4);
+            var plan = CollectionOps.PlanUpgrade(_app.Session, Wall)!;
+            Assert.That(new[] { plan.Needed, plan.Own, plan.Missing }, Is.EqualTo(new[] { 1, 0, 1 }));
+            Assert.That(plan.Others.Select(o => (o.Key, o.Value)), Is.EqualTo(new[] { (a, 3) }));
+            Assert.That(Owned(a), Is.EqualTo(4));
+        }
+
+        [Test, Description("Vérifie que les Crédits dépensés restent 200 × niveau même quand l'amélioration puise dans d'autres cartes — parce que seule la monnaie des doublons change")]
+        public void Upgrade_KeepsCreditsCost()
+        {
+            var a = SameStars()[0];
+            CollectionOps.SetCardLevel(_app.Session, Wall, 3);
+            CollectionOps.AddCard(_app.Session, Wall);
+            CollectionOps.AddCard(_app.Session, a, 4);
+            int credits = _app.Session.Wallet.Credits;
+            Assert.That(_app.Collection.UpgradeCard(Wall).IsSuccess);
+            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(credits - 600));
+        }
+
+        [Test, Description("Vérifie qu'une sauvegarde enregistrée avant l'économie des doublons se recharge avec ses niveaux et ses exemplaires — parce qu'aucune migration n'est prévue")]
+        public void ExistingSave_Reloads_AndKeepsItsLevels()
+        {
+            CollectionOps.AddCard(_app.Session, Wall, 3);
+            CollectionOps.SetCardLevel(_app.Session, Wall, 7);
+            var profile = _app.Session.ToProfile(System.DateTime.UtcNow);
+            var restored = new GameSession(TestContent.Build());
+            restored.ApplyProfile(UnityEngine.JsonUtility.FromJson<N29.HeroesDawn.Application.Ports.ProfileData>(UnityEngine.JsonUtility.ToJson(profile)));
+            Assert.That(CollectionOps.CardLevel(restored, Wall), Is.EqualTo(7));
+            Assert.That(CollectionOps.OwnedCards(restored, Wall), Is.EqualTo(3));
         }
 
         // ------------------------------------------------------------------ Paliers (lot C1)
