@@ -71,13 +71,13 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(back[0].Skill.Effects[0].When!.Status, Is.EqualTo(StatusType.Burn));
         }
 
-        [Test, Description("Vérifie que le fichier cards.json livré commence par les 48 cartes du code, à l identique et dans le même ordre, suivies des 12 cartes de la première vague — parce que la source des cartes change sans changer les cartes d avant P1")]
+        [Test, Description("Vérifie que le fichier cards.json livré compte 250 cartes et commence par les 48 cartes du code, à l identique et dans le même ordre (suivies des 12 cartes de la première vague puis des 190 autres) — parce que la source des cartes change sans changer les cartes d avant P1")]
         public void Cards_FromTheJsonFile_EqualTheCodeCards()
         {
             var asset = UnityEngine.Resources.Load<UnityEngine.TextAsset>("Content/cards");
             Assert.That(asset, Is.Not.Null, "Resources/Content/cards.json est absent : lancer le menu d'export");
             var fromFile = CardDataLibrary.FromJson(asset.text);
-            Assert.That(fromFile.Count, Is.EqualTo(60));
+            Assert.That(fromFile.Count, Is.EqualTo(250));
             AssertSameCards(PrototypeCollection.LegacyCards(), fromFile.Take(48).ToList());
         }
 

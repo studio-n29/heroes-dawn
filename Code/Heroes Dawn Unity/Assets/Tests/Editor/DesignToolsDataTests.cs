@@ -203,11 +203,20 @@ namespace N29.HeroesDawn.Tests.Editor
             ["ballistic_fabric"] = ItemType.Armor, ["recovery_gel"] = ItemType.Tool, ["energy_cell"] = ItemType.Tool, ["neural_chip"] = ItemType.Implant,
         };
 
-        [Test, Description("Vérifie que les cartes et les objets du code ont la nature et le type fixés par la spec du lot B — parce que ces catégories pilotent les filtres et la règle d'équipement")]
+        /// <summary>
+        /// Natures saisies des cartes hors de la table <see cref="SpecNatures"/> (les 190 cartes mises en jeu après la première vague) qui diffèrent de la
+        /// nature déduite de leur effet de base : même liste que <c>CollectionRulesTests.ExplicitNatures</c> (Sprint incandescent : soutien malgré un premier effet de bouclier).
+        /// </summary>
+        static readonly Dictionary<string, CardNature> LaterExplicitNatures = new Dictionary<string, CardNature> { ["card_blazing_sprint"] = CardNature.Support };
+
+        [Test, Description("Vérifie que les cartes et les objets du code ont la nature et le type fixés par la spec du lot B (60 premières cartes), que les 190 autres ont la nature déduite de leur effet de base sauf liste explicite, et que le catalogue en compte 250 — parce que ces catégories pilotent les filtres et la règle d'équipement")]
         public void CodeCatalog_HasTheSpecCategories()
         {
             var col = PrototypeCollection.Build();
-            Assert.That(col.Cards.ToDictionary(c => c.Id.Value, c => c.Nature), Is.EquivalentTo(SpecNatures));
+            Assert.That(col.Cards.Count, Is.EqualTo(250));
+            Assert.That(col.Cards.Where(c => SpecNatures.ContainsKey(c.Id.Value)).ToDictionary(c => c.Id.Value, c => c.Nature), Is.EquivalentTo(SpecNatures));
+            foreach (var c in col.Cards.Where(c => !SpecNatures.ContainsKey(c.Id.Value)))
+                Assert.That(c.Nature, Is.EqualTo(LaterExplicitNatures.TryGetValue(c.Id.Value, out var n) ? n : CardNatures.Of(c.Skill)), c.Id.Value);
             Assert.That(col.Items.ToDictionary(i => i.Id.Value, i => i.Type), Is.EquivalentTo(SpecTypes));
         }
 

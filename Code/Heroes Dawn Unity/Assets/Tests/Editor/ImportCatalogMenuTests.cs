@@ -132,11 +132,11 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(ex2!.Message, Does.Contain("8"), "il manque 8 cartes du code");
         }
 
-        [Test, Description("Vérifie que mise-en-jeu.txt liste les 12 cartes de la vague 1, que toutes se convertissent depuis les fiches et que cards.json les contient déjà à l'identique — parce que le fichier de données doit être le résultat exact de l'outil")]
+        [Test, Description("Vérifie que mise-en-jeu.txt liste les 250 cartes du catalogue, que toutes se convertissent depuis les fiches et que cards.json les contient déjà à l'identique — parce que le fichier de données doit être le résultat exact de l'outil")]
         public void ShippedList_IsAlreadyAppliedToCardsJson()
         {
             var ids = ImportCatalogMenu.ParseIds(File.ReadAllText(Path.Combine(CatalogueFolder, "mise-en-jeu.txt")));
-            Assert.That(ids.Count, Is.EqualTo(12));
+            Assert.That(ids.Count, Is.EqualTo(250));
             var rows = Directory.GetFiles(CatalogueFolder, "cartes-*.md").SelectMany(f => CatalogImporter.ReadTable(File.ReadAllText(f))).ToList();
             var asset = UnityEngine.Resources.Load<UnityEngine.TextAsset>("Content/cards");
             Assert.That(asset, Is.Not.Null);

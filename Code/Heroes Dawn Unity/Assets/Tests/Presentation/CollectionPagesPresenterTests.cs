@@ -216,7 +216,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         static int Opt(ItemType t) => 1 + (int)t;
         string[] Titles() => _view.Rows.Select(r => r.Title).ToArray();
 
-        [Test, Description("Vérifie que les filtres du grimoire se combinent (Matière × Défensive : seul le Mur de verre) et que la barre montre l'option choisie de chaque groupe — parce que le joueur doit trouver vite les cartes d'un type de deck")]
+        [Test, Description("Vérifie que les filtres du grimoire se combinent (Matière × Défensive : les 19 cartes défensives de la famille Matière parmi les 250) et que la barre montre l'option choisie de chaque groupe — parce que le joueur doit trouver vite les cartes d'un type de deck")]
         public void Grimoire_FiltersByFamilyAndNature()
         {
             var p = Grimoire();
@@ -225,7 +225,12 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Filters[1].Labels.Length, Is.EqualTo(5));
             _view.ClickFilter(0, Opt(Family.Matter));
             _view.ClickFilter(1, Opt(CardNature.Defensive));
-            Assert.That(Titles(), Is.EquivalentTo(new[] { "Mur de verre", "Rempart de béton", "Armure de rivets", "Prisme réfléchissant" }));
+            Assert.That(Titles(), Is.EquivalentTo(new[]
+            {
+                "Mur de verre", "Rempart de béton", "Armure de rivets", "Prisme réfléchissant", "Citadelle", "Cotte de braises", "Mur du souvenir", "Barricade roulante",
+                "Tissu cicatriciel", "Cocon", "Fortin", "Écorce vive", "Plaque réactive", "Front commun", "Voile de cendres", "Barrière Nadar", "Plastron d'urgence",
+                "Gants ignifugés", "Gilet lourd",
+            }));
             Assert.That(_view.Filters[0].Selected, Is.EqualTo(Opt(Family.Matter)));
             Assert.That(_view.Filters[1].Selected, Is.EqualTo(Opt(CardNature.Defensive)));
             _view.ClickFilter(0, 0);
@@ -292,7 +297,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         }
         // ------------------------------------------------------------------ Paliers (lot C1)
 
-        [Test, Description("Vérifie que chacune des 48 cartes a un nom français (et pas son identifiant) — parce que le grimoire et les boosters affichent ce nom")]
+        [Test, Description("Vérifie que chacune des 250 cartes a un nom français (et pas son identifiant) — parce que le grimoire et les boosters affichent ce nom")]
         public void EveryCard_HasAName()
         {
             foreach (var c in N29.HeroesDawn.Content.Prototype.PrototypeCollection.Build().Cards)

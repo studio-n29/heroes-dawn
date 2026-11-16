@@ -42,8 +42,17 @@ namespace N29.HeroesDawn.Tests.Domain
             return rows;
         }
 
-        /// <summary>Les 48 cartes d'avant P1 (le catalogue chargé contient aussi les 12 de la première vague, qui ont leurs propres tests).</summary>
-        static System.Collections.Generic.IReadOnlyList<SkillCardDef> Existing => Defs.Cards.Where(c => !FirstWaveTests.WaveCardIds.Contains(c.Id.Value)).ToList();
+        /// <summary>Les 48 cartes d'avant P1, en tête du catalogue chargé (qui contient aussi les 12 de la première vague et les 190 autres, qui ont leurs propres tests).</summary>
+        static System.Collections.Generic.IReadOnlyList<SkillCardDef> Existing => Defs.Cards.Take(48).ToList();
+
+        [Test, Description("Vérifie que les 250 cartes se répartissent par archétype principal (le premier de la fiche) en 35 Brûlure, 35 Entrave, 35 Traque, 35 Tempo, 35 Rempart, 35 Renouveau et 40 neutres sans archétype — parce que c est la répartition du catalogue de 250 cartes")]
+        public void PrimaryArchetypeCounts_Are35Each_Plus40Neutral()
+        {
+            Assert.That(Defs.Cards.Count, Is.EqualTo(250));
+            int Count(Archetype a) => Defs.Cards.Count(c => c.Archetypes.Count > 0 && c.Archetypes[0] == a);
+            foreach (var a in ArchetypeNames.Values) Assert.That(Count(a), Is.EqualTo(35), a.ToString());
+            Assert.That(Defs.Cards.Count(c => c.Archetypes.Count == 0), Is.EqualTo(40), "neutres");
+        }
 
         [Test, Description("Vérifie que chacune des 48 cartes d avant P1 a exactement un archétype — parce que la fiche du catalogue en donne un seul à chaque carte existante")]
         public void EveryExistingCard_HasOneArchetype()

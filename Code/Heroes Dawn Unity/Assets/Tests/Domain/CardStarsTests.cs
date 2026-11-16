@@ -13,11 +13,11 @@ namespace N29.HeroesDawn.Tests.Domain
     {
         static readonly CollectionDef Defs = PrototypeCollection.Build();
 
-        [Test, Description("Vérifie que les 60 cartes se répartissent en 24 ★1, 12 ★2, 12 ★3, 8 ★4 et 4 ★5 — parce que les 12 cartes ★1 de la première vague de P1 s ajoutent à la répartition validée de la spec du bloc A (12/12/12/8/4)")]
-        public void La_repartition_des_60_cartes_est_24_12_12_8_4()
+        [Test, Description("Vérifie que les 250 cartes se répartissent en 90 ★1, 70 ★2, 50 ★3, 28 ★4 et 12 ★5 — parce que c est la répartition du catalogue de 250 cartes (spec du catalogue)")]
+        public void La_repartition_des_250_cartes_est_90_70_50_28_12()
         {
-            Assert.That(Defs.Cards.Count, Is.EqualTo(60));
-            Assert.That(Enumerable.Range(1, 5).Select(s => Defs.Cards.Count(c => c.Stars == s)), Is.EqualTo(new[] { 24, 12, 12, 8, 4 }));
+            Assert.That(Defs.Cards.Count, Is.EqualTo(250));
+            Assert.That(Enumerable.Range(1, 5).Select(s => Defs.Cards.Count(c => c.Stars == s)), Is.EqualTo(new[] { 90, 70, 50, 28, 12 }));
         }
 
         [Test, Description("Vérifie que des cartes témoins ont l'étoile de la table (card_monolith 5, card_inferno 4, card_shackle 3, card_borrowed_mask 2, card_ember 2, card_concrete_rampart 1) — parce que la table redistribue les anciennes raretés")]

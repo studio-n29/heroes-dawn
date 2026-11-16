@@ -238,43 +238,33 @@ namespace N29.HeroesDawn.Tests.Domain
             }
         }
 
-        // ------------------------------------------------------------------ Catalogue de 60 cartes (lot C2 + première vague de P1)
+        // ------------------------------------------------------------------ Catalogue de 250 cartes (48 d'origine, première vague de P1, puis les 190 autres)
 
-        /// <summary>
-        /// Effectifs de la première vague de P1 (12 cartes ★1, fiches cartes-*.md) par famille puis par nature, à ajouter aux 12 cartes par famille et
-        /// 4 par nature des 48 cartes d'origine. Matière : Jet de cendres, Poids mort (offensives), Compresse tiède, Baume d'urgence (soutien) ;
-        /// Élémentaire : Secousse statique (offensive), Sillage (soutien) ; Physique/Bio : Fer chauffé, Coup d'écu (offensives), Départ lancé (soutien) ;
-        /// Perception : Œil de lynx, Cible désignée (offensives), Leurre (défensive).
-        /// </summary>
-        static readonly System.Collections.Generic.Dictionary<Family, (int Defensive, int Support, int OffensiveOrControl)> WaveByFamily
-            = new System.Collections.Generic.Dictionary<Family, (int, int, int)>
+        [Test, Description("Vérifie que le catalogue compte 250 cartes aux identifiants uniques et que chaque famille en a 62 à 3 près — parce que le catalogue de 250 cartes répartit les familles à peu près également (spec du catalogue)")]
+        public void Catalog_Has250Cards_About62PerFamily()
         {
-            [Family.Matter] = (0, 2, 2), [Family.Elemental] = (0, 1, 1), [Family.PhysicalBio] = (0, 1, 2), [Family.Perception] = (1, 0, 2),
-        };
-
-        [Test, Description("Vérifie que le catalogue compte 60 cartes aux identifiants uniques : les 12 par famille et 4 par nature des 48 cartes d origine plus les effectifs des 12 fiches de la première vague — parce que la vague ajoute des cartes sans toucher à la répartition d origine")]
-        public void Catalog_Has60Cards_TheOriginal12PerFamily_PlusTheWave()
-        {
-            Assert.That(Catalog.Length, Is.EqualTo(60));
-            Assert.That(Catalog.Select(c => c.Id.Value).Distinct().Count(), Is.EqualTo(60));
-            Assert.That(WaveByFamily.Values.Sum(v => v.Defensive + v.Support + v.OffensiveOrControl), Is.EqualTo(12), "la table des fiches compte 12 cartes");
+            Assert.That(Catalog.Length, Is.EqualTo(250));
+            Assert.That(Catalog.Select(c => c.Id.Value).Distinct().Count(), Is.EqualTo(250));
             foreach (Family f in System.Enum.GetValues(typeof(Family)))
-            {
-                var wave = WaveByFamily[f];
-                var fam = Catalog.Where(c => c.Family == f).ToList();
-                Assert.That(fam.Count, Is.EqualTo(12 + wave.Defensive + wave.Support + wave.OffensiveOrControl), f.ToString());
-                Assert.That(fam.Count(c => c.Nature == CardNature.Defensive), Is.EqualTo(4 + wave.Defensive), f + " Defensive");
-                Assert.That(fam.Count(c => c.Nature == CardNature.Support), Is.EqualTo(4 + wave.Support), f + " Support");
-                Assert.That(fam.Count(c => c.Nature == CardNature.Offensive || c.Nature == CardNature.Control), Is.EqualTo(4 + wave.OffensiveOrControl), f + " Offensive + Control");
-            }
+                Assert.That(Catalog.Count(c => c.Family == f), Is.InRange(62 - 3, 62 + 3), f.ToString());
         }
 
-        [Test, Description("Vérifie que la nature de chaque carte est celle déduite de son effet de base, sauf 4 cartes à effet principal de dégâts passées explicitement en Contrôle — parce que leur intention de jeu est le contrôle (spec du bloc A)")]
+        /// <summary>
+        /// Cartes dont la nature saisie diffère de la nature déduite de leur effet de base, avec la raison : les 4 cartes à effet principal de dégâts passées
+        /// en Contrôle (spec du bloc A), et Sprint incandescent, dont l'effet de base est un petit bouclier (déduit : défensive) mais dont l'intention de jeu est
+        /// l'accélération (Haste) : soutien (fiche cartes-brulure.md).
+        /// </summary>
+        internal static readonly System.Collections.Generic.Dictionary<string, CardNature> ExplicitNatures = new System.Collections.Generic.Dictionary<string, CardNature>
+        {
+            ["card_prism_burst"] = CardNature.Control, ["card_mark"] = CardNature.Control, ["card_guard_break"] = CardNature.Control, ["card_ram_strike"] = CardNature.Control,
+            ["card_blazing_sprint"] = CardNature.Support,
+        };
+
+        [Test, Description("Vérifie que la nature de chaque carte est celle déduite de son effet de base, sauf les cartes de la liste explicite (4 cartes à dégâts passées en Contrôle, 1 carte d accélération à petit bouclier passée en Soutien) — parce que leur intention de jeu prime sur leur premier effet")]
         public void EveryCard_NatureEqualsItsDeduction()
         {
-            var explicitControl = new[] { "card_prism_burst", "card_mark", "card_guard_break", "card_ram_strike" };
-            foreach (var c in Catalog.Where(c => !explicitControl.Contains(c.Id.Value))) Assert.That(c.Nature, Is.EqualTo(CardNatures.Of(c.Skill)), c.Id.Value);
-            foreach (var c in Catalog.Where(c => explicitControl.Contains(c.Id.Value))) Assert.That(c.Nature, Is.EqualTo(CardNature.Control), c.Id.Value);
+            foreach (var c in Catalog.Where(c => !ExplicitNatures.ContainsKey(c.Id.Value))) Assert.That(c.Nature, Is.EqualTo(CardNatures.Of(c.Skill)), c.Id.Value);
+            foreach (var c in Catalog.Where(c => ExplicitNatures.ContainsKey(c.Id.Value))) Assert.That(c.Nature, Is.EqualTo(ExplicitNatures[c.Id.Value]), c.Id.Value);
         }
 
         [Test, Description("Vérifie qu'aucune carte lancée sur soi ne compte sur un élan ou un gain de jauge — parce que l'élan ignore le lanceur et l'effet serait perdu")]

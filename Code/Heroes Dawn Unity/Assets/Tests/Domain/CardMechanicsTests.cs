@@ -212,7 +212,7 @@ namespace N29.HeroesDawn.Tests.Domain
             }
         }
 
-        [Test, Description("Vérifie que chacune des 48 cartes, équipée en carte 1 (3e place) au niveau 10 par un agent de sa famille, est bien lancée par l'IA en mode Auto, sans erreur — parce que chaque liste d'effets doit réellement tourner dans le moteur")]
+        [Test, Description("Vérifie que chacune des 250 cartes, équipée en carte 1 (3e place) au niveau 10 par un agent de sa famille, est bien lancée par l'IA en mode Auto, sans erreur — parce que chaque liste d'effets doit réellement tourner dans le moteur")]
         public void AutoMode_CastsEveryCard()
         {
             var c = TestContent.Build();
