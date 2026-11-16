@@ -36,6 +36,11 @@ namespace N29.HeroesDawn.Domain.Combat
                 h.Add(u.BurnRemainder);
                 h.Add(u.PhaseReached);
                 foreach (var s in u.Statuses) { h.Add((int)s.Type); h.Add(s.TurnsLeft); h.Add(s.Value); }
+                if (_reactionsArmed) // seulement si une réaction a été armée : l'empreinte des combats sans réaction ne change pas
+                {
+                    h.Add(u.Reactions.Count);
+                    foreach (var r in u.Reactions) { h.Add(r.Order); h.Add(r.TurnsLeft); }
+                }
             }
             h.Add(Victory == true ? 1 : Victory == false ? 2 : 0);
             return h.Value;

@@ -12,14 +12,14 @@ namespace N29.HeroesDawn.Definitions
         EnemyDefeated,
         /// <summary>Un autre allié du porteur est vaincu.</summary>
         AllyDefeated,
-        /// <summary>Le porteur perd des PV (coup, brûlure).</summary>
+        /// <summary>Le porteur perd des PV sous le coup d'une unité (ennemi ou allié) ; jamais par la brûlure, ni quand le bouclier absorbe tout.</summary>
         CarrierHit,
         /// <summary>Le porteur inflige un coup critique.</summary>
         CarrierCrit,
     }
 
     /// <summary>
-    /// Réaction (P2) installée sur le lanceur par un effet <see cref="EffectType.ArmReaction"/> : pendant <see cref="Turns"/> tours du porteur,
+    /// Réaction (P2) installée sur le lanceur par un effet <see cref="EffectType.ArmReaction"/> (une fois par lancer, après les effets sur les cibles) : pendant <see cref="Turns"/> tours du porteur,
     /// chaque <see cref="Trigger"/> applique <see cref="Effect"/> (valeur fixe, jamais remise à l'échelle par niveau ni bonus).
     /// Cible : l'unité concernée par l'événement si <see cref="OnTriggerUnit"/> (receveur du statut, unité vaincue, attaquant du porteur, ennemi touché par son critique) ;
     /// sinon la règle <see cref="Target"/> + <see cref="Pick"/> d'une compétence lancée par le porteur (<see cref="TargetRule.Self"/> : le porteur).

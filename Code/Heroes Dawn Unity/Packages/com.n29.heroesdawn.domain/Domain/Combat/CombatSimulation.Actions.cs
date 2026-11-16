@@ -148,7 +148,6 @@ namespace N29.HeroesDawn.Domain.Combat
             // Exécution : bonus lu avant la boucle, pour qu'il compte où qu'il soit placé dans la liste.
             int executeBonus = 0;
             foreach (var fx in effects) if (fx.Type == EffectType.Execute) executeBonus += fx.Value;
-            List<EffectDef>? armed = null; // réactions déjà armées par cet appel (une compétence de zone n'arme qu'une fois)
             foreach (var tid in targets)
             {
                 var t = _units[tid];
@@ -156,6 +155,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 int dealt = 0; // dégâts infligés à cette cible par la compétence (après bouclier), pour le vol de vie
                 foreach (var fx in effects)
                 {
+                    if (fx.Type == EffectType.ArmReaction) continue; // armée une seule fois, après les cibles (ArmReactions)
                     if (missed) break;
                     // Une cible vaincue ne reçoit plus d'effet (sans tirage au sort) ; le vol de vie et le rebond comptent encore le coup qui l'a
                     // vaincue, même placés après d'autres effets (les paliers s'ajoutent après les effets de base).
@@ -216,14 +216,10 @@ namespace N29.HeroesDawn.Domain.Combat
                             if (t.PlannedSlot >= 0 && t.Point < PlanStartPoint(t)) CancelPlan(t, InterruptReason.PushBack, output);
 
                             break;
-                        case EffectType.ArmReaction:
-                            if (fx.Reaction == null || !actor.IsAlive || (armed != null && armed.Contains(fx))) break;
-                            (armed ??= new List<EffectDef>()).Add(fx);
-                            ArmReaction(actor, fx.Reaction, output);
-                            break;
                     }
                 }
             }
+            ArmReactions(actor, effects, output);
         }
 
         /// <summary>

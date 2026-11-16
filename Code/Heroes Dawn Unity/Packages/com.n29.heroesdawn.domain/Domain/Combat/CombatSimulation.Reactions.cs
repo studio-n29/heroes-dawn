@@ -23,6 +23,10 @@ namespace N29.HeroesDawn.Domain.Combat
     /// dans l'ordre ; pour chacun, les réactions des porteurs vivants partent par numéro d'unité croissant puis par ordre d'armement, au plus une fois
     /// par événement. Les événements produits par les réactions ne sont jamais relus (file, pas de récursion). Sans aucune réaction armée dans le
     /// combat, rien n'est fait : ni travail, ni tirage, ni événement.
+    /// Précisions : « allié » compte le porteur (un allié reçoit un statut) ; une réaction n'émet aucun événement en expirant (lire <see cref="CombatUnit.Reactions"/>) ;
+    /// <see cref="ReactionArmedEvent"/> donne le porteur et le déclencheur, pas la définition ; les vagues ne sont pas séparées : une réaction armée
+    /// reste armée à la vague suivante, et une réaction « un ennemi est vaincu → … sur ZE » qui part sur le dernier ennemi d'une vague frappe la vague
+    /// suivante, déjà apparue quand les réactions du pas sont traitées.
     /// </summary>
     public sealed partial class CombatSimulation
     {
@@ -31,6 +35,23 @@ namespace N29.HeroesDawn.Domain.Combat
         int _reactionOrder;
         /// <summary>Auteur de chaque coup du pas en cours (tenu seulement quand une réaction est armée), vidé après le traitement.</summary>
         readonly Dictionary<CombatEvent, int> _hitBy = new Dictionary<CombatEvent, int>();
+
+        /// <summary>
+        /// Effets <see cref="EffectType.ArmReaction"/> d'un lancer : traités une seule fois, APRÈS la boucle des cibles, sur le lanceur, quels que soient
+        /// le nombre de cibles, leur mort ou un raté. La réaction n'entend donc pas les effets de la carte qui l'arme (elle écoute à partir de son armement).
+        /// Chance : un seul tirage, et seulement si elle est sous 100 % (<c>Chance(100)</c> ne tire pas). Condition : évaluée sur le lanceur (lanceur = cible).
+        /// Sans ArmReaction dans la liste : aucun travail ni tirage.
+        /// </summary>
+        void ArmReactions(CombatUnit actor, IReadOnlyList<EffectDef> effects, List<CombatEvent> output)
+        {
+            foreach (var fx in effects)
+            {
+                if (fx.Type != EffectType.ArmReaction || fx.Reaction == null || !actor.IsAlive) continue;
+                if (fx.When != null && !Holds(fx.When, actor, actor)) continue;
+                if (!_rng.Chance(fx.ChancePercent)) continue;
+                ArmReaction(actor, fx.Reaction, output);
+            }
+        }
 
         /// <summary>Arme (ou réarme : durée remise à Turns, même rang, sans doublon) la réaction sur le porteur.</summary>
         void ArmReaction(CombatUnit carrier, ReactionDef def, List<CombatEvent> output)
@@ -109,8 +130,9 @@ namespace N29.HeroesDawn.Domain.Combat
                 }
                 case ReactionTrigger.CarrierHit:
                 {
-                    if (!(ev is DamageEvent h) || h.Target != carrier.Id) return false;
-                    if (_hitBy.TryGetValue(h, out int attacker)) unit = attacker; // brûlure : auteur inconnu
+                    // Seulement un coup dont l'auteur est connu (ennemi ou allié) : jamais la brûlure, qui mord à chaque point de frise.
+                    if (!(ev is DamageEvent h) || h.Target != carrier.Id || !_hitBy.TryGetValue(h, out int attacker)) return false;
+                    unit = attacker;
                     return true;
                 }
                 case ReactionTrigger.CarrierCrit:

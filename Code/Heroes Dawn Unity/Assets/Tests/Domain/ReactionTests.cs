@@ -96,6 +96,50 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(sim.Unit(0).Reactions.Select(x => x.Def), Is.EqualTo(new[] { r, other }), "une autre définition s'ajoute après");
         }
 
+        static ReactionDef Listen() => React(ReactionTrigger.EnemyReceivesStatus, Fx(EffectType.Heal, 10), StatusType.Burn);
+
+        [Test, Description("Vérifie qu'une carte qui achève sa cible arme quand même sa réaction — parce que la réaction est armée sur le porteur quelle que soit la cible")]
+        public void Arm_HappensEvenWhenTheCardKillsItsTarget()
+        {
+            var sim = Fight(new[] { new[] { Card("card_r0", TargetRule.SingleEnemy, Fx(EffectType.Damage, 100), Arm(Listen())) } }, Two);
+            sim.Unit(1).Hp = 1;
+            var events = Cast(sim, 0, target: 1);
+            Assert.That(events.OfType<UnitDefeatedEvent>().Any(u => u.Unit == 1), Is.True, "la cible est vaincue");
+            Assert.That(sim.Unit(0).Reactions.Count, Is.EqualTo(1), "la réaction est armée");
+        }
+
+        [Test, Description("Vérifie qu'une carte dont le coup est raté (Esquive) arme quand même sa réaction — parce qu'un raté n'arrête que les effets sur la cible")]
+        public void Arm_HappensEvenWhenTheCardMisses()
+        {
+            var sim = Fight(new[] { new[] { Card("card_r0", TargetRule.SingleEnemy, Fx(EffectType.Damage, 100), Arm(Listen())) } }, One);
+            sim.Unit(1).Statuses.Add(new StatusInstance(StatusType.Evade, 2, 0));
+            var events = Cast(sim, 0, target: 1);
+            Assert.That(events.OfType<MissEvent>().Any(m => m.Target == 1), Is.True, "le coup est raté");
+            Assert.That(sim.Unit(0).Reactions.Count, Is.EqualTo(1), "la réaction est armée");
+        }
+
+        [Test, Description("Vérifie qu'une carte de zone sur trois ennemis n'arme sa réaction qu'une fois (un seul événement, une seule durée) — parce que l'armement se fait une fois par lancer, pas par cible")]
+        public void Arm_HappensOnceForAnAreaCard()
+        {
+            var sim = Fight(new[] { new[] { Card("card_r0", TargetRule.AllEnemies, Fx(EffectType.Damage, 10), Arm(Listen())) } }, Three);
+            var events = Cast(sim, 0);
+            Assert.That(events.OfType<DamageEvent>().Count(), Is.EqualTo(3), "trois cibles touchées");
+            Assert.That(events.OfType<ReactionArmedEvent>().Count(), Is.EqualTo(1), "un seul armement");
+            Assert.That(sim.Unit(0).Reactions.Single().TurnsLeft, Is.EqualTo(3), "une seule durée");
+        }
+
+        [Test, Description("Vérifie qu'une réaction n'entend pas les effets de la carte qui l'arme, que l'armement soit placé avant ou après la Brûlure, mais entend le lancer suivant — parce que l'armement a lieu après les effets sur les cibles")]
+        public void Arm_DoesNotListenToItsOwnCardsEffects()
+        {
+            var burn = Fx(EffectType.ApplyStatus, 0, StatusType.Burn, 2);
+            foreach (var fx in new[] { new[] { Arm(Listen()), burn }, new[] { burn, Arm(Listen()) } })
+            {
+                var sim = Fight(new[] { new[] { Card("card_r0", TargetRule.SingleEnemy, fx) } }, One);
+                Assert.That(Triggered(Cast(sim, 0, target: 1)), Is.Empty, "pas sur sa propre carte");
+                Assert.That(Triggered(Cast(sim, 0, target: 1)).Count, Is.EqualTo(1), "mais au lancer suivant");
+            }
+        }
+
         // ------------------------------------------------------------------ Déclencheurs
 
         [Test, Description("Vérifie qu'« un ennemi reçoit Brûlure » ne se déclenche que pour la Brûlure posée sur un ennemi (ni le Gel, ni une Brûlure sur un allié), et frappe l'unité déclenchante — parce que le déclencheur nomme un statut et un camp")]
@@ -182,6 +226,22 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(Triggered(Cast(sim, 1, target: 1)), Is.Empty, "un autre allié touché ne compte pas");
         }
 
+        [Test, Description("Vérifie que la brûlure du porteur ne déclenche pas « le porteur est touché », alors qu'elle lui retire des PV à chaque point de frise — parce que seul un coup d'une unité compte, sinon la réaction partirait une dizaine de fois par tour")]
+        public void CarrierHit_IgnoresBurnDamage()
+        {
+            var r = React(ReactionTrigger.CarrierHit, Fx(EffectType.Heal, 10));
+            var sim = Fight(new[] { new[] { Card("card_r0", TargetRule.Self, Arm(r)) } }, One);
+            Cast(sim, 0);
+            sim.Unit(0).Point = 0; // frise de 10 points ; l'ennemi un point devant : pas de rencontre, personne prêt avant 8 pas
+            sim.Unit(1).Point = 1;
+            sim.Unit(0).Statuses.Add(new StatusInstance(StatusType.Burn, 5, 0));
+            var events = new List<CombatEvent>();
+            for (int i = 0; i < 5; i++) events.AddRange(sim.Step(1));
+            Assert.That(events.OfType<SkillUsedEvent>(), Is.Empty, "personne n'agit");
+            Assert.That(events.OfType<DamageEvent>().Count(d => d.Target == 0), Is.GreaterThan(1), "la brûlure mord plusieurs fois");
+            Assert.That(Triggered(events), Is.Empty, "aucun déclenchement");
+        }
+
         [Test, Description("Vérifie que « le porteur inflige un critique » ne se déclenche que sur un critique du porteur (pas sur celui d'un allié), une fois par coup critique — parce que le déclencheur suit l'auteur du coup")]
         public void CarrierCrit_Triggers_OnTheCarriersCritical()
         {
@@ -202,9 +262,10 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(own.OfType<DamageEvent>().Single(d => d.Target == 2).Crit, Is.True, "critique du porteur");
             var t = Triggered(own).Single();
             Assert.That((t.Carrier, t.Trigger, t.TriggerUnit), Is.EqualTo((0, ReactionTrigger.CarrierCrit, 2)), "unité concernée : celle qui a subi le critique");
-            var plain = Cast(sim, 0, slot: 3, target: 3); // sans Marque : critique ou non selon le tirage
-            bool crit = plain.OfType<DamageEvent>().Where(d => d.Target == 3).Any(d => d.Crit);
-            Assert.That(Triggered(plain).Count, Is.EqualTo(crit ? 1 : 0), "déclenché seulement si le coup est critique");
+            sim.Unit(0).CritBonusPercent = -1000; // chance de critique nulle : aucun critique, sans tirage
+            var plain = Cast(sim, 0, slot: 3, target: 3);
+            Assert.That(plain.OfType<DamageEvent>().Single(d => d.Target == 3).Crit, Is.False, "coup du porteur non critique");
+            Assert.That(Triggered(plain), Is.Empty, "un coup non critique du porteur ne déclenche rien");
         }
 
         // ------------------------------------------------------------------ Valeur et cibles
@@ -227,7 +288,8 @@ namespace N29.HeroesDawn.Tests.Domain
             int ReactionDamage(int level, out int cardDamage)
             {
                 var sim = Fight(new[] { new[] { card } }, One, seed: 5, cardLevel: level);
-                var events = Cast(sim, 0, target: 1);
+                Cast(sim, 0, target: 1); // arme (la réaction n'entend pas sa propre carte)
+                var events = Cast(sim, 0, target: 1); // la Brûlure du second lancer la déclenche
                 var t = Triggered(events).Single();
                 var hits = events.OfType<DamageEvent>().Where(d => d.Target == 1).ToList();
                 cardDamage = hits.First().Amount;
@@ -451,6 +513,44 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(armed.Log.OfType<ReactionTriggeredEvent>().Any(), Is.False, "et ne se déclenche jamais");
             Assert.That(Trace(armed.Log), Is.EqualTo(Trace(plain.Log)), "mêmes événements");
             Assert.That(armed.RngProbeForTests(), Is.EqualTo(plain.RngProbeForTests()), "même empreinte du générateur");
+        }
+
+        [Test, Description("Vérifie qu'une réaction se déclenche aussi sur une commande appliquée par Submit(cmd, camp) en duel mené de l'extérieur — parce que ces commandes ne passent pas par Step")]
+        public void Reaction_Triggers_ThroughSubmitFromSide()
+        {
+            var r = React(ReactionTrigger.EnemyReceivesStatus, Fx(EffectType.ApplyStatus, 0, StatusType.Vulnerable, 2), StatusType.Burn, onTrigger: true);
+            var cards = new[] { Card("card_r0", TargetRule.Self, Arm(r)), Card("card_burn", TargetRule.SingleEnemy, Fx(EffectType.ApplyStatus, 0, StatusType.Burn, 2)) };
+            var c = TestContent.Build();
+            var col = c.Collection;
+            var catalog = c.WithCollection(new CollectionDef(col.Items, col.Cards.Concat(cards).ToList(), col.Boosters));
+            var mine = new[] { new AllyEntry(new MemberId("verre"), 5, 0, 0, null, cards.Select(k => (CardId?)k.Id).ToArray()) };
+            var theirs = new[] { new AllyEntry(new MemberId("ancre"), 5, 0) };
+            var sim = new CombatSimulation(catalog, new CombatSetup(3, CombatRank.Elite, mine, new EnemyEntry[0], false).WithOpponentTeam(theirs, SideControl.External));
+            foreach (var u in sim.Units) u.Point = 0;
+            var verre = sim.Unit(0);
+            verre.Point = verre.ActionPoint;
+            Assert.That(sim.Submit(CombatCommand.UseSkill(0, 2, -1), Side.Ally).OfType<ReactionArmedEvent>().Count(), Is.EqualTo(1), "armée par Submit");
+            verre.Point = verre.ActionPoint;
+            var events = sim.Submit(CombatCommand.UseSkill(0, 3, 1), Side.Ally);
+            var t = Triggered(events).Single();
+            Assert.That((t.Carrier, t.TriggerUnit), Is.EqualTo((0, 1)));
+            Assert.That(sim.Unit(1).Has(StatusType.Vulnerable), Is.True);
+            Assert.That(sim.Log.OfType<ReactionTriggeredEvent>().Count(), Is.EqualTo(1), "journalisé une fois");
+        }
+
+        [Test, Description("Vérifie que l'empreinte d'état tient compte des réactions armées (durée restante) — parce que le rejeu compare cette empreinte, et qu'elle ne change pas pour un combat sans réaction")]
+        public void StateHash_IncludesArmedReactions()
+        {
+            var r = React(ReactionTrigger.CarrierHit, Fx(EffectType.Heal, 10));
+            var armed = Fight(new[] { new[] { Card("card_r0", TargetRule.Self, Arm(r)) } }, One);
+            var plain = Fight(new[] { new[] { Card("card_r0", TargetRule.Self, Arm(r)) } }, One);
+            Assert.That(armed.StateHash(), Is.EqualTo(plain.StateHash()), "avant armement : même empreinte");
+            Cast(armed, 0);
+            ulong h3 = armed.StateHash();
+            armed.Unit(0).Reactions[0].TurnsLeft = 1;
+            Assert.That(armed.StateHash(), Is.Not.EqualTo(h3), "la durée restante compte");
+            armed.Unit(0).Reactions.Clear();
+            Assert.That(armed.StateHash(), Is.Not.EqualTo(h3), "la présence de la réaction compte");
         }
 
         [Test, Description("Vérifie qu'une réaction portée par une unité vaincue ne se déclenche pas — parce qu'un porteur hors de combat ne réagit plus")]
