@@ -22,6 +22,52 @@ $warns  = New-Object System.Collections.Generic.List[string]
 function Err($m) { $script:errors.Add($m) }
 function Warn($m) { $script:warns.Add($m) }
 
+# --- Grammaire P2/P3 : expressions régulières strictes (réactions, Consomme, Propage, échelle d'archétype)
+$rxStatus = 'Burn|Freeze|Shock|Corrosion|Blind|Vulnerable|Bind|Mark|Taunt|Shield|Regen|Haste|Evade|Anchor'
+$rxEvent  = "un ennemi reçoit ($rxStatus)|un allié reçoit ($rxStatus)|un ennemi est vaincu|un allié est vaincu|le porteur est touché|le porteur inflige un critique"
+$rxEffect = "Dmg \d+|Heal \d+|Shield \d+|St ($rxStatus) \d+t( \(\d+ ?%\))?|Push \d+|Adv \d+|Gauge [+-]\d+|Purge \d+"
+$rxTarget = 'Soi|ZE|ZA|1E:aléatoire|1E:faible|1A:prochain|1A:faible|déclencheur'
+$rxReaction = "^\[Réaction [1-5]t : quand ($rxEvent) → ($rxEffect)( sur ($rxTarget))?\]$"
+$rxArchScale = "^\[\+\d+ par carte (Brûlure|Entrave|Traque|Tempo|Rempart|Renouveau) équipée dans l'escouade \(max (10|[1-9])\)\]$"
+$rxConsume = "^Consomme ($rxStatus) : (Dmg|Heal) \d+ par tour restant \(max (10|[1-9])\)$"
+$rxSpread  = "^Propage ($rxStatus)$"
+function Test-P2P3Cell($cell, $isP23) {
+  $msgs = New-Object System.Collections.Generic.List[string]
+  $brackets = [regex]::Matches($cell, '\[[^\]]*\]')
+  foreach ($b in $brackets) {
+    $t = $b.Value
+    if ($t -match 'Réaction|quand|→') {
+      if (-not $isP23) { $msgs.Add("réaction dans une fiche P1 : $t") }
+      elseif ($t -cnotmatch $rxReaction) { $msgs.Add("réaction hors grammaire : $t") }
+    }
+    elseif ($t -match 'par carte') {
+      if (-not $isP23) { $msgs.Add("échelle d'archétype dans une fiche P1 : $t") }
+      elseif ($t -cnotmatch $rxArchScale) { $msgs.Add("échelle d'archétype hors grammaire : $t") }
+    }
+    elseif ($t -match 'Consomme|Propage') { $msgs.Add("Consomme/Propage ne peut pas être entre crochets : $t") }
+  }
+  $rest = [regex]::Replace($cell, '\[[^\]]*\]', '§')
+  foreach ($el in ($rest -split ',\s+|\s+;\s+' | ForEach-Object { $_.Trim() })) {
+    if ($el -match 'Consomme|Propage') {
+      $e2 = ($el -replace '\s*§', '').Trim()
+      if (-not $isP23) { $msgs.Add("Consomme/Propage dans une fiche P1 : $e2") }
+      elseif ($e2 -match '^Consomme') {
+        if ($e2 -cnotmatch $rxConsume) { $msgs.Add("Consomme hors grammaire : $e2") }
+        elseif ($e2 -match '^Consomme Mark' -and $e2 -notmatch '\(max 1\)$') { $msgs.Add("Consomme Mark exige (max 1) : $e2") }
+      }
+      elseif ($e2 -match '^Propage') { if ($e2 -cnotmatch $rxSpread) { $msgs.Add("Propage hors grammaire : $e2") } }
+      else { $msgs.Add("Consomme/Propage mal placé : $e2") }
+    }
+  }
+  if ($isP23) {
+    if ($cell -match '[’‘“”]') { $msgs.Add('apostrophe ou guillemet typographique (utiliser '')') }
+    if ($cell -match '\d t\b') { $msgs.Add('durée « N t » (écrire Nt)') }
+    if ($cell -match '\((ZA|ZE|Soi|1E|1A)') { $msgs.Add('cible entre parenthèses (écrire « sur <cible> »)') }
+    if ($cell -match 'début de tour') { $msgs.Add('événement « début de tour » hors des six formes') }
+  }
+  return $msgs
+}
+
 $all = @()
 foreach ($key in $sections.Keys) {
   $path = Join-Path $dir "$key.md"
@@ -81,6 +127,10 @@ foreach ($r in $all) {
   if ([string]::IsNullOrWhiteSpace($r.Base)) { Err "$w : base vide" }
   # Règles de contenu
   $cells = @($r.Base, $r.T3, $r.T6, $r.T10)
+  # Grammaire P2/P3 (voir docs/plans/2026-11-16-p2-p4-plan-complet.md) : erreur pour toute cellule hors grammaire
+  foreach ($pc in @(@('Base', $r.Base), @('Niv.3', $r.T3), @('Niv.6', $r.T6), @('Niv.10', $r.T10))) {
+    foreach ($m in (Test-P2P3Cell $pc[1] ($r.Phase -in 'P2','P3'))) { Err "$w : $($pc[0]) hors grammaire P2/P3 : $m ('$($pc[1])')" }
+  }
   if (& $isEnemy $r.Cible) {
     foreach ($cell in $cells) {
       $clean = $cell -replace '\[si [^:\]]*:', '['   # on retire la condition (avant « : »), pas l'effet
