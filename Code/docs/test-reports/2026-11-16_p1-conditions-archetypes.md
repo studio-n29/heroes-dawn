@@ -29,7 +29,7 @@ Ce sont les mêmes échecs qu'en P0, moins `QgPagePresenterTests` et `QuestLogFl
 
 ## Garde-fous
 - `combat-golden.txt` (478 lignes) : modifié une seule fois dans ce plan, par le commit `14cadfa2` (tâche 1, ré-enregistrement voulu au départ de P1). `git log b77b5ebd..HEAD -- combat-golden.txt` ne donne que ce commit ; `git diff --stat 14cadfa2 HEAD -- combat-golden.txt` est vide.
-- `combat-golden-p1.txt` (36 empreintes : 12 cartes x niveaux 1, 6, 10) : tel que commité en `e2c1c364`, aucune modification dans l'arbre de travail.
+- `combat-golden-p1.txt` : 36 empreintes (12 cartes x niveaux 1, 6, 10) tel que commité en `e2c1c364` ; 48 depuis `d9abffc8` (+15 `wave2:`, -3 `wave:card_slipstream:*`, 2 lignes L10 modifiées : `card_designated_target` et `card_emergency_balm`). Voir « Revue finale et corrections ».
 - `CombatGoldenTests` (classe entière, arbre de l'utilisateur) : 6 réussis, 1 ignoré (`RecordGolden`), 0 échec, y compris `Golden_MatchesTheRecordedDigests`. Cet état dépend de l'arbre de travail : `combat-golden.txt` a été ré-enregistré en tâche 1 sur un arbre qui contenait déjà les modifications non commitées de l'utilisateur sur `BossPhaseChangedEvent` (propriété `Lines` à l'époque de P0, devenue la méthode `GetLines()` dans son arbre actuel). La classe est verte sur cet arbre, mais elle n'a pas été vérifiée sur une copie propre de la branche : si l'utilisateur annule ou modifie ce travail, les lignes `enemy:*` (boss à phases) peuvent redevenir rouges et la référence devra alors être ré-enregistrée sciemment.
 - `WaveGoldenTests` : `WaveGolden_MatchesTheRecordedDigests` et `EveryWaveScenario_CastsTheCardAtLeastOnce` réussis.
 - `RulesVersion.Value` : `"0.2.0"`.
@@ -37,8 +37,8 @@ Ce sont les mêmes échecs qu'en P0, moins `QgPagePresenterTests` et `QuestLogFl
 
 ## Limites du filet de sécurité
 - Pour `combat-golden.txt` (48 cartes d'avant P1) : graines 7 et 11, empreinte = journal d'événements complet, état final des unités (PV, énergie, jauge, statuts) et sonde du générateur. Pour la vague (`combat-golden-p1.txt`) : graine 7 seulement, un seul scénario par carte et par niveau (1, 6, 10) ; le scénario d'origine n'avait qu'une alliée (corrigé par la revue finale : voir plus bas).
-- Golden de Sillage (`card_slipstream`) identique aux trois niveaux (1, 6, 10) : le scénario n'a qu'un seul allié (« verre »), la compétence ciblant « allié prochain » hors lanceur n'a donc aucune cible et ne produit aucun effet.
-- L'IA Auto lance une compétence sans cible valide (énergie dépensée) : non couvert par un test de comportement.
+- Golden de Sillage (`card_slipstream`) : l'identité des trois niveaux relevée à `e2c1c364` (scénario à une seule alliée, sans cible) est levée depuis `d9abffc8` par les scénarios à deux alliés `wave2:` (empreintes différentes aux niveaux 1, 6, 10) ; il n'existe plus de scénario `wave:` pour Sillage.
+- L'IA Auto ne lance plus une compétence à ciblage fin sans candidat (`PickHasTarget` dans `CanUseSlot`, testé par `Ai_DoesNotCastAPickWithNoCandidate`). Reste vrai en manuel : une carte `1A:prochain` sans autre allié part encore à vide (énergie dépensée).
 - Les deux objets `SkillPower` donnent des empreintes différentes (test `SkillPowerItems_GiveDifferentDigests`) ; en revanche certaines empreintes d'ennemis sont identiques (équipe de niveau 40 qui les tue avant qu'ils n'agissent) ; 60 des 90 lignes `enemy:*` viennent de contenu de quartiers non commité à l'enregistrement.
 - Fusion (`Merge`) du catalogue : dépend du format canonique de `JsonUtility`.
 - Les mesures de l'équilibre en simulation (taux de victoire, etc.) ne sont pas dans le périmètre de P1.
@@ -90,6 +90,7 @@ Tests existants adaptés (la règle « les alliés prêts ne sont plus visés »
 - `card_designated_target` Niv.10 : `[si cible a Mark : St Vulnerable 2t]` devient `St Vulnerable 2t` (inconditionnel). Le coup de base consomme la Marque avant le palier ; la carte vise de toute façon le porteur de Marque.
 - Règle `1A:prochain` : le lanceur et les alliés déjà prêts sont écartés ; sans candidat, l'IA ne lance pas la compétence (en manuel, elle part encore sans cible et l'énergie est dépensée).
 - Sillage : son palier 10 (`Purge 1`) ne s'exprime que sur un allié affligé ; le scénario de référence donne donc Brûlure à l'allié de départ.
+- Texte du ciblage `pick.HighestHp` : « Cible : le plus en forme (PV en %) » (formule libre, à confirmer).
 
 ### À corriger avant mise en jeu (P4), relevé par les nouveaux avertissements de `verifier-catalogue.ps1`
 - Cartes Soi à `Adv` ou `Gauge +` inertes : les 7 déjà connues (`card_iron_vest`, `card_stand_firm`, `card_adrenal_shell`, `card_last_gasp`, `card_hardened_post`, `card_adrenaline_surge`, `card_pursuit`) plus `card_blazing_sprint` et `card_marked_bait` ; `card_thorn_hide` (Steal sans coup de base, hors réaction).
