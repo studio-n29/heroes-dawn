@@ -67,6 +67,12 @@ namespace N29.HeroesDawn.Authoring
             i++;
             var rows = new List<CatalogRow>();
             for (; i < lines.Length && IsTableLine(lines[i]); i++) rows.Add(ReadRow(SplitCells(lines[i])));
+            for (; i < lines.Length; i++)
+            {
+                if (!IsTableLine(lines[i])) continue;
+                var cells = SplitCells(lines[i]);
+                throw new CatalogImportException(cells.Count > 0 ? cells[0] : "", "ligne", "ligne de tableau après la fin du tableau du catalogue (un seul tableau par fichier, sans ligne vide ni texte au milieu)");
+            }
             return rows;
         }
 
@@ -515,6 +521,7 @@ namespace N29.HeroesDawn.Authoring
                 {
                     var bonus = s.Int("bonus");
                     s.End();
+                    if (bonus < 1) throw Fail("bonus d'au moins 1 attendu");
                     AddMod(Host(items, index), NewMod(bonus, cond));
                     return;
                 }
@@ -598,11 +605,15 @@ namespace N29.HeroesDawn.Authoring
                 return null;
             }
 
-            // Hôte d'un « +N » : l'effet qui précède s'il peut porter un bonus, sinon le premier effet porteur de la cellule.
+            // Hôte d'un « +N » : l'effet qui précède ; s'il ne peut pas porter de bonus, erreur ; sans effet précédent, le premier effet porteur de la cellule.
             EffectRecord Host(List<Item> items, int index)
             {
                 var preceding = Preceding(items, index);
-                if (preceding != null && ValueTypes.Contains(preceding.type)) return preceding;
+                if (preceding != null)
+                {
+                    if (ValueTypes.Contains(preceding.type)) return preceding;
+                    throw Fail($"« +N » placé après un effet {preceding.type} qui ne peut pas porter de bonus (écrire « <Type> +N » ou déplacer le crochet)");
+                }
                 var first = items.Select(i => i.Host).FirstOrDefault(h => h != null && ValueTypes.Contains(h.type));
                 if (first != null) return first;
                 throw Fail("aucun effet Dmg, Heal, Shield, Adv, Push ou Gauge dans la cellule pour porter le bonus");

@@ -127,11 +127,45 @@ namespace N29.HeroesDawn.Tests.Domain
             Rejects("Dmg 50, Heal 20, Dmg 60, Shield 10 [si cible a Burn : Dmg +5]");
         }
 
-        [Test, Description("Vérifie qu'un bonus « +N » placé après un effet de statut revient au premier effet porteur de la cellule — parce que la grammaire dit « sinon du premier Dmg/Heal/… de la cellule »")]
-        public void BareBonus_AfterAStatus_FallsBackToFirstValueEffect()
+        [Test, Description("Vérifie qu'un bonus « +N » placé après un effet qui ne peut pas le porter (St, Steal, Purge, Bounce, Exec) est rejeté — parce que « sinon » ne vaut que sans effet précédent et qu'un déplacement silencieux vers un autre effet serait une supposition")]
+        public void BareBonus_AfterAnEffectThatCannotCarryIt_IsRejected()
         {
-            var c = Convert("Dmg 100, St Burn 2t [si cible a Burn : +30]");
-            Assert.That(Fxs(c.skill.effects), Is.EqualTo("Damage:100:None:0:100:-:[TargetHasStatus/Burn/0|30|-] / ApplyStatus:0:Burn:2:100:-:[]"));
+            Rejects("Dmg 100, St Burn 2t [si cible a Burn : +30]");
+            Rejects("Dmg 110, Steal 15, [si lanceur < 50% PV : +25]");
+            Rejects("Dmg 110, Purge 1 [si cible a Burn : +25]");
+            Rejects("Dmg 110, Bounce 40 [+10 par ennemi vivant (max 2)]");
+            Rejects("Dmg 110, Exec 30 [si cible a Burn : +5]");
+        }
+
+        [Test, Description("Vérifie qu'un bonus « +0 » est rejeté — parce qu'un bonus nul ne change rien et trahit une faute de frappe")]
+        public void ZeroBonus_IsRejected()
+        {
+            Rejects("Dmg 100 [si cible a Burn : +0]");
+            Rejects("Dmg 100 [si cible a Burn : Dmg +0]");
+        }
+
+        [Test, Description("Vérifie que « Gauge +N » est un bonus typé quand un Gauge existe, et que « Shield +N » sans Shield donne un effet Shield conditionnel — parce que ces types suivent la même règle que Dmg")]
+        public void TypedBonus_GaugeAndShield_FollowTheSameRule()
+        {
+            Assert.That(Fxs(Convert("Gauge -60 [si cible a Burn : Gauge +20]").skill.effects), Is.EqualTo("GaugeDelta:-60:None:0:100:-:[TargetHasStatus/Burn/0|20|-]"));
+            Assert.That(Fxs(Convert("Dmg 100 [si cible a Burn : Shield +12]").skill.effects), Is.EqualTo(
+                "Damage:100:None:0:100:-:[] / Shield:12:Shield:2:100:TargetHasStatus/Burn/0:[]"));
+        }
+
+        [Test, Description("Vérifie que les formes ASCII « >= » et « <= » valent « ≥ » et « ≤ » — parce qu'une fiche saisie au clavier doit être lue pareil")]
+        public void AsciiComparisons_AreAccepted()
+        {
+            var a = Convert("Dmg 100 [si >= 3 ennemis vivants : +10] [si <= 2 ennemis vivants : +5] [si cible a >= 2 statuts : +7]").skill.effects[0].mods;
+            Assert.That(string.Join(";", a.Select(Mod)), Is.EqualTo("EnemiesAliveAtLeast/None/3|10|-;EnemiesAliveAtMost/None/2|5|-;TargetStatusCountAtLeast/None/2|7|-"));
+        }
+
+        [Test, Description("Vérifie qu'un compte d'échelle inconnu et « PV manquants » sans « de » sont rejetés — parce que seuls les cinq comptes du plan existent")]
+        public void UnknownScaleCount_IsRejected()
+        {
+            Rejects("Dmg 100 [+10 par pierre (max 3)]");
+            Rejects("Dmg 100 [+10 par 10 % PV manquants de la cible (max 3)]");
+            Rejects("Dmg 100 [+10 par 20 % de PV manquants de la cible (max 3)]");
+            Rejects("Dmg 100 [+10 par statut de la cible]");
         }
 
         [Test, Description("Vérifie qu'un crochet seul placé avant l'effet vise le premier effet porteur de la cellule — parce qu'aucun effet ne le précède")]
@@ -227,9 +261,9 @@ namespace N29.HeroesDawn.Tests.Domain
         [Test, Description("Vérifie que les espaces insécables, les espaces multiples et « 50 % » avec espace sont acceptés — parce que les fiches utilisent « < 50% PV » et « ≥ 2 statuts » avec des caractères Unicode et des espacements variés")]
         public void OddWhitespace_IsTolerated()
         {
-            var c = Convert("Dmg 100  ,\tSt  Burn 2t [si cible < 50 % PV : +40]  [ si cible a ≥ 2 statuts : Dmg +10 ]");
+            var c = Convert("St\u00A0 Burn\u00A02t ,\tDmg\u00A0100  [si\u00A0cible <\u00A050 % PV :\u202F+40]  [ si cible a ≥\u00A02\u00A0statuts : Dmg +10 ]");
             Assert.That(Fxs(c.skill.effects), Is.EqualTo(
-                "Damage:100:None:0:100:-:[TargetHpBelow/None/50|40|-;TargetStatusCountAtLeast/None/2|10|-] / ApplyStatus:0:Burn:2:100:-:[]"));
+                "ApplyStatus:0:Burn:2:100:-:[] / Damage:100:None:0:100:-:[TargetHpBelow/None/50|40|-;TargetStatusCountAtLeast/None/2|10|-]"));
         }
 
         [Test, Description("Vérifie qu'une condition inconnue est rejetée — parce que ne jamais ignorer un crochet incompris est la règle de l'importeur")]
@@ -339,6 +373,7 @@ namespace N29.HeroesDawn.Tests.Domain
         [TestCase("Soi:faible")]
         [TestCase("2E:faible")]
         [TestCase("3E")]
+        [TestCase("2E")]
         [TestCase("1E:Poison")]
         [TestCase("1E:")]
         [TestCase("")]
@@ -510,6 +545,8 @@ namespace N29.HeroesDawn.Tests.Domain
             var rows = CatalogImporter.ReadTable(File.ReadAllText(Path.Combine(CatalogueFolder, "cartes-existantes.md")));
             Assert.That(rows.Count, Is.EqualTo(48));
             var legacy = PrototypeCollection.LegacyCards().ToDictionary(c => c.Id.Value);
+            Assert.That(rows.Select(r => r.Id).Distinct().Count(), Is.EqualTo(48), "identifiants en double dans la fiche");
+            Assert.That(rows.Select(r => r.Id).OrderBy(x => x, StringComparer.Ordinal), Is.EqualTo(legacy.Keys.OrderBy(x => x, StringComparer.Ordinal)));
             foreach (var row in rows)
             {
                 var rec = CatalogImporter.ToRecord(row);
@@ -520,6 +557,13 @@ namespace N29.HeroesDawn.Tests.Domain
                 Assert.That(rec.archetypes, Is.EqualTo(card.Archetypes.ToList()), row.Id);
                 Assert.That(rec.role, Is.EqualTo(card.Role), row.Id);
                 Assert.That(rec.skill.target, Is.EqualTo(card.Skill.Target), row.Id);
+                Assert.That(rec.skill.pick, Is.EqualTo(card.Skill.Pick), row.Id);
+                Assert.That(rec.skill.pickStatus, Is.EqualTo(card.Skill.PickStatus), row.Id);
+                Assert.That(rec.skill.slot, Is.EqualTo(card.Skill.Slot), row.Id);
+                Assert.That(rec.skill.id, Is.EqualTo(card.Skill.Id.Value), row.Id);
+                Assert.That(rec.id, Is.EqualTo(card.Id.Value), row.Id);
+                Assert.That(rec.skill.cost, Is.EqualTo(card.Skill.Cost), row.Id);
+                Assert.That(rec.skill.cooldown, Is.EqualTo(card.Skill.Cooldown), row.Id);
                 Assert.That(Fxs(rec.skill.effects), Is.EqualTo(string.Join(" / ", card.Skill.Effects.Select(FxOf))), row.Id);
                 Assert.That(rec.tiers.Count, Is.EqualTo(card.Tiers.Count), row.Id);
                 for (int i = 0; i < card.Tiers.Count; i++)
@@ -532,20 +576,38 @@ namespace N29.HeroesDawn.Tests.Domain
 
         static string FxOf(EffectDef e) => $"{e.Type}:{e.Value}:{e.Status}:{e.Duration}:{e.ChancePercent}:-:[]";
 
+        /// <summary>Fiches P1 du catalogue hors grammaire (triées) ; la tâche 9 met ce tableau à jour en corrigeant les fiches.</summary>
+        static readonly string[] ExpectedRejectedIds =
+        {
+            "card_armored_convoy", "card_blood_scent", "card_blood_thirst", "card_brittle_ice", "card_cautery", "card_clinch", "card_crushing_mass",
+            "card_dawns_hand", "card_dead_weight", "card_leech_bite", "card_magma_fist", "card_momentum_cascade", "card_pack_charge",
+            "card_pressure_point", "card_saving_bite", "card_stoker", "card_torn_veil", "card_unravel", "card_wear_down",
+        };
+
+        [Test, Description("Vérifie que ReadTable rejette un second en-tête ou une ligne de carte placée après la fin du tableau — parce qu'une ligne ignorée en silence serait une fiche perdue")]
+        public void ReadTable_RejectsRowsAfterTheTableEnded()
+        {
+            Assert.Throws<CatalogImportException>(() => CatalogImporter.ReadTable(Table(RowLine("Dmg 100")) + "\n" + RowLine("Dmg 100").Replace("card_test", "card_late")));
+            Assert.Throws<CatalogImportException>(() => CatalogImporter.ReadTable(Table(RowLine("Dmg 100")) + "\n" + Header + "\n" + Separator + "\n"));
+        }
+
         [Test, Description("Vérifie que chaque fiche P1 de chaque fichier du catalogue est soit convertie, soit rejetée par CatalogImportException (jamais une autre exception) — parce que l'importeur doit refuser proprement ce qui sort de la grammaire")]
         public void EveryCatalogueRow_ConvertsOrIsRejectedCleanly()
         {
             var rejected = new System.Collections.Generic.List<string>();
+            var messages = new System.Collections.Generic.List<string>();
             foreach (var file in Directory.GetFiles(CatalogueFolder, "cartes-*.md"))
             {
                 foreach (var row in CatalogImporter.ReadTable(File.ReadAllText(file)))
                 {
                     if (row.Phase != "P1") { Assert.Throws<NotSupportedException>(() => CatalogImporter.ToRecord(row), row.Id); continue; }
                     try { CatalogImporter.ToRecord(row); }
-                    catch (CatalogImportException e) { rejected.Add(e.Message); }
+                    catch (CatalogImportException e) { rejected.Add(e.CardId); messages.Add(e.Message); }
                 }
             }
-            TestContext.Out.WriteLine("REJETS " + rejected.Count + "\n" + string.Join("\n", rejected));
+            TestContext.Out.WriteLine("REJETS " + rejected.Count + "\n" + string.Join("\n", messages));
+            rejected.Sort(StringComparer.Ordinal);
+            Assert.That(rejected, Is.EqualTo(ExpectedRejectedIds), "l'ensemble des fiches rejetées a changé (régression de l'analyseur ou fiche corrigée : mettre ExpectedRejectedIds à jour)");
         }
     }
 }
