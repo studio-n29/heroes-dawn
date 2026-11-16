@@ -80,6 +80,9 @@ namespace N29.HeroesDawn.Tests.Domain
             yield return ("duel:starter:s1", Duel);
         }
 
+        // 60 des 90 lignes "enemy:*" de combat-golden.txt (ennemis hrl_*, kap_*, mnh_*, pr_*, sad_*, syn_*)
+        // viennent de contenu de quartiers non commité à l'enregistrement de la référence. Sans ce contenu,
+        // ces lignes n'ont pas de scénario et ne sont simplement pas exercées : ne pas les supprimer.
         static Dictionary<string, string> ReadGolden()
         {
             var path = GoldenPath();
