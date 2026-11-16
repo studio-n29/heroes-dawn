@@ -576,14 +576,6 @@ namespace N29.HeroesDawn.Tests.Domain
 
         static string FxOf(EffectDef e) => $"{e.Type}:{e.Value}:{e.Status}:{e.Duration}:{e.ChancePercent}:-:[]";
 
-        /// <summary>Fiches P1 du catalogue hors grammaire (triées) ; la tâche 9 met ce tableau à jour en corrigeant les fiches.</summary>
-        static readonly string[] ExpectedRejectedIds =
-        {
-            "card_armored_convoy", "card_blood_scent", "card_blood_thirst", "card_brittle_ice", "card_cautery", "card_clinch", "card_crushing_mass",
-            "card_dawns_hand", "card_dead_weight", "card_leech_bite", "card_magma_fist", "card_momentum_cascade", "card_pack_charge",
-            "card_pressure_point", "card_saving_bite", "card_stoker", "card_torn_veil", "card_unravel", "card_wear_down",
-        };
-
         [Test, Description("Vérifie que ReadTable rejette un second en-tête ou une ligne de carte placée après la fin du tableau — parce qu'une ligne ignorée en silence serait une fiche perdue")]
         public void ReadTable_RejectsRowsAfterTheTableEnded()
         {
@@ -591,23 +583,23 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.Throws<CatalogImportException>(() => CatalogImporter.ReadTable(Table(RowLine("Dmg 100")) + "\n" + Header + "\n" + Separator + "\n"));
         }
 
-        [Test, Description("Vérifie que chaque fiche P1 de chaque fichier du catalogue est soit convertie, soit rejetée par CatalogImportException (jamais une autre exception) — parce que l'importeur doit refuser proprement ce qui sort de la grammaire")]
-        public void EveryCatalogueRow_ConvertsOrIsRejectedCleanly()
+        [Test, Description("Vérifie que TOUTE ligne de phase P1 de toutes les fiches du catalogue s'importe sans exception et que les lignes P2/P3 sont ignorées (NotSupportedException) — parce que les fiches doivent respecter la grammaire et qu'un rejet est une fiche à corriger")]
+        public void EveryP1Row_Imports()
         {
             var rejected = new System.Collections.Generic.List<string>();
-            var messages = new System.Collections.Generic.List<string>();
+            int imported = 0, skipped = 0;
             foreach (var file in Directory.GetFiles(CatalogueFolder, "cartes-*.md"))
             {
                 foreach (var row in CatalogImporter.ReadTable(File.ReadAllText(file)))
                 {
-                    if (row.Phase != "P1") { Assert.Throws<NotSupportedException>(() => CatalogImporter.ToRecord(row), row.Id); continue; }
-                    try { CatalogImporter.ToRecord(row); }
-                    catch (CatalogImportException e) { rejected.Add(e.CardId); messages.Add(e.Message); }
+                    if (row.Phase != "P1") { Assert.Throws<NotSupportedException>(() => CatalogImporter.ToRecord(row), row.Id); skipped++; continue; }
+                    try { CatalogImporter.ToRecord(row); imported++; }
+                    catch (CatalogImportException e) { rejected.Add(e.CardId + " : " + e.Message); }
                 }
             }
-            TestContext.Out.WriteLine("REJETS " + rejected.Count + "\n" + string.Join("\n", messages));
-            rejected.Sort(StringComparer.Ordinal);
-            Assert.That(rejected, Is.EqualTo(ExpectedRejectedIds), "l'ensemble des fiches rejetées a changé (régression de l'analyseur ou fiche corrigée : mettre ExpectedRejectedIds à jour)");
+            TestContext.Out.WriteLine($"P1 importées : {imported} ; P2/P3 ignorées : {skipped} ; rejetées : {rejected.Count}");
+            Assert.That(rejected, Is.Empty, "fiches P1 hors grammaire :\n" + string.Join("\n", rejected));
+            Assert.That(imported, Is.GreaterThan(0));
         }
     }
 }

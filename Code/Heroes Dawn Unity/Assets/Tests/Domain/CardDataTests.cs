@@ -86,7 +86,9 @@ namespace N29.HeroesDawn.Tests.Domain
         public void MissingFile_FallsBackToCode()
         {
             var legacy = PrototypeCollection.LegacyCards();
+            UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Warning, new System.Text.RegularExpressions.Regex("cards.json"));
             AssertSameCards(legacy, CardDataLibrary.Load(() => null, () => legacy));
+            UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Warning, new System.Text.RegularExpressions.Regex("cards.json"));
             AssertSameCards(legacy, CardDataLibrary.Load(() => "", () => legacy));
             UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Warning, new System.Text.RegularExpressions.Regex("cards"));
             AssertSameCards(legacy, CardDataLibrary.Load(() => "{ ceci n'est pas du json", () => legacy));
@@ -110,6 +112,113 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(changed.Collection.Cards.Count, Is.EqualTo(1));
             Assert.That(changed.Collection.Items, Is.SameAs(cat.Collection.Items));
             Assert.That(changed.Collection.Boosters, Is.SameAs(cat.Collection.Boosters));
+        }
+
+        // ---- Validation du chargeur de cartes ----
+
+        static SkillCardDef Card(string id, Family family = Family.Matter, EffectDef? effect = null, CardRole role = CardRole.Basic, Archetype[]? archetypes = null)
+            => new SkillCardDef(new CardId(id), "cards." + id + ".name", family, 1,
+                                new SkillDef(new SkillId(id), SkillSlot.A3, 4, TargetRule.SingleEnemy, new[] { effect ?? new EffectDef(EffectType.Damage, 100) }, 40),
+                                CardNature.Offensive, null, archetypes ?? new Archetype[0], role);
+
+        const string OldRecordJson = "{\"cards\":[{\"id\":\"card_old\",\"family\":0,\"stars\":1,\"nature\":0,\"role\":0,"
+            + "\"skill\":{\"id\":\"card_old\",\"slot\":2,\"cost\":40,\"cooldown\":4,\"target\":0,\"effects\":[{\"type\":0,\"value\":100,\"status\":0,\"duration\":0,\"chance\":100}]},"
+            + "\"tiers\":[{\"level\":3,\"effects\":[{\"type\":0,\"value\":20,\"status\":0,\"duration\":0,\"chance\":100}]}]}]}";
+
+        static void ExpectCardsWarning(string pattern = "cards.json")
+            => UnityEngine.TestTools.LogAssert.Expect(UnityEngine.LogType.Warning, new System.Text.RegularExpressions.Regex(pattern));
+
+        [Test, Description("Vérifie qu'un ancien enregistrement sans les champs de condition, de modificateurs ni de ciblage fin se relit en effet sans condition ni modificateur — parce que les fichiers cards.json déjà écrits doivent rester lisibles")]
+        public void OldRecord_WithoutTheNewFields_ReadsAsAnUnconditionalEffect()
+        {
+            var cards = CardDataLibrary.FromJson(OldRecordJson);
+            Assert.That(cards.Count, Is.EqualTo(1));
+            var fx = cards[0].Skill.Effects[0];
+            Assert.That(fx.When, Is.Null);
+            Assert.That(fx.Mods, Is.Empty);
+            Assert.That(cards[0].Skill.Pick, Is.EqualTo(TargetPick.Default));
+            Assert.That(cards[0].Tiers[0].Effects[0].When, Is.Null);
+            Assert.That(cards[0].Tiers[0].Effects[0].Mods, Is.Empty);
+            Assert.That(CardDataLibrary.Validate(cards), Is.Empty);
+        }
+
+        [Test, Description("Vérifie que {\"cards\":[]} avertit puis retombe sur les cartes du code — parce qu'un catalogue vide rendrait le jeu injouable")]
+        public void EmptyCardList_WarnsThenFallsBack()
+        {
+            var legacy = PrototypeCollection.LegacyCards();
+            ExpectCardsWarning();
+            AssertSameCards(legacy, CardDataLibrary.Load(() => "{\"cards\":[]}", () => legacy));
+        }
+
+        [Test, Description("Vérifie qu'un fichier cards.json absent ou vide avertit avant le repli sur le code — parce qu'un repli silencieux en build cacherait un catalogue manquant")]
+        public void AbsentOrBlankFile_WarnsBeforeFallingBack()
+        {
+            var legacy = PrototypeCollection.LegacyCards();
+            ExpectCardsWarning();
+            AssertSameCards(legacy, CardDataLibrary.Load(() => null, () => legacy));
+            ExpectCardsWarning();
+            AssertSameCards(legacy, CardDataLibrary.Load(() => "  ", () => legacy));
+        }
+
+        [Test, Description("Vérifie que Validate signale un identifiant vide et un identifiant en double, et que Load se replie sur le code avec un avertissement par erreur — parce que deux cartes de même id écraseraient l'une l'autre")]
+        public void DuplicateOrEmptyId_IsReportedAndFallsBack()
+        {
+            var errors = CardDataLibrary.Validate(new[] { Card("card_a"), Card("card_a"), Card("") });
+            Assert.That(errors.Count, Is.EqualTo(2));
+            Assert.That(errors.Any(e => e.Contains("card_a")), Is.True);
+
+            var legacy = PrototypeCollection.LegacyCards();
+            var json = CardDataLibrary.ToJson(new[] { Card("card_a"), Card("card_a") });
+            ExpectCardsWarning("card_a");
+            AssertSameCards(legacy, CardDataLibrary.Load(() => json, () => legacy));
+        }
+
+        [Test, Description("Vérifie que Validate signale une valeur d'enum hors plage (famille, rôle, archétype, type d'effet, statut, condition, échelle, ciblage) et que Load se replie — parce qu'une valeur inconnue serait ignorée en silence par le moteur")]
+        public void OutOfRangeEnum_IsReportedAndFallsBack()
+        {
+            Assert.That(CardDataLibrary.Validate(new[] { Card("c1", (Family)9) }), Has.Count.EqualTo(1));
+            Assert.That(CardDataLibrary.Validate(new[] { Card("c2", role: (CardRole)9) }), Has.Count.EqualTo(1));
+            Assert.That(CardDataLibrary.Validate(new[] { Card("c3", archetypes: new[] { (Archetype)9 }) }), Has.Count.EqualTo(1));
+            Assert.That(CardDataLibrary.Validate(new[] { Card("c4", effect: new EffectDef((EffectType)99, 10)) }), Has.Count.EqualTo(1));
+            Assert.That(CardDataLibrary.Validate(new[] { Card("c5", effect: new EffectDef(EffectType.ApplyStatus, 0, (StatusType)99, 2)) }), Has.Count.EqualTo(1));
+            Assert.That(CardDataLibrary.Validate(new[] { Card("c6", effect: new EffectDef(EffectType.Damage, 10, StatusType.None, 0, 100, new Condition((ConditionKind)99))) }), Has.Count.EqualTo(1));
+            Assert.That(CardDataLibrary.Validate(new[] { Card("c7", effect: new EffectDef(EffectType.Damage, 10, StatusType.None, 0, 100, null, new[] { new ValueMod(5, null, (ScaleKind)99, 2) })) }), Has.Count.EqualTo(1));
+            var badSkill = new SkillCardDef(new CardId("c8"), "cards.c8.name", Family.Matter, 1,
+                new SkillDef(new SkillId("c8"), SkillSlot.A3, 4, (TargetRule)9, new[] { new EffectDef(EffectType.Damage, 10) }, 40, (TargetPick)9));
+            Assert.That(CardDataLibrary.Validate(new[] { badSkill }).Count, Is.EqualTo(2));
+            Assert.That(CardDataLibrary.Validate(new[] { Card("ok", Family.Elemental, null, CardRole.Payoff, new[] { Archetype.Burn }) }), Is.Empty);
+
+            var legacy = PrototypeCollection.LegacyCards();
+            var json = CardDataLibrary.ToJson(new[] { Card("card_bad", (Family)9) });
+            ExpectCardsWarning("card_bad");
+            AssertSameCards(legacy, CardDataLibrary.Load(() => json, () => legacy));
+        }
+
+        [Test, Description("Vérifie que Validate accepte les cartes du code et refuse une liste vide — parce que le catalogue livré doit toujours passer la validation et qu'un catalogue vide est une erreur")]
+        public void Validate_AcceptsTheCodeCards_AndRejectsAnEmptyList()
+        {
+            Assert.That(CardDataLibrary.Validate(PrototypeCollection.LegacyCards()), Is.Empty);
+            Assert.That(CardDataLibrary.Validate(new SkillCardDef[0]), Has.Count.EqualTo(1));
+        }
+
+        static string EnumTable<T>() where T : struct, System.Enum
+            => string.Join(",", System.Enum.GetValues(typeof(T)).Cast<T>().Select(v => v + "=" + System.Convert.ToInt32(v)));
+
+        [Test, Description("Vérifie la table nom → valeur entière de chaque enum sérialisé dans cards.json — parce que renuméroter une valeur changerait en silence le sens de toutes les cartes déjà écrites")]
+        public void SerializedEnums_AreStable()
+        {
+            // Les enums sont sérialisés en entiers dans cards.json : n'ajouter une valeur qu'en fin d'enum.
+            Assert.That(EnumTable<StatusType>(), Is.EqualTo("None=0,Burn=1,Freeze=2,Shock=3,Corrosion=4,Blind=5,Vulnerable=6,Bind=7,Mark=8,Taunt=9,Shield=10,Regen=11,Haste=12,Evade=13,Anchor=14"));
+            Assert.That(EnumTable<EffectType>(), Is.EqualTo("Damage=0,Heal=1,ApplyStatus=2,GaugeDelta=3,Shield=4,PushBack=5,Advance=6,Lifesteal=7,Purge=8,Bounce=9,Execute=10"));
+            Assert.That(EnumTable<TargetRule>(), Is.EqualTo("SingleEnemy=0,AllEnemies=1,SingleAlly=2,AllAllies=3,Self=4"));
+            Assert.That(EnumTable<TargetPick>(), Is.EqualTo("Default=0,LowestHp=1,HighestHp=2,StatusHolder=3,NextToAct=4,Random=5,TwoRandom=6"));
+            Assert.That(EnumTable<ConditionKind>(), Is.EqualTo("TargetHasStatus=0,TargetLacksStatus=1,TargetHpBelow=2,TargetHpAbove=3,CasterHasStatus=4,CasterHpBelow=5,AnyAllyHasStatus=6,TargetStatusCountAtLeast=7,TargetPlannedAction=8,EnemiesAliveAtLeast=9,EnemiesAliveAtMost=10"));
+            Assert.That(EnumTable<ScaleKind>(), Is.EqualTo("TargetStatusCount=0,EnemiesAlive=1,AlliesAlive=2,TargetMissingHpTenths=3,CasterMissingHpTenths=4"));
+            Assert.That(EnumTable<Archetype>(), Is.EqualTo("Burn=0,Restrain=1,Hunt=2,Tempo=3,Bulwark=4,Renewal=5"));
+            Assert.That(EnumTable<CardRole>(), Is.EqualTo("Primer=0,Payoff=1,Bridge=2,Basic=3"));
+            Assert.That(EnumTable<Family>(), Is.EqualTo("Matter=0,Elemental=1,PhysicalBio=2,Perception=3"));
+            Assert.That(EnumTable<CardNature>(), Is.EqualTo("Offensive=0,Defensive=1,Support=2,Control=3"));
+            Assert.That(EnumTable<SkillSlot>(), Is.EqualTo("A1=0,A2=1,A3=2,Passive=3,A4=4"));
         }
 
         static string PlayCard(ContentCatalog catalog, string cardId, int level, ulong seed)
