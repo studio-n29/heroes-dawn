@@ -143,7 +143,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(kitChanged, Is.True, "aucun boss ne change de kit");
         }
 
-        [Test, Explicit("Réécrit combat-golden.txt : à lancer seulement pour (re)figer la référence")]
+        [Test, Explicit("Réécrit combat-golden.txt : à lancer seulement pour (re)figer la référence"), Description("Vérifie que la référence combat-golden.txt est réécrite (uniquement si HEROES_RECORD_GOLDEN=1) — parce que la référence ne doit changer que sur décision explicite, jamais par un simple lancement de la classe")]
         public void RecordGolden()
         {
             // Le lanceur Unity exécute aussi les tests Explicit quand on cible la classe entière : garde-fou contre un écrasement involontaire.
