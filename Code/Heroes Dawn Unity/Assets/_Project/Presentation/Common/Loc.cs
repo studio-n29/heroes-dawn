@@ -298,6 +298,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendStages(d);
             ExtendNarration(d);
             ExtendCollection(d);
+            ExtendCardNames(d);
             ExtendAgents(d);
             ExtendOnboarding(d);
             ExtendQuests(d);
@@ -323,6 +324,7 @@ namespace N29.HeroesDawn.Presentation.Common
         static partial void ExtendStages(Dictionary<string, string> d);
         static partial void ExtendNarration(Dictionary<string, string> d);
         static partial void ExtendCollection(Dictionary<string, string> d);
+        static partial void ExtendCardNames(Dictionary<string, string> d);
         static partial void ExtendAgents(Dictionary<string, string> d);
         static partial void ExtendOnboarding(Dictionary<string, string> d);
         static partial void ExtendQuests(Dictionary<string, string> d);

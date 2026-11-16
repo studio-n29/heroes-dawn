@@ -9,7 +9,7 @@ namespace N29.HeroesDawn.Presentation.Common
     /// </summary>
     public static partial class Loc
     {
-        static readonly Dictionary<string, string> En = WithMoscowEnglish(new Dictionary<string, string>
+        static readonly Dictionary<string, string> En = WithCardNamesEnglish(WithMoscowEnglish(new Dictionary<string, string>
         {
             // --- Général ---
             ["booster.next"] = "NEXT",
@@ -143,7 +143,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["combat.intro.skip"] = "SKIP",
             ["combat.intro.allies"] = "YOUR SQUAD",
             ["combat.intro.enemies"] = "ENEMIES",
-        });
+        }));
 
         /// <summary>Clés traduites en anglais (contrôlées par les tests de langue).</summary>
         public static IEnumerable<string> EnglishKeys() => En.Keys;
