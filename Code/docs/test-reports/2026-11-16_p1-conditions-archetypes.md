@@ -105,3 +105,7 @@ Tests existants adaptés (la règle « les alliés prêts ne sont plus visés »
 | Classes ciblées (305 tests) | 303 réussis, 0 échec, 2 ignorés (`RecordGolden`, `RecordGoldenP1`) |
 
 `verifier-catalogue.ps1` : 0 erreur, 19 avertissements (dont les 12 nouveaux). `CombatGoldenTests` verte, `combat-golden.txt` inchangé depuis `14cadfa2`.
+
+## Validation du concepteur (2026-11-16)
+
+Tous les points de la section « À valider par le concepteur » ci-dessus sont **validés** (choix d'équilibre des fiches corrigées, règles de ciblage et d'échelles, texte de `pick.HighestHp`, repli en français des noms de cartes). Cette validation a été relayée le 2026-11-16 par la session d'orchestration de la version 1.0.1 pour le compte de l'utilisateur ; elle n'a pas été confirmée directement dans la conversation de travail de P1.
