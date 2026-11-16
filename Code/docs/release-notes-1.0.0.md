@@ -15,7 +15,7 @@ Version Unity 1.0.0 (code Android 10000). Plateformes : Windows et Android. Ni i
 - **Tournois JcJ** en ligne et hors ligne, avec classement et paliers.
 - **Achats intégrés** (7 produits consommables), testés en bac à sable seulement.
 - **Mesure d'usage** anonyme, désactivée par défaut, activée seulement après accord à la première connexion.
-- **Poids** : l'APK passe de 1,59 Go à environ 251 Mo.
+- **Poids** : l'APK est passé de 1,59 Go à 251 Mo le 13/11 ; l'APK de test du 16/11 (compteur FPS compris) pèse 282 Mo.
 
 ## Technique
 

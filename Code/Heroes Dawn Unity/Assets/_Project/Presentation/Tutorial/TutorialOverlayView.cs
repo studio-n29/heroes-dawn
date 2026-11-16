@@ -62,6 +62,9 @@ namespace N29.HeroesDawn.Presentation.Tutorial
             _hintTitle = Q<Label>("hintTitle"); _hintBody = Q<Label>("hintBody");
             _ok = Q<UnityEngine.UIElements.Button>("ok"); _skip = Q<UnityEngine.UIElements.Button>("skip"); _hintOk = Q<UnityEngine.UIElements.Button>("hintOk");
             OkButton = new HdButtonRef(_ok, this); SkipButton = new HdButtonRef(_skip, this); HintOkButton = new HdButtonRef(_hintOk, this);
+            // La zone sûre couvre tout l'écran : sans cette ligne, elle capte chaque touche, même quand aucune étape du tutoriel n'est affichée
+            // (le titre, le QG et tous les boutons du jeu restaient muets sur téléphone). Seuls le voile (quand il grise), l'anneau, la bulle et l'astuce captent.
+            Root.Q<VisualElement>("safe")!.pickingMode = PickingMode.Ignore;
             _fx.pickingMode = PickingMode.Ignore; _ripple.pickingMode = PickingMode.Ignore; _pointer.pickingMode = PickingMode.Ignore;
             foreach (var b in _brackets) b.pickingMode = PickingMode.Ignore;
             _veil.pickingMode = PickingMode.Ignore;
