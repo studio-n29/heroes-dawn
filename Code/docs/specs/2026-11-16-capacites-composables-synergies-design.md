@@ -121,9 +121,9 @@ Le mélange reste viable : la valeur de base d'une carte reste dans le gabarit d
 ### 7. Phases (chacune aura son propre plan)
 - **P0 — Structure et garde-fous** — faite le 2026-11-16. Introduire `Ability`, migrer les 48 cartes, les ennemis et les boss à l'identique. Garde-fou : combats graine fixe, journal d'événements identique avant et après sur tout le catalogue.
 - **P1 — Conditions, échelle, ciblage, archétypes** — faite le 2026-11-16. Briques `OnCast`, étiquettes sur les 48 cartes, textes générés, une première vague d'environ 12 cartes (2 par archétype) pour éprouver le modèle.
-- **P2 — Réactions.** Déclencheurs, événements, icône de réaction, anti-boucle.
-- **P3 — Seuils d'archétype** (optionnelle, voir §4).
-- **P4 — Contenu par lots, jusqu'à 250 cartes.** Lots d'environ 40 cartes (un archétype ou les neutres à la fois), répartition par étoile, textes, **liste d'illustrations avec descriptifs remise au porteur du projet pour chaque lot (il crée les images)**, équilibrage en simulation après chaque lot. Environ 5 lots après la vague de P1.
+- **P2 — Réactions** — faite le 2026-11-16. Déclencheurs, événements, icône de réaction, anti-boucle.
+- **P3 — Seuils d'archétype** (optionnelle, voir §4) — faite le 2026-11-16 (échelle seulement, seuils non implémentés).
+- **P4 — Contenu par lots, jusqu'à 250 cartes** — faite le 2026-11-16 (les 250 cartes en jeu d'un coup). Lots d'environ 40 cartes (un archétype ou les neutres à la fois), répartition par étoile, textes, **liste d'illustrations avec descriptifs remise au porteur du projet pour chaque lot (il crée les images)**, équilibrage en simulation après chaque lot. Environ 5 lots après la vague de P1.
 
 ## Tests (critères d'acceptation)
 - **Garde-fou P0** : pour chaque carte (aux niveaux 1, 3, 6, 10) et pour les ennemis, journal d'événements identique à celui d'avant la migration, sur plusieurs graines.
