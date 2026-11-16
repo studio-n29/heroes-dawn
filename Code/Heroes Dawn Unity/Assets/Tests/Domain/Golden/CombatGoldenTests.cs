@@ -22,9 +22,10 @@ namespace N29.HeroesDawn.Tests.Domain
 
         static string GoldenPath([CallerFilePath] string source = "") => Path.Combine(Path.GetDirectoryName(source)!, "combat-golden.txt");
 
-        static CombatSimulation Run(ContentCatalog catalog, CombatSetup setup)
+        static CombatSimulation Run(ContentCatalog catalog, CombatSetup setup, Action<CombatSimulation>? before = null)
         {
             var sim = new CombatSimulation(catalog, setup);
+            before?.Invoke(sim);
             for (int i = 0; i < MaxTicks && !sim.IsOver; i++) sim.Step(1);
             return sim;
         }
@@ -36,7 +37,7 @@ namespace N29.HeroesDawn.Tests.Domain
                                      new CardId?[] { card.Id }, new[] { level });
             var setup = new CombatSetup(seed, CombatRank.Normal, new[] { ally },
                                         new[] { new EnemyEntry(new EnemyId("brute"), 5), new EnemyEntry(new EnemyId("brute"), 5) }, true);
-            return Run(c, setup);
+            return Run(c, setup, s => s.Unit(0).Energy = s.Unit(0).MaxEnergy); // énergie pleine : la carte (coût jusqu à 70) part dès le premier tour, comme dans CardMechanicsTests.Cast
         }
 
         static AllyEntry[] Starter(int level) => LegacyRoster.StarterTeam.Select(m => new AllyEntry(new MemberId(m), level, 0)).ToArray();
@@ -108,6 +109,38 @@ namespace N29.HeroesDawn.Tests.Domain
         {
             foreach (var (key, build) in Scenarios().Where((_, i) => i % 7 == 0))
                 Assert.That(CombatDigest.Of(build()), Is.EqualTo(CombatDigest.Of(build())), key);
+        }
+
+        [Test, Description("Vérifie que chaque scénario de carte lance réellement la carte au moins une fois — parce qu'une carte jamais lancée n'aurait aucune protection de non-régression")]
+        public void EveryCardScenario_CastsTheCardAtLeastOnce()
+        {
+            var catalog = TestContent.Build();
+            var never = new List<string>();
+            foreach (var (key, build) in Scenarios().Where(s => s.Key.StartsWith("card:", StringComparison.Ordinal)))
+            {
+                var cardId = key.Split(':')[1];
+                var skill = catalog.Collection.Cards.Single(c => c.Id.Value == cardId).Skill.Id;
+                if (!build().Log.OfType<SkillUsedEvent>().Any(e => e.Skill == skill)) never.Add(key);
+            }
+            Assert.That(never, Is.Empty, "cartes jamais lancées : " + string.Join(", ", never));
+        }
+
+        [Test, Description("Vérifie que chaque boss du catalogue change de phase dans son scénario de référence, et qu'au moins un remplace son kit — parce que les changements de kit de boss sont un risque nommé de la refonte")]
+        public void BossScenarios_CrossPhaseThresholds()
+        {
+            var catalog = TestContent.Build();
+            var noPhase = new List<string>();
+            bool kitChanged = false;
+            foreach (var (key, build) in Scenarios().Where(s => s.Key.StartsWith("enemy:", StringComparison.Ordinal) && s.Key.EndsWith(":s1", StringComparison.Ordinal)))
+            {
+                var id = key.Split(':')[1];
+                var phases = build().Log.OfType<BossPhaseChangedEvent>().ToList();
+                kitChanged |= phases.Any(p => p.KitChanged);
+                if (catalog.Enemies.Single(e => e.Id.Value == id).IsBoss && phases.Count == 0) noPhase.Add(key);
+                if (phases.Count > 0) TestContext.WriteLine($"{key} : {phases.Count} changement(s) de phase, kit changé = {phases.Any(p => p.KitChanged)}");
+            }
+            Assert.That(noPhase, Is.Empty, "boss sans changement de phase : " + string.Join(", ", noPhase));
+            Assert.That(kitChanged, Is.True, "aucun boss ne change de kit");
         }
 
         [Test, Explicit("Réécrit combat-golden.txt : à lancer seulement pour (re)figer la référence")]
