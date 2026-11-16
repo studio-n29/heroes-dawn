@@ -30,7 +30,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 case TargetRule.SingleAlly:
                 {
                     if (pick == TargetPick.TwoRandom) return null;
-                    int t = PickOne(actor.Side, pick, skill.PickStatus, true);
+                    int t = PickOne(actor.Side, pick, skill.PickStatus, true, actor.Id);
                     if (t >= 0) list.Add(t);
                     return list;
                 }
@@ -60,13 +60,13 @@ namespace N29.HeroesDawn.Domain.Combat
         }
 
         /// <summary>Une cible d'un camp selon le choix ; -1 s'il n'y a personne (sans tirage). Égalités : plus petit identifiant.</summary>
-        int PickOne(Side side, TargetPick pick, StatusType status, bool ally)
+        int PickOne(Side side, TargetPick pick, StatusType status, bool ally, int except = -1)
         {
             switch (pick)
             {
                 case TargetPick.LowestHp: return LowestHpRatio(side);
                 case TargetPick.HighestHp: return HighestHpRatio(side);
-                case TargetPick.NextToAct: return NextToActOf(side);
+                case TargetPick.NextToAct: return NextToActOf(side, except);
                 case TargetPick.StatusHolder:
                 {
                     foreach (var u in _units) if (u.Side == side && u.IsAlive && u.Has(status)) return u.Id;
@@ -96,13 +96,13 @@ namespace N29.HeroesDawn.Domain.Combat
             return best;
         }
 
-        /// <summary>Le vivant du camp le plus proche de son point d'action : plus grand rapport Point / ActionPoint, comparé en produits croisés.</summary>
-        int NextToActOf(Side side)
+        /// <summary>Le vivant du camp le plus proche de son point d'action : plus grand rapport Point / ActionPoint, comparé en produits croisés. <paramref name="except"/> : unité écartée (le lanceur d'une carte « 1A:prochain », qui agit déjà).</summary>
+        int NextToActOf(Side side, int except = -1)
         {
             CombatUnit? best = null;
             foreach (var u in _units)
             {
-                if (u.Side != side || !u.IsAlive) continue;
+                if (u.Side != side || !u.IsAlive || u.Id == except) continue;
                 if (best == null || (long)u.Point * best.ActionPoint > (long)best.Point * u.ActionPoint) best = u;
             }
             return best == null ? -1 : best.Id;

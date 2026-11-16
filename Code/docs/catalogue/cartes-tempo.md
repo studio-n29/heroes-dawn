@@ -6,7 +6,7 @@
 
 | Id | Nom | Name | ★ | Famille | Nature | Archétype | Rôle | Cible | Coût | Phase | Base | Niv.3 | Niv.6 | Niv.10 | Idée |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| card_running_start | Départ lancé | Running Start | 1 | Physique/Bio | Soutien | Tempo | Amorce | Soi | 40 | P1 | St Haste 2t | Adv 20 | Shield 10 | St Evade 1t | Le porteur prend de la vitesse : un pas bonus tous les trois. |
+| card_running_start | Départ lancé | Running Start | 1 | Physique/Bio | Soutien | Tempo | Amorce | Soi | 40 | P1 | St Haste 2t | Purge 1 | Shield 10 | St Evade 1t | Le porteur prend de la vitesse : un pas bonus tous les trois. |
 | card_boost_pad | Tremplin | Boost Pad | 1 | Matière | Soutien | Tempo | Amorce | 1A:faible | 40 | P1 | St Haste 2t | Adv 20 | Heal 10 | Purge 1 | Accélère l'allié le plus blessé, souvent celui qui en a besoin. |
 | card_momentum_gust | Rafale d'élan | Momentum Gust | 1 | Élémentaire | Soutien | Tempo | Amorce | ZA | 50 | P1 | Adv 15 | Shield 8 | St Haste 1t | Purge 1 | Un courant d'air pousse toute l'équipe plus près d'agir. |
 | card_metronome | Métronome | Metronome | 1 | Matière | Soutien | Tempo | Amorce | 1A | 40 | P1 | Gauge +270, [si cible sans Haste : St Haste 1t] | Adv 10 | Shield 8 | St Regen 2t | Remplit la jauge d'un allié et lui donne le tempo. |

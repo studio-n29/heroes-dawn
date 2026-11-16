@@ -51,6 +51,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["skills.card_precise_shot"] = "Tir précis"; d["skills.card_side_step"] = "Pas de côté"; d["skills.card_camouflage"] = "Camouflage";
             d["skills.card_guiding_echo"] = "Écho guide"; d["skills.card_guard_break"] = "Faille de garde"; d["skills.card_premonition"] = "Prémonition";
             d["skills.card_shared_watch"] = "Veille partagée"; d["skills.card_silent_takedown"] = "Exécution silencieuse"; d["skills.card_time_veil"] = "Voile temporel";
+            // Première vague de P1 (12 cartes à conditions) : noms de la colonne Nom des fiches
+            d["skills.card_cinder_toss"] = "Jet de cendres"; d["skills.card_hot_iron"] = "Fer chauffé"; d["skills.card_static_jolt"] = "Secousse statique";
+            d["skills.card_dead_weight"] = "Poids mort"; d["skills.card_lynx_eye"] = "Œil de lynx"; d["skills.card_designated_target"] = "Cible désignée";
+            d["skills.card_running_start"] = "Départ lancé"; d["skills.card_slipstream"] = "Sillage"; d["skills.card_decoy"] = "Leurre";
+            d["skills.card_shield_bash"] = "Coup d'écu"; d["skills.card_warm_compress"] = "Compresse tiède"; d["skills.card_emergency_balm"] = "Baume d'urgence";
             d["boosters.booster_standard.name"] = "Booster de cartes";
             d["boosters.booster_operation.name"] = "Pack Opération";
             d["boosters.booster_mission.name"] = "Pack Mission";

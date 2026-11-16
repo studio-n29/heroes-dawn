@@ -234,8 +234,8 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que chacune des 8 combinaisons famille × (défensive ou soutien) montre exactement 4 cartes, sans note « aucune carte » — parce que le catalogue de 48 cartes remplit toutes les cases")]
-        public void Grimoire_EveryFamilyAndNature_Shows4Cards()
+        [Test, Description("Vérifie que chacune des 8 combinaisons famille × (défensive ou soutien) montre exactement les cartes du catalogue de cette famille et de cette nature (au moins 4), sans note « aucune carte » — parce que le catalogue remplit toutes les cases et que la première vague de P1 en a rempli certaines de plus")]
+        public void Grimoire_EveryFamilyAndNature_ShowsEveryMatchingCard()
         {
             var p = Grimoire();
             foreach (Family f in System.Enum.GetValues(typeof(Family)))
@@ -243,7 +243,8 @@ namespace N29.HeroesDawn.Tests.Presentation
                 {
                     _view.ClickFilter(0, Opt(f));
                     _view.ClickFilter(1, Opt(n));
-                    Assert.That(_view.Rows.Length, Is.EqualTo(4), f + " × " + n);
+                    Assert.That(_view.Rows.Length, Is.EqualTo(_app.Session.Content.Collection.Cards.Count(c => c.Family == f && c.Nature == n)), f + " × " + n);
+                    Assert.That(_view.Rows.Length, Is.GreaterThanOrEqualTo(4), f + " × " + n);
                     Assert.That(Titles(), Has.None.EqualTo(_loc.T("grimoire.none_filtered")), f + " × " + n);
                 }
             p.Dispose();

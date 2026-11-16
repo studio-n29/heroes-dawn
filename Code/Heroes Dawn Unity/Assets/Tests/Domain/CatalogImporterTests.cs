@@ -599,7 +599,8 @@ namespace N29.HeroesDawn.Tests.Domain
             }
             TestContext.Out.WriteLine($"P1 importées : {imported} ; P2/P3 ignorées : {skipped} ; rejetées : {rejected.Count}");
             Assert.That(rejected, Is.Empty, "fiches P1 hors grammaire :\n" + string.Join("\n", rejected));
-            Assert.That(imported, Is.GreaterThan(0));
+            Assert.That(imported, Is.EqualTo(196), "lignes P1 importées");
+            Assert.That(skipped, Is.EqualTo(54), "lignes P2/P3 ignorées");
         }
     }
 }

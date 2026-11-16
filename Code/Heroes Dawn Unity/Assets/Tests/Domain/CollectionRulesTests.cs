@@ -238,20 +238,34 @@ namespace N29.HeroesDawn.Tests.Domain
             }
         }
 
-        // ------------------------------------------------------------------ Catalogue de 48 cartes (lot C2)
+        // ------------------------------------------------------------------ Catalogue de 60 cartes (lot C2 + première vague de P1)
 
-        [Test, Description("Vérifie que le catalogue compte 48 cartes aux identifiants uniques, 12 par famille dont 4 défensives, 4 de soutien et 4 offensives ou de contrôle — parce que le type Contrôle prend la place d une partie des offensives")]
-        public void Catalog_Has48Cards_12PerFamily_4PerNature()
+        /// <summary>
+        /// Effectifs de la première vague de P1 (12 cartes ★1, fiches cartes-*.md) par famille puis par nature, à ajouter aux 12 cartes par famille et
+        /// 4 par nature des 48 cartes d'origine. Matière : Jet de cendres, Poids mort (offensives), Compresse tiède, Baume d'urgence (soutien) ;
+        /// Élémentaire : Secousse statique (offensive), Sillage (soutien) ; Physique/Bio : Fer chauffé, Coup d'écu (offensives), Départ lancé (soutien) ;
+        /// Perception : Œil de lynx, Cible désignée (offensives), Leurre (défensive).
+        /// </summary>
+        static readonly System.Collections.Generic.Dictionary<Family, (int Defensive, int Support, int OffensiveOrControl)> WaveByFamily
+            = new System.Collections.Generic.Dictionary<Family, (int, int, int)>
         {
-            Assert.That(Catalog.Length, Is.EqualTo(48));
-            Assert.That(Catalog.Select(c => c.Id.Value).Distinct().Count(), Is.EqualTo(48));
+            [Family.Matter] = (0, 2, 2), [Family.Elemental] = (0, 1, 1), [Family.PhysicalBio] = (0, 1, 2), [Family.Perception] = (1, 0, 2),
+        };
+
+        [Test, Description("Vérifie que le catalogue compte 60 cartes aux identifiants uniques : les 12 par famille et 4 par nature des 48 cartes d origine plus les effectifs des 12 fiches de la première vague — parce que la vague ajoute des cartes sans toucher à la répartition d origine")]
+        public void Catalog_Has60Cards_TheOriginal12PerFamily_PlusTheWave()
+        {
+            Assert.That(Catalog.Length, Is.EqualTo(60));
+            Assert.That(Catalog.Select(c => c.Id.Value).Distinct().Count(), Is.EqualTo(60));
+            Assert.That(WaveByFamily.Values.Sum(v => v.Defensive + v.Support + v.OffensiveOrControl), Is.EqualTo(12), "la table des fiches compte 12 cartes");
             foreach (Family f in System.Enum.GetValues(typeof(Family)))
             {
+                var wave = WaveByFamily[f];
                 var fam = Catalog.Where(c => c.Family == f).ToList();
-                Assert.That(fam.Count, Is.EqualTo(12), f.ToString());
-                Assert.That(fam.Count(c => c.Nature == CardNature.Defensive), Is.EqualTo(4), f + " Defensive");
-                Assert.That(fam.Count(c => c.Nature == CardNature.Support), Is.EqualTo(4), f + " Support");
-                Assert.That(fam.Count(c => c.Nature == CardNature.Offensive || c.Nature == CardNature.Control), Is.EqualTo(4), f + " Offensive + Control");
+                Assert.That(fam.Count, Is.EqualTo(12 + wave.Defensive + wave.Support + wave.OffensiveOrControl), f.ToString());
+                Assert.That(fam.Count(c => c.Nature == CardNature.Defensive), Is.EqualTo(4 + wave.Defensive), f + " Defensive");
+                Assert.That(fam.Count(c => c.Nature == CardNature.Support), Is.EqualTo(4 + wave.Support), f + " Support");
+                Assert.That(fam.Count(c => c.Nature == CardNature.Offensive || c.Nature == CardNature.Control), Is.EqualTo(4 + wave.OffensiveOrControl), f + " Offensive + Control");
             }
         }
 

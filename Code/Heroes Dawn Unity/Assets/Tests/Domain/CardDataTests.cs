@@ -68,18 +68,20 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(back[0].Skill.Effects[0].When!.Status, Is.EqualTo(StatusType.Burn));
         }
 
-        [Test, Description("Vérifie que le fichier cards.json livré donne les 48 cartes du code, ni plus ni moins — parce que la source des cartes change sans changer le jeu")]
+        [Test, Description("Vérifie que le fichier cards.json livré commence par les 48 cartes du code, à l identique et dans le même ordre, suivies des 12 cartes de la première vague — parce que la source des cartes change sans changer les cartes d avant P1")]
         public void Cards_FromTheJsonFile_EqualTheCodeCards()
         {
             var asset = UnityEngine.Resources.Load<UnityEngine.TextAsset>("Content/cards");
             Assert.That(asset, Is.Not.Null, "Resources/Content/cards.json est absent : lancer le menu d'export");
-            AssertSameCards(PrototypeCollection.LegacyCards(), CardDataLibrary.FromJson(asset.text));
+            var fromFile = CardDataLibrary.FromJson(asset.text);
+            Assert.That(fromFile.Count, Is.EqualTo(60));
+            AssertSameCards(PrototypeCollection.LegacyCards(), fromFile.Take(48).ToList());
         }
 
-        [Test, Description("Vérifie que le catalogue du prototype prend ses cartes dans cards.json — parce que PrototypeCollection.Build doit passer par le chargeur de données")]
+        [Test, Description("Vérifie que le catalogue du prototype prend ses cartes dans cards.json (ses 48 premières sont celles du code) — parce que PrototypeCollection.Build doit passer par le chargeur de données")]
         public void PrototypeBuild_UsesTheLoadedCards()
         {
-            AssertSameCards(PrototypeCollection.LegacyCards(), PrototypeCollection.Build().Cards);
+            AssertSameCards(PrototypeCollection.LegacyCards(), PrototypeCollection.Build().Cards.Take(48).ToList());
         }
 
         [Test, Description("Vérifie qu'une source JSON absente ou illisible redonne les cartes du code — parce que le jeu ne doit jamais démarrer sans catalogue de cartes")]

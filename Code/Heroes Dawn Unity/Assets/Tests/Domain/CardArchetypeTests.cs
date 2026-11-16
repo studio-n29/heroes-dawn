@@ -42,17 +42,20 @@ namespace N29.HeroesDawn.Tests.Domain
             return rows;
         }
 
-        [Test, Description("Vérifie que chacune des 48 cartes existantes a exactement un archétype — parce que la fiche du catalogue en donne un seul à chaque carte existante")]
+        /// <summary>Les 48 cartes d'avant P1 (le catalogue chargé contient aussi les 12 de la première vague, qui ont leurs propres tests).</summary>
+        static System.Collections.Generic.IReadOnlyList<SkillCardDef> Existing => Defs.Cards.Where(c => !FirstWaveTests.WaveCardIds.Contains(c.Id.Value)).ToList();
+
+        [Test, Description("Vérifie que chacune des 48 cartes d avant P1 a exactement un archétype — parce que la fiche du catalogue en donne un seul à chaque carte existante")]
         public void EveryExistingCard_HasOneArchetype()
         {
-            Assert.That(Defs.Cards.Count, Is.EqualTo(48));
-            Assert.That(Defs.Cards.All(c => c.Archetypes.Count == 1), Is.True);
+            Assert.That(Existing.Count, Is.EqualTo(48));
+            Assert.That(Existing.All(c => c.Archetypes.Count == 1), Is.True);
         }
 
         [Test, Description("Vérifie que les archétypes se répartissent en Brûlure 2, Entrave 7, Traque 6, Tempo 9, Rempart 16, Renouveau 8 — parce que c'est la répartition de la fiche du catalogue")]
         public void ArchetypeCounts_MatchTheCatalogueSheet()
         {
-            int Count(Archetype a) => Defs.Cards.Count(c => c.Archetypes.Contains(a));
+            int Count(Archetype a) => Existing.Count(c => c.Archetypes.Contains(a));
             Assert.That(Count(Archetype.Burn), Is.EqualTo(2));
             Assert.That(Count(Archetype.Restrain), Is.EqualTo(7));
             Assert.That(Count(Archetype.Hunt), Is.EqualTo(6));

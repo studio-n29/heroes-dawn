@@ -186,6 +186,11 @@ namespace N29.HeroesDawn.Tests.Editor
             ["card_precise_shot"] = CardNature.Offensive, ["card_side_step"] = CardNature.Defensive, ["card_camouflage"] = CardNature.Defensive,
             ["card_guiding_echo"] = CardNature.Support, ["card_guard_break"] = CardNature.Control, ["card_premonition"] = CardNature.Defensive,
             ["card_shared_watch"] = CardNature.Support, ["card_silent_takedown"] = CardNature.Offensive, ["card_time_veil"] = CardNature.Defensive,
+            // Première vague de P1 : nature déduite de l'effet de base (dégâts : offensive ; bouclier : défensive ; soin, avance ou statut allié : soutien)
+            ["card_cinder_toss"] = CardNature.Offensive, ["card_hot_iron"] = CardNature.Offensive, ["card_static_jolt"] = CardNature.Offensive,
+            ["card_dead_weight"] = CardNature.Offensive, ["card_lynx_eye"] = CardNature.Offensive, ["card_designated_target"] = CardNature.Offensive,
+            ["card_running_start"] = CardNature.Support, ["card_slipstream"] = CardNature.Support, ["card_decoy"] = CardNature.Defensive,
+            ["card_shield_bash"] = CardNature.Offensive, ["card_warm_compress"] = CardNature.Support, ["card_emergency_balm"] = CardNature.Support,
         };
 
         static readonly Dictionary<string, ItemType> SpecTypes = new Dictionary<string, ItemType>

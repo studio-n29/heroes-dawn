@@ -49,7 +49,8 @@ namespace N29.HeroesDawn.Tests.Domain
             return sim;
         }
 
-        static CombatSimulation Card(SkillCardDef card, int level, ItemId? item, ulong seed)
+        /// <summary>Combat de carte de référence (aussi utilisé par <see cref="WaveGoldenTests"/>) : « verre » équipé de la carte au niveau donné contre deux brutes, Auto.</summary>
+        internal static CombatSimulation Card(SkillCardDef card, int level, ItemId? item, ulong seed)
         {
             var c = TestContent.Build();
             var ally = new AllyEntry(new MemberId("verre"), 5, 0, 0, item.HasValue ? new[] { item.Value } : null,
