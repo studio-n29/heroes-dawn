@@ -1,7 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <ui:VisualElement name="page" class="hd-page hd-list">
+    <ui:VisualElement name="page" class="hd-page hd-list hd-listpage">
         <ui:VisualElement class="hd-list__main">
             <ui:VisualElement name="header" class="hd-panel hd-list__header">
+                <ui:VisualElement class="hd-list__headstar" picking-mode="Ignore" />
                 <ui:VisualElement class="hd-list__headtext">
                     <ui:Label name="headerTitle" class="hd-list__title" />
                     <ui:Label name="headerLine" class="hd-list__line" />
@@ -14,7 +15,10 @@
             <ui:ScrollView name="rows" class="hd-list__rows" />
         </ui:VisualElement>
         <ui:VisualElement name="side" class="hd-panel hd-list__side">
-            <ui:Label name="sideTitle" class="hd-list__sidetitle" />
+            <ui:VisualElement class="hd-list__sidehead" picking-mode="Ignore">
+                <ui:VisualElement class="hd-list__sidestar" picking-mode="Ignore" />
+                <ui:Label name="sideTitle" class="hd-list__sidetitle" />
+            </ui:VisualElement>
             <ui:Label name="sideText" class="hd-list__sidetext" />
             <ui:ScrollView name="sideRows" class="hd-list__rows" />
         </ui:VisualElement>

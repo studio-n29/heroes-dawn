@@ -2,18 +2,33 @@
     <ui:VisualElement name="page" class="hd-page hd-team">
         <ui:VisualElement class="hd-team__main">
             <ui:VisualElement name="filters" class="hd-team__chips" />
-            <ui:VisualElement name="sorts" class="hd-team__chips" />
-            <ui:ScrollView name="grid" class="hd-list__rows" />
+            <ui:VisualElement name="sorts" class="hd-team__chips hd-team__chips--sort" />
+            <ui:ScrollView name="grid" class="hd-list__rows hd-team__grid" />
         </ui:VisualElement>
         <ui:VisualElement name="side" class="hd-panel hd-team__side">
-            <ui:Label name="squadTitle" class="hd-list__sidetitle" />
+            <ui:VisualElement class="hd-team__sidehead">
+                <ui:VisualElement class="hd-tm-ico hd-tm-ico--team hd-tm-ico--gold" picking-mode="Ignore" />
+                <ui:Label name="squadTitle" class="hd-list__sidetitle hd-team__sidetitle" />
+            </ui:VisualElement>
             <ui:VisualElement name="squadRow" class="hd-team__squad" />
-            <ui:Label name="synergiesTitle" class="hd-team__subtitle" />
-            <ui:ScrollView class="hd-team__synergies"><ui:Label name="synergies" class="hd-list__sidetext" /></ui:ScrollView>
+            <ui:VisualElement name="squadFatigue" class="hd-team__fatigue">
+                <ui:VisualElement class="hd-tm-ico hd-tm-ico--fatigue hd-tm-ico--gold hd-team__fatigueico" picking-mode="Ignore" />
+                <ui:VisualElement class="hd-bar hd-team__fatiguebar">
+                    <ui:VisualElement name="squadFatigueFill" class="hd-bar__fill" />
+                    <ui:Label name="squadFatigueLabel" class="hd-list__barlabel" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-team__sidehead hd-team__sidehead--sub">
+                <ui:VisualElement class="hd-tm-ico hd-tm-ico--spark hd-team__subico" picking-mode="Ignore" />
+                <ui:Label name="synergiesTitle" class="hd-team__subtitle" />
+            </ui:VisualElement>
+            <ui:ScrollView class="hd-team__synergies"><ui:Label name="synergies" class="hd-list__sidetext hd-team__synergytext" /></ui:ScrollView>
             <ui:VisualElement name="presets" class="hd-team__presets" />
-            <ui:Button name="healAll" class="hd-btn hd-btn--secondary hd-btn--small" />
+            <ui:Button name="healAll" class="hd-btn hd-btn--secondary hd-btn--small hd-tm-ibtn hd-team__heal">
+                <ui:VisualElement class="hd-tm-ico hd-tm-ico--heal hd-tm-ibtn__ico" picking-mode="Ignore" />
+            </ui:Button>
             <ui:Label name="missionHint" class="hd-team__hint" />
-            <ui:Button name="mission" class="hd-btn hd-btn--primary" />
+            <ui:Button name="mission" class="hd-btn hd-btn--primary hd-team__mission" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

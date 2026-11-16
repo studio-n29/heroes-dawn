@@ -1,38 +1,60 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="page" class="hd-page hd-qg">
         <ui:VisualElement class="hd-qg__left">
-            <ui:Button name="banner" class="hd-panel hd-qg__banner">
-                <ui:Label name="bannerTitle" class="hd-qg__banner-title" />
-                <ui:Label name="bannerLine" class="hd-qg__banner-line" />
+            <ui:Button name="banner" class="hd-qg__banner">
+                <ui:VisualElement class="hd-qg__banner-star" picking-mode="Ignore" />
+                <ui:VisualElement class="hd-qg__banner-text" picking-mode="Ignore">
+                    <ui:Label name="bannerTitle" class="hd-qg__banner-title" picking-mode="Ignore" />
+                    <ui:Label name="bannerLine" class="hd-qg__banner-line" picking-mode="Ignore" />
+                </ui:VisualElement>
             </ui:Button>
-            <ui:VisualElement class="hd-qg__alerts">
-                <ui:Button name="shopAlert" class="hd-panel hd-qg__alert">
-                    <ui:VisualElement class="hd-qg__alert-icon hd-icon--shop" />
-                    <ui:Label name="shopAlertLabel" class="hd-qg__alert-label" />
-                    <ui:VisualElement name="shopAlertBadgeBox" class="hd-badge"><ui:Label name="shopAlertBadge" /></ui:VisualElement>
-                </ui:Button>
-                <ui:Button name="secondary" class="hd-panel hd-qg__alert">
-                    <ui:VisualElement class="hd-qg__alert-icon hd-icon--quest" />
-                    <ui:Label name="secondaryLabel" class="hd-qg__alert-label" />
-                    <ui:VisualElement name="secondaryDot" class="hd-badge"><ui:Label text="!" /></ui:VisualElement>
-                </ui:Button>
-            </ui:VisualElement>
             <ui:VisualElement class="hd-grow" />
             <ui:Label name="roomsTitle" class="hd-qg__section" />
             <ui:VisualElement name="rooms" class="hd-qg__rooms" />
         </ui:VisualElement>
         <ui:VisualElement class="hd-qg__right">
-            <ui:Button name="daily" class="hd-panel hd-qg__daily">
-                <ui:Label name="dailyTitle" class="hd-qg__banner-title" />
-                <ui:Label name="dailyCount" class="hd-qg__banner-line" />
-                <ui:VisualElement name="dailyBadgeBox" class="hd-badge"><ui:Label name="dailyBadge" /></ui:VisualElement>
-            </ui:Button>
-            <ui:VisualElement class="hd-panel hd-qg__drawer"><ui:Label name="dailyBody" class="hd-qg__daily-body" /></ui:VisualElement>
-            <ui:VisualElement class="hd-grow" />
-            <ui:VisualElement name="nextArt" class="hd-panel hd-qg__next"><ui:VisualElement class="hd-qg__next-shade" /></ui:VisualElement>
-            <ui:Label name="missionHint" class="hd-qg__hint" />
-            <ui:Label name="missionSub" class="hd-qg__sub" />
-            <ui:Button name="mission" class="hd-btn hd-btn--primary hd-qg__mission" />
+            <ui:VisualElement class="hd-panel hd-qg__dailypanel">
+                <ui:VisualElement class="hd-qg__dailyhead">
+                    <ui:Button name="daily" class="hd-qg__daily">
+                        <ui:VisualElement class="hd-qg__daily-icon" picking-mode="Ignore" />
+                        <ui:VisualElement class="hd-qg__daily-text" picking-mode="Ignore">
+                            <ui:Label name="dailyTitle" class="hd-qg__daily-title" picking-mode="Ignore" />
+                            <ui:Label name="dailyCount" class="hd-qg__daily-count" picking-mode="Ignore" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="dailyBadgeBox" class="hd-badge" picking-mode="Ignore"><ui:Label name="dailyBadge" picking-mode="Ignore" /></ui:VisualElement>
+                    </ui:Button>
+                    <ui:VisualElement class="hd-qg__alerts">
+                        <ui:Button name="shopAlert" class="hd-qg__alert">
+                            <ui:VisualElement class="hd-qg__alert-icon hd-icon--shop" picking-mode="Ignore" />
+                            <ui:Label name="shopAlertLabel" class="hd-qg__alert-label" picking-mode="Ignore" />
+                            <ui:VisualElement name="shopAlertBadgeBox" class="hd-badge" picking-mode="Ignore"><ui:Label name="shopAlertBadge" picking-mode="Ignore" /></ui:VisualElement>
+                        </ui:Button>
+                        <ui:Button name="secondary" class="hd-qg__alert">
+                            <ui:VisualElement class="hd-qg__alert-icon hd-qg__alert-icon--objective" picking-mode="Ignore" />
+                            <ui:Label name="secondaryLabel" class="hd-qg__alert-label" picking-mode="Ignore" />
+                            <ui:VisualElement name="secondaryDot" class="hd-badge hd-qg__alert-dot" picking-mode="Ignore" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-qg__rule" picking-mode="Ignore" />
+                <ui:VisualElement name="dailyList" class="hd-qg__dailylist" picking-mode="Ignore" />
+                <ui:Label name="dailyBody" class="hd-qg__daily-body" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-qg__bottom">
+                <ui:VisualElement class="hd-qg__nextcard">
+                    <ui:VisualElement name="nextArt" class="hd-qg__next" picking-mode="Ignore" />
+                    <ui:VisualElement class="hd-qg__nexthead" picking-mode="Ignore">
+                        <ui:VisualElement class="hd-qg__next-star" picking-mode="Ignore" />
+                        <ui:Label name="missionSub" class="hd-qg__sub" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hd-qg__frame" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:Label name="missionHint" class="hd-qg__hint" />
+                <ui:Button name="mission" class="hd-btn hd-btn--primary hd-qg__mission">
+                    <ui:VisualElement class="hd-qg__mission-star" picking-mode="Ignore" />
+                    <ui:VisualElement class="hd-qg__mission-chevron" picking-mode="Ignore" />
+                </ui:Button>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

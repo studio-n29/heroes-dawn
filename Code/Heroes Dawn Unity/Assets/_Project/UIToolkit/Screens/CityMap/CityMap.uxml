@@ -2,17 +2,21 @@
     <ui:VisualElement name="page" class="hd-page hd-map">
         <ui:VisualElement name="mapArea" class="hd-map__area" />
         <ui:VisualElement class="hd-panel hd-map__side">
-            <ui:Label name="actTitle" class="hd-list__sidetitle" />
+            <ui:VisualElement class="hd-map__head">
+                <ui:VisualElement class="hd-map__headicon" picking-mode="Ignore" />
+                <ui:Label name="actTitle" class="hd-list__sidetitle hd-map__acttitle" />
+                <ui:Button name="chapters" class="hd-btn hd-btn--secondary hd-btn--small hd-map__chapters" />
+            </ui:VisualElement>
             <ui:VisualElement name="rows" class="hd-map__rows" />
+            <ui:VisualElement class="hd-map__rule" picking-mode="Ignore" />
             <ui:ScrollView class="hd-map__detail">
                 <ui:Label name="detailTitle" class="hd-map__dtitle" />
-                <ui:Label name="chips" class="hd-pop__hint" />
-                <ui:Label name="description" class="hd-pop__text" />
-                <ui:VisualElement name="objectives" />
-                <ui:Label name="rewards" class="hd-pop__section" />
+                <ui:Label name="chips" class="hd-map__chips" />
+                <ui:VisualElement name="objectives" class="hd-map__objectives" />
+                <ui:Label name="rewards" class="hd-m-reward hd-map__rewards" />
+                <ui:Label name="description" class="hd-map__desc" />
             </ui:ScrollView>
-            <ui:Button name="chapters" class="hd-btn hd-btn--secondary hd-btn--small" />
-            <ui:Button name="deploy" class="hd-btn hd-btn--primary" />
+            <ui:Button name="deploy" class="hd-btn hd-btn--primary hd-map__deploy" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -2,53 +2,57 @@
     <ui:VisualElement name="safe" class="hd-board">
         <ui:VisualElement name="viewport" class="hd-board__viewport" />
         <ui:VisualElement class="hd-board__zoom">
-            <ui:Button name="zoomIn" class="hd-btn hd-btn--secondary hd-board__zbtn" text="+" />
-            <ui:Button name="zoomOut" class="hd-btn hd-btn--secondary hd-board__zbtn" text="-" />
-            <ui:Button name="recenter" class="hd-btn hd-btn--secondary hd-board__zbtn" text="PION" />
+            <ui:Button name="zoomOut" class="hd-btn hd-btn--secondary hd-board__zbtn"><ui:VisualElement class="hd-board__zicon hd-board__zicon--minus" picking-mode="Ignore" /></ui:Button>
+            <ui:Button name="zoomIn" class="hd-btn hd-btn--secondary hd-board__zbtn"><ui:VisualElement class="hd-board__zicon hd-board__zicon--plus" picking-mode="Ignore" /></ui:Button>
+            <ui:Button name="recenter" class="hd-btn hd-btn--secondary hd-board__zbtn"><ui:VisualElement class="hd-board__zicon hd-board__zicon--pawn" picking-mode="Ignore" /></ui:Button>
             <ui:VisualElement class="hd-board__cases">
-                <ui:Button name="prevCase" class="hd-btn hd-btn--secondary hd-board__zbtn hd-board__zbtn--wide" text="&lt; CASE" />
-                <ui:Button name="nextCase" class="hd-btn hd-btn--secondary hd-board__zbtn hd-board__zbtn--wide" text="CASE &gt;" />
+                <ui:Button name="prevCase" class="hd-btn hd-btn--secondary hd-board__zbtn hd-board__zbtn--wide"><ui:VisualElement class="hd-board__zicon hd-board__zicon--prev" picking-mode="Ignore" /></ui:Button>
+                <ui:Button name="nextCase" class="hd-btn hd-btn--secondary hd-board__zbtn hd-board__zbtn--wide"><ui:VisualElement class="hd-board__zicon hd-board__zicon--next" picking-mode="Ignore" /></ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement class="hd-board__top">
+            <ui:Button name="back" class="hd-btn hd-btn--secondary hd-btn--lead hd-board__back"><ui:VisualElement class="hd-btn__lead hd-icon--back" picking-mode="Ignore" /></ui:Button>
             <ui:Label name="zone" class="hd-board__zone" />
             <ui:VisualElement class="hd-board__spacer" />
             <ui:VisualElement name="wallet" class="hd-wallet">
-                <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--credits"><ui:Label name="credits" class="hd-wallet__value" /><ui:Label text="CR" class="hd-wallet__unit" /></ui:VisualElement>
-                <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--pr"><ui:Label name="pr" class="hd-wallet__value" /><ui:Label text="PR" class="hd-wallet__unit" /></ui:VisualElement>
-                <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--gems"><ui:Label name="gems" class="hd-wallet__value" /><ui:Label text="G" class="hd-wallet__unit" /></ui:VisualElement>
+                <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--credits"><ui:VisualElement picking-mode="Ignore" class="hd-wallet__unit" /><ui:Label name="credits" class="hd-wallet__value" /></ui:VisualElement>
+                <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--pr"><ui:VisualElement picking-mode="Ignore" class="hd-wallet__unit" /><ui:Label name="pr" class="hd-wallet__value" /></ui:VisualElement>
+                <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--gems"><ui:VisualElement picking-mode="Ignore" class="hd-wallet__unit" /><ui:Label name="gems" class="hd-wallet__value" /></ui:VisualElement>
                 <ui:Label name="saving" class="hd-wallet__saving" />
             </ui:VisualElement>
-            <ui:Button name="back" class="hd-btn hd-btn--secondary hd-board__back" />
         </ui:VisualElement>
         <ui:VisualElement name="objectives" class="hd-board__objectives">
-            <ui:Label name="objTitle" class="hd-board__objtitle" />
-            <ui:VisualElement name="objList" />
+            <ui:VisualElement class="hd-board__objhead">
+                <ui:VisualElement class="hd-board__objstar" picking-mode="Ignore" />
+                <ui:Label name="objTitle" class="hd-board__objtitle" />
+            </ui:VisualElement>
+            <ui:VisualElement name="objList" class="hd-board__objlist" />
         </ui:VisualElement>
         <ui:Label name="legend" class="hd-board__legend" />
         <ui:VisualElement name="preview" class="hd-board__preview">
             <ui:Label name="pvTitle" class="hd-board__pvtitle" />
+            <ui:VisualElement class="hd-board__pvrule" picking-mode="Ignore" />
             <ui:Label name="pvBody" class="hd-board__pvbody" />
             <ui:Label name="pvDetail" class="hd-board__pvdetail" />
             <ui:VisualElement class="hd-board__pvbuttons">
-                <ui:Button name="pvGo" class="hd-btn hd-btn--primary" />
                 <ui:Button name="pvCancel" class="hd-btn hd-btn--secondary" />
+                <ui:Button name="pvGo" class="hd-btn hd-btn--primary hd-board__pvgo" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement class="hd-board__hud">
-            <ui:VisualElement name="squad" class="hd-board__squad" />
-            <ui:VisualElement class="hd-board__center">
-                <ui:Label name="hint" class="hd-board__hint" />
-                <ui:Label name="pm" class="hd-board__pm" />
-                <ui:VisualElement class="hd-board__reserve"><ui:VisualElement name="reserveFill" class="hd-board__reservefill" /><ui:Label name="reserveText" class="hd-board__reservetext" /></ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="die" class="hd-board__die"><ui:Label name="dieFace" class="hd-board__dieface" text="-" /></ui:VisualElement>
-            <ui:VisualElement class="hd-board__actions">
-                <ui:VisualElement class="hd-board__row">
-                    <ui:Button name="roll" class="hd-btn hd-btn--primary hd-board__roll" />
-                    <ui:Button name="bonus" class="hd-btn hd-btn--secondary hd-board__bonus" />
+            <ui:Label name="hint" class="hd-board__hint" />
+            <ui:VisualElement class="hd-board__hudrow">
+                <ui:VisualElement name="squad" class="hd-board__squad" />
+                <ui:VisualElement class="hd-board__center">
+                    <ui:Label name="pm" class="hd-board__pm" />
+                    <ui:VisualElement class="hd-board__reserve"><ui:VisualElement name="reserveFill" class="hd-board__reservefill" /><ui:Label name="reserveText" class="hd-board__reservetext" /></ui:VisualElement>
                 </ui:VisualElement>
-                <ui:Button name="end" class="hd-btn hd-btn--ghost hd-board__end" />
+                <ui:VisualElement name="die" class="hd-board__die"><ui:Label name="dieFace" class="hd-board__dieface" /></ui:VisualElement>
+                <ui:VisualElement class="hd-board__actions">
+                    <ui:Button name="bonus" class="hd-btn hd-btn--secondary hd-board__bonus" />
+                    <ui:Button name="end" class="hd-btn hd-btn--secondary hd-board__end" />
+                    <ui:Button name="roll" class="hd-btn hd-btn--primary hd-board__roll" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="burst" class="hd-board__burst">

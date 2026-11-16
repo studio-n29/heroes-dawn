@@ -3,16 +3,43 @@
     <ui:VisualElement name="screen" class="hd-screen login">
         <ui:VisualElement class="login__backdrop" />
         <ui:VisualElement class="login__veil" />
+        <ui:VisualElement class="login__shade login__shade--top" picking-mode="Ignore" />
+        <ui:VisualElement class="login__shade login__shade--bottom" picking-mode="Ignore" />
         <ui:VisualElement name="hero" class="login__hero" />
+        <!-- Cadre fin laiton de la planche 1.1 : filet et deux coins marqués. -->
+        <ui:VisualElement class="login__frame" picking-mode="Ignore">
+            <ui:VisualElement class="login__corner login__corner--tl" picking-mode="Ignore">
+                <ui:VisualElement class="login__cornerfill" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="login__corner login__corner--br" picking-mode="Ignore">
+                <ui:VisualElement class="login__cornerfill" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="safe" class="hd-fill login__safe">
-            <ui:VisualElement name="lockup" class="login__lockup">
-                <ui:VisualElement name="logo" class="login__logo" />
+            <ui:VisualElement name="lockup" class="login__lockup" picking-mode="Ignore">
+                <!-- Logotype ivoire, étoile laiton : trois fenêtres sur la même image (ivoire, or, ivoire). -->
+                <ui:VisualElement name="logo" class="login__logo" picking-mode="Ignore">
+                    <ui:VisualElement class="login__logoclip login__logoclip--left" picking-mode="Ignore">
+                        <ui:VisualElement class="login__logoimg login__logoimg--left" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="login__logoclip login__logoclip--star" picking-mode="Ignore">
+                        <ui:VisualElement class="login__logoimg login__logoimg--star" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="login__logoclip login__logoclip--right" picking-mode="Ignore">
+                        <ui:VisualElement class="login__logoimg login__logoimg--right" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="actions" class="login__actions">
                 <ui:Label name="status" class="hd-text hd-text--muted hd-text--center login__status" />
                 <ui:VisualElement name="spinner" class="login__spinner" />
-                <ui:Button name="play" class="hd-btn hd-btn--primary login__play" />
-                <ui:Button name="account" class="hd-btn hd-btn--secondary login__account" />
+                <ui:Button name="play" class="hd-btn hd-btn--primary login__play">
+                    <ui:VisualElement class="login__btnicon login__btnicon--star" picking-mode="Ignore" />
+                    <ui:VisualElement class="login__btnicon login__btnicon--chevron" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Button name="account" class="hd-btn hd-btn--secondary login__account">
+                    <ui:VisualElement class="login__btnicon login__btnicon--account" picking-mode="Ignore" />
+                </ui:Button>
             </ui:VisualElement>
             <ui:Label name="studio" class="hd-text hd-text--heading login__studio" />
         </ui:VisualElement>

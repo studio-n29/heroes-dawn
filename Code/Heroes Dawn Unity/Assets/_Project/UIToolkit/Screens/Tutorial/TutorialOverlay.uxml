@@ -11,22 +11,28 @@
             <ui:VisualElement name="bracket1" class="hd-tut__bracket" />
             <ui:VisualElement name="bracket2" class="hd-tut__bracket" />
             <ui:VisualElement name="bracket3" class="hd-tut__bracket" />
-            <ui:Label name="pointer" class="hd-tut__pointer" text="▲" />
+            <ui:Label name="pointer" class="hd-tut__pointer" />
         </ui:VisualElement>
         <ui:VisualElement name="bubble" class="hd-tut__bubble">
             <ui:VisualElement name="medal" class="hd-tut__medal" />
+            <ui:VisualElement picking-mode="Ignore" class="hd-tut__medal-ring" />
             <ui:Label name="title" class="hd-tut__title" />
             <ui:Label name="body" class="hd-tut__body" />
             <ui:Label name="progress" class="hd-tut__progress" />
             <ui:VisualElement class="hd-tut__buttons">
-                <ui:Button name="skip" class="hd-btn hd-btn--ghost hd-btn--small" />
+                <ui:Button name="skip" class="hd-btn hd-btn--ghost hd-btn--small hd-tut__skip">
+                    <ui:VisualElement picking-mode="Ignore" class="hd-tut__skip-chevron hd-icon--forward hd-icon--tint-muted" />
+                </ui:Button>
                 <ui:Button name="ok" class="hd-btn hd-btn--primary" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="hint" class="hd-tut__hint">
-            <ui:Label name="hintTitle" class="hd-tut__hint-title" />
-            <ui:Label name="hintBody" class="hd-tut__hint-body" />
-            <ui:Button name="hintOk" class="hd-btn hd-btn--primary hd-btn--small" />
+            <ui:VisualElement picking-mode="Ignore" class="hd-tut__hint-icon hd-icon--info" />
+            <ui:VisualElement class="hd-tut__hint-text">
+                <ui:Label name="hintTitle" class="hd-tut__hint-title" />
+                <ui:Label name="hintBody" class="hd-tut__hint-body" />
+            </ui:VisualElement>
+            <ui:Button name="hintOk" class="hd-btn hd-btn--primary hd-btn--small hd-tut__hint-ok" />
         </ui:VisualElement>
         <ui:VisualElement name="fx" class="hd-tut__fx" />
     </ui:VisualElement>

@@ -16,6 +16,7 @@ namespace N29.HeroesDawn.Presentation.UiToolkit
     {
         /// <summary>Marge de la zone sûre des consoles (surbalayage des téléviseurs), en fraction de la taille.</summary>
         public const float ConsoleMargin = 0.05f;
+        const long DecoRescanMs = 400;
 
         UIDocument? _doc;
 
@@ -48,6 +49,9 @@ namespace N29.HeroesDawn.Presentation.UiToolkit
             ApplyMode(HdInput.Mode);
             Bind();
             ApplySafeArea();
+            // Ornements des boutons principaux (étoile, chevron) : à l'activation, puis à intervalle lent pour les boutons créés ou basculés ensuite.
+            HdButtonDeco.Apply(root);
+            root.schedule.Execute(() => HdButtonDeco.Apply(root)).Every(DecoRescanMs);
             IsVisible = true;
             Shown?.Invoke();
         }

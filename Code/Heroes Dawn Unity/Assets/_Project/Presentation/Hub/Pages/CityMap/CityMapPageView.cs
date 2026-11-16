@@ -23,13 +23,21 @@ namespace N29.HeroesDawn.Presentation.Hub
             public string ZoneId = "";
         }
 
+        /// <summary>Cartouche d'un quartier : nom, puis état (icône de lieu, cadenas si verrouillé).</summary>
+        sealed class Plate
+        {
+            public VisualElement Root = null!;
+            public Label Name = null!, State = null!;
+        }
+
         readonly Dictionary<string, HdPolygon> _polygons = new Dictionary<string, HdPolygon>();
-        readonly Dictionary<string, Label> _tags = new Dictionary<string, Label>();
+        readonly Dictionary<string, Plate> _tags = new Dictionary<string, Plate>();
         readonly Dictionary<string, bool> _lockedBoroughs = new Dictionary<string, bool>();
         readonly Dictionary<string, string> _tagText = new Dictionary<string, string>();
         readonly List<Point> _points = new List<Point>();
         readonly List<UnityEngine.UIElements.Button> _rows = new List<UnityEngine.UIElements.Button>();
         readonly List<string> _rowIds = new List<string>();
+        readonly List<Label> _rowTitles = new List<Label>(), _rowStatus = new List<Label>();
         VisualElement _mapArea = null!, _rowBox = null!, _objectives = null!;
         Label _actTitle = null!, _detailTitle = null!, _description = null!, _chips = null!, _rewards = null!;
         UnityEngine.UIElements.Button _deploy = null!, _chapters = null!;
@@ -61,7 +69,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _deploy.clicked += () => DeployClicked?.Invoke();
             HdTutorialAnchor.Attach(this, _deploy, TutorialTarget.MapDeploy);
             _chapters.clicked += () => ChaptersClicked?.Invoke();
-            _polygons.Clear(); _tags.Clear(); _points.Clear(); _rows.Clear(); _rowIds.Clear();
+            _polygons.Clear(); _tags.Clear(); _points.Clear(); _rows.Clear(); _rowIds.Clear(); _rowTitles.Clear(); _rowStatus.Clear();
             _built = false;
             if (_last.HasValue) Show(_last.Value);
         }
@@ -80,7 +88,12 @@ namespace N29.HeroesDawn.Presentation.Hub
                 var b = new UnityEngine.UIElements.Button();
                 b.AddToClassList("hd-btn"); b.AddToClassList("hd-btn--small"); b.AddToClassList("hd-map__row");
                 b.clicked += () => { if (index < _rowIds.Count && !string.IsNullOrEmpty(_rowIds[index])) ZoneSelected?.Invoke(_rowIds[index]); };
-                _rows.Add(b); _rowIds.Add(""); _rowBox.Add(b);
+                // Ligne de zone : icône d'état, nom, état en clair à droite.
+                var icon = new VisualElement { pickingMode = PickingMode.Ignore }; icon.AddToClassList("hd-map__rowicon");
+                var title = new Label { pickingMode = PickingMode.Ignore }; title.AddToClassList("hd-map__rowtitle");
+                var status = new Label { pickingMode = PickingMode.Ignore }; status.AddToClassList("hd-map__rowstatus");
+                b.Add(icon); b.Add(title); b.Add(status);
+                _rows.Add(b); _rowIds.Add(""); _rowTitles.Add(title); _rowStatus.Add(status); _rowBox.Add(b);
             }
             for (int i = 0; i < _rows.Count; i++)
             {
@@ -89,7 +102,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 if (!used) { _rowIds[i] = ""; continue; }
                 var r = d.Rows[i];
                 _rowIds[i] = r.ZoneId;
-                _rows[i].text = r.Title + "  ·  " + r.StatusText;
+                _rowTitles[i].text = r.Title; _rowStatus[i].text = r.StatusText;
+                _rows[i].EnableInClassList("hd-map__row--locked", r.Status == ZoneStatus.Locked);
+                _rows[i].EnableInClassList("hd-map__row--done", r.Status == ZoneStatus.Done);
                 _rows[i].EnableInClassList("hd-btn--primary", r.Selected);
                 _rows[i].EnableInClassList("hd-btn--secondary", !r.Selected);
                 _rows[i].SetEnabled(r.Status != ZoneStatus.Locked || r.Selected);
@@ -104,12 +119,18 @@ namespace N29.HeroesDawn.Presentation.Hub
             for (int i = 0; i < z.Objectives.Length; i++)
             {
                 bool done = z.ObjectivesDone[i];
-                var line = new Label((done ? "[X] " : "[  ] ") + z.Objectives[i]);
-                line.AddToClassList("hd-pop__text");
-                line.style.color = done ? Theme.Success : Theme.Text;
+                // Case à cocher du kit, puis le libellé de l'objectif.
+                var line = new VisualElement { pickingMode = PickingMode.Ignore };
+                line.AddToClassList("hd-m-check");
+                line.EnableInClassList("hd-m-check--done", done);
+                var box = new VisualElement { pickingMode = PickingMode.Ignore }; box.AddToClassList("hd-check"); box.AddToClassList("hd-check--sm"); box.AddToClassList("hd-m-check__box"); box.EnableInClassList("hd-check--on", done);
+                var text = new Label(z.Objectives[i]) { pickingMode = PickingMode.Ignore }; text.AddToClassList("hd-m-check__text");
+                line.Add(box); line.Add(text);
                 _objectives.Add(line);
             }
             _rewards.text = z.Rewards;
+            _rewards.style.display = string.IsNullOrEmpty(z.Rewards) ? DisplayStyle.None : DisplayStyle.Flex;
+            _description.style.display = string.IsNullOrEmpty(z.Description) ? DisplayStyle.None : DisplayStyle.Flex;
             _deploy.text = z.ButtonLabel;
             _deploy.SetEnabled(z.ButtonEnabled);
             _deploy.tooltip = z.Reason;
@@ -118,7 +139,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         void Build(CityMapPageData d)
         {
             _mapArea.Clear();
-            // Quartiers d'abord (dessous), puis les points (dessus).
+            // Quartiers d'abord (dessous), puis leurs cartouches, puis les points (dessus) : aucun quartier ne recouvre le nom d'un autre.
             foreach (var b in d.Boroughs)
             {
                 var poly = new HdPolygon();
@@ -131,12 +152,24 @@ namespace N29.HeroesDawn.Presentation.Hub
                 poly.RegisterCallback<ClickEvent>(_ => { if (IsLocked(id)) LockedTapped?.Invoke(TagOf(id)); });
                 _polygons[b.Id] = poly;
                 _mapArea.Add(poly);
-                var tag = new Label { pickingMode = PickingMode.Ignore };
-                tag.AddToClassList("hd-map__tag");
-                tag.style.left = Length.Percent(b.LabelAt.x * 100f);
-                tag.style.top = Length.Percent(b.LabelAt.y * 100f);
-                _tags[b.Id] = tag;
-                _mapArea.Add(tag);
+            }
+            foreach (var b in d.Boroughs)
+            {
+                var anchor = new VisualElement { pickingMode = PickingMode.Ignore };
+                anchor.AddToClassList("hd-map__tag");
+                anchor.style.left = Length.Percent(b.LabelAt.x * 100f);
+                anchor.style.top = Length.Percent(b.LabelAt.y * 100f);
+                var plate = new Plate { Root = new VisualElement { pickingMode = PickingMode.Ignore } };
+                plate.Root.AddToClassList("hd-map__plate");
+                plate.Name = new Label { pickingMode = PickingMode.Ignore }; plate.Name.AddToClassList("hd-map__platename");
+                var state = new VisualElement { pickingMode = PickingMode.Ignore }; state.AddToClassList("hd-map__platestate");
+                var icon = new VisualElement { pickingMode = PickingMode.Ignore }; icon.AddToClassList("hd-map__plateicon");
+                plate.State = new Label { pickingMode = PickingMode.Ignore }; plate.State.AddToClassList("hd-map__platetag");
+                state.Add(icon); state.Add(plate.State);
+                plate.Root.Add(plate.Name); plate.Root.Add(state);
+                anchor.Add(plate.Root);
+                _tags[b.Id] = plate;
+                _mapArea.Add(anchor);
             }
             foreach (var p in d.Points)
             {
@@ -179,13 +212,15 @@ namespace N29.HeroesDawn.Presentation.Hub
             var poly = _polygons[b.Id];
             _lockedBoroughs[b.Id] = b.Locked;
             _tagText[b.Id] = b.Tag;
-            poly.Fill = b.Locked ? Theme.WithAlpha(Theme.Surface3, 0.85f) : b.Highlight ? Theme.WithAlpha(Theme.Glow, 0.9f) : Theme.WithAlpha(Color.Lerp(Theme.SkyTop, Theme.Surface2, 0.5f), 0.95f);
-            poly.Outline = b.Locked ? Theme.WithAlpha(Theme.Navy, 0.5f) : Theme.Primary;
-            poly.OutlineWidth = b.Locked ? 4f : 7f;
+            // Voiles translucides : le décor de la ville reste lisible sous les quartiers ; le quartier courant est doré.
+            poly.Fill = b.Locked ? Theme.WithAlpha(Theme.Surface3, 0.72f) : b.Highlight ? Theme.WithAlpha(Theme.Glow, 0.62f) : Theme.WithAlpha(Color.Lerp(Theme.SkyTop, Theme.Surface2, 0.5f), 0.8f);
+            poly.Outline = b.Locked ? Theme.WithAlpha(Theme.FrostEdge, 0.55f) : b.Highlight ? Theme.Accent : Theme.Primary;
+            poly.OutlineWidth = b.Locked ? 3f : 6f;
             poly.Repaint();
-            var tag = _tags[b.Id];
-            tag.text = b.Name + " · " + b.Tag;
-            tag.style.color = b.Locked ? Theme.TextMuted : Theme.Text;
+            var plate = _tags[b.Id];
+            plate.Name.text = b.Name;
+            plate.State.text = b.Tag;
+            plate.Root.EnableInClassList("hd-map__plate--locked", b.Locked);
         }
     }
 }

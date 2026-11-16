@@ -14,8 +14,8 @@ namespace N29.HeroesDawn.Presentation.Combat
     public sealed partial class CombatHudView
     {
         const int FanSlots = 4;
-        static readonly float[] FanX = { -285f, -95f, 95f, 285f };
-        static readonly float[] FanRotate = { -3f, -1f, 1f, 3f };
+        /// <summary>Largeur de la zone des cartes, largeur d'une carte et pas entre deux cartes (pixels de référence, voir .hd-hud__fan et .hd-skill).</summary>
+        const float FanWidth = 760f, FanCardWidth = 180f, FanStep = 190f;
 
         VisualElement _allies = null!, _enemies = null!, _fan = null!, _fanAnchor = null!, _desc = null!, _drop = null!, _fx = null!, _spotlight = null!;
         Label _descTitle = null!, _descText = null!, _arenaTitle = null!;
@@ -61,8 +61,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             for (int i = 0; i < FanSlots; i++)
             {
                 var card = new SkillCardHud();
-                card.Root.style.left = 380f + FanX[i] - 90f;
-                card.SetHome(FanRotate[i]);
+                card.Root.style.left = (FanWidth - (FanSlots * FanStep - (FanStep - FanCardWidth))) * 0.5f + i * FanStep;
+                card.SetHome(0f);
                 card.Holding += (c, held) => SkillHolding?.Invoke(c, held);
                 card.DragBegan += c => SkillDragBegan?.Invoke(c);
                 card.DragEnded += (c, at) => SkillDragEnded?.Invoke(c, at);
@@ -119,7 +119,10 @@ namespace N29.HeroesDawn.Presentation.Combat
             if (art == null) return;
             _spotlightArt = art;
             if (_spotlight == null) return;
-            _spotlight.style.backgroundImage = new StyleBackground(Background.FromSprite(art));
+            // L'agent détouré est posé en grand sur le décor ; sans détourage, l'illustration reste dans un cadre fin.
+            var cutout = AgentArt.Cutout(art.name);
+            _spotlight.EnableInClassList("hd-hud__spotlight--cutout", cutout != null);
+            _spotlight.style.backgroundImage = new StyleBackground(Background.FromSprite(cutout != null ? cutout : art));
             _spotlight.style.display = DisplayStyle.Flex;
         }
 
@@ -147,6 +150,16 @@ namespace N29.HeroesDawn.Presentation.Combat
                 _fanCards[i].Show(slotData, i);
                 // Trois cartes en éventail ; la 4e (carte du grimoire) n'apparaît que si elle existe.
                 if (i >= 3) _fanCards[i].Root.style.display = slotData.Visible && !slotData.Locked ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+            // Les cartes affichées sont alignées à plat et centrées en bas de l'écran.
+            int shown = 0;
+            foreach (var c in _fanCards) if (c.Root.style.display == DisplayStyle.Flex) shown++;
+            float x = (FanWidth - (shown * FanStep - (FanStep - FanCardWidth))) * 0.5f;
+            foreach (var c in _fanCards)
+            {
+                if (c.Root.style.display != DisplayStyle.Flex) continue;
+                c.Root.style.left = x;
+                x += FanStep;
             }
             if (opening) AnimateFanIn();
         }

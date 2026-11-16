@@ -3,10 +3,14 @@
         <ui:ScrollView name="categories" class="hd-panel hd-settings__cats" />
         <ui:VisualElement class="hd-panel hd-settings__main">
             <ui:VisualElement class="hd-settings__head">
+                <ui:VisualElement name="titleIcon" class="hd-settings__titleicon" />
                 <ui:Label name="title" class="hd-settings__title" />
-                <ui:Button name="reset" class="hd-btn hd-btn--danger hd-btn--small" />
             </ui:VisualElement>
+            <ui:VisualElement class="hd-settings__rule" />
             <ui:ScrollView name="rows" class="hd-settings__rows" />
+            <ui:VisualElement class="hd-settings__foot">
+                <ui:Button name="reset" class="hd-btn hd-btn--ghost hd-btn--small hd-settings__reset" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

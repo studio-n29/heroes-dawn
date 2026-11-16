@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.UiToolkit;
 using UnityEngine;
@@ -86,6 +87,13 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (TabsHost != null) TabsHost.style.display = HasShopTabs ? DisplayStyle.Flex : DisplayStyle.None;
             _grid.contentContainer.style.flexDirection = FlexDirection.Row;
             _grid.contentContainer.style.flexWrap = Wrap.Wrap;
+            // Classes de variante pour la feuille de style : registre (portraits), collections (grimoire, inventaire, équipement).
+            var page = TryQ<VisualElement>("page");
+            if (page != null)
+            {
+                page.EnableInClassList("hd-grid--portrait", PortraitFraming);
+                page.EnableInClassList("hd-grid--collection", !HasShopTabs && !PortraitFraming);
+            }
             HeaderButtonA = new HdButtonRef(_headerA, this); HeaderButtonB = new HdButtonRef(_headerB, this);
             _headerA.clicked += () => HeaderClicked?.Invoke(0);
             _headerB.clicked += () => HeaderClicked?.Invoke(1);
@@ -147,8 +155,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                     {
                         int group = g, option = o;
                         var b = new UnityEngine.UIElements.Button { text = groups[g].Labels[o] };
-                        b.AddToClassList("hd-btn"); b.AddToClassList("hd-btn--small"); b.AddToClassList("hd-list__filter");
+                        b.AddToClassList("hd-btn"); b.AddToClassList("hd-btn--small"); b.AddToClassList("hd-btn--plain"); b.AddToClassList("hd-list__filter");
                         b.clicked += () => FilterClicked?.Invoke(group, option);
+                        AddFamilyIcon(b);
                         row.Add(b); buttons.Add(b);
                     }
                     _filters.Add(row); _filterButtons.Add(buttons);
@@ -162,6 +171,20 @@ namespace N29.HeroesDawn.Presentation.Hub
                     _filterButtons[g][o].EnableInClassList("hd-btn--primary", on);
                     _filterButtons[g][o].EnableInClassList("hd-btn--secondary", !on);
                 }
+        }
+
+        /// <summary>Un filtre qui porte le nom d'une famille reçoit l'icône de cette famille devant son libellé.</summary>
+        static void AddFamilyIcon(UnityEngine.UIElements.Button filter)
+        {
+            foreach (Family f in Enum.GetValues(typeof(Family)))
+            {
+                if (!string.Equals(filter.text, Loc.FamilyName(f), StringComparison.OrdinalIgnoreCase)) continue;
+                filter.AddToClassList("hd-tm-ibtn");
+                var icon = HdTeamUi.FamilyIcon(f);
+                icon.AddToClassList("hd-tm-ibtn__ico");
+                filter.Add(icon);
+                return;
+            }
         }
 
         /// <summary>Pas de colonne de droite sur cette page : la fiche détaillée la remplace.</summary>
@@ -209,7 +232,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 _tiles[i].Root.style.display = used ? DisplayStyle.Flex : DisplayStyle.None;
                 if (used) ShowTile(_tiles[i], _rows[_rowOf[i]], _rowOf[i] == _selectedRow);
             }
-            ShowDetail(_selectedRow >= 0 && _selectedRow < _rows.Length ? _rows[_selectedRow] : (InfoRowData?)null);
+            // Grille vide (aucun objet, aucun résultat de filtre) : la fiche reprend le message de la liste au lieu de rester vide.
+            if (_rowOf.Count == 0 && _rows.Length > 0) ShowDetail(_rows[0]);
+            else ShowDetail(_selectedRow >= 0 && _selectedRow < _rows.Length ? _rows[_selectedRow] : (InfoRowData?)null);
         }
 
         Tile NewTile(int index)
@@ -227,12 +252,15 @@ namespace N29.HeroesDawn.Presentation.Hub
             return t;
         }
 
-        static void ShowTile(Tile t, InfoRowData r, bool selected)
+        void ShowTile(Tile t, InfoRowData r, bool selected)
         {
             t.Title.text = r.Title;
             t.Sub.text = r.Badge ?? "";
             t.Sub.style.display = string.IsNullOrEmpty(r.Badge) ? DisplayStyle.None : DisplayStyle.Flex;
-            t.Art.style.backgroundImage = r.Art != null ? new StyleBackground(r.Art) : new StyleBackground(StyleKeyword.Null);
+            // Registre : portrait cadré sur le visage ; ailleurs l'illustration de la carte ou de l'objet (sans illustration : case « plus »).
+            if (PortraitFraming) HdTeamUi.Head(t.Art, r.Art);
+            else t.Art.style.backgroundImage = r.Art != null ? new StyleBackground(r.Art) : new StyleBackground(StyleKeyword.Null);
+            t.Art.EnableInClassList("hd-tile__art--none", r.Art == null);
             Color frame = selected ? Theme.Primary : r.TagColor.a > 0.01f ? r.TagColor : Theme.Outline;
             t.Root.style.borderTopColor = t.Root.style.borderBottomColor = t.Root.style.borderLeftColor = t.Root.style.borderRightColor = frame;
             t.Root.EnableInClassList("hd-tile--selected", selected);
@@ -247,7 +275,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             _detailText.text = has ? row!.Value.Subtitle ?? "" : "";
             bool art = has && row!.Value.Art != null;
             _detailArt.style.display = art ? DisplayStyle.Flex : DisplayStyle.None;
-            _detailArt.style.backgroundImage = art ? new StyleBackground(row!.Value.Art) : new StyleBackground(StyleKeyword.Null);
+            if (PortraitFraming) HdTeamUi.Head(_detailArt, art ? row!.Value.Art : null);
+            else _detailArt.style.backgroundImage = art ? new StyleBackground(row!.Value.Art) : new StyleBackground(StyleKeyword.Null);
             _detailArt.EnableInClassList("hd-grid__detailart--portrait", PortraitFraming);
             Apply(_detailButtons[0], has ? row!.Value.A : default);
             Apply(_detailButtons[1], has ? row!.Value.B : default);

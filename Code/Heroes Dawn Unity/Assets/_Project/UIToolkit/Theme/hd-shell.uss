@@ -1,0 +1,77 @@
+/* Heroes Dawn : ajustements de fidélité « planches » pour la zone shell. Importé après hd.uss : ces règles priment à spécificité égale. */
+
+/* ================================================================================================================
+   AIDE-MÉMOIRE DES CLASSES COMMUNES (définies dans hd.uss, sections communes ; utilisables par toutes les zones)
+
+   Icônes ........ « hd-icon » (carré 40 px, image ajustée) + taille « hd-icon--xs » 20, « --sm » 28, « --md » 40, « --lg » 56, « --xl » 72
+                   + glyphe blanc du kit : « hd-icon--back », « --forward », « --up », « --down », « --plus », « --minus », « --check »,
+                     « --close », « --lock », « --settings », « --info », « --warning », « --error », « --gift », « --clock », « --dice »,
+                     « --document », « --filter », « --health », « --attack », « --defense », « --speed », « --fatigue », « --energy », « --heal »
+                   + teinte : « hd-icon--tint-ivory », « --tint-brass », « --tint-ink », « --tint-muted », « --tint-danger », « --tint-success »
+                   Glyphes déjà colorés (sans teinte) : « hd-icon--star » (étoile laiton), « hd-icon--credits », « --pr », « --gems » (traits colorés),
+                     « hd-icon--qg », « --team », « --pass », « --shop », « --profile », « --quest » (laiton).
+                   Exemple : <ui:VisualElement class="hd-icon hd-icon--sm hd-icon--lock hd-icon--tint-muted" />
+   Case à cocher . « hd-check » (vide) + « hd-check--on » (cochée) ; « hd-check--sm » 30 px. Remplace « [ ] » et « [x] ».
+   Monnaie ....... « hd-coin » + « hd-coin--credits » | « --pr » | « --gems » (disque coloré, glyphe sombre) ; « hd-coin--sm » 30 px.
+                   Pastille de portefeuille complète : <VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--credits">
+                     <VisualElement class="hd-wallet__unit" /><Label class="hd-wallet__value" /></VisualElement>
+                   (un ancien Label « CR » de classe « hd-wallet__unit » devient la pièce sans changer le modèle : son texte n'est plus affiché).
+   Niveau ........ « hd-level » sur un Label (plaque ivoire à coin coupé, chiffres sombres) ; « hd-level--sm ».
+   Notification .. « hd-dot » (point rouge 16 px) ; pastille chiffrée existante : « hd-badge » (absolue, coin haut droit du parent).
+   Portrait ...... <VisualElement class="hd-portrait-frame [hd-portrait-frame--sm|--lg] [--enemy|--boss|--selected|--empty|--matter|--elemental|--physical-bio|--perception]">
+                     <VisualElement class="hd-portrait-frame__art" />   (illustration « -head » posée en C# par style.backgroundImage)
+                     <VisualElement class="hd-portrait-frame__ring" /></VisualElement>
+   Boutons ....... « hd-btn--primary » reçoit seul son étoile (à gauche du libellé) et son chevron (à droite) : HdButtonDeco (C#) les pose
+                   sur tout bouton principal non « hd-btn--small ». Ajouter « hd-btn--plain » pour les refuser (bascule, filtre, rangée sélectionnée).
+                   « hd-btn--icon » : bouton carré à icône seule (enfant « hd-icon »). « hd-btn--lead » + enfant « hd-btn__lead hd-icon--back » :
+                   bouton précédé d'un chevron (retour).
+   Fenêtres ...... « hd-modal__title » porte l'étoile et se centre seul ; « hd-divider » juste dessous = filet ; « hd-modal__body » = encart mat ;
+                   « hd-modal__buttons » : secondaire à gauche, principal à droite.
+   ================================================================================================================ */
+
+/* ---------------------------------------------------------------- Tutoriel : bulle de Rayner */
+.hd-tut__bubble { position: absolute; left: 50%; width: 1060px; margin-left: -530px; height: auto; min-height: 250px; padding: 18px 28px 112px 180px;
+    background-color: rgba(0, 0, 0, 0); border-width: 0; border-radius: 0;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Surfaces/surface-tutorial.png");
+    -unity-slice-left: 40; -unity-slice-top: 40; -unity-slice-right: 40; -unity-slice-bottom: 32; display: none; }
+.hd-tut__medal { position: absolute; left: 32px; top: 28px; width: 120px; height: 120px; border-radius: 60px; border-width: 0; overflow: hidden;
+    background-color: var(--hd-surface-3); -unity-background-scale-mode: scale-and-crop; }
+.hd-tut__medal-ring { position: absolute; left: 24px; top: 20px; width: 136px; height: 136px; -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/portrait-ally.png"); }
+.hd-tut__title { align-self: flex-start; margin: 0; padding: 2px 18px; background-color: var(--hd-brass); border-radius: 0;
+    -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-ink); }
+.hd-tut__body { margin: 10px 0 0 0; padding: 0; -unity-font: var(--hd-font-body); font-size: 28px; color: var(--hd-ivory); white-space: normal; flex-shrink: 1; max-width: 840px; }
+.hd-tut__progress { position: absolute; right: 28px; top: 18px; -unity-font: var(--hd-font-heading); font-size: 26px; color: var(--hd-brass-soft); }
+.hd-tut__buttons { position: absolute; left: 180px; right: 24px; bottom: 16px; flex-direction: row; justify-content: space-between; align-items: center; }
+.hd-tut__skip { padding-right: 56px; color: var(--hd-muted); }
+.hd-tut__buttons > .hd-btn--primary { min-width: 300px; }
+.hd-tut__skip-chevron { position: absolute; right: 18px; top: 50%; margin-top: -13px; width: 26px; height: 26px; -unity-background-scale-mode: scale-to-fit; }
+/* Flèche de désignation : chevron du kit teinté laiton (le texte du Label reste vide). */
+.hd-tut__pointer { -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-brass); }
+.hd-tut__pointer--up { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/up.png"); }
+.hd-tut__pointer--down { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/down.png"); }
+.hd-tut__ring { border-width: 3px; border-radius: 0; }
+.hd-tut__ripple { border-width: 2px; border-radius: 0; }
+.hd-tut__bracket { border-left-width: 4px; border-top-width: 4px; border-color: var(--hd-brass-soft); }
+
+/* ---------------------------------------------------------------- Tutoriel : astuce contextuelle
+   Bandeau compact en bas à gauche, au-dessus de la barre de navigation : il ne couvre ni l'en-tête ni les filtres de la page,
+   ni l'action principale (en bas à droite sur les planches). */
+.hd-tut__hint { position: absolute; left: 24px; margin-left: 0; top: auto; bottom: 128px; width: 46%; min-width: 620px; max-width: 900px; min-height: 0;
+    flex-direction: row; align-items: center; padding: 12px 18px 12px 20px;
+    background-color: rgba(0, 0, 0, 0); border-width: 0; border-radius: 0;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Surfaces/surface-tutorial.png");
+    -unity-slice-left: 40; -unity-slice-top: 40; -unity-slice-right: 40; -unity-slice-bottom: 32; display: none; }
+.hd-tut__hint-icon { width: 36px; height: 36px; margin-right: 16px; flex-shrink: 0; -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-info); }
+.hd-tut__hint-text { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; }
+.hd-tut__hint-title { align-self: flex-start; margin: 0; padding: 0; background-color: rgba(0, 0, 0, 0); border-radius: 0;
+    -unity-font: var(--hd-font-title); font-size: 24px; color: var(--hd-brass); }
+.hd-tut__hint-body { margin: 2px 0 0 0; padding: 0; -unity-font: var(--hd-font-body); font-size: 24px; color: var(--hd-ivory); white-space: normal; max-width: 100%; }
+.hd-tut__hint .hd-tut__hint-ok { position: relative; right: auto; bottom: auto; margin-left: 18px; min-width: 110px; flex-shrink: 0; }
+
+/* ---- Second tour de fidélité (2026-11-16) ---- */
+/* Le bouton retour garde son libellé sur une ligne (sans quoi il s'empilait lettre par lettre dans une largeur trop courte). */
+.hd-btn--lead { white-space: nowrap; }
+.hd-topbar__back { min-width: 230px; }
+/* Les boutons qui dessinent eux-mêmes leur étoile et leur chevron (titre, QG) ne reçoivent pas ceux de l'aide commune. */
+.hd-btn.login__play > .hd-btn__deco, .hd-btn.hd-qg__mission > .hd-btn__deco { display: none; }

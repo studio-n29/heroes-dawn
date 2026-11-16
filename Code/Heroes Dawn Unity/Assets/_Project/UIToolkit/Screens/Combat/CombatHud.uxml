@@ -15,13 +15,17 @@
             <ui:Label name="axisLabel" class="hd-tl__axis-label" />
         </ui:VisualElement>
         <ui:VisualElement class="hd-hud__top">
-            <ui:Button name="retreat" class="hd-btn hd-btn--danger hd-hud__btn" />
+            <ui:Button name="retreat" class="hd-btn hd-btn--secondary hd-hud__btn hd-hud__btn--icon">
+                <ui:VisualElement class="hd-hud__btn-icon hd-hud__btn-icon--back" picking-mode="Ignore" />
+            </ui:Button>
             <ui:Label name="title" class="hd-hud__title" />
             <ui:VisualElement class="hd-hud__spacer" />
             <ui:Button name="debugWin" class="hd-btn hd-btn--ghost hd-hud__btn hd-hud__btn--small" />
             <ui:Button name="auto" class="hd-btn hd-btn--secondary hd-hud__btn" />
-            <ui:Button name="speed" class="hd-btn hd-btn--secondary hd-hud__btn hd-hud__btn--speed" />
-            <ui:Button name="pause" class="hd-btn hd-btn--secondary hd-hud__btn hd-hud__btn--square" />
+            <ui:Button name="speed" class="hd-btn hd-btn--primary hd-btn--plain hd-hud__btn hd-hud__btn--speed" />
+            <ui:Button name="pause" class="hd-btn hd-btn--primary hd-btn--plain hd-hud__btn hd-hud__btn--icon">
+                <ui:VisualElement class="hd-hud__btn-icon hd-hud__btn-icon--pause" picking-mode="Ignore" />
+            </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement name="boss" class="hd-hud__boss">
             <ui:Label name="bossName" class="hd-hud__boss-name" />
@@ -36,6 +40,7 @@
         <ui:VisualElement name="bonuses" class="hd-hud__bonuses" />
         <ui:Label name="banner" class="hd-hud__banner" />
         <ui:VisualElement name="hintBand" class="hd-hud__hint">
+            <ui:VisualElement class="hd-hud__hint-star" picking-mode="Ignore" />
             <ui:Label name="hint" class="hd-hud__hint-text" />
         </ui:VisualElement>
         <ui:VisualElement class="hd-hud__log">

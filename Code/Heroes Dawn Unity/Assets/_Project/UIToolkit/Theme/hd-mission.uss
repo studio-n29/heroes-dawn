@@ -1,0 +1,195 @@
+/* Heroes Dawn : ajustements de fidélité « planches » pour la zone mission. Importé après hd.uss : ces règles priment à spécificité égale. */
+
+/* ---------------------------------------------------------------- Communs mission */
+/* L'étoile et le chevron des boutons principaux sont posés par le composant commun (HdButtonDeco). */
+
+/* Objectif à cocher : case commune « hd-check » puis libellé. */
+.hd-m-check { flex-direction: row; align-items: flex-start; flex-shrink: 0; margin-bottom: 6px; }
+.hd-m-check__box { margin: 2px 12px 0 0; }
+.hd-m-check__text { flex-grow: 1; flex-basis: 0; min-width: 0; margin: 0; padding: 0;
+    -unity-font: var(--hd-font-body); font-size: 24px; color: var(--hd-ivory); white-space: normal; }
+.hd-m-check--done .hd-m-check__text { color: var(--hd-success); }
+
+/* Bloc récompense : filet de laiton à gauche. */
+.hd-m-reward { flex-shrink: 0; margin: 4px 0 10px 0; padding: 8px 14px;
+    background-color: rgba(214, 175, 91, 0.12); border-left-width: 3px; border-left-color: var(--hd-brass);
+    -unity-font: var(--hd-font-heading); font-size: 26px; color: var(--hd-brass-soft); white-space: normal; }
+
+/* En-tête de fenêtre : icône et titre alignés à gauche. */
+.hd-m-pophead { flex-direction: row; align-items: center; flex-shrink: 0; margin-bottom: 4px; }
+.hd-m-pophead__icon { width: 56px; height: 56px; margin-right: 18px; flex-shrink: 0;
+    -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-brass); }
+.hd-m-pophead__icon--rest { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/heal.png"); }
+/* Le titre y perd l'étoile commune : l'icône propre à la fenêtre la remplace. */
+.hd-m-pophead > .hd-modal__title { flex-grow: 1; flex-basis: 0; min-width: 0; align-self: auto; margin-bottom: 0; padding-left: 0; background-image: none;
+    -unity-text-align: middle-left; white-space: normal; }
+
+/* ---------------------------------------------------------------- Carte de la ville */
+.hd-map__side { width: 640px; flex-shrink: 0; padding: 20px 24px 22px 24px; min-height: 0; overflow: hidden; }
+.hd-map__head { flex-direction: row; align-items: center; flex-shrink: 0; min-height: 64px; margin-bottom: 10px; }
+.hd-map__headicon { width: 40px; height: 40px; margin-right: 10px; flex-shrink: 0;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/location.png");
+    -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-brass); }
+.hd-map__acttitle { flex-grow: 1; flex-basis: 0; min-width: 0; margin: 0; -unity-font: var(--hd-font-title); font-size: 34px; color: var(--hd-ivory); white-space: normal; }
+.hd-map__chapters { flex-shrink: 0; margin-left: 10px; padding: 0 22px; font-size: 26px; }
+
+.hd-map__rows { flex-shrink: 0; margin-bottom: 0; }
+.hd-map__row { flex-direction: row; align-items: center; margin: 0 0 4px 0; min-height: 64px; padding: 0 22px; }
+.hd-map__rowicon { width: 28px; height: 28px; margin-right: 14px; flex-shrink: 0;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/flag.png");
+    -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-brass); }
+.hd-map__row--locked .hd-map__rowicon { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/lock.png"); -unity-background-image-tint-color: var(--hd-muted); }
+.hd-map__row--done .hd-map__rowicon { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/check.png"); -unity-background-image-tint-color: var(--hd-success); }
+.hd-map__rowtitle { flex-grow: 1; flex-basis: 0; min-width: 0; margin: 0; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    -unity-font: var(--hd-font-heading); font-size: 28px; color: var(--hd-ivory); -unity-text-align: middle-left; }
+.hd-map__rowstatus { flex-shrink: 0; margin: 0 0 0 10px; padding: 0; white-space: nowrap;
+    -unity-font: var(--hd-font-body-regular); font-size: 22px; color: var(--hd-muted); -unity-text-align: middle-right; }
+.hd-map__row--done .hd-map__rowstatus { color: var(--hd-success); }
+.hd-map__row:disabled .hd-map__rowtitle { color: rgba(236, 231, 220, 0.5); }
+.hd-map__row:disabled .hd-map__rowstatus { color: rgba(193, 205, 210, 0.5); }
+.hd-map__row.hd-btn--primary .hd-map__rowtitle { color: var(--hd-ink); }
+.hd-map__row.hd-btn--primary .hd-map__rowstatus { color: var(--hd-surface); }
+.hd-map__row.hd-btn--primary .hd-map__rowicon { -unity-background-image-tint-color: var(--hd-ink); }
+
+.hd-map__rule { height: 2px; flex-shrink: 0; margin: 6px 0 10px 0; background-color: var(--hd-brass); opacity: 0.45; }
+.hd-map__detail { flex-grow: 1; flex-basis: 0; min-height: 0; margin-bottom: 10px; }
+/* Rien ne se tasse dans la fiche : elle défile (les blocs tassés se chevauchaient). */
+.hd-map__detail .unity-scroll-view__content-container > * { flex-shrink: 0; }
+.hd-map__dtitle { flex-shrink: 0; -unity-font: var(--hd-font-title); font-size: 32px; color: var(--hd-brass); white-space: normal; }
+.hd-map__chips { flex-shrink: 0; margin-bottom: 8px; -unity-font: var(--hd-font-body-regular); font-size: 22px; color: var(--hd-muted); white-space: normal; }
+.hd-map__objectives { flex-shrink: 0; margin: 4px 0 4px 0; }
+.hd-map__rewards { font-size: 24px; }
+.hd-map__desc { flex-shrink: 0; margin-bottom: 4px; -unity-font: var(--hd-font-body-regular); font-size: 23px; color: var(--hd-muted); white-space: normal; }
+.hd-map__deploy { flex-shrink: 0; min-height: 96px; font-size: 46px; }
+
+/* Cartouche d'un quartier : nom, puis état avec icône (cadenas si verrouillé). L'ancre garde la largeur fixe centrée sur le point. */
+.hd-map__tag { align-items: center; }
+.hd-map__plate { align-items: center; padding: 6px 20px 8px 20px;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Surfaces/panel-ivory.png");
+    -unity-slice-left: 40; -unity-slice-top: 40; -unity-slice-right: 40; -unity-slice-bottom: 32; -unity-slice-scale: 0.5px; }
+.hd-map__plate--locked { opacity: 0.84; }
+.hd-map__platename { margin: 0; padding: 0; white-space: nowrap; -unity-font: var(--hd-font-title); font-size: 28px; color: var(--hd-ink); -unity-text-align: middle-center; }
+.hd-map__platestate { flex-direction: row; align-items: center; }
+.hd-map__plateicon { width: 18px; height: 18px; margin-right: 6px; flex-shrink: 0;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/location.png");
+    -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-ink); }
+.hd-map__plate--locked .hd-map__plateicon { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/lock.png"); }
+.hd-map__platetag { margin: 0; padding: 0; white-space: nowrap; -unity-font: var(--hd-font-body); font-size: 18px; color: var(--hd-surface); }
+
+/* ---------------------------------------------------------------- Plateau (HUD) */
+.hd-board__viewport { bottom: 214px; }
+
+/* Barre du haut : retour à chevron, titre ivoire, ressources à icônes. */
+.hd-board__back { height: 66px; min-width: 0; margin: 0 18px 0 0; padding-right: 26px; font-size: 28px; flex-shrink: 0; }
+.hd-board__zone { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 44px; color: var(--hd-ivory); }
+
+/* Objectifs : panneau marine, en-tête ivoire à étoile, cases à cocher. */
+.hd-board__objectives { left: 24px; top: 112px; width: 470px; padding: 10px 0 12px 0; border-radius: 0;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Surfaces/panel-navy.png");
+    -unity-slice-left: 40; -unity-slice-top: 40; -unity-slice-right: 40; -unity-slice-bottom: 32; }
+.hd-board__objhead { flex-direction: row; align-items: center; flex-shrink: 0; margin: 0 40px 10px 10px; padding: 2px 12px; background-color: var(--hd-ivory); }
+.hd-board__objstar { width: 26px; height: 26px; margin-right: 10px; flex-shrink: 0;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/FX/spark-four-point.png");
+    -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-brass-dark); }
+.hd-board__objtitle { margin: 0; padding: 0; font-size: 28px; color: var(--hd-ink); }
+.hd-board__objlist { padding: 0 18px; }
+.hd-board__objlist .hd-m-check { margin-bottom: 4px; }
+.hd-board__objlist .hd-m-check__box { width: 26px; height: 26px; margin-right: 10px; }
+.hd-board__objlist .hd-m-check__text { font-size: 22px; }
+
+/* Les cases portent leurs icônes : l'ancienne légende en lettres n'a plus d'objet. */
+.hd-board__legend { display: none; }
+
+/* Caméra et navigation de case en case : rangée de boutons carrés à icônes. */
+.hd-board__zoom { left: 28px; bottom: 228px; flex-direction: row; align-items: center; }
+.hd-board__zbtn { width: 64px; height: 64px; min-width: 64px; margin: 0 8px 0 0; padding: 0; }
+.hd-board__zbtn--wide { width: 64px; margin-right: 8px; }
+.hd-board__cases { flex-direction: row; margin-left: 12px; }
+.input--touch .hd-board__zbtn { width: 96px; min-width: 96px; }
+.input--gamepad .hd-board__zbtn { width: 96px; min-width: 96px; }
+.hd-board__zicon { position: absolute; left: 16px; top: 16px; right: 16px; bottom: 16px;
+    -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-ivory); }
+.hd-board__zicon--plus { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/plus.png"); }
+.hd-board__zicon--minus { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/minus.png"); }
+.hd-board__zicon--pawn { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/location.png"); }
+.hd-board__zicon--prev { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/back.png"); }
+.hd-board__zicon--next { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/forward.png"); }
+
+/* Fiche de la case visée. */
+.hd-board__preview { right: 30px; top: 50%; margin-top: 0; translate: 0 -50%; width: 540px; padding: 24px 30px 26px 30px;
+    background-color: rgba(0, 0, 0, 0); border-width: 0; border-radius: 0;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Surfaces/panel-navy.png");
+    -unity-slice-left: 40; -unity-slice-top: 40; -unity-slice-right: 40; -unity-slice-bottom: 32; }
+.hd-board__pvtitle { margin-right: 24px; font-size: 36px; white-space: normal; }
+.hd-board__pvrule { height: 2px; margin: 8px 0 4px 0; background-color: var(--hd-brass); opacity: 0.45; }
+.hd-board__pvbody { font-size: 25px; }
+.hd-board__pvdetail { font-size: 23px; color: var(--hd-brass-soft); }
+.hd-board__pvbuttons { flex-direction: row; justify-content: flex-start; margin-top: 16px; }
+.hd-board__pvbuttons > .hd-btn { flex-grow: 1; flex-basis: 0; min-height: 76px; padding: 0 14px; font-size: 30px; }
+.hd-board__pvbuttons > .hd-board__pvgo { flex-grow: 1.5; margin-left: 12px; }
+
+/* Bandeau du bas : consigne sur une ligne, puis escouade, PM, dé et actions. */
+.hd-board__hud { left: 0; right: 0; bottom: 0; height: auto; flex-direction: column; align-items: stretch; padding: 8px 28px 14px 28px;
+    background-color: rgba(10, 17, 26, 0.88); border-width: 0; border-top-width: 2px; border-top-color: var(--hd-brass-dark); border-radius: 0; }
+.hd-board__hint { flex-shrink: 0; max-width: none; margin: 0 0 6px 0; padding: 0;
+    -unity-font: var(--hd-font-body-regular); font-size: 21px; color: var(--hd-muted); -unity-text-align: middle-center; white-space: normal; }
+.hd-board__hudrow { flex-direction: row; align-items: center; min-height: 124px; }
+
+.hd-board__squad { flex-direction: row; width: auto; flex-shrink: 1; min-width: 0; }
+.hd-board__slot { width: 96px; flex-shrink: 1; margin-right: 12px; align-items: stretch; }
+.hd-board__slotportrait { width: auto; height: 84px; border-radius: 3px; border-width: 2px; overflow: hidden;
+    -unity-background-scale-mode: scale-and-crop; background-position: center top; }
+.hd-board__slotbar { width: auto; height: 8px; margin-top: 4px; border-radius: 0; overflow: hidden; background-color: var(--hd-ink-deep); }
+.hd-board__slotname { margin: 2px 0 0 0; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-size: 18px; color: var(--hd-muted); -unity-text-align: middle-center; }
+
+.hd-board__center { flex-grow: 1; flex-basis: 0; flex-shrink: 0; min-width: 170px; margin: 0 16px; align-items: center; justify-content: center; }
+.hd-board__pm { margin-top: 0; font-size: 40px; }
+.hd-board__reserve { width: 100%; max-width: 320px; height: 24px; margin-top: 6px; border-radius: 0; }
+
+/* Dé : faces du kit ; au repos, l'icône de dé ; au-delà de six, le nombre. */
+.hd-board__die { width: 108px; height: 108px; flex-shrink: 0; margin-right: 20px; border-width: 3px; border-color: var(--hd-brass); border-radius: 6px;
+    background-color: var(--hd-ink);
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/dice.png");
+    background-size: 56px 56px; background-position: center; background-repeat: no-repeat;
+    -unity-background-image-tint-color: var(--hd-brass-soft); }
+.hd-board__die--num { background-image: none; }
+.hd-board__die--face { background-size: 100% 100%; background-color: rgba(0, 0, 0, 0); border-width: 0; -unity-background-image-tint-color: #FFFFFF; }
+.hd-board__die--f1 { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Board/dice-face-1.png"); }
+.hd-board__die--f2 { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Board/dice-face-2.png"); }
+.hd-board__die--f3 { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Board/dice-face-3.png"); }
+.hd-board__die--f4 { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Board/dice-face-4.png"); }
+.hd-board__die--f5 { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Board/dice-face-5.png"); }
+.hd-board__die--f6 { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Board/dice-face-6.png"); }
+.hd-board__dieface { margin: 0; padding: 0; font-size: 64px; color: var(--hd-ivory); }
+
+.hd-board__actions { width: auto; flex-shrink: 0; flex-direction: row; align-items: center; }
+.hd-board__bonus { width: 190px; height: 96px; margin: 0 12px 0 0; padding: 0 12px; font-size: 24px; white-space: normal; }
+.hd-board__end { width: 220px; height: 96px; margin: 0 12px 0 0; padding: 0 16px; font-size: 34px; }
+.hd-board__roll { width: 360px; height: 96px; padding: 0 16px; font-size: 48px; }
+
+/* ---------------------------------------------------------------- Repos (fatigue actuelle → après repos) */
+.hd-m-rest__row { flex-direction: row; align-items: center; flex-shrink: 0; min-height: 60px; padding: 4px 6px;
+    border-bottom-width: 1px; border-bottom-color: rgba(214, 175, 91, 0.25); }
+.hd-m-rest__name { width: 250px; flex-shrink: 0; margin: 0; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    -unity-font: var(--hd-font-heading); font-size: 28px; color: var(--hd-ivory); }
+.hd-m-rest__bar { flex-grow: 1; flex-basis: 0; min-width: 80px; height: 22px; margin: 0 16px; }
+.hd-m-rest__value { min-width: 84px; flex-shrink: 0; margin: 0; padding: 0; white-space: nowrap;
+    -unity-font: var(--hd-font-heading); font-size: 28px; color: var(--hd-ivory); -unity-text-align: middle-right; }
+.hd-m-rest__value--after { color: var(--hd-success); }
+.hd-m-rest__arrow { width: 24px; height: 24px; margin: 0 6px 0 14px; flex-shrink: 0;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/forward.png");
+    -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-brass); }
+.hd-m-rest__rows { margin: 4px 0 18px 0; }
+
+/* ---------------------------------------------------------------- Zone sécurisée */
+.hd-m-zone__objectives { flex-shrink: 0; margin: 2px 0 8px 0; }
+.hd-m-zone__objectives .hd-m-check__text { font-size: 28px; }
+.hd-m-zone__objectives .hd-m-check__box { width: 34px; height: 34px; margin-top: 3px; }
+.hd-m-zone__rewards { margin-bottom: 22px; font-size: 30px; }
+.hd-m-hidden { display: none; }
+.hd-board__slot--out .hd-board__slotportrait { -unity-background-image-tint-color: rgb(200, 110, 110); }
+
+/* Second tour : retour du plateau sur une ligne. */
+.hd-btn.hd-board__back { min-width: 250px; white-space: nowrap; }

@@ -2,14 +2,20 @@
     <ui:VisualElement name="modal" class="hd-modal hd-intropop">
         <ui:VisualElement name="cinematicLayer" class="hd-intropop__cine">
             <ui:Button name="tap" class="hd-intropop__tap" />
-            <ui:Button name="skip" class="hd-btn hd-btn--ghost hd-intropop__skip" />
+            <ui:Button name="skip" class="hd-btn hd-btn--ghost hd-intropop__skip">
+                <ui:VisualElement class="hd-ecta__icon hd-ecta__icon--chevron hd-ecta__icon--light" picking-mode="Ignore" />
+            </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement name="characterLayer" class="hd-intropop__char">
             <ui:Label name="title" class="hd-intropop__title" />
+            <ui:VisualElement class="hd-intropop__divider" picking-mode="Ignore" />
             <ui:TextField name="nameField" class="hd-pop__field hd-intropop__name" max-length="20" />
             <ui:Label name="nameHint" class="hd-intropop__hint" />
             <ui:VisualElement name="avatars" class="hd-intropop__avatars" />
-            <ui:Button name="confirm" class="hd-btn hd-btn--primary hd-intropop__confirm" />
+            <ui:Button name="confirm" class="hd-btn hd-btn--primary hd-intropop__confirm hd-ecta">
+                <ui:VisualElement class="hd-ecta__icon hd-ecta__icon--star" picking-mode="Ignore" />
+                <ui:VisualElement class="hd-ecta__icon hd-ecta__icon--chevron" picking-mode="Ignore" />
+            </ui:Button>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -1,10 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="modal" class="hd-modal">
-        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-pop__wide">
-            <ui:Label name="title" class="hd-modal__title" />
-            <ui:VisualElement class="hd-divider" />
+        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-pop__wide hd-res">
+            <ui:Label name="title" class="hd-modal__title hd-res__title" />
+            <ui:VisualElement class="hd-res__divider" />
             <ui:ScrollView class="hd-pop__scroll">
-                <ui:Label name="reward" class="hd-pop__text" />
+                <ui:Label name="reward" class="hd-pop__text hd-res__reward" />
                 <ui:Label name="fatigueTitle" class="hd-pop__section" />
                 <ui:VisualElement name="fatigue" class="hd-pop__rows" />
                 <ui:Label name="xpTitle" class="hd-pop__section" />

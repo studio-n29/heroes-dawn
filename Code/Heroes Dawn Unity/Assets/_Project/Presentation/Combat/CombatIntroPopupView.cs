@@ -29,6 +29,13 @@ namespace N29.HeroesDawn.Presentation.Combat
             var portrait = new VisualElement(); portrait.AddToClassList("hd-intro__portrait");
             var initial = new Label(); initial.AddToClassList("hd-intro__initial"); portrait.Add(initial);
             HdPortrait.Fill(portrait, initial, fighter.Portrait);
+            // Portrait cadré sur le visage (agents) ou illustration de l'ennemi ; un ennemi sans illustration garde une silhouette (USS).
+            bool framed = left ? HudPortraits.ApplyAgent(portrait, fighter.Portrait.Art, fighter.Name) : HudPortraits.ApplyEnemy(portrait, fighter.Name);
+            bool empty = !framed && !left && fighter.Portrait.Art == null;
+            if (empty) portrait.style.backgroundImage = new StyleBackground(StyleKeyword.Null);
+            if (framed) initial.text = "";
+            portrait.EnableInClassList("hd-intro__portrait--empty", empty);
+            Root.EnableInClassList("hd-intro__banner--boss", fighter.Portrait.Boss);
             var text = new VisualElement(); text.AddToClassList("hd-intro__text");
             var name = new Label(fighter.Name); name.AddToClassList("hd-intro__name");
             var sub = new Label(fighter.Sub); sub.AddToClassList("hd-intro__sub");

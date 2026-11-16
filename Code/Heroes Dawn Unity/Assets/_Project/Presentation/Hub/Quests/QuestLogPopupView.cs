@@ -101,7 +101,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             text.Add(title); text.Add(detail);
             var state = new Label(d.State) { pickingMode = PickingMode.Ignore };
             state.AddToClassList("hd-quest__state");
-            row.Add(accent); row.Add(text); row.Add(state);
+            // Icône d'état du kit (étoile : en cours, coche : terminée, cadenas : verrouillée) ; la classe de la ligne choisit l'image.
+            var icon = new VisualElement { pickingMode = PickingMode.Ignore };
+            icon.AddToClassList("hd-quest__icon");
+            row.Add(accent); row.Add(icon); row.Add(text); row.Add(state);
             _body.Add(row);
         }
 

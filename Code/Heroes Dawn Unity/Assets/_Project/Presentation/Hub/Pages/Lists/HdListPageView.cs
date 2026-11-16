@@ -17,7 +17,8 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         sealed class Row
         {
-            public VisualElement Root = null!, Tag = null!, Text = null!, BarFill = null!, Bar = null!;
+            public VisualElement Root = null!, Tag = null!, TagIcon = null!, Text = null!, BarFill = null!, Bar = null!;
+            public string IconClass = "";
             public Label TagText = null!, Title = null!, Sub = null!, BarLabel = null!, Badge = null!;
             public UnityEngine.UIElements.Button[] Buttons = new UnityEngine.UIElements.Button[3];
         }
@@ -84,7 +85,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             _lastHeader = d;
             if (_title == null) return;
             _title.text = d.Title;
-            _line.text = d.Line;
+            _line.text = d.Line ?? "";
+            _line.style.display = string.IsNullOrEmpty(d.Line) ? DisplayStyle.None : DisplayStyle.Flex;
             Q<VisualElement>("header").style.backgroundColor = d.HeaderTint.HasValue ? new Color(d.HeaderTint.Value.r, d.HeaderTint.Value.g, d.HeaderTint.Value.b, 0.9f) : new StyleColor(StyleKeyword.Null);
             bool bar = d.Progress >= 0f;
             _bar.style.display = bar ? DisplayStyle.Flex : DisplayStyle.None;
@@ -97,7 +99,19 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             b.style.display = d.Visible ? DisplayStyle.Flex : DisplayStyle.None;
             if (!d.Visible) return;
-            b.text = d.Label;
+            // Chevrons écrits en texte (« < », « > ») : remplacés par les icônes du kit, le bouton garde sa taille.
+            bool back = d.Label == "<", forward = d.Label == ">";
+            b.text = back || forward ? "" : d.Label;
+            b.EnableInClassList("hd-btn--icon-back", back);
+            b.EnableInClassList("hd-btn--icon-forward", forward);
+            var glyph = b.Q<VisualElement>(className: "hd-btn__glyph");
+            if (glyph == null && (back || forward))
+            {
+                glyph = new VisualElement { pickingMode = PickingMode.Ignore };
+                glyph.AddToClassList("hd-btn__glyph");
+                b.Add(glyph);
+            }
+            if (glyph != null) glyph.style.display = back || forward ? DisplayStyle.Flex : DisplayStyle.None;
             b.EnableInClassList("hd-btn--primary", d.Style == 0 && !forceSecondary);
             b.EnableInClassList("hd-btn--pr", d.Style == 1);
             b.EnableInClassList("hd-btn--danger", d.Style == 2);
@@ -185,6 +199,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             r.Tag.AddToClassList("hd-row__tag");
             r.TagText = new Label { pickingMode = PickingMode.Ignore };
             r.Tag.Add(r.TagText);
+            r.TagIcon = new VisualElement { pickingMode = PickingMode.Ignore };
+            r.TagIcon.AddToClassList("hd-row__tagicon");
+            r.Tag.Add(r.TagIcon);
             r.Root.Add(r.Tag);
             r.Text = new VisualElement { pickingMode = PickingMode.Ignore };
             r.Text.AddToClassList("hd-row__text");
@@ -213,11 +230,50 @@ namespace N29.HeroesDawn.Presentation.Hub
             return r;
         }
 
+        /// <summary>Classe USS de l'icône du kit qui remplace un sigle de pastille ; vide : la pastille garde son texte (rang, niveau, initiale).</summary>
+        static string TagIconClass(string tag)
+        {
+            switch (tag)
+            {
+                case "OK": return "hd-row__tagicon--check";
+                case "KO": return "hd-row__tagicon--close";
+                case "--": return "hd-row__tagicon--lock";
+                case "+": return "hd-row__tagicon--plus";
+                case "!": return "hd-row__tagicon--info";
+                case "GO": return "hd-row__tagicon--play";
+                default: return "";
+            }
+        }
+
         static void Show(Row r, InfoRowData d)
         {
-            bool hasTag = !string.IsNullOrEmpty(d.Tag);
+            bool hasArt = d.Art != null;
+            bool hasTag = hasArt || !string.IsNullOrEmpty(d.Tag);
             r.Tag.style.display = hasTag ? DisplayStyle.Flex : DisplayStyle.None;
-            if (hasTag) { r.Tag.style.backgroundColor = d.TagColor; r.TagText.text = d.Tag; }
+            // Vignette : l'illustration quand la ligne en fournit une ; sinon la pastille, avec une icône du kit à la place des sigles (OK, KO, +, !…).
+            string iconClass = hasArt || !hasTag ? "" : TagIconClass(d.Tag);
+            if (iconClass != r.IconClass)
+            {
+                if (r.IconClass.Length > 0) r.TagIcon.RemoveFromClassList(r.IconClass);
+                if (iconClass.Length > 0) r.TagIcon.AddToClassList(iconClass);
+                r.IconClass = iconClass;
+            }
+            r.TagIcon.style.display = iconClass.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            r.TagText.style.display = hasArt || iconClass.Length > 0 ? DisplayStyle.None : DisplayStyle.Flex;
+            r.Tag.EnableInClassList("hd-row__tag--art", hasArt);
+            // Pastille sombre (verrouillé, occupé) : texte et icône clairs, sinon ils disparaissent dans le fond.
+            r.Tag.EnableInClassList("hd-row__tag--dark", !hasArt && hasTag && d.TagColor.r * 0.299f + d.TagColor.g * 0.587f + d.TagColor.b * 0.114f < 0.4f);
+            if (hasArt)
+            {
+                r.Tag.style.backgroundImage = new StyleBackground(d.Art);
+                r.Tag.style.backgroundColor = new StyleColor(StyleKeyword.Null);
+            }
+            else if (hasTag)
+            {
+                r.Tag.style.backgroundImage = new StyleBackground(StyleKeyword.Null);
+                r.Tag.style.backgroundColor = d.TagColor;
+                r.TagText.text = d.Tag;
+            }
             r.Title.text = d.Title;
             r.Sub.text = d.Subtitle;
             r.Sub.style.display = string.IsNullOrEmpty(d.Subtitle) ? DisplayStyle.None : DisplayStyle.Flex;

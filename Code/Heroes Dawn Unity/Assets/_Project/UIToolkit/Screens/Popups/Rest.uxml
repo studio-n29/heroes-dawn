@@ -1,11 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="modal" class="hd-modal">
         <ui:VisualElement name="window" class="hd-window hd-modal__window">
-            <ui:Label name="title" class="hd-modal__title" />
+            <ui:VisualElement class="hd-m-pophead">
+                <ui:VisualElement class="hd-m-pophead__icon hd-m-pophead__icon--rest" picking-mode="Ignore" />
+                <ui:Label name="title" class="hd-modal__title" />
+            </ui:VisualElement>
             <ui:VisualElement class="hd-divider" />
             <ui:Label name="body" class="hd-pop__text" />
             <ui:Label name="fatigueTitle" class="hd-pop__section" />
-            <ui:VisualElement name="fatigue" class="hd-pop__rows" />
+            <ui:VisualElement name="fatigue" class="hd-pop__rows hd-m-rest__rows" />
             <ui:VisualElement class="hd-modal__buttons">
                 <ui:Button name="skip" class="hd-btn hd-btn--secondary" />
                 <ui:Button name="take" class="hd-btn hd-btn--primary" />

@@ -60,17 +60,20 @@ namespace N29.HeroesDawn.Presentation.Hub
             box.Clear(); _questionLabels.Clear(); _rating.Clear();
             for (int q = 0; q < PlaytestFeedback.Questions; q++)
             {
-                var label = new Label(); label.AddToClassList("hd-pop__text");
+                // Planche 16.4 : la question à gauche, ses cinq notes en cases à droite sur la même ligne.
+                var line = new VisualElement(); line.AddToClassList("hd-poll__line");
+                var label = new Label(); label.AddToClassList("hd-pop__text"); label.AddToClassList("hd-poll__question");
                 var row = new VisualElement(); row.AddToClassList("hd-poll__row");
                 for (int r = 1; r <= 5; r++)
                 {
                     int question = q, rating = r;
                     var b = new UnityEngine.UIElements.Button { text = r.ToString() };
-                    b.AddToClassList("hd-btn"); b.AddToClassList("hd-btn--small"); b.AddToClassList("hd-poll__rate");
+                    b.AddToClassList("hd-btn"); b.AddToClassList("hd-btn--small"); b.AddToClassList("hd-poll__rate"); b.AddToClassList("hd-btn--plain");
                     b.clicked += () => { _ratings[question] = rating; Refresh(); };
                     row.Add(b); _rating.Add(b);
                 }
-                box.Add(label); box.Add(row);
+                line.Add(label); line.Add(row);
+                box.Add(line);
                 _questionLabels.Add(label);
             }
             if (_last.HasValue) Fill(_last.Value);

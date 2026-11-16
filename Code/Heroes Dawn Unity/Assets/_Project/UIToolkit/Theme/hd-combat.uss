@@ -1,0 +1,190 @@
+/* Heroes Dawn : ajustements de fidélité « planches » pour la zone combat. Importé après hd.uss : ces règles priment à spécificité égale. */
+
+/* ---------------------------------------------------------------- Combat : barre du haut (puce retour, titre, puces compactes) */
+.hd-hud__top { height: 84px; padding: 0 36px; background-color: rgba(10, 17, 26, 0.82); border-bottom-width: 1px; border-bottom-color: rgba(149, 116, 60, 0.7); }
+.hd-hud__title { font-size: 36px; color: var(--hd-ivory); margin-left: 20px; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 68 px de référence : la cible reste au-dessus de 56 px quand le HUD est réduit en 4:3 et en 20:9. */
+.hd-hud__top .hd-hud__btn { height: 68px; min-height: 68px; min-width: 132px; margin-left: 10px; padding: 0 24px; font-size: 28px; flex-shrink: 0; }
+.hd-hud__top .hd-hud__btn--small { min-width: 120px; padding: 0 18px; font-size: 20px; }
+.hd-hud__top .hd-hud__btn--speed { min-width: 104px; }
+.hd-hud__top .hd-hud__btn--icon { width: 76px; min-width: 76px; padding: 0; align-items: center; justify-content: center; }
+.hd-hud__top .hd-hud__btn--on { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Buttons/button-primary-normal.png"); color: var(--hd-ink); }
+.hd-hud__top .hd-hud__btn--on:hover { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Buttons/button-primary-hover.png"); }
+.hd-hud__top .hd-hud__btn--on:focus { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Buttons/button-primary-focus.png"); }
+.hd-hud__btn-icon { width: 34px; height: 34px; -unity-background-scale-mode: scale-to-fit; }
+.hd-hud__btn-icon--back { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/back.png"); -unity-background-image-tint-color: var(--hd-ivory); }
+.hd-hud__btn-icon--pause { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/pause.png"); -unity-background-image-tint-color: var(--hd-ink); }
+
+/* ---------------------------------------------------------------- Combat : frise (graduations fines, zone d'action rouge, losanges) */
+.hd-tl { left: 36px; right: 36px; top: 96px; height: 104px; background-color: rgba(16, 28, 41, 0.9); border-width: 1px; border-color: rgba(149, 116, 60, 0.8); border-radius: 2px; }
+.hd-tl__track { left: 112px; right: 132px; height: 2px; margin-top: -1px; background-color: rgba(193, 205, 210, 0.35); border-radius: 0; }
+.hd-tl__prep { top: -37px; bottom: -37px; background-color: rgba(182, 56, 64, 0.5); border-radius: 0; border-left-width: 2px; border-left-color: var(--hd-danger); border-right-width: 3px; border-right-color: var(--hd-brass); }
+.hd-tl__seg { width: 2px; height: 26px; margin-left: -1px; margin-top: -13px; }
+.hd-tl__axis-start { left: 10px; width: 92px; font-size: 34px; }
+.hd-tl__axis-end { right: 14px; top: 8px; width: 104px; font-size: 44px; }
+.hd-tl__axis-label { right: 14px; bottom: 10px; width: 104px; font-size: 20px; }
+.hd-tl__marker { width: 48px; height: 48px; margin-left: -24px; margin-top: -24px; }
+.hd-tl__frame { left: 7px; top: 7px; width: 34px; height: 34px; border-width: 2px; border-color: var(--hd-brass); }
+.hd-tl__marker--enemy .hd-tl__frame { border-color: var(--hd-danger); }
+.hd-tl__disc { width: 24px; height: 24px; }
+.hd-tl__ring { left: 2px; top: 2px; width: 44px; height: 44px; border-width: 3px; }
+.hd-tl__initial { font-size: 22px; }
+.hd-tl__marker--enemy .hd-tl__initial { color: var(--hd-ivory); }
+.hd-tl__plan { left: -40px; right: -40px; bottom: 46px; font-size: 18px; }
+
+/* ---------------------------------------------------------------- Combat : terrain (agent actif en grand, détouré sur le décor) */
+.hd-hud__arena { top: 204px; bottom: 0; height: auto; translate: -50% 0; background-color: rgba(0, 0, 0, 0); border-radius: 0; overflow: hidden; }
+.hd-hud__spotlight { top: 76px; width: 440px; height: 440px; translate: -50% 0; background-color: var(--hd-ink); border-width: 2px; border-color: var(--hd-brass-dark); border-radius: 2px; -unity-background-scale-mode: scale-and-crop; }
+.hd-hud__spotlight--cutout { top: auto; bottom: -74px; width: 620px; height: 930px; background-color: rgba(0, 0, 0, 0); border-width: 0; -unity-background-scale-mode: scale-to-fit; }
+.hd-hud__arena-title { top: 150px; }
+
+/* ---------------------------------------------------------------- Combat : fiches d'unités (portrait carré cadré, insigne, nom, vie) */
+.hd-hud__col { top: 214px; width: 400px; }
+.hd-unit { width: 400px; height: 108px; margin-bottom: 12px; border-width: 1px; border-color: rgba(149, 116, 60, 0.85); border-radius: 2px; }
+.hd-unit--enemy { border-color: rgba(182, 56, 64, 0.9); }
+.hd-unit--ready { border-color: var(--hd-brass-soft); border-width: 2px; }
+.hd-unit__select { left: -6px; top: -6px; right: -6px; bottom: -6px; border-width: 3px; border-color: var(--hd-ivory); border-radius: 4px; }
+.hd-unit__target { left: -6px; top: -6px; right: -6px; bottom: -6px; border-width: 3px; border-radius: 4px; }
+.hd-unit__portrait { left: 5px; top: 5px; width: 96px; height: 96px; border-radius: 2px; border-width: 2px; align-items: center; justify-content: center; }
+.hd-unit--ready .hd-unit__portrait { left: 4px; top: 4px; }
+.hd-unit--enemy .hd-unit__portrait--empty { background-image: url("project://database/Assets/_Project/Resources/UI/Bust.png"); -unity-background-image-tint-color: rgba(236, 231, 220, 0.38); }
+.hd-unit__initial { font-size: 46px; flex-grow: 0; }
+.hd-unit__badge { position: absolute; left: -10px; top: -10px; width: 38px; height: 38px; align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; }
+.hd-unit--matter .hd-unit__badge { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-matter.png"); }
+.hd-unit--elemental .hd-unit__badge { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-elemental.png"); }
+.hd-unit--bio .hd-unit__badge { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-bio.png"); }
+.hd-unit--perception .hd-unit__badge { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-perception.png"); }
+.hd-unit--enemy .hd-unit__badge { left: -13px; top: -13px; width: 44px; height: 44px; background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Indicators/timeline-danger.png"); }
+.hd-unit__badge-text { -unity-font: var(--hd-font-title); font-size: 20px; color: var(--hd-ivory); -unity-text-align: middle-center; margin: 0; padding: 0; }
+.hd-unit__name { left: 112px; right: 10px; top: 3px; width: auto; font-size: 27px; text-overflow: ellipsis; }
+.hd-unit__bar { left: 112px; right: 10px; top: 38px; width: auto; height: 26px; border-radius: 2px; background-color: rgba(10, 17, 26, 0.9); border-width: 1px; border-color: rgba(193, 205, 210, 0.25); }
+.hd-unit__gauge { left: 112px; right: 10px; top: 69px; width: auto; height: 6px; border-radius: 0; background-color: rgba(10, 17, 26, 0.9); }
+.hd-unit__statuses { left: 112px; right: 124px; top: 78px; bottom: auto; font-size: 20px; overflow: hidden; }
+.hd-unit__sub { right: 10px; top: 78px; font-size: 20px; color: var(--hd-muted); -unity-font: var(--hd-font-body-regular); }
+.hd-unit__ko { font-size: 44px; }
+.hd-unit__flash { border-radius: 2px; }
+
+/* ---------------------------------------------------------------- Combat : cartes de compétence (à plat, illustration pleine carte, numéro en losange, nom en bas) */
+.hd-skill { bottom: 10px; width: 180px; height: 220px; background-color: var(--hd-ink); border-radius: 2px; }
+.hd-skill--pending { background-color: var(--hd-surface-3); }
+.hd-skill--locked { background-color: rgba(16, 28, 41, 0.55); }
+.hd-skill__ring { left: -6px; top: -6px; right: -6px; bottom: -6px; border-width: 3px; border-radius: 4px; }
+.hd-skill__frame { border-width: 2px; border-color: var(--hd-brass-dark); border-radius: 2px; }
+.hd-skill--locked .hd-skill__frame { border-width: 1px; border-color: rgba(193, 205, 210, 0.5); }
+.hd-skill__art { left: 2px; top: 2px; right: 2px; bottom: 2px; border-radius: 0; }
+.hd-skill__shade { position: absolute; left: 2px; right: 2px; bottom: 2px; height: 120px; background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Overlays/gradient-dark-bottom.png"); -unity-background-scale-mode: stretch-to-fill; }
+.hd-skill__glyph { top: 30px; height: 100px; font-size: 76px; color: var(--hd-brass-soft); }
+.hd-skill__plus { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin-left: -22px; margin-top: -22px; background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/plus.png"); -unity-background-image-tint-color: var(--hd-muted); -unity-background-scale-mode: scale-to-fit; display: none; }
+.hd-skill__label { left: 8px; right: 8px; bottom: 8px; height: 58px; font-size: 22px; -unity-text-align: lower-center; }
+.hd-skill__cost { right: 6px; top: 6px; width: 44px; height: 44px; border-radius: 22px; border-width: 2px; border-color: var(--hd-brass); }
+.hd-skill__costtext { font-size: 22px; }
+.hd-skill__slot { left: -14px; top: -14px; width: 48px; height: 48px; background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Indicators/timeline-unit.png"); -unity-background-scale-mode: scale-to-fit; }
+.hd-skill__slottext { font-size: 22px; background-color: rgba(0, 0, 0, 0); padding: 0; margin: 0; border-radius: 0; }
+
+/* ---------------------------------------------------------------- Combat : consigne, description, dépôt, journal, bonus, boss */
+.hd-hud__hint { flex-direction: row; align-items: center; padding: 8px 34px 8px 24px; background-color: rgba(16, 28, 41, 0.94); border-width: 1px; border-color: var(--hd-brass); border-radius: 2px; }
+.hd-hud__hint-star { width: 26px; height: 26px; margin-right: 12px; flex-shrink: 0; background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/FX/spark-four-point.png"); -unity-background-image-tint-color: var(--hd-brass); -unity-background-scale-mode: scale-to-fit; }
+.hd-hud__hint-text { color: var(--hd-ivory); flex-shrink: 1; }
+.hd-hud__desc { bottom: 276px; background-color: rgba(16, 28, 41, 0.96); border-width: 1px; border-color: var(--hd-brass); border-radius: 2px; padding: 12px 24px; }
+.hd-hud__desc-title { font-size: 32px; color: var(--hd-brass); }
+.hd-hud__drop { bottom: 276px; background-color: rgba(214, 175, 91, 0.18); border-width: 2px; border-color: var(--hd-brass); border-radius: 2px; }
+.hd-hud__drop-text { font-size: 40px; }
+.hd-hud__log { right: 36px; bottom: 24px; width: 360px; height: 156px; padding: 8px 14px; background-color: rgba(16, 28, 41, 0.74); border-radius: 2px; border-width: 1px; border-color: rgba(149, 116, 60, 0.45); border-left-width: 3px; border-left-color: var(--hd-brass-dark); }
+.hd-hud__log-text { font-size: 20px; }
+.hd-hud__chip { background-color: rgba(16, 28, 41, 0.9); border-left-width: 4px; border-radius: 2px; }
+.hd-hud__boss { background-color: rgba(16, 28, 41, 0.94); border-width: 1px; border-color: rgba(214, 175, 91, 0.85); border-radius: 2px; }
+.hd-hud__boss-name { color: var(--hd-ivory); }
+.hd-hud__boss-phase { right: 20px; top: 8px; padding: 0 16px; font-size: 24px; color: var(--hd-ivory); background-color: var(--hd-danger); border-radius: 2px; -unity-font: var(--hd-font-title); }
+.hd-hud__boss-track { border-radius: 2px; background-color: rgba(10, 17, 26, 0.9); border-width: 1px; border-color: rgba(193, 205, 210, 0.3); }
+.hd-hud__boss-mark { width: 3px; }
+
+/* ---------------------------------------------------------------- Entrée en combat */
+.hd-intro { background-color: rgba(10, 17, 26, 0.9); }
+.hd-intro__cols { padding: 0 60px; }
+.hd-intro__col { width: 44%; }
+.hd-intro__versus { width: 64px; height: 64px; flex-shrink: 0; background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/FX/spark-four-point.png"); -unity-background-image-tint-color: var(--hd-brass); -unity-background-scale-mode: scale-to-fit; }
+.hd-intro__title { font-size: 40px; color: var(--hd-brass); margin-bottom: 16px; padding-bottom: 6px; border-bottom-width: 1px; border-bottom-color: rgba(214, 175, 91, 0.7); }
+.hd-intro__title--enemy { color: #E0727A; border-bottom-color: rgba(182, 56, 64, 0.9); -unity-text-align: middle-right; }
+.hd-intro__banner { height: 124px; margin-bottom: 12px; padding: 0 24px 0 20px; background-color: rgba(16, 28, 41, 0.94); border-width: 1px; border-color: rgba(149, 116, 60, 0.7); border-radius: 2px; }
+.hd-intro__banner--right { padding: 0 20px 0 24px; border-color: rgba(182, 56, 64, 0.8); }
+.hd-intro__banner--boss { border-width: 2px; }
+.hd-intro__accent { width: 5px; }
+.hd-intro__portrait { width: 104px; height: 104px; flex-shrink: 0; border-radius: 2px; border-width: 2px; }
+.hd-intro__portrait--empty { background-image: url("project://database/Assets/_Project/Resources/UI/Bust.png"); -unity-background-image-tint-color: rgba(236, 231, 220, 0.38); }
+.hd-intro__text { flex-basis: 0; min-width: 0; }
+.hd-intro__name { font-size: 38px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd-intro__skip { right: 60px; bottom: 44px; height: 96px; min-width: 320px; font-size: 40px; }
+
+/* ---------------------------------------------------------------- Résultats du combat */
+.hd-res__title { font-size: 72px; margin-bottom: 0; }
+.hd-res__divider { height: 40px; margin: 0 0 10px 0; flex-shrink: 0; background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Decorations/divider-star.png"); -unity-background-scale-mode: scale-to-fit; }
+.hd-res .hd-pop__scroll { height: 480px; }
+.hd-res__reward { padding: 12px 18px; margin-bottom: 12px; background-color: rgba(27, 43, 59, 0.92); border-left-width: 4px; border-left-color: var(--hd-brass); border-radius: 2px; }
+.hd-res .hd-poprow { min-height: 84px; padding: 6px 16px 6px 8px; background-color: rgba(27, 43, 59, 0.92); border-width: 1px; border-color: rgba(149, 116, 60, 0.45); border-radius: 2px; }
+.hd-res__head { width: 68px; height: 68px; margin-right: 16px; flex-shrink: 0; align-items: center; justify-content: center; background-color: var(--hd-surface-2); border-width: 2px; border-color: var(--hd-brass-dark); border-radius: 2px; -unity-background-scale-mode: scale-and-crop; }
+.hd-res__initial { -unity-font: var(--hd-font-title); font-size: 34px; color: var(--hd-ivory); -unity-text-align: middle-center; margin: 0; padding: 0; }
+.hd-res .hd-poprow__name { width: 250px; font-size: 28px; }
+.hd-res .hd-modal__buttons { margin-top: 14px; }
+.hd-res .hd-modal__buttons > .hd-btn { min-height: 96px; }
+
+/* ---------------------------------------------------------------- Dialogue à choix et événement narratif */
+.hd-story .hd-pop__text { font-size: 30px; margin: 4px 0 16px 0; }
+.hd-story .hd-pop__choices > .hd-btn { margin: 7px 0; min-height: 88px; padding: 6px 48px; font-size: 34px; white-space: normal; -unity-text-align: middle-left; }
+
+/* ---------------------------------------------------------------- Boîte de dialogue de narration (agent au premier plan, plaque ivoire, panneau marine) */
+.hd-dlg__stage { left: 48px; right: 48px; bottom: 40px; height: 320px; }
+.hd-dlg__avatarbox { width: 320px; flex-shrink: 0; }
+.hd-dlg__avatar { width: 300px; height: 300px; border-radius: 2px; border-width: 2px; flex-shrink: 0; }
+.hd-dlg__avatar--cutout { width: 420px; height: 630px; margin: 0 -50px; border-width: 0; -unity-background-scale-mode: scale-to-fit; }
+.hd-dlg__plate { margin-top: -26px; padding: 4px 30px; min-width: 220px; -unity-text-align: middle-center; font-size: 34px; color: var(--hd-ink); background-color: var(--hd-ivory); border-radius: 2px; border-width: 1px; border-color: var(--hd-brass); border-bottom-width: 5px; }
+.hd-dlg__bubble { height: 300px; padding: 26px 36px; background-color: rgba(16, 28, 41, 0.95); border-width: 1px; border-color: var(--hd-brass); border-radius: 2px; }
+.hd-dlg__body { color: var(--hd-ivory); }
+.hd-dlg__hint { color: var(--hd-muted); }
+.hd-dlg__progress { color: var(--hd-muted); }
+.hd-dlg__skip { right: 48px; top: 40px; height: 68px; min-height: 68px; }
+
+/* ---------------------------------------------------------------- Portraits cadrés sur le visage (agents) et illustrations d'ennemis : classes posées par HudPortraits */
+.hd-head--ada_okonkwo { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/ada_okonkwo.png"); }
+.hd-head--agent_d { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/agent_d.png"); }
+.hd-head--agent_m { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/agent_m.png"); }
+.hd-head--amara_hughes { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/amara_hughes.png"); }
+.hd-head--anna_petrov { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/anna_petrov.png"); }
+.hd-head--astrid_hallstrom { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/astrid_hallstrom.png"); }
+.hd-head--brie_rayner { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/brie_rayner.png"); }
+.hd-head--celeste_moreau { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/celeste_moreau.png"); }
+.hd-head--clement_lefevre { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/clement_lefevre.png"); }
+.hd-head--darius_brooks { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/darius_brooks.png"); }
+.hd-head--eero_nieminen { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/eero_nieminen.png"); }
+.hd-head--fatou_diallo { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/fatou_diallo.png"); }
+.hd-head--freya_lindqvist { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/freya_lindqvist.png"); }
+.hd-head--giulia_rossi { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/giulia_rossi.png"); }
+.hd-head--haruto_nakamura { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/haruto_nakamura.png"); }
+.hd-head--ilona_varga { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/ilona_varga.png"); }
+.hd-head--ji_hoon_park { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/ji_hoon_park.png"); }
+.hd-head--kwame_abara { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/kwame_abara.png"); }
+.hd-head--louis_dubois { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/louis_dubois.png"); }
+.hd-head--lucas_mendes { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/lucas_mendes.png"); }
+.hd-head--marco_bellini { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/marco_bellini.png"); }
+.hd-head--mateo_vasquez { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/mateo_vasquez.png"); }
+.hd-head--mei_lin_chen { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/mei_lin_chen.png"); }
+.hd-head--noah_kaplan { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/noah_kaplan.png"); }
+.hd-head--odile_ferrand { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/odile_ferrand.png"); }
+.hd-head--rin_takeda { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/rin_takeda.png"); }
+.hd-head--sam_okafor { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/sam_okafor.png"); }
+.hd-head--severine_morel { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/severine_morel.png"); }
+.hd-head--tunde_oyelaran { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/tunde_oyelaran.png"); }
+.hd-head--victor_sorel { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/victor_sorel.png"); }
+.hd-head--yelena_ivanova { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/yelena_ivanova.png"); }
+.hd-head--youssef_haddad { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/youssef_haddad.png"); }
+.hd-head--zofia_kowalczyk { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Portraits128/zofia_kowalczyk.png"); }
+.hd-foe--thug { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-thug.png"); }
+.hd-foe--brute { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-brute.png"); }
+.hd-foe--sniper { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-sniper.png"); }
+.hd-foe--street_pyro { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-street-pyro.png"); }
+.hd-foe--brick { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-brick.png"); }
+.hd-foe--canal_chief { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-canal-chief.png"); }
+.hd-foe--crocodile { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-crocodile.png"); }
+.hd-foe--bridge_titan { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-bridge-titan.png"); }
+.hd-foe--amif_trooper { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-amif-trooper.png"); }
+.hd-foe--amif_marksman { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-amif-marksman.png"); }
+.hd-foe--amif_captain { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueExtension/Exports/Enemies128/enemy-amif-captain.png"); }

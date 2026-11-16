@@ -1,7 +1,9 @@
 #nullable enable
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.UiToolkit;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Popups
@@ -45,9 +47,47 @@ namespace N29.HeroesDawn.Presentation.Popups
             _fatigueTitle.style.display = rows ? DisplayStyle.Flex : DisplayStyle.None;
             _fatigue.style.display = rows ? DisplayStyle.Flex : DisplayStyle.None;
             _fatigueTitle.text = d.FatigueTitle;
-            HdPopupRows.FillFatigue(_fatigue, d.Fatigue);
+            FillFatigue(d.Fatigue);
             _skip.text = d.Skip; _take.text = d.Take;
             _skip.SetEnabled(true); _take.SetEnabled(true);
+        }
+
+        /// <summary>Une ligne par agent : nom, barre de fatigue actuelle, valeur actuelle, flèche, valeur après repos.</summary>
+        void FillFatigue(N29.HeroesDawn.Presentation.Combat.FatigueRowData[]? rows)
+        {
+            _fatigue.Clear();
+            if (rows == null) return;
+            foreach (var r in rows)
+            {
+                var row = new VisualElement { pickingMode = PickingMode.Ignore };
+                row.AddToClassList("hd-m-rest__row");
+                var name = new Label(r.Name) { pickingMode = PickingMode.Ignore };
+                name.AddToClassList("hd-m-rest__name");
+                var bar = new VisualElement { pickingMode = PickingMode.Ignore };
+                bar.AddToClassList("hd-bar"); bar.AddToClassList("hd-m-rest__bar");
+                var fill = new VisualElement { pickingMode = PickingMode.Ignore };
+                fill.AddToClassList("hd-bar__fill");
+                float before = Mathf.Clamp01(r.Before01);
+                fill.style.width = Length.Percent(before * 100f);
+                fill.style.unityBackgroundImageTintColor = Theme.FatigueColor(Mathf.RoundToInt(before * 100f));
+                bar.Add(fill);
+                row.Add(name); row.Add(bar);
+                // Le libellé reçu est « avant → après » : les deux valeurs encadrent la flèche du kit.
+                string label = r.Label ?? "";
+                int arrow = label.IndexOf('→');
+                var current = new Label(arrow >= 0 ? label.Substring(0, arrow).Trim() : label) { pickingMode = PickingMode.Ignore };
+                current.AddToClassList("hd-m-rest__value");
+                row.Add(current);
+                if (arrow >= 0)
+                {
+                    var icon = new VisualElement { pickingMode = PickingMode.Ignore };
+                    icon.AddToClassList("hd-m-rest__arrow");
+                    var after = new Label(label.Substring(arrow + 1).Trim()) { pickingMode = PickingMode.Ignore };
+                    after.AddToClassList("hd-m-rest__value"); after.AddToClassList("hd-m-rest__value--after");
+                    row.Add(icon); row.Add(after);
+                }
+                _fatigue.Add(row);
+            }
         }
 
         public UniTask<bool> ChooseAsync(RestPopupData d, CancellationToken ct)

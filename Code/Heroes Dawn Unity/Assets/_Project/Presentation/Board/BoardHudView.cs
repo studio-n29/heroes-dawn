@@ -59,6 +59,9 @@ namespace N29.HeroesDawn.Presentation.Board
     /// </summary>
     public sealed class BoardHudView : HdView
     {
+        /// <summary>Classes USS des six faces du dé (images du kit).</summary>
+        static readonly string[] DieFaceClasses = { "hd-board__die--f1", "hd-board__die--f2", "hd-board__die--f3", "hd-board__die--f4", "hd-board__die--f5", "hd-board__die--f6" };
+
         VisualElement _viewport = null!, _preview = null!, _objList = null!, _squad = null!, _die = null!, _reserveFill = null!, _objectives = null!;
         Label _zone = null!, _legend = null!, _objTitle = null!, _pvTitle = null!, _pvBody = null!, _pvDetail = null!, _hint = null!, _pm = null!, _reserveText = null!, _dieFace = null!;
         UnityEngine.UIElements.Button _back = null!, _roll = null!, _bonus = null!, _end = null!, _go = null!, _cancel = null!;
@@ -137,10 +140,23 @@ namespace N29.HeroesDawn.Presentation.Board
             _objList.Clear();
             foreach (var o in objectives)
             {
-                var l = new Label(o.Text); l.AddToClassList("hd-board__objline");
-                l.style.color = o.Done ? Theme.Hex(0x1E7A3A) : Theme.TextDark;
-                _objList.Add(l);
+                // Case à cocher du kit, puis le libellé de l'objectif.
+                var line = new VisualElement { pickingMode = PickingMode.Ignore };
+                line.AddToClassList("hd-m-check");
+                line.EnableInClassList("hd-m-check--done", o.Done);
+                var box = new VisualElement { pickingMode = PickingMode.Ignore }; box.AddToClassList("hd-check"); box.AddToClassList("hd-check--sm"); box.AddToClassList("hd-m-check__box"); box.EnableInClassList("hd-check--on", o.Done);
+                var text = new Label(StripMark(o.Text)) { pickingMode = PickingMode.Ignore }; text.AddToClassList("hd-m-check__text");
+                line.Add(box); line.Add(text);
+                _objList.Add(line);
             }
+        }
+
+        /// <summary>Retire la marque en texte (« [X] », « [ ] ») placée devant un objectif : la case à cocher la remplace.</summary>
+        static string StripMark(string text)
+        {
+            if (string.IsNullOrEmpty(text) || text[0] != '[') return text;
+            int close = text.IndexOf(']');
+            return close > 0 ? text.Substring(close + 1).TrimStart() : text;
         }
 
         public void ShowSquad(IReadOnlyList<SquadSlotData> squad)
@@ -151,6 +167,7 @@ namespace N29.HeroesDawn.Presentation.Board
             foreach (var s in squad)
             {
                 var slot = new VisualElement(); slot.AddToClassList("hd-board__slot");
+                slot.EnableInClassList("hd-board__slot--out", s.Exhausted);
                 var portrait = new VisualElement(); portrait.AddToClassList("hd-board__slotportrait");
                 var initial = new Label(); initial.AddToClassList("hd-board__slotinitial"); portrait.Add(initial);
                 HdPortrait.Fill(portrait, initial, s.Portrait);
@@ -158,10 +175,11 @@ namespace N29.HeroesDawn.Presentation.Board
                 var name = new Label(s.Name); name.AddToClassList("hd-board__slotname");
                 var bar = new VisualElement(); bar.AddToClassList("hd-board__slotbar");
                 var fill = new VisualElement(); fill.AddToClassList("hd-board__slotfill");
-                fill.style.width = Length.Percent(Mathf.Clamp01(s.Fatigue01) * 100f);
+                // Barre d'endurance : pleine quand l'agent est frais, elle se vide à mesure que la fatigue monte.
+                fill.style.width = Length.Percent((1f - Mathf.Clamp01(s.Fatigue01)) * 100f);
                 fill.style.backgroundColor = Theme.FatigueColor(s.Fatigue);
                 bar.Add(fill);
-                slot.Add(portrait); slot.Add(name); slot.Add(bar);
+                slot.Add(portrait); slot.Add(bar); slot.Add(name);
                 _squad.Add(slot);
             }
         }
@@ -176,6 +194,10 @@ namespace N29.HeroesDawn.Presentation.Board
             _roll.SetEnabled(d.RollEnabled);
             _bonus.text = d.BonusLabel; _bonus.SetEnabled(d.BonusEnabled);
             _end.SetEnabled(d.EndEnabled);
+            // Une seule action principale ivoire : Terminer la devient quand le dé est déjà lancé.
+            bool endIsMain = d.EndEnabled && !d.RollEnabled;
+            _end.EnableInClassList("hd-btn--primary", endIsMain);
+            _end.EnableInClassList("hd-btn--secondary", !endIsMain);
         }
 
         public void ShowMovePreview(MovePreviewData? data)
@@ -193,15 +215,25 @@ namespace N29.HeroesDawn.Presentation.Board
         public UniTask RollDieAsync(int value, int faces, CancellationToken ct)
         {
             var done = new UniTaskCompletionSource();
-            HudAnim.Run(_die, 0.5f, k => { if (k < 0.95f) _dieFace.text = UnityEngine.Random.Range(1, faces + 1).ToString(); }, () =>
+            HudAnim.Run(_die, 0.5f, k => { if (k < 0.95f) SetDie(UnityEngine.Random.Range(1, faces + 1)); }, () =>
             {
-                _dieFace.text = value.ToString();
+                SetDie(value);
                 HudAnim.Punch(_die, 0.25f, 0.3f);
                 done.TrySetResult();
             });
             return done.Task.AttachExternalCancellation(ct);
         }
 
-        public void ResetDie() { if (_dieFace != null) _dieFace.text = "-"; }
+        public void ResetDie() { if (_dieFace != null) SetDie(0); }
+
+        /// <summary>Face affichée : image du kit de 1 à 6, nombre au-delà, icône de dé au repos (0).</summary>
+        void SetDie(int value)
+        {
+            bool face = value >= 1 && value <= DieFaceClasses.Length;
+            for (int i = 0; i < DieFaceClasses.Length; i++) _die.EnableInClassList(DieFaceClasses[i], i == value - 1);
+            _die.EnableInClassList("hd-board__die--face", face);
+            _die.EnableInClassList("hd-board__die--num", value > DieFaceClasses.Length);
+            _dieFace.text = value > DieFaceClasses.Length ? value.ToString() : "";
+        }
     }
 }

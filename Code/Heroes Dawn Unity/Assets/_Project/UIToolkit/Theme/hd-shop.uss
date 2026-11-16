@@ -1,0 +1,240 @@
+/* Heroes Dawn : ajustements de fidélité « planches » pour la zone shop. Importé après hd.uss : ces règles priment à spécificité égale. */
+/* Portraits cadrés sur le visage (un par agent), dans une feuille à part : classes « hd-bust--<identifiant> ». */
+@import url("hd-shop-portraits.uss");
+
+/* ---------------------------------------------------------------- Icônes de la zone (glyphes blancs du kit, teintés par le contexte) */
+.hd-ico--team { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/team.png"); }
+.hd-ico--booster { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/booster.png"); }
+.hd-ico--gems { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/gems.png"); }
+.hd-ico--gift { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/gift.png"); }
+.hd-ico--register { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/register.png"); }
+.hd-ico--refresh { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/refresh.png"); }
+.hd-ico--star { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/dawn.png"); }
+.hd-ico--audio { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/audio.png"); }
+.hd-ico--graphics { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/graphics.png"); }
+.hd-ico--accessibility { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/accessibility.png"); }
+.hd-ico--language { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/language.png"); }
+.hd-ico--controls { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/controls.png"); }
+.hd-ico--account { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/account.png"); }
+.hd-ico--support { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/support.png"); }
+.hd-ico--settings { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/settings.png"); }
+.hd-ico--minus { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/minus.png"); }
+.hd-ico--plus { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/plus.png"); }
+.hd-ico--back { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/back.png"); }
+.hd-ico--forward { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/forward.png"); }
+.hd-ico--health { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/health.png"); }
+.hd-ico--attack { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/attack.png"); }
+.hd-ico--defense { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/defense.png"); }
+.hd-ico--speed { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/speed.png"); }
+
+/* Étoile à quatre branches (titres de section) et icônes de famille. */
+.hd-star { width: 34px; height: 34px; flex-shrink: 0; margin-right: 10px; -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsGold/dawn.png"); }
+.hd-star--small { width: 26px; height: 26px; margin-right: 8px; }
+.hd-famicon { width: 32px; height: 32px; flex-shrink: 0; margin-right: 8px; -unity-background-scale-mode: scale-to-fit; }
+.hd-famicon--matter { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-matter.png"); }
+.hd-famicon--elemental { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-elemental.png"); }
+.hd-famicon--bio { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-bio.png"); }
+.hd-famicon--perception { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-perception.png"); }
+
+/* ---------------------------------------------------------------- Bouton à contenu composé (HdButtonContent : icône, libellé, pièce, montant)
+   Le texte propre du bouton reste en place pour les parcours de test mais n'est pas dessiné : les enfants le remplacent. */
+.hd-btn.hd-bc, .hd-btn.hd-bc:hover, .hd-btn.hd-bc:active, .hd-btn.hd-bc:focus, .hd-btn.hd-bc:disabled { color: rgba(0, 0, 0, 0); }
+.hd-bc { flex-direction: row; align-items: center; justify-content: center; }
+.hd-bc__icon { width: 34px; height: 34px; flex-shrink: 0; margin-right: 12px; -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-ivory); }
+.hd-bc__head, .hd-bc__amount { color: var(--hd-ivory); -unity-text-align: middle-center; margin: 0; padding: 0; flex-shrink: 1; white-space: normal; }
+.hd-bc__amount { flex-shrink: 0; white-space: nowrap; }
+.hd-bc__coin { margin: 0 8px 0 14px; }
+.hd-btn--primary .hd-bc__head, .hd-btn--primary .hd-bc__amount { color: var(--hd-ink); }
+.hd-btn--primary .hd-bc__icon { -unity-background-image-tint-color: var(--hd-brass-dark); }
+.hd-btn--ghost .hd-bc__icon { -unity-background-image-tint-color: var(--hd-brass); }
+.hd-btn--primary:disabled .hd-bc__head, .hd-btn--primary:disabled .hd-bc__amount { color: rgba(236, 231, 220, 0.55); }
+.hd-btn--secondary:disabled .hd-bc__head, .hd-btn--secondary:disabled .hd-bc__amount,
+.hd-btn--ghost:disabled .hd-bc__head, .hd-btn--ghost:disabled .hd-bc__amount { color: rgba(236, 231, 220, 0.45); }
+.hd-bc:disabled .hd-bc__icon, .hd-bc:disabled .hd-bc__coin { opacity: 0.5; }
+
+/* Prix d'un libellé (HdButtonContent.Price) : l'icône de la monnaie remplace son code, à gauche du montant. */
+.hd-price { padding-left: 40px; background-size: 30px 30px; background-repeat: no-repeat; background-position: left center; }
+.hd-price.hd-price--credits { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/credits.png"); }
+.hd-price.hd-price--pr { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/pr.png"); }
+.hd-price.hd-price--gems { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/gems.png"); }
+
+/* ---------------------------------------------------------------- Onglets verticaux à icône (boutique, catégories des réglages) */
+.hd-shoptabs { flex-direction: column; flex-shrink: 0; width: 17%; min-width: 250px; max-width: 320px; margin: 0 20px 0 0; }
+.hd-shoptabs__tab, .hd-settings__cat { flex-grow: 0; flex-basis: auto; flex-shrink: 0; margin: 0 0 10px 0; min-height: 84px; padding: 0 16px 0 22px; justify-content: flex-start; }
+.hd-shoptabs__tab .hd-bc__head, .hd-settings__cat .hd-bc__head { -unity-text-align: middle-left; flex-grow: 1; flex-basis: 0; min-width: 0; }
+.hd-shoptabs__tab.hd-btn--secondary, .hd-settings__cat.hd-btn--secondary,
+.hd-shoptabs__tab.hd-btn--secondary:hover, .hd-settings__cat.hd-btn--secondary:hover,
+.hd-shoptabs__tab.hd-btn--secondary:active, .hd-settings__cat.hd-btn--secondary:active {
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Tabs/tab-vertical-inactive.png"); }
+.hd-shoptabs__tab.hd-btn--primary, .hd-settings__cat.hd-btn--primary,
+.hd-shoptabs__tab.hd-btn--primary:hover, .hd-settings__cat.hd-btn--primary:hover,
+.hd-shoptabs__tab.hd-btn--primary:active, .hd-settings__cat.hd-btn--primary:active {
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Tabs/tab-vertical-active.png"); }
+.hd-shoptabs__tab.hd-btn--secondary:focus, .hd-settings__cat.hd-btn--secondary:focus {
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Buttons/button-secondary-focus.png"); }
+.hd-shoptabs__tab.hd-btn--primary:focus, .hd-settings__cat.hd-btn--primary:focus {
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Buttons/button-primary-focus.png"); }
+.hd-shoptabs__tab.hd-btn--secondary .hd-bc__head, .hd-settings__cat.hd-btn--secondary .hd-bc__head { color: var(--hd-muted); }
+.hd-shoptabs__tab.hd-btn--secondary:hover .hd-bc__head, .hd-settings__cat.hd-btn--secondary:hover .hd-bc__head { color: var(--hd-ivory); }
+.hd-shoptabs__tab.hd-btn--primary .hd-bc__icon, .hd-settings__cat.hd-btn--primary .hd-bc__icon { -unity-background-image-tint-color: var(--hd-ink); }
+
+/* ---------------------------------------------------------------- Recruter (planche 10.1) */
+.hd-recruit { flex-direction: row; overflow: hidden; }
+.hd-recruit__main { flex-grow: 1; flex-basis: 0; min-width: 0; min-height: 0; }
+.hd-recruit__info { flex-direction: column; align-items: stretch; justify-content: flex-start; flex-shrink: 0; margin-bottom: 10px; padding: 8px 18px;
+    background-color: rgba(10, 17, 26, 0.82); border-left-width: 3px; border-left-color: var(--hd-brass); }
+.hd-recruit__headline { flex-direction: row; align-items: center; }
+.hd-recruit__countdown { font-size: 32px; flex-shrink: 1; white-space: normal; }
+.hd-recruit__rule { width: auto; font-size: 22px; color: var(--hd-muted); flex-shrink: 0; }
+.hd-recruit__cards { flex-direction: row; justify-content: center; flex-grow: 1; flex-basis: 0; min-height: 0; margin-bottom: 10px; }
+.hd-recruit__scraps { flex-direction: row; flex-wrap: wrap; flex-shrink: 0; }
+.hd-recruit__scrap { flex-grow: 1; flex-basis: 40%; min-width: 0; margin: 0 8px 8px 0; padding: 0 16px; font-size: 24px; }
+.hd-recruit__scrap .hd-bc__head { -unity-text-align: middle-left; flex-grow: 1; flex-basis: 0; min-width: 0; }
+.hd-recruit__actions { flex-direction: row; align-items: center; justify-content: flex-end; flex-shrink: 0; }
+.hd-recruit__actions > .hd-btn { margin: 0 0 0 12px; flex-shrink: 0; }
+.hd-recruit__progress { flex-grow: 1; flex-basis: 0; min-width: 0; padding: 4px 14px; background-color: rgba(10, 17, 26, 0.82); white-space: normal; }
+
+/* Carte d'agent en portrait : illustration, portrait cadré, cadre de famille, nom, pastille de prix. */
+.hd-hero { flex-grow: 1; flex-basis: 0; min-width: 0; max-width: 340px; margin: 0 14px 0 0; padding: 0; border-width: 0; border-radius: 0;
+    background-color: var(--hd-surface-3); overflow: hidden; align-items: stretch; }
+.hd-hero--legend { margin-top: 0; }
+.hd-hero--selected { background-color: var(--hd-surface); }
+.hd-hero--taken { opacity: 0.6; }
+.hd-hero__art { flex-grow: 1; flex-basis: 0; min-height: 0; border-bottom-width: 0; -unity-background-scale-mode: scale-and-crop; background-position: center top; }
+.hd-hero__bust { position: absolute; left: 0; top: 0; right: 0; bottom: 0; -unity-background-scale-mode: scale-and-crop; background-position: center top; }
+.hd-hero__shade { position: absolute; left: 0; right: 0; bottom: 0; height: 40%;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Overlays/gradient-dark-bottom.png"); }
+.hd-hero__famicon { position: absolute; left: 14px; top: 14px; width: 44px; height: 44px; margin: 0; }
+.hd-hero__frame { position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    -unity-slice-left: 40; -unity-slice-top: 40; -unity-slice-right: 40; -unity-slice-bottom: 56; }
+.hd-hero__frame--matter { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-matter-normal.png"); }
+.hd-hero__frame--elemental { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-elemental-normal.png"); }
+.hd-hero__frame--bio { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-bio-normal.png"); }
+.hd-hero__frame--perception { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-perception-normal.png"); }
+.hd-hero--selected .hd-hero__frame--matter, .hd-hero:focus .hd-hero__frame--matter { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-matter-selected.png"); }
+.hd-hero--selected .hd-hero__frame--elemental, .hd-hero:focus .hd-hero__frame--elemental { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-elemental-selected.png"); }
+.hd-hero--selected .hd-hero__frame--bio, .hd-hero:focus .hd-hero__frame--bio { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-bio-selected.png"); }
+.hd-hero--selected .hd-hero__frame--perception, .hd-hero:focus .hd-hero__frame--perception { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-perception-selected.png"); }
+.hd-hero:focus { background-color: var(--hd-surface-2); }
+.hd-hero__body { padding: 6px 14px 0 14px; flex-shrink: 0; align-items: center; }
+.hd-hero__name { font-size: 28px; -unity-text-align: middle-center; }
+.hd-hero--legend .hd-hero__name { color: var(--hd-brass-soft); }
+.hd-hero__rarity { font-size: 20px; -unity-text-align: middle-center; }
+.hd-hero__inteam { margin: 6px 14px 16px 14px; }
+.hd-hero .hd-btn { margin: 6px 14px 16px 14px; flex-shrink: 0; align-self: center; min-width: 150px; padding: 0 18px; }
+
+/* Fiche du héros choisi, à droite. */
+.hd-recruit__detail { width: 27%; min-width: 400px; max-width: 520px; flex-shrink: 0; margin: 0 0 0 6px; padding: 22px 26px; min-height: 0; }
+.hd-recruit__dhead { flex-direction: row; align-items: flex-start; flex-shrink: 0; }
+.hd-recruit__dtitle { flex-grow: 1; flex-basis: 0; min-width: 0; }
+.hd-recruit__dname { font-size: 36px; }
+.hd-recruit__dfamily { flex-direction: row; align-items: center; margin-top: 2px; }
+.hd-recruit__drole { font-size: 24px; color: var(--hd-muted); margin-bottom: 0; flex-shrink: 1; }
+.hd-recruit__dlevel { margin-left: 10px; }
+.hd-recruit__drarity { font-size: 22px; margin-top: 4px; }
+.hd-recruit__dgrid { flex-direction: row; flex-wrap: wrap; flex-shrink: 0; margin: 10px 0 6px 0; padding-top: 6px;
+    border-top-width: 1px; border-top-color: rgba(214, 175, 91, 0.6); }
+.hd-stat { width: 50%; flex-direction: row; align-items: center; min-height: 50px; border-bottom-width: 1px; border-bottom-color: rgba(113, 128, 138, 0.35); }
+.hd-stat__icon { width: 30px; height: 30px; flex-shrink: 0; margin-right: 10px; -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-ivory); }
+.hd-stat__label { -unity-font: var(--hd-font-heading); font-size: 22px; color: var(--hd-muted); }
+.hd-stat__value { -unity-font: var(--hd-font-title); font-size: 28px; color: var(--hd-ivory); flex-grow: 1; -unity-text-align: middle-right; margin-right: 16px; }
+.hd-recruit__dsection { flex-direction: row; align-items: center; flex-shrink: 0; margin: 8px 0 8px 0; }
+.hd-recruit__dsectiontitle { -unity-font: var(--hd-font-title); font-size: 26px; color: var(--hd-ivory); margin-right: 12px; }
+.hd-recruit__dsectionline { flex-grow: 1; height: 1px; background-color: rgba(214, 175, 91, 0.6); }
+.hd-recruit__dskilllist { flex-direction: row; flex-wrap: wrap; }
+.hd-recruit__skill { margin: 0 8px 8px 0; padding: 8px 16px; background-color: rgba(48, 73, 89, 0.85); border-left-width: 3px; border-left-color: var(--hd-brass);
+    -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-ivory); white-space: normal; }
+.hd-recruit__detail > .hd-btn { margin-top: 10px; min-height: 96px; flex-shrink: 0; padding: 0 16px; font-size: 38px; }
+
+/* ---------------------------------------------------------------- Boutique (planches 10.2 à 10.4) : classe « hd-shop » posée par BoutiquePageView */
+/* Le portefeuille est déjà dans la barre du haut : l'en-tête ne garde que ses deux raccourcis, à droite. */
+.hd-shop .hd-list__header { background-image: none; min-height: 0; padding: 0; margin: 0 0 10px 0; justify-content: flex-end; }
+.hd-shop .hd-list__headtext { display: none; }
+.hd-shop .hd-list__headbtn { min-width: 220px; margin: 0 0 0 12px; }
+.hd-shop .hd-list__side { width: 27%; min-width: 420px; max-width: 560px; margin: 0 0 0 20px; }
+.hd-shop .hd-list__sidetitle { font-size: 36px; color: var(--hd-ivory); padding-bottom: 6px; margin-bottom: 8px; white-space: normal;
+    border-bottom-width: 1px; border-bottom-color: rgba(214, 175, 91, 0.6); }
+.hd-shop .hd-grid__detailart { height: 200px; }
+.hd-shop .hd-grid__badge { -unity-font: var(--hd-font-title); font-size: 32px; align-self: flex-start; }
+.hd-shop .hd-grid__badge.hd-price { padding-left: 46px; background-size: 36px 36px; }
+.hd-shop .hd-tile { width: 250px; height: 330px; margin: 0 16px 16px 0; padding: 0; border-width: 2px; border-radius: 0; background-color: var(--hd-surface-3); overflow: hidden; }
+.hd-shop .hd-tile--selected { border-width: 4px; background-color: var(--hd-surface); }
+.hd-shop .hd-tile__art { margin: 12px 12px 0 12px; }
+.hd-shop .hd-tile__title { font-size: 26px; margin: 6px 8px 4px 8px; }
+/* Bandeau de prix du kit sous l'illustration ; un prix en monnaie du jeu devient une pastille sombre à pièce. */
+.hd-shop .hd-tile__sub { margin: 0; padding: 0 12px; min-height: 48px; -unity-text-align: middle-center;
+    -unity-font: var(--hd-font-title); font-size: 26px; color: var(--hd-ink);
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Economy/price-ribbon.png");
+    -unity-slice-left: 32; -unity-slice-top: 32; -unity-slice-right: 32; -unity-slice-bottom: 24; }
+.hd-shop .hd-tile__sub.hd-price { align-self: center; margin: 0 8px 10px 8px; padding: 0 18px 0 52px; min-height: 42px; color: var(--hd-ivory);
+    background-color: rgba(10, 17, 26, 0.9); border-width: 1px; border-color: var(--hd-brass-dark); border-radius: 21px;
+    background-size: 30px 30px; background-repeat: no-repeat; background-position: 12px center;
+    -unity-slice-left: 0; -unity-slice-top: 0; -unity-slice-right: 0; -unity-slice-bottom: 0; }
+.hd-shop .hd-tile__sub.hd-price--credits { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/credits.png"); }
+.hd-shop .hd-tile__sub.hd-price--pr { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/pr.png"); }
+.hd-shop .hd-tile__sub.hd-price--gems { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/gems.png"); }
+
+/* ---------------------------------------------------------------- Réglages (planches 14 et 15) */
+.hd-settings__cats { width: 22%; min-width: 320px; max-width: 420px; padding: 16px 14px; }
+.hd-settings__head { justify-content: flex-start; margin-bottom: 6px; }
+.hd-settings__titleicon { width: 44px; height: 44px; flex-shrink: 0; margin-right: 14px; -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-ivory); }
+.hd-settings__title { font-size: 42px; color: var(--hd-ivory); flex-shrink: 1; white-space: normal; }
+.hd-settings__rule { height: 1px; flex-shrink: 0; margin-bottom: 10px; background-color: rgba(214, 175, 91, 0.7); }
+.hd-settings__foot { flex-direction: row; justify-content: flex-start; flex-shrink: 0; margin-top: 8px; }
+.hd-settings__reset { margin: 0; }
+.hd-setting { min-height: 88px; margin: 0 0 6px 0; padding: 8px 14px 8px 18px; border-width: 0; border-radius: 0;
+    background-color: rgba(27, 43, 59, 0.6); border-bottom-width: 1px; border-bottom-color: rgba(113, 128, 138, 0.45); }
+.hd-setting__label { font-size: 30px; }
+.hd-setting__hint { color: var(--hd-muted); }
+.hd-setting__step { min-width: 72px; width: 72px; padding: 0; margin: 0; align-items: center; justify-content: center; flex-shrink: 0; }
+.hd-setting__stepicon { width: 28px; height: 28px; -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-ivory); }
+.hd-setting__bar { width: 26%; min-width: 180px; max-width: 420px; height: 20px; margin: 0 26px; padding: 3px; flex-shrink: 1; }
+.hd-setting__thumb { position: absolute; top: 50%; width: 40px; height: 40px; margin-left: -20px; margin-top: -20px; -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Controls/slider-thumb.png"); }
+.hd-setting__percent { -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-ivory); min-width: 110px; -unity-text-align: middle-right; margin-left: 12px; }
+.hd-setting__value { color: var(--hd-ivory); min-width: 0; -unity-text-align: middle-right; white-space: normal; flex-shrink: 1; margin-left: 12px; }
+.hd-setting__value--choice { min-width: 190px; min-height: 56px; margin: 0 8px; padding: 0 16px; color: var(--hd-ink); -unity-font: var(--hd-font-title); -unity-text-align: middle-center;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Economy/price-ribbon.png");
+    -unity-slice-left: 32; -unity-slice-top: 32; -unity-slice-right: 32; -unity-slice-bottom: 24; }
+.hd-setting__value--state { -unity-font: var(--hd-font-title); font-size: 26px; color: var(--hd-muted); margin-right: 14px; }
+.hd-setting__value--on { color: var(--hd-brass); }
+.hd-setting__action { min-width: 240px; }
+/* Interrupteur du kit : le bouton garde sa cible et son focus, son image suit l'état. */
+.hd-btn.hd-setting__switch { width: 128px; min-width: 128px; padding: 0; margin: 0; flex-shrink: 0;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Controls/toggle-off.png"); -unity-background-scale-mode: scale-to-fit;
+    -unity-slice-left: 0; -unity-slice-top: 0; -unity-slice-right: 0; -unity-slice-bottom: 0; }
+.hd-btn.hd-setting__switch--on { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Controls/toggle-on.png"); }
+.hd-setting__switch > .hd-bc__icon, .hd-setting__switch > .hd-bc__head, .hd-setting__switch > .hd-bc__coin, .hd-setting__switch > .hd-bc__amount { display: none; }
+.hd-btn.hd-setting__switch:focus { border-width: 2px; border-color: var(--hd-ivory); border-radius: 8px; }
+
+/* ---------------------------------------------------------------- Confirmation de recrutement (planche 11.1) */
+.hd-pop__portrait { width: 220px; height: 300px; border-width: 0; background-color: var(--hd-surface-3); overflow: hidden; }
+.hd-pop__herorole { margin-bottom: 0; color: var(--hd-muted); flex-shrink: 1; }
+.hd-pop__costs { margin-top: 8px; flex-shrink: 0; border-top-width: 1px; border-top-color: rgba(214, 175, 91, 0.6); }
+.hd-pop__costrow { flex-direction: row; align-items: center; min-height: 52px; border-bottom-width: 1px; border-bottom-color: rgba(113, 128, 138, 0.35); }
+.hd-pop__costlabel { -unity-font: var(--hd-font-body); font-size: 26px; color: var(--hd-muted); flex-grow: 1; flex-basis: 0; min-width: 0; white-space: normal; }
+.hd-pop__costvalue { -unity-font: var(--hd-font-title); font-size: 32px; color: var(--hd-ivory); -unity-text-align: middle-right; margin-left: 12px; }
+.hd-pop__costvalue.hd-price { padding-left: 44px; background-size: 34px 34px; }
+
+/* ---------------------------------------------------------------- Questionnaire (planche 16.4) : question à gauche, cinq notes en cases à droite */
+.hd-poll__line { flex-direction: row; align-items: center; flex-shrink: 0; min-height: 76px; margin-bottom: 6px;
+    border-bottom-width: 1px; border-bottom-color: rgba(113, 128, 138, 0.35); }
+.hd-poll__question { flex-grow: 1; flex-basis: 0; min-width: 0; flex-shrink: 1; margin: 0 16px 0 0; }
+.hd-poll__row { margin-bottom: 0; }
+.hd-poll__rate { flex-grow: 0; flex-basis: auto; width: 72px; min-width: 72px; padding: 0; margin: 0 0 0 8px; }
+.hd-poll__rate.hd-btn--primary, .hd-poll__rate.hd-btn--primary:hover { color: var(--hd-ink); }
+
+/* ---------------------------------------------------------------- Ouverture d'un booster (planche 11.2) : étoile du kit sur le paquet, sans glyphe de texte */
+.hd-boost__pack { background-color: var(--hd-ink); border-width: 3px; border-radius: 6px; }
+.hd-boost__packglow { position: absolute; left: 0; top: 0; right: 0; bottom: 0; -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/FX/glow-gold.png"); opacity: 0.7; }
+.hd-boost__packglyph { width: 180px; height: 180px; font-size: 1px; -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsGold/dawn.png"); }
+.hd-boost__hint { margin-top: 12px; padding: 6px 36px; color: var(--hd-ink); -unity-font: var(--hd-font-title);
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Economy/price-ribbon.png");
+    -unity-slice-left: 32; -unity-slice-top: 32; -unity-slice-right: 32; -unity-slice-bottom: 24; }
+.hd-boost__card { border-width: 3px; border-radius: 4px; }
+.hd-boost__back { border-radius: 0;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Cards/card-back.png"); -unity-background-scale-mode: scale-and-crop; }
+.hd-boost__art { border-radius: 0; }

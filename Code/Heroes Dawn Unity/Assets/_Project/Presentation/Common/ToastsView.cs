@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Common
 {
-    /// <summary>Messages éphémères en haut de l'écran (UI Toolkit) : au plus quatre, chacun disparaît seul.</summary>
+    /// <summary>Messages éphémères sous la barre du haut, à droite (UI Toolkit) : au plus quatre, compacts, chacun disparaît seul.</summary>
     public sealed class ToastsView : HdView, IToastService
     {
         const int Max = 4;
@@ -39,6 +39,10 @@ namespace N29.HeroesDawn.Presentation.Common
             var item = new VisualElement { pickingMode = PickingMode.Ignore };
             item.AddToClassList("hd-toast");
             item.AddToClassList(kind == ToastKind.Reward ? "hd-toast--reward" : kind == ToastKind.Warning ? "hd-toast--warning" : kind == ToastKind.Error ? "hd-toast--error" : "hd-toast--info");
+            // La nature du message se lit à l'icône teintée (information, gain, alerte, erreur), posée par USS.
+            var icon = new VisualElement { pickingMode = PickingMode.Ignore };
+            icon.AddToClassList("hd-toast__icon");
+            item.Add(icon);
             var label = new Label(text) { pickingMode = PickingMode.Ignore };
             label.AddToClassList("hd-toast__text");
             item.Add(label);

@@ -197,6 +197,8 @@ namespace N29.HeroesDawn.Presentation.Audio
             var e = id > 0 && id < _sfx.Length ? _sfx[id] : null;
             if (e == null || e.Clips.Length == 0 || _sfxVolume <= 0f) return;
             var voices = _rig.Voices;
+            // Le banc de sources est détruit à la fermeture du jeu ou d'une scène : une suite asynchrone (fenêtre qui se ferme) peut encore demander un son.
+            if (voices.Length == 0 || voices[0] == null) return;
             for (int i = 0; i < voices.Length; i++) _playing[i] = voices[i].isPlaying;
             int v = _pool.Acquire(sfx, e.Priority, e.MaxInstances, e.Cooldown, _now, _playing);
             if (v < 0) return;

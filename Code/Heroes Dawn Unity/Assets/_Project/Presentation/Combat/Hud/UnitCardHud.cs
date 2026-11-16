@@ -1,17 +1,18 @@
 #nullable enable
 using System;
+using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Presentation.Common;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Combat.Hud
 {
-    /// <summary>Carte d'une unité en combat (UI Toolkit) : portrait, nom, PV, jauge d'énergie, statuts, états (prête, sélectionnée, ciblable, K.O.).</summary>
+    /// <summary>Fiche d'une unité en combat (UI Toolkit) : portrait carré cadré sur le visage, insigne de famille (alliés) ou losange (ennemis), nom, PV, jauge d'énergie, statuts, états (prête, sélectionnée, ciblable, K.O.).</summary>
     public sealed class UnitCardHud
     {
         readonly VisualElement _root = new VisualElement(), _portrait = new VisualElement(), _selectRing = new VisualElement(), _targetRing = new VisualElement(), _flash = new VisualElement();
-        readonly VisualElement _hpFill = new VisualElement(), _gaugeFill = new VisualElement(), _floats = new VisualElement();
-        readonly Label _initial = new Label(), _name = new Label(), _sub = new Label(), _hpText = new Label(), _statuses = new Label(), _ko = new Label();
+        readonly VisualElement _hpFill = new VisualElement(), _gaugeFill = new VisualElement(), _floats = new VisualElement(), _badge = new VisualElement();
+        readonly Label _initial = new Label(), _name = new Label(), _sub = new Label(), _hpText = new Label(), _statuses = new Label(), _ko = new Label(), _badgeText = new Label();
         bool _ally;
         Color _baseFill;
 
@@ -30,6 +31,10 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
             _portrait.AddToClassList("hd-unit__portrait");
             _initial.AddToClassList("hd-unit__initial");
             _portrait.Add(_initial);
+            _portrait.pickingMode = PickingMode.Ignore;
+            _badge.AddToClassList("hd-unit__badge"); _badge.pickingMode = PickingMode.Ignore;
+            _badgeText.AddToClassList("hd-unit__badge-text"); _badgeText.pickingMode = PickingMode.Ignore;
+            _badge.Add(_badgeText);
             _name.AddToClassList("hd-unit__name"); _sub.AddToClassList("hd-unit__sub");
             var hp = new VisualElement(); hp.AddToClassList("hd-unit__bar"); _hpFill.AddToClassList("hd-unit__hp"); _hpText.AddToClassList("hd-unit__bartext");
             hp.Add(_hpFill); hp.Add(_hpText);
@@ -38,7 +43,7 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
             _ko.AddToClassList("hd-unit__ko"); _ko.text = "K.O."; _ko.style.display = DisplayStyle.None;
             _flash.AddToClassList("hd-unit__flash"); _flash.pickingMode = PickingMode.Ignore;
             _floats.AddToClassList("hd-unit__floats"); _floats.pickingMode = PickingMode.Ignore;
-            foreach (var e in new VisualElement[] { _targetRing, _selectRing, _portrait, _name, _sub, hp, gauge, _statuses, _flash, _ko, _floats }) _root.Add(e);
+            foreach (var e in new VisualElement[] { _targetRing, _selectRing, _portrait, _badge, _name, _sub, hp, gauge, _statuses, _flash, _ko, _floats }) _root.Add(e);
             _root.RegisterCallback<ClickEvent>(_ => Tapped?.Invoke(UnitId));
         }
 
@@ -49,15 +54,26 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
         {
             UnitId = d.Id; _ally = d.Ally;
             _root.name = (d.Ally ? "Ally_" : "Enemy_") + d.Id;
-            _baseFill = d.Ally ? Theme.Surface : Color.Lerp(Theme.SurfaceDark, Theme.Danger, 0.16f);
+            _baseFill = Theme.WithAlpha(d.Ally ? Theme.Frost : Color.Lerp(Theme.SurfaceDark, Theme.Danger, 0.22f), 0.92f);
             _root.style.backgroundColor = _baseFill;
+            _root.EnableInClassList("hd-unit--enemy", !d.Ally);
+            _root.EnableInClassList("hd-unit--boss", d.Boss);
+            _root.EnableInClassList("hd-unit--matter", d.Family == Family.Matter);
+            _root.EnableInClassList("hd-unit--elemental", d.Family == Family.Elemental);
+            _root.EnableInClassList("hd-unit--bio", d.Family == Family.PhysicalBio);
+            _root.EnableInClassList("hd-unit--perception", d.Family == Family.Perception);
             _sub.text = d.Sub ?? "";
             var family = Theme.FamilyColor(d.Family);
-            Border(_portrait, family);
+            Border(_portrait, d.Ally ? family : Theme.Danger);
             PortraitArt = d.Portrait.Art;
-            _portrait.style.backgroundImage = PortraitArt != null ? new StyleBackground(Background.FromSprite(PortraitArt)) : new StyleBackground(StyleKeyword.None);
-            _portrait.style.backgroundColor = Color.Lerp(family, Theme.Navy, d.Ally ? 0.25f : 0.4f);
-            _initial.text = PortraitArt != null ? "" : d.Portrait.Initial;
+            // Portrait cadré sur le visage (agents) ou illustration de l'ennemi ; à défaut l'illustration reçue, sinon une silhouette (USS).
+            bool framed = d.Ally ? HudPortraits.ApplyAgent(_portrait, PortraitArt, d.Name) : HudPortraits.ApplyEnemy(_portrait, d.Name);
+            bool empty = !framed && PortraitArt == null;
+            if (!framed) _portrait.style.backgroundImage = PortraitArt != null ? new StyleBackground(Background.FromSprite(PortraitArt)) : new StyleBackground(StyleKeyword.Null);
+            _portrait.EnableInClassList("hd-unit__portrait--empty", empty);
+            _portrait.style.backgroundColor = Color.Lerp(d.Ally ? family : Theme.Danger, Theme.Navy, d.Ally ? 0.55f : 0.7f);
+            _initial.text = empty && d.Ally ? d.Portrait.Initial : "";
+            _badgeText.text = d.Ally ? "" : d.Portrait.Initial;
             _name.text = d.Name;
             _name.style.color = d.Boss ? Theme.Primary : Theme.Text;
             _hpFill.style.backgroundColor = d.Ally ? Theme.Hp : Theme.HpEnemy;

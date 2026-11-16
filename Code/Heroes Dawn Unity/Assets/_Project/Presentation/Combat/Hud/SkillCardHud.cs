@@ -7,13 +7,13 @@ using UnityEngine.UIElements;
 namespace N29.HeroesDawn.Presentation.Combat.Hud
 {
     /// <summary>
-    /// Carte de compétence de l'éventail (UI Toolkit) : numéro, illustration ou initiale, nom, coût en énergie, anneau quand elle est lançable.
+    /// Carte de compétence de l'éventail (UI Toolkit) : numéro en losange, illustration pleine carte ou initiale, nom en bas, coût en énergie, anneau quand elle est lançable.
     /// Appui maintenu : description ; glisser : la carte suit le doigt puis, au lâcher, la vue décide de la cible et la carte revient à sa place.
     /// </summary>
     public sealed class SkillCardHud
     {
         const float DragThreshold = 14f;
-        readonly VisualElement _root = new VisualElement(), _ring = new VisualElement(), _frame = new VisualElement(), _art = new VisualElement(), _costBadge = new VisualElement(), _slotBadge = new VisualElement();
+        readonly VisualElement _root = new VisualElement(), _ring = new VisualElement(), _frame = new VisualElement(), _art = new VisualElement(), _costBadge = new VisualElement(), _slotBadge = new VisualElement(), _shade = new VisualElement(), _plus = new VisualElement();
         readonly Label _glyph = new Label(), _label = new Label(), _cost = new Label(), _slot = new Label();
         string? _artKey;
         Sprite? _cachedArt;
@@ -44,10 +44,11 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
             _ring.AddToClassList("hd-skill__ring"); _ring.pickingMode = PickingMode.Ignore;
             _frame.AddToClassList("hd-skill__frame"); _frame.pickingMode = PickingMode.Ignore;
             _art.AddToClassList("hd-skill__art"); _art.pickingMode = PickingMode.Ignore;
+            _shade.AddToClassList("hd-skill__shade"); _plus.AddToClassList("hd-skill__plus");
             _glyph.AddToClassList("hd-skill__glyph"); _label.AddToClassList("hd-skill__label");
             _costBadge.AddToClassList("hd-skill__cost"); _cost.AddToClassList("hd-skill__costtext"); _costBadge.Add(_cost);
             _slotBadge.AddToClassList("hd-skill__slot"); _slot.AddToClassList("hd-skill__slottext"); _slotBadge.Add(_slot);
-            foreach (var e in new VisualElement[] { _ring, _frame, _art, _glyph, _label, _costBadge, _slotBadge }) { e.pickingMode = PickingMode.Ignore; _root.Add(e); }
+            foreach (var e in new VisualElement[] { _ring, _art, _shade, _frame, _glyph, _plus, _label, _costBadge, _slotBadge }) { e.pickingMode = PickingMode.Ignore; _root.Add(e); }
             _root.RegisterCallback<PointerDownEvent>(OnDown);
             _root.RegisterCallback<PointerMoveEvent>(OnMove);
             _root.RegisterCallback<PointerUpEvent>(OnUp);
@@ -60,14 +61,18 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
             _root.style.display = d.Visible ? DisplayStyle.Flex : DisplayStyle.None;
             if (!d.Visible) return;
             _slot.text = (index + 1).ToString();
-            _glyph.text = d.Locked ? "+" : d.Glyph;
+            // Emplacement du grimoire encore vide : contour discret et icône « plus » du kit.
+            _root.EnableInClassList("hd-skill--locked", d.Locked);
+            _plus.style.display = d.Locked ? DisplayStyle.Flex : DisplayStyle.None;
+            _glyph.text = d.Locked ? "" : d.Glyph;
             _label.text = d.Locked ? "" : NameOf(d.Label);
             _root.EnableInClassList("hd-skill--pending", d.Pending);
             if (_artKey != d.ArtKey) { _artKey = d.ArtKey; _cachedArt = AgentArt.Skill(d.ArtKey ?? ""); }
             var art = d.Locked ? null : _cachedArt;
             _art.style.display = art != null ? DisplayStyle.Flex : DisplayStyle.None;
             _art.style.backgroundImage = art != null ? new StyleBackground(Background.FromSprite(art)) : new StyleBackground(StyleKeyword.None);
-            _glyph.style.display = d.Locked || art == null ? DisplayStyle.Flex : DisplayStyle.None;
+            _shade.style.display = art != null ? DisplayStyle.Flex : DisplayStyle.None;
+            _glyph.style.display = !d.Locked && art == null ? DisplayStyle.Flex : DisplayStyle.None;
             bool paid = !d.Locked && d.Cost > 0;
             _costBadge.style.display = paid ? DisplayStyle.Flex : DisplayStyle.None;
             _cost.text = paid ? d.Cost.ToString() : "";
@@ -77,7 +82,7 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
             _ring.style.borderTopColor = _ring.style.borderBottomColor = _ring.style.borderLeftColor = _ring.style.borderRightColor = d.Pending ? Theme.Primary : Theme.Glow;
             CanDrag = d.Enabled;
             _root.SetEnabled(true);
-            _root.style.opacity = d.Locked ? 0.45f : d.Enabled || d.Pending ? 1f : 0.62f;
+            _root.style.opacity = d.Locked ? 0.7f : d.Enabled || d.Pending ? 1f : 0.62f;
         }
 
         /// <summary>« [2] Barrière de fer » → « Barrière de fer » (le numéro est déjà affiché dans le coin).</summary>

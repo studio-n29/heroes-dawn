@@ -73,7 +73,7 @@ namespace N29.HeroesDawn.Presentation.Account
             _email.textEdition.placeholder = data.EmailHint; _password.textEdition.placeholder = data.PasswordHint; _name.textEdition.placeholder = data.NameHint;
             _google.text = data.Google; _apple.text = data.Apple; _forgot.text = data.Forgot; _close.text = data.Close;
             _email.value = ""; _password.value = ""; _name.value = "";
-            _message.text = "";
+            SetMessage("");
             _busy.style.display = DisplayStyle.None;
             SetMode(data.Mode, data.Title, data.Submit);
         }
@@ -85,7 +85,9 @@ namespace N29.HeroesDawn.Presentation.Account
             _name.style.display = mode == AccountMode.SignUp ? DisplayStyle.Flex : DisplayStyle.None;
             _tabIn.EnableInClassList("hd-tab--active", mode == AccountMode.SignIn);
             _tabUp.EnableInClassList("hd-tab--active", mode == AccountMode.SignUp);
-            _message.text = "";
+            // « Mot de passe oublié » ne concerne que la connexion (planche 2.2 : la création ne le montre pas).
+            _forgot.style.display = mode == AccountMode.SignIn ? DisplayStyle.Flex : DisplayStyle.None;
+            SetMessage("");
         }
 
         public void SetBusy(bool busy, string text)
@@ -97,9 +99,16 @@ namespace N29.HeroesDawn.Presentation.Account
 
         public void ShowMessage(string text, bool isError)
         {
-            _message.text = text;
+            SetMessage(text);
             _message.EnableInClassList("hd-form__message--error", isError);
             _message.EnableInClassList("hd-form__message--ok", !isError);
+        }
+
+        // Le bandeau de message n'occupe de place que lorsqu'il a un texte.
+        void SetMessage(string text)
+        {
+            _message.text = text;
+            _message.EnableInClassList("hd-entry__message--shown", text.Length > 0);
         }
     }
 }

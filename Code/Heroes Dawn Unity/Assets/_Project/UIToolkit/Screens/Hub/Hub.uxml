@@ -3,7 +3,10 @@
         <ui:VisualElement name="backdrop" class="hd-shell__backdrop" />
         <ui:VisualElement name="top" class="hd-topbar">
             <ui:VisualElement name="safeTop" class="hd-topbar__row">
-                <ui:Button name="back" class="hd-btn hd-btn--secondary hd-btn--small hd-topbar__back" />
+                <ui:Button name="back" class="hd-btn hd-btn--secondary hd-btn--small hd-btn--lead hd-topbar__back">
+                    <ui:VisualElement picking-mode="Ignore" class="hd-btn__lead hd-icon--back hd-icon--tint-ivory" />
+                </ui:Button>
+                <ui:VisualElement name="titleStar" picking-mode="Ignore" class="hd-topbar__star" />
                 <ui:Label name="title" class="hd-topbar__title" />
                 <ui:VisualElement name="avatar" class="hd-topbar__avatar">
                     <ui:VisualElement name="avatarPortrait" class="hd-topbar__portrait" />
@@ -14,12 +17,14 @@
                 </ui:VisualElement>
                 <ui:VisualElement class="hd-grow" />
                 <ui:VisualElement name="wallet" class="hd-wallet">
-                    <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--credits"><ui:Label name="credits" class="hd-wallet__value" /><ui:Label text="CR" class="hd-wallet__unit" /></ui:VisualElement>
-                    <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--pr"><ui:Label name="pr" class="hd-wallet__value" /><ui:Label text="PR" class="hd-wallet__unit" /></ui:VisualElement>
-                    <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--gems"><ui:Label name="gems" class="hd-wallet__value" /><ui:Label text="G" class="hd-wallet__unit" /></ui:VisualElement>
+                    <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--credits"><ui:VisualElement picking-mode="Ignore" class="hd-wallet__unit" /><ui:Label name="credits" class="hd-wallet__value" /></ui:VisualElement>
+                    <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--pr"><ui:VisualElement picking-mode="Ignore" class="hd-wallet__unit" /><ui:Label name="pr" class="hd-wallet__value" /></ui:VisualElement>
+                    <ui:VisualElement class="hd-pill hd-wallet__pill hd-wallet__pill--gems"><ui:VisualElement picking-mode="Ignore" class="hd-wallet__unit" /><ui:Label name="gems" class="hd-wallet__value" /></ui:VisualElement>
                     <ui:Label name="saving" class="hd-wallet__saving" />
                 </ui:VisualElement>
-                <ui:Button name="settings" class="hd-btn hd-btn--secondary hd-btn--small hd-topbar__settings" />
+                <ui:Button name="settings" class="hd-btn hd-btn--secondary hd-btn--small hd-btn--icon hd-topbar__settings">
+                    <ui:VisualElement picking-mode="Ignore" class="hd-icon hd-icon--settings hd-icon--tint-ivory" />
+                </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="nav" class="hd-navbar">

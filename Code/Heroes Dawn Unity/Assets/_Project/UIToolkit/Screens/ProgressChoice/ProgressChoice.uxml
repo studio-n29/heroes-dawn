@@ -1,23 +1,36 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="modal" class="hd-modal">
-        <ui:VisualElement name="window" class="hd-window hd-modal__window">
-            <ui:Label name="title" class="hd-modal__title" />
-            <ui:VisualElement class="hd-divider" />
-            <ui:Label name="hint" class="hd-modal__body hd-choice__hint" />
-            <ui:VisualElement class="hd-choice__cards">
-                <ui:VisualElement class="hd-panel hd-choice__card">
-                    <ui:Label name="deviceHeader" class="hd-choice__header" />
-                    <ui:Label name="deviceSummary" class="hd-choice__summary" />
-                    <ui:Button name="keepDevice" class="hd-btn hd-btn--secondary" />
-                </ui:VisualElement>
-                <ui:VisualElement class="hd-panel hd-choice__card hd-choice__card--account">
-                    <ui:Label name="accountHeader" class="hd-choice__header" />
-                    <ui:Label name="accountSummary" class="hd-choice__summary" />
-                    <ui:Button name="keepAccount" class="hd-btn hd-btn--primary" />
-                </ui:VisualElement>
+        <!-- Planche 2.3 : illustration à gauche, titre et deux cartes de sauvegarde à droite. -->
+        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-entry hd-entry--choice">
+            <ui:VisualElement class="hd-entry__art hd-entry__art--harbor" picking-mode="Ignore">
+                <ui:VisualElement class="hd-entry__artshade" picking-mode="Ignore" />
             </ui:VisualElement>
-            <ui:VisualElement class="hd-modal__buttons hd-form__row">
-                <ui:Button name="later" class="hd-btn hd-btn--ghost hd-btn--small" />
+            <ui:VisualElement class="hd-entry__form">
+                <ui:Label name="title" class="hd-modal__title hd-choice__title" />
+                <ui:Label name="hint" class="hd-modal__body hd-choice__hint" />
+                <ui:VisualElement class="hd-choice__cards">
+                    <ui:VisualElement class="hd-panel hd-choice__card">
+                        <ui:VisualElement class="hd-choice__head">
+                            <ui:VisualElement class="hd-choice__icon hd-choice__icon--device" picking-mode="Ignore" />
+                            <ui:Label name="deviceHeader" class="hd-choice__header" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="hd-choice__rule" />
+                        <ui:Label name="deviceSummary" class="hd-choice__summary" />
+                        <ui:Button name="keepDevice" class="hd-btn hd-btn--secondary" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hd-panel hd-choice__card hd-choice__card--account">
+                        <ui:VisualElement class="hd-choice__head">
+                            <ui:VisualElement class="hd-choice__icon hd-choice__icon--account" picking-mode="Ignore" />
+                            <ui:Label name="accountHeader" class="hd-choice__header" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="hd-choice__rule" />
+                        <ui:Label name="accountSummary" class="hd-choice__summary" />
+                        <ui:Button name="keepAccount" class="hd-btn hd-btn--primary" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-modal__buttons hd-form__row hd-entry__footer hd-entry__footer--end">
+                    <ui:Button name="later" class="hd-btn hd-btn--ghost hd-btn--small" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

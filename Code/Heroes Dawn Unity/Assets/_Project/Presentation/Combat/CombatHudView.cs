@@ -49,8 +49,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             _speed.clicked += () => SpeedClicked?.Invoke();
             _pause.clicked += () => PauseClicked?.Invoke();
             _debug.clicked += () => DebugWinClicked?.Invoke();
-            _retreat.text = Loc.T("combat.retreat");
-            _pause.text = Loc.T("combat.pause");
+            // Retraite et pause sont des puces à icône (chevron de retour, pause) : l'icône est dans le document.
+            _retreat.text = ""; _pause.text = "";
             _auto.text = Loc.T("combat.auto_hint");
             _debug.text = Loc.T("combat.debug_win");
             _banner.pickingMode = PickingMode.Ignore;

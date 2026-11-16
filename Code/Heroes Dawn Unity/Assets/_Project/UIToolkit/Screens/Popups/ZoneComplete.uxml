@@ -4,10 +4,13 @@
             <ui:Label name="title" class="hd-modal__title" />
             <ui:VisualElement class="hd-divider" />
             <ui:Label name="objectivesTitle" class="hd-pop__section" />
-            <ui:Label name="objectives" class="hd-pop__text" />
+            <ui:VisualElement name="objectiveRows" class="hd-m-zone__objectives" />
+            <ui:Label name="objectives" class="hd-pop__text hd-m-hidden" />
             <ui:Label name="rewardsTitle" class="hd-pop__section" />
-            <ui:Label name="rewards" class="hd-pop__text" />
-            <ui:VisualElement class="hd-modal__buttons"><ui:Button name="toHq" class="hd-btn hd-btn--primary" /></ui:VisualElement>
+            <ui:Label name="rewards" class="hd-m-reward hd-m-zone__rewards" />
+            <ui:VisualElement class="hd-modal__buttons">
+                <ui:Button name="toHq" class="hd-btn hd-btn--primary" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

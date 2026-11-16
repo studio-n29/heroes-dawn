@@ -1,24 +1,44 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="modal" class="hd-modal">
-        <ui:VisualElement name="window" class="hd-window hd-modal__window">
-            <ui:Label name="title" class="hd-modal__title" />
-            <ui:VisualElement class="hd-modal__buttons hd-tabs">
-                <ui:Button name="tabSignIn" class="hd-tab" />
-                <ui:Button name="tabSignUp" class="hd-tab" />
+        <!-- Planche 2 : illustration à gauche, formulaire à droite sous le logotype. -->
+        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-entry">
+            <ui:VisualElement class="hd-entry__art hd-entry__art--title" picking-mode="Ignore">
+                <ui:VisualElement class="hd-entry__arthero" picking-mode="Ignore" />
+                <ui:VisualElement class="hd-entry__artshade" picking-mode="Ignore" />
             </ui:VisualElement>
-            <ui:VisualElement class="hd-divider" />
-            <ui:TextField name="email" class="hd-field hd-form__row" />
-            <ui:TextField name="password" password="true" class="hd-field hd-form__row" />
-            <ui:TextField name="name" class="hd-field hd-form__row" />
-            <ui:Label name="message" class="hd-form__message" />
-            <ui:Button name="submit" class="hd-btn hd-btn--primary hd-form__row" />
-            <ui:VisualElement class="hd-modal__buttons hd-form__row">
-                <ui:Button name="google" class="hd-btn hd-btn--secondary hd-btn--small" />
-                <ui:Button name="apple" class="hd-btn hd-btn--secondary hd-btn--small" />
-            </ui:VisualElement>
-            <ui:VisualElement class="hd-modal__buttons hd-form__row">
-                <ui:Button name="forgot" class="hd-btn hd-btn--ghost hd-btn--small" />
-                <ui:Button name="close" class="hd-btn hd-btn--ghost hd-btn--small" />
+            <ui:VisualElement class="hd-entry__form">
+                <ui:VisualElement class="hd-ebrand" picking-mode="Ignore">
+                    <ui:VisualElement class="hd-ebrand__clip hd-ebrand__clip--left" picking-mode="Ignore">
+                        <ui:VisualElement class="hd-ebrand__img hd-ebrand__img--left" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hd-ebrand__clip hd-ebrand__clip--star" picking-mode="Ignore">
+                        <ui:VisualElement class="hd-ebrand__img hd-ebrand__img--star" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hd-ebrand__clip hd-ebrand__clip--right" picking-mode="Ignore">
+                        <ui:VisualElement class="hd-ebrand__img hd-ebrand__img--right" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label name="title" class="hd-modal__title hd-entry__kicker" />
+                <ui:VisualElement class="hd-modal__buttons hd-tabs hd-entry__tabs">
+                    <ui:Button name="tabSignIn" class="hd-tab" />
+                    <ui:Button name="tabSignUp" class="hd-tab" />
+                </ui:VisualElement>
+                <ui:Label name="message" class="hd-form__message hd-entry__message" />
+                <ui:TextField name="email" class="hd-field hd-form__row hd-entry__field hd-entry__field--mail" />
+                <ui:TextField name="password" password="true" class="hd-field hd-form__row hd-entry__field hd-entry__field--password" />
+                <ui:TextField name="name" class="hd-field hd-form__row hd-entry__field hd-entry__field--name" />
+                <ui:Button name="forgot" class="hd-entry__link" />
+                <ui:Button name="submit" class="hd-btn hd-btn--primary hd-form__row hd-ecta">
+                    <ui:VisualElement class="hd-ecta__icon hd-ecta__icon--star" picking-mode="Ignore" />
+                    <ui:VisualElement class="hd-ecta__icon hd-ecta__icon--chevron" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:VisualElement class="hd-modal__buttons hd-form__row hd-entry__providers">
+                    <ui:Button name="google" class="hd-btn hd-btn--secondary hd-btn--small" />
+                    <ui:Button name="apple" class="hd-btn hd-btn--secondary hd-btn--small" />
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-modal__buttons hd-form__row hd-entry__footer">
+                    <ui:Button name="close" class="hd-btn hd-btn--ghost hd-btn--small" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="busy" class="hd-busy" style="display: none;">

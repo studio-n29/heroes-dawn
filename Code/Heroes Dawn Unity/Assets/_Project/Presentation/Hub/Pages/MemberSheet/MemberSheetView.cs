@@ -19,9 +19,13 @@ namespace N29.HeroesDawn.Presentation.Hub
         sealed class TileEl
         {
             public UnityEngine.UIElements.Button Root = null!;
-            public VisualElement Art = null!;
+            public VisualElement Art = null!, Slot = null!;
             public Label Title = null!, Sub = null!;
         }
+
+        /// <summary>Icônes du kit des quatre statistiques, dans l'ordre de la ligne « PV · ATQ · DÉF · VIT ».</summary>
+        static readonly string[] StatIcons = { "health", "attack", "defense", "speed" };
+        static readonly string[] StatSeparator = { " · " };
 
         readonly List<TileEl> _skills = new List<TileEl>(), _items = new List<TileEl>(), _picker = new List<TileEl>();
 
@@ -35,6 +39,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         DossierData? _lastDossier;
         PickerData? _lastPicker;
         HdTutorialAnchor? _pickAnchor;
+        VisualElement? _statCells, _fatigueRow, _familyIcon, _dossierFace, _dossierFamily;
+        Label? _dossierName, _dossierRole;
 
         public event Action? PreviousClicked;
         public event Action? NextClicked;
@@ -75,6 +81,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             _dossierScroll = Q<ScrollView>("dossierScroll"); _dossierClose = Q<UnityEngine.UIElements.Button>("dossierClose");
             _pickerRoot = Q<VisualElement>("pickerRoot"); _pickerTitle = Q<Label>("pickerTitle"); _pickerHint = Q<Label>("pickerHint");
             _pickerBox = Q<ScrollView>("pickerTiles"); _pickerRemove = Q<UnityEngine.UIElements.Button>("pickerRemove"); _pickerClose = Q<UnityEngine.UIElements.Button>("pickerClose");
+            _statCells = TryQ<VisualElement>("statCells"); _fatigueRow = TryQ<VisualElement>("fatigueRow"); _familyIcon = TryQ<VisualElement>("familyIcon");
+            _dossierFace = TryQ<VisualElement>("dossierFace"); _dossierFamily = TryQ<VisualElement>("dossierFamily");
+            _dossierName = TryQ<Label>("dossierName"); _dossierRole = TryQ<Label>("dossierRole");
+            var skillsTitle = TryQ<Label>("skillsTitle");
+            if (skillsTitle != null) skillsTitle.text = Loc.T("sheet.skills");
+            var itemsTitle = TryQ<Label>("itemsTitle");
+            if (itemsTitle != null) itemsTitle.text = Loc.T("sheet.loadout");
+            _reason.style.display = DisplayStyle.None;
             _pickerBox.contentContainer.style.flexDirection = FlexDirection.Row;
             _pickerBox.contentContainer.style.flexWrap = Wrap.Wrap;
             _previous.clicked += () => PreviousClicked?.Invoke();
@@ -108,19 +122,30 @@ namespace N29.HeroesDawn.Presentation.Hub
             t.Root.AddToClassList("hd-tile"); t.Root.AddToClassList("hd-sheettile");
             t.Root.clicked += click;
             t.Art = new VisualElement { pickingMode = PickingMode.Ignore }; t.Art.AddToClassList("hd-tile__art");
+            // Emplacement sans contenu : une icône du kit (plus ou cadenas) remplace le mot « vide » ou « verrouillé ».
+            t.Slot = new VisualElement { pickingMode = PickingMode.Ignore }; t.Slot.AddToClassList("hd-tm-ico"); t.Slot.AddToClassList("hd-sheettile__slot");
+            var caption = new VisualElement { pickingMode = PickingMode.Ignore }; caption.AddToClassList("hd-sheettile__caption");
             t.Title = new Label { pickingMode = PickingMode.Ignore }; t.Title.AddToClassList("hd-tile__title");
             t.Sub = new Label { pickingMode = PickingMode.Ignore }; t.Sub.AddToClassList("hd-tile__sub");
-            t.Root.Add(t.Art); t.Root.Add(t.Title); t.Root.Add(t.Sub);
+            caption.Add(t.Title); caption.Add(t.Sub);
+            t.Root.Add(t.Art); t.Root.Add(t.Slot); t.Root.Add(caption);
             return t;
         }
 
         static void FillTile(TileEl t, SheetTile d)
         {
-            bool empty = d.Kind == SheetTileKind.Empty || d.Kind == SheetTileKind.Locked;
+            bool locked = d.Kind == SheetTileKind.Locked;
+            bool empty = d.Kind == SheetTileKind.Empty || locked;
+            bool icon = empty && d.Art == null;
             t.Title.text = d.Title; t.Sub.text = d.Sub;
+            t.Title.style.display = icon || string.IsNullOrEmpty(d.Title) ? DisplayStyle.None : DisplayStyle.Flex;
             t.Sub.style.display = string.IsNullOrEmpty(d.Sub) ? DisplayStyle.None : DisplayStyle.Flex;
             HdPopupRows.SetArt(t.Art, d.Art);
             t.Art.style.display = d.Art != null ? DisplayStyle.Flex : DisplayStyle.None;
+            t.Slot.style.display = icon ? DisplayStyle.Flex : DisplayStyle.None;
+            t.Slot.EnableInClassList("hd-tm-ico--lock", locked);
+            t.Slot.EnableInClassList("hd-tm-ico--plus", !locked);
+            t.Root.EnableInClassList("hd-sheettile--empty", icon);
             Color frame = empty ? Theme.Outline : d.Frame;
             t.Root.style.borderTopColor = t.Root.style.borderBottomColor = t.Root.style.borderLeftColor = t.Root.style.borderRightColor = frame;
             t.Root.EnableInClassList("hd-tile--locked", d.Kind == SheetTileKind.Locked || d.Dim);
@@ -138,6 +163,40 @@ namespace N29.HeroesDawn.Presentation.Hub
         }
 
         static void Visible(VisualElement e, bool on) => e.style.display = on ? DisplayStyle.Flex : DisplayStyle.None;
+
+        /// <summary>
+        /// Rangée des quatre statistiques (icône, sigle, valeur) à partir de la ligne localisée « PV 1343 · ATQ 172 · DÉF 92 · VIT 105 ».
+        /// Si la ligne n'a pas cette forme, elle reste affichée telle quelle.
+        /// </summary>
+        void ShowStats(string? line)
+        {
+            _stats.text = line ?? "";
+            if (_statCells == null) return;
+            _statCells.Clear();
+            var parts = string.IsNullOrEmpty(line) ? Array.Empty<string>() : line!.Split(StatSeparator, StringSplitOptions.RemoveEmptyEntries);
+            bool ok = parts.Length == StatIcons.Length;
+            for (int i = 0; ok && i < parts.Length; i++)
+            {
+                parts[i] = parts[i].Trim();
+                int cut = parts[i].LastIndexOf(' ');
+                ok = cut > 0 && cut < parts[i].Length - 1;
+            }
+            Visible(_statCells, ok);
+            Visible(_stats, !ok);
+            if (!ok) return;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                int cut = parts[i].LastIndexOf(' ');
+                var cell = new VisualElement { pickingMode = PickingMode.Ignore }; cell.AddToClassList("hd-sheet__stat");
+                var icon = HdTeamUi.Icon(StatIcons[i]); icon.AddToClassList("hd-sheet__statico");
+                var text = new VisualElement { pickingMode = PickingMode.Ignore }; text.AddToClassList("hd-sheet__stattext");
+                var label = new Label(parts[i].Substring(0, cut)) { pickingMode = PickingMode.Ignore }; label.AddToClassList("hd-sheet__statlabel");
+                var value = new Label(parts[i].Substring(cut + 1)) { pickingMode = PickingMode.Ignore }; value.AddToClassList("hd-sheet__statvalue");
+                text.Add(label); text.Add(value);
+                cell.Add(icon); cell.Add(text);
+                _statCells.Add(cell);
+            }
+        }
 
         public void Show(MemberSheetData d)
         {
@@ -157,15 +216,18 @@ namespace N29.HeroesDawn.Presentation.Hub
             _name.text = d.Card.Name;
             _rarity.text = d.Card.RarityText; _rarity.style.color = Theme.RarityColor(d.Card.Rarity);
             _role.text = d.Card.RoleLine;
+            if (_familyIcon != null) HdTeamUi.SetFamily(_familyIcon, d.Card.Family);
             _levelFill.style.width = Length.Percent(Mathf.Clamp01(d.Level01) * 100f);
             _levelFill.style.unityBackgroundImageTintColor = family;
             _levelLabel.text = d.LevelBarText;
             _bio.text = d.Bio;
-            _stats.text = d.Card.Stats;
+            _bio.style.display = string.IsNullOrEmpty(d.Bio) ? DisplayStyle.None : DisplayStyle.Flex;
+            ShowStats(d.Card.Stats);
             _fatigueFill.style.width = Length.Percent(Mathf.Clamp01(d.Fatigue01) * 100f);
             _fatigueFill.style.unityBackgroundImageTintColor = Theme.FatigueColor(d.Fatigue);
             _fatigueLabel.text = d.FatigueText;
             Visible(_fatigueBar, d.Owned);
+            if (_fatigueRow != null) Visible(_fatigueRow, d.Owned);
             _tiersTitle.text = d.TiersTitle;
             var sb = new StringBuilder();
             foreach (var t in d.Tiers)
@@ -184,8 +246,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 foreach (var p in d.Affinity)
                 {
                     var face = new VisualElement { pickingMode = PickingMode.Ignore };
-                    face.AddToClassList("hd-squadslot__art");
-                    HdPopupRows.SetArt(face, p.Art);
+                    face.AddToClassList("hd-sheet__face");
+                    HdTeamUi.SetFamily(face, p.Family, "hd-sheet__face--");
+                    HdTeamUi.Head(face, p.Art);
                     _affinity.Add(face);
                 }
 
@@ -200,6 +263,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _primary.SetEnabled(d.PrimaryEnabled);
             _primary.tooltip = d.PrimaryReason;
             _reason.text = d.PrimaryReason;
+            Visible(_reason, !string.IsNullOrEmpty(d.PrimaryReason));
         }
 
         public void ShowDossier(DossierData d)
@@ -207,6 +271,17 @@ namespace N29.HeroesDawn.Presentation.Hub
             _lastDossier = d;
             if (_dossierRoot == null) return;
             _dossierTitle.text = d.Title;
+            // Identité de l'agent affiché par la fiche : portrait cadré sur le visage, nom, rôle et famille.
+            if (_last.HasValue)
+            {
+                var card = _last.Value.Card;
+                if (_dossierFace != null) HdTeamUi.Head(_dossierFace, card.Portrait.Art);
+                if (_dossierFamily != null) HdTeamUi.SetFamily(_dossierFamily, card.Family);
+                var frame = TryQ<VisualElement>("dossierFrame");
+                if (frame != null) HdTeamUi.SetFamily(frame, card.Family, "hd-tm-frame--");
+                if (_dossierName != null) _dossierName.text = card.Name ?? "";
+                if (_dossierRole != null) _dossierRole.text = card.RoleLine ?? "";
+            }
             var sb = new StringBuilder();
             foreach (var section in d.Sections)
             {
@@ -237,6 +312,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 int k = i;
                 var t = NewTile(() => PickerChosen?.Invoke(k));
+                t.Root.AddToClassList("hd-sheettile--pick");
                 FillTile(t, d.Options[i]);
                 _picker.Add(t); _pickerBox.Add(t.Root);
                 if (i == 0) { if (_pickAnchor != null) Destroy(_pickAnchor.gameObject); _pickAnchor = HdTutorialAnchor.Attach(this, t.Root, TutorialTarget.SheetPick); }

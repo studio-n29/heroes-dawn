@@ -29,6 +29,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         UnityEngine.UIElements.Button _back = null!, _settings = null!;
         readonly UnityEngine.UIElements.Button[] _tabs = new UnityEngine.UIElements.Button[HubNavigator.Tabs.Length];
         readonly Label[] _badges = new Label[HubNavigator.Tabs.Length];
+        readonly Label[] _tabLabels = new Label[HubNavigator.Tabs.Length];
         readonly VisualElement[] _badgeBoxes = new VisualElement[HubNavigator.Tabs.Length];
         readonly HdButtonRef[] _tabRefs = new HdButtonRef[HubNavigator.Tabs.Length];
         readonly WalletBar _wallet = new WalletBar();
@@ -72,19 +73,30 @@ namespace N29.HeroesDawn.Presentation.Hub
                 var page = HubNavigator.Tabs[i];
                 var tab = new UnityEngine.UIElements.Button();
                 tab.AddToClassList("hd-navtab");
+                if (i == 0) tab.AddToClassList("hd-navtab--first");
+                // Icône (onglet inactif) ou étoile (onglet actif), puis le libellé ; la pastille s'accroche au coin haut droit du libellé.
                 var icon = new VisualElement { pickingMode = PickingMode.Ignore };
                 icon.AddToClassList("hd-navtab__icon");
                 icon.AddToClassList(IconClass(page));
                 tab.Add(icon);
+                var star = new VisualElement { pickingMode = PickingMode.Ignore };
+                star.AddToClassList("hd-navtab__star");
+                tab.Add(star);
+                var text = new VisualElement { pickingMode = PickingMode.Ignore };
+                text.AddToClassList("hd-navtab__text");
+                var label = new Label { pickingMode = PickingMode.Ignore };
+                label.AddToClassList("hd-navtab__label");
+                text.Add(label);
                 var badge = new VisualElement { pickingMode = PickingMode.Ignore };
                 badge.AddToClassList("hd-navtab__badge");
                 var badgeText = new Label { pickingMode = PickingMode.Ignore };
                 badge.Add(badgeText);
                 badge.style.display = DisplayStyle.None;
-                tab.Add(badge);
+                text.Add(badge);
+                tab.Add(text);
                 tab.clicked += () => TabClicked?.Invoke(page);
                 _tabsRow.Add(tab);
-                _tabs[i] = tab; _badges[i] = badgeText; _badgeBoxes[i] = badge;
+                _tabs[i] = tab; _tabLabels[i] = label; _badges[i] = badgeText; _badgeBoxes[i] = badge;
                 _tabRefs[i] = new HdButtonRef(tab, this);
                 if (page == HubPage.Team) _anchors.Add(HdTutorialAnchor.Attach(this, tab, TutorialTarget.TabTeam));
                 if (page == HubPage.Shop) _anchors.Add(HdTutorialAnchor.Attach(this, tab, TutorialTarget.TabRecruit));
@@ -120,11 +132,13 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
             _back.style.display = d.ShowBack ? DisplayStyle.Flex : DisplayStyle.None;
             _back.text = Loc.T("nav.back");
-            _settings.text = Loc.T("nav.settings");
+            // Réglages : icône seule ; le libellé reste disponible en infobulle.
+            _settings.text = "";
+            _settings.tooltip = Loc.T("nav.settings");
             for (int i = 0; i < _tabs.Length && i < d.Tabs.Length; i++)
             {
                 var t = d.Tabs[i];
-                _tabs[i].text = t.Label;
+                _tabLabels[i].text = t.Label;
                 _tabs[i].EnableInClassList("hd-navtab--active", t.Active);
                 _tabs[i].style.display = t.Hidden ? DisplayStyle.None : DisplayStyle.Flex;
                 bool show = !string.IsNullOrEmpty(t.Badge);

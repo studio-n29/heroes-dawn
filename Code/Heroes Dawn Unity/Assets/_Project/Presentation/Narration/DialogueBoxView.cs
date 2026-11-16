@@ -126,8 +126,18 @@ namespace N29.HeroesDawn.Presentation.Narration
         void Show(DialogueBoxLine line)
         {
             HdPortrait.Fill(_avatar, _initial, line.Portrait);
+            // Un agent détouré passe au premier plan, sans cadre ; les autres personnages gardent leur illustration encadrée.
+            var art = line.Portrait.Art;
+            var cutout = art != null ? AgentArt.Cutout(art.name) : null;
+            if (cutout != null)
+            {
+                _avatar.style.backgroundImage = new StyleBackground(Background.FromSprite(cutout));
+                _avatar.style.backgroundColor = Color.clear;
+            }
+            _avatar.EnableInClassList("hd-dlg__avatar--cutout", cutout != null);
             _speaker.text = line.Speaker;
-            _speaker.style.backgroundColor = Theme.FamilyColor(line.Portrait.Family);
+            // Plaque de nom ivoire, soulignée de la couleur de la famille.
+            _speaker.style.borderBottomColor = Theme.FamilyColor(line.Portrait.Family);
             // L'avatar est du côté du locuteur ; la bulle occupe le reste.
             _stage.style.flexDirection = line.Left ? FlexDirection.Row : FlexDirection.RowReverse;
             _stage.EnableInClassList("hd-dlg__stage--right", !line.Left);

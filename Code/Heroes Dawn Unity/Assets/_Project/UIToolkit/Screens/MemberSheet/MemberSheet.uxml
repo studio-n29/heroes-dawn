@@ -6,42 +6,93 @@
             <ui:VisualElement name="strip" class="hd-sheet__strip" />
         </ui:VisualElement>
         <ui:VisualElement class="hd-panel hd-sheet__info">
-            <ui:Label name="memberName" class="hd-sheet__name" />
-            <ui:Label name="rarity" class="hd-sheet__rarity" />
-            <ui:Label name="role" class="hd-sheet__role" />
-            <ui:VisualElement name="levelBar" class="hd-bar hd-sheet__bar"><ui:VisualElement name="levelFill" class="hd-bar__fill" /><ui:Label name="levelLabel" class="hd-list__barlabel" /></ui:VisualElement>
+            <ui:VisualElement class="hd-sheet__head">
+                <ui:VisualElement class="hd-tm-ico hd-tm-ico--spark hd-sheet__headico" picking-mode="Ignore" />
+                <ui:Label name="memberName" class="hd-sheet__name" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-sheet__meta">
+                <ui:VisualElement name="familyIcon" class="hd-tm-ico hd-sheet__famico" picking-mode="Ignore" />
+                <ui:Label name="role" class="hd-sheet__role" />
+                <ui:Label name="rarity" class="hd-sheet__rarity" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-sheet__gauge">
+                <ui:VisualElement class="hd-tm-ico hd-tm-ico--level hd-tm-ico--gold hd-sheet__gaugeico" picking-mode="Ignore" />
+                <ui:VisualElement name="levelBar" class="hd-bar hd-sheet__bar"><ui:VisualElement name="levelFill" class="hd-bar__fill" /><ui:Label name="levelLabel" class="hd-list__barlabel" /></ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="statCells" class="hd-sheet__statrow" />
+            <ui:Label name="stats" class="hd-sheet__stats" />
+            <ui:VisualElement name="fatigueRow" class="hd-sheet__gauge">
+                <ui:VisualElement class="hd-tm-ico hd-tm-ico--fatigue hd-tm-ico--gold hd-sheet__gaugeico" picking-mode="Ignore" />
+                <ui:VisualElement name="fatigueBar" class="hd-bar hd-sheet__bar"><ui:VisualElement name="fatigueFill" class="hd-bar__fill" /><ui:Label name="fatigueLabel" class="hd-list__barlabel" /></ui:VisualElement>
+            </ui:VisualElement>
             <ui:ScrollView class="hd-sheet__scroll">
                 <ui:Label name="bio" class="hd-sheet__bio" />
-                <ui:Label name="stats" class="hd-sheet__stats" />
                 <ui:Label name="tiersTitle" class="hd-sheet__section" />
                 <ui:Label name="tiers" class="hd-sheet__tiers" />
             </ui:ScrollView>
-            <ui:VisualElement name="fatigueBar" class="hd-bar hd-sheet__bar"><ui:VisualElement name="fatigueFill" class="hd-bar__fill" /><ui:Label name="fatigueLabel" class="hd-list__barlabel" /></ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement class="hd-panel hd-sheet__side">
-            <ui:VisualElement name="skills" class="hd-sheet__tiles" />
-            <ui:VisualElement name="items" class="hd-sheet__tiles" />
             <ui:VisualElement name="affinityBox" class="hd-sheet__affinity">
                 <ui:Label name="affinityTitle" class="hd-sheet__section" />
                 <ui:VisualElement name="affinity" class="hd-sheet__faces" />
             </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="hd-panel hd-sheet__side">
+            <ui:VisualElement class="hd-sheet__sectionhead">
+                <ui:VisualElement class="hd-tm-ico hd-tm-ico--spark hd-sheet__sectionico" picking-mode="Ignore" />
+                <ui:Label name="skillsTitle" class="hd-sheet__section" />
+            </ui:VisualElement>
+            <ui:VisualElement name="skills" class="hd-sheet__tiles" />
+            <ui:VisualElement class="hd-sheet__sectionhead">
+                <ui:VisualElement class="hd-tm-ico hd-tm-ico--inventory hd-tm-ico--gold hd-sheet__sectionico" picking-mode="Ignore" />
+                <ui:Label name="itemsTitle" class="hd-sheet__section" />
+            </ui:VisualElement>
+            <ui:VisualElement name="items" class="hd-sheet__tiles" />
+            <ui:VisualElement class="hd-sheet__spacer" picking-mode="Ignore" />
             <ui:Label name="primaryReason" class="hd-sheet__reason" />
             <ui:VisualElement class="hd-sheet__actions">
-                <ui:Button name="heal" class="hd-btn hd-btn--secondary hd-btn--small" />
-                <ui:Button name="dossier" class="hd-btn hd-btn--secondary hd-btn--small" />
-                <ui:Button name="loadout" class="hd-btn hd-btn--secondary hd-btn--small" />
+                <ui:Button name="heal" class="hd-btn hd-btn--secondary hd-btn--small hd-tm-ibtn hd-sheet__action">
+                    <ui:VisualElement class="hd-tm-ico hd-tm-ico--heal hd-tm-ibtn__ico" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Button name="dossier" class="hd-btn hd-btn--secondary hd-btn--small hd-tm-ibtn hd-sheet__action">
+                    <ui:VisualElement class="hd-tm-ico hd-tm-ico--document hd-tm-ibtn__ico" picking-mode="Ignore" />
+                </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement class="hd-sheet__actions">
-                <ui:Button name="previous" class="hd-btn hd-btn--secondary hd-btn--small" text="&lt;" />
+                <ui:Button name="loadout" class="hd-btn hd-btn--secondary hd-btn--small hd-tm-ibtn hd-sheet__action">
+                    <ui:VisualElement class="hd-tm-ico hd-tm-ico--inventory hd-tm-ibtn__ico" picking-mode="Ignore" />
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-sheet__actions hd-sheet__actions--main">
+                <ui:Button name="previous" class="hd-btn hd-btn--secondary hd-btn--small hd-tm-iconbtn">
+                    <ui:VisualElement class="hd-tm-ico hd-tm-ico--back" picking-mode="Ignore" />
+                </ui:Button>
                 <ui:Button name="primary" class="hd-btn hd-btn--primary hd-sheet__primary" />
-                <ui:Button name="next" class="hd-btn hd-btn--secondary hd-btn--small" text="&gt;" />
+                <ui:Button name="next" class="hd-btn hd-btn--secondary hd-btn--small hd-tm-iconbtn">
+                    <ui:VisualElement class="hd-tm-ico hd-tm-ico--forward" picking-mode="Ignore" />
+                </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="dossierRoot" class="hd-sheet__overlay">
-            <ui:VisualElement class="hd-panel hd-sheet__overlaybox">
-                <ui:Label name="dossierTitle" class="hd-sheet__name" />
-                <ui:ScrollView name="dossierScroll" class="hd-sheet__overlayscroll"><ui:Label name="dossierText" class="hd-pop__text" /></ui:ScrollView>
-                <ui:Button name="dossierClose" class="hd-btn hd-btn--secondary" />
+            <ui:VisualElement class="hd-panel hd-sheet__overlaybox hd-sheet__dossier">
+                <ui:VisualElement class="hd-sheet__dossierside">
+                    <ui:VisualElement class="hd-sheet__dossierportrait">
+                        <ui:VisualElement name="dossierFace" class="hd-sheet__dossierface" picking-mode="Ignore" />
+                        <ui:VisualElement name="dossierFrame" class="hd-tm-frame hd-sheet__dossierframe" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:Label name="dossierName" class="hd-sheet__dossiername" />
+                    <ui:VisualElement class="hd-sheet__dossiermeta">
+                        <ui:VisualElement name="dossierFamily" class="hd-tm-ico hd-sheet__famico" picking-mode="Ignore" />
+                        <ui:Label name="dossierRole" class="hd-sheet__role" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-sheet__dossierbody">
+                    <ui:VisualElement class="hd-sheet__sectionhead">
+                        <ui:VisualElement class="hd-tm-ico hd-tm-ico--document hd-tm-ico--gold hd-sheet__headico" picking-mode="Ignore" />
+                        <ui:Label name="dossierTitle" class="hd-sheet__name" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hd-divider" />
+                    <ui:ScrollView name="dossierScroll" class="hd-sheet__overlayscroll"><ui:Label name="dossierText" class="hd-pop__text" /></ui:ScrollView>
+                    <ui:Button name="dossierClose" class="hd-btn hd-btn--secondary hd-sheet__dossierclose" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="pickerRoot" class="hd-sheet__overlay">

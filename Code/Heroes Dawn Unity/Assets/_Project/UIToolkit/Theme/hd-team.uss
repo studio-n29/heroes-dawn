@@ -1,0 +1,235 @@
+/* Heroes Dawn : ajustements de fidélité « planches » pour la zone team. Importé après hd.uss : ces règles priment à spécificité égale. */
+
+/* ---------------------------------------------------------------- Icônes du kit propres à la zone (posées en C# par HdTeamUi) */
+.hd-tm-ico { width: 40px; height: 40px; flex-shrink: 0; flex-grow: 0; -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-ivory); }
+.hd-tm-ico--back { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/back.png"); }
+.hd-tm-ico--forward { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/forward.png"); }
+.hd-tm-ico--plus { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/plus.png"); }
+.hd-tm-ico--minus { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/minus.png"); }
+.hd-tm-ico--lock { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/lock.png"); }
+.hd-tm-ico--health { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/health.png"); }
+.hd-tm-ico--attack { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/attack.png"); }
+.hd-tm-ico--defense { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/defense.png"); }
+.hd-tm-ico--speed { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/speed.png"); }
+.hd-tm-ico--fatigue { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/fatigue.png"); }
+.hd-tm-ico--heal { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/heal.png"); }
+.hd-tm-ico--document { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/document.png"); }
+.hd-tm-ico--team { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/team.png"); }
+.hd-tm-ico--level { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/level.png"); }
+.hd-tm-ico--inventory { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/inventory.png"); }
+.hd-tm-ico--sort { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/sort.png"); }
+.hd-tm-ico--spark { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/FX/spark-four-point.png"); -unity-background-image-tint-color: var(--hd-brass); }
+.hd-tm-ico--gold { -unity-background-image-tint-color: var(--hd-brass); }
+/* Icônes de famille : déjà colorées, sans teinte. */
+.hd-tm-fam--matter { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-matter.png"); -unity-background-image-tint-color: rgb(255, 255, 255); }
+.hd-tm-fam--elemental { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-elemental.png"); -unity-background-image-tint-color: rgb(255, 255, 255); }
+.hd-tm-fam--bio { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-bio.png"); -unity-background-image-tint-color: rgb(255, 255, 255); }
+.hd-tm-fam--perception { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsColor/family-perception.png"); -unity-background-image-tint-color: rgb(255, 255, 255); }
+.hd-btn--primary .hd-tm-ico { -unity-background-image-tint-color: var(--hd-ink); }
+.hd-btn:disabled .hd-tm-ico { opacity: 0.45; }
+
+/* Bouton à icône devant le libellé (enfant « hd-tm-ibtn__ico ») et bouton à icône seule. */
+.hd-btn.hd-tm-ibtn { padding-left: 64px; }
+.hd-tm-ibtn__ico { position: absolute; left: 16px; top: 50%; translate: 0 -50%; width: 36px; height: 36px; }
+.hd-btn.hd-tm-iconbtn { min-width: 80px; padding: 0; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* Portrait cadré sur le visage (sprite posé en C#) ; sans cadrage connu, l'illustration entière est recadrée vers le haut. */
+.hd-tm-head { -unity-background-scale-mode: scale-and-crop; background-color: var(--hd-surface-3); }
+.hd-tm-head--full { background-position: center top; }
+
+/* Cadre de famille à coin coupé (9 tranches), posé au-dessus d'un portrait carré. */
+.hd-tm-frame, .hd-member__frame, .hd-squadslot__frame {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    -unity-slice-left: 20; -unity-slice-top: 44; -unity-slice-right: 44; -unity-slice-bottom: 20;
+}
+.hd-tm-frame--matter { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-matter-normal.png"); }
+.hd-tm-frame--elemental { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-elemental-normal.png"); }
+.hd-tm-frame--bio { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-bio-normal.png"); }
+.hd-tm-frame--perception { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-perception-normal.png"); }
+
+/* ---------------------------------------------------------------- Équipe : filtres, tri */
+.hd-team__chips { margin-bottom: 6px; }
+.hd-team__chip { margin: 0 8px 6px 0; min-height: 64px; font-size: 28px; padding: 0 22px; }
+.hd-team__chips--sort .hd-team__chip { font-size: 26px; padding: 0 18px; }
+.hd-team__sortico { width: 30px; height: 30px; margin: 0 6px 6px 4px; -unity-background-image-tint-color: var(--hd-muted); }
+.hd-team__sortlabel { font-size: 24px; color: var(--hd-muted); margin: 0 12px 6px 0; }
+.hd-team__grid { margin-top: 4px; }
+
+/* ---------------------------------------------------------------- Équipe : vignette d'agent (portrait carré, famille, niveau) */
+.hd-member { width: 208px; margin: 0 12px 12px 0; padding: 0; background-color: rgba(16, 28, 41, 0.94); border-width: 2px; border-color: rgba(16, 28, 41, 0); border-radius: 0; flex-shrink: 0; overflow: visible; }
+.hd-member:hover { background-color: rgba(38, 59, 76, 0.96); }
+.hd-member--squad { border-color: rgba(16, 28, 41, 0); background-color: rgba(27, 43, 59, 0.98); }
+.hd-member--exhausted { background-color: rgba(70, 28, 36, 0.94); }
+.hd-member:focus { border-color: var(--hd-ivory); }
+.hd-member__portrait { height: 204px; flex-shrink: 0; }
+.hd-member__art { position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px; height: auto; border-width: 0; border-top-right-radius: 44px; }
+.hd-member--exhausted .hd-member__art { -unity-background-image-tint-color: rgb(150, 132, 136); }
+.hd-member--matter .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-matter-normal.png"); }
+.hd-member--elemental .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-elemental-normal.png"); }
+.hd-member--bio .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-bio-normal.png"); }
+.hd-member--perception .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-perception-normal.png"); }
+.hd-member--squad.hd-member--matter .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-matter-selected.png"); }
+.hd-member--squad.hd-member--elemental .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-elemental-selected.png"); }
+.hd-member--squad.hd-member--bio .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-bio-selected.png"); }
+.hd-member--squad.hd-member--perception .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-perception-selected.png"); }
+.hd-member--exhausted.hd-member--matter .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-matter-locked.png"); }
+.hd-member--exhausted.hd-member--elemental .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-elemental-locked.png"); }
+.hd-member--exhausted.hd-member--bio .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-bio-locked.png"); }
+.hd-member--exhausted.hd-member--perception .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-perception-locked.png"); }
+.hd-member__family { position: absolute; left: 10px; top: 10px; width: 46px; height: 46px; background-color: rgba(10, 17, 26, 0.84); border-radius: 23px; }
+.hd-member__level { position: absolute; left: 9px; right: 78px; bottom: 9px; height: 38px; margin: 0; padding: 0 8px; background-color: rgba(10, 17, 26, 0.82);
+    -unity-font: var(--hd-font-title); font-size: 24px; color: var(--hd-ivory); -unity-text-align: middle-left; white-space: nowrap; overflow: hidden; }
+.hd-member__toggle { position: absolute; right: 9px; bottom: 9px; width: 64px; height: 64px; margin: 0; padding: 0; align-items: center; justify-content: center;
+    background-color: rgba(27, 43, 59, 0.96); border-width: 2px; border-color: var(--hd-brass-dark); border-radius: 0; }
+.hd-member__toggle--add { background-color: var(--hd-ivory); border-color: var(--hd-brass); }
+.hd-member__toggle--add .hd-tm-ico { -unity-background-image-tint-color: var(--hd-ink); }
+.hd-member__toggle:hover { border-color: var(--hd-brass-soft); }
+.hd-member__toggle:focus { border-color: var(--hd-ivory); border-width: 4px; }
+.hd-member__toggle:active { scale: 0.96 0.96; }
+.input--gamepad .hd-member__toggle { width: 72px; height: 72px; }
+.input--touch .hd-member__toggle { width: 72px; height: 72px; }
+.input--gamepad .hd-member__level { right: 86px; }
+.input--touch .hd-member__level { right: 86px; }
+.hd-member__foot { padding: 6px 10px 8px 10px; flex-shrink: 0; }
+.hd-member__name { -unity-font: var(--hd-font-title); font-size: 23px; color: var(--hd-ivory); margin: 0; padding: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd-member__status { -unity-font: var(--hd-font-heading); font-size: 18px; color: var(--hd-brass); margin: 0; padding: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd-member__status--plain { color: var(--hd-muted); }
+.hd-member__status--alert { color: #FF8A8A; }
+.hd-member__bar { height: 8px; margin: 4px 0 0 0; padding: 0; background-color: rgba(10, 17, 26, 0.92); border-width: 1px; border-color: rgba(193, 205, 210, 0.28); }
+.hd-member__barfill { height: 100%; }
+
+/* ---------------------------------------------------------------- Équipe : panneau d'escouade */
+.hd-team__side { width: 34%; min-width: 560px; max-width: 620px; margin-left: 20px; padding: 18px 26px 18px 26px; }
+.hd-team__sidehead { flex-direction: row; align-items: center; flex-shrink: 0; margin-bottom: 6px; }
+.hd-team__sidehead--sub { margin: 2px 0 6px 0; }
+.hd-team__sidetitle { margin: 0 0 0 10px; color: var(--hd-ivory); }
+.hd-team__subico { width: 26px; height: 26px; margin-right: 8px; }
+.hd-team__subtitle { margin: 0; font-size: 26px; }
+.hd-team__squad { justify-content: space-between; margin-bottom: 8px; }
+.hd-squadslot { width: 112px; margin-right: 0; align-items: stretch; flex-shrink: 0; }
+.hd-squadslot__portrait { width: 112px; height: 112px; background-color: rgba(10, 17, 26, 0.55); }
+.hd-squadslot__face { position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px; border-top-right-radius: 40px; }
+.hd-squadslot--exhausted .hd-squadslot__face { -unity-background-image-tint-color: rgb(150, 132, 136); }
+.hd-squadslot--matter .hd-squadslot__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-matter-selected.png"); }
+.hd-squadslot--elemental .hd-squadslot__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-elemental-selected.png"); }
+.hd-squadslot--bio .hd-squadslot__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-bio-selected.png"); }
+.hd-squadslot--perception .hd-squadslot__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-perception-selected.png"); }
+.hd-squadslot--exhausted.hd-squadslot--matter .hd-squadslot__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-matter-locked.png"); }
+.hd-squadslot--exhausted.hd-squadslot--elemental .hd-squadslot__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-elemental-locked.png"); }
+.hd-squadslot--exhausted.hd-squadslot--bio .hd-squadslot__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-bio-locked.png"); }
+.hd-squadslot--exhausted.hd-squadslot--perception .hd-squadslot__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-perception-locked.png"); }
+.hd-squadslot--empty .hd-squadslot__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-matter-locked.png"); opacity: 0.6; }
+.hd-squadslot__family { position: absolute; left: 7px; top: 7px; width: 34px; height: 34px; background-color: rgba(10, 17, 26, 0.84); border-radius: 17px; }
+.hd-squadslot__initial { position: absolute; left: 0; top: 0; right: 0; bottom: 0; margin: 0; padding: 0; -unity-font: var(--hd-font-title); font-size: 48px; color: var(--hd-ivory); -unity-text-align: middle-center; }
+.hd-squadslot__plus { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 44px; height: 44px; -unity-background-image-tint-color: rgba(193, 205, 210, 0.45); }
+.hd-squadslot__name { font-size: 20px; margin: 4px 0 0 0; padding: 0; -unity-text-align: middle-center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd-squadslot__gauge { height: 8px; margin-top: 3px; background-color: rgba(10, 17, 26, 0.92); border-width: 1px; border-color: rgba(193, 205, 210, 0.28); }
+.hd-squadslot__gaugefill { height: 100%; }
+.hd-team__fatigue { flex-direction: row; align-items: center; flex-shrink: 0; margin-bottom: 8px; }
+.hd-team__fatigueico { width: 34px; height: 34px; margin-right: 10px; }
+.hd-team__fatiguebar { flex-grow: 1; flex-basis: 0; height: 32px; }
+.hd-team__synergies { flex-grow: 1; flex-shrink: 1; flex-basis: 0; height: auto; min-height: 40px; margin-bottom: 8px; }
+.hd-team__synergytext { font-size: 23px; color: var(--hd-muted); margin-bottom: 0; }
+.hd-team__presets { margin-bottom: 2px; }
+.hd-team__presets .hd-team__chip { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; margin: 0 6px 6px 0; padding: 0 6px; font-size: 21px; overflow: hidden; }
+.hd-team__heal { margin: 0 0 8px 0; font-size: 28px; }
+.hd-team__hint { margin: 0 0 6px 0; color: var(--hd-fatigue); }
+.hd-team__mission { margin: 0; flex-shrink: 0; }
+
+/* ---------------------------------------------------------------- Fiche d'agent */
+.hd-sheet__art { width: 30%; min-width: 360px; max-width: 520px; margin-right: 18px; }
+.hd-sheet__info { margin-right: 18px; padding: 20px 24px; }
+.hd-sheet__head { flex-direction: row; align-items: center; flex-shrink: 0; }
+.hd-sheet__headico { width: 34px; height: 34px; margin-right: 10px; }
+.hd-sheet__head .hd-sheet__name, .hd-sheet__sectionhead .hd-sheet__name { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; margin: 0; padding: 0; }
+.hd-sheet__meta { flex-direction: row; flex-wrap: wrap; align-items: center; flex-shrink: 0; margin: 2px 0 6px 0; }
+.hd-sheet__famico { width: 36px; height: 36px; margin-right: 8px; }
+.hd-sheet__role { margin: 0 18px 0 0; padding: 0; white-space: nowrap; }
+.hd-sheet__rarity { margin: 0; padding: 0; font-size: 24px; white-space: nowrap; }
+.hd-sheet__gauge { flex-direction: row; align-items: center; flex-shrink: 0; margin: 4px 0; }
+.hd-sheet__gaugeico { width: 34px; height: 34px; margin-right: 10px; }
+.hd-sheet__gauge > .hd-sheet__bar { flex-grow: 1; flex-basis: 0; height: 32px; margin: 0; }
+.hd-sheet__statrow { flex-direction: row; flex-wrap: wrap; flex-shrink: 0; margin: 6px 0 4px 0; padding: 8px 0 2px 0;
+    border-top-width: 1px; border-bottom-width: 1px; border-color: rgba(149, 116, 60, 0.6); }
+.hd-sheet__stat { flex-direction: row; align-items: center; flex-grow: 1; flex-basis: 0; min-width: 125px; margin-bottom: 6px; }
+.hd-sheet__statico { width: 40px; height: 40px; margin-right: 6px; }
+.hd-sheet__stattext { justify-content: center; }
+.hd-sheet__statlabel { -unity-font: var(--hd-font-heading); font-size: 18px; color: var(--hd-muted); margin: 0; padding: 0; }
+.hd-sheet__statvalue { -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-ivory); margin: -4px 0 0 0; padding: 0; }
+.hd-sheet__scroll { margin-top: 6px; }
+.hd-sheet__bio { color: var(--hd-muted); }
+.hd-sheet__section { font-size: 26px; margin: 0; padding: 0; }
+.hd-sheet__scroll .hd-sheet__section { margin-top: 6px; }
+.hd-sheet__affinity { margin: 8px 0 0 0; padding-top: 6px; border-top-width: 1px; border-color: rgba(149, 116, 60, 0.6); }
+.hd-sheet__faces { margin-top: 4px; flex-wrap: wrap; }
+.hd-sheet__face { width: 68px; height: 68px; margin: 0 10px 4px 0; flex-shrink: 0; border-width: 2px; border-color: var(--hd-brass); border-top-right-radius: 14px; }
+.hd-sheet__face--matter { border-color: var(--hd-matter); }
+.hd-sheet__face--elemental { border-color: var(--hd-elemental); }
+.hd-sheet__face--bio { border-color: var(--hd-physical-bio); }
+.hd-sheet__face--perception { border-color: var(--hd-perception); }
+
+.hd-sheet__side { width: 620px; padding: 18px 22px; }
+.hd-sheet__sectionhead { flex-direction: row; align-items: center; flex-shrink: 0; margin-bottom: 6px; }
+.hd-sheet__sectionico { width: 26px; height: 26px; margin-right: 8px; }
+.hd-sheet__tiles { margin-bottom: 6px; }
+.hd-sheettile { width: 124px; height: 124px; margin: 0 10px 8px 0; padding: 0; border-width: 2px; border-radius: 0; border-top-right-radius: 16px; background-color: var(--hd-surface-3); overflow: hidden; }
+.hd-sheettile:focus { border-width: 4px; }
+.hd-sheettile--empty { background-color: rgba(27, 43, 59, 0.7); }
+.hd-sheettile .hd-tile__art { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-size: cover; -unity-background-scale-mode: scale-and-crop; }
+.hd-sheettile__slot { position: absolute; left: 50%; top: 40%; translate: -50% -50%; width: 50px; height: 50px; -unity-background-image-tint-color: rgba(193, 205, 210, 0.6); }
+.hd-sheettile__caption { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 6px 3px 6px; background-color: rgba(10, 17, 26, 0.82); }
+.hd-sheettile .hd-tile__title { font-size: 17px; margin: 0; padding: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd-sheettile .hd-tile__sub { font-size: 15px; margin: 0; padding: 0; color: var(--hd-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd-sheettile--pick { width: 180px; height: 180px; margin: 0 12px 12px 0; }
+.hd-sheettile--pick .hd-tile__title { font-size: 20px; }
+.hd-sheettile--pick .hd-tile__sub { font-size: 17px; }
+.hd-sheet__spacer { flex-grow: 1; flex-shrink: 1; min-height: 0; }
+.hd-sheet__reason { margin: 0; padding: 0; }
+.hd-sheet__actions { flex-wrap: nowrap; margin: 8px 0 0 -8px; }
+.hd-sheet__actions > .hd-sheet__action { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; margin: 0 0 0 8px; font-size: 26px; overflow: hidden; }
+.hd-sheet__actions--main { align-items: center; }
+.hd-sheet__actions--main > .hd-tm-iconbtn { min-height: 96px; margin: 0 0 0 8px; }
+.hd-sheet__actions--main > .hd-sheet__primary { min-height: 96px; margin: 0 0 0 8px; font-size: 36px; flex-shrink: 1; min-width: 0; }
+
+/* Dossier d'agent : portrait et identité à gauche, récit à droite. */
+.hd-sheet__overlaybox.hd-sheet__dossier { flex-direction: row; width: 1320px; max-width: 94%; }
+.hd-sheet__dossierside { width: 300px; flex-shrink: 0; margin-right: 28px; }
+.hd-sheet__dossierportrait { width: 300px; height: 300px; flex-shrink: 0; }
+.hd-sheet__dossierface { position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px; border-top-right-radius: 44px; }
+.hd-sheet__dossiername { -unity-font: var(--hd-font-title); font-size: 34px; color: var(--hd-ivory); margin: 10px 0 2px 0; padding: 0; white-space: normal; }
+.hd-sheet__dossiermeta { flex-direction: row; align-items: center; }
+.hd-sheet__dossiermeta .hd-sheet__role { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; margin: 0; white-space: normal; color: var(--hd-muted); }
+.hd-sheet__dossierbody { flex-grow: 1; flex-basis: 0; min-width: 0; }
+.hd-sheet__dossier .hd-sheet__overlayscroll { height: 440px; }
+.hd-sheet__dossierclose { align-self: flex-end; min-width: 320px; flex-shrink: 0; }
+
+/* ---------------------------------------------------------------- Registre des agents (grille de portraits) */
+.hd-grid--portrait .hd-tile { width: 196px; height: auto; margin: 0 12px 12px 0; padding: 0; border-width: 2px; border-radius: 0; border-top-right-radius: 22px; background-color: rgba(16, 28, 41, 0.94); overflow: hidden; }
+.hd-grid--portrait .hd-tile:focus { border-width: 4px; }
+.hd-grid--portrait .hd-tile--selected { background-color: rgba(38, 59, 76, 1); }
+.hd-grid--portrait .hd-tile--locked { opacity: 0.62; }
+.hd-grid--portrait .hd-tile__art { flex-grow: 0; flex-shrink: 0; flex-basis: auto; height: 192px; }
+.hd-grid--portrait .hd-tile__title { font-size: 22px; margin: 4px 6px 0 6px; padding: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd-grid--portrait .hd-tile__sub { font-size: 18px; margin: 0 6px 6px 6px; padding: 0; color: var(--hd-brass); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd-grid--portrait .hd-tile--locked .hd-tile__sub { color: var(--hd-muted); }
+.hd-grid--portrait .hd-grid__detailart { width: 240px; height: 240px; align-self: center; border-width: 2px; border-color: var(--hd-brass); border-top-right-radius: 28px; }
+
+/* ---------------------------------------------------------------- Grimoire, inventaire, équipement (grille de cartes et d'objets) */
+.hd-grid--collection .hd-tile { width: 204px; height: 280px; margin: 0 12px 12px 0; border-width: 2px; border-radius: 0; border-top-right-radius: 20px; background-color: rgba(16, 28, 41, 0.94); }
+.hd-grid--collection .hd-tile:focus { border-width: 4px; }
+.hd-grid--collection .hd-tile--selected { background-color: rgba(38, 59, 76, 1); }
+.hd-grid--collection .hd-tile__title { font-size: 24px; }
+.hd-grid--collection .hd-tile__sub { font-size: 19px; color: var(--hd-muted); }
+.hd-grid--collection .hd-tile__art--none { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/plus.png"); background-size: 84px 84px; -unity-background-image-tint-color: rgba(193, 205, 210, 0.45); }
+
+/* ---------------------------------------------------------------- Fenêtre d'affinités */
+.hd-poprow.hd-aff__row { min-height: 96px; padding: 8px 16px; border-radius: 0; border-left-width: 3px; border-color: var(--hd-brass-dark); background-color: rgba(27, 43, 59, 0.92); }
+.hd-poprow__art.hd-aff__face { width: 78px; height: 78px; margin-right: 18px; border-radius: 0; border-top-right-radius: 14px; }
+.hd-aff__face--matter { border-color: var(--hd-matter); }
+.hd-aff__face--elemental { border-color: var(--hd-elemental); }
+.hd-aff__face--bio { border-color: var(--hd-physical-bio); }
+.hd-aff__face--perception { border-color: var(--hd-perception); }
+.hd-aff__family { position: absolute; right: -10px; bottom: -8px; width: 32px; height: 32px; background-color: rgba(10, 17, 26, 0.9); border-radius: 16px; }
+
+/* Second tour : les filtres de famille ne rétrécissent jamais en dessous de leur libellé (icône à gauche comprise). */
+.hd-team__chips .hd-team__chip { flex-shrink: 0; white-space: nowrap; }

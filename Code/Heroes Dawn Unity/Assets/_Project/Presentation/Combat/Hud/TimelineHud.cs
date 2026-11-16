@@ -74,13 +74,14 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
             bool prep = point >= _prepStartPoint;
             if (point == _points) return occupied ? Theme.Primary : Theme.WithAlpha(Theme.Primary, 0.55f);
             if (occupied) return prep ? Theme.Danger : Theme.Info;
-            return prep ? Theme.WithAlpha(Theme.Danger, 0.35f) : Theme.WithAlpha(Theme.TextMuted, 0.35f);
+            return prep ? Theme.WithAlpha(Theme.Primary, 0.45f) : Theme.WithAlpha(Theme.TextMuted, 0.4f);
         }
 
         Marker Create(TimelineMarkerData m)
         {
             var root = new VisualElement { pickingMode = PickingMode.Ignore };
             root.AddToClassList("hd-tl__marker");
+            root.AddToClassList(m.Ally ? "hd-tl__marker--ally" : "hd-tl__marker--enemy");
             var ring = new VisualElement { pickingMode = PickingMode.Ignore }; ring.AddToClassList("hd-tl__ring");
             var frame = new VisualElement { pickingMode = PickingMode.Ignore }; frame.AddToClassList("hd-tl__frame");
             var disc = new VisualElement { pickingMode = PickingMode.Ignore }; disc.AddToClassList("hd-tl__disc");

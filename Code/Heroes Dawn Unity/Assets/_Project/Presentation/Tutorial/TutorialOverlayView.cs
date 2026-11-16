@@ -141,7 +141,10 @@ namespace N29.HeroesDawn.Presentation.Tutorial
                 // La flèche est posée du côté opposé à la bulle, pointant vers la cible.
                 _pointerBase = new Vector2(h.center.x - 20f, bubbleAtTop ? h.yMax + 8f : h.yMin - 48f);
                 _pointer.style.left = _pointerBase.x;
-                _pointer.text = bubbleAtTop ? "▲" : "▼";
+                // Chevron du kit (teinté par USS) : vers le haut quand la bulle est en haut, la cible étant alors au-dessus de la flèche.
+                _pointer.text = "";
+                _pointer.EnableInClassList("hd-tut__pointer--up", bubbleAtTop);
+                _pointer.EnableInClassList("hd-tut__pointer--down", !bubbleAtTop);
             }
             else
             {

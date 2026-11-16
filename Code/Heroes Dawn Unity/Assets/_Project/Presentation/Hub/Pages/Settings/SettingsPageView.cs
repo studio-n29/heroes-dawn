@@ -8,7 +8,10 @@ using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
-    /// <summary>Page Paramètres (UI Toolkit) : catégories à gauche, réglages de la catégorie à droite.</summary>
+    /// <summary>
+    /// Page Paramètres (UI Toolkit, planches 14 et 15) : catégories à icône à gauche (onglets verticaux), réglages de la catégorie à droite
+    /// (interrupteurs, curseurs à pas, sélecteurs à chevrons, boutons d'action).
+    /// </summary>
     public sealed class SettingsPageView : HdView, ISettingsPageView
     {
         /// <summary>Ce que les tests lisent d'une ligne de réglage affichée.</summary>
@@ -17,15 +20,25 @@ namespace N29.HeroesDawn.Presentation.Hub
         sealed class Row
         {
             public VisualElement Root = null!;
-            public Label Label = null!, Hint = null!, Value = null!;
+            public Label Label = null!, Hint = null!, Value = null!, Percent = null!;
+            public VisualElement Bar = null!, Fill = null!, Thumb = null!, MinusIcon = null!, PlusIcon = null!;
             public UnityEngine.UIElements.Button Minus = null!, Plus = null!, Action = null!;
         }
+
+        /// <summary>Icône de chaque catégorie, dans l'ordre du présentateur (Audio, Graphismes, Accessibilité, Langue, Contrôles, Compte, Support).</summary>
+        static readonly string[] CategoryIcons =
+        {
+            "hd-ico--audio", "hd-ico--graphics", "hd-ico--accessibility", "hd-ico--language", "hd-ico--controls", "hd-ico--account", "hd-ico--support",
+        };
+        const string DefaultIcon = "hd-ico--settings";
 
         readonly List<Row> _pool = new List<Row>();
         readonly List<RowInfo> _infos = new List<RowInfo>();
         readonly List<UnityEngine.UIElements.Button> _cats = new List<UnityEngine.UIElements.Button>();
         ScrollView _catBox = null!, _rows = null!;
         Label _title = null!;
+        VisualElement _titleIcon = null!;
+        string _titleIconClass = "";
         UnityEngine.UIElements.Button _reset = null!;
         SettingsPageData? _last;
 
@@ -45,9 +58,12 @@ namespace N29.HeroesDawn.Presentation.Hub
             return null;
         }
 
+        static string CategoryIcon(int index) => index >= 0 && index < CategoryIcons.Length ? CategoryIcons[index] : DefaultIcon;
+
         protected override void Bind()
         {
             _catBox = Q<ScrollView>("categories"); _rows = Q<ScrollView>("rows"); _title = Q<Label>("title");
+            _titleIcon = Q<VisualElement>("titleIcon"); _titleIconClass = "";
             _reset = Q<UnityEngine.UIElements.Button>("reset");
             _reset.clicked += () => ResetCategoryClicked?.Invoke();
             _pool.Clear(); _infos.Clear(); _cats.Clear();
@@ -62,7 +78,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 int index = _cats.Count;
                 var b = new UnityEngine.UIElements.Button();
-                b.AddToClassList("hd-btn"); b.AddToClassList("hd-settings__cat");
+                b.AddToClassList("hd-btn"); b.AddToClassList("hd-btn--small"); b.AddToClassList("hd-settings__cat");
                 b.clicked += () => CategorySelected?.Invoke(index);
                 _cats.Add(b); _catBox.Add(b);
             }
@@ -71,14 +87,21 @@ namespace N29.HeroesDawn.Presentation.Hub
                 bool used = i < d.Categories.Length;
                 _cats[i].style.display = used ? DisplayStyle.Flex : DisplayStyle.None;
                 if (!used) continue;
-                _cats[i].text = d.Categories[i];
+                HdButtonContent.Fill(_cats[i], d.Categories[i], CategoryIcon(i));
                 bool active = i == d.Active;
                 _cats[i].EnableInClassList("hd-btn--primary", active);
                 _cats[i].EnableInClassList("hd-btn--secondary", !active);
             }
             _title.text = d.CategoryTitle;
+            string icon = CategoryIcon(d.Active);
+            if (icon != _titleIconClass)
+            {
+                if (_titleIconClass.Length > 0) _titleIcon.RemoveFromClassList(_titleIconClass);
+                _titleIcon.AddToClassList(icon);
+                _titleIconClass = icon;
+            }
             _reset.style.display = d.CanReset ? DisplayStyle.Flex : DisplayStyle.None;
-            _reset.text = d.ResetLabel;
+            HdButtonContent.Fill(_reset, d.ResetLabel, "hd-ico--refresh");
 
             while (_pool.Count < d.Rows.Length) { _pool.Add(NewRow(_pool.Count)); _rows.Add(_pool[_pool.Count - 1].Root); }
             _infos.Clear();
@@ -92,50 +115,97 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
         }
 
+        static T Part<T>(string cls) where T : VisualElement, new()
+        {
+            var e = new T { pickingMode = PickingMode.Ignore };
+            e.AddToClassList(cls);
+            return e;
+        }
+
         Row NewRow(int index)
         {
             var r = new Row { Root = new VisualElement() };
             r.Root.AddToClassList("hd-setting");
-            var text = new VisualElement { pickingMode = PickingMode.Ignore };
-            text.AddToClassList("hd-setting__text");
-            r.Label = new Label { pickingMode = PickingMode.Ignore }; r.Label.AddToClassList("hd-setting__label");
-            r.Hint = new Label { pickingMode = PickingMode.Ignore }; r.Hint.AddToClassList("hd-setting__hint");
+            var text = Part<VisualElement>("hd-setting__text");
+            r.Label = Part<Label>("hd-setting__label");
+            r.Hint = Part<Label>("hd-setting__hint");
             text.Add(r.Label); text.Add(r.Hint);
-            r.Minus = Step("-", () => RowAction?.Invoke(index, 0));
-            r.Value = new Label { pickingMode = PickingMode.Ignore }; r.Value.AddToClassList("hd-setting__value");
-            r.Plus = Step("+", () => RowAction?.Invoke(index, 1));
+            r.Minus = Step(out r.MinusIcon, () => RowAction?.Invoke(index, 0));
+            // Curseur à pas (volumes) : piste, remplissage et poignée entre « moins » et « plus », valeur à droite.
+            r.Bar = Part<VisualElement>("hd-bar"); r.Bar.AddToClassList("hd-setting__bar");
+            r.Fill = Part<VisualElement>("hd-bar__fill");
+            r.Thumb = Part<VisualElement>("hd-setting__thumb");
+            r.Bar.Add(r.Fill); r.Bar.Add(r.Thumb);
+            r.Value = Part<Label>("hd-setting__value");
+            r.Plus = Step(out r.PlusIcon, () => RowAction?.Invoke(index, 1));
+            r.Percent = Part<Label>("hd-setting__percent");
             r.Action = new UnityEngine.UIElements.Button();
             r.Action.AddToClassList("hd-btn"); r.Action.AddToClassList("hd-btn--small"); r.Action.AddToClassList("hd-setting__action");
             r.Action.clicked += () => RowAction?.Invoke(index, 0);
-            r.Root.Add(text); r.Root.Add(r.Minus); r.Root.Add(r.Value); r.Root.Add(r.Plus); r.Root.Add(r.Action);
+            r.Root.Add(text); r.Root.Add(r.Minus); r.Root.Add(r.Bar); r.Root.Add(r.Value); r.Root.Add(r.Plus); r.Root.Add(r.Percent); r.Root.Add(r.Action);
             return r;
         }
 
-        static UnityEngine.UIElements.Button Step(string label, Action click)
+        /// <summary>Bouton de pas : une icône du kit (moins et plus pour un curseur, chevrons pour un sélecteur), sans texte.</summary>
+        static UnityEngine.UIElements.Button Step(out VisualElement icon, Action click)
         {
-            var b = new UnityEngine.UIElements.Button { text = label };
+            var b = new UnityEngine.UIElements.Button();
             b.AddToClassList("hd-btn"); b.AddToClassList("hd-btn--secondary"); b.AddToClassList("hd-btn--small"); b.AddToClassList("hd-setting__step");
+            icon = Part<VisualElement>("hd-setting__stepicon");
+            b.Add(icon);
             b.clicked += click;
             return b;
         }
+
+        /// <summary>« 80 % » donne 80 : la valeur d'un curseur de volume.</summary>
+        static bool TryPercent(string? value, out int percent)
+        {
+            percent = 0;
+            if (string.IsNullOrEmpty(value)) return false;
+            string v = value!.Trim();
+            if (!v.EndsWith("%", StringComparison.Ordinal)) return false;
+            return int.TryParse(v.Substring(0, v.Length - 1).Trim(), out percent);
+        }
+
+        static void Show(VisualElement e, bool shown) => e.style.display = shown ? DisplayStyle.Flex : DisplayStyle.None;
 
         static void Apply(Row r, SettingRowData d)
         {
             r.Label.text = d.Label;
             r.Hint.text = d.Hint ?? "";
-            r.Hint.style.display = string.IsNullOrEmpty(d.Hint) ? DisplayStyle.None : DisplayStyle.Flex;
+            Show(r.Hint, !string.IsNullOrEmpty(d.Hint));
             bool stepper = d.Kind == SettingKind.Stepper;
-            r.Minus.style.display = r.Plus.style.display = stepper ? DisplayStyle.Flex : DisplayStyle.None;
-            r.Value.style.display = stepper || d.Kind == SettingKind.Info ? DisplayStyle.Flex : DisplayStyle.None;
-            r.Value.text = d.Value;
-            bool button = d.Kind == SettingKind.Toggle || d.Kind == SettingKind.Button;
-            r.Action.style.display = button ? DisplayStyle.Flex : DisplayStyle.None;
-            if (!button) return;
-            r.Action.text = d.Value;
             bool toggle = d.Kind == SettingKind.Toggle;
-            r.Action.EnableInClassList("hd-btn--primary", (!toggle && !d.Danger) || (toggle && d.On));
+            int percent = 0;
+            bool slider = stepper && TryPercent(d.Value, out percent);
+            bool choice = stepper && !slider;
+            Show(r.Minus, stepper); Show(r.Plus, stepper);
+            r.MinusIcon.EnableInClassList("hd-ico--minus", slider); r.MinusIcon.EnableInClassList("hd-ico--back", choice);
+            r.PlusIcon.EnableInClassList("hd-ico--plus", slider); r.PlusIcon.EnableInClassList("hd-ico--forward", choice);
+            Show(r.Bar, slider); Show(r.Percent, slider);
+            if (slider)
+            {
+                float filled = Mathf.Clamp(percent, 0, 100);
+                r.Fill.style.width = Length.Percent(filled);
+                r.Thumb.style.left = Length.Percent(filled);
+                r.Percent.text = d.Value;
+            }
+            // Le libellé de valeur sert au sélecteur (entre les chevrons), à l'information et à l'état de l'interrupteur.
+            Show(r.Value, choice || toggle || d.Kind == SettingKind.Info);
+            r.Value.text = d.Value;
+            r.Value.EnableInClassList("hd-setting__value--choice", choice);
+            r.Value.EnableInClassList("hd-setting__value--state", toggle);
+            r.Value.EnableInClassList("hd-setting__value--on", toggle && d.On);
+            bool button = toggle || d.Kind == SettingKind.Button;
+            Show(r.Action, button);
+            if (!button) return;
+            // Le texte du bouton reste lisible par les parcours de test ; l'interrupteur le remplace par son image (kit : toggle-on, toggle-off).
+            HdButtonContent.Fill(r.Action, d.Value);
+            r.Action.EnableInClassList("hd-setting__switch", toggle);
+            r.Action.EnableInClassList("hd-setting__switch--on", toggle && d.On);
+            r.Action.EnableInClassList("hd-btn--primary", !toggle && !d.Danger);
             r.Action.EnableInClassList("hd-btn--danger", !toggle && d.Danger);
-            r.Action.EnableInClassList("hd-btn--secondary", toggle && !d.On);
+            r.Action.EnableInClassList("hd-btn--secondary", false);
         }
     }
 }

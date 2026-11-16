@@ -50,7 +50,14 @@ namespace N29.HeroesDawn.Presentation.Hub
                 row.AddToClassList("hd-poprow");
                 var art = new VisualElement { pickingMode = PickingMode.Ignore };
                 art.AddToClassList("hd-poprow__art");
-                HdPopupRows.SetArt(art, r.Portrait.Art);
+                // Portrait cadré sur le visage, bordé à la couleur de la famille, icône de famille en coin.
+                art.AddToClassList("hd-aff__face");
+                HdTeamUi.SetFamily(art, r.Portrait.Family, "hd-aff__face--");
+                HdTeamUi.Head(art, r.Portrait.Art);
+                var family = HdTeamUi.FamilyIcon(r.Portrait.Family);
+                family.AddToClassList("hd-aff__family");
+                art.Add(family);
+                row.AddToClassList("hd-aff__row");
                 var text = new VisualElement { pickingMode = PickingMode.Ignore };
                 text.AddToClassList("hd-poprow__text");
                 var name = new Label(r.Name) { pickingMode = PickingMode.Ignore }; name.AddToClassList("hd-poprow__name");
