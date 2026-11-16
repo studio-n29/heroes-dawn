@@ -157,11 +157,14 @@ namespace N29.HeroesDawn.Domain.Combat
                     // Une cible vaincue ne reçoit plus d'effet (sans tirage au sort) ; le vol de vie et le rebond comptent encore le coup qui l'a
                     // vaincue, même placés après d'autres effets (les paliers s'ajoutent après les effets de base).
                     if (!t.IsAlive && fx.Type != EffectType.Lifesteal && fx.Type != EffectType.Bounce) continue;
+                    // Condition fausse : effet sauté sans consommer son tirage de chance.
+                    if (fx.When != null && !Holds(fx.When, actor, t)) continue;
                     if (!_rng.Chance(fx.ChancePercent)) continue;
+                    int v = ValueOf(fx, actor, t); // base + modificateurs (Bounce, Execute, Lifesteal : valeur de base)
                     switch (fx.Type)
                     {
                         case EffectType.Damage:
-                            dealt += HitWithDamage(actor, t, fx.Value, executeBonus, output, out missed);
+                            dealt += HitWithDamage(actor, t, v, executeBonus, output, out missed);
                             break;
                         case EffectType.Bounce:
                             Bounce(actor, effects, targets, fx.Value, output);
@@ -176,27 +179,27 @@ namespace N29.HeroesDawn.Domain.Combat
                             output.Add(new HealEvent(Tick, actor.Id, stolen));
                             break;
                         case EffectType.Heal:
-                            int heal = t.MaxHp * fx.Value / 100;
+                            int heal = t.MaxHp * v / 100;
                             int applied = Math.Min(heal, t.MaxHp - t.Hp);
                             t.Hp += applied;
                             output.Add(new HealEvent(Tick, t.Id, applied));
                             break;
                         case EffectType.Shield:
-                            ApplyStatus(t, StatusType.Shield, Math.Max(1, fx.Duration), t.MaxHp * fx.Value / 100, output);
+                            ApplyStatus(t, StatusType.Shield, Math.Max(1, fx.Duration), t.MaxHp * v / 100, output);
                             break;
                         case EffectType.ApplyStatus:
                             ApplyStatus(t, fx.Status, fx.Duration, 0, output);
                             break;
                         case EffectType.PushBack:
                             if (t.KnockbackGuard || t.Side == actor.Side) break;
-                            if (PushBack(t, fx.Value, InterruptReason.PushBack, output)) t.KnockbackGuard = true;
+                            if (PushBack(t, v, InterruptReason.PushBack, output)) t.KnockbackGuard = true;
                             break;
                         case EffectType.Advance:
                             if (t == actor || t.IsReady) break;
-                            int reach = t.Point + PointsOf(fx.Value);
+                            int reach = t.Point + PointsOf(v);
                             bool arrives = reach >= t.ActionPoint;
                             t.Point = arrives ? t.ActionPoint : reach;
-                            output.Add(new AdvancedEvent(Tick, t.Id, fx.Value, arrives));
+                            output.Add(new AdvancedEvent(Tick, t.Id, v, arrives));
                             if (arrives)
                             {
                                 output.Add(new GaugeFullEvent(Tick, t.Id));
@@ -204,8 +207,8 @@ namespace N29.HeroesDawn.Domain.Combat
                             }
                             break;
                         case EffectType.GaugeDelta:
-                            if (t.IsReady && fx.Value > 0) break; // deja prete : rien a ajouter
-                            int delta = (Math.Abs(fx.Value) * _b.TimelinePoints + 500) / 1000 * Math.Sign(fx.Value); // points sur 1000 -> points de frise
+                            if (t.IsReady && v > 0) break; // deja prete : rien a ajouter
+                            int delta = (Math.Abs(v) * _b.TimelinePoints + 500) / 1000 * Math.Sign(v); // points sur 1000 -> points de frise
                             t.Point = Math.Max(0, Math.Min(t.ActionPoint - 1, t.Point + delta)); // ne declenche pas de tour hors de l avance normale
                             if (t.PlannedSlot >= 0 && t.Point < PlanStartPoint(t)) CancelPlan(t, InterruptReason.PushBack, output);
 
