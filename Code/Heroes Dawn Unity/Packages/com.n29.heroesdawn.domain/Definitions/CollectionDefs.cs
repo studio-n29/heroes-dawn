@@ -107,11 +107,19 @@ namespace N29.HeroesDawn.Definitions
         /// <summary>Paliers d'effets secondaires (niveaux 3, 6 et 10), dans l'ordre des niveaux ; vide : aucun.</summary>
         public IReadOnlyList<CardTier> Tiers { get; }
 
-        public SkillCardDef(CardId id, string nameKey, Family family, int stars, SkillDef skill, CardNature? nature = null, IReadOnlyList<CardTier>? tiers = null)
+        /// <summary>Archétypes de la carte (un seul pour les cartes existantes ; une carte hybride peut en avoir deux, dans l'ordre de la fiche).</summary>
+        public IReadOnlyList<Archetype> Archetypes { get; }
+        /// <summary>Rôle de la carte dans son archétype : Amorce, Gain, Pont ou Base.</summary>
+        public CardRole Role { get; }
+
+        public SkillCardDef(CardId id, string nameKey, Family family, int stars, SkillDef skill, CardNature? nature = null, IReadOnlyList<CardTier>? tiers = null,
+                            IReadOnlyList<Archetype>? archetypes = null, CardRole role = CardRole.Basic)
         {
             Id = id; NameKey = nameKey; Family = family; Stars = stars < 1 ? 1 : stars > 5 ? 5 : stars; Skill = skill;
             Nature = nature ?? CardNatures.Of(skill);
             Tiers = tiers ?? Array.Empty<CardTier>();
+            Archetypes = archetypes ?? Array.Empty<Archetype>();
+            Role = role;
         }
     }
 
