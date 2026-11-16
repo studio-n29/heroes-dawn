@@ -53,9 +53,10 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void EveryCard_HasAnEnglishName_EqualToItsSheet()
         {
             Loc.BindLanguage(() => "en");
+            var english = new HashSet<string>(Loc.EnglishKeys());
             foreach (var r in Rows())
             {
-                Assert.That(Loc.HasEnglish("skills." + r.Id), Is.True, r.Id);
+                Assert.That(english.Contains("skills." + r.Id), Is.True, r.Id);
                 Assert.That(Loc.T("skills." + r.Id), Is.EqualTo(r.Name), r.Id);
             }
         }
@@ -66,7 +67,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             const string key = "skills.card_ember_inexistante_en";
             Loc.Override(new[] { new KeyValuePair<string, string>(key, "Texte français") });
             Loc.BindLanguage(() => "en");
-            Assert.That(Loc.HasEnglish(key), Is.False);
+            Assert.That(Loc.EnglishKeys().Contains(key), Is.False);
             Assert.That(Loc.T(key), Is.EqualTo("Texte français"));
             Loc.BindLanguage(() => "fr");
             Assert.That(Loc.T("skills.card_ember"), Is.EqualTo("Braise"));
