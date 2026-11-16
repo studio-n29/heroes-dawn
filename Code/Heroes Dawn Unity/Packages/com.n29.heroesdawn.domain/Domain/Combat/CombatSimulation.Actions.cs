@@ -398,6 +398,9 @@ namespace N29.HeroesDawn.Domain.Combat
             return best;
         }
 
+        /// <summary>Tire une valeur du générateur du combat (empreinte de référence des tests) ; à n'appeler qu'en fin de combat, car elle fait avancer le générateur.</summary>
+        public uint RngProbeForTests() => _rng.NextUInt();
+
         /// <summary>Aides de test et de debug.</summary>
         public IReadOnlyList<CombatEvent> ApplyDamageForTests(CombatUnit t, int dmg, bool crit = false)
         {
