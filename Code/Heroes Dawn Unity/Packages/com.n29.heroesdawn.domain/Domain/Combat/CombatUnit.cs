@@ -27,6 +27,8 @@ namespace N29.HeroesDawn.Domain.Combat
         /// <summary>Énergie en plus à chaque pas de la frise (effet d équipe).</summary>
         public int EnergyRegenBonus { get; set; }
         public List<StatusInstance> Statuses { get; } = new List<StatusInstance>();
+        /// <summary>Archétypes de toutes les cartes équipées de l'unité (une entrée par archétype et par carte), fixés à la construction : alimente l'échelle d'archétype ; vide pour un ennemi de campagne.</summary>
+        public List<Archetype> EquippedArchetypes { get; } = new List<Archetype>();
         /// <summary>Réactions armées sur cette unité, dans l'ordre d'armement.</summary>
         public List<ReactionInstance> Reactions { get; } = new List<ReactionInstance>();
         public IReadOnlyList<SkillDef> Skills { get; private set; }

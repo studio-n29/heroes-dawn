@@ -23,8 +23,8 @@ namespace N29.HeroesDawn.Definitions
         }
     }
 
-    /// <summary>Grandeur comptée par un modificateur à échelle.</summary>
-    public enum ScaleKind { TargetStatusCount, EnemiesAlive, AlliesAlive, TargetMissingHpTenths, CasterMissingHpTenths }
+    /// <summary>Grandeur comptée par un modificateur à échelle (valeurs sérialisées en entiers : n'ajouter qu'en fin). <see cref="EquippedArchetypeCards"/> : cartes équipées de l'archétype <see cref="ValueMod.PerArchetype"/> dans le camp du lanceur, carte lancée comprise.</summary>
+    public enum ScaleKind { TargetStatusCount, EnemiesAlive, AlliesAlive, TargetMissingHpTenths, CasterMissingHpTenths, EquippedArchetypeCards }
 
     /// <summary>
     /// Modificateur de valeur d'un effet. Sans <see cref="Per"/> : bonus fixe quand <see cref="When"/> est vraie.
@@ -36,11 +36,13 @@ namespace N29.HeroesDawn.Definitions
         public int Bonus { get; }
         public ScaleKind? Per { get; }
         public int MaxCount { get; }
+        /// <summary>Archétype compté quand <see cref="Per"/> vaut <see cref="ScaleKind.EquippedArchetypeCards"/> ; ignoré sinon (null : aucune carte comptée).</summary>
+        public Archetype? PerArchetype { get; }
 
-        public ValueMod(int bonus, Condition? when = null, ScaleKind? per = null, int maxCount = 0)
+        public ValueMod(int bonus, Condition? when = null, ScaleKind? per = null, int maxCount = 0, Archetype? perArchetype = null)
         {
             if (per.HasValue && maxCount < 1) throw new ArgumentException("MaxCount doit être au moins 1 pour un modificateur à échelle.", nameof(maxCount));
-            Bonus = bonus; When = when; Per = per; MaxCount = maxCount;
+            Bonus = bonus; When = when; Per = per; MaxCount = maxCount; PerArchetype = perArchetype;
         }
     }
 }

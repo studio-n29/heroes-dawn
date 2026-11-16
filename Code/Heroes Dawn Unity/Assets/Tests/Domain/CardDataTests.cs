@@ -263,7 +263,7 @@ namespace N29.HeroesDawn.Tests.Domain
             Assert.That(EnumTable<TargetRule>(), Is.EqualTo("SingleEnemy=0,AllEnemies=1,SingleAlly=2,AllAllies=3,Self=4"));
             Assert.That(EnumTable<TargetPick>(), Is.EqualTo("Default=0,LowestHp=1,HighestHp=2,StatusHolder=3,NextToAct=4,Random=5,TwoRandom=6"));
             Assert.That(EnumTable<ConditionKind>(), Is.EqualTo("TargetHasStatus=0,TargetLacksStatus=1,TargetHpBelow=2,TargetHpAbove=3,CasterHasStatus=4,CasterHpBelow=5,AnyAllyHasStatus=6,TargetStatusCountAtLeast=7,TargetPlannedAction=8,EnemiesAliveAtLeast=9,EnemiesAliveAtMost=10"));
-            Assert.That(EnumTable<ScaleKind>(), Is.EqualTo("TargetStatusCount=0,EnemiesAlive=1,AlliesAlive=2,TargetMissingHpTenths=3,CasterMissingHpTenths=4"));
+            Assert.That(EnumTable<ScaleKind>(), Is.EqualTo("TargetStatusCount=0,EnemiesAlive=1,AlliesAlive=2,TargetMissingHpTenths=3,CasterMissingHpTenths=4,EquippedArchetypeCards=5"));
             Assert.That(EnumTable<Archetype>(), Is.EqualTo("Burn=0,Restrain=1,Hunt=2,Tempo=3,Bulwark=4,Renewal=5"));
             Assert.That(EnumTable<CardRole>(), Is.EqualTo("Primer=0,Payoff=1,Bridge=2,Basic=3"));
             Assert.That(EnumTable<Family>(), Is.EqualTo("Matter=0,Elemental=1,PhysicalBio=2,Perception=3"));

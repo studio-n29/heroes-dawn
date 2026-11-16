@@ -38,12 +38,12 @@ namespace N29.HeroesDawn.Domain.Combat
             foreach (var m in fx.Mods)
             {
                 if (m.When != null && !Holds(m.When, actor, target)) continue;
-                total += m.Per.HasValue ? m.Bonus * Math.Min(CountOf(m.Per.Value, actor, target), m.MaxCount) : m.Bonus;
+                total += m.Per.HasValue ? m.Bonus * Math.Min(CountOf(m.Per.Value, m.PerArchetype, actor, target), m.MaxCount) : m.Bonus;
             }
             return total;
         }
 
-        int CountOf(ScaleKind kind, CombatUnit actor, CombatUnit target)
+        int CountOf(ScaleKind kind, Archetype? archetype, CombatUnit actor, CombatUnit target)
         {
             switch (kind)
             {
@@ -52,8 +52,21 @@ namespace N29.HeroesDawn.Domain.Combat
                 case ScaleKind.AlliesAlive: return CountAlive(actor, enemies: false);
                 case ScaleKind.TargetMissingHpTenths: return (target.MaxHp - target.Hp) * 10 / target.MaxHp;
                 case ScaleKind.CasterMissingHpTenths: return (actor.MaxHp - actor.Hp) * 10 / actor.MaxHp;
+                case ScaleKind.EquippedArchetypeCards: return archetype.HasValue ? CountEquipped(actor, archetype.Value) : 0;
                 default: return 0;
             }
+        }
+
+        /// <summary>Cartes équipées de l'archétype dans le camp du lanceur : somme des listes figées de ses unités, vaincues comprises (aucun tirage).</summary>
+        int CountEquipped(CombatUnit actor, Archetype archetype)
+        {
+            int n = 0;
+            foreach (var u in _units)
+            {
+                if (u.Side != actor.Side) continue;
+                foreach (var a in u.EquippedArchetypes) if (a == archetype) n++;
+            }
+            return n;
         }
 
         int CountAlive(CombatUnit actor, bool enemies)

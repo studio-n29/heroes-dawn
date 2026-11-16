@@ -64,6 +64,7 @@ namespace N29.HeroesDawn.Domain.Combat
             unit.CritBonusPercent = crit;
             unit.StartPointBonus = startGauge * b.TimelinePoints / 100;
             if (shield > 0) unit.Statuses.Add(new StatusInstance(StatusType.Shield, 2, unit.MaxHp * shield / 100));
+            FillEquippedArchetypes(unit, e, collection);
             return unit;
         }
 
@@ -93,6 +94,18 @@ namespace N29.HeroesDawn.Domain.Combat
                 first = false;
             }
             return list;
+        }
+
+        /// <summary>Archétypes des cartes équipées de l'agent (mêmes cartes retenues que pour ses compétences : présentes dans le jeu, sans doublon), une entrée par archétype et par carte.</summary>
+        static void FillEquippedArchetypes(CombatUnit unit, AllyEntry e, CollectionDef? collection)
+        {
+            if (collection == null) return;
+            var seen = new HashSet<CardId>();
+            foreach (var slot in e.Cards)
+            {
+                if (!slot.HasValue || !collection.HasCard(slot.Value) || !seen.Add(slot.Value)) continue;
+                unit.EquippedArchetypes.AddRange(collection.Card(slot.Value).Archetypes);
+            }
         }
 
         /// <summary>Applique la puissance de compétence des objets (dégâts, soins, boucliers) à toutes les compétences.</summary>

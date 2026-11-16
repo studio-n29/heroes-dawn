@@ -72,7 +72,7 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void EveryScaleKind_ExactSentence(ScaleKind kind, string expected)
         {
             Assert.That(Lines(Dmg(100, null, new ValueMod(10, null, kind, 2))), Is.EqualTo(new[] { "Dégâts 100 %", "+10 % par " + expected + " (max 2)" }));
-            Assert.That(Enum.GetValues(typeof(ScaleKind)).Length, Is.EqualTo(5), "un ScaleKind a été ajouté : compléter la table");
+            Assert.That(Enum.GetValues(typeof(ScaleKind)).Length, Is.EqualTo(6), "un ScaleKind a été ajouté : compléter la table");
         }
 
         [Test, Description("Vérifie qu'un modificateur sans condition ni échelle s'affiche seul avec son signe — parce que fx.mod_always doit produire « +25 % »")]

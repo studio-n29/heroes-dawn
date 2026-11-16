@@ -105,6 +105,37 @@ namespace N29.HeroesDawn.Presentation.Common
             d["scale.AlliesAlive"] = "allié en vie";
             d["scale.TargetMissingHpTenths"] = "10 % de PV manquants de la cible";
             d["scale.CasterMissingHpTenths"] = "10 % de PV manquants du lanceur";
+            d["scale.EquippedArchetypeCards"] = "carte {0} équipée dans l'escouade";
+            // Archétypes, réactions armées, Consomme et Propage (plan P2-P4)
+            d["archetype.Burn"] = "Brûlure"; d["archetype.Restrain"] = "Entrave"; d["archetype.Hunt"] = "Traque";
+            d["archetype.Tempo"] = "Tempo"; d["archetype.Bulwark"] = "Rempart"; d["archetype.Renewal"] = "Renouveau";
+            d["reaction.line"] = "Réaction {0} t : quand {1} → {2}";
+            d["reaction.line_target"] = "Réaction {0} t : quand {1} → {2} sur {3}";
+            d["reaction.trigger.EnemyReceivesStatus"] = "un ennemi reçoit {0}";
+            d["reaction.trigger.AllyReceivesStatus"] = "un allié reçoit {0}";
+            d["reaction.trigger.EnemyDefeated"] = "un ennemi est vaincu";
+            d["reaction.trigger.AllyDefeated"] = "un allié est vaincu";
+            d["reaction.trigger.CarrierHit"] = "le porteur est touché";
+            d["reaction.trigger.CarrierCrit"] = "le porteur inflige un critique";
+            // Cibles d'une réaction : zones et soi tels quels ; pour une cible unique, {0} = nom de l'unité, {1} = avec article défini, {2} = statut du choix, et reaction.pick.* en fait un groupe nominal
+            d["reaction.target.trigger"] = "le déclencheur";
+            d["reaction.target.Self"] = "soi";
+            d["reaction.target.AllEnemies"] = "tous les ennemis";
+            d["reaction.target.AllAllies"] = "toute l'équipe";
+            d["reaction.target.SingleEnemy"] = "ennemi";
+            d["reaction.target.SingleAlly"] = "allié";
+            d["reaction.the.SingleEnemy"] = "l'ennemi"; d["reaction.the.SingleAlly"] = "l'allié"; // article défini élidé : « {1} » des choix reaction.pick.*
+            d["reaction.pick.Default"] = "un {0}";
+            d["reaction.pick.LowestHp"] = "{1} le plus faible";
+            d["reaction.pick.HighestHp"] = "{1} le plus en forme";
+            d["reaction.pick.StatusHolder"] = "un {0} porteur de {2}";
+            d["reaction.pick.NextToAct"] = "le prochain {0} à agir";
+            d["reaction.pick.Random"] = "un {0} au hasard";
+            d["reaction.pick.TwoRandom"] = "deux {0}s au hasard";
+            // Valeurs en % même avec les statistiques de l'agent (par tour restant, ou fixes d'une réaction : jamais en montant brut)
+            d["fx.consume_damage"] = "Consomme {0} : Dégâts {1} % par tour restant (max {2})";
+            d["fx.consume_heal"] = "Consomme {0} : Soin {1} % PV par tour restant (max {2})";
+            d["fx.spread"] = "Propage {0}";
             d["pick.LowestHp"] = "Cible : le plus faible en PV";
             d["pick.HighestHp"] = "Cible : le plus en forme (PV en %)";
             d["pick.StatusHolder"] = "Cible : porteur de {0}";

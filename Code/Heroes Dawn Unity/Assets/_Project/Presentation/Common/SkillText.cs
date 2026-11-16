@@ -64,15 +64,46 @@ namespace N29.HeroesDawn.Presentation.Common
             }
         }
 
+        /// <summary>Grandeur comptée : pour les cartes d'archétype équipées, le texte nomme l'archétype.</summary>
+        static string ScaleText(ValueMod m)
+            => m.Per == ScaleKind.EquippedArchetypeCards
+                ? Loc.F("scale." + m.Per.Value, m.PerArchetype.HasValue ? Loc.T("archetype." + m.PerArchetype.Value) : "")
+                : Loc.T("scale." + m.Per!.Value);
+
         static string ModLine(EffectDef fx, ValueMod m, SkillOwnerStats? owner)
         {
             string bonus = BonusText(fx, m.Bonus, owner);
             if (m.Per.HasValue)
             {
-                string scaled = Loc.F("fx.mod_scaled", bonus, Loc.T("scale." + m.Per.Value), m.MaxCount);
+                string scaled = Loc.F("fx.mod_scaled", bonus, ScaleText(m), m.MaxCount);
                 return m.When != null ? Loc.F("fx.conditional", ConditionText(m.When), scaled) : scaled;
             }
             return m.When != null ? Loc.F("fx.mod_flat", bonus, ConditionText(m.When)) : Loc.F("fx.mod_always", bonus);
+        }
+
+        /// <summary>
+        /// Réaction armée : « Réaction N t : quand &lt;événement&gt; → &lt;effet&gt; [sur &lt;cible&gt;] ». L'effet est toujours en % (montants bruts jamais calculés pour une réaction).
+        /// La cible par défaut de la fiche (le déclencheur pour les événements de statut, le porteur sinon) ne s'écrit pas.
+        /// </summary>
+        static string? ReactionLine(ReactionDef r)
+        {
+            string? effect = BaseLine(r.Effect, null);
+            if (effect == null) return null;
+            string trigger = Loc.F("reaction.trigger." + r.Trigger, r.Status == StatusType.None ? "" : Loc.StatusName(r.Status));
+            string? target = ReactionTarget(r);
+            return target == null ? Loc.F("reaction.line", r.Turns, trigger, effect) : Loc.F("reaction.line_target", r.Turns, trigger, effect, target);
+        }
+
+        static string? ReactionTarget(ReactionDef r)
+        {
+            bool statusEvent = r.Trigger == ReactionTrigger.EnemyReceivesStatus || r.Trigger == ReactionTrigger.AllyReceivesStatus;
+            if (r.OnTriggerUnit) return statusEvent ? null : Loc.T("reaction.target.trigger");
+            switch (r.Target)
+            {
+                case TargetRule.Self: return statusEvent ? Loc.T("reaction.target.Self") : null;
+                case TargetRule.AllEnemies: case TargetRule.AllAllies: return Loc.T("reaction.target." + r.Target);
+                default: return Loc.F("reaction.pick." + r.Pick, Loc.T("reaction.target." + r.Target), Loc.T("reaction.the." + r.Target), r.PickStatus == StatusType.None ? "" : Loc.StatusName(r.PickStatus));
+            }
         }
 
         static string? BaseLine(EffectDef fx, SkillOwnerStats? owner)
@@ -93,6 +124,10 @@ namespace N29.HeroesDawn.Presentation.Common
                 case EffectType.Purge: return fx.Value <= 0 ? Loc.T("fx.purge_all") : Loc.F("fx.purge", fx.Value);
                 case EffectType.Bounce: return Loc.F("fx.bounce", fx.Value);
                 case EffectType.Execute: return Loc.F("fx.execute", fx.Value, ExecuteThreshold);
+                case EffectType.ArmReaction: return fx.Reaction == null ? null : ReactionLine(fx.Reaction);
+                case EffectType.ConsumeDamage: return Loc.F("fx.consume_damage", Loc.StatusName(fx.Status), fx.Value, fx.Duration);
+                case EffectType.ConsumeHeal: return Loc.F("fx.consume_heal", Loc.StatusName(fx.Status), fx.Value, fx.Duration);
+                case EffectType.Spread: return Loc.F("fx.spread", Loc.StatusName(fx.Status));
                 case EffectType.ApplyStatus:
                     int turns = fx.Duration >= 99 ? 1 : fx.Duration;
                     return fx.ChancePercent >= 100
