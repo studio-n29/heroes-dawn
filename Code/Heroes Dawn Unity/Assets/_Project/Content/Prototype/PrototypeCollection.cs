@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using N29.HeroesDawn.Authoring;
 using N29.HeroesDawn.Core;
 using N29.HeroesDawn.Definitions;
 
@@ -54,7 +55,16 @@ namespace N29.HeroesDawn.Content.Prototype
                 I("energy_cell", ItemType.Tool, ItemRarity.Rare, 800, hp: 6, perk: ItemPerk.StartGauge, perkValue: 12),
                 I("neural_chip", ItemType.Implant, ItemRarity.Epic, 2400, spd: 4, perk: ItemPerk.SkillPower, perkValue: 20),
             },
-            new List<SkillCardDef>
+            CardDataLibrary.Load(LegacyCards),
+            new List<BoosterDef>
+            {
+                new BoosterDef(BoosterDef.StandardId, "boosters.booster_standard.name", 3, BoosterDef.StandardWeights, 5, 120),
+                new BoosterDef(BoosterDef.OperationId, "boosters.booster_operation.name", 5, new[] { 40, 30, 19, 9, 2 }, 4, 300),
+                new BoosterDef(BoosterDef.MissionId, "boosters.booster_mission.name", 4, new[] { 20, 35, 28, 14, 3 }, 3, 250),
+            });
+
+        /// <summary>Les 48 cartes du prototype écrites en code : repli de <c>cards.json</c> et référence de l'export (menu Heroes Dawn ▸ Contenu).</summary>
+        public static IReadOnlyList<SkillCardDef> LegacyCards() => new List<SkillCardDef>
             {
                 T(C("card_glass_wall", Family.Matter, CardNature.Defensive, 1, 5, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Anchor, 1), St(StatusType.Regen, 2)), Shield(15)), Archetype.Bulwark, CardRole.Basic),
                 T(C("card_shackle", Family.Matter, CardNature.Control, 3, 4, TargetRule.SingleEnemy, Tiers(St(StatusType.Vulnerable, 2), Purge(1), St(StatusType.Shock, 1)), St(StatusType.Bind, 2), Push(25)), Archetype.Restrain, CardRole.Primer),
@@ -112,12 +122,6 @@ namespace N29.HeroesDawn.Content.Prototype
                 T(C("card_shared_watch", Family.Perception, CardNature.Support, 3, 5, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Haste, 1), Shield(8)), Gauge(100)), Archetype.Tempo, CardRole.Primer),
                 T(C("card_silent_takedown", Family.Perception, CardNature.Offensive, 4, 6, TargetRule.SingleEnemy, Tiers(St(StatusType.Blind, 1), Steal(15), Bounce(60)), Dmg(150), Exec(50)), Archetype.Hunt, CardRole.Payoff),
                 T(C("card_time_veil", Family.Perception, CardNature.Defensive, 4, 6, TargetRule.AllAllies, Tiers(Purge(1), St(StatusType.Evade, 1, 30), St(StatusType.Regen, 2)), Shield(15), Adv(20)), Archetype.Tempo, CardRole.Basic),
-            },
-            new List<BoosterDef>
-            {
-                new BoosterDef(BoosterDef.StandardId, "boosters.booster_standard.name", 3, BoosterDef.StandardWeights, 5, 120),
-                new BoosterDef(BoosterDef.OperationId, "boosters.booster_operation.name", 5, new[] { 40, 30, 19, 9, 2 }, 4, 300),
-                new BoosterDef(BoosterDef.MissionId, "boosters.booster_mission.name", 4, new[] { 20, 35, 28, 14, 3 }, 3, 250),
-            });
+            };
     }
 }

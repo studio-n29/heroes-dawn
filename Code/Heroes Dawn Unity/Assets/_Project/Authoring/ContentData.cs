@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using N29.HeroesDawn.Definitions;
 
@@ -17,8 +18,34 @@ namespace N29.HeroesDawn.Authoring
         [Tooltip("Statut appliqué (type « ApplyStatus »), ou statut du bouclier.")] public StatusType status;
         [Tooltip("Durée du statut en tours.")] public int duration;
         [Tooltip("Chance en % (100 = toujours).")] public int chance = 100;
+        [Tooltip("Vrai : l'effet n'est appliqué que si la condition (condKind, condStatus, condValue) est vraie.")] public bool hasCondition;
+        public ConditionKind condKind;
+        public StatusType condStatus;
+        public int condValue;
+        [Tooltip("Modificateurs de la valeur de l'effet (bonus conditionnels ou à échelle).")] public List<ModRecord> mods = new List<ModRecord>();
 
-        public EffectRecord Clone() => (EffectRecord)MemberwiseClone();
+        public EffectRecord Clone()
+        {
+            var copy = (EffectRecord)MemberwiseClone();
+            copy.mods = mods.Select(m => m.Clone()).ToList();
+            return copy;
+        }
+    }
+
+    /// <summary>Modificateur de valeur d'un effet (plat pour JsonUtility : des booléens remplacent les champs facultatifs).</summary>
+    [Serializable]
+    public sealed class ModRecord
+    {
+        public bool hasCondition;
+        public ConditionKind condKind;
+        public StatusType condStatus;
+        public int condValue;
+        public int bonus;
+        [Tooltip("Vrai : le bonus est multiplié par le compte de « per » (plafonné à maxCount).")] public bool hasScale;
+        public ScaleKind per;
+        public int maxCount;
+
+        public ModRecord Clone() => (ModRecord)MemberwiseClone();
     }
 
     [Serializable]
@@ -30,6 +57,8 @@ namespace N29.HeroesDawn.Authoring
         [Tooltip("Énergie dépensée à chaque usage.")] public int cost;
         [Tooltip("Recharge historique en tours (n a plus d effet).")] public int cooldown;
         public TargetRule target;
+        [Tooltip("Choix fin de la cible (Default : la cible voulue par le joueur).")] public TargetPick pick;
+        [Tooltip("Altération recherchée quand pick = StatusHolder.")] public StatusType pickStatus;
         [Tooltip("Premier effet = effet de base ; les suivants = effets secondaires.")] public List<EffectRecord> effects = new List<EffectRecord>();
     }
 

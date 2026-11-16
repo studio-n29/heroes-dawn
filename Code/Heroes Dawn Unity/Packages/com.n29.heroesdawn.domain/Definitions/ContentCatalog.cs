@@ -68,6 +68,10 @@ namespace N29.HeroesDawn.Definitions
         public ContentCatalog WithItems(IReadOnlyList<ItemDef> items)
             => WithCollection(new CollectionDef(items, Collection.Cards, Collection.Boosters));
 
+        /// <summary>Même contenu avec ces cartes à la place de celles du code (catalogue en données, cards.json).</summary>
+        public ContentCatalog WithCards(IReadOnlyList<SkillCardDef> cards)
+            => WithCollection(new CollectionDef(Collection.Items, cards, Collection.Boosters));
+
         /// <summary>Même contenu avec ces agents à la place de ceux du code (outil de design des agents).</summary>
         public ContentCatalog WithMembers(IReadOnlyList<MemberDef> members)
             => new ContentCatalog(Balance, members, Enemies, Synergies, Zones, Activities, Collection, StarterTeam);

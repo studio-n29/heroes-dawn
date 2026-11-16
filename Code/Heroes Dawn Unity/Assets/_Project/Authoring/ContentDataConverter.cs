@@ -9,16 +9,52 @@ namespace N29.HeroesDawn.Authoring
     /// <summary>Passage entre les fiches éditables (JSON) et les définitions du jeu, dans les deux sens.</summary>
     public static class ContentDataConverter
     {
-        public static EffectDef ToDef(EffectRecord e) => new EffectDef(e.type, e.value, e.status, e.duration, e.chance);
+        public static EffectDef ToDef(EffectRecord e)
+            => new EffectDef(e.type, e.value, e.status, e.duration, e.chance,
+                             e.hasCondition ? new Condition(e.condKind, e.condStatus, e.condValue) : null,
+                             e.mods.Count == 0 ? null : e.mods.Select(ToDef).ToList());
 
         public static EffectRecord FromDef(EffectDef e)
-            => new EffectRecord { type = e.Type, value = e.Value, status = e.Status, duration = e.Duration, chance = e.ChancePercent };
+            => new EffectRecord
+            {
+                type = e.Type, value = e.Value, status = e.Status, duration = e.Duration, chance = e.ChancePercent,
+                hasCondition = e.When != null, condKind = e.When?.Kind ?? default, condStatus = e.When?.Status ?? StatusType.None, condValue = e.When?.Value ?? 0,
+                mods = e.Mods.Select(FromDef).ToList(),
+            };
+
+        public static ValueMod ToDef(ModRecord m)
+            => new ValueMod(m.bonus, m.hasCondition ? new Condition(m.condKind, m.condStatus, m.condValue) : null,
+                            m.hasScale ? m.per : (ScaleKind?)null, m.hasScale ? m.maxCount : 0);
+
+        public static ModRecord FromDef(ValueMod m)
+            => new ModRecord
+            {
+                hasCondition = m.When != null, condKind = m.When?.Kind ?? default, condStatus = m.When?.Status ?? StatusType.None, condValue = m.When?.Value ?? 0,
+                bonus = m.Bonus, hasScale = m.Per.HasValue, per = m.Per ?? default, maxCount = m.MaxCount,
+            };
 
         public static SkillDef ToDef(SkillRecord s)
-            => new SkillDef(new SkillId(s.id), s.slot, s.cooldown, s.target, s.effects.Select(ToDef).ToList(), s.cost);
+            => new SkillDef(new SkillId(s.id), s.slot, s.cooldown, s.target, s.effects.Select(ToDef).ToList(), s.cost, s.pick, s.pickStatus);
 
         public static SkillRecord FromDef(SkillDef s, string name)
-            => new SkillRecord { id = s.Id.Value, name = name, slot = s.Slot, cost = s.Cost, cooldown = s.Cooldown, target = s.Target, effects = s.Effects.Select(FromDef).ToList() };
+            => new SkillRecord
+            {
+                id = s.Id.Value, name = name, slot = s.Slot, cost = s.Cost, cooldown = s.Cooldown, target = s.Target, pick = s.Pick, pickStatus = s.PickStatus,
+                effects = s.Effects.Select(FromDef).ToList(),
+            };
+
+        /// <summary>Carte du grimoire à partir de sa fiche : étoiles, famille, nature, archétypes, rôle, compétence et paliers (seule capacité : OnCast).</summary>
+        public static SkillCardDef ToDef(CardRecord c)
+            => new SkillCardDef(new CardId(c.id), "cards." + c.id + ".name", c.family, c.stars, ToDef(c.skill), c.nature,
+                                c.tiers.Select(t => new CardTier(t.level, t.effects.Select(ToDef).ToArray())).ToList(), c.archetypes.ToList(), c.role);
+
+        public static CardRecord FromDef(SkillCardDef c)
+            => new CardRecord
+            {
+                id = c.Id.Value, family = c.Family, stars = c.Stars, nature = c.Nature, archetypes = c.Archetypes.ToList(), role = c.Role,
+                skill = FromDef(c.Skill, ""),
+                tiers = c.Tiers.Select(t => new TierRecord { level = t.Level, effects = t.Effects.Select(FromDef).ToList() }).ToList(),
+            };
 
         public static ItemDef ToDef(ItemRecord i)
             => new ItemDef(new ItemId(i.id), "items." + i.id + ".name", i.rarity, i.hp, i.atk, i.def, i.spd, i.perk, i.perkValue, i.price,
