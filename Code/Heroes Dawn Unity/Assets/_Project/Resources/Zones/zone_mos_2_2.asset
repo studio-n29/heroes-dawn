@@ -1,0 +1,612 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df527a111f48e9749b23b1fde962ba77, type: 3}
+  m_Name: zone_mos_2_2
+  m_EditorClassIdentifier: N29.HeroesDawn.Authoring::N29.HeroesDawn.Authoring.ZoneAsset
+  zoneId: zone_mos_2_2
+  nameKey: zones.mos_2_2.name
+  displayName: 
+  shortName: 
+  description: 
+  code: M2.2
+  act: 2
+  borough: kapotnya
+  recommendedLevel: 13
+  requires:
+  - zone_mos_2_1
+  biome: 2
+  weather: 1
+  entry: n00
+  nodes:
+  - id: n00
+    type: 0
+    isFixed: 1
+    rank: 1
+    x: 0
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n01
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 1
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n02
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 2
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n03
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n04
+    type: 4
+    isFixed: 1
+    rank: 1
+    x: 4
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: narrateur
+      text: La route du convoi traverse la brume. Les camions roulent sans phares, comme s'ils connaissaient chaque virage.
+      key: narration.mos_2_2.intro.0
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: "Quatre camions, une escorte, et pas un seul feu allum\xE9."
+      key: narration.mos_2_2.intro.1
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Les camions sont charg\xE9s de ce que nous avons vu sur la voie 9. Mais plus lourd, plus dangereux."
+      key: narration.mos_2_2.intro.2
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: "Ces caisses ont \xE9t\xE9 emball\xE9es par des mains qui savent ce qu'elles portent."
+      key: narration.mos_2_2.intro.2.d
+      route: agent_d
+      replaces: narration.mos_2_2.intro.2
+    narrationAfter: []
+  - id: n05
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n06
+    type: 3
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 3
+    activity: potion_field
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n07
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 4
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n08
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n09
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n10
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 4
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n11
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n12
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 6
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n13
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 7
+    y: 2
+    activity: rooftop_rescue
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n14
+    type: 2
+    isFixed: 1
+    rank: 2
+    x: 8
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: enforcer
+      text: "Ce convoi est autoris\xE9. Vous avez la permission de reculer."
+      key: narration.mos_2_2.elite.before.0
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: "Autoris\xE9 par qui ? Il ne r\xE9pond pas."
+      key: narration.mos_2_2.elite.before.1
+      route: 
+      replaces: 
+    narrationAfter:
+    - speaker: giulia_rossi
+      text: "Les caisses brillent. Ce sont des r\xE9sidus de la Supernova."
+      key: narration.mos_2_2.elite.after.0
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: "Des fragments de la br\xE8che, transport\xE9s comme du charbon."
+      key: narration.mos_2_2.elite.after.1
+      route: 
+      replaces: 
+  - id: n15
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 7
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n16
+    type: 4
+    isFixed: 0
+    rank: 1
+    x: 8
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n17
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 9
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n18
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 10
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n19
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n20
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n21
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 12
+    y: 3
+    activity: crate_pick_depot
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n22
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 13
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter:
+    - speaker: agent_m
+      text: "M\xEAme code sovi\xE9tique que sur les caisses de Sergueiv. Quelqu'un relie les deux."
+      key: narration.mos_2_2.exit.0
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: Alors le laboratoire est au bout de cette route.
+      key: narration.mos_2_2.exit.1
+      route: 
+      replaces: 
+  links:
+  - a: n00
+    b: n01
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n01
+    b: n02
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n03
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n06
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n03
+    b: n04
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n04
+    b: n05
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n06
+    b: n07
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n07
+    b: n08
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n09
+    b: n10
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n11
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n05
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n08
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n11
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n13
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n13
+    b: n14
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n15
+    b: n16
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n14
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n16
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n17
+    b: n18
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n18
+    b: n19
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n18
+    b: n20
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n19
+    b: n21
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n20
+    b: n21
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n21
+    b: n22
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  objectives:
+  - id: obj_chase
+    type: 2
+    target: n13
+    nameKey: objectives.mos22.chase
+    text: 
+  - id: obj_escort
+    type: 0
+    target: n14
+    nameKey: objectives.mos22.escort
+    text: 
+  - id: obj_residue
+    type: 2
+    target: n21
+    nameKey: objectives.mos22.residue
+    text: 
+  - id: obj_roadend
+    type: 1
+    target: n22
+    nameKey: objectives.mos22.roadend
+    text: 
+  encounters:
+  - rank: 0
+    waves:
+    - enemies:
+      - kap_convoyeur
+      - mos_smuggler
+  - rank: 1
+    waves:
+    - enemies:
+      - kap_garde
+      - kap_convoyeur
+      - street_pyro
+  - rank: 1
+    waves:
+    - enemies:
+      - brute
+      - kap_convoyeur
+      - kap_convoyeur
+  - rank: 2
+    waves:
+    - enemies:
+      - kap_surveillant
+      - kap_convoyeur
+      - kap_garde
+  regions: []
+  hasMapPoint: 0
+  mapPointPermille: {x: 500, y: 500}
+  backgroundKey: zone_mos_2_2_bg
+  backgroundMinX: -1
+  backgroundMinY: 0
+  backgroundMaxX: 14
+  backgroundMaxY: 6
+  backgroundSeed: 1

@@ -111,6 +111,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public LocalFriendsPort Friends { get; }
         public PlayerProfile Profile { get; }
         public N29.HeroesDawn.Application.Features.World.ChapterBook Chapters { get; }
+        public N29.HeroesDawn.Application.Features.World.NarrativeChoices Choices { get; }
         public N29.HeroesDawn.Application.Features.World.MemoryFragmentBook Fragments { get; }
         public N29.HeroesDawn.Application.Features.World.LairBook Lairs { get; }
         public static readonly System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Definitions.TournamentDef> TestCalendar = N29.HeroesDawn.Authoring.TournamentLibrary.Load();
@@ -191,6 +192,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Friends = new LocalFriendsPort(MetaCtx);
             Profile = new PlayerProfile(MetaCtx, Pass);
             Chapters = new N29.HeroesDawn.Application.Features.World.ChapterBook(MetaCtx);
+            Choices = new N29.HeroesDawn.Application.Features.World.NarrativeChoices(MetaCtx);
             Fragments = new N29.HeroesDawn.Application.Features.World.MemoryFragmentBook(MetaCtx);
             Lairs = new N29.HeroesDawn.Application.Features.World.LairBook(MetaCtx);
             Arena = new N29.HeroesDawn.Infrastructure.Simulated.InMemoryArenaGateway(() => Time.LocalNow, (rating, seed) => ArenaSnapshots.Fallback(Session.Content, rating, seed, "Repli"));

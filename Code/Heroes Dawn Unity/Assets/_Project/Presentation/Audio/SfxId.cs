@@ -54,5 +54,28 @@ namespace N29.HeroesDawn.Presentation.Audio
         BoosterOpen = 81,
         RewardTile = 82,
         TentRest = 83,
+
+        // Compétences par famille d'animation, statuts, divers (lot SFX du 2026-11-16)
+        SkillOffensePhysical = 90,
+        SkillOffenseEnergy = 91,
+        SkillDefense = 92,
+        SkillHeal = 93,
+        SkillBuff = 94,
+        SkillControl = 95,
+        StatusBurn = 96,
+        StatusShock = 97,
+        StatusFreeze = 98,
+        StatusDot = 99,
+        CardSlide = 100,
+        RadioBlip = 101,
+        MiniGameWon = 102,
+        MiniGameFailed = 103,
+        MiniGameTick = 104,
+
+        // Ouverture de booster : retournement des cartes selon la rareté (clips à fournir)
+        CardFlip = 110,
+        CardFlipRare = 111,
+        CardFlipEpic = 112,
+        CardFlipLegendary = 113,
     }
 }

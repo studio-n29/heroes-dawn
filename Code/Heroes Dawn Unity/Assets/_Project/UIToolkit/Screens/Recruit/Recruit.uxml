@@ -2,21 +2,23 @@
     <ui:VisualElement name="page" class="hd-page hd-recruit">
         <ui:VisualElement name="shopTabs" class="hd-shoptabs" />
         <ui:VisualElement class="hd-recruit__main">
-            <ui:VisualElement class="hd-recruit__info">
-                <ui:VisualElement class="hd-recruit__headline">
-                    <ui:VisualElement class="hd-star" />
-                    <ui:Label name="countdown" class="hd-recruit__countdown" />
+            <ui:ScrollView name="recruitScroll" class="hd-recruit__scroll">
+                <ui:VisualElement class="hd-recruit__info">
+                    <ui:VisualElement class="hd-recruit__headline">
+                        <ui:VisualElement class="hd-star" />
+                        <ui:Label name="countdown" class="hd-recruit__countdown" />
+                    </ui:VisualElement>
+                    <ui:Label name="rule" class="hd-recruit__rule" />
                 </ui:VisualElement>
-                <ui:Label name="rule" class="hd-recruit__rule" />
-            </ui:VisualElement>
-            <ui:Label name="empty" class="hd-recruit__empty" />
-            <ui:VisualElement name="cards" class="hd-recruit__cards" />
-            <ui:VisualElement name="scraps" class="hd-recruit__scraps" />
-            <ui:VisualElement class="hd-recruit__actions">
-                <ui:Label name="progress" class="hd-recruit__progress" />
-                <ui:Button name="reroll" class="hd-btn hd-btn--secondary hd-btn--small" />
-                <ui:Button name="registry" class="hd-btn hd-btn--ghost hd-btn--small" />
-            </ui:VisualElement>
+                <ui:Label name="empty" class="hd-recruit__empty" />
+                <ui:VisualElement name="cards" class="hd-recruit__cards" />
+                <ui:VisualElement name="scraps" class="hd-recruit__scraps" />
+                <ui:VisualElement class="hd-recruit__actions">
+                    <ui:Label name="progress" class="hd-recruit__progress" />
+                    <ui:Button name="reroll" class="hd-btn hd-btn--secondary hd-btn--small" />
+                    <ui:Button name="registry" class="hd-btn hd-btn--ghost hd-btn--small" />
+                </ui:VisualElement>
+            </ui:ScrollView>
         </ui:VisualElement>
         <ui:VisualElement name="detail" class="hd-panel hd-recruit__detail">
             <ui:VisualElement class="hd-recruit__dhead">

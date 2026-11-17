@@ -34,7 +34,7 @@ namespace N29.HeroesDawn.Content.Prototype
             return System.Array.Empty<ZoneId>();
         }
 
-        static NarrationLineDef L(string zone, string node, string phase, int i, string speaker) => PrototypeZones.L(zone, node, phase, i, speaker);
+        static NarrationLineDef L(string speaker, string key) => new NarrationLineDef(speaker, key);
 
         static ObjectiveDef Obj(string id, ObjectiveType t, string node, string zoneKey, string key)
             => new ObjectiveDef(id, t, new CaseId(node), "objectives." + zoneKey + "." + key);
@@ -50,9 +50,12 @@ namespace N29.HeroesDawn.Content.Prototype
         static ZoneDef BuildZone11()
         {
             var enforcer = new NarrationDef(
-                new[] { L("mos_1_1", "n14", "before", 0, "enforcer"), L("mos_1_1", "n14", "before", 1, "ilona_varga") },
-                new[] { L("mos_1_1", "n14", "after", 0, "agent_m") });
-            var exit = new NarrationDef(null, new[] { L("mos_1_1", "n19", "after", 0, "ilona_varga") });
+                new[] { L("enforcer", "narration.mos_1_1.elite.before.0"), L("ilona_varga", "narration.mos_1_1.elite.before.1") },
+                new[] { L("agent_m", "narration.mos_1_1.elite.after.0"), L("lucas_mendes", "narration.mos_1_1.elite.after.1"), L("agent_m", "narration.mos_1_1.elite.after.2") });
+            var exit = new NarrationDef(
+                null,
+                new[] { L("ilona_varga", "narration.mos_1_1.exit.0") });
+            var intro = new NarrationDef(new[] { new NarrationLineDef("narrateur", "narration.mos_1_1.intro.0"), new NarrationLineDef("giulia_rossi", "narration.mos_1_1.intro.1"), new NarrationLineDef("ilona_varga", "narration.mos_1_1.intro.2"), new NarrationLineDef("agent_m", "narration.mos_1_1.intro.3"), new NarrationLineDef("agent_d", "narration.mos_1_1.intro.3.d", "agent_d", "narration.mos_1_1.intro.3"), new NarrationLineDef("lucas_mendes", "narration.mos_1_1.intro.4"), new NarrationLineDef("ilona_varga", "narration.mos_1_1.intro.5"), new NarrationLineDef("agent_m", "narration.mos_1_1.intro.6", "agent_m") }, null);
             var objectives = new List<ObjectiveDef>
             {
                 Obj("obj_welcome", ObjectiveType.ReachCase, "n03", "mos11", "welcome"),
@@ -67,7 +70,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 Enc(CombatRank.Normal, "brute", "mos_smuggler", "mos_guard"),
                 Enc(CombatRank.Elite, "mos_enforcer", "mos_guard", "mos_smuggler"),
             };
-            return new ZoneDef(Zone11, "zones.mos_1_1.name", new CaseId("n00"), PrototypeZones.BrownsvilleNodes(enforcer, exit, "infiltration_camp", true), PrototypeZones.BrownsvilleLinks(),
+            return new ZoneDef(Zone11, "zones.mos_1_1.name", new CaseId("n00"), PrototypeZones.BrownsvilleNodes(enforcer, exit, "infiltration_camp", true, intro), PrototypeZones.BrownsvilleLinks(),
                                objectives, encounters, "M1.1", 1, Borough, 5, Requires(Zone11), new ZoneEnvironment(Biome.City, Weather.Day));
         }
 
@@ -75,9 +78,12 @@ namespace N29.HeroesDawn.Content.Prototype
         static ZoneDef BuildZone12()
         {
             var guardian = new NarrationDef(
-                new[] { L("mos_1_2", "n14", "before", 0, "enforcer"), L("mos_1_2", "n14", "before", 1, "agent_m") },
-                new[] { L("mos_1_2", "n14", "after", 0, "agent_m") });
-            var exit = new NarrationDef(null, new[] { L("mos_1_2", "n18", "after", 0, "ilona_varga") });
+                new[] { L("enforcer", "narration.mos_1_2.elite.before.0"), L("agent_m", "narration.mos_1_2.elite.before.1") },
+                new[] { L("agent_m", "narration.mos_1_2.elite.after.0"), L("lucas_mendes", "narration.mos_1_2.elite.after.1") });
+            var exit = new NarrationDef(
+                null,
+                new[] { L("ilona_varga", "narration.mos_1_2.exit.0"), L("agent_m", "narration.mos_1_2.exit.1") });
+            var intro = new NarrationDef(new[] { new NarrationLineDef("narrateur", "narration.mos_1_2.intro.0"), new NarrationLineDef("lucas_mendes", "narration.mos_1_2.intro.1"), new NarrationLineDef("agent_m", "narration.mos_1_2.intro.2"), new NarrationLineDef("agent_d", "narration.mos_1_2.intro.2.d", "agent_d", "narration.mos_1_2.intro.2"), new NarrationLineDef("giulia_rossi", "narration.mos_1_2.intro.3"), new NarrationLineDef("agent_m", "narration.mos_1_2.intro.4"), new NarrationLineDef("agent_d", "narration.mos_1_2.intro.4.d", "agent_d", "narration.mos_1_2.intro.4"), new NarrationLineDef("agent_m", "narration.mos_1_2.intro.5", "agent_m") }, null);
             var objectives = new List<ObjectiveDef>
             {
                 Obj("obj_archives", ObjectiveType.ReachCase, "n04", "mos12", "archives"),
@@ -91,7 +97,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 Enc(CombatRank.Normal, "mos_guard", "mos_smuggler", "mos_smuggler"),
                 Enc(CombatRank.Elite, "mos_enforcer", "mos_smuggler", "mos_smuggler"), // spec : + thug ; deux tireurs pour tenir 60-85 % (tâche 8)
             };
-            return new ZoneDef(Zone12, "zones.mos_1_2.name", new CaseId("n00"), PrototypeZones.BridgeNodes(null, guardian, exit, "gears_workshop", false, true), PrototypeZones.BridgeLinks(),
+            return new ZoneDef(Zone12, "zones.mos_1_2.name", new CaseId("n00"), PrototypeZones.BridgeNodes(null, guardian, exit, "gears_workshop", false, true, intro), PrototypeZones.BridgeLinks(),
                                objectives, encounters, "M1.2", 1, Borough, 6, Requires(Zone12), new ZoneEnvironment(Biome.City, Weather.Fog));
         }
 
@@ -99,9 +105,12 @@ namespace N29.HeroesDawn.Content.Prototype
         static ZoneDef BuildZone13()
         {
             var escort = new NarrationDef(
-                new[] { L("mos_1_3", "n14", "before", 0, "enforcer") },
-                new[] { L("mos_1_3", "n14", "after", 0, "agent_m") });
-            var exit = new NarrationDef(null, new[] { L("mos_1_3", "n18", "after", 0, "ilona_varga") });
+                new[] { L("enforcer", "narration.mos_1_3.elite.before.0"), L("ilona_varga", "narration.mos_1_3.elite.before.1") },
+                new[] { L("agent_m", "narration.mos_1_3.elite.after.0"), L("lucas_mendes", "narration.mos_1_3.elite.after.1") });
+            var exit = new NarrationDef(
+                null,
+                new[] { L("ilona_varga", "narration.mos_1_3.exit.0"), L("agent_m", "narration.mos_1_3.exit.1") });
+            var intro = new NarrationDef(new[] { new NarrationLineDef("narrateur", "narration.mos_1_3.intro.0"), new NarrationLineDef("giulia_rossi", "narration.mos_1_3.intro.1"), new NarrationLineDef("agent_m", "narration.mos_1_3.intro.2"), new NarrationLineDef("agent_d", "narration.mos_1_3.intro.2.d", "agent_d", "narration.mos_1_3.intro.2"), new NarrationLineDef("lucas_mendes", "narration.mos_1_3.intro.3") }, null);
             var objectives = new List<ObjectiveDef>
             {
                 Obj("obj_convoy", ObjectiveType.CompleteMiniGame, "n11", "mos13", "convoy"),
@@ -114,16 +123,20 @@ namespace N29.HeroesDawn.Content.Prototype
                 Enc(CombatRank.Normal, "brute", "mos_smuggler", "street_pyro"),
                 Enc(CombatRank.Elite, "mos_enforcer", "brute", "mos_smuggler"),
             };
-            return new ZoneDef(Zone13, "zones.mos_1_3.name", new CaseId("n00"), PrototypeZones.BridgeNodes(null, escort, exit, "rooftop_rescue", false), PrototypeZones.BridgeLinks(),
+            return new ZoneDef(Zone13, "zones.mos_1_3.name", new CaseId("n00"), PrototypeZones.BridgeNodes(null, escort, exit, "rooftop_rescue", false, false, intro), PrototypeZones.BridgeLinks(),
                                objectives, encounters, "M1.3", 1, Borough, 8, Requires(Zone13), new ZoneEnvironment(Biome.City, Weather.Night));
         }
 
         /// <summary>Dépôt du maglev : graphe B avec boss fixe au bout, le Passeur (avant, après, fin de chapitre).</summary>
         static ZoneDef BuildZone14()
         {
+            var guard = new NarrationDef(
+                new[] { L("enforcer", "narration.mos_1_4.elite.before.0") },
+                new[] { L("ilona_varga", "narration.mos_1_4.elite.after.0") });
             var passeur = new NarrationDef(
-                new[] { L("mos_1_4", "n18", "before", 0, "passeur"), L("mos_1_4", "n18", "before", 1, "passeur"), L("mos_1_4", "n18", "before", 2, "ilona_varga") },
-                new[] { L("mos_1_4", "n18", "after", 0, "passeur"), L("mos_1_4", "n18", "after", 1, "agent_m"), L("mos_1_4", "n18", "after", 2, "ilona_varga") });
+                new[] { L("passeur", "narration.mos_1_4.boss.before.0"), L("passeur", "narration.mos_1_4.boss.before.1"), L("ilona_varga", "narration.mos_1_4.boss.before.2"), L("passeur", "narration.mos_1_4.boss.before.3"), new NarrationLineDef("passeur", "narration.mos_1_4.boss.before.3.m", "agent_m", "narration.mos_1_4.boss.before.3"), new NarrationLineDef("passeur", "narration.mos_1_4.boss.before.3.d", "agent_d", "narration.mos_1_4.boss.before.3") },
+                new[] { L("passeur", "narration.mos_1_4.boss.after.0"), L("agent_m", "narration.mos_1_4.boss.after.1"), L("passeur", "narration.mos_1_4.boss.after.2"), L("ilona_varga", "narration.mos_1_4.boss.after.3"), new NarrationLineDef("passeur", "narration.mos_1_4.boss.after.4", "agent_m"), L("narrateur", "narration.mos_1_4.chapter_end.0") });
+            var intro = new NarrationDef(new[] { new NarrationLineDef("narrateur", "narration.mos_1_4.intro.0"), new NarrationLineDef("giulia_rossi", "narration.mos_1_4.intro.1"), new NarrationLineDef("agent_m", "narration.mos_1_4.intro.2"), new NarrationLineDef("lucas_mendes", "narration.mos_1_4.intro.3") }, null);
             var objectives = new List<ObjectiveDef>
             {
                 Obj("obj_depot", ObjectiveType.CompleteMiniGame, "n11", "mos14", "depot"),
@@ -137,7 +150,7 @@ namespace N29.HeroesDawn.Content.Prototype
                 Enc(CombatRank.Elite, "mos_enforcer", "mos_guard", "mos_guard"),
                 Enc(CombatRank.Boss, "mos_passeur", "mos_smuggler", "mos_guard"),
             };
-            return new ZoneDef(Zone14, "zones.mos_1_4.name", new CaseId("n00"), PrototypeZones.BridgeNodes(passeur, null, null, "crate_pick_depot", true), PrototypeZones.BridgeLinks(),
+            return new ZoneDef(Zone14, "zones.mos_1_4.name", new CaseId("n00"), PrototypeZones.BridgeNodes(passeur, guard, null, "crate_pick_depot", true, false, intro), PrototypeZones.BridgeLinks(),
                                objectives, encounters, "M1.4", 1, Borough, 10, Requires(Zone14), new ZoneEnvironment(Biome.City, Weather.Snow));
         }
     }

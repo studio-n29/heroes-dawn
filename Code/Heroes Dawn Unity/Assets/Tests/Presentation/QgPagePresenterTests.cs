@@ -133,7 +133,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             _app.Session.CompletedZones.Add(PrototypeZones.Zone14.Value);
             _view = new FakeQgPageView();
             Make();
-            Assert.That(_view.Last.FilText, Is.EqualTo(new LocLocalization().T("qg.fil.done")));
+            Assert.That(_view.Last.FilText, Is.EqualTo(new LocLocalization().T("qg.fil.zone_ny_2_1")), "Brooklyn fini : le fil passe à Queens");
         }
 
         [Test, Description("Vérifie que toucher une pièce ouvre sa page — parce que le QG est la porte d'entrée des pièces (M10 ③)")]

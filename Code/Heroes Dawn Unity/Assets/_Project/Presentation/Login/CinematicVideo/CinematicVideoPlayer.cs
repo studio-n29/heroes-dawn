@@ -41,6 +41,8 @@ namespace N29.HeroesDawn.Presentation.Login
 
         RectTransform _layer = null!;
         Canvas? _ownCanvas;
+        // Le lecteur n'est visible que pendant la lecture : sans cela son voile noir (fondu à 1 en fin de séquence) restait posé sur l'écran suivant.
+        CanvasGroup? _group;
         RawImage _picture = null!;
         Image _fader = null!;
         VideoPlayer _video = null!;
@@ -123,6 +125,7 @@ namespace N29.HeroesDawn.Presentation.Login
         {
             if (IsPlaying) return;
             IsPlaying = true;
+            Show(true);
             _mainTheme = mainTheme;
             _steps = steps ?? CinematicVideoSequence.Steps;
             _voiceCue = voiceCue;
@@ -167,6 +170,7 @@ namespace N29.HeroesDawn.Presentation.Login
             _subtitle.text = "";
             _mainTheme?.Invoke(1f);
             SetFade(1f);
+            Show(false);
             IsPlaying = false;
         }
 
@@ -191,6 +195,7 @@ namespace N29.HeroesDawn.Presentation.Login
             _subtitle.text = "";
             _previousPicture.enabled = false;
             SetFade(1f);
+            Show(false);
             IsPlaying = false;
             _run = null;
             _mainTheme?.Invoke(1f);
@@ -344,6 +349,11 @@ namespace N29.HeroesDawn.Presentation.Login
         }
 
         /// <summary>Règle l'opacité du voile noir (la couleur reste noire).</summary>
+        void Show(bool shown)
+        {
+            if (_group != null) _group.alpha = shown ? 1f : 0f;
+        }
+
         void SetFade(float alpha)
         {
             var color = _fader.color;
@@ -372,6 +382,13 @@ namespace N29.HeroesDawn.Presentation.Login
                 scaler.matchWidthOrHeight = 0.5f;
                 _layer = (RectTransform)canvasGo.transform;
             }
+
+            // Invisible et sans toucher tant que rien ne joue (le lecteur couvre tout l'écran, bien au-dessus de l'interface).
+            _group = _layer.gameObject.GetComponent<CanvasGroup>();
+            if (_group == null) _group = _layer.gameObject.AddComponent<CanvasGroup>();
+            _group.interactable = false;
+            _group.blocksRaycasts = false;
+            _group.alpha = 0f;
 
             _picture = CreateFullscreen<RawImage>("Image");
             var aspect = _picture.gameObject.AddComponent<AspectRatioFitter>();

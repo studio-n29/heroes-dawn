@@ -1,0 +1,34 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-tourney">
+        <ui:VisualElement class="hd-panel hd-tourney__bar">
+            <ui:VisualElement class="hd-tourney__star" picking-mode="Ignore" />
+            <ui:Label name="title" class="hd-tourney__title" />
+            <ui:VisualElement class="hd-grow" picking-mode="Ignore" />
+            <ui:Label name="state" class="hd-tourney__state" />
+        </ui:VisualElement>
+        <ui:VisualElement class="hd-tourney__body">
+            <ui:VisualElement class="hd-panel hd-tourney__ranking">
+                <ui:Label name="rankingTitle" class="hd-tourney__head" />
+                <ui:ScrollView name="rankRows" class="hd-tourney__rows" />
+                <ui:Label name="rankingEmpty" class="hd-tourney__empty" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-tourney__side">
+                <ui:VisualElement class="hd-panel hd-tourney__tiers">
+                    <ui:Label name="tiersTitle" class="hd-tourney__head" />
+                    <ui:VisualElement name="tiers" class="hd-tourney__chips" />
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-panel hd-tourney__status">
+                    <ui:Label name="statusTitle" class="hd-tourney__head" />
+                    <ui:Label name="statusMain" class="hd-tourney__main" />
+                    <ui:VisualElement class="hd-bar hd-tourney__progress"><ui:VisualElement name="progressFill" class="hd-bar__fill" /></ui:VisualElement>
+                    <ui:Label name="statusSub" class="hd-tourney__sub" />
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-tourney__actions">
+                    <ui:Button name="claim" class="hd-btn hd-btn--secondary hd-btn--small hd-tourney__btn" />
+                    <ui:Button name="duel" class="hd-btn hd-btn--primary hd-tourney__btn" />
+                    <ui:Button name="backToQg" class="hd-btn hd-btn--primary hd-tourney__btn" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

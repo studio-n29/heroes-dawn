@@ -33,8 +33,12 @@
                     <ui:VisualElement class="hd-ecta__icon hd-ecta__icon--chevron" picking-mode="Ignore" />
                 </ui:Button>
                 <ui:VisualElement class="hd-modal__buttons hd-form__row hd-entry__providers">
-                    <ui:Button name="google" class="hd-btn hd-btn--secondary hd-btn--small" />
-                    <ui:Button name="apple" class="hd-btn hd-btn--secondary hd-btn--small" />
+                    <ui:Button name="google" class="hd-btn hd-btn--secondary hd-btn--small hd-btn--lead">
+                        <ui:VisualElement class="hd-btn__lead hd-brand hd-brand--google" picking-mode="Ignore" />
+                    </ui:Button>
+                    <ui:Button name="apple" class="hd-btn hd-btn--secondary hd-btn--small hd-btn--lead">
+                        <ui:VisualElement class="hd-btn__lead hd-brand hd-brand--apple" picking-mode="Ignore" />
+                    </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement class="hd-modal__buttons hd-form__row hd-entry__footer">
                     <ui:Button name="close" class="hd-btn hd-btn--ghost hd-btn--small" />

@@ -31,6 +31,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly CollectionBook _book;
         readonly GameSession _session;
         readonly IModalService _modals;
+        readonly N29.HeroesDawn.Presentation.Audio.IAudioService? _audio;
         readonly List<SkillCardDef> _rows = new List<SkillCardDef>();
         string? _focus;
         /// <summary>Filtres choisis : 0 = toutes, sinon 1 + la famille / la nature. Gardés d'un rafraîchissement à l'autre.</summary>
@@ -40,10 +41,10 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         public GrimoirePagePresenter(IGrimoirePageView view, CollectionBook book, GameSession session, IModalService modals, ILocalization loc,
                                      IToastService toasts, ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet,
-                                     ISubscriber<RosterChanged> roster, IClock clock, HubNavigator? nav = null)
+                                     ISubscriber<RosterChanged> roster, IClock clock, HubNavigator? nav = null, N29.HeroesDawn.Presentation.Audio.IAudioService? audio = null)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
-            _book = book; _session = session; _modals = modals;
+            _book = book; _session = session; _modals = modals; _audio = audio;
             _focus = nav?.FocusCard;
             if (nav != null) nav.FocusCard = null;
             // Ouvert sur une carte (depuis la fiche d'un agent) : filtre réglé sur sa famille.
@@ -178,7 +179,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         async UniTaskVoid OpenAsync()
         {
-            try { await BoosterOpening.OpenAndShowAsync(_book, Defs, _modals, Loc, Toasts, Lifetime, CollectionText.ReferenceStats(_session)); }
+            try { await BoosterOpening.OpenAndShowAsync(_book, Defs, _modals, Loc, Toasts, Lifetime, CollectionText.ReferenceStats(_session), BoosterDef.StandardId, _audio); }
             catch (System.OperationCanceledException) { }
             if (!Disposed) Refresh();
         }

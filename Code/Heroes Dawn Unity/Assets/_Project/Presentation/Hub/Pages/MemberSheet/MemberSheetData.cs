@@ -1,4 +1,5 @@
 #nullable enable
+using N29.HeroesDawn.Definitions;
 using N29.HeroesDawn.Presentation.Common;
 using UnityEngine;
 
@@ -47,6 +48,8 @@ namespace N29.HeroesDawn.Presentation.Hub
     public struct MemberSheetData
     {
         public MemberCardData Card;
+        /// <summary>Position de l'agent (icône à côté de la famille).</summary>
+        public Position Role;
         public bool Owned;
         public string FatigueText;
         public float Fatigue01;

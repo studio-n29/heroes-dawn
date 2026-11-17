@@ -307,6 +307,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ExtendMiniGames(d);
             ExtendAccount(d);
             ExtendMoscow(d);
+            ExtendChapterTexts(d);
             return d;
         }
 
@@ -349,6 +350,9 @@ namespace N29.HeroesDawn.Presentation.Common
         }
 
         public static bool Has(string key) => Fr.ContainsKey(key);
+
+        /// <summary>Vrai si la clé a une traduction anglaise propre (sinon l anglais reprend le français).</summary>
+        public static bool HasEnglish(string key) => En.ContainsKey(key);
 
         /// <summary>Toutes les clés de texte connues (outil de narration).</summary>
         public static IEnumerable<string> AllKeys() => Fr.Keys;

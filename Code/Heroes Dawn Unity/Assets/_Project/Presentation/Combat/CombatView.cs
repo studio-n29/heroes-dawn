@@ -30,6 +30,8 @@ namespace N29.HeroesDawn.Presentation.Combat
         public event Action<int>? SkillDragBegan;
         public event Action<int, int>? SkillDropped;
         public event Action<int>? UnitTapped;
+        public event Action<int, int>? SkillDragOver;
+        int _lastDragOver = int.MinValue;
 
         /// <summary>Boutons Auto et vitesse (tests PlayMode : clics réels).</summary>
         public UiToolkit.HdButtonRef AutoButton => hud.AutoButton;
@@ -69,7 +71,19 @@ namespace N29.HeroesDawn.Presentation.Combat
             hud.SkillHolding += ShowDescription;
             hud.SkillDragBegan += OnDragBegan;
             hud.SkillDragEnded += (card, at) => OnDragEnded(SlotOf(card), at);
+            hud.SkillDragMoved += (card, at) => OnDragMoved(SlotOf(card), at);
         }
+
+        /// <summary>L'unité sous la carte glissée change : le présentateur recalcule l'aperçu (une seule levée par changement de cible).</summary>
+        void OnDragMoved(int slot, Vector2 screenPos)
+        {
+            int over = ResolveDrop(screenPos);
+            if (over == _lastDragOver) return;
+            _lastDragOver = over;
+            SkillDragOver?.Invoke(slot, over);
+        }
+
+        public void ShowPreview(CombatPreviewData? data) => hud.ShowPreview(data);
 
         int SlotOf(SkillCardHud card)
         {
@@ -80,6 +94,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         void OnDragBegan(SkillCardHud card)
         {
             hud.SetDescription(false, "", "");
+            _lastDragOver = int.MinValue;
             hud.SetDropZone(!card.Data.NeedsTarget);
             SkillDragBegan?.Invoke(SlotOf(card));
         }
@@ -87,6 +102,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         void OnDragEnded(int slot, Vector2 screenPos)
         {
             hud.SetDropZone(false);
+            _lastDragOver = int.MinValue;
             SkillDropped?.Invoke(slot, ResolveDrop(screenPos));
         }
 
@@ -186,7 +202,7 @@ namespace N29.HeroesDawn.Presentation.Combat
         {
             if (!hud.TryCard(unitId, out var c)) return;
             c.Act();
-            hud.Spotlight(c.PortraitArt);
+            hud.ActingUnit(unitId);
         }
 
         public UniTask PauseAsync(float seconds, CancellationToken ct)

@@ -1,0 +1,525 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df527a111f48e9749b23b1fde962ba77, type: 3}
+  m_Name: zone_ny_3_2
+  m_EditorClassIdentifier: N29.HeroesDawn.Authoring::N29.HeroesDawn.Authoring.ZoneAsset
+  zoneId: zone_ny_3_2
+  nameKey: zones.ny_3_2.name
+  displayName: 
+  shortName: 
+  description: 
+  code: 3.2
+  act: 3
+  borough: harlem
+  recommendedLevel: 19
+  requires:
+  - zone_ny_3_1
+  biome: 0
+  weather: 3
+  entry: n00
+  nodes:
+  - id: n00
+    type: 0
+    isFixed: 1
+    rank: 1
+    x: 0
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n01
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 1
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n02
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 2
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n03
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n04
+    type: 4
+    isFixed: 1
+    rank: 1
+    x: 4
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: narrateur
+      text: "La clinique occupe une ancienne \xE9glise. Un groupe \xE9lectrog\xE8ne tousse dans la cour, et une file de bless\xE9s attend \xE0 la porte."
+      key: narration.ny_3_2.intro.0
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: Il n'y a ni badge ni formulaire. Ils entrent, c'est tout.
+      key: narration.ny_3_2.intro.1
+      route: 
+      replaces: 
+    - speaker: dr_colby
+      text: "\xC9vacuer ? Les h\xF4pitaux du centre n'admettent personne de ce quartier. Ils ne soignent qu'ici. Si je pars, ils n'ont nulle part."
+      key: narration.ny_3_2.intro.2
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: "Elle ne cherche pas \xE0 \xEAtre courageuse. Elle a fait ses comptes."
+      key: narration.ny_3_2.intro.3
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: Alors on tient la clinique. Dites-nous seulement quelle porte ne doit jamais tomber.
+      key: narration.ny_3_2.intro.4
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Je vois par o\xF9 ils vont entrer. Dites-moi seulement quelle porte vous voulez garder."
+      key: narration.ny_3_2.intro.4.m
+      route: agent_m
+      replaces: narration.ny_3_2.intro.4
+    narrationAfter: []
+  - id: n05
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n06
+    type: 3
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 1
+    activity: potion_field
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n07
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 4
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n08
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n09
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 6
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n10
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 7
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n11
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 8
+    y: 3
+    activity: dna_lab
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n12
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 9
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n13
+    type: 4
+    isFixed: 0
+    rank: 1
+    x: 8
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n14
+    type: 2
+    isFixed: 1
+    rank: 2
+    x: 9
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: enforcer
+      text: "On vide le b\xE2timent. \xC7a sera plus simple pour tout le monde."
+      key: narration.ny_3_2.elite.before.0
+      route: 
+      replaces: 
+    - speaker: dr_colby
+      text: "Plus simple pour qui ? Pas pour les gens couch\xE9s derri\xE8re moi."
+      key: narration.ny_3_2.elite.before.1
+      route: 
+      replaces: 
+    narrationAfter:
+    - speaker: lucas_mendes
+      text: "L'entr\xE9e tient. Les patients sont \xE0 l'abri."
+      key: narration.ny_3_2.elite.after.0
+      route: 
+      replaces: 
+  - id: n15
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 10
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n16
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n17
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 12
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n18
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 13
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter:
+    - speaker: dr_colby
+      text: "Je ne vais pas vous remercier. J'ai d\xE9j\xE0 trop remerci\xE9 des gens qui n'ont pas pu rester."
+      key: narration.ny_3_2.exit.0
+      route: 
+      replaces: 
+    - speaker: dr_colby
+      text: Restez, si vous voulez. Le gang n'a pas fini.
+      key: narration.ny_3_2.exit.1
+      route: 
+      replaces: 
+  links:
+  - a: n00
+    b: n01
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n01
+    b: n02
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n03
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n06
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n03
+    b: n04
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n04
+    b: n05
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n06
+    b: n07
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n07
+    b: n08
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n05
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n08
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n09
+    b: n10
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n11
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n13
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n11
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n13
+    b: n14
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n14
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n15
+    b: n16
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n16
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n17
+    b: n18
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  objectives:
+  - id: obj_clinic
+    type: 1
+    target: n04
+    nameKey: objectives.ny32.clinic
+    text: 
+  - id: obj_supplies
+    type: 2
+    target: n11
+    nameKey: objectives.ny32.supplies
+    text: 
+  - id: obj_assault
+    type: 0
+    target: n14
+    nameKey: objectives.ny32.assault
+    text: 
+  - id: obj_hold
+    type: 1
+    target: n18
+    nameKey: objectives.ny32.hold
+    text: 
+  encounters:
+  - rank: 0
+    waves:
+    - enemies:
+      - hrl_gangster
+      - hrl_gangster
+  - rank: 1
+    waves:
+    - enemies:
+      - hrl_gangster
+      - hrl_roofer
+      - hrl_torch
+  - rank: 1
+    waves:
+    - enemies:
+      - brute
+      - hrl_roofer
+      - hrl_roofer
+  - rank: 2
+    waves:
+    - enemies:
+      - hrl_lieutenant
+      - hrl_gangster
+      - hrl_roofer
+  regions: []
+  hasMapPoint: 0
+  mapPointPermille: {x: 500, y: 500}
+  backgroundKey: zone_ny_3_2_bg
+  backgroundMinX: -1
+  backgroundMinY: 0
+  backgroundMaxX: 14
+  backgroundMaxY: 4
+  backgroundSeed: 1

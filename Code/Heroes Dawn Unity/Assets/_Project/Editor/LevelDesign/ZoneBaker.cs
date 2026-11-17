@@ -33,7 +33,7 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
                 importer.mipmapEnabled = false;
                 importer.filterMode = FilterMode.Bilinear;
                 importer.alphaIsTransparency = false;
-                importer.maxTextureSize = 4096;
+                importer.maxTextureSize = 1024;
                 importer.textureCompression = TextureImporterCompression.Compressed;
                 importer.SaveAndReimport();
             }
@@ -126,6 +126,16 @@ namespace N29.HeroesDawn.EditorTools.LevelDesign
 
         /// <summary>Entrée en ligne de commande : <c>-executeMethod N29.HeroesDawn.EditorTools.LevelDesign.ZoneBaker.ImportMoscowBatch -quit</c> (les quatre zones de Sergueiv).</summary>
         public static void ImportMoscowBatch() => ImportZones(z => z.Borough == PrototypeMoscowZones.Borough);
+
+        /// <summary>Quartiers des six chapitres suivants (Queens, Harlem, Manhattan, Kapotnya, Sadovoye Koltso, Place Rouge).</summary>
+        static readonly string[] ChapterBoroughs = { "queens", "harlem", "manhattan", "sergueiv", "kapotnya", "sadovoye", "place_rouge" };
+
+        /// <summary>
+        /// Importe les 28 zones de Queens, Harlem, Manhattan, Sergueiv (scènes d entrée et dialogues du script), Kapotnya, Sadovoye Koltso et Place Rouge (assets + fonds générés) sans toucher à Brooklyn, puis les ajoute à la campagne.
+        /// Entrée en ligne de commande : <c>-executeMethod N29.HeroesDawn.EditorTools.LevelDesign.ZoneBaker.ImportChaptersBatch -quit</c>.
+        /// </summary>
+        [MenuItem("Heroes Dawn/Campagne/Importer les zones des chapitres (hors Brooklyn)")]
+        public static void ImportChaptersBatch() => ImportZones(z => System.Array.IndexOf(ChapterBoroughs, z.Borough) >= 0);
 
         /// <summary>Entrée en ligne de commande : <c>-executeMethod N29.HeroesDawn.EditorTools.LevelDesign.ZoneBaker.ImportPrototypeBatch -quit</c>.</summary>
         public static void ImportPrototypeBatch() => ImportPrototype();

@@ -15,6 +15,12 @@ namespace N29.HeroesDawn.Presentation.Combat
         public PortraitData Portrait;
         /// <summary>Ligne fixe sous les barres (alliés : fatigue).</summary>
         public string Sub;
+        /// <summary>Identifiant de définition de l'unité (ennemis : choix de l'illustration) ; peut être null.</summary>
+        public string? DefId;
+        /// <summary>Position de l'agent (icône de la fiche alliée).</summary>
+        public Position Position;
+        /// <summary>Ennemi d'un combat élite : cadre doré par-dessus le portrait.</summary>
+        public bool Elite;
     }
 
     /// <summary>État affiché d'une unité (rafraîchi à chaque image).</summary>
@@ -30,6 +36,10 @@ namespace N29.HeroesDawn.Presentation.Combat
         public string EnergyText;
         public bool GaugeFull;
         public string Statuses;
+        /// <summary>Statuts en cours, un par icône (durée ou cumul) ; null : la fiche affiche le texte « Statuses ».</summary>
+        public StatusChipData[]? Chips;
+        /// <summary>Phase de boss atteinte (0 = première), pour changer le portrait.</summary>
+        public int Phase;
         public bool Alive;
         public bool Highlight;
         public bool Selected;
@@ -38,6 +48,13 @@ namespace N29.HeroesDawn.Presentation.Combat
         public bool Instant;
         /// <summary>Icônes des 4 compétences (alliés seulement) ; null pour les ennemis.</summary>
         public SkillSlotData[]? Skills;
+    }
+
+    /// <summary>Un statut affiché en icône sous les barres de PV : <see cref="Count"/> = tours restants (points de bouclier pour le bouclier ; 0 : pas de chiffre).</summary>
+    public struct StatusChipData
+    {
+        public StatusType Type;
+        public int Count;
     }
 
     /// <summary>Bouton de compétence (emplacement 0 à 2).</summary>

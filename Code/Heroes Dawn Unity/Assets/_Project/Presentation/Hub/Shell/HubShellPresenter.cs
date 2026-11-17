@@ -39,6 +39,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly ISubscriber<MetaChanged>? _metaChanged;
         readonly TutorialGuide? _tutorial;
         readonly IMusicSignals? _music;
+        readonly PlayerProfile? _profile;
         IDisposable? _metaSub;
 
         IHubPageHandle? _page;
@@ -53,10 +54,10 @@ namespace N29.HeroesDawn.Presentation.Hub
                                  IOpenShopUseCase openShop, IClock clock,
                                  IModalService modals, IToastService toasts, ILocalization loc, IAppQuit quit, BackButtonRouter router,
                                  MetaOverview? meta = null, ISubscriber<MetaChanged>? metaChanged = null, TutorialGuide? tutorial = null,
-                                 IMusicSignals? music = null)
+                                 IMusicSignals? music = null, PlayerProfile? profile = null)
             : base(view, router)
         {
-            _music = music;
+            _music = music; _profile = profile;
             _nav = nav; _pages = pages; _session = session; _walletChanged = wallet; _saving = saving; _shopChanged = shopChanged;
             _openShop = openShop; _clock = clock;
             _modals = modals; _toasts = toasts; _loc = loc; _quit = quit;
@@ -168,11 +169,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             var route = _session.Route;
             MemberDef? hero = null;
             foreach (var m in _session.Content.Members) if (m.Id.Value == route.HeroId) { hero = m; break; }
+            // Le chef d'unité de la barre haute est le joueur : son avatar choisi et son nom ; à défaut (profil absent ou image manquante), le chef de la route.
+            var playerArt = _profile != null ? PlayerAvatarArt.For(_profile.Avatar) : null;
+            string name = _profile != null && playerArt != null ? _profile.Pseudo : route.HeroName;
             View.ShowChrome(new HubShellData
             {
                 Title = _page?.Title ?? "", ShowBack = !_nav.IsOnTab, Tabs = tabs,
-                Avatar = new PortraitData(route.HeroName, hero?.Family ?? Family.Matter, art: AgentArt.For(route.HeroId)),
-                AvatarName = route.HeroName.ToUpperInvariant(), AvatarRole = _loc.T("hub.avatar_role"),
+                Avatar = new PortraitData(name, hero?.Family ?? Family.Matter, art: playerArt ?? AgentArt.For(route.HeroId)),
+                AvatarName = name.ToUpperInvariant(), AvatarRole = _loc.T("hub.avatar_role"),
                 BackgroundKey = route.ActCities[0] == StoryRoutes.Moscow ? "hq-moscow" : "hq-new-york",
             });
         }

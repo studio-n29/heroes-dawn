@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using N29.HeroesDawn.Definitions;
+using N29.HeroesDawn.Presentation.Common;
 using UnityEngine;
 using UnityEngine.UIElements;
+using DefPosition = N29.HeroesDawn.Definitions.Position;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
@@ -105,6 +107,52 @@ namespace N29.HeroesDawn.Presentation.Hub
                 case Family.PhysicalBio: return "bio";
                 default: return "perception";
             }
+        }
+
+        /// <summary>Fichier d'icône de position (<c>Missing20261116/Positions</c>) : première ligne, attaquant, contrôle, soutien, distance.</summary>
+        public static string PositionSlug(DefPosition position)
+        {
+            switch (position)
+            {
+                case DefPosition.FrontLine: return "frontline";
+                case DefPosition.Attacker: return "attacker";
+                case DefPosition.Controller: return "control";
+                case DefPosition.Support: return "support";
+                default: return "ranged";
+            }
+        }
+
+        /// <summary>Icône blanche de position, teintée à la couleur de la famille de l'agent, inerte au toucher.</summary>
+        public static VisualElement PositionIcon(DefPosition position, Family family)
+        {
+            var e = new VisualElement { pickingMode = PickingMode.Ignore };
+            e.AddToClassList("hd-tm-pos");
+            SetPosition(e, position, family);
+            return e;
+        }
+
+        /// <summary>Change la position affichée d'une icône de position et sa teinte de famille.</summary>
+        public static void SetPosition(VisualElement element, DefPosition position, Family family)
+        {
+            foreach (DefPosition p in Enum.GetValues(typeof(DefPosition)))
+                element.EnableInClassList("hd-tm-pos--" + PositionSlug(p), p == position);
+            element.style.unityBackgroundImageTintColor = Theme.FamilyColor(family);
+        }
+
+        /// <summary>Insigne de rang AMIF (1 à 5, <c>Missing20261116/Ranks</c>), inerte au toucher.</summary>
+        public static VisualElement RankBadge(int rank)
+        {
+            var e = new VisualElement { pickingMode = PickingMode.Ignore };
+            e.AddToClassList("hd-tm-rank");
+            SetRank(e, rank);
+            return e;
+        }
+
+        /// <summary>Change le rang affiché d'un insigne (ramené dans 1..5).</summary>
+        public static void SetRank(VisualElement element, int rank)
+        {
+            int r = Mathf.Clamp(rank, AgentRanks.Min, AgentRanks.Max);
+            for (int i = AgentRanks.Min; i <= AgentRanks.Max; i++) element.EnableInClassList("hd-tm-rank--" + i, i == r);
         }
 
         /// <summary>Icône blanche du kit (classe <c>hd-tm-ico--nom</c>), inerte au toucher.</summary>

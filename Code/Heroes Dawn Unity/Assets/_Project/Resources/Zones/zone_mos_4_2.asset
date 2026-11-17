@@ -1,0 +1,530 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df527a111f48e9749b23b1fde962ba77, type: 3}
+  m_Name: zone_mos_4_2
+  m_EditorClassIdentifier: N29.HeroesDawn.Authoring::N29.HeroesDawn.Authoring.ZoneAsset
+  zoneId: zone_mos_4_2
+  nameKey: zones.mos_4_2.name
+  displayName: 
+  shortName: 
+  description: 
+  code: M4.2
+  act: 4
+  borough: place_rouge
+  recommendedLevel: 25
+  requires:
+  - zone_mos_4_1
+  biome: 2
+  weather: 4
+  entry: n00
+  nodes:
+  - id: n00
+    type: 0
+    isFixed: 1
+    rank: 1
+    x: 0
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n01
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 1
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n02
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 2
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n03
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n04
+    type: 4
+    isFixed: 1
+    rank: 1
+    x: 4
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: narrateur
+      text: "Sous le Kremlin, les tunnels sentent la pierre mouill\xE9e et la cire. Des c\xE2bles anciens courent le long des murs."
+      key: narration.mos_4_2.intro.0
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: Ces tunnels datent d'avant l'Union. Quelqu'un les entretient.
+      key: narration.mos_4_2.intro.1
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: "Des salles de recherche. Des cages. Des planches d'anatomie\u2026 Des Apex, avant m\xEAme que le mot existe."
+      key: narration.mos_4_2.intro.2
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Je vois les mains qui ont travaill\xE9 ici. Elles \xE9crivent comme dans les marges du laboratoire."
+      key: narration.mos_4_2.intro.3
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: "Ces cages ont la taille d'un homme. Je pr\xE9f\xE8re ne pas dessiner ce qu'il y avait dedans."
+      key: narration.mos_4_2.intro.3.d
+      route: agent_d
+      replaces: narration.mos_4_2.intro.3
+    - speaker: agent_m
+      text: "Cette odeur\u2026 cire, encens, pierre froide. C'est celle de la cath\xE9drale, avant l'explosion. Je ne comprends pas."
+      key: narration.mos_4_2.intro.4
+      route: agent_m
+      replaces: 
+    narrationAfter: []
+  - id: n05
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n06
+    type: 3
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 1
+    activity: potion_field
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n07
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 4
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n08
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n09
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 6
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n10
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 7
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n11
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 8
+    y: 3
+    activity: survival_snow
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n12
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 9
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n13
+    type: 4
+    isFixed: 0
+    rank: 1
+    x: 8
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n14
+    type: 2
+    isFixed: 1
+    rank: 2
+    x: 9
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: enforcer
+      text: Le conseil vous attend. Personne n'a dit qu'il vous attendait entier.
+      key: narration.mos_4_2.elite.before.0
+      route: 
+      replaces: 
+    narrationAfter:
+    - speaker: ilona_varga
+      text: "Les acc\xE8s sont libres. Le conseil est au bout."
+      key: narration.mos_4_2.elite.after.0
+      route: 
+      replaces: 
+  - id: n15
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 10
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n16
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n17
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 12
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n18
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 13
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter:
+    - speaker: giulia_rossi
+      text: "Un mot revient sur les dossiers : \xAB Khost \xBB."
+      key: narration.mos_4_2.exit.0
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: Je ne sais pas ce que c'est, mais ces dossiers parlent d'un endroit loin d'ici. Salem.
+      key: narration.mos_4_2.exit.1
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Alors tout \xE7a, c'est le d\xE9but d'autre chose."
+      key: narration.mos_4_2.exit.2
+      route: 
+      replaces: 
+  links:
+  - a: n00
+    b: n01
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n01
+    b: n02
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n03
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n06
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n03
+    b: n04
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n04
+    b: n05
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n06
+    b: n07
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n07
+    b: n08
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n05
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n08
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n09
+    b: n10
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n11
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n13
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n11
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n13
+    b: n14
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n14
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n15
+    b: n16
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n16
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n17
+    b: n18
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  objectives:
+  - id: obj_descent
+    type: 1
+    target: n04
+    nameKey: objectives.mos42.descent
+    text: 
+  - id: obj_halls
+    type: 2
+    target: n11
+    nameKey: objectives.mos42.halls
+    text: 
+  - id: obj_warden
+    type: 0
+    target: n14
+    nameKey: objectives.mos42.warden
+    text: 
+  - id: obj_council
+    type: 1
+    target: n18
+    nameKey: objectives.mos42.council
+    text: 
+  encounters:
+  - rank: 0
+    waves:
+    - enemies:
+      - pr_kremlin_guard
+      - pr_technician
+  - rank: 0
+    waves:
+    - enemies:
+      - pr_operator
+      - pr_technician
+  - rank: 1
+    waves:
+    - enemies:
+      - pr_kremlin_guard
+      - pr_technician
+      - pr_operator
+  - rank: 1
+    waves:
+    - enemies:
+      - mos_guard
+      - pr_technician
+      - pr_technician
+  - rank: 2
+    waves:
+    - enemies:
+      - pr_commandant
+      - pr_technician
+      - pr_kremlin_guard
+  regions: []
+  hasMapPoint: 0
+  mapPointPermille: {x: 500, y: 500}
+  backgroundKey: zone_mos_4_2_bg
+  backgroundMinX: -1
+  backgroundMinY: 0
+  backgroundMaxX: 14
+  backgroundMaxY: 4
+  backgroundSeed: 1

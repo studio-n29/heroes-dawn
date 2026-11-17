@@ -3,13 +3,20 @@
         <ui:Button name="tap" class="hd-boost__tap" />
         <ui:Label name="title" class="hd-boost__title" />
         <ui:Label name="hint" class="hd-boost__hint" />
+        <ui:VisualElement name="rays" class="hd-boost__rays" />
+        <ui:VisualElement name="rays2" class="hd-boost__rays hd-boost__rays--down" />
         <ui:VisualElement name="pack" class="hd-boost__pack">
             <ui:VisualElement class="hd-boost__packglow" />
             <ui:Label name="packGlyph" class="hd-boost__packglyph" />
+            <ui:VisualElement name="packArt" class="hd-boost__packart" />
         </ui:VisualElement>
         <ui:VisualElement name="cards" class="hd-boost__cards" />
+        <ui:Label name="best" class="hd-boost__best" />
         <ui:Button name="skip" class="hd-btn hd-btn--ghost hd-boost__skip" />
-        <ui:Button name="continue" class="hd-btn hd-btn--primary hd-boost__continue" />
+        <ui:VisualElement class="hd-boost__actions">
+            <ui:Button name="again" class="hd-btn hd-btn--ghost hd-boost__again" />
+            <ui:Button name="continue" class="hd-btn hd-btn--primary hd-boost__continue" />
+        </ui:VisualElement>
         <ui:VisualElement name="flash" class="hd-boost__flash" />
     </ui:VisualElement>
 </ui:UXML>

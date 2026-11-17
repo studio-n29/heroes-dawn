@@ -16,7 +16,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         [Test, Description("Vérifie que chaque fragment pointe vers un chapitre et une zone qui existent — parce qu'un fragment orphelin ne se débloquerait jamais")]
         public void EveryFragment_HasItsChapterAndZone()
         {
-            var zones = TestContent.Build().Zones.Concat(PrototypeZones.Zones()).Concat(PrototypeMoscowZones.Zones()).Select(z => z.Id.Value).ToList();
+            var zones = PrototypeContent.Build().Zones.Select(z => z.Id.Value).ToList();
             foreach (var f in MemoryFragments.All)
             {
                 Assert.That(Chapters.Find(f.ChapterId), Is.Not.Null, f.Id);

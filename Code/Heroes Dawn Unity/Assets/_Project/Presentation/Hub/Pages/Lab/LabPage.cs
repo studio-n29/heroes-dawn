@@ -61,10 +61,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             .Where(v => _grade == 0 || (int)v.MinGrade == _grade - 1)
             .ToList();
 
-        void ShowFilters()
+        FilterGroupData[] FilterGroups()
         {
             string all = Loc.T("filters.all");
-            View.ShowFilters(new[]
+            return new[]
             {
                 new FilterGroupData
                 {
@@ -76,8 +76,10 @@ namespace N29.HeroesDawn.Presentation.Hub
                     Labels = new[] { all }.Concat(System.Enum.GetValues(typeof(ComponentGrade)).Cast<ComponentGrade>().Select(g => Loc.T("grade." + g))).ToArray(),
                     Selected = _grade,
                 },
-            });
+            };
         }
+
+        void ShowFilters() => View.ShowFilters(FilterGroups());
 
         /// <summary>Qualité utilisée : la plus basse acceptée par la recette dont le joueur a assez de Composants, sinon la qualité minimale.</summary>
         static ComponentGrade GradeFor(RecipeView v)
@@ -103,6 +105,110 @@ namespace N29.HeroesDawn.Presentation.Hub
             AddWorkshopRows(rows);
             View.ShowRows(rows.ToArray());
             ShowSide();
+            // Écran détaillé (colonnes filtres, recettes, détail) : seulement si la vue le propose ; le contrat de liste ci-dessus reste complet.
+            if (View is ILabDetailView detail) detail.ShowLab(BuildLab());
+        }
+
+        /// <summary>Données de l'écran de l'Atelier : recettes filtrées, détail de la recette choisie (statistiques, Composants requis avec quantités), stock.</summary>
+        LabData BuildLab()
+        {
+            string stock = StockLine();
+            var data = new LabData
+            {
+                FiltersTitle = Loc.T("lab.filters"),
+                TypeTitle = Loc.T("lab.group.type"),
+                GradeTitle = Loc.T("lab.group.grade"),
+                RecipesTitle = Loc.F("lab.recipes", _recipes.Count),
+                RequiredTitle = Loc.T("lab.required"),
+                CraftLabel = Loc.T("lab.craft"),
+                StockTitle = Loc.T("lab.workshop"),
+                StockText = stock.Length > 0 ? stock : "—",
+                Filters = FilterGroups(),
+                Recipes = _recipes.Select((v, i) => new LabRecipeData
+                {
+                    Name = Loc.T(v.Recipe.NameKey),
+                    Sub = RecipeKind(v.Recipe),
+                    Art = LabArt.Recipe(v.Recipe.Id),
+                    Selected = i == _selected,
+                }).ToArray(),
+            };
+            if (_selected < 0 || _selected >= _recipes.Count)
+            {
+                data.Name = Loc.T("lab.side.none");
+                return data;
+            }
+            var recipe = _recipes[_selected];
+            var grade = GradeFor(recipe);
+            var kind = ComponentKinds.For(recipe.Recipe.Type);
+            int have = _workshop.Components(kind, grade);
+            bool can = recipe.CanCraft(grade);
+            data.HasSelection = true;
+            data.Name = Loc.T(recipe.Recipe.NameKey);
+            data.Sub = RecipeKind(recipe.Recipe);
+            data.Art = LabArt.Recipe(recipe.Recipe.Id);
+            data.Stats = StatsOf(recipe.Recipe);
+            data.Description = Loc.T("lab.provenance");
+            data.Info = RecipeLine(recipe, grade);
+            data.State = Loc.T(can ? "lab.state.ok" : "lab.state.missing");
+            data.CraftReason = Loc.T("errors.not_enough_components");
+            data.CanCraft = can;
+            data.Components = new[]
+            {
+                new LabComponentData
+                {
+                    Art = LabArt.Component(kind),
+                    Name = Loc.T("component." + kind + "." + grade),
+                    Have = have,
+                    Need = recipe.Cost,
+                    Sub = have >= recipe.Cost ? Loc.F("lab.have", have) : Loc.F("lab.missing", recipe.Cost - have),
+                },
+            };
+            return data;
+        }
+
+        /// <summary>« Arme · Commun » : type d'objet et rareté de la recette.</summary>
+        string RecipeKind(RecipeDef r) => CollectionText.ItemTypeName(Loc, r.Type) + " · " + CollectionText.RarityName(Loc, r.Rarity);
+
+        /// <summary>Statistiques tirées par la recette (fourchettes en %), puis son bonus particulier.</summary>
+        LabStatData[] StatsOf(RecipeDef r)
+        {
+            var list = new List<LabStatData>();
+            foreach (var s in r.Stats)
+            {
+                string range = s.Min == s.Max ? s.Min.ToString() : s.Min + "–" + s.Max;
+                string icon, key;
+                switch (s.Stat)
+                {
+                    case RecipeStatKind.Hp: icon = "health"; key = "item.fx.hp"; break;
+                    case RecipeStatKind.Atk: icon = "attack"; key = "item.fx.atk"; break;
+                    case RecipeStatKind.Def: icon = "defense"; key = "item.fx.def"; break;
+                    default: icon = "speed"; key = "item.fx.spd"; break;
+                }
+                list.Add(new LabStatData { Icon = icon, Text = Loc.F(key, range) });
+            }
+            string? perkKey = null;
+            switch (r.Perk)
+            {
+                case ItemPerk.StartGauge: perkKey = "item.fx.start_gauge"; break;
+                case ItemPerk.OpeningShield: perkKey = "item.fx.opening_shield"; break;
+                case ItemPerk.CritChance: perkKey = "item.fx.crit"; break;
+                case ItemPerk.SkillPower: perkKey = "item.fx.skill_power"; break;
+            }
+            if (perkKey != null) list.Add(new LabStatData { Icon = "star", Text = Loc.F(perkKey, r.PerkValue) });
+            return list.ToArray();
+        }
+
+        /// <summary>Composants possédés, séparés par « · » (un type et une qualité par segment) ; vide sans stock.</summary>
+        string StockLine()
+        {
+            var stock = new List<string>();
+            for (int k = 0; k < ComponentKinds.Count; k++)
+                for (int g = 0; g < ComponentKinds.GradeCount; g++)
+                {
+                    int n = _workshop.Components((ComponentKind)k, (ComponentGrade)g);
+                    if (n > 0) stock.Add(CollectionText.Component(Loc, (ComponentKind)k, (ComponentGrade)g, n));
+                }
+            return string.Join(" · ", stock);
         }
 
         /// <summary>Panneau de droite : la recette choisie, ses Composants (possédés et manquants), l'état et le bouton Fabriquer.</summary>
@@ -166,14 +272,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.Highlight = index++ == _selected;
                 rows.Add(r);
             }
-            var stock = new List<string>();
-            for (int k = 0; k < ComponentKinds.Count; k++)
-                for (int g = 0; g < ComponentKinds.GradeCount; g++)
-                {
-                    int n = _workshop.Components((ComponentKind)k, (ComponentGrade)g);
-                    if (n > 0) stock.Add(CollectionText.Component(Loc, (ComponentKind)k, (ComponentGrade)g, n));
-                }
-            var title = InfoRowData.Basic(Loc.T("lab.workshop"), string.Join(" · ", stock));
+            var title = InfoRowData.Basic(Loc.T("lab.workshop"), StockLine());
             title.Dim = true;
             rows.Add(title);
         }

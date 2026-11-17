@@ -224,6 +224,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 Slot = slot,
                 Card = MemberCards.Card(def, MetaRules.RecruitLevel, _session.Content.Balance, _loc),
+                Role = def.Position,
                 Rarity = def.Rank,
                 PriceLabel = _loc.F("hub.recruit", cost),
                 InTeam = inTeam,

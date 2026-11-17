@@ -29,13 +29,17 @@ namespace N29.HeroesDawn.Domain.Combat
         public bool? Victory { get; private set; }
         public bool Auto { get; private set; }
 
-        public CombatSimulation(ContentCatalog c, CombatSetup setup)
+        public CombatSimulation(ContentCatalog c, CombatSetup setup) : this(c, setup, null) { }
+
+        /// <summary>Constructeur de la prévisualisation : <paramref name="wrapRng"/> enveloppe le générateur du combat (même flux par défaut) pour changer de source d'aléa après le rejeu.</summary>
+        internal CombatSimulation(ContentCatalog c, CombatSetup setup, System.Func<IRandom, IRandom>? wrapRng)
         {
             _c = c;
             _b = c.Balance;
             Setup = setup;
             Auto = setup.Auto;
-            _rng = new Pcg32(setup.Seed).Fork(3);
+            IRandom stream = new Pcg32(setup.Seed).Fork(3);
+            _rng = wrapRng == null ? stream : wrapRng(stream);
             BuildTeam(setup.Allies, setup.Links, Side.Ally);
             if (setup.OpponentTeam.Count > 0) BuildTeam(setup.OpponentTeam, setup.OpponentLinks, Side.Enemy); // duel de tournoi : le camp adverse est une équipe de joueur
             else SpawnWave(0);

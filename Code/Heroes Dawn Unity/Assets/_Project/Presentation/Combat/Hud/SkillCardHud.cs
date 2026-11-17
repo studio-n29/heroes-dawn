@@ -31,6 +31,8 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
         public event Action<SkillCardHud>? DragBegan;
         /// <summary>Carte lâchée à cette position de l'écran (y vers le haut).</summary>
         public event Action<SkillCardHud, Vector2>? DragEnded;
+        /// <summary>Carte glissée : position courante de l'écran (y vers le haut), à chaque mouvement du pointeur.</summary>
+        public event Action<SkillCardHud, Vector2>? DragMoved;
 
         /// <summary>Décalage vertical de la carte par rapport à sa place, vers le haut positif (animation d'ouverture ; tests).</summary>
         public float OffsetY => -_fanY;
@@ -113,6 +115,7 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
                 BeginDrag();
             }
             Follow((Vector2)e.position - _startPanel);
+            DragMoved?.Invoke(this, HudSpace.PanelToScreen(_root, e.position));
         }
 
         void OnUp(PointerUpEvent e)

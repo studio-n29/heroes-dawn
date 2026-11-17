@@ -95,7 +95,47 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
-    narrationBefore: []
+    narrationBefore:
+    - speaker: narrateur
+      text: "Le monast\xE8re est silencieux. Les archives de Sergueiv dorment sous les vo\xFBtes, au bout d'un couloir de cierges."
+      key: narration.mos_1_2.intro.0
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: "Les cierges sont \xE9lectriques. M\xEAme les saints ont une facture d'\xE9nergie."
+      key: narration.mos_1_2.intro.1
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Cette fresque a \xE9t\xE9 repeinte. Moins de dix jours. Le pigment ne ment pas."
+      key: narration.mos_1_2.intro.2
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: "Je dessine des murs, pas des fresques. Mais celui-ci a \xE9t\xE9 retouch\xE9, j'en suis s\xFBr."
+      key: narration.mos_1_2.intro.2.d
+      route: agent_d
+      replaces: narration.mos_1_2.intro.2
+    - speaker: giulia_rossi
+      text: Quelqu'un a pris la peine de peindre par-dessus un mur. Pour cacher quoi ?
+      key: narration.mos_1_2.intro.3
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Je le vois\u2026 et je ne vois pas la couleur, je vois la porte."
+      key: narration.mos_1_2.intro.4
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: Je vois le trait qui ne va pas. Je ne vois pas pourquoi.
+      key: narration.mos_1_2.intro.4.d
+      route: agent_d
+      replaces: narration.mos_1_2.intro.4
+    - speaker: agent_m
+      text: "M\xEAme couloir de cierges que chez moi\u2026 avant que tout bascule."
+      key: narration.mos_1_2.intro.5
+      route: agent_m
+      replaces: 
     narrationAfter: []
   - id: n05
     type: 2
@@ -237,12 +277,26 @@ MonoBehaviour:
     enemiesMax: 3
     narrationBefore:
     - speaker: enforcer
-      text: "\xAB Les archives sont ferm\xE9es au public. \xBB"
+      text: "Les archives sont ferm\xE9es au public."
+      key: narration.mos_1_2.elite.before.0
+      route: 
+      replaces: 
     - speaker: agent_m
-      text: "\xAB Pas pour la restauratrice de la fresque. \xBB"
+      text: Pas pour la restauratrice de la fresque.
+      key: narration.mos_1_2.elite.before.1
+      route: 
+      replaces: 
     narrationAfter:
     - speaker: agent_m
-      text: "\xAB Derri\xE8re la fresque, un registre. Je l'avais vu avant de le toucher. \xBB"
+      text: "Derri\xE8re la fresque, un registre. Je l'avais vu avant de le toucher."
+      key: narration.mos_1_2.elite.after.0
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: "Des noms\u2026 des dates\u2026 des livraisons. Ce sont des ventes."
+      key: narration.mos_1_2.elite.after.1
+      route: 
+      replaces: 
   - id: n15
     type: 1
     isFixed: 1
@@ -300,7 +354,15 @@ MonoBehaviour:
     narrationBefore: []
     narrationAfter:
     - speaker: ilona_varga
-      text: "\xAB Un registre, la moiti\xE9 d'une preuve. L'autre moiti\xE9 est du c\xF4t\xE9 des raffineries. \xBB"
+      text: "Un registre, la moiti\xE9 d'une preuve. L'autre moiti\xE9 est du c\xF4t\xE9 des raffineries."
+      key: narration.mos_1_2.exit.0
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: Alors on part pour Kapotnya.
+      key: narration.mos_1_2.exit.1
+      route: 
+      replaces: 
   links:
   - a: n00
     b: n01

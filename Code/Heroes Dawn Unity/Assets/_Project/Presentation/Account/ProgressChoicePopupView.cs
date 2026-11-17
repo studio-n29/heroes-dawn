@@ -52,5 +52,8 @@ namespace N29.HeroesDawn.Presentation.Account
         }
 
         public override void RequestCancel() => _answer?.TrySetResult(null);
+
+        /// <summary>Choix de progression : une décision à prendre entre deux cartes, sans croix (Retour garde « Plus tard »).</summary>
+        protected override bool ShowCloseButton => false;
     }
 }

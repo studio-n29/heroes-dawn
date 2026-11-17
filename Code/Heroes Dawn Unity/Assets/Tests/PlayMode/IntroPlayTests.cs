@@ -20,7 +20,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         [UnityTearDown]
         public IEnumerator TearDown() => PlayModeHarness.TearDown();
 
-        [UnityTest, Timeout(300000), Description("Vérifie qu'un nouveau joueur passe par la cinématique (passée d'un clic), ne peut pas commencer sans nom, crée son agent avec un nom et un avatar de la galerie, puis arrive au QG avec ce nom — parce que c'est le parcours de première connexion")]
+        [UnityTest, Timeout(300000), Description("Vérifie qu'un nouveau joueur passe par la cinématique (passée d'un clic), écoute Rayner en Full Art, remplit la fiche d identification (nom, prénom, âge, avatar, pouvoir du tableau), écoute Rayner conclure, choisit New York avec l agent D, puis arrive au QG avec son prénom — parce que c'est le parcours de première connexion")]
         public IEnumerator FirstConnection_GoesThroughIntro_ThenTheHq()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway(), withIntro: true);
@@ -29,18 +29,39 @@ namespace N29.HeroesDawn.Tests.PlayMode
             var intro = Object.FindAnyObjectByType<IntroPopupView>()!;
             yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Cinematic);
             intro.SkipButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Character);
+            // Rayner en Full Art : elle parle plusieurs fois, un toucher passe à la réplique suivante, la dernière est sa question.
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Rayner);
+            for (int guard = 0; intro.Current == IntroPopupView.Stage.Rayner && guard < 20; guard++) { intro.AdvanceRayner(); yield return null; }
 
+            // La fiche : incomplète tant qu'il manque un champ.
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Form);
             Assert.That(intro.Avatars.Count, Is.EqualTo(PlayerAvatars.Gallery.Count), "la galerie complète");
-            Assert.That(intro.CharacterConfirmButton.interactable, Is.False, "aucun nom saisi");
-            intro.NameField.text = "Maya";
-            Assert.That(intro.CharacterConfirmButton.interactable, Is.True, "un nom et un avatar suffisent");
+            Assert.That(intro.PowerCount, Is.EqualTo(HeroPowers.All.Count), "tous les pouvoirs sont dans le tableau");
+            Assert.That(intro.FormConfirmButton.interactable, Is.False, "fiche vide");
+            intro.LastNameField.text = "Rivera";
+            intro.FirstNameField.text = "Maya";
+            intro.AgeField.text = "27";
+            Assert.That(intro.FormConfirmButton.interactable, Is.False, "pas encore de pouvoir");
+            intro.PowerButton.onClick.Invoke();
+            Assert.That(intro.PowerSheetOpen, Is.True, "le tableau des pouvoirs s'ouvre");
+            intro.SelectPower("electrogenese");
+            Assert.That(intro.PowerSheetOpen, Is.False, "le choix referme le tableau");
+            Assert.That(intro.FormConfirmButton.interactable, Is.True, "la fiche est complète");
             intro.SelectAvatar("avatar_2");
-            intro.CharacterConfirmButton.onClick.Invoke();
+            intro.FormConfirmButton.onClick.Invoke();
+
+            // Rayner reprend la parole, puis le choix de la ville : New York avec l'agent D (Moscou reste fermée).
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Rayner);
+            for (int guard = 0; intro.Current == IntroPopupView.Stage.Rayner && guard < 20; guard++) { intro.AdvanceRayner(); yield return null; }
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Start);
+            intro.PickStart("agent_d");
 
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>());
             var session = GameBootstrap.Instance!.Scope.Container.Resolve<GameSession>();
             Assert.That(session.Account!.DisplayName, Is.EqualTo("Maya"));
+            Assert.That(session.Meta.onboarding.lastName, Is.EqualTo("Rivera"));
+            Assert.That(session.Meta.onboarding.age, Is.EqualTo(27));
+            Assert.That(session.Meta.onboarding.power, Is.EqualTo("electrogenese"));
             Assert.That(session.Meta.onboarding.avatar, Is.EqualTo("avatar_2"));
             Assert.That(session.Meta.onboarding.campaign, Is.EqualTo("new_york"));
             Assert.That(session.Meta.onboarding.hero, Is.EqualTo("agent_d"));
@@ -118,11 +139,27 @@ namespace N29.HeroesDawn.Tests.PlayMode
             Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<IntroPopupView>() != null);
             intro = Object.FindAnyObjectByType<IntroPopupView>()!;
-            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Character, 1200);
-            intro.NameField.text = "Maya";
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Rayner, 1200);
+            yield return new WaitForSecondsRealtime(1f);
+            yield return ScreenCaptureTests.Capture("accueil-rayner");
+            for (int guard = 0; intro.Current == IntroPopupView.Stage.Rayner && guard < 20; guard++) { intro.AdvanceRayner(); yield return null; }
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Form, 1200);
+            intro.LastNameField.text = "Rivera";
+            intro.FirstNameField.text = "Maya";
+            intro.AgeField.text = "27";
             intro.SelectAvatar("avatar_1");
             yield return new WaitForSecondsRealtime(1f);
-            yield return ScreenCaptureTests.Capture("cin-choix");
+            yield return ScreenCaptureTests.Capture("fiche");
+            intro.PowerButton.onClick.Invoke();
+            yield return new WaitForSecondsRealtime(0.5f);
+            yield return ScreenCaptureTests.Capture("fiche-pouvoirs");
+            intro.SelectPower("electrogenese");
+            intro.FormConfirmButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Rayner, 1200);
+            for (int guard = 0; intro.Current == IntroPopupView.Stage.Rayner && guard < 20; guard++) { intro.AdvanceRayner(); yield return null; }
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Start, 1200);
+            yield return new WaitForSecondsRealtime(1f);
+            yield return ScreenCaptureTests.Capture("choix-ville");
         }
     }
 }

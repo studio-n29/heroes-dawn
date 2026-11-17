@@ -1,6 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="page" class="hd-page hd-qg">
         <ui:VisualElement class="hd-qg__left">
+            <ui:VisualElement name="subtabs" class="hd-qg__subtabs">
+                <ui:Button name="tabHq" class="hd-btn hd-btn--nav hd-btn--nav-active hd-btn--plain hd-qg__subtab" />
+                <ui:Button name="tabTournament" class="hd-btn hd-btn--nav hd-btn--plain hd-qg__subtab" />
+                <ui:Button name="tabLair" class="hd-btn hd-btn--nav hd-btn--plain hd-qg__subtab" />
+            </ui:VisualElement>
             <ui:Button name="banner" class="hd-qg__banner">
                 <ui:VisualElement class="hd-qg__banner-star" picking-mode="Ignore" />
                 <ui:VisualElement class="hd-qg__banner-text" picking-mode="Ignore">

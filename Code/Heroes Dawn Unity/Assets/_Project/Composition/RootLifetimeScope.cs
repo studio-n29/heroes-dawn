@@ -167,6 +167,7 @@ namespace N29.HeroesDawn.Composition
             builder.Register<Workshop>(Lifetime.Singleton);
             builder.Register<PlayerProfile>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.ChapterBook>(Lifetime.Singleton);
+            builder.Register<N29.HeroesDawn.Application.Features.World.NarrativeChoices>(Lifetime.Singleton);
             builder.Register<N29.HeroesDawn.Application.Features.World.LairBook>(Lifetime.Singleton);
             builder.Register<TournamentArena>(c => new TournamentArena(c.Resolve<MetaContext>(), c.Resolve<IArenaGateway>(), c.Resolve<IDuelChannel>(),
                 N29.HeroesDawn.Authoring.TournamentLibrary.Load(), N29.HeroesDawn.Authoring.ArenaRewardsLibrary.Load(), c.Resolve<PassProgress>()), Lifetime.Singleton);

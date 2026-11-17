@@ -10,17 +10,23 @@ using UnityEngine.UIElements;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
+    /// <summary>Vue de liste qui peut afficher un insigne de rang AMIF par ligne (la page l'interroge par <c>as</c> : le contrat <see cref="IListPageView"/> reste inchangé).</summary>
+    public interface IRowRanks
+    {
+        void SetRowRanks(int[]? ranks);
+    }
+
     /// <summary>
     /// Base UI Toolkit des pages « grille de cartes » (Grimoire, Équipement, Registre, Boutique) : en-tête, onglets et recherche optionnels,
     /// filtres, grille de tuiles défilante, fiche détaillée de la tuile choisie (illustration, texte, jusqu'à trois boutons).
     /// Même contrat que <see cref="CardGridPageView"/> : une tuile par ligne (les lignes de section ne sont pas dessinées),
     /// les boutons de la fiche sont ceux de la ligne choisie.
     /// </summary>
-    public abstract class HdCardGridPageView : HdView, IListPageView, IFilterBarView
+    public abstract class HdCardGridPageView : HdView, IListPageView, IFilterBarView, IRowRanks
     {
         sealed class Tile
         {
-            public VisualElement Root = null!, Art = null!;
+            public VisualElement Root = null!, Art = null!, Rank = null!;
             public Label Title = null!, Sub = null!;
         }
 
@@ -29,6 +35,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly List<UnityEngine.UIElements.Button> _detailButtons = new List<UnityEngine.UIElements.Button>();
         readonly List<List<UnityEngine.UIElements.Button>> _filterButtons = new List<List<UnityEngine.UIElements.Button>>();
         string _filterShape = "";
+        int[]? _rowRanks;
 
         UnityEngine.UIElements.Button _headerA = null!, _headerB = null!;
         Label _title = null!, _line = null!, _barLabel = null!, _detailTitle = null!, _detailBadge = null!, _detailText = null!;
@@ -187,6 +194,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
         }
 
+        /// <summary>Rang AMIF de chaque ligne (indexé comme les lignes de <see cref="ShowRows"/>), à poser avant ShowRows ; null ou 0 : pas d'insigne.</summary>
+        public void SetRowRanks(int[]? ranks) => _rowRanks = ranks;
+
         /// <summary>Pas de colonne de droite sur cette page : la fiche détaillée la remplace.</summary>
         public void ShowSide(ListSideData data) { }
 
@@ -230,7 +240,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 bool used = i < _rowOf.Count;
                 _tiles[i].Root.style.display = used ? DisplayStyle.Flex : DisplayStyle.None;
-                if (used) ShowTile(_tiles[i], _rows[_rowOf[i]], _rowOf[i] == _selectedRow);
+                if (used) ShowTile(_tiles[i], _rows[_rowOf[i]], _rowOf[i] == _selectedRow, _rowOf[i]);
             }
             // Grille vide (aucun objet, aucun résultat de filtre) : la fiche reprend le message de la liste au lieu de rester vide.
             if (_rowOf.Count == 0 && _rows.Length > 0) ShowDetail(_rows[0]);
@@ -248,11 +258,13 @@ namespace N29.HeroesDawn.Presentation.Hub
             t.Art.EnableInClassList("hd-tile__art--portrait", PortraitFraming);
             t.Title = new Label { pickingMode = PickingMode.Ignore }; t.Title.AddToClassList("hd-tile__title");
             t.Sub = new Label { pickingMode = PickingMode.Ignore }; t.Sub.AddToClassList("hd-tile__sub");
+            t.Rank = HdTeamUi.RankBadge(1); t.Rank.AddToClassList("hd-tile__rank"); t.Rank.style.display = DisplayStyle.None;
+            t.Art.Add(t.Rank);
             t.Root.Add(t.Art); t.Root.Add(t.Title); t.Root.Add(t.Sub);
             return t;
         }
 
-        void ShowTile(Tile t, InfoRowData r, bool selected)
+        void ShowTile(Tile t, InfoRowData r, bool selected, int row)
         {
             t.Title.text = r.Title;
             t.Sub.text = r.Badge ?? "";
@@ -261,6 +273,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             if (PortraitFraming) HdTeamUi.Head(t.Art, r.Art);
             else t.Art.style.backgroundImage = r.Art != null ? new StyleBackground(r.Art) : new StyleBackground(StyleKeyword.Null);
             t.Art.EnableInClassList("hd-tile__art--none", r.Art == null);
+            // Insigne de rang AMIF (Registre) : posé par la page par ligne, masqué sans rang.
+            int rank = _rowRanks != null && row >= 0 && row < _rowRanks.Length ? _rowRanks[row] : 0;
+            t.Rank.style.display = rank > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            if (rank > 0) HdTeamUi.SetRank(t.Rank, rank);
             Color frame = selected ? Theme.Primary : r.TagColor.a > 0.01f ? r.TagColor : Theme.Outline;
             t.Root.style.borderTopColor = t.Root.style.borderBottomColor = t.Root.style.borderLeftColor = t.Root.style.borderRightColor = frame;
             t.Root.EnableInClassList("hd-tile--selected", selected);

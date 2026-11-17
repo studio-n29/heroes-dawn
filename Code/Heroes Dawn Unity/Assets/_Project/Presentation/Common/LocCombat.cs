@@ -176,6 +176,16 @@ namespace N29.HeroesDawn.Presentation.Common
             d["combat.drop_here"] = "Lâche la carte ici";
             d["combat.auto_hint"] = "AUTO [A]";
             d["combat.speed_hint"] = "{0} [S]";
+            // Aperçu de l'effet de la carte tenue (dry-run)
+            d["preview.variable"] = "variable";
+            d["preview.shield"] = "Bouclier {0}";
+            d["preview.plan_cancelled"] = "Action annulée";
+            d["preview.plan_cancelled_maybe"] = "Action annulée ?";
+            d["preview.victory"] = "VICTOIRE !";
+            d["preview.victory_maybe"] = "Victoire possible";
+            d["preview.next_wave"] = "VAGUE SUIVANTE";
+            d["preview.next_wave_maybe"] = "Vague suivante possible";
+            d["preview.defeat"] = "Défaite possible";
         }
     }
 }

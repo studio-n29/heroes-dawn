@@ -28,7 +28,8 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         {
             var s = NewSession("agent_m");
             Assert.That(StoryProgress.Current(s).City, Is.EqualTo("moscow"));
-            Assert.That(StoryProgress.ZonesOf(s, "moscow").Select(z => z.Code), Is.EqualTo(new[] { "M1.1", "M1.2", "M1.3", "M1.4" }));
+            Assert.That(StoryProgress.ZonesOf(s, "moscow").Select(z => z.Code).Take(4), Is.EqualTo(new[] { "M1.1", "M1.2", "M1.3", "M1.4" }));
+            Assert.That(StoryProgress.ZonesOf(s, "moscow").Count, Is.EqualTo(16));
             CompleteMoscow(s);
             var act = StoryProgress.Current(s);
             Assert.That(act.Number, Is.EqualTo(2));
@@ -43,7 +44,7 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             CompleteMoscow(s);
             Assert.That(C.Zones.Where(z => !z.IsTutorial).Select(z => ZoneProgress.StatusOf(s, z)).Count(st => st == ZoneStatus.Available), Is.EqualTo(0));
             var rec = ZoneProgress.Recommended(s);
-            Assert.That(rec.Borough, Is.EqualTo("sergueiv"));
+            Assert.That(rec.Borough, Is.EqualTo("place_rouge"), "la dernière zone validée du catalogue");
             Assert.That(ZoneProgress.StatusOf(s, rec), Is.EqualTo(ZoneStatus.Done));
         }
 
@@ -70,8 +71,9 @@ namespace N29.HeroesDawn.Tests.Domain.Application
                 app.Session.Meta.onboarding.hero = hero;
                 foreach (var z in app.Session.Content.Zones) if (!z.IsTutorial) app.Session.CompletedZones.Add(z.Id.Value);
                 var main = app.Quests.Main();
-                Assert.That(main.Count, Is.EqualTo(4), hero);
-                Assert.That(main.All(m => m.Zone.Borough == borough && m.Status == ZoneStatus.Done), Is.True, hero);
+                Assert.That(main.Count, Is.EqualTo(16), hero);
+                Assert.That(main.All(m => m.Status == ZoneStatus.Done), Is.True, hero);
+                Assert.That(main[0].Zone.Borough, Is.EqualTo(borough), hero);
             }
         }
 
@@ -93,8 +95,10 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             app.SignInDirect("p1");
             app.Session.Meta.onboarding.hero = "agent_m";
             var main = app.Quests.Main();
-            Assert.That(main.Select(m => m.Zone.Code), Is.EqualTo(new[] { "M1.1", "M1.2", "M1.3", "M1.4" }));
-            Assert.That(main.Select(m => m.Status), Is.EqualTo(new[] { ZoneStatus.Available, ZoneStatus.Locked, ZoneStatus.Locked, ZoneStatus.Locked }));
+            Assert.That(main.Count, Is.EqualTo(16));
+            Assert.That(main.Select(m => m.Zone.Code).Take(4), Is.EqualTo(new[] { "M1.1", "M1.2", "M1.3", "M1.4" }));
+            Assert.That(main[0].Status, Is.EqualTo(ZoneStatus.Available));
+            Assert.That(main.Skip(1).All(m => m.Status == ZoneStatus.Locked), Is.True);
             Assert.That(app.Quests.CurrentMain()!.Value.Zone.Code, Is.EqualTo("M1.1"));
         }
     }

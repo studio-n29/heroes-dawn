@@ -41,8 +41,8 @@ namespace N29.HeroesDawn.Content.Prototype
                         S("mos_passeur_p2_a2", SkillSlot.A2, 3, TargetRule.SingleEnemy, Dmg(150), St(StatusType.Corrosion, 2)),
                         S("mos_passeur_a3", SkillSlot.A3, 5, TargetRule.AllEnemies, Dmg(90), St(StatusType.Corrosion, 2, 40)),
                         S("mos_passeur_a4", SkillSlot.A4, 4, TargetRule.SingleEnemy, Dmg(75), St(StatusType.Bind, 1, 50)),
-                    }, AiStyle.Aggressive),
-                PrototypeZones.Phase(33, "enemies.mos_passeur.phase3", 25, -10, 10)), AiStyle.Control);
+                    }, AiStyle.Aggressive, lines: new[] { new NarrationLineDef("passeur", "narration.mos_1_4.boss.phase1.0") }),
+                PrototypeZones.Phase(33, "enemies.mos_passeur.phase3", 25, -10, 10, lines: new[] { new NarrationLineDef("passeur", "narration.mos_1_4.boss.phase2.0") })), AiStyle.Control);
         }
     }
 }

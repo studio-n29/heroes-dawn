@@ -521,6 +521,7 @@ namespace N29.HeroesDawn.Presentation.Board
             if (validated)
             {
                 await View.PauseAsync(0.5f, Lifetime);
+                await _cases.PlayEpilogueAsync(Lifetime);
                 _audio.Play(SfxId.ZoneComplete);
                 await ShowZoneCompleteAsync();
                 return;

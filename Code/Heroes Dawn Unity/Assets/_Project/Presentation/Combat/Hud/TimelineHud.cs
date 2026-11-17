@@ -161,10 +161,54 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
             }
         }
 
+        // ---- Aperçu : fantômes de position (où l'unité se retrouvera après la carte), reliés à leur place actuelle par un trait
+        readonly List<VisualElement> _ghosts = new List<VisualElement>();
+        /// <summary>Fantômes affichés (tests PlayMode).</summary>
+        public int GhostCount => _ghosts.Count;
+
+        public void ShowGhosts(PreviewGhostData[]? ghosts)
+        {
+            foreach (var g in _ghosts) g.RemoveFromHierarchy();
+            _ghosts.Clear();
+            if (ghosts == null || _points <= 0) return;
+            var seen = new Dictionary<(bool, int), int>();
+            foreach (var d in ghosts)
+            {
+                int from = Mathf.Clamp(d.FromPoint, 0, _points), to = Mathf.Clamp(d.ToPoint, 0, _points);
+                float y = d.Ally ? RowOffset : -RowOffset;
+                if (from != to)
+                {
+                    var line = new VisualElement { pickingMode = PickingMode.Ignore };
+                    line.AddToClassList("hd-tl__ghostline");
+                    line.style.left = Length.Percent(Mathf.Min(from, to) / (float)_points * 100f);
+                    line.style.width = Length.Percent(Mathf.Abs(to - from) / (float)_points * 100f);
+                    HudAnim.SetTranslate(line, 0f, y);
+                    line.style.backgroundColor = Theme.WithAlpha(d.Ally ? Theme.Primary : Theme.Danger, 0.7f);
+                    _track.Add(line); _ghosts.Add(line);
+                }
+                var key = (d.Ally, to);
+                seen.TryGetValue(key, out int rank);
+                seen[key] = rank + 1;
+                var root = new VisualElement { pickingMode = PickingMode.Ignore };
+                root.AddToClassList("hd-tl__ghost");
+                root.EnableInClassList("hd-tl__ghost--variable", d.Variable);
+                root.EnableInClassList("hd-tl__ghost--defeat", d.Defeat != PreviewDefeat.None);
+                root.style.left = Length.Percent(to / (float)_points * 100f);
+                HudAnim.SetTranslate(root, rank * SpreadStep, y);
+                var frame = new VisualElement { pickingMode = PickingMode.Ignore }; frame.AddToClassList("hd-tl__ghostframe");
+                frame.style.borderTopColor = frame.style.borderBottomColor = frame.style.borderLeftColor = frame.style.borderRightColor = d.Ally ? Theme.Primary : Theme.Danger;
+                var label = new Label(d.Text ?? "") { pickingMode = PickingMode.Ignore }; label.AddToClassList("hd-tl__ghosttext");
+                label.style.color = d.Ally ? Theme.Primary : Theme.Danger;
+                root.Add(frame); root.Add(label);
+                _track.Add(root); _ghosts.Add(root);
+            }
+        }
+
         /// <summary>Nouveau combat : on repart sans pastilles.</summary>
         public void Clear()
         {
             foreach (var m in _markers) m.Root.RemoveFromHierarchy();
+            ShowGhosts(null);
             _markers.Clear(); _byId.Clear();
         }
     }

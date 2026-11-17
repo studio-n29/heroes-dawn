@@ -1,0 +1,631 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df527a111f48e9749b23b1fde962ba77, type: 3}
+  m_Name: zone_ny_2_1
+  m_EditorClassIdentifier: N29.HeroesDawn.Authoring::N29.HeroesDawn.Authoring.ZoneAsset
+  zoneId: zone_ny_2_1
+  nameKey: zones.ny_2_1.name
+  displayName: 
+  shortName: 
+  description: 
+  code: 2.1
+  act: 2
+  borough: queens
+  recommendedLevel: 12
+  requires:
+  - zone_ny_1_4
+  biome: 0
+  weather: 0
+  entry: n00
+  nodes:
+  - id: n00
+    type: 0
+    isFixed: 1
+    rank: 1
+    x: 0
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n01
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 1
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n02
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 2
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n03
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n04
+    type: 4
+    isFixed: 1
+    rank: 1
+    x: 4
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: narrateur
+      text: "Flushing grouille. Chaque \xE9tal a sa cam\xE9ra au-dessus de la caisse, et personne ne l\xE8ve les yeux."
+      key: narration.ny_2_1.intro.0
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: "Dix cam\xE9ras sur un march\xE9 d'oignons. Le Syndicat ne rate pas une transaction."
+      key: narration.ny_2_1.intro.1
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: "Ou quelqu'un lui pr\xEAte le mat\xE9riel."
+      key: narration.ny_2_1.intro.2
+      route: 
+      replaces: 
+    - speaker: commercant
+      text: "Elles tournent depuis l'\xE9t\xE9. Elles nous voient. Elles ne nous aident jamais."
+      key: narration.ny_2_1.intro.3
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: "Si on les coupe d'un coup, tout le march\xE9 le saura. On y va \xE9tal par \xE9tal."
+      key: narration.ny_2_1.intro.4
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Je vois ce que chaque cam\xE9ra a film\xE9 hier. Coupons-les dans l'ordre : celles qui regardent la caisse en dernier."
+      key: narration.ny_2_1.intro.4.m
+      route: agent_m
+      replaces: narration.ny_2_1.intro.4
+    - speaker: commercant
+      text: "Vous \xEAtes l'Aube. Faites vite, avant que quelqu'un le raconte."
+      key: narration.ny_2_1.intro.5
+      route: 
+      replaces: 
+    narrationAfter: []
+  - id: n05
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n06
+    type: 3
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 3
+    activity: potion_field
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n07
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 4
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n08
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n09
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n10
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 4
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n11
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n12
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 6
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n13
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 7
+    y: 2
+    activity: infiltration_camp
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n14
+    type: 2
+    isFixed: 1
+    rank: 2
+    x: 8
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: enforcer
+      text: "On ne coupe pas ce qui prot\xE8ge le quartier. Surtout pas pour des visiteurs."
+      key: narration.ny_2_1.elite.before.0
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: "\xAB Prot\xE9ger \xBB : tu es s\xFBr que c'est le mot qu'ils t'ont donn\xE9 ?"
+      key: narration.ny_2_1.elite.before.1
+      route: 
+      replaces: 
+    narrationAfter:
+    - speaker: lucas_mendes
+      text: "Regardez le bo\xEEtier. Ce n'est pas un mod\xE8le de rue. Il y a un sigle grav\xE9 dessous."
+      key: narration.ny_2_1.elite.after.0
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: "Un prestataire de l'AMIF. Les cam\xE9ras du Syndicat sont lou\xE9es \xE0 l'agence."
+      key: narration.ny_2_1.elite.after.1
+      route: 
+      replaces: 
+  - id: n15
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 7
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n16
+    type: 4
+    isFixed: 0
+    rank: 1
+    x: 8
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n17
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 9
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n18
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 10
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n19
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n20
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n21
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 12
+    y: 3
+    activity: gears_workshop
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n22
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 13
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter:
+    - speaker: ilona_varga
+      text: "Un gang qui loue ses yeux \xE0 une agence d'\xC9tat. On remonte la piste jusqu'\xE0 Astoria."
+      key: narration.ny_2_1.exit.0
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: "Ou on suit les cam\xE9ras. Elles vont toutes dans la m\xEAme direction."
+      key: narration.ny_2_1.exit.1
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "\xC0 Moscou, c'\xE9taient des hologrammes. Ici, des cam\xE9ras. Le m\xEAme sourire poli derri\xE8re."
+      key: narration.ny_2_1.exit.2
+      route: agent_m
+      replaces: 
+  links:
+  - a: n00
+    b: n01
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n01
+    b: n02
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n03
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n06
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n03
+    b: n04
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n04
+    b: n05
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n06
+    b: n07
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n07
+    b: n08
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n09
+    b: n10
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n11
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n05
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n08
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n11
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n13
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n13
+    b: n14
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n15
+    b: n16
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n14
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n16
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n17
+    b: n18
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n18
+    b: n19
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n18
+    b: n20
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n19
+    b: n21
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n20
+    b: n21
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n21
+    b: n22
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  objectives:
+  - id: obj_market
+    type: 1
+    target: n04
+    nameKey: objectives.ny21.market
+    text: 
+  - id: obj_cameras
+    type: 2
+    target: n13
+    nameKey: objectives.ny21.cameras
+    text: 
+  - id: obj_collector
+    type: 0
+    target: n14
+    nameKey: objectives.ny21.collector
+    text: 
+  - id: obj_logo
+    type: 1
+    target: n22
+    nameKey: objectives.ny21.logo
+    text: 
+  encounters:
+  - rank: 0
+    waves:
+    - enemies:
+      - syn_racketeer
+      - syn_hacker
+  - rank: 0
+    waves:
+    - enemies:
+      - thug
+      - syn_hacker
+  - rank: 1
+    waves:
+    - enemies:
+      - syn_racketeer
+      - syn_gunman
+      - syn_hacker
+  - rank: 2
+    waves:
+    - enemies:
+      - syn_collector
+      - syn_racketeer
+      - syn_hacker
+  regions: []
+  hasMapPoint: 0
+  mapPointPermille: {x: 500, y: 500}
+  backgroundKey: zone_ny_2_1_bg
+  backgroundMinX: -1
+  backgroundMinY: 0
+  backgroundMaxX: 14
+  backgroundMaxY: 6
+  backgroundSeed: 1

@@ -188,6 +188,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         {
             Id = m.Id,
             Card = MemberCards.Card(m.Def, m.Level, _session.Content.Balance, _loc),
+            Role = m.Def.Position,
             InSquad = m.InSquad,
             Fatigue = m.Fatigue,
             Fatigue01 = m.Fatigue / 100f,

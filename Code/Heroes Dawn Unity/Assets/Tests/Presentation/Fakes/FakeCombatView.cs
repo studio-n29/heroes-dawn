@@ -20,6 +20,12 @@ namespace N29.HeroesDawn.Tests.Presentation.Fakes
         public event Action<int>? SkillDragBegan;
         public event Action<int, int>? SkillDropped;
         public event Action<int>? UnitTapped;
+        public event Action<int, int>? SkillDragOver;
+        /// <summary>Dernier aperçu reçu (null : effacé) et nombre d'envois.</summary>
+        public CombatPreviewData? Preview;
+        public int PreviewShows;
+        public void ShowPreview(CombatPreviewData? data) { Preview = data; PreviewShows++; }
+        public void DragOver(int slot, int where) => SkillDragOver?.Invoke(slot, where);
 
         public IReadOnlyList<UnitCardData> Built = Array.Empty<UnitCardData>();
         public IReadOnlyList<UnitStateData> States = Array.Empty<UnitStateData>();

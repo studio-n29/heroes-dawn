@@ -60,7 +60,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             for (int i = 1; i < 8; i++)
             {
                 Assert.That(_view.Rows[i].Dim, Is.True, "rangée " + i);
-                Assert.That(_view.Rows[i].Subtitle, Does.Contain(_loc.T(i == 4 ? "chapter.status.Locked" : "chapter.status.Soon")), "rangée " + i); // Sergueiv (rangée 4) a ses zones, verrouillées pour Agent D
+                Assert.That(_view.Rows[i].Subtitle, Does.Contain(_loc.T("chapter.status.Locked")), "rangée " + i); // tous les chapitres ont leurs zones : verrouillés derrière Brooklyn ou, pour Moscou, derrière New York
             }
             Assert.That(_view.Rows[4].Title, Is.EqualTo(_loc.T("chapter.mos_sergueiv.title")));
             Assert.That(_view.Header.Line, Is.EqualTo(_loc.F("chapters.line", 0, 8)));
@@ -99,12 +99,11 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie que Relire est grisé avec une raison pour un chapitre « Bientôt » — parce qu'il n'a pas encore de contenu")]
-        public void Reread_IsDisabledForSoonChapters()
+        [Test, Description("Vérifie que Relire est actif pour les huit chapitres, aucun n étant « Bientôt » — parce que tous ont désormais leurs zones")]
+        public void Reread_IsEnabledForEveryChapter_NoneIsSoon()
         {
             var p = Page();
-            Assert.That(_view.Rows[1].A.Enabled, Is.False);
-            Assert.That(_view.Rows[1].A.Reason, Is.EqualTo(_loc.T("chapter.soon_reason")));
+            Assert.That(_view.Rows.All(r => r.A.Enabled), Is.True);
             Assert.That(_view.Rows[0].A.Enabled, Is.True);
             p.Dispose();
         }
@@ -141,9 +140,10 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.Side.Rows[0].A.Enabled, Is.True);
             Assert.That(_view.Rows[0].Subtitle, Does.Contain(_loc.F("fragments.new", 1)));
             _view.ClickSide(0);
-            var ask = ((FakeConfirmPopup)_host.Spawned.Last()).Asked!.Value;
-            Assert.That(ask.Title, Is.EqualTo(_loc.T("fragment.redhook_docks.title")));
-            Assert.That(ask.Body, Does.Contain(_loc.T("fragment.redhook_docks.text")).And.Contain(_loc.T("fragments.no_audio")));
+            // La lecture d'un souvenir passe par la fenêtre Chapitre (illustration au-dessus du texte), plus par la confirmation générique.
+            var shown = _popup.Data!.Value;
+            Assert.That(shown.Heading, Is.EqualTo(_loc.T("fragment.redhook_docks.title")));
+            Assert.That(shown.Text, Does.Contain(_loc.T("fragment.redhook_docks.text")).And.Contain(_loc.T("fragments.no_audio")));
             Assert.That(_app.Session.Meta.fragmentsRead, Is.EqualTo(new[] { "redhook_docks" }));
             Assert.That(_view.Rows[0].Subtitle, Does.Not.Contain(_loc.F("fragments.new", 1)), "plus de pastille une fois lu");
             Assert.That(_view.Side.Title, Is.EqualTo(_loc.F("fragments.title", _loc.T("chapter.ny_brooklyn.title"), 1, 4)));
@@ -161,13 +161,12 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        [Test, Description("Vérifie qu'un chapitre sans souvenir affiche « aucun souvenir » dans la colonne — parce que Queens n'en a pas encore")]
-        public void ChapterWithoutFragments_ShowsAnEmptySide()
+        [Test, Description("Vérifie que chaque chapitre a ses quatre souvenirs, listés dans la colonne — parce que les huit chapitres ont leurs fragments")]
+        public void EveryChapter_HasFourFragments()
         {
             var p = Page();
             _view.SelectRow(1);
-            Assert.That(_view.Side.Rows, Is.Empty);
-            Assert.That(_view.Side.Text, Is.EqualTo(_loc.T("fragments.none")));
+            for (int i = 0; i < 8; i++) { _view.SelectRow(i); Assert.That(_view.Side.Rows.Length, Is.EqualTo(4), "chapitre " + i); }
             p.Dispose();
         }
 

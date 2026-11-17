@@ -20,12 +20,14 @@ namespace N29.HeroesDawn.Definitions
         public IReadOnlyList<SkillDef>? Skills { get; }
         /// <summary>Nouveau style d IA à l ouverture de la phase ; nul : le style précédent est conservé.</summary>
         public AiStyle? Style { get; }
+        /// <summary>Répliques du boss à l ouverture de la phase (script narratif) : lues par l interface, sans effet sur la simulation.</summary>
+        public IReadOnlyList<NarrationLineDef> Lines { get; }
 
         public BossPhaseDef(int thresholdPercent, string nameKey, int atkPercent, int defPercent, int spdPercent,
-                            IReadOnlyList<SkillDef>? skills = null, AiStyle? style = null)
+                            IReadOnlyList<SkillDef>? skills = null, AiStyle? style = null, IReadOnlyList<NarrationLineDef>? lines = null)
         {
             ThresholdPercent = thresholdPercent; NameKey = nameKey; AtkPercent = atkPercent; DefPercent = defPercent; SpdPercent = spdPercent;
-            Skills = skills; Style = style;
+            Skills = skills; Style = style; Lines = lines ?? System.Array.Empty<NarrationLineDef>();
         }
     }
 }

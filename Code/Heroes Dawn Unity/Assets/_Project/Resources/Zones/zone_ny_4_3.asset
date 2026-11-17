@@ -1,0 +1,641 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df527a111f48e9749b23b1fde962ba77, type: 3}
+  m_Name: zone_ny_4_3
+  m_EditorClassIdentifier: N29.HeroesDawn.Authoring::N29.HeroesDawn.Authoring.ZoneAsset
+  zoneId: zone_ny_4_3
+  nameKey: zones.ny_4_3.name
+  displayName: 
+  shortName: 
+  description: 
+  code: 4.3
+  act: 4
+  borough: manhattan
+  recommendedLevel: 27
+  requires:
+  - zone_ny_4_2
+  biome: 0
+  weather: 0
+  entry: n00
+  nodes:
+  - id: n00
+    type: 0
+    isFixed: 1
+    rank: 1
+    x: 0
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n01
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 1
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n02
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 2
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n03
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n04
+    type: 4
+    isFixed: 1
+    rank: 1
+    x: 4
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: narrateur
+      text: "Le hall de l'ONU est plein de drapeaux, de micros et de regards. Dans une heure, les Accords de Salem seront annonc\xE9s."
+      key: narration.ny_4_3.intro.0
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: "Quelqu'un coupe d\xE9j\xE0 les c\xE2bles de la retransmission."
+      key: narration.ny_4_3.intro.1
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: "Sabotage \xE0 l'\xE9tage technique. Si l'annonce ne passe pas, tout \xE7a n'a servi \xE0 rien."
+      key: narration.ny_4_3.intro.2
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: On tient la salle. Personne ne coupe cette retransmission.
+      key: narration.ny_4_3.intro.3
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Je vois les mains qui couperont les c\xE2bles dans dix secondes. Je les arr\xEAte avant."
+      key: narration.ny_4_3.intro.3.m
+      route: agent_m
+      replaces: narration.ny_4_3.intro.3
+    narrationAfter: []
+  - id: n05
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n06
+    type: 3
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 3
+    activity: potion_field
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n07
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 4
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n08
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n09
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n10
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 4
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n11
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n12
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 6
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n13
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 7
+    y: 2
+    activity: deflect_docks
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n14
+    type: 2
+    isFixed: 1
+    rank: 2
+    x: 8
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: agent_amif
+      text: "Pour la s\xE9curit\xE9 des d\xE9l\xE9gu\xE9s, la salle est \xE9vacu\xE9e. Merci de coop\xE9rer."
+      key: narration.ny_4_3.elite.before.0
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: "\xC9vacuer la salle, c'est \xE9touffer l'annonce. Il le sait."
+      key: narration.ny_4_3.elite.before.1
+      route: 
+      replaces: 
+    narrationAfter:
+    - speaker: giulia_rossi
+      text: La salle est tenue. Rayner peut parler.
+      key: narration.ny_4_3.elite.after.0
+      route: 
+      replaces: 
+  - id: n15
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 7
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n16
+    type: 4
+    isFixed: 0
+    rank: 1
+    x: 8
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n17
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 9
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter:
+    - speaker: rayner
+      text: "Les Apex ne demandent pas la permission d'exister. Ils demandent d'\xEAtre reconnus, pas contr\xF4l\xE9s."
+      key: narration.ny_4_3.stage.0
+      route: 
+      replaces: 
+    - speaker: stroke
+      text: "Madame Rayner parle de reconnaissance. Je parle de responsabilit\xE9. Un pouvoir qu'on ne mesure pas est un pouvoir qu'on ne prot\xE8ge pas."
+      key: narration.ny_4_3.stage.1
+      route: 
+      replaces: 
+    - speaker: rayner
+      text: "Mesurer, pr\xE9lever, enfermer : ce n'est pas prot\xE9ger. C'est poss\xE9der."
+      key: narration.ny_4_3.stage.2
+      route: 
+      replaces: 
+    - speaker: stroke
+      text: "Les chiffres de Paris, madame, ne mentent pas. Je ne poss\xE8de personne. Je compte."
+      key: narration.ny_4_3.stage.3
+      route: 
+      replaces: 
+    - speaker: rayner
+      text: "Alors comptez aussi ceux que vous avez enferm\xE9s \xE0 Queens. Il y en avait beaucoup."
+      key: narration.ny_4_3.stage.4
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: "C'est lui. Il n'a pas de visage m\xE9chant. C'est ce qui est le plus effrayant."
+      key: narration.ny_4_3.stage.5.d
+      route: agent_d
+      replaces: 
+    - speaker: agent_m
+      text: "Les chiffres de Paris. J'y \xE9tais. Ils n'ont pas dit tout ce qu'ils ont compt\xE9."
+      key: narration.ny_4_3.stage.5.m
+      route: agent_m
+      replaces: 
+  - id: n18
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 10
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n19
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n20
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n21
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 12
+    y: 3
+    activity: arena_training
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n22
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 13
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter:
+    - speaker: narrateur
+      text: "La salle retient son souffle. Pour la premi\xE8re fois, la voix de l'AMIF et celle de The Dawn s'opposent devant tous."
+      key: narration.ny_4_3.exit.0
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: "Il a gard\xE9 son calme. Il en gardera encore. Il nous attend dehors."
+      key: narration.ny_4_3.exit.1
+      route: 
+      replaces: 
+  links:
+  - a: n00
+    b: n01
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n01
+    b: n02
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n03
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n06
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n03
+    b: n04
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n04
+    b: n05
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n06
+    b: n07
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n07
+    b: n08
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n09
+    b: n10
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n11
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n05
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n08
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n11
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n13
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n13
+    b: n14
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n15
+    b: n16
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n14
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n16
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n17
+    b: n18
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n18
+    b: n19
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n18
+    b: n20
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n19
+    b: n21
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n20
+    b: n21
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n21
+    b: n22
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  objectives:
+  - id: obj_delegates
+    type: 2
+    target: n13
+    nameKey: objectives.ny43.delegates
+    text: 
+  - id: obj_captain
+    type: 0
+    target: n14
+    nameKey: objectives.ny43.captain
+    text: 
+  - id: obj_hall
+    type: 2
+    target: n21
+    nameKey: objectives.ny43.hall
+    text: 
+  - id: obj_accords
+    type: 1
+    target: n22
+    nameKey: objectives.ny43.accords
+    text: 
+  encounters:
+  - rank: 0
+    waves:
+    - enemies:
+      - amif_trooper
+      - mnh_drone
+  - rank: 1
+    waves:
+    - enemies:
+      - amif_trooper
+      - amif_marksman
+      - mnh_guard
+  - rank: 2
+    waves:
+    - enemies:
+      - amif_captain
+      - amif_trooper
+      - amif_marksman
+  regions: []
+  hasMapPoint: 0
+  mapPointPermille: {x: 500, y: 500}
+  backgroundKey: zone_ny_4_3_bg
+  backgroundMinX: -1
+  backgroundMinY: 0
+  backgroundMaxX: 14
+  backgroundMaxY: 6
+  backgroundSeed: 1

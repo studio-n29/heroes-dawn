@@ -371,7 +371,7 @@ namespace N29.HeroesDawn.Domain.Combat
                 if (phase.Skills != null) t.SetKit(phase.Skills);
                 if (phase.Style.HasValue) t.Style = phase.Style.Value;
                 t.PhaseReached++;
-                output.Add(new BossPhaseChangedEvent(Tick, t.Id, t.PhaseReached + 1, t.Phases.Count + 1, phase.NameKey, kitChanged));
+                output.Add(new BossPhaseChangedEvent(Tick, t.Id, t.PhaseReached + 1, t.Phases.Count + 1, phase.NameKey, kitChanged, phase.Lines));
             }
         }
 

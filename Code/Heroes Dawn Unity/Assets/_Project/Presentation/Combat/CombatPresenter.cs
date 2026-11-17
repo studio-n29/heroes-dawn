@@ -18,6 +18,7 @@ using N29.HeroesDawn.Domain.Combat;
 using N29.HeroesDawn.Presentation.Audio;
 using N29.HeroesDawn.Presentation.Common;
 using N29.HeroesDawn.Presentation.Mvp;
+using N29.HeroesDawn.Presentation.Narration;
 using VContainer.Unity;
 
 namespace N29.HeroesDawn.Presentation.Combat
@@ -83,6 +84,22 @@ namespace N29.HeroesDawn.Presentation.Combat
             _tutorial = tutorial;
         }
 
+        /// <summary>Répliques d'un boss à l'ouverture d'une phase (script narratif) : la boîte de dialogue met le combat en pause (une modale ouverte l'arrête) ; le joueur la passe d'un toucher. Un échec d'affichage ne bloque jamais le combat.</summary>
+        async UniTaskVoid PlayBossLinesAsync(IReadOnlyList<NarrationLineDef> lines)
+        {
+            IDialogueBoxView? view = null;
+            try
+            {
+                var built = NarrationLines.Build(lines, _session.Content, _loc, _session.Route.HeroId);
+                if (built.Count == 0) return;
+                view = await _modals.OpenAsync<IDialogueBoxView>(Lifetime);
+                await view.PlayAsync(built, Lifetime);
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception) { }
+            finally { if (view != null) _modals.Close(view); }
+        }
+
         protected override IBackHandler BackHandler => this;
 
         protected override void OnStart()
@@ -96,6 +113,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.SkillClicked += Skill;
             View.SkillDragBegan += SkillDragBegan;
             View.SkillDropped += SkillDropped;
+            View.SkillDragOver += SkillDragOver;
             View.UnitTapped += UnitTapped;
         }
 
@@ -110,6 +128,7 @@ namespace N29.HeroesDawn.Presentation.Combat
             View.SkillClicked -= Skill;
             View.SkillDragBegan -= SkillDragBegan;
             View.SkillDropped -= SkillDropped;
+            View.SkillDragOver -= SkillDragOver;
             View.UnitTapped -= UnitTapped;
         }
 
@@ -239,7 +258,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                 _names[u.Id] = name;
                 if (u.Side == Side.Enemy && !u.IsAlive) continue; // ennemis des vagues précédentes
                 _shown.Add(u.Id);
-                cards.Add(new UnitCardData { Id = u.Id, Ally = u.Side == Side.Ally, Name = name.ToUpperInvariant(), Boss = u.IsBoss, Family = fam, Portrait = new PortraitData(name, fam, u.IsBoss, u.Side == Side.Ally ? AgentArt.For(u.DefId) : null), Sub = u.Side == Side.Ally && u.Id < fighters.Count ? _loc.F("ui.fatigue", fighters[u.Id].Fatigue) : "" });
+                cards.Add(new UnitCardData { Id = u.Id, Ally = u.Side == Side.Ally, Name = name.ToUpperInvariant(), Boss = u.IsBoss, Family = fam, Portrait = new PortraitData(name, fam, u.IsBoss, u.Side == Side.Ally ? AgentArt.For(u.DefId) : null), DefId = u.DefId, Position = u.Position, Elite = u.Side == Side.Enemy && !u.IsBoss && _combat.Case?.Rank == CombatRank.Elite, Sub = u.Side == Side.Ally && u.Id < fighters.Count ? _loc.F("ui.fatigue", fighters[u.Id].Fatigue) : "" });
             }
             View.BuildUnits(cards);
         }
@@ -358,8 +377,9 @@ namespace N29.HeroesDawn.Presentation.Combat
                         View.Act(su.Actor);
                         if (_sim!.Unit(su.Actor).Side == Side.Ally) _tutorial?.Signal(TutorialSignal.SkillUsed);
                         else if (!_sim.Auto) _pauseLeft = Math.Max(_pauseLeft, AiThinkingSeconds());
+                        _lastFx = null; // une compétence sans animation ne rejoue pas le son de la précédente
                         PlaySkillFx(su);
-                        _audio.Play(SfxId.SkillCast);
+                        _audio.Play(_lastFx.HasValue ? SkillFx.SoundOf(_lastFx.Value.Kind) : SfxId.SkillCast);
                         AddLog(Name(su.Actor) + " : " + SkillLabel(su.Actor, su.Skill));
                         break;
                     case DamageEvent d:
@@ -393,7 +413,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                         break;
                     case StatusAppliedEvent st:
                         if (st.Status != StatusType.Shield) View.Float(st.Target, _loc.StatusName(st.Status), Tone.Perception, 30);
-                        _audio.Play(st.Status == StatusType.Shield ? SfxId.Shield : SfxId.Status);
+                        _audio.Play(SkillFx.SoundOf(st.Status));
                         break;
                     case TurnSkippedEvent ts:
                         View.Float(ts.Unit, _loc.T("combat.skip"), Tone.Info, 36);
@@ -435,6 +455,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                         AddLog(Name(bp.Unit) + " : " + _loc.F("combat.boss.phase_log", bp.Phase, bp.PhaseCount, _loc.T(bp.NameKey)));
                         _pauseLeft = Math.Max(_pauseLeft, BossPhasePauseSeconds);
                         _bossPhaseChanged = true;
+                        if (bp.GetLines().Count > 0) PlayBossLinesAsync(bp.GetLines()).Forget();
                         break;
                     case WaveStartedEvent ws:
                         BuildUnits(_sim!);
@@ -489,6 +510,8 @@ namespace N29.HeroesDawn.Presentation.Combat
                     EnergyText = u.Energy + " / " + u.MaxEnergy,
                     GaugeFull = u.IsReady,
                     Statuses = Statuses(u),
+                    Chips = StatusChips(u),
+                    Phase = u.PhaseReached,
                     Alive = u.IsAlive,
                     Highlight = manual && ally && u.IsReady,
                     Selected = u.Id == _selected && u.IsAlive,
@@ -522,6 +545,7 @@ namespace N29.HeroesDawn.Presentation.Combat
                        : manual && _selected < 0 ? _loc.T("combat.waiting") : "");
             RefreshTopBar();
             RefreshBoss(sim);
+            if (_shownPreview != null) UpdatePreview(); // l'état a bougé : l'aperçu se recalcule ou s'efface
         }
 
         /// <summary>Durée du gel de la frise quand un boss change de phase : le temps de lire l'annonce.</summary>
@@ -586,6 +610,21 @@ namespace N29.HeroesDawn.Presentation.Combat
             return sb.ToString();
         }
 
+        static readonly StatusChipData[] NoChips = new StatusChipData[0];
+
+        /// <summary>Statuts sous forme d'icônes : durée restante (points restants pour le bouclier, rien pour la marque).</summary>
+        static StatusChipData[] StatusChips(CombatUnit u)
+        {
+            if (u.Statuses.Count == 0) return NoChips;
+            var chips = new StatusChipData[u.Statuses.Count];
+            for (int i = 0; i < chips.Length; i++)
+            {
+                var s = u.Statuses[i];
+                chips[i] = new StatusChipData { Type = s.Type, Count = s.Type == StatusType.Shield ? s.Value : s.Type == StatusType.Mark ? 0 : s.TurnsLeft };
+            }
+            return chips;
+        }
+
         void RefreshTopBar()
         {
             var pending = _combat.Case;
@@ -633,8 +672,53 @@ namespace N29.HeroesDawn.Presentation.Combat
             var sim = _sim;
             if (!CanCommand || _selected < 0 || !sim!.CanUse(_selected, slot)) return;
             _dragSlot = slot;
+            _dragOver = -1;
             if (NeedsTarget(sim.Unit(_selected).Skills[slot])) _pendingSlot = slot;
             RefreshAll();
+            UpdatePreview(); // carte armée : zone, soi ou ciblage fin se prévisualisent tout de suite
+        }
+
+        /// <summary>Carte glissée au-dessus d'une unité (ou du vide) : l'aperçu suit la cible survolée.</summary>
+        void SkillDragOver(int slot, int where)
+        {
+            if (_dragSlot != slot) return;
+            _dragOver = where >= 0 ? where : -1;
+            UpdatePreview();
+        }
+
+        // ---- Aperçu de l'effet de la carte (dry-run du moteur : rejeu du combat réel, puis la commande hypothétique sur une copie)
+        int _dragOver = -1;
+        string? _previewKey;
+        CombatPreviewData? _previewData;
+        CombatPreviewData? _shownPreview;
+
+        /// <summary>Recalcule l'aperçu de la carte glissée (null : rien à montrer) et ne le renvoie à la vue que s'il a changé.</summary>
+        void UpdatePreview()
+        {
+            var data = BuildPreview();
+            if (ReferenceEquals(data, _shownPreview)) return;
+            _shownPreview = data;
+            View.ShowPreview(data);
+        }
+
+        CombatPreviewData? BuildPreview()
+        {
+            var sim = _sim;
+            if (sim == null || _dragSlot < 0 || _selected < 0 || !CanCommand || !sim.CanUse(_selected, _dragSlot)) return null;
+            var skill = sim.Unit(_selected).Skills[_dragSlot];
+            int target = -1;
+            if (NeedsTarget(skill))
+            {
+                if (_dragOver < 0 || !IsValidTarget(skill.Target, sim.Unit(_dragOver))) return null;
+                target = _dragOver;
+            }
+            else if (skill.Pick == TargetPick.Default && skill.Target == TargetRule.SingleEnemy && AliveCount(Side.Enemy) == 1) target = FirstAlive(Side.Enemy);
+            string key = sim.ActiveTick + "|" + sim.InputLog.Count + "|" + _selected + "|" + _dragSlot + "|" + target;
+            if (key == _previewKey) return _previewData;
+            var result = CombatPreview.Compute(_session.Content, sim, CombatCommand.UseSkill(_selected, _dragSlot, target));
+            _previewKey = key;
+            _previewData = result == null ? null : CombatPreviewMapper.Build(result, _loc, id => sim.Unit(id).Side == Side.Ally);
+            return _previewData;
         }
 
         /// <summary>Carte lâchée : sur une cible valide (compétence ciblée), dans le vide (compétence générale), sinon retour sans effet.</summary>
@@ -643,6 +727,8 @@ namespace N29.HeroesDawn.Presentation.Combat
             var sim = _sim;
             if (_dragSlot != slot) return;
             _dragSlot = -1;
+            _dragOver = -1;
+            UpdatePreview(); // plus de carte en main : l'aperçu s'efface
             if (!CanCommand || _selected < 0 || !sim!.CanUse(_selected, slot) || where == ICombatView.DropCancel)
             {
                 _pendingSlot = -1;

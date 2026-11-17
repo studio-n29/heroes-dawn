@@ -11,8 +11,12 @@ namespace N29.HeroesDawn.Presentation.Narration
     /// <summary>Traduit les répliques d'un événement de narration en lignes affichables (nom, portrait, côté, texte).</summary>
     public static class NarrationLines
     {
-        public static IReadOnlyList<DialogueBoxLine> Build(NarrationEvent e, ContentCatalog content, ILocalization loc)
-            => e.Lines.Select(l => Build(l, content, loc)).ToList();
+        /// <summary>Lignes d'un événement de narration pour un parcours (<paramref name="hero"/> : <c>agent_d</c> ou <c>agent_m</c>) : variantes .d / .m et répliques réservées appliquées.</summary>
+        public static IReadOnlyList<DialogueBoxLine> Build(NarrationEvent e, ContentCatalog content, ILocalization loc, string? hero = null)
+            => Build(e.Lines, content, loc, hero);
+
+        public static IReadOnlyList<DialogueBoxLine> Build(IReadOnlyList<NarrationLineDef> lines, ContentCatalog content, ILocalization loc, string? hero = null)
+            => NarrationLineDef.ForRoute(lines, hero).Select(l => Build(l, content, loc)).ToList();
 
         public static DialogueBoxLine Build(NarrationLineDef line, ContentCatalog content, ILocalization loc)
         {
@@ -25,7 +29,7 @@ namespace N29.HeroesDawn.Presentation.Narration
             }
             string key = "speaker." + line.Speaker;
             string npc = loc.Has(key) ? loc.T(key) : Capitalize(line.Speaker);
-            return new DialogueBoxLine(npc, new PortraitData(npc, FamilyOf(line.Speaker), boss: false, art: AgentArt.For(line.Speaker)), text, false, line.TextKey);
+            return new DialogueBoxLine(npc, new PortraitData(npc, FamilyOf(line.Speaker), boss: false, art: AgentArt.For(line.Speaker)), text, false, line.TextKey, line.Speaker);
         }
 
         /// <summary>Couleur stable d'un personnage non joueur (selon son identifiant).</summary>

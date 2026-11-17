@@ -8,6 +8,8 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         public int Slot;
         public MemberCardData Card;
+        /// <summary>Position de l'agent (icône sous la famille).</summary>
+        public Position Role;
         public int Rarity;
         public string PriceLabel;
         public bool InTeam;

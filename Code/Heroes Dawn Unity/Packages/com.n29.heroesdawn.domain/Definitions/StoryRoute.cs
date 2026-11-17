@@ -67,7 +67,7 @@ namespace N29.HeroesDawn.Definitions
         {
             switch (borough)
             {
-                case "brooklyn": case "queens": case "bronx": case "manhattan": case "staten": return NewYork;
+                case "brooklyn": case "queens": case "harlem": case "bronx": case "manhattan": case "staten": return NewYork;
                 case "paris": return Paris;
                 case "moscow": case "sergueiv": case "kapotnya": case "sadovoye": case "place_rouge": return Moscow;
                 case "salem": return Salem;

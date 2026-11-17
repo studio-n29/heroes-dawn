@@ -264,6 +264,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             var d = new MemberSheetData
             {
                 Card = MemberCards.Card(def, level, _session.Content.Balance, _loc),
+                Role = def.Position,
                 Owned = owned,
                 Skills = def.Skills.Select(s => { var st = CollectionText.StatsOf(def, level, _session.Content.Balance); return new SkillLineData { Name = _loc.SkillName(s), Description = _loc.DescribeSkill(s, st.Atk, st.MaxHp) }; }).ToArray(),
                 Synergies = SquadSynergies.For(def.Family, _session.Content.Synergies)

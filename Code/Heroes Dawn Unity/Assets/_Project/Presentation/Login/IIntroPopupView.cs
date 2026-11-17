@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using N29.HeroesDawn.Application.Features.Meta;
 using N29.HeroesDawn.Presentation.Mvp;
 
 namespace N29.HeroesDawn.Presentation.Login
 {
     /// <summary>
-    /// Première connexion (popup plein écran) en deux temps : cinématique de lancement, création du personnage joueur (nom et avatar).
-    /// Chaque étape se termine quand le joueur agit (toucher, « Passer », « Commencer »).
+    /// Première connexion (popup plein écran) : cinématique de lancement, puis la séquence de Rayner (accueil en Full Art, fiche d'identification,
+    /// réplique de conclusion, choix de la ville de départ). Chaque étape se termine quand le joueur agit (toucher, « Passer », validation).
     /// </summary>
     public interface IIntroPopupView : IPopupView
     {
@@ -19,7 +20,13 @@ namespace N29.HeroesDawn.Presentation.Login
         /// </summary>
         UniTask PlayCinematicAsync(IntroCinematicTexts texts, Action<float>? mainTheme, CancellationToken ct, CinematicKind kind = CinematicKind.Launch, Action<string>? voiceCue = null);
 
-        /// <summary>Demande le nom et l'avatar du personnage ; se termine quand le nom est valide et « Commencer » touché.</summary>
-        UniTask<CharacterChoice> ChooseCharacterAsync(ChooseCharacterData data, CancellationToken ct);
+        /// <summary>Rayner en Full Art : joue ses répliques, un toucher passe à la suivante ; se termine après la dernière.</summary>
+        UniTask ShowRaynerAsync(RaynerSceneData scene, CancellationToken ct);
+
+        /// <summary>La fiche d'identification (nom, prénom, âge, avatar, pouvoir) ; se termine quand elle est complète et validée.</summary>
+        UniTask<AgentForm> FillFormAsync(AgentFormData data, CancellationToken ct);
+
+        /// <summary>Choix de la ville de départ ; rend l'identifiant du parcours retenu (jamais un parcours indisponible).</summary>
+        UniTask<string> ChooseStartAsync(StartChoiceData data, CancellationToken ct);
     }
 }

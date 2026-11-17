@@ -48,7 +48,7 @@ namespace N29.HeroesDawn.Presentation.Common
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 30;
             text.fontStyle = FontStyle.Bold;
-            text.alignment = TextAnchor.UpperLeft;
+            text.alignment = TextAnchor.UpperCenter;
             text.color = new Color(0.45f, 1f, 0.45f, 0.95f);
             text.raycastTarget = false;
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -57,9 +57,9 @@ namespace N29.HeroesDawn.Presentation.Common
             shadow.effectColor = new Color(0f, 0f, 0f, 0.9f);
             shadow.effectDistance = new Vector2(2f, -2f);
             var rect = text.rectTransform;
-            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 1f);
-            // Sous l'encoche et le coin arrondi : marge fixe plutôt que la zone sûre, pour ne rien recalculer.
-            rect.anchoredPosition = new Vector2(90f, -8f);
+            // Au centre du haut de l'écran : à gauche se trouvent le titre et le retour, à droite le portefeuille et les boutons du combat.
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 1f);
+            rect.anchoredPosition = new Vector2(0f, -6f);
             rect.sizeDelta = new Vector2(400f, 40f);
 
             go.AddComponent<FpsOverlay>()._text = text;

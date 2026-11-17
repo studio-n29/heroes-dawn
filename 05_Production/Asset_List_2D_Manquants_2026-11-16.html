@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Heroes Dawn — Asset List 2D manquants au 16 novembre 2026</title>
+<style>
+  @page { size: A4 landscape; margin: 11mm 10mm 12mm 10mm; }
+  :root { --ink:#101C29; --brass:#9a762f; --brass-l:#D6AF5B; --muted:#5b6773; --line:#d9dde1; --ok:#1f7a55; --warn:#b36b00; --bad:#a82e36; --bg:#f4f1ea; }
+  * { box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body { font-family:"Segoe UI",Calibri,Arial,sans-serif; color:#1b2631; font-size:9.4pt; line-height:1.38; margin:0; }
+  h1 { font-size:22pt; margin:0 0 2px 0; color:#ECE7DC; letter-spacing:.5px; }
+  h2 { font-size:14pt; color:var(--ink); border-bottom:2px solid var(--brass-l); padding-bottom:3px; margin:18px 0 7px 0; page-break-after:avoid; }
+  h3 { font-size:11pt; color:#ECE7DC; background:var(--ink); margin:14px 0 0 0; padding:5px 9px; page-break-after:avoid; }
+  h3 small { color:var(--brass-l); font-weight:400; font-size:8.6pt; margin-left:8px; }
+  h4 { font-size:10.2pt; margin:0 0 3px 0; color:var(--ink); }
+  p { margin:4px 0; }
+  .cover { background:var(--ink); color:#ECE7DC; padding:22px 26px; border-radius:4px; margin-bottom:12px; }
+  .cover .sub { color:var(--brass-l); font-size:11.5pt; margin-bottom:8px; }
+  .cover .meta { font-size:9pt; color:#c1cdd2; }
+  .kpis { display:flex; flex-wrap:wrap; gap:7px; margin:8px 0; }
+  .kpi { flex:1 1 17%; min-width:120px; border:1px solid var(--line); border-left:4px solid var(--brass-l); background:var(--bg); padding:6px 9px; border-radius:3px; page-break-inside:avoid; }
+  .kpi b { display:block; font-size:14pt; color:var(--ink); }
+  .kpi span { font-size:8.4pt; color:var(--muted); }
+  table { border-collapse:collapse; width:100%; table-layout:fixed; }
+  table.list th { background:#233447; color:#ECE7DC; text-align:left; padding:4px 7px; font-weight:600; font-size:8.8pt; }
+  table.list td { border-bottom:1px solid var(--line); padding:6px 7px; vertical-align:top; }
+  table.list tr { page-break-inside:avoid; }
+  td.id { font-family:Consolas,monospace; font-size:8.6pt; color:var(--ink); }
+  .tag { display:inline-block; padding:1px 7px; border-radius:9px; font-size:7.8pt; font-weight:600; color:#fff; white-space:nowrap; margin-top:3px; }
+  .p1 { background:var(--bad); } .p2 { background:var(--warn); } .p3 { background:#5b6773; } .conf { background:#6b4fa0; }
+  dl { margin:3px 0 0 0; display:grid; grid-template-columns:62px 1fr; gap:1px 6px; font-size:8.7pt; }
+  dt { color:var(--brass); font-weight:600; } dd { margin:0; }
+  .crop { position:relative; overflow:hidden; aspect-ratio:1.6; background:#0b1520; border:1px solid #1e2f40; }
+  .crop img { display:block; width:100%; height:100%; object-fit:cover; }
+  .cap { font-size:7.9pt; color:var(--muted); margin-top:3px; line-height:1.3; }
+  .cap b { color:var(--ink); }
+  .note { background:var(--bg); border-left:4px solid var(--brass-l); padding:6px 10px; margin:7px 0; font-size:9pt; page-break-inside:avoid; }
+  .small { font-size:8.4pt; color:var(--muted); }
+  ul { margin:3px 0 5px 0; padding-left:17px; } li { margin:1px 0; }
+  code { font-family:Consolas,monospace; font-size:8.4pt; background:#eef0f2; padding:0 3px; border-radius:2px; }
+  .pb { page-break-before:always; }
+  table.sum td, table.sum th { padding:3px 7px; border-bottom:1px solid var(--line); font-size:9pt; }
+  table.sum th { background:#233447; color:#ECE7DC; text-align:left; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="sub">✦ STUDIO N29</div>
+  <h1>HEROES ✦ DAWN — Asset List 2D manquants</h1>
+  <div class="sub">Tout ce qui reste à dessiner, générer ou intégrer côté 2D pour la 1.0.0</div>
+  <div class="meta">Établie à partir du rapport d'état du 16/11/2026 (<code>Rapport_Etat_du_Jeu_2026-11-16</code>), recoupée avec le code, les ressources Unity (<code>Assets/_Project</code>), le registre <code>Decisions.md</code> et les 21 planches « Aube tactique ».<br>
+  Périmètre : Brooklyn + chapitre Sergueiv (Moscou) · Windows + Android · rc1 le 22/01/2027, stable le 29/01/2027.</div>
+</div>
+
+<h2>1. Synthèse</h2>
+<div class="kpis" id="kpis"></div>
+<p><b>Deux listes, deux natures de manque.</b> La <b>liste A</b> recense les assets qui <b>n'existent nulle part</b> (aucun fichier dans <code>Art/</code> ni <code>Resources/</code>) : ce sont les vrais travaux de création. La <b>liste B</b> recense les assets <b>déjà produits</b> par la livraison « Aube tactique » du 9–11/11 mais <b>absents du jeu</b> (aucune référence dans le code, ou chemin de chargement qui ne trouve rien) : aucun dessin à refaire, seulement de l'import et du branchement.</p>
+<div class="note"><b>Légende des priorités.</b>
+ <span class="tag p1">P1</span> bloque le parcours jouable de la rc1 (22/01/2027) ·
+ <span class="tag p2">P2</span> à livrer avant la stable (29/01/2027) ·
+ <span class="tag p3">P3</span> confort, peut glisser après la 1.0 ·
+ <span class="tag conf">À confirmer</span> décision de périmètre ou de direction artistique à prendre avant de produire.
+ <br><b>Colonne de droite :</b> image de référence recadrée, le cadre jaune montre l'élément dont on parle. Les planches sont celles du <code>03_Art_UI_UX/Aube_Tactique_2026-11-04</code> (1774 × 887) ; quand aucune planche ne dessine l'élément, c'est une capture du jeu du 16/11 qui sert de repère.</div>
+
+<table class="sum" id="sumtable"></table>
+
+<h2 class="pb">2. Liste A — Assets 2D à créer</h2>
+<div id="listA"></div>
+
+<h2 class="pb">3. Liste B — Assets déjà produits, à importer et brancher dans le jeu</h2>
+<p class="small">Sources : <code>Art/UI/AubeTactiqueExtension</code> (477 assets livrés le 11/11) et <code>Art/UI/AubeTactiqueKit/Illustrations</code>. Seuls 8 groupes sur 23 ont été copiés dans <code>Resources/UI/AubeTactique/Ext</code> (Agents, Cards, Components, Icons, Items, MiniGames, Skills, Zones), et le code n'en appelle que quelques-uns (<code>TacticalArt.Ext</code> : Agents, Cards, Icons, Items, MiniGames, Skills). Les USS référencent le Kit, <code>Exports/Portraits128</code> et <code>Exports/Enemies128</code>.</p>
+<div id="listB"></div>
+
+<h2 class="pb">4. Volontairement hors liste (hors périmètre 1.0.0)</h2>
+<ul>
+<li><b>Contenu reporté (décision H1, 12/11) :</b> Paris, Salem, chapitres Moscou 2 à 4 (Kapotnya, Sadovoye Koltso, Place Rouge : seule la carte « Bientôt » est affichée), arc Hell Rising / Eda.</li>
+<li><b>Plateformes hors 1.0 (H3) :</b> iOS, Switch, Steam (capsules, bannières de store).</li>
+<li><b>Voix :</b> aucune voix en 1.0 ; pas de portraits animés ni de lip-sync.</li>
+<li><b>Notifications locales :</b> post-1.0 (icône de notification monochrome à prévoir à ce moment-là).</li>
+<li><b>Déjà couverts, à ne pas refaire :</b> 33 portraits d'agents et détourés, 64 icônes de compétence, 48 cartes, 14 objets, 11 ennemis de Brooklyn, 4 fonds de zones NY + 4 de Moscou, 8 fonds de mini-jeux, icônes de famille / rareté / ressources, kit d'interface (boutons, cadres, jauges).</li>
+</ul>
+
+<h2>5. Méthode et limites</h2>
+<ul>
+<li>« N'existe pas » = aucun fichier de ce nom dans <code>Assets/_Project/Art</code> et <code>Resources</code> au 16/11/2026 ; « non branché » = aucune référence dans <code>Presentation/</code>, <code>UIToolkit/</code> ou les <code>.uss</code> (recherche textuelle).</li>
+<li>Rien n'a été lancé dans Unity : une référence indirecte (nom construit à l'exécution) peut échapper à la recherche. La liste B est donc à confirmer à l'ouverture du projet.</li>
+<li>Les numéros de planche (8.1, 12.2…) renvoient aux 21 planches du dossier. Les éléments sans planche (états de combat, FX, cosmétiques, visuels de store) n'ont pas de maquette : le cadre jaune indique <i>où ils s'afficheront</i>, pas leur dessin.</li>
+<li>Les nombres de fichiers par ligne sont des ordres de grandeur (source + déclinaisons) ; ils cadrent le travail, ils ne remplacent pas un devis.</li>
+</ul>
+
+<script>
+const PL = "../03_Art_UI_UX/Aube_Tactique_2026-11-04/";
+const CAP = "Asset_List_2D_refs/";
+const IMG = {
+  "01": {src:PL+"01-entree.png",w:1774,h:887},   "02": {src:PL+"02-compte.png",w:1774,h:887},   "04": {src:PL+"04-equipe-agents.png",w:1774,h:887},
+  "05": {src:PL+"05-collections.png",w:1774,h:887}, "06": {src:PL+"06-mission.png",w:1774,h:887},
+  "07": {src:PL+"07-plateau.png",w:1774,h:887},   "08": {src:PL+"08-combat.png",w:1774,h:887},
+  "09": {src:PL+"09-narration-resultats.png",w:1774,h:887}, "10": {src:PL+"10-boutique.png",w:1774,h:887},
+  "11": {src:PL+"11-recompenses.png",w:1774,h:887}, "12": {src:PL+"12-progression-social.png",w:1774,h:887},
+  "13": {src:PL+"13-tournoi-tutoriel.png",w:1774,h:887}, "16": {src:PL+"16-fenetres.png",w:1774,h:887},
+  "18": {src:PL+"18-minijeux-b.png",w:1774,h:887}, "20": {src:PL+"20-heros-etats.png",w:1774,h:887},
+  "21": {src:PL+"21-complements.png",w:1774,h:887},
+  "cap-combat": {src:CAP+"04-combat.png",w:1920,h:1080}, "cap-souvenir": {src:CAP+"91b-chapitres-souvenir.png",w:1920,h:1080}
+};
+const R = (img, boxes, cap) => ({img, boxes, cap});
+
+/* ============================== LISTE A ============================== */
+const A = [
+ {cat:"1 · Ennemis, PNJ et carte de Moscou", note:"Le chapitre Sergueiv est jouable de bout en bout mais ses 4 ennemis et ses 2 intervenants de dialogue n'ont aucune image.", rows:[
+  {id:"M-01", prio:"P1", n:3, t:"Garde de la mafia (<code>mos_guard</code>) — portrait d'ennemi",
+   p:"Buste de trois quarts, visage et équipement lisibles à 128 px. Garde moscovite de première ligne : carrure large, manteau sombre doublé, bouclier de rue et crosse (compétences « Coup de crosse », « Cordon de sécurité » = bouclier + provocation). Famille Matière : liseré ambre. Même direction que les planches (aplats anguleux, lumière rose-violet du soir, côté ennemi : liseré rouge), fond détouré.",
+   f:"PNG transparent 1024×1024 (source) + exports 512 et 128 ; se pose dans le cadre incliné <code>enemy-slanted-frame</code>.",
+   u:"Intro de combat (8.1), cartes d'unités (8.2), ciblage (8.3), fiche de case (7.3), Archives ennemis. Présent dans les 4 zones M1.1–M1.4.",
+   a:"Silhouette USS : l'ennemi n'est pas dans <code>HudPortraits.Foes</code> (11 ennemis de Brooklyn seulement).",
+   ref:R("08",[[592,166,248,202]],"<b>Planche 8.1</b> — cadre incliné d'ennemi (Voyou) : le format à reprendre.")},
+  {id:"M-02", prio:"P1", n:3, t:"Contrebandier (<code>mos_smuggler</code>) — portrait d'ennemi",
+   p:"Tireur de la filière du maglev : silhouette plus fine, manteau de voyage, pistolet à canon court, sac de livraison. Famille Perception (liseré violet). Compétences « Tir d'avertissement », « Livraison express » (applique Marque) : poser légèrement tournée vers la cible, regard fixe.",
+   f:"PNG transparent 1024×1024 + exports 512 et 128.",
+   u:"Mêmes écrans que M-01 ; présent dans les 4 zones (base, normal, élite, boss).",
+   a:"Silhouette USS.",
+   ref:R("08",[[1578,168,184,185]],"<b>Planche 8.2</b> — carte d'ennemi à droite du terrain de combat.")},
+  {id:"M-03", prio:"P1", n:3, t:"Homme de main (<code>mos_enforcer</code>) — élite",
+   p:"« L'élite du comité d'accueil » : massif, gants renforcés (« Poing ganté »), manteau doublé (« Manteau doublé » = bouclier), attitude de courtoisie menaçante. Famille Physique/Bio (liseré rose). Doit se lire comme un cran au-dessus de M-01 (élites à 60–85 % de réussite).",
+   f:"PNG transparent 1024×1024 + exports 512 et 128 ; variante « élite » du cadre (liseré épais).",
+   u:"Fiche de case « Combat élite » (7.3, bandeau d'illustration à gauche), combats élites des 4 zones, Archives.",
+   a:"Silhouette USS.",
+   ref:R("07",[[240,540,200,245]],"<b>Planche 7.3</b> — bandeau d'illustration de la fiche de case « Combat élite ».")},
+  {id:"M-04", prio:"P1", n:6, t:"Le Passeur (<code>mos_passeur</code>) — boss, portrait et 3 phases",
+   p:"Boss de la zone M1.4 (5 000 PV). « Il ne parle jamais de victimes ni d'ennemis, seulement de clients » : marchand soigné, manteau long, registre ou clé de cargaison à la main, sourire commercial. Famille Matière. 1 portrait grand format + 3 expressions suivant les phases : « Marchandage » (départ), « Les clients arrivent » (sous 66 %), « Tout doit partir » (sous 33 %).",
+   f:"PNG transparent 1536×1024 (portrait plein cadre de la planche 8.4) × 3 expressions + vignettes 512 et 128 (frise, Archives, Repaire).",
+   u:"Écran de boss (8.4 : portrait, nom, bandeau de phase, barre de PV), intro de combat, Archives ennemis.",
+   a:"Aucune illustration ; le boss s'affiche en silhouette.",
+   ref:R("08",[[1190,555,575,310]],"<b>Planche 8.4</b> — boss grand format, nom, bandeau « Phase 2 », barre de PV.")},
+  {id:"M-05", prio:"P1", n:2, t:"Poses de dialogue détourées : Homme de main et Passeur",
+   p:"Deux agents-PNJ en buste ou mi-corps, fond transparent, expression de dialogue (l'Homme de main sûr de lui ; le Passeur amène, légèrement penché). Identiques en identité à M-03 et M-04.",
+   f:"PNG transparent 1024×1536.",
+   u:"Dialogues « avant / après » des zones M1.1 à M1.3 (orateur <code>enforcer</code>) et M1.4 (orateur <code>passeur</code>, 6 répliques), à gauche de la planche 9.1.",
+   a:"<code>AgentArt.For(\"enforcer\")</code> retombe sur une illustration générique <code>char_XX</code> choisie par hachage de l'identifiant : un visage arbitraire sans rapport avec l'ennemi.",
+   ref:R("09",[[12,60,340,360]],"<b>Planche 9.1</b> — personnage détouré au premier plan du dialogue.")},
+  {id:"M-06", prio:"P1", n:13, t:"Carte illustrée de Moscou + masques et calques d'arrondissement",
+   p:"Vue aérienne de Moscou à l'aube sous la neige : Sergueiv au nord-ouest (monastères, voie du maglev), Kapotnya au sud-est (raffineries, brouillard industriel), anneau Sadovoye Koltso, Place Rouge / Kremlin au centre. Quatre arrondissements détourés aux contours exacts de <code>CityMapLayout.MoscowBoroughs</code> (Sergueiv jouable ; les 3 autres « Bientôt »), chacun en état normal et état sélectionné (liseré or), comme pour New York.",
+   f:"1 JPG 3840×2160 + 4 masques PNG + 8 calques PNG (normal / sélectionné).",
+   u:"Page Carte quand le chapitre Moscou est ouvert (planche 6.1).",
+   a:"Il n'existe que <code>map-new-york</code> (+ 5 masques et 10 calques de New York). Aucun fichier « Moscou ».",
+   ref:R("06",[[10,120,610,345]],"<b>Planche 6.1</b> — carte illustrée aux arrondissements détourés (version Moscou à produire).")}
+ ]},
+ {cat:"2 · Joueur et social", note:"", rows:[
+  {id:"S-01", prio:"P2", n:12, t:"Avatars de profil ×12",
+   p:"Pastilles rondes pour le profil, les amis et le classement : 8 portraits neutres de recrues (hommes / femmes, teints variés, tenue The Dawn) + 4 emblèmes de famille (Matière, Élémentaire, Physique/Bio, Perception). Un avatar par défaut (ville au crépuscule) existe déjà en scène <code>profile-default</code> ; il faut ici le <b>choix</b> d'avatars.",
+   f:"PNG 256×256 sur disque, cadre rond appliqué par le jeu ; 12 fichiers.",
+   u:"Création de compte (2.2), Profil (12.2), Ajouter un ami (12.3), Classement de tournoi (13.1), duels JcJ.",
+   a:"Aucune image d'avatar (rapport du 16/11 : « avatars (aucune image) »). Le profil affiche l'aperçu ou la tête d'un agent.",
+   ref:R("12",[[1120,105,86,96],[1488,222,66,140]],"<b>Planche 12.2</b> — avatar du profil et avatars des amis.")},
+  {id:"S-02", prio:"P3", n:4, t:"Silhouettes « Non recruté » ×4 familles",
+   p:"Silhouette noir-bleuté d'un buste d'agent avec un léger liseré de la couleur de famille ; le cadenas (<code>lock</code>) est déjà dans le kit.",
+   f:"PNG 256×256 (4 fichiers).",
+   u:"Registre des agents (4.4) pour les agents non possédés.",
+   a:"Silhouette générée par le code (<code>Sprites.Bust</code>) : fonctionnelle mais sans la finesse de la planche.",
+   ref:R("04",[[908,745,440,112]],"<b>Planche 4.4</b> — rangée « Non recruté » avec silhouettes et cadenas.")}
+ ]},
+ {cat:"3 · Narration", note:"", rows:[
+  {id:"N-01", prio:"P2", n:8, t:"Illustrations des souvenirs ×8",
+   p:"Une image par fragment de mémoire, sans texte ni bulle, ton légèrement désaturé et vignette sombre. Brooklyn : 4 fragments (dont « La nuit des quais » : conteneurs de Red Hook, camions de l'AMIF). Moscou : « L'accueil parfait » (hologrammes et quais balayés, cargo sur la voie 9), « Le registre sous la fresque », « Des caisses marquées », « Le Passeur » (dépôt, tout a un prix).",
+   f:"JPG 1200×675 (8 fichiers) ; placée en tête de la fenêtre du souvenir, au-dessus du texte.",
+   u:"Chapitres ▸ Souvenirs ▸ LIRE (fenêtre de lecture).",
+   a:"Fenêtre de texte seul (et la mention « Audio à venir »).",
+   ref:R("cap-souvenir",[[413,413,1094,238]],"<b>Capture du jeu (16/11)</b> — zone de texte du souvenir : l'illustration viendrait au-dessus.")}
+ ]},
+ {cat:"4 · Pictogrammes et effets de combat", note:"", rows:[
+  {id:"G-01", prio:"P2", n:14, t:"Icônes d'états de combat ×14",
+   p:"Brûlure, Gel, Choc, Corrosion, Aveuglé, Vulnérable, Entrave, Marque, Provocation, Bouclier, Régénération, Hâte, Esquive, Ancrage. Pastille 64 px lisible à petite taille : pictogramme blanc, fond sombre, contour <b>rouge</b> pour les malus et <b>cyan/vert</b> pour les bonus, point de durée à poser par le code.",
+   f:"PNG 128×128 (affichés en 32–48 px) ; 14 fichiers.",
+   u:"Sous les barres de PV des cartes d'unités (8.2), frise d'initiative, ciblage, fiche d'unité.",
+   a:"Texte seul : <code>CombatPresenter</code> n'affiche que le nom de l'état (texte flottant et liste). Aucun pictogramme dans <code>Icons</code>.",
+   ref:R("cap-combat",[[36,215,402,352],[1488,215,396,228]],"<b>Capture du jeu (16/11)</b> — cartes d'unités sans aucun indicateur d'état.")},
+  {id:"G-02", prio:"P2", n:5, t:"Icônes de position ×5",
+   p:"Première ligne, Attaquant, Contrôle, Soutien, Précision à distance (la position remplace le rôle depuis la décision du 10/11). Trait blanc monochrome comme <code>Icons</code>, à teinter par la famille.",
+   f:"PNG 128×128 (5 fichiers).",
+   u:"Fiche d'agent (4.2) à côté de la famille, escouade, ciblage, combat.",
+   a:"Aucun pictogramme de position dans <code>Icons</code> ni <code>Ext/Icons</code> ; la position est écrite en texte.",
+   ref:R("04",[[1388,90,100,34]],"<b>Planche 4.2</b> — en-tête de la fiche : la puce « Matière » ; la position se placerait à côté.")},
+  {id:"G-03", prio:"P2", n:5, t:"Insignes de rang AMIF 1 à 5",
+   p:"Le rang AMIF (1 à 5, stats ×1 à ×1,65) remplace la rareté d'agent. Cinq insignes en chevrons / étoiles croissants, du bronze terne à l'or rayonnant, lisibles à 48 px, à poser sur les vignettes et les fiches. Les cadres de rareté (5) du kit restent utilisables comme cadres.",
+   f:"PNG 128×128 (5 fichiers).",
+   u:"Cartes de recrutement (10.1), vignettes d'équipe (4.1), fiche d'agent, registre.",
+   a:"Aucun insigne de rang : aucune planche ni asset ne le porte.",
+   conf:true,
+   ref:R("10",[[208,158,70,60],[787,130,78,30]],"<b>Planche 10.1</b> — coin de la carte d'agent et pastille « Niv. 42 » : emplacement probable.")},
+  {id:"G-04", prio:"P3", n:22, t:"Effets de compétence : projectile + impact ×11 familles d'effet",
+   p:"Impact, Feu, Glace, Foudre, Acide, Chaînes, Marque, Soin, Bouclier, Hâte, Temps. Pour chacun : un projectile (traînée) et un éclat d'impact, lumineux, additifs, teintés par le code. Style des éclats de la planche (cristaux roses, étincelles dorées).",
+   f:"PNG 256×256, 4 à 8 images par éclat (planche d'animation) ou image fixe + particule ; ≈ 22 fichiers.",
+   u:"Terrain central du combat (<code>SkillFxHud.Projectile / Burst</code>).",
+   a:"Formes génériques recolorées (<code>Sprites.Diamond / Shine / Ring / Circle / Cloud / Burst</code>) : tous les pouvoirs se ressemblent.",
+   ref:R("08",[[1105,160,460,270]],"<b>Planche 8.2</b> — éclats et lueur de pouvoir autour de l'agent actif.")}
+ ]},
+ {cat:"5 · Composants d'interface", note:"Restes explicites du rapport (§3.2 « Reste »).", rows:[
+  {id:"U-01", prio:"P2", n:4, t:"Bouton de fermeture « croix » des fenêtres",
+   p:"Pastille à coin coupé, croix fine ivoire sur fond marine, liseré or à l'état survolé. Quatre états : normal, survolé, appuyé, focus manette. Zone de toucher ≥ 48 px.",
+   f:"PNG 96×96 ou 9-slice (4 fichiers) ; <code>Icons/close</code> existe déjà, c'est le <b>bouton</b> qui manque.",
+   u:"Coin supérieur droit de toutes les fenêtres modales (16.2) ; remplace le bouton « Fermer » en pied.",
+   a:"Fenêtres fermées par un bouton texte (« FERMER ») en bas.",
+   ref:R("16",[[1536,134,50,42]],"<b>Planche 16.2</b> — croix de fermeture en haut à droite.")},
+  {id:"U-02", prio:"P2", n:5, t:"Bulle de tutoriel ivoire avec pointe + buste de guide",
+   p:"Bulle ivoire à coin coupé, filet or, pointe orientable (haut, bas, gauche, droite) ; à gauche, buste rond de Brie Rayner (face, cadre doré). Fond ivoire pour trancher sur le plateau et le combat.",
+   f:"9-slice PNG ×1 + 4 pointes + buste rond 256×256 (5 fichiers). Le détouré de Brie (<code>Agents/brie_rayner</code>) existe (liste B).",
+   u:"Tutoriel au QG (13.3) et en combat (13.4).",
+   a:"Bulle sombre générique du kit (<code>surface-tutorial</code>), sans buste ni pointe.",
+   ref:R("13",[[1165,603,375,118]],"<b>Planche 13.4</b> — bulle ivoire, pointe vers la compétence et buste de Brie Rayner.")},
+  {id:"U-03", prio:"P2", n:6, t:"Graphe d'affinités en étoile",
+   p:"Nœud-portrait (carré 1:1 + nom + famille), liens dorés à coude vers les partenaires en 4 intensités (paliers de lien 3 / 8 / 15 / 25 : fin pointillé → épais lumineux), pastille « +15 % » de bonus de combo.",
+   f:"PNG / 9-slice : 1 nœud + 4 liens + 1 pastille (6 fichiers).",
+   u:"Écran Affinités (5.4).",
+   a:"Pas de graphe : le rapport liste « graphe d'affinités en étoile » parmi les écarts restants.",
+   ref:R("05",[[1085,568,290,272]],"<b>Planche 5.4</b> — liens dorés de l'agent central vers ses partenaires.")},
+  {id:"U-04", prio:"P2", n:7, t:"Piste de paliers du Pass (états de tuile et en-têtes)",
+   p:"Tuile de palier en 3 états : verrouillée, à réclamer (liseré or + halo), réclamée (coche verte) ; rubans de rangée « Gratuit » et « Premium » (verrou premium) ; losange du palier actif ; étiquette « RÉCLAMER ».",
+   f:"PNG / 9-slice ×7 (<code>Components/reward-tile</code> sert de base, à vérifier pour les états).",
+   u:"Pass saisonnier (12.1) ; même trame réutilisée pour les paliers de tournoi (13.2) et le profil.",
+   a:"Liste de lignes textuelles ; le rapport note « grille de paliers » absente des pages Profil / Pass / Tournoi.",
+   ref:R("12",[[268,222,402,172]],"<b>Planche 12.1</b> — grille Gratuit / Premium avec états des tuiles.")},
+  {id:"U-05", prio:"P3", n:4, t:"Ouverture de booster : états du paquet et rayons de lumière",
+   p:"Paquet fermé → déchiré → éclat de lumière, plus un éventail de rayons doré (derrière le paquet). Le ruban « TOUCHEZ POUR OUVRIR » se fait avec les surfaces du kit.",
+   f:"PNG 1024×1024 ×3 + rayons PNG 2048×1024 (4 fichiers).",
+   u:"Boosters : paquet (11.2), révélation (11.3), résumé (11.4).",
+   a:"Le rapport note « paquet de booster non illustré ». <code>shop-booster</code> existe pour la boutique, pas les états d'ouverture.",
+   conf:true,
+   ref:R("11",[[1190,105,335,330]],"<b>Planche 11.2</b> — paquet fermé, rayons, ruban d'ouverture.")}
+ ]},
+ {cat:"6 · Cosmétiques (boutique de confort, Pass, tournois)", note:"19 cosmétiques sont déclarés dans <code>cosmetics.json</code> et vendus 150 à 1 000 gemmes : aucun n'a d'image ni d'écran d'aperçu.", rows:[
+  {id:"C-01", prio:"P2", n:14, t:"Tenues alternatives ×7",
+   p:"Variantes de l'agent : <code>outfit.agent_d</code>, <code>agent_m</code>, <code>victor_sorel</code>, <code>odile_ferrand</code> (boutique, 1 000 gemmes) ; <code>pass_vanguard</code>, <code>pass_nightshift</code>, <code>pass_dawn</code> (Pass). Même pose et cadrage que le détouré de base (couleurs, motif et accessoires changent), + vignette.",
+   f:"PNG transparent 1024×1536 + vignette 512×512 par tenue (14 fichiers).",
+   u:"Fiche d'agent (4.2), boutique, Pass, dialogues.",
+   a:"Cosmétiques gérés par le code (achat, possession) ; aucune image ni emplacement d'aperçu côté interface.",
+   ref:R("04",[[895,88,300,368]],"<b>Planche 4.2</b> — portrait détouré de l'agent : une variante par tenue.")},
+  {id:"C-02", prio:"P2", n:6, t:"Thèmes de QG ×3",
+   p:"<code>hq.nocturne</code> (nuit, néons), <code>hq.aube</code> (aube dorée), <code>hq.pass_dawn</code> (récompense de Pass). Même composition que <code>hq-new-york</code> pour que les tuiles et l'interface restent lisibles ; + vignette d'aperçu.",
+   f:"JPG 1920×1080 + vignette 512×288 (6 fichiers).",
+   u:"Fond du QG (13.3) et page boutique cosmétiques.",
+   a:"Un seul fond de QG par ville (<code>hq-new-york</code>, <code>hq-moscow</code>).",
+   ref:R("13",[[10,478,875,378]],"<b>Planche 13.3</b> — fond du QG, à décliner en thèmes.")},
+  {id:"C-03", prio:"P3", n:21, t:"Dés ×3 skins (chrome, néon, ambre du Pass)",
+   p:"Six faces par skin, mêmes points et même taille que <code>dice-face-1…6</code> du kit ; chrome brossé, néon cyan, ambre translucide ; + vignette.",
+   f:"PNG 256×256 : 18 faces + 3 vignettes.",
+   u:"Dé du plateau (7.1), boutique.",
+   a:"Un seul dé (kit).",
+   ref:R("07",[[580,356,74,64]],"<b>Planche 7.1</b> — dé du plateau.")},
+  {id:"C-04", prio:"P3", n:4, t:"Pions ×2 (laiton, éclaireur du Pass)",
+   p:"Jeton d'escouade qui parcourt le plateau, en 2 états (immobile, actif) pour chaque skin. Style médaillon à étoile de l'Aube.",
+   f:"PNG 256×256 ×4.",
+   u:"Plateau : case de départ et déplacement (7.1, 7.2).",
+   a:"Un seul jeton (code / kit).",
+   ref:R("07",[[255,266,58,58]],"<b>Planche 7.1</b> — jeton d'équipe sur la case de départ.")},
+  {id:"C-05", prio:"P3", n:23, t:"Récompenses de tournoi : cadres, titres, médailles",
+   p:"8 tournois annuels (Nouvel An, Saint-Valentin, Printemps, Été, Vacances, Rentrée, Halloween, Noël) : 1 cadre d'avatar + 1 bannière de titre par tournoi (16) ; 5 médailles de palier bronze → diamant (<code>medal-1/2/3</code> existent) et insignes Top 10 / Top 3 (2).",
+   f:"PNG 256×256 (cadres), 512×128 (titres), 128×128 (médailles) ; ≈ 23 fichiers.",
+   u:"Classement et récompenses de tournoi (13.1, 13.2), profil.",
+   a:"<code>cosmetics.json</code> ne déclare que 4 cadres/titres (Noël, Nouvel An) ; les 5 paliers et Top 10 / Top 3 pointent des identifiants <code>cosmetic:{r}_…</code> sans image.",
+   conf:true,
+   ref:R("13",[[1180,192,62,48],[1465,185,290,80]],"<b>Planche 13.2</b> — laurées de rang et tuiles de récompense.")}
+ ]},
+ {cat:"7 · Fiche de store et diffusion", note:"Exigés pour Google Play (compte à créer) et le packaging Windows ; aucun n'a de maquette.", rows:[
+  {id:"R-01", prio:"P2", n:1, t:"Icône haute résolution Google Play",
+   p:"512×512, PNG 32 bits, composée depuis <code>HD_Icon_Foreground</code> + <code>HD_Icon_Background</code> (icônes adaptatives déjà faites pour Android).",
+   f:"PNG 512×512, ≤ 1 Mo.", u:"Fiche Play Console.", a:"Icônes adaptatives présentes ; pas d'export store.",
+   ref:R("01",[[15,96,866,368]],"<b>Planche 1.1</b> — écran titre : source du visuel de marque.")},
+  {id:"R-02", prio:"P2", n:1, t:"Image de présentation (feature graphic)",
+   p:"Visuel 1024×500 sans texte parasite : logo « HEROES ✦ DAWN » + héroïne et skyline de l'écran titre, zones sûres respectées (le logo sur le tiers gauche).",
+   f:"JPG ou PNG 1024×500.", u:"Fiche Play Console.", a:"Inexistante.",
+   ref:R("01",[[15,96,866,368]],"<b>Planche 1.1</b> — composition de base à recadrer en 1024×500.")},
+  {id:"R-03", prio:"P2", n:12, t:"Captures d'écran de store ×8 (+4 tablette)",
+   p:"8 captures en paysage 1920×1080 : titre, QG, équipe, plateau, combat, boss, boutique, tournoi ; à prendre une fois l'interface finale et la fluidité validées. Option : 4 captures tablette 7\" / 10\".",
+   f:"PNG ou JPG 1920×1080 (8 + 4).", u:"Fiche Play Console (min. 2 exigées).", a:"Captures internes de test seulement.",
+   ref:R("08",[[10,490,870,385]],"<b>Planche 8.3</b> — type de capture de combat attendue (à refaire en jeu).")},
+  {id:"R-04", prio:"P2", n:2, t:"Icône Windows (.ico) et écran de lancement",
+   p:"<code>.ico</code> multi-tailles 16 / 32 / 48 / 256 générée depuis l'icône du jeu ; écran de lancement avec <code>N29_Logo</code> sur le fond marine de la marque.",
+   f:"ICO + 1 image de lancement.", u:"Exécutable Windows, build 1.0.0.", a:"À vérifier dans les paramètres du joueur Windows (non lancé).",
+   conf:true,
+   ref:R("01",[[690,380,170,90],[15,96,866,368]],"<b>Planche 1.1</b> — identité à reprendre pour l'icône et le lancement.")}
+ ]}
+];
+
+/* ============================== LISTE B ============================== */
+const B = [
+ {id:"I-01", prio:"P1", n:16, t:"Illustrations de chapitre ×16 (8 + 8 verrouillées)", d:"<code>Extension/Chapters</code> + <code>ChaptersLocked</code> (NY 01–04, Moscou 01–04). Le code charge <code>Illustrations/Chapters/&lt;id&gt;</code>, dossier <b>absent</b> de <code>Resources</code> : l'ouverture de chapitre s'affiche sans image et la liste des chapitres n'a pas de vignettes.", u:"Chapitres (6.4), ouverture de chapitre (<code>ChapterIntroFlow</code>).", ref:R("06",[[905,545,395,285]],"<b>Planche 6.4</b> — vignettes de chapitre avec états.")},
+ {id:"I-02", prio:"P2", n:5, t:"Scènes d'ambiance", d:"<code>Scenes</code> : <code>title-new-york</code>, <code>loading-team</code>, <code>construction-dawn</code> (« Bientôt disponible »), <code>support-kremlin</code>, <code>profile-default</code>. Aucune référence dans le code.", u:"Titre / chargement (1.1, 1.3), « Bientôt » (21.3), Support (21.4), Profil.", ref:R("01",[[12,513,870,352]],"<b>Planche 1.3</b> — écran de chargement (<code>loading-team</code>).")},
+ {id:"I-03", prio:"P2", n:7, t:"Scènes d'événements, de zone sécurisée et de résultat de mini-jeu", d:"<code>event-quais-paralyses</code>, <code>event-bridge-evacuation</code>, <code>event-brownsville-hostages</code>, <code>event-coney-blockade</code>, <code>zone-secured</code>, <code>minigame-success</code>, <code>minigame-failure</code>. Non référencées.", u:"Événements (9.2), zone sécurisée (9.4), fin de mini-jeu (20.4).", ref:R("09",[[897,80,420,345]],"<b>Planche 9.2</b> — illustration d'événement narratif.")},
+ {id:"I-04", prio:"P2", n:10, t:"Poses de l'héroïne et figurants", d:"<code>Poses</code> : Giulia (basket, bouclier, pêche, saut, potion, course, relevé), <code>foreman</code>, <code>patient</code>, <code>ilona-reference</code>. Aucune référence.", u:"Mini-jeux Rempart / Course des toits (20.1, 20.2), Tir franc (18.1), potion, pêche, dialogue à choix.", ref:R("20",[[15,200,355,245]],"<b>Planche 20.1</b> — Giulia en pose de blocage devant le bouclier rose.")},
+ {id:"I-05", prio:"P2", n:8, t:"Introductions de mini-jeux avec l'héroïne", d:"<code>MiniGameIntros/intro-*</code> ×8 (ADN, Rythme, Caisses, Engrenages, Tir franc, Infiltration, Ingénierie, Survie). Le code utilise <code>mini-*</code> (sans l'héroïne).", u:"Introduction de mini-jeu (20.3).", ref:R("20",[[10,508,455,355]],"<b>Planche 20.3</b> — héroïne devant l'écran d'analyse ADN.")},
+ {id:"I-06", prio:"P2", n:42, t:"Éléments de mini-jeux (sprites de jeu) pour 6 jeux sur 9", d:"<code>Resources/…/MiniGames</code> (42 sprites : garde, cône de vision, totems, arbres, ballon, panier, caisses, poissons, civils, bouclier rose…) sont importés mais seuls les pilotes ADN, Infiltration et Rythme les appellent (5 appels). Les autres dessinent encore des formes géométriques. Les planches 17 à 20 ne sont pas reprises (rapport §3.2).", u:"Infiltration (18.2) à finir ; Survie en neige, Tir franc, Ingénierie, Caisses, Engrenages, Rempart, Course des toits, pêche, potion, arène.", ref:R("18",[[900,135,860,330]],"<b>Planche 18.2</b> — vue de dessus : gardes, cônes, caisses, sortie.")},
+ {id:"I-07", prio:"P2", n:8, t:"Avatars des rivaux de tournoi", d:"<code>Rivals</code> : Basalte, Cyclone, Kestrel, Mirage, Nocturne, Ombre, Tempo, Vortex. Aucune référence dans le code.", u:"Classement de tournoi (13.1), duels JcJ.", ref:R("13",[[35,175,370,215]],"<b>Planche 13.1</b> — lignes de classement avec avatar.")},
+ {id:"I-08", prio:"P3", n:32, t:"Illustrations de dossier d'agent ×32", d:"<code>Dossiers</code> (un lieu de récit par agent). Pas dans <code>Resources</code> ni dans le code.", u:"Dossier d'agent (4.3), vignette de lieu à droite.", ref:R("04",[[695,558,178,236]],"<b>Planche 4.3</b> — illustration de lieu (casino de Manhattan pour Giulia).")},
+ {id:"I-09", prio:"P2", n:15, t:"Masques et calques d'arrondissement de New York", d:"<code>MapMasks</code> ×5 et <code>MapOverlays</code> ×10 (normal / sélectionné) ; fond <code>map-new-york</code> dans <code>Scenes</code>. Non référencés : la carte garde des polygones unis.", u:"Carte (6.1).", ref:R("06",[[10,120,610,345]],"<b>Planche 6.1</b> — arrondissements détourés avec liseré or à la sélection.")},
+ {id:"I-10", prio:"P2", n:2, t:"Logos Google et Apple", d:"<code>BrandIcons/apple</code>, <code>google</code> (vectoriels monochromes). Le rapport note « logos Google/Apple absents du kit » : ils sont dans l'extension, pas importés.", u:"Connexion (2.1).", ref:R("02",[[433,317,400,62]],"<b>Planche 2.1</b> — boutons Google / Apple.")},
+ {id:"I-11", prio:"P2", n:13, t:"Icônes de ressource et visuels de packs et monnaies", d:"<code>ResourceIcons</code> ×4 (Matière, Élémentaire, Physique/Bio, Perception) ; Kit <code>Generated</code> : <code>shop-pack-mission</code>, <code>shop-pack-operation</code>, <code>shop-credits-*</code> ×3, <code>shop-gems-*</code> ×3, <code>shop-gift-daily</code>. Non référencés ; le rapport note « contenu du pack en texte à puces ».", u:"Boutique (10.2 : packs et contenu en icônes ; 10.3 : gemmes et crédits ; 10.4 : cadeau).", ref:R("10",[[1058,140,375,212],[1465,185,268,110]],"<b>Planche 10.2</b> — packs illustrés et contenu en icônes.")},
+ {id:"I-12", prio:"P3", n:5, t:"Laurées et médailles", d:"<code>Decorations/laurel-left/right</code> et <code>IconsGold/medal-1/2/3</code>. Non référencées (médailles : quelques occurrences à vérifier).", u:"« VICTOIRE » (9.3), score de fin de mini-jeu (20.4), tournoi (13.2).", ref:R("09",[[292,518,278,62]],"<b>Planche 9.3</b> — laurées autour de « VICTOIRE ».")},
+ {id:"I-13", prio:"P1", n:1, t:"Voyou casqué (<code>enemy-helmet-thug</code>)", d:"Présent dans <code>Extension/Enemies</code>, absent de <code>HudPortraits.Foes</code> et de <code>Exports/Enemies128</code> ; le combat montre toujours l'ancien « Voyou » sans casque, alors que la planche est casquée à visière rouge.", u:"Intro de combat (8.1), cartes d'unités (8.2).", ref:R("08",[[592,166,248,202]],"<b>Planche 8.1</b> — Voyou casqué à visière rouge.")},
+ {id:"I-14", prio:"P2", n:24, t:"Composants d'interface de l'extension (24)", d:"<code>vs-banner</code>, <code>enemy-slanted-frame</code>, <code>reward-tile</code>, <code>podium</code>, <code>leaderboard-row / -player</code>, <code>hex-round-chip</code>, <code>objectives-paper</code>, <code>node-detail</code>, <code>agent-xp</code>, <code>fatigue-portrait</code>, <code>recipe-book</code>, <code>spiral-notebook</code>, <code>action-circle</code>, <code>reflex-*</code>, <code>touch-*</code>, <code>new-corner</code>, <code>rarity-corner</code>, <code>bolt-pill</code>, <code>gold-toggle-on/off</code>. Aucun appel dans le code (hors le <code>gold-toggle</code>).", u:"Intro « VS » (8.1), classement et manches (13.1), récompenses (9.3), plateau (7.1–7.2), Atelier, réglages.", ref:R("13",[[35,175,830,215]],"<b>Planche 13.1</b> — lignes de classement, puces hexagonales, podium.")},
+ {id:"I-15", prio:"P2", n:54, t:"Icônes de l'extension (54)", d:"<code>Ext/Icons</code> : <code>node-crate / alert / tower / chest</code>, <code>crossed-swords</code>, <code>star-threat</code>, <code>tent</code>, <code>handshake</code>, <code>crowd</code>, <code>shield-check</code>, <code>mountain</code>, <code>boss-diamond</code>, <code>friend-online</code>… Copiées dans <code>Resources</code> mais presque jamais appelées : les cases du plateau affichent encore des lettres.", u:"Cases du plateau (7.1), fiche de case (7.3), événements (9.2), repos (7.4), Repaire (12.4).", ref:R("07",[[250,95,610,240]],"<b>Planche 7.1</b> — pictogrammes de cases (caisse, alerte, tour, équipe, combat).")}
+];
+
+/* ============================== RENDU ============================== */
+const ASPECT = 1.6;
+function cropOf(boxes, W, H){
+  const x0=Math.min(...boxes.map(b=>b[0])), y0=Math.min(...boxes.map(b=>b[1]));
+  const x1=Math.max(...boxes.map(b=>b[0]+b[2])), y1=Math.max(...boxes.map(b=>b[1]+b[3]));
+  const uw=x1-x0, uh=y1-y0, cx=x0+uw/2, cy=y0+uh/2;
+  let tw=Math.max(uw*1.55, uh*1.55*ASPECT, 330);
+  let th=tw/ASPECT;
+  if (th<uh*1.4){ th=uh*1.4; tw=th*ASPECT; }
+  if (tw>W){ tw=W; th=tw/ASPECT; }
+  if (th>H){ th=H; tw=th*ASPECT; }
+  let x=cx-tw/2, y=cy-th/2;
+  x=Math.max(0,Math.min(W-tw,x)); y=Math.max(0,Math.min(H-th,y));
+  return {x,y,tw,th};
+}
+/* Les recadrages (avec cadre jaune) sont pré-découpés par build-asset-list-crops.ps1 : une image légère par ligne. */
+function refHtml(r, id){
+  const I=IMG[r.img];
+  return '<div class="crop"><img src="'+CAP+'crops/'+id+'.jpg" alt="Référence '+id+'"></div><div class="cap">'+r.cap+' <span class="small">('+I.src.split("/").pop()+')</span></div>';
+}
+function tags(r){ return '<span class="tag '+r.prio.toLowerCase()+'">'+r.prio+'</span>'+(r.conf?'<br><span class="tag conf">À confirmer</span>':''); }
+function rowA(r){
+  return '<tr><td class="id">'+r.id+'<br>'+tags(r)+'<br><span class="small">≈ '+r.n+' fichier'+(r.n>1?'s':'')+'</span></td>'
+   +'<td><h4>'+r.t+'</h4><p>'+r.p+'</p><dl><dt>Format</dt><dd>'+r.f+'</dd><dt>Où</dt><dd>'+r.u+'</dd><dt>Aujourd\'hui</dt><dd>'+r.a+'</dd></dl></td>'
+   +'<td>'+refHtml(r.ref, r.id)+'</td></tr>';
+}
+function rowB(r){
+  return '<tr><td class="id">'+r.id+'<br>'+tags(r)+'<br><span class="small">'+r.n+' fichier'+(r.n>1?'s':'')+'</span></td>'
+   +'<td><h4>'+r.t+'</h4><p>'+r.d+'</p><dl><dt>Écrans</dt><dd>'+r.u+'</dd></dl></td><td>'+refHtml(r.ref, r.id)+'</td></tr>';
+}
+const head='<tr><th style="width:9%">N°</th><th style="width:56%">Asset et description précise</th><th style="width:35%">Image de référence (élément surligné)</th></tr>';
+let htmlA='', totA=0, rowsA=0; const sumA=[];
+for(const g of A){
+  let n=0; htmlA+='<h3>'+g.cat+'<small>'+g.rows.length+' ligne'+(g.rows.length>1?'s':'')+'</small></h3>'+(g.note?'<p class="small" style="margin:4px 2px">'+g.note+'</p>':'')+'<table class="list">'+head;
+  for(const r of g.rows){ htmlA+=rowA(r); n+=r.n; rowsA++; }
+  htmlA+='</table>'; totA+=n; sumA.push([g.cat,g.rows.length,n]);
+}
+document.getElementById('listA').innerHTML=htmlA;
+let htmlB='<table class="list">'+head, totB=0;
+for(const r of B){ htmlB+=rowB(r); totB+=r.n; }
+document.getElementById('listB').innerHTML=htmlB+'</table>';
+const cnt=p=>A.flatMap(g=>g.rows).filter(r=>r.prio===p).length;
+document.getElementById('kpis').innerHTML=
+ '<div class="kpi"><b>'+rowsA+' lignes · ≈ '+totA+'</b><span>fichiers 2D à créer (liste A)</span></div>'+
+ '<div class="kpi"><b>'+B.length+' groupes · '+totB+'</b><span>fichiers déjà produits, à brancher (liste B)</span></div>'+
+ '<div class="kpi"><b>'+cnt('P1')+' · '+cnt('P2')+' · '+cnt('P3')+'</b><span>lignes A en P1 · P2 · P3</span></div>'+
+ '<div class="kpi"><b>7</b><span>éléments de Moscou sans aucun visuel (4 ennemis, 2 poses de dialogue, 1 carte)</span></div>';
+let s='<tr><th>Catégorie (liste A)</th><th style="width:90px">Lignes</th><th style="width:130px">≈ fichiers</th></tr>';
+for(const [c,l,n] of sumA) s+='<tr><td>'+c+'</td><td>'+l+'</td><td>'+n+'</td></tr>';
+s+='<tr><td><b>Total liste A</b></td><td><b>'+rowsA+'</b></td><td><b>≈ '+totA+'</b></td></tr>';
+document.getElementById('sumtable').innerHTML=s;
+</script>
+</body>
+</html>

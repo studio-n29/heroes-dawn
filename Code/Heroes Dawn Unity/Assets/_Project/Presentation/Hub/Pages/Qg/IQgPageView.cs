@@ -13,6 +13,8 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Icône d'alerte Boutique touchée : ouvre son pop-up.</summary>
         event Action ShopAlertClicked;
         event Action QuestsClicked;
+        /// <summary>Onglet du QG touché (Tournois, Repaires) : ouvre la page correspondante.</summary>
+        event Action<HubPage> SubTabClicked;
         void Show(QgPageData data);
     }
 }

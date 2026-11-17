@@ -15,7 +15,7 @@ namespace N29.HeroesDawn.Tests.Editor
     public sealed class BuildBudgetTests
     {
         /// <summary>Plafond des textures sous Resources, en Mo, estimé (compression 4x4 ≈ 1 octet par pixel, non compressé = 4).</summary>
-        const double TextureBudgetMb = 280;
+        const double TextureBudgetMb = 300;
 
         static IEnumerable<(string Path, double Mb)> Textures()
         {

@@ -34,7 +34,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Lab.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<LabPageView>("LabPage", "ListPage/ListPage.uxml", 10);
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<LabPageView>("LabPage", "Lab/Lab.uxml", 10);
     }
 
     /// <summary>Profil du joueur : tag, accès au registre et aux archives, statistiques, amis.</summary>
@@ -42,7 +42,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Profile.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<ProfilePageView>("ProfilePage", "ListPage/ListPage.uxml", 10);
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<ProfilePageView>("ProfilePage", "Profile/Profile.uxml", 10);
     }
 
     /// <summary>Page Chapitres : les 8 chapitres de l'histoire, leur statut et « Relire ».</summary>
@@ -58,7 +58,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Lair.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<LairPageView>("LairPage", "ListPage/ListPage.uxml", 10);
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<LairPageView>("LairPage", "Lair/Lair.uxml", 10);
     }
 
     /// <summary>Page Tournoi : classement à gauche, manches du jour à droite.</summary>
@@ -66,7 +66,7 @@ namespace N29.HeroesDawn.EditorTools.Prefabs.Recipes
     {
         public string RelativePath => "Pages/Tournament.prefab";
         public int Order => 10;
-        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<TournamentPageView>("TournamentPage", "ListPage/ListPage.uxml", 10);
+        public GameObject Build(PrefabContext ctx) => N29.HeroesDawn.EditorTools.UiToolkit.UiToolkitSetup.NewViewObject<TournamentPageView>("TournamentPage", "Tournament/Tournament.uxml", 10);
     }
 
     public sealed class ArchivesPageRecipe : IPrefabRecipe

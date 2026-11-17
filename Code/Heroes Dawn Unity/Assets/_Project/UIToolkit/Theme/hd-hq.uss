@@ -255,3 +255,127 @@
     -unity-background-image-tint-color: var(--hd-brass);
 }
 .hd-friend__field { flex-grow: 1; flex-basis: 0; min-width: 0; margin: 0; }
+
+/* ---------------------------------------------------------------- Atelier de fabrication (planche 3.3) : filtres | recettes | détail */
+.hd-lab { flex-direction: row; }
+.hd-lab__filters { width: 20%; min-width: 280px; max-width: 360px; flex-shrink: 0; margin-right: 18px; padding: 16px 16px 12px 16px; }
+.hd-lab__main { flex-grow: 1; flex-basis: 0; min-width: 0; min-height: 0; margin-right: 18px; }
+.hd-lab__recipes { flex-grow: 1; flex-basis: 0; min-height: 0; padding: 16px 16px 8px 16px; }
+.hd-lab__stock { flex-shrink: 0; margin-top: 12px; padding: 12px 22px 14px 22px; }
+.hd-lab__detail { width: 42%; min-width: 520px; max-width: 800px; flex-shrink: 0; padding: 16px 22px 18px 22px; }
+.hd-lab__scroll { flex-grow: 1; flex-basis: 0; min-height: 0; }
+
+/* Titres de colonne : filet laiton fin sous le titre. */
+.hd-lab__head { flex-direction: row; align-items: center; flex-shrink: 0; margin-bottom: 10px; padding-bottom: 8px; border-bottom-width: 1px; border-bottom-color: rgba(214, 175, 91, 0.5); }
+.hd-lab__headtitle { flex-shrink: 1; min-width: 0; margin: 0 0 0 12px; padding: 0; white-space: normal; -unity-font: var(--hd-font-title); font-size: 34px; color: var(--hd-ivory); }
+.hd-lab__headtitle--first { margin-left: 0; }
+
+/* Filtres : cases du kit, option choisie en bande ivoire. */
+.hd-lab__group { margin: 10px 0 6px 0; padding: 0 0 0 12px; border-left-width: 4px; border-left-color: var(--hd-brass); -unity-font: var(--hd-font-heading); font-size: 28px; color: var(--hd-brass); white-space: normal; }
+.hd-lab__filter {
+    flex-direction: row; align-items: center; flex-shrink: 0; min-height: 64px; margin: 0 0 4px 0; padding: 0 12px;
+    border-width: 0; border-radius: 0; background-color: rgba(0, 0, 0, 0);
+    -unity-slice-left: 40; -unity-slice-top: 40; -unity-slice-right: 40; -unity-slice-bottom: 24;
+}
+.hd-lab__filter:hover { background-color: rgba(236, 231, 220, 0.08); }
+.hd-lab__filter:focus { border-width: 2px; border-color: var(--hd-brass); }
+.hd-lab__filter--on, .hd-lab__filter--on:hover {
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Tabs/tab-vertical-active.png");
+}
+.hd-lab__check { margin-right: 12px; }
+.hd-lab__filterlabel { flex-grow: 1; flex-shrink: 1; min-width: 0; margin: 0; padding: 0; white-space: normal; -unity-font: var(--hd-font-body); font-size: 28px; color: var(--hd-ivory); -unity-text-align: middle-left; }
+.hd-lab__filter--on .hd-lab__filterlabel { color: var(--hd-ink); }
+
+/* Recettes : plaque marine, la recette choisie passe en ivoire (texte encre) avec chevron. */
+.hd-lab__row {
+    flex-direction: row; align-items: center; flex-shrink: 0; min-height: 104px; margin: 0 0 8px 0; padding: 8px 18px 10px 14px;
+    border-width: 2px; border-color: rgba(0, 0, 0, 0); border-radius: 0; background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Tabs/tab-vertical-inactive.png");
+    -unity-slice-left: 40; -unity-slice-top: 40; -unity-slice-right: 40; -unity-slice-bottom: 24;
+}
+.hd-lab__row:hover { -unity-background-image-tint-color: rgb(255, 244, 220); }
+.hd-lab__row:focus { border-color: var(--hd-brass); }
+.hd-lab__row--sel, .hd-lab__row--sel:hover { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Tabs/tab-vertical-active.png"); -unity-background-image-tint-color: rgb(255, 255, 255); }
+.hd-lab__thumb {
+    width: 96px; height: 72px; margin-right: 16px; flex-shrink: 0; -unity-background-scale-mode: scale-to-fit;
+    border-width: 1px; border-color: var(--hd-brass-dark); background-color: rgba(10, 17, 26, 0.55);
+}
+.hd-lab__rowtext { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; justify-content: center; }
+.hd-lab__rowname { margin: 0; padding: 0; white-space: normal; -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-ivory); -unity-text-align: middle-left; }
+.hd-lab__rowsub { margin: 0; padding: 0; white-space: normal; -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-muted); -unity-text-align: middle-left; }
+.hd-lab__row--sel .hd-lab__rowname { color: var(--hd-ink); }
+.hd-lab__row--sel .hd-lab__rowsub { color: #33475A; }
+.hd-lab__chevron {
+    display: none; width: 28px; height: 28px; margin-left: 8px; flex-shrink: 0; -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Icons/forward.png"); -unity-background-image-tint-color: var(--hd-brass-dark);
+}
+.hd-lab__row--sel .hd-lab__chevron { display: flex; }
+
+/* Stock : une ligne sous la liste (remplace la file de fabrication de la planche : le jeu fabrique sans attente). */
+.hd-lab__stocktitle { margin: 0; padding: 0; -unity-font: var(--hd-font-heading); font-size: 26px; color: var(--hd-brass); white-space: normal; }
+.hd-lab__stocktext { margin: 2px 0 0 0; padding: 0; -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-muted); white-space: normal; }
+
+/* Détail : titre à étoile, illustration et statistiques, composants requis, bouton principal. */
+.hd-lab__dhead { flex-direction: row; align-items: center; flex-shrink: 0; margin-bottom: 10px; padding-bottom: 8px; border-bottom-width: 1px; border-bottom-color: rgba(214, 175, 91, 0.5); }
+.hd-lab__star {
+    width: 40px; height: 40px; margin-right: 14px; flex-shrink: 0; -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsGold/dawn.png");
+}
+.hd-lab__dtitles { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; }
+.hd-lab__name { margin: 0; padding: 0; white-space: normal; -unity-font: var(--hd-font-title); font-size: 40px; color: var(--hd-ivory); }
+.hd-lab__sub { margin: 0; padding: 0; white-space: normal; -unity-font: var(--hd-font-body); font-size: 24px; color: var(--hd-muted); }
+.hd-lab__dscroll { flex-grow: 1; flex-basis: 0; min-height: 0; }
+.hd-lab__body { flex-direction: row; flex-shrink: 0; margin-bottom: 14px; }
+.hd-lab__art {
+    width: 40%; min-width: 180px; max-width: 300px; height: 280px; margin-right: 18px; flex-shrink: 0; -unity-background-scale-mode: scale-to-fit;
+    border-width: 1px; border-color: var(--hd-brass-dark); background-color: rgba(10, 17, 26, 0.6);
+}
+.hd-lab__info { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; }
+.hd-lab__stats { flex-shrink: 0; margin-bottom: 10px; }
+.hd-lab__stat { flex-direction: row; align-items: center; margin-bottom: 6px; }
+.hd-lab__stattext { flex-shrink: 1; min-width: 0; margin: 0 0 0 10px; padding: 0; white-space: normal; -unity-font: var(--hd-font-title); font-size: 30px; color: var(--hd-ivory); }
+.hd-lab__desc { margin: 0; padding: 0; white-space: normal; -unity-font: var(--hd-font-body); font-size: 24px; color: var(--hd-muted); }
+.hd-lab__infoline { margin: 8px 0 0 0; padding: 0; white-space: normal; -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-brass-soft); }
+.hd-lab__section { margin: 4px 0 8px 0; padding: 0 0 0 12px; border-left-width: 4px; border-left-color: var(--hd-brass); white-space: normal; -unity-font: var(--hd-font-title); font-size: 32px; color: var(--hd-ivory); }
+.hd-lab__components { flex-shrink: 0; }
+.hd-lab__comp {
+    flex-direction: row; align-items: center; flex-shrink: 0; min-height: 104px; margin: 0 0 8px 0; padding: 8px 20px 10px 14px;
+    background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Surfaces/panel-muted.png");
+    -unity-slice-left: 40; -unity-slice-top: 40; -unity-slice-right: 40; -unity-slice-bottom: 32;
+}
+.hd-lab__compthumb { width: 80px; height: 80px; margin-right: 16px; flex-shrink: 0; -unity-background-scale-mode: scale-to-fit; }
+.hd-lab__comptext { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; justify-content: center; }
+.hd-lab__compname { margin: 0; padding: 0; white-space: normal; -unity-font: var(--hd-font-title); font-size: 28px; color: var(--hd-ivory); }
+.hd-lab__compsub { margin: 0; padding: 0; white-space: normal; -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-muted); }
+.hd-lab__compcount { flex-shrink: 0; min-width: 96px; margin: 0 0 0 12px; padding: 0; -unity-font: var(--hd-font-title); font-size: 44px; color: var(--hd-success); -unity-text-align: middle-right; }
+/* Composant manquant : rouge atténué (quantité 0/6), vignette ternie, pas de cadre d'alerte. */
+.hd-lab__comp--missing .hd-lab__compcount { color: #D9777D; }
+.hd-lab__comp--missing .hd-lab__compsub { color: #C98A8E; }
+.hd-lab__comp--missing .hd-lab__compthumb { opacity: 0.55; }
+.hd-lab__state { margin: 4px 0 0 0; padding: 0; white-space: normal; -unity-font: var(--hd-font-body); font-size: 24px; color: var(--hd-muted); }
+.hd-lab__state--ok { color: var(--hd-success); }
+.hd-lab__foot { flex-direction: row; flex-shrink: 0; margin-top: 12px; }
+.hd-lab__craft { flex-grow: 1; min-height: 96px; font-size: 48px; }
+
+/* ---------------------------------------------------------------- Pass saisonnier : piste de paliers (livraison Missing20261116, U-04).
+   Cases 192 x 192 (9 tranches de 16 px, sans objet : l'icône de la piste est superposée), losange du palier en cours, rubans à texte français non étirés. */
+.hd-pass__legend { flex-direction: row; flex-shrink: 0; margin: 0 0 6px 0; }
+.hd-pass__ribbon { width: 176px; height: 44px; margin-right: 12px; flex-shrink: 0; -unity-background-scale-mode: scale-to-fit; }
+.hd-pass__ribbon--free { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Pass/ribbon-free.png"); }
+.hd-pass__ribbon--premium { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Pass/ribbon-premium.png"); }
+.hd-pass .hd-row__tag { width: 72px; height: 72px; border-width: 0; border-radius: 0; background-color: rgba(0, 0, 0, 0); -unity-background-scale-mode: scale-to-fit; }
+.hd-pass .hd-row__tag > Label { color: var(--hd-ivory); }
+.hd-pass .hd-row--hl .hd-row__tag > Label { color: var(--hd-ink); }
+.hd-pass .hd-pass__tag--current { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Pass/active-tier.png"); }
+.hd-pass .hd-row .hd-pass__tag--current > Label { color: var(--hd-ivory); }
+.hd-pass__cases { flex-direction: row; flex-shrink: 0; margin-right: 16px; }
+.hd-pass__case { width: 70px; height: 70px; margin-right: 6px; flex-shrink: 0; -unity-slice-left: 16; -unity-slice-top: 16; -unity-slice-right: 16; -unity-slice-bottom: 16; }
+.hd-pass__case--locked { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Pass/reward-locked.png"); }
+.hd-pass__case--claimable { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Pass/reward-claimable.png"); }
+.hd-pass__case--claimed { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Pass/reward-claimed.png"); }
+.hd-pass__caseico { position: absolute; left: 15px; top: 6px; width: 40px; height: 40px; -unity-background-scale-mode: scale-to-fit; }
+.hd-pass__caseico--free { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsGold/gift.png"); }
+.hd-pass__caseico--premium { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/IconsGold/pass.png"); }
+.hd-pass__case--locked > .hd-pass__caseico { opacity: 0.5; }
+.hd-pass__case--claimed > .hd-pass__caseico { opacity: 0.7; }

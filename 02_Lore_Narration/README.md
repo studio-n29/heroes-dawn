@@ -13,6 +13,10 @@
 | `10_Quetes_Moscou.md` | Quêtes de Moscou : 4 chapitres et leurs zones |
 | `11_Quetes_Paris.md` | Quêtes de Paris : 4 chapitres et leurs zones |
 | `12_Quetes_Salem.md` | Quêtes de Salem : 4 chapitres et leurs zones, dénouement des Accords |
+| `13_Script_New_York.md` | Script complet de New York : trame, événements, dialogues FR, variantes Agent D/M, épilogues (2026-11-16, fait foi sur les dialogues) |
+| `14_Script_Moscou.md` | Script complet de Moscou : même format (2026-11-16, fait foi sur les dialogues) |
+| `13_Script_New_York_EN.md` | Passe anglaise du script de New York (même clés, à relire) |
+| `14_Script_Moscou_EN.md` | Passe anglaise du script de Moscou (même clés, à relire) |
 | `Archive_v1/` | Ancienne version (Guilde, campagne de New York : 35 recrues, événements, Brooklyn), conservée pour référence |
 | `Sources/` | Documents originaux de Djason (livre, encyclopédie, recherches génétiques, scène de Paris) |
 

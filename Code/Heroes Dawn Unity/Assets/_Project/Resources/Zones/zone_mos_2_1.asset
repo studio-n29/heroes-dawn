@@ -1,0 +1,529 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df527a111f48e9749b23b1fde962ba77, type: 3}
+  m_Name: zone_mos_2_1
+  m_EditorClassIdentifier: N29.HeroesDawn.Authoring::N29.HeroesDawn.Authoring.ZoneAsset
+  zoneId: zone_mos_2_1
+  nameKey: zones.mos_2_1.name
+  displayName: 
+  shortName: 
+  description: 
+  code: M2.1
+  act: 2
+  borough: kapotnya
+  recommendedLevel: 12
+  requires:
+  - zone_mos_1_4
+  biome: 2
+  weather: 4
+  entry: n00
+  nodes:
+  - id: n00
+    type: 0
+    isFixed: 1
+    rank: 1
+    x: 0
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n01
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 1
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n02
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 2
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n03
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n04
+    type: 4
+    isFixed: 1
+    rank: 1
+    x: 4
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: narrateur
+      text: "Kapotnya respire un brouillard jaune. Les torch\xE8res \xE9clairent les tuyaux comme des cierges."
+      key: narration.mos_2_1.intro.0
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: "Alarme de gaz sur le bloc C. Il reste des gens \xE0 l'int\xE9rieur."
+      key: narration.mos_2_1.intro.1
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "La vanne \xE9tait ouverte avant l'alarme. Quelqu'un l'a tourn\xE9e \xE0 la main."
+      key: narration.mos_2_1.intro.2
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: "Je vois la trace d'une main sur cette vanne. Quelqu'un l'a ouverte expr\xE8s."
+      key: narration.mos_2_1.intro.2.d
+      route: agent_d
+      replaces: narration.mos_2_1.intro.2
+    - speaker: giulia_rossi
+      text: Pourquoi provoquer une fuite sur sa propre raffinerie ?
+      key: narration.mos_2_1.intro.3
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Les torch\xE8res de la raffinerie\u2026 de loin, on dirait des cierges. Chez moi, tout br\xFBlait comme \xE7a."
+      key: narration.mos_2_1.intro.4
+      route: agent_m
+      replaces: 
+    narrationAfter: []
+  - id: n05
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n06
+    type: 3
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 1
+    activity: potion_field
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n07
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 4
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n08
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n09
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 6
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n10
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 7
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n11
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 8
+    y: 3
+    activity: gears_workshop
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n12
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 9
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n13
+    type: 4
+    isFixed: 0
+    rank: 1
+    x: 8
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n14
+    type: 2
+    isFixed: 1
+    rank: 2
+    x: 9
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: enforcer
+      text: "L'\xE9vacuation est suspendue. Le transfert ne s'arr\xEAte pas pour un accident."
+      key: narration.mos_2_1.elite.before.0
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: Il parle de transfert avant de parler des ouvriers. Il vient de se trahir.
+      key: narration.mos_2_1.elite.before.1
+      route: 
+      replaces: 
+    narrationAfter:
+    - speaker: ouvrier
+      text: "On nous a dit de quitter le site pour la nuit. Quelques-uns ont refus\xE9."
+      key: narration.mos_2_1.elite.after.0
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "La fuite sert d'\xE9cran : pendant qu'on regarde les flammes, on charge autre chose."
+      key: narration.mos_2_1.elite.after.1
+      route: 
+      replaces: 
+  - id: n15
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 10
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n16
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n17
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 12
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n18
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 13
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter:
+    - speaker: ilona_varga
+      text: Une fuite volontaire pour couvrir un transfert. Les camions partent vers la route du convoi.
+      key: narration.mos_2_1.exit.0
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: Alors on les suit.
+      key: narration.mos_2_1.exit.1
+      route: 
+      replaces: 
+  links:
+  - a: n00
+    b: n01
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n01
+    b: n02
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n03
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n06
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n03
+    b: n04
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n04
+    b: n05
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n06
+    b: n07
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n07
+    b: n08
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n05
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n08
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n09
+    b: n10
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n11
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n13
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n11
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n13
+    b: n14
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n14
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n15
+    b: n16
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n16
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n17
+    b: n18
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  objectives:
+  - id: obj_gate
+    type: 1
+    target: n04
+    nameKey: objectives.mos21.gate
+    text: 
+  - id: obj_leak
+    type: 2
+    target: n11
+    nameKey: objectives.mos21.leak
+    text: 
+  - id: obj_guard
+    type: 0
+    target: n14
+    nameKey: objectives.mos21.guard
+    text: 
+  - id: obj_workers
+    type: 1
+    target: n18
+    nameKey: objectives.mos21.workers
+    text: 
+  encounters:
+  - rank: 0
+    waves:
+    - enemies:
+      - kap_garde
+      - kap_garde
+  - rank: 0
+    waves:
+    - enemies:
+      - kap_convoyeur
+      - thug
+  - rank: 1
+    waves:
+    - enemies:
+      - kap_garde
+      - kap_convoyeur
+      - mos_guard
+  - rank: 2
+    waves:
+    - enemies:
+      - kap_surveillant
+      - kap_garde
+      - kap_convoyeur
+  regions: []
+  hasMapPoint: 0
+  mapPointPermille: {x: 500, y: 500}
+  backgroundKey: zone_mos_2_1_bg
+  backgroundMinX: -1
+  backgroundMinY: 0
+  backgroundMaxX: 14
+  backgroundMaxY: 4
+  backgroundSeed: 1

@@ -24,10 +24,30 @@ namespace N29.HeroesDawn.Presentation.UiToolkit
             if (root is Button button && button.ClassListContains(ButtonClass))
             {
                 if (button.ClassListContains(PrimaryClass) && !button.ClassListContains(SmallClass) && !button.ClassListContains(PlainClass)) Decorate(button);
+                FitWidth(button);
                 return;
             }
             var children = root.hierarchy;
             for (int i = 0, n = children.childCount; i < n; i++) Apply(children[i]);
+        }
+
+        /// <summary>
+        /// UI Toolkit ne mesure le texte d'un élément que s'il n'a aucun enfant : dès qu'un bouton porte une icône, une étoile ou un chevron,
+        /// sa largeur automatique se réduit à ses marges (filtres écrasés, « Passer le tutoriel » écrit lettre par lettre, retour coupé).
+        /// On pose donc une largeur minimale égale à la largeur du libellé plus les marges. Ignoré pour un libellé volontairement invisible
+        /// (boutons à contenu composé), vide, ou tant que la mise en page n'est pas calculée.
+        /// </summary>
+        static void FitWidth(Button button)
+        {
+            if (button.hierarchy.childCount == 0 || string.IsNullOrEmpty(button.text) || button.panel == null) return;
+            var style = button.resolvedStyle;
+            if (float.IsNaN(style.paddingLeft) || style.color.a < 0.05f || style.fontSize < 2f) return;
+            float text = button.MeasureTextSize(button.text, 0f, VisualElement.MeasureMode.Undefined, 0f, VisualElement.MeasureMode.Undefined).x;
+            if (float.IsNaN(text) || text <= 0f) return;
+            float need = Mathf.Ceil(text + style.paddingLeft + style.paddingRight + style.borderLeftWidth + style.borderRightWidth + 2f);
+            var current = button.style.minWidth;
+            if (current.keyword == StyleKeyword.Undefined && Mathf.Abs(current.value.value - need) < 1f) return;
+            button.style.minWidth = need;
         }
 
         static VisualElement? Find(Button button, string className)

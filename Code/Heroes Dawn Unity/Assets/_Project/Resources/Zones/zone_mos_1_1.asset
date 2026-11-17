@@ -80,7 +80,47 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
-    narrationBefore: []
+    narrationBefore:
+    - speaker: narrateur
+      text: "Les hologrammes saluent l'Aube par son nom. Les quais sont balay\xE9s, les sourires parfaits."
+      key: narration.mos_1_1.intro.0
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: "On dirait qu'ils attendaient un chef d'\xC9tat."
+      key: narration.mos_1_1.intro.1
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: Ils attendaient quelqu'un. Je ne sais pas encore qui.
+      key: narration.mos_1_1.intro.2
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Ces quais ont \xE9t\xE9 lav\xE9s cette nuit. Je vois les balais, les seaux\u2026 et personne n'a dormi."
+      key: narration.mos_1_1.intro.3
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: "Ils ont lav\xE9 ces quais pour nous. \xC0 New York, on cache les cam\xE9ras, pas les balais."
+      key: narration.mos_1_1.intro.3.d
+      route: agent_d
+      replaces: narration.mos_1_1.intro.3
+    - speaker: lucas_mendes
+      text: "Un accueil de cette qualit\xE9, \xE7a se pr\xE9pare des jours \xE0 l'avance."
+      key: narration.mos_1_1.intro.4
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: "Ou \xE7a sert \xE0 nous garder les yeux sur la fa\xE7ade."
+      key: narration.mos_1_1.intro.5
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Cette odeur de cire et d'encens sur un quai de gare\u2026 je la connais."
+      key: narration.mos_1_1.intro.6
+      route: agent_m
+      replaces: 
     narrationAfter: []
   - id: n04
     type: 5
@@ -236,12 +276,31 @@ MonoBehaviour:
     enemiesMax: 3
     narrationBefore:
     - speaker: enforcer
-      text: "\xAB Bienvenue \xE0 Moscou. Le comit\xE9 d'accueil vous prie de rebrousser chemin. \xBB"
+      text: "Bienvenue \xE0 Moscou. Le comit\xE9 d'accueil vous prie de rebrousser chemin."
+      key: narration.mos_1_1.elite.before.0
+      route: 
+      replaces: 
     - speaker: ilona_varga
-      text: "\xAB Un accueil trop parfait cache toujours quelque chose. \xBB"
+      text: Un accueil trop parfait cache toujours quelque chose.
+      key: narration.mos_1_1.elite.before.1
+      route: 
+      replaces: 
     narrationAfter:
     - speaker: agent_m
-      text: "\xAB Ce cargo scell\xE9 n'est sur aucun manifeste. Je vois les camions qui l'ont d\xE9pos\xE9\u2026 trois jours avant nous. \xBB"
+      text: "Ce cargo scell\xE9 n'est sur aucun manifeste. Je vois les camions qui l'ont d\xE9pos\xE9\u2026 trois jours avant nous."
+      key: narration.mos_1_1.elite.after.0
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: "Trois jours ? Avant m\xEAme qu'on d\xE9cide de venir ?"
+      key: narration.mos_1_1.elite.after.1
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Avant m\xEAme qu'on d\xE9cide de venir."
+      key: narration.mos_1_1.elite.after.2
+      route: 
+      replaces: 
   - id: n15
     type: 1
     isFixed: 0
@@ -313,7 +372,10 @@ MonoBehaviour:
     narrationBefore: []
     narrationAfter:
     - speaker: ilona_varga
-      text: "\xAB On sort par les archives du monast\xE8re. Si quelqu'un nous y attend, ce n'est pas pour nous souhaiter la bienvenue. \xBB"
+      text: "On sort par les archives du monast\xE8re. Si quelqu'un nous y attend, ce n'est pas pour nous souhaiter la bienvenue."
+      key: narration.mos_1_1.exit.0
+      route: 
+      replaces: 
   links:
   - a: n00
     b: n01

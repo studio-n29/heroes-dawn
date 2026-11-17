@@ -25,6 +25,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["lab.odds"] = "{0} {1} %";
             d["lab.craft"] = "Fabriquer";
             d["lab.crafted"] = "Fabriqué : {0} · {1}";
+            d["lab.filters"] = "Filtres";
+            d["lab.group.type"] = "Type";
+            d["lab.group.grade"] = "Qualité";
+            d["lab.recipes"] = "Recettes ({0})";
+            d["lab.required"] = "Composants requis";
             d["lab.recipe_sub"] = "Coût : {0} · qualité min. {1} · départ {2}";
             d["errors.not_enough_components"] = "Il manque des Composants.";
             d["errors.grade_too_low"] = "Ces Composants sont de trop faible qualité.";

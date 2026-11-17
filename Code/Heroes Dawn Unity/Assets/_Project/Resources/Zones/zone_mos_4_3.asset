@@ -1,0 +1,627 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df527a111f48e9749b23b1fde962ba77, type: 3}
+  m_Name: zone_mos_4_3
+  m_EditorClassIdentifier: N29.HeroesDawn.Authoring::N29.HeroesDawn.Authoring.ZoneAsset
+  zoneId: zone_mos_4_3
+  nameKey: zones.mos_4_3.name
+  displayName: 
+  shortName: 
+  description: 
+  code: M4.3
+  act: 4
+  borough: place_rouge
+  recommendedLevel: 27
+  requires:
+  - zone_mos_4_2
+  biome: 0
+  weather: 0
+  entry: n00
+  nodes:
+  - id: n00
+    type: 0
+    isFixed: 1
+    rank: 1
+    x: 0
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n01
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 1
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n02
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 2
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n03
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n04
+    type: 4
+    isFixed: 1
+    rank: 1
+    x: 4
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: narrateur
+      text: "La salle du conseil est ronde, bois\xE9e, silencieuse. Une seule chaise est occup\xE9e."
+      key: narration.mos_4_3.intro.0
+      route: 
+      replaces: 
+    - speaker: conseiller
+      text: "Soyez les bienvenus. J'ai longtemps attendu une visite aussi pr\xE9cise."
+      key: narration.mos_4_3.intro.1
+      route: 
+      replaces: 
+    - speaker: conseiller
+      text: Mademoiselle, je vous attendais surtout vous.
+      key: narration.mos_4_3.intro.1.m
+      route: agent_m
+      replaces: narration.mos_4_3.intro.1
+    - speaker: conseiller
+      text: "L'AMIF vous pourchasse. Elle pr\xE9l\xE8ve et revend vos semblables. Je peux la chasser de cette ville."
+      key: narration.mos_4_3.intro.2
+      route: 
+      replaces: 
+    - speaker: conseiller
+      text: "En \xE9change de votre neutralit\xE9. Laissez Moscou r\xE9gler ses affaires, et l'Aube sera libre de partir."
+      key: narration.mos_4_3.intro.3
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: "Il parle de neutralit\xE9. Il parle de libert\xE9. Il ne parle ni de ses troph\xE9es ni de ses laboratoires."
+      key: narration.mos_4_3.intro.4
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "La cire sur ses mains. Le m\xEAme parfum. C'est lui."
+      key: narration.mos_4_3.intro.5
+      route: agent_m
+      replaces: 
+    narrationAfter: []
+  - id: n05
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n06
+    type: 3
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 3
+    activity: potion_field
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n07
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 4
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n08
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n09
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n10
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 4
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n11
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n12
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 6
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n13
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 7
+    y: 2
+    activity: dialogue_dockers
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n14
+    type: 2
+    isFixed: 1
+    rank: 2
+    x: 8
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: agent_amif
+      text: "Il est temps de vous retirer. Ce dossier n'est pas le v\xF4tre."
+      key: narration.mos_4_3.elite.before.0
+      route: 
+      replaces: 
+    - speaker: conseiller
+      text: "Vous n'avez pas \xE9t\xE9 invit\xE9, monsieur. Mes hommes vont vous raccompagner."
+      key: narration.mos_4_3.elite.before.1
+      route: 
+      replaces: 
+    narrationAfter:
+    - speaker: giulia_rossi
+      text: "L'envoy\xE9 est tomb\xE9. L'AMIF s'est montr\xE9e, et elle a perdu."
+      key: narration.mos_4_3.elite.after.0
+      route: 
+      replaces: 
+  - id: n15
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 7
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n16
+    type: 4
+    isFixed: 0
+    rank: 1
+    x: 8
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n17
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 9
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n18
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 10
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n19
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n20
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n21
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 12
+    y: 3
+    activity: arena_training
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n22
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 13
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter:
+    - speaker: conseiller
+      text: "Vous voyez : je tiens mes promesses. Reste la v\xF4tre."
+      key: narration.mos_4_3.exit.0
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Une promesse \xE0 un homme qui se tient derri\xE8re tout \xE7a."
+      key: narration.mos_4_3.exit.1
+      route: 
+      replaces: 
+  links:
+  - a: n00
+    b: n01
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n01
+    b: n02
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n03
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n06
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n03
+    b: n04
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n04
+    b: n05
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n06
+    b: n07
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n07
+    b: n08
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n09
+    b: n10
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n11
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n05
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n08
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n11
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n13
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n13
+    b: n14
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n15
+    b: n16
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n14
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n16
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n17
+    b: n18
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n18
+    b: n19
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n18
+    b: n20
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n19
+    b: n21
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n20
+    b: n21
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n21
+    b: n22
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  objectives:
+  - id: obj_antechamber
+    type: 1
+    target: n04
+    nameKey: objectives.mos43.antechamber
+    text: 
+  - id: obj_hearing
+    type: 2
+    target: n13
+    nameKey: objectives.mos43.hearing
+    text: 
+  - id: obj_amif
+    type: 0
+    target: n14
+    nameKey: objectives.mos43.amif
+    text: 
+  - id: obj_offer
+    type: 1
+    target: n22
+    nameKey: objectives.mos43.offer
+    text: 
+  encounters:
+  - rank: 0
+    waves:
+    - enemies:
+      - pr_kremlin_guard
+      - pr_operator
+  - rank: 0
+    waves:
+    - enemies:
+      - pr_operator
+      - pr_technician
+  - rank: 1
+    waves:
+    - enemies:
+      - pr_kremlin_guard
+      - pr_technician
+      - pr_operator
+  - rank: 1
+    waves:
+    - enemies:
+      - amif_trooper
+      - amif_marksman
+      - amif_trooper
+  - rank: 2
+    waves:
+    - enemies:
+      - amif_captain
+      - amif_trooper
+      - amif_marksman
+  regions: []
+  hasMapPoint: 0
+  mapPointPermille: {x: 500, y: 500}
+  backgroundKey: zone_mos_4_3_bg
+  backgroundMinX: -1
+  backgroundMinY: 0
+  backgroundMaxX: 14
+  backgroundMaxY: 6
+  backgroundSeed: 1

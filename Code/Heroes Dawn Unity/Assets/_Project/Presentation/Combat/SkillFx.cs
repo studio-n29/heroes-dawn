@@ -62,6 +62,40 @@ namespace N29.HeroesDawn.Presentation.Combat
             return SkillFxKind.Impact;
         }
 
+        /// <summary>Son de lancement d'une compétence selon sa famille d'animation.</summary>
+        public static Audio.SfxId SoundOf(SkillFxKind kind)
+        {
+            switch (kind)
+            {
+                case SkillFxKind.Impact: return Audio.SfxId.SkillOffensePhysical;
+                case SkillFxKind.Fire:
+                case SkillFxKind.Ice:
+                case SkillFxKind.Lightning:
+                case SkillFxKind.Acid: return Audio.SfxId.SkillOffenseEnergy;
+                case SkillFxKind.Chains:
+                case SkillFxKind.Mark:
+                case SkillFxKind.Time: return Audio.SfxId.SkillControl;
+                case SkillFxKind.Heal: return Audio.SfxId.SkillHeal;
+                case SkillFxKind.Shield: return Audio.SfxId.SkillDefense;
+                case SkillFxKind.Haste: return Audio.SfxId.SkillBuff;
+                default: return Audio.SfxId.SkillCast;
+            }
+        }
+
+        /// <summary>Son d'application d'un statut : dédié pour Brûlure, Choc, Gel et Corrosion, <see cref="Audio.SfxId.Status"/> pour les autres.</summary>
+        public static Audio.SfxId SoundOf(StatusType status)
+        {
+            switch (status)
+            {
+                case StatusType.Burn: return Audio.SfxId.StatusBurn;
+                case StatusType.Shock: return Audio.SfxId.StatusShock;
+                case StatusType.Freeze: return Audio.SfxId.StatusFreeze;
+                case StatusType.Corrosion: return Audio.SfxId.StatusDot;
+                case StatusType.Shield: return Audio.SfxId.Shield;
+                default: return Audio.SfxId.Status;
+            }
+        }
+
         public static Color ColorOf(SkillFxKind kind)
         {
             switch (kind)

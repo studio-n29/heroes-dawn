@@ -297,7 +297,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
             N29.HeroesDawn.Application.Features.World.LairBook.RecordBossDefeat(narrationSession.Meta, "zone_lair_amif_vault", "n04");
             Object.FindAnyObjectByType<ChaptersPageView>()!.HeaderButtonA.Button.onClick.Invoke();
             yield return CaptureSettled("91c-repaire");
-            Object.FindAnyObjectByType<LairPageView>()!.HeaderButtonA.Button.onClick.Invoke();
+            Object.FindAnyObjectByType<LairPageView>()!.EnterButton.Button.onClick.Invoke();
             yield return CaptureSettled("91d-repaire-confirmation");
             Object.FindAnyObjectByType<ConfirmPopupView>()!.CancelButton.Button.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<ConfirmPopupView>() == null);

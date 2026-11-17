@@ -28,6 +28,20 @@
 .hd-btn--primary .hd-tm-ico { -unity-background-image-tint-color: var(--hd-ink); }
 .hd-btn:disabled .hd-tm-ico { opacity: 0.45; }
 
+/* Icônes de position (blanches, teintées par la famille en C#) et insignes de rang AMIF (livraison Missing20261116). */
+.hd-tm-pos { width: 36px; height: 36px; flex-shrink: 0; flex-grow: 0; -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: var(--hd-ivory); }
+.hd-tm-pos--frontline { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Positions/frontline.png"); }
+.hd-tm-pos--attacker { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Positions/attacker.png"); }
+.hd-tm-pos--control { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Positions/control.png"); }
+.hd-tm-pos--support { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Positions/support.png"); }
+.hd-tm-pos--ranged { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Positions/ranged.png"); }
+.hd-tm-rank { width: 40px; height: 40px; flex-shrink: 0; flex-grow: 0; -unity-background-scale-mode: scale-to-fit; }
+.hd-tm-rank--1 { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Ranks/amif-1.png"); }
+.hd-tm-rank--2 { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Ranks/amif-2.png"); }
+.hd-tm-rank--3 { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Ranks/amif-3.png"); }
+.hd-tm-rank--4 { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Ranks/amif-4.png"); }
+.hd-tm-rank--5 { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Ranks/amif-5.png"); }
+
 /* Bouton à icône devant le libellé (enfant « hd-tm-ibtn__ico ») et bouton à icône seule. */
 .hd-btn.hd-tm-ibtn { padding-left: 64px; }
 .hd-tm-ibtn__ico { position: absolute; left: 16px; top: 50%; translate: 0 -50%; width: 36px; height: 36px; }
@@ -77,6 +91,8 @@
 .hd-member--exhausted.hd-member--bio .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-bio-locked.png"); }
 .hd-member--exhausted.hd-member--perception .hd-member__frame { background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/card-family-perception-locked.png"); }
 .hd-member__family { position: absolute; left: 10px; top: 10px; width: 46px; height: 46px; background-color: rgba(10, 17, 26, 0.84); border-radius: 23px; }
+.hd-member__role { position: absolute; left: 14px; top: 62px; width: 38px; height: 38px; padding: 4px; background-color: rgba(10, 17, 26, 0.84); border-radius: 19px; }
+.hd-member__rank { position: absolute; right: 12px; top: 12px; width: 44px; height: 44px; }
 .hd-member__level { position: absolute; left: 9px; right: 78px; bottom: 9px; height: 38px; margin: 0; padding: 0 8px; background-color: rgba(10, 17, 26, 0.82);
     -unity-font: var(--hd-font-title); font-size: 24px; color: var(--hd-ivory); -unity-text-align: middle-left; white-space: nowrap; overflow: hidden; }
 .hd-member__toggle { position: absolute; right: 9px; bottom: 9px; width: 64px; height: 64px; margin: 0; padding: 0; align-items: center; justify-content: center;
@@ -146,6 +162,7 @@
 .hd-sheet__famico { width: 36px; height: 36px; margin-right: 8px; }
 .hd-sheet__role { margin: 0 18px 0 0; padding: 0; white-space: nowrap; }
 .hd-sheet__rarity { margin: 0; padding: 0; font-size: 24px; white-space: nowrap; }
+.hd-sheet__rankico { width: 36px; height: 36px; margin: 0 6px 0 0; }
 .hd-sheet__gauge { flex-direction: row; align-items: center; flex-shrink: 0; margin: 4px 0; }
 .hd-sheet__gaugeico { width: 34px; height: 34px; margin-right: 10px; }
 .hd-sheet__gauge > .hd-sheet__bar { flex-grow: 1; flex-basis: 0; height: 32px; margin: 0; }
@@ -231,5 +248,41 @@
 .hd-aff__face--perception { border-color: var(--hd-perception); }
 .hd-aff__family { position: absolute; right: -10px; bottom: -8px; width: 32px; height: 32px; background-color: rgba(10, 17, 26, 0.9); border-radius: 16px; }
 
+/* Graphe en étoile (planche 5.4) : liens 256 x 128 posés et pivotés en C# (rapport conservé, jamais étirés en 9 tranches), nœuds 9 tranches
+   dont la bande basse (68 px) protège le nom et la famille rendus par le code. */
+.hd-modal__window.hd-aff__window { width: 1500px; max-width: 96%; }
+.hd-aff__starbox { flex-direction: row; height: 480px; flex-shrink: 0; margin-bottom: 10px; }
+.hd-aff__star { flex-grow: 1; flex-basis: 0; min-width: 0; }
+.hd-aff__link { position: absolute; -unity-background-scale-mode: stretch-to-fill; }
+.hd-aff__link--3 { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Affinity/link-3.png"); }
+.hd-aff__link--8 { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Affinity/link-8.png"); }
+.hd-aff__link--15 { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Affinity/link-15.png"); }
+.hd-aff__link--25 { background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Affinity/link-25.png"); }
+.hd-aff__link--faint { opacity: 0.45; }
+.hd-aff__node { position: absolute; margin: 0; padding: 0; border-width: 0; border-radius: 0; background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Project/Resources/UI/AubeTactique/Missing20261116/Affinity/node.png");
+    -unity-slice-left: 16; -unity-slice-top: 16; -unity-slice-right: 16; -unity-slice-bottom: 68; }
+.hd-aff__node:hover { -unity-background-image-tint-color: rgb(255, 244, 218); }
+.hd-aff__node:focus, .hd-aff__node--sel { -unity-background-image-tint-color: rgb(255, 226, 160); }
+.hd-aff__node--center { -unity-background-image-tint-color: rgb(255, 238, 200); }
+.hd-aff__nodeface { position: absolute; left: 16px; top: 16px; right: 16px; bottom: 70px; background-color: var(--hd-surface-3); }
+.hd-aff__nodefam { position: absolute; left: 6px; top: 6px; width: 30px; height: 30px; background-color: rgba(10, 17, 26, 0.84); border-radius: 15px; }
+.hd-aff__nodetext { position: absolute; left: 42px; right: 12px; bottom: 6px; height: 52px; justify-content: center; }
+.hd-aff__nodename { -unity-font: var(--hd-font-title); font-size: 20px; color: var(--hd-ivory); margin: 0; padding: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd-aff__nodefamily { -unity-font: var(--hd-font-body); font-size: 15px; color: var(--hd-muted); margin: 0; padding: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd-aff__detail { width: 36%; min-width: 360px; flex-shrink: 0; margin-left: 18px; padding: 16px 22px; overflow: hidden;
+    background-color: rgba(16, 28, 41, 0.9); border-left-width: 3px; border-color: var(--hd-brass-dark); }
+.hd-aff__dname { -unity-font: var(--hd-font-title); font-size: 36px; color: var(--hd-ivory); white-space: normal; margin: 0 0 4px 0; }
+.hd-aff__dlink { -unity-font: var(--hd-font-body); font-size: 24px; color: var(--hd-brass); white-space: normal; margin: 0 0 8px 0; }
+.hd-aff__dbonus { -unity-font: var(--hd-font-body); font-size: 24px; white-space: normal; margin: 0 0 10px 0; }
+.hd-aff__dpair { -unity-font: var(--hd-font-body); font-size: 22px; color: var(--hd-ivory); white-space: normal; margin: 0; }
+
 /* Second tour : les filtres de famille ne rétrécissent jamais en dessous de leur libellé (icône à gauche comprise). */
 .hd-team__chips .hd-team__chip { flex-shrink: 0; white-space: nowrap; }
+
+/* Filtres de famille : icône seule, puce carrée de taille fixe (aucune mesure de texte). */
+.hd-btn.hd-team__chip--icon { width: 84px; min-width: 84px; padding: 0; }
+.hd-team__chipicon { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin-left: -22px; margin-top: -22px; }
+
+/* Insigne de rang AMIF sur les tuiles du registre (coin haut droit du portrait). */
+.hd-tile__rank { position: absolute; right: 6px; top: 6px; width: 44px; height: 44px; }

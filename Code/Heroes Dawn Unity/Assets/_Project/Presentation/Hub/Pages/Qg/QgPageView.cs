@@ -34,6 +34,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         public event Action? SecondaryClicked;
         public event Action? ShopAlertClicked;
         public event Action? QuestsClicked;
+        public event Action<HubPage>? SubTabClicked;
 
         /// <summary>Bouton MISSION (tests PlayMode : clic réel).</summary>
         public HdButtonRef MissionButton { get; private set; } = null!;
@@ -56,6 +57,14 @@ namespace N29.HeroesDawn.Presentation.Hub
             _secondaryDot = Q<VisualElement>("secondaryDot"); _roomsRow = Q<VisualElement>("rooms"); _dailyList = Q<VisualElement>("dailyList");
             MissionButton = new HdButtonRef(_mission, this); QuestsButton = new HdButtonRef(_banner, this);
 
+            Q<UnityEngine.UIElements.Button>("tabHq").text = Loc.T("qg.tab.hq");
+            Q<UnityEngine.UIElements.Button>("tabHq").SetEnabled(false);
+            var tabTournament = Q<UnityEngine.UIElements.Button>("tabTournament");
+            tabTournament.text = Loc.T("qg.tab.tournaments");
+            tabTournament.clicked += () => SubTabClicked?.Invoke(HubPage.Tournament);
+            var tabLair = Q<UnityEngine.UIElements.Button>("tabLair");
+            tabLair.text = Loc.T("qg.tab.lairs");
+            tabLair.clicked += () => SubTabClicked?.Invoke(HubPage.Lair);
             Q<Label>("roomsTitle").text = Loc.T("qg.rooms");
             Q<Label>("dailyTitle").text = Loc.T("qg.daily");
             Q<Label>("shopAlertLabel").text = Loc.T("nav.shop");

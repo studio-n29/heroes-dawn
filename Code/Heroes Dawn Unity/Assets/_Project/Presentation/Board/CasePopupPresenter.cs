@@ -37,13 +37,16 @@ namespace N29.HeroesDawn.Presentation.Board
         readonly ILocalization _loc;
         readonly IAudioService _audio;
         readonly IVoicePlayer? _voice;
+        readonly N29.HeroesDawn.Application.Features.World.NarrativeChoices? _choices;
 
         public CasePopupPresenter(IModalService modals, IResolveRestUseCase rest, IResolveNarrativeUseCase narrative, IPlanActivityUseCase plan, IResolveActivityUseCase activity,
-                                  ISessionReadModel session, IToastService toasts, ILocalization loc, IAudioService? audio = null, IVoicePlayer? voice = null)
+                                  ISessionReadModel session, IToastService toasts, ILocalization loc, IAudioService? audio = null, IVoicePlayer? voice = null,
+                                  N29.HeroesDawn.Application.Features.World.NarrativeChoices? choices = null)
         {
             _modals = modals; _rest = rest; _narrative = narrative; _plan = plan; _activity = activity; _session = session; _toasts = toasts; _loc = loc;
             _audio = audio ?? NullAudioService.Instance;
             _voice = voice;
+            _choices = choices;
         }
 
         /// <summary>Joue la case ; liste vide si elle n'est pas interactive ou si sa résolution échoue.</summary>
@@ -125,7 +128,7 @@ namespace N29.HeroesDawn.Presentation.Board
                 }
                 var plan = planned.Value;
                 var result = plan.Def.Kind == ActivityKinds.Reflex ? await PlayReflexAsync(at, ct) : await PlayActivityAsync(plan, ct);
-                _audio.Play(result.Success ? SfxId.MiniGameHit : SfxId.MiniGameMiss);
+                _audio.Play(result.Success ? SfxId.MiniGameWon : SfxId.MiniGameFailed);
                 ToastOutcome(ActivityRules.Resolve(plan, result));
                 var events = Events(await _activity.ExecuteAsync(result, ct));
                 all.AddRange(events);
@@ -364,10 +367,57 @@ namespace N29.HeroesDawn.Presentation.Board
             else if (o.FollowUp != null && o.FollowUp.Type == FollowUpType.Activity) _toasts.Show(_loc.T("activity.followup_activity"), ToastKind.Info);
         }
 
-        /// <summary>Dialogue de narration d'une case (avant son action ou après sa résolution) dans la boîte de dialogue ; rend la main à la fin ou si le joueur le passe.</summary>
+        /// <summary>Dialogue de narration d'une case (avant son action ou après sa résolution) dans la boîte de dialogue ; rend la main à la fin ou si le joueur le passe. Variantes par parcours appliquées ; un choix d'histoire s'insère après la réplique qui le précède.</summary>
         public async UniTask PlayNarrationAsync(NarrationEvent e, CancellationToken ct)
         {
-            var lines = NarrationLines.Build(e, _session.Content, _loc);
+            string hero = _session.Route.HeroId;
+            var zone = _session.RunZone;
+            var choice = _choices != null && zone != null && e.Phase == NarrationPhase.After ? StoryChoices.At(zone.Id.Value, e.Case.Value) : null;
+            if (choice == null)
+            {
+                await PlayLinesAsync(NarrationLines.Build(e, _session.Content, _loc, hero), ct);
+                return;
+            }
+            int cut = -1;
+            if (choice.AfterKey.Length == 0) cut = -2;
+            else for (int i = 0; i < e.Lines.Count; i++) if (e.Lines[i].TextKey == choice.AfterKey) cut = i;
+            var head = cut == -2 ? new List<NarrationLineDef>() : cut < 0 ? e.Lines : e.Lines.Take(cut + 1).ToList();
+            var tail = cut == -2 ? e.Lines : cut < 0 ? new List<NarrationLineDef>() : e.Lines.Skip(cut + 1).ToList();
+            await PlayLinesAsync(NarrationLines.Build(head, _session.Content, _loc, hero), ct);
+            string? chosen = _choices!.Chosen(choice.Id);
+            if (chosen == null)
+            {
+                await PlayLinesAsync(NarrationLines.Build(choice.Prompt, _session.Content, _loc, hero), ct);
+                var a = choice.Options[0]; var b = choice.Options[1];
+                bool first = await _modals.ConfirmAsync(new ConfirmData(_loc.T(choice.TitleKey), _loc.T("choice.hint"), _loc.T(a.LabelKey), _loc.T(b.LabelKey), Tone.Info), ct);
+                chosen = _choices.Choose(choice.Id, first ? a.Id : b.Id);
+            }
+            var branch = chosen == null ? null : choice.Option(chosen);
+            if (branch != null) await PlayLinesAsync(NarrationLines.Build(branch.Branch, _session.Content, _loc, hero), ct);
+            await PlayLinesAsync(NarrationLines.Build(tail, _session.Content, _loc, hero), ct);
+        }
+
+        /// <summary>
+        /// Épilogue du chapitre (script narratif) : joué quand la zone qui vient d'être validée termine son chapitre, après le dernier dialogue de la zone et
+        /// avant l'écran de récompenses. La scène de l'option retenue (si le choix a été fait) précède la scène commune.
+        /// </summary>
+        public async UniTask PlayEpilogueAsync(CancellationToken ct)
+        {
+            var zone = _session.RunZone;
+            if (zone == null) return;
+            var chapter = Chapters.OfZone(zone);
+            if (chapter == null) return;
+            var epilogue = StoryChoices.EpilogueOf(chapter.Id);
+            if (epilogue == null) return;
+            foreach (var z in _session.Content.Zones)
+                if (Chapters.OfZone(z)?.Id == chapter.Id && z.Id != zone.Id && !_session.CompletedZones.Contains(z.Id.Value)) return;
+            var lines = epilogue.For(_choices?.Chosen(epilogue.ChoiceId));
+            await PlayLinesAsync(NarrationLines.Build(lines, _session.Content, _loc, _session.Route.HeroId), ct);
+        }
+
+        /// <summary>Joue des répliques déjà construites dans la boîte de dialogue (rien si la liste est vide).</summary>
+        public async UniTask PlayLinesAsync(IReadOnlyList<DialogueBoxLine> lines, CancellationToken ct)
+        {
             if (lines.Count == 0) return;
             var view = await _modals.OpenAsync<IDialogueBoxView>(ct);
             void Voice(DialogueBoxLine l) => _voice?.Play(l.VoiceKey);

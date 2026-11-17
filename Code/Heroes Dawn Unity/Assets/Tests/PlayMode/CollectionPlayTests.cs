@@ -72,17 +72,28 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoosterOpeningPopupView>() != null, 120);
             var popup = Object.FindAnyObjectByType<BoosterOpeningPopupView>()!;
             yield return null;
-            Assert.That(popup.Current, Is.EqualTo(BoosterOpeningPopupView.Phase.Sealed), "le paquet attend un toucher");
+            Assert.That(popup.Current, Is.EqualTo(RevealPhase.Sealed), "le paquet attend un toucher");
             popup.TapButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => popup.Current == BoosterOpeningPopupView.Phase.Revealing, 300);
+            yield return PlayModeHarness.WaitFor(() => popup.Current == RevealPhase.Revealing, 300);
             Assert.That(popup.Cards.Count, Is.EqualTo(3));
-            popup.TapButton.onClick.Invoke(); // un toucher pendant la révélation retourne tout
+            Assert.That(popup.Cards.Any(x => x.Revealed), Is.False, "les cartes sont face cachée après l'ouverture");
+            for (int i = 0; i < 3; i++)
+            {
+                int n = i;
+                popup.TapButton.onClick.Invoke(); // un toucher = une carte retournée
+                yield return PlayModeHarness.WaitFor(() => popup.Cards[n].Revealed, 120);
+                Assert.That(popup.Cards.Count(x => x.Revealed), Is.EqualTo(i + 1), "une seule carte de plus à chaque toucher");
+                yield return new WaitForSecondsRealtime(1f); // laisse finir l'animation de retournement (verrou anti-rafale)
+            }
             yield return PlayModeHarness.WaitFor(() => popup.ContinueVisible, 300);
             Assert.That(popup.Cards.All(x => x.Revealed && x.FaceVisible), Is.True, "toutes les cartes sont retournées");
+            Assert.That(popup.Cards.All(x => x.BadgeVisible), Is.True, "chaque carte montre NOUVEAU ou DOUBLON");
             popup.ContinueButton.onClick.Invoke();
-            Assert.That(popup.Current, Is.EqualTo(BoosterOpeningPopupView.Phase.Summary));
-            Assert.That(popup.Hint, Is.EqualTo(N29.HeroesDawn.Presentation.Common.Loc.F("booster.received", 3)), "le résumé n'affiche plus l'invite d'ouverture");
-            Assert.That(CollectionOps.Boosters(session, BoosterDef.StandardId), Is.EqualTo(0), "le résumé ne consomme pas un second booster");
+            Assert.That(popup.Current, Is.EqualTo(RevealPhase.Recap));
+            Assert.That(popup.Hint, Does.Contain(N29.HeroesDawn.Presentation.Common.Loc.F("booster.received", 3)), "le récapitulatif annonce les cartes reçues");
+            Assert.That(popup.BestLine, Is.Not.Empty, "la meilleure carte est mise en avant");
+            Assert.That(popup.AgainVisible, Is.False, "plus de booster en réserve : pas de « Ouvrir un autre »");
+            Assert.That(CollectionOps.Boosters(session, BoosterDef.StandardId), Is.EqualTo(0), "le récapitulatif ne consomme pas un second booster");
             popup.ContinueButton.onClick.Invoke();
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<BoosterOpeningPopupView>() == null, 120);
             Assert.That(CollectionOps.Boosters(session, BoosterDef.StandardId), Is.EqualTo(0));
@@ -114,13 +125,17 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return new WaitForSecondsRealtime(0.6f);
             yield return ScreenCaptureTests.Capture("61-booster-paquet");
             popup.TapButton.onClick.Invoke();
-            yield return new WaitForSecondsRealtime(2.2f);
-            yield return ScreenCaptureTests.Capture("62-booster-revelation");
+            yield return new WaitForSecondsRealtime(0.8f);
+            yield return ScreenCaptureTests.Capture("62a-booster-dechire");
+            yield return PlayModeHarness.WaitFor(() => popup.Current == RevealPhase.Revealing, 300);
+            yield return new WaitForSecondsRealtime(0.8f);
+            yield return ScreenCaptureTests.Capture("62b-booster-cartes-face-cachee");
             popup.TapButton.onClick.Invoke();
-            yield return PlayModeHarness.WaitFor(() => popup.ContinueVisible, 300);
-            popup.ContinueButton.onClick.Invoke();
+            yield return new WaitForSecondsRealtime(0.5f);
+            yield return ScreenCaptureTests.Capture("62c-booster-revelation");
+            popup.SkipButton.onClick.Invoke();
             yield return new WaitForSecondsRealtime(0.6f);
-            yield return ScreenCaptureTests.Capture("63-booster-resume");
+            yield return ScreenCaptureTests.Capture("63-booster-recapitulatif");
             popup.ContinueButton.onClick.Invoke();
         }
 

@@ -28,8 +28,11 @@ namespace N29.HeroesDawn.Presentation.Tutorial
     public sealed class TutorialOverlayView : HdView
     {
         const float Pad = 8f;
+        /// <summary>Largeur de la bulle (celle de hd-shell.uss) : sert à poser la pointe en face de la cible.</summary>
+        const float BubbleWidth = 1060f, TipSize = 48f, TipMargin = 40f;
+        const string RoundBust = "Missing20261116/Tutorial/brie-rayner-round";
 
-        VisualElement _veil = null!, _top = null!, _bottom = null!, _left = null!, _right = null!, _ring = null!, _ripple = null!, _bubble = null!, _hint = null!, _fx = null!, _medal = null!;
+        VisualElement _veil = null!, _top = null!, _bottom = null!, _left = null!, _right = null!, _ring = null!, _ripple = null!, _bubble = null!, _hint = null!, _fx = null!, _medal = null!, _tip = null!;
         readonly VisualElement[] _brackets = new VisualElement[4];
         Label _pointer = null!, _title = null!, _body = null!, _progress = null!, _hintTitle = null!, _hintBody = null!;
         UnityEngine.UIElements.Button _ok = null!, _skip = null!, _hintOk = null!;
@@ -56,7 +59,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
             _veil = Q<VisualElement>("veil"); _top = Q<VisualElement>("veilTop"); _bottom = Q<VisualElement>("veilBottom");
             _left = Q<VisualElement>("veilLeft"); _right = Q<VisualElement>("veilRight");
             _ring = Q<VisualElement>("ring"); _ripple = Q<VisualElement>("ripple"); _bubble = Q<VisualElement>("bubble");
-            _hint = Q<VisualElement>("hint"); _fx = Q<VisualElement>("fx"); _medal = Q<VisualElement>("medal");
+            _hint = Q<VisualElement>("hint"); _fx = Q<VisualElement>("fx"); _medal = Q<VisualElement>("medal"); _tip = Q<VisualElement>("bubbleTip");
             for (int i = 0; i < 4; i++) _brackets[i] = Q<VisualElement>("bracket" + i);
             _pointer = Q<Label>("pointer"); _title = Q<Label>("title"); _body = Q<Label>("body"); _progress = Q<Label>("progress");
             _hintTitle = Q<Label>("hintTitle"); _hintBody = Q<Label>("hintBody");
@@ -68,7 +71,11 @@ namespace N29.HeroesDawn.Presentation.Tutorial
             _fx.pickingMode = PickingMode.Ignore; _ripple.pickingMode = PickingMode.Ignore; _pointer.pickingMode = PickingMode.Ignore;
             foreach (var b in _brackets) b.pickingMode = PickingMode.Ignore;
             _veil.pickingMode = PickingMode.Ignore;
-            _medal.style.backgroundImage = AgentArt.For("rayner") is Sprite face ? new StyleBackground(Background.FromSprite(face)) : new StyleBackground(StyleKeyword.None);
+            var round = TacticalArt.Load(RoundBust);
+            // L image ronde porte déjà son anneau laiton ; sans elle, le portrait carré de Rayner passe sous un masque rond.
+            Sprite? bust = round != null ? round : AgentArt.For("rayner");
+            _medal.EnableInClassList("hd-tut__medal--face", round == null);
+            _medal.style.backgroundImage = bust != null ? new StyleBackground(Background.FromSprite(bust)) : new StyleBackground(StyleKeyword.None);
             _ok.clicked += () => AcknowledgeClicked?.Invoke();
             _skip.clicked += () => SkipClicked?.Invoke();
             _hintOk.clicked += () => { HideHint(); HintClosed?.Invoke(); };
@@ -142,12 +149,15 @@ namespace N29.HeroesDawn.Presentation.Tutorial
                 foreach (var b in _brackets) b.style.display = DisplayStyle.Flex;
                 LayoutBrackets(0f);
                 // La flèche est posée du côté opposé à la bulle, pointant vers la cible.
-                _pointerBase = new Vector2(h.center.x - 20f, bubbleAtTop ? h.yMax + 8f : h.yMin - 48f);
+                _pointerBase = new Vector2(h.center.x - TipSize * 0.5f, bubbleAtTop ? h.yMax + 8f : h.yMin - TipSize);
                 _pointer.style.left = _pointerBase.x;
-                // Chevron du kit (teinté par USS) : vers le haut quand la bulle est en haut, la cible étant alors au-dessus de la flèche.
+                // Pointe du kit : vers le haut quand la bulle est en haut, la cible étant alors au-dessus de la flèche.
                 _pointer.text = "";
                 _pointer.EnableInClassList("hd-tut__pointer--up", bubbleAtTop);
                 _pointer.EnableInClassList("hd-tut__pointer--down", !bubbleAtTop);
+                // Pointe de la bulle : sur le bord tourné vers la cible (bord bas quand la bulle est en haut), en face du centre de la cible.
+                float bubbleLeft = panel.x * 0.5f - BubbleWidth * 0.5f;
+                SetTip(bubbleAtTop ? "down" : "up", Mathf.Clamp(h.center.x - bubbleLeft - TipSize * 0.5f, TipMargin, BubbleWidth - TipMargin - TipSize));
             }
             else
             {
@@ -155,6 +165,7 @@ namespace N29.HeroesDawn.Presentation.Tutorial
                 Place(_bottom, 0, 0, 0, 0); Place(_left, 0, 0, 0, 0); Place(_right, 0, 0, 0, 0);
                 _ring.style.display = DisplayStyle.None; _ripple.style.display = DisplayStyle.None; _pointer.style.display = DisplayStyle.None;
                 foreach (var b in _brackets) b.style.display = DisplayStyle.None;
+                SetTip(null, 0f); // aucune cible : la bulle n'a pas de pointe
             }
 
             _title.text = text.Title; _body.text = text.Body; _progress.text = text.Progress;
@@ -163,6 +174,16 @@ namespace N29.HeroesDawn.Presentation.Tutorial
             _bubble.style.display = DisplayStyle.Flex;
             _bubble.style.top = bubbleAtTop ? 130f : StyleKeyword.Auto;
             _bubble.style.bottom = bubbleAtTop ? StyleKeyword.Auto : 140f;
+        }
+
+        /// <summary>
+        /// Pose la pointe de la bulle sur un bord (« up », « down », « left », « right » ; null : masquée). Sur les bords haut et bas,
+        /// <paramref name="along"/> est son décalage depuis le coin gauche de la bulle ; sur les bords latéraux, USS la centre.
+        /// </summary>
+        void SetTip(string? side, float along)
+        {
+            foreach (var s in new[] { "up", "down", "left", "right" }) _tip.EnableInClassList("hd-tut__tip--" + s, s == side);
+            if (side == "up" || side == "down") _tip.style.left = along;
         }
 
         public void Hide()

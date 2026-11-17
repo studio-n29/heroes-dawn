@@ -1,6 +1,7 @@
 #nullable enable
 using UnityEditor;
 using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
 using UnityEngine;
 
 namespace N29.HeroesDawn.EditorTools.Build
@@ -11,10 +12,10 @@ namespace N29.HeroesDawn.EditorTools.Build
         public const string ProductName = "Heroes Dawn";
         public const string CompanyName = "Studio N29";
         public const string AndroidIdentifier = "com.studion29.heroesdawn";
-        public const string IconPath = "Assets/_Project/Art/UI/HD_Logo.png";
+        public const string IconPath = "Assets/_Project/Art/UI/HD_AppIcon_AubeTactique.png";
         /// <summary>Icône adaptative Android : fond uni (couleur du bord de l icône) et icône à 64 % au centre (zone sûre).</summary>
-        public const string IconBackgroundPath = "Assets/_Project/Art/UI/HD_Icon_Background.png";
-        public const string IconForegroundPath = "Assets/_Project/Art/UI/HD_Icon_Foreground.png";
+        public const string IconBackgroundPath = "Assets/_Project/Art/UI/HD_AppIcon_AubeTactique_AndroidBackground.png";
+        public const string IconForegroundPath = "Assets/_Project/Art/UI/HD_AppIcon_AubeTactique_AndroidForeground.png";
 
         [MenuItem("Heroes Dawn/Build/Appliquer le nom et le logo du jeu")]
         public static void Apply()
@@ -24,10 +25,7 @@ namespace N29.HeroesDawn.EditorTools.Build
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, AndroidIdentifier);
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Standalone, AndroidIdentifier);
 
-            var logo = AssetDatabase.LoadAssetAtPath<Texture2D>(IconPath);
-            if (logo == null) throw new System.InvalidOperationException("Logo introuvable : " + IconPath + " (Heroes Dawn ▸ Setup ▸ Générer les assets d'interface)");
-            PlayerSettings.SetIcons(NamedBuildTarget.Unknown, new[] { logo }, IconKind.Any);
-            ApplyAndroidIcons(logo);
+            ApplyIcons();
 
             // Tous les écrans sont conçus en paysage 16:9.
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.AutoRotation;
@@ -38,9 +36,20 @@ namespace N29.HeroesDawn.EditorTools.Build
             AssetDatabase.SaveAssets();
         }
 
+        /// <summary>Applique l'icône Aube tactique sans modifier les autres réglages du joueur.</summary>
+        public static void ApplyIcons()
+        {
+            var logo = AssetDatabase.LoadAssetAtPath<Texture2D>(IconPath);
+            if (logo == null) throw new System.InvalidOperationException("Icône introuvable : " + IconPath);
+            PlayerSettings.SetIcons(NamedBuildTarget.Unknown, new[] { logo }, IconKind.Any);
+            ApplyAndroidIcons(logo);
+            AssetDatabase.SaveAssets();
+            Debug.Log("[Heroes Dawn] Icône Aube tactique appliquée : défaut et tous les emplacements Android.");
+        }
+
         /// <summary>
-        /// Sans réglage par plateforme, Android affiche l'icône Unity : on renseigne tous les emplacements
-        /// (adaptative avec fond et premier plan, ronde, classique).
+        /// Renseigne tous les emplacements Android pris en charge par la version de Unity,
+        /// notamment chaque taille adaptative avec fond et premier plan dans la zone sûre.
         /// </summary>
         public static void ApplyAndroidIcons(Texture2D logo)
         {
@@ -58,6 +67,17 @@ namespace N29.HeroesDawn.EditorTools.Build
                 }
                 PlayerSettings.SetPlatformIcons(NamedBuildTarget.Android, kind, icons);
             }
+        }
+    }
+
+    /// <summary>Couvre aussi les builds Android lancés depuis les Build Profiles ou un autre script.</summary>
+    public sealed class GameBrandingBuildProcessor : IPreprocessBuildWithReport
+    {
+        public int callbackOrder => 0;
+
+        public void OnPreprocessBuild(BuildReport report)
+        {
+            if (report.summary.platform == BuildTarget.Android) GameBranding.ApplyIcons();
         }
     }
 }

@@ -50,7 +50,7 @@ namespace N29.HeroesDawn.Authoring
         {
             if (n.narrationBefore.Count == 0 && n.narrationAfter.Count == 0) return null;
             IReadOnlyList<NarrationLineDef> Lines(List<NarrationLineData> src, NarrationPhase phase)
-                => src.Select((l, i) => new NarrationLineDef(l.speaker, NarrationKeyOf(a, n, phase, i))).ToList();
+                => src.Select((l, i) => new NarrationLineDef(l.speaker, string.IsNullOrEmpty(l.key) ? NarrationKeyOf(a, n, phase, i) : l.key, string.IsNullOrEmpty(l.route) ? null : l.route, string.IsNullOrEmpty(l.replaces) ? null : l.replaces)).ToList();
             return new NarrationDef(Lines(n.narrationBefore, NarrationPhase.Before), Lines(n.narrationAfter, NarrationPhase.After));
         }
 
@@ -65,15 +65,15 @@ namespace N29.HeroesDawn.Authoring
             foreach (var o in a.objectives) if (!string.IsNullOrEmpty(o.text)) t.Values[ObjectiveKeyOf(a, o)] = o.text;
             foreach (var n in a.nodes)
             {
-                for (int i = 0; i < n.narrationBefore.Count; i++) t.Values[NarrationKeyOf(a, n, NarrationPhase.Before, i)] = n.narrationBefore[i].text;
-                for (int i = 0; i < n.narrationAfter.Count; i++) t.Values[NarrationKeyOf(a, n, NarrationPhase.After, i)] = n.narrationAfter[i].text;
+                for (int i = 0; i < n.narrationBefore.Count; i++) if (string.IsNullOrEmpty(n.narrationBefore[i].key)) t.Values[NarrationKeyOf(a, n, NarrationPhase.Before, i)] = n.narrationBefore[i].text;
+                for (int i = 0; i < n.narrationAfter.Count; i++) if (string.IsNullOrEmpty(n.narrationAfter[i].key)) t.Values[NarrationKeyOf(a, n, NarrationPhase.After, i)] = n.narrationAfter[i].text;
             }
             return t;
         }
 
         static List<NarrationLineData> LinesOf(IReadOnlyList<NarrationLineDef>? lines, System.Func<string, string>? textOf)
             => lines == null ? new List<NarrationLineData>()
-               : lines.Select(l => new NarrationLineData { speaker = l.Speaker, text = textOf != null ? textOf(l.TextKey) : "" }).ToList();
+               : lines.Select(l => new NarrationLineData { speaker = l.Speaker, text = textOf != null ? textOf(l.TextKey) : "", key = l.TextKey, route = l.Route ?? "", replaces = l.Replaces ?? "" }).ToList();
 
         /// <summary>Remplit un asset d'après une zone du code (import) : même graphe, mêmes objectifs, mêmes rencontres.</summary>
         public static void FillFrom(ZoneAsset a, ZoneDef d, System.Func<string, string>? textOf = null)

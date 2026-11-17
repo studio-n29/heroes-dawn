@@ -148,13 +148,14 @@ namespace N29.HeroesDawn.Presentation.Hub
                     Id = b.Id,
                     Name = _loc.T("map.borough." + b.Id),
                     Polygon = b.Polygon,
-                    Locked = b.Act > 1,
+                    Locked = b.Act > 1 && !zones.Any(z => z.Borough == b.Id && ZoneProgress.StatusOf(s, z) != ZoneStatus.Locked),
                     Highlight = b.Id == sel.Borough,
-                    Tag = b.Act > 1 ? _loc.F(tagKey + "_soon", b.Act) : _loc.F(tagKey, b.Act),
+                    Tag = b.Act > 1 && !zones.Any(z => z.Borough == b.Id) ? _loc.F(tagKey + "_soon", b.Act) : _loc.F(tagKey, b.Act),
                     LabelAt = b.LabelAt,
                 }).ToArray(),
                 Points = SpotsFor(layout.Spots, city).Select(p => PointOf(p, sel)).ToArray(),
-                Rows = zones.Select(z => RowOf(z, sel)).ToArray(),
+                // La liste ne montre que les zones du quartier sélectionné (quatre au plus) ; les autres quartiers se choisissent sur la carte.
+                Rows = zones.Where(z => z.Borough == sel.Borough).Select(z => RowOf(z, sel)).ToArray(),
                 Detail = DetailOf(sel),
             });
         }

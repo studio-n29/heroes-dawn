@@ -1,0 +1,48 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-lab">
+        <ui:VisualElement name="labFilters" class="hd-panel hd-lab__filters">
+            <ui:VisualElement class="hd-lab__head" picking-mode="Ignore">
+                <ui:VisualElement class="hd-icon hd-icon--md hd-icon--filter hd-icon--tint-brass" picking-mode="Ignore" />
+                <ui:Label name="labFiltersTitle" class="hd-lab__headtitle" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:ScrollView name="labFilterScroll" class="hd-lab__scroll" />
+        </ui:VisualElement>
+        <ui:VisualElement class="hd-lab__main">
+            <ui:VisualElement name="labRecipesPanel" class="hd-panel hd-lab__recipes">
+                <ui:VisualElement class="hd-lab__head" picking-mode="Ignore">
+                    <ui:Label name="labRecipesTitle" class="hd-lab__headtitle hd-lab__headtitle--first" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:ScrollView name="labRecipes" class="hd-lab__scroll" />
+            </ui:VisualElement>
+            <ui:VisualElement name="labStock" class="hd-panel hd-lab__stock">
+                <ui:Label name="labStockTitle" class="hd-lab__stocktitle" picking-mode="Ignore" />
+                <ui:Label name="labStockText" class="hd-lab__stocktext" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="labDetail" class="hd-panel hd-lab__detail">
+            <ui:VisualElement class="hd-lab__dhead" picking-mode="Ignore">
+                <ui:VisualElement class="hd-lab__star" picking-mode="Ignore" />
+                <ui:VisualElement class="hd-lab__dtitles" picking-mode="Ignore">
+                    <ui:Label name="labName" class="hd-lab__name" picking-mode="Ignore" />
+                    <ui:Label name="labSub" class="hd-lab__sub" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:ScrollView name="labDetailScroll" class="hd-lab__dscroll">
+                <ui:VisualElement name="labBody" class="hd-lab__body" picking-mode="Ignore">
+                    <ui:VisualElement name="labArt" class="hd-lab__art" picking-mode="Ignore" />
+                    <ui:VisualElement class="hd-lab__info" picking-mode="Ignore">
+                        <ui:VisualElement name="labStats" class="hd-lab__stats" picking-mode="Ignore" />
+                        <ui:Label name="labDesc" class="hd-lab__desc" picking-mode="Ignore" />
+                        <ui:Label name="labInfo" class="hd-lab__infoline" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label name="labRequiredTitle" class="hd-lab__section" picking-mode="Ignore" />
+                <ui:VisualElement name="labComponents" class="hd-lab__components" picking-mode="Ignore" />
+                <ui:Label name="labState" class="hd-lab__state" picking-mode="Ignore" />
+            </ui:ScrollView>
+            <ui:VisualElement class="hd-lab__foot" picking-mode="Ignore">
+                <ui:Button name="labCraft" class="hd-btn hd-btn--primary hd-lab__craft" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

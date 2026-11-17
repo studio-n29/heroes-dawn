@@ -129,6 +129,8 @@ namespace N29.HeroesDawn.Presentation.Narration
             // Un agent détouré passe au premier plan, sans cadre ; les autres personnages gardent leur illustration encadrée.
             var art = line.Portrait.Art;
             var cutout = art != null ? AgentArt.Cutout(art.name) : null;
+            // Un personnage non jouable (Homme de main, Passeur) a une illustration générique : sa pose détourée se retrouve par l'identifiant de l'orateur.
+            if (cutout == null && !string.IsNullOrEmpty(line.CutoutId)) cutout = AgentArt.Cutout(line.CutoutId);
             if (cutout != null)
             {
                 _avatar.style.backgroundImage = new StyleBackground(Background.FromSprite(cutout));

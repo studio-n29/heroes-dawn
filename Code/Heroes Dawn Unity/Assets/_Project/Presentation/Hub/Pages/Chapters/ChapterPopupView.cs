@@ -15,7 +15,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         public readonly string Text;
         public readonly Sprite? Art;
         public readonly string Continue;
-        public ChapterPopupData(string heading, string text, Sprite? art, string @continue) { Heading = heading; Text = text; Art = art; Continue = @continue; }
+        /// <summary>Illustration 16:9 d'un souvenir (fenêtre LIRE), placée au-dessus du texte ; nulle : aucune. Remplace l'image large du chapitre.</summary>
+        public readonly Sprite? MemoryArt;
+        public ChapterPopupData(string heading, string text, Sprite? art, string @continue, Sprite? memoryArt = null)
+        { Heading = heading; Text = text; Art = art; Continue = @continue; MemoryArt = memoryArt; }
     }
 
     /// <summary>Fenêtre d'ouverture d'un chapitre : se termine quand le joueur continue (ou revient en arrière).</summary>
@@ -28,7 +31,7 @@ namespace N29.HeroesDawn.Presentation.Hub
     public sealed class ChapterPopupView : HdPopup, IChapterPopupView
     {
         Label _heading = null!, _text = null!;
-        VisualElement _art = null!;
+        VisualElement _art = null!, _memoryArt = null!;
         UnityEngine.UIElements.Button _continue = null!;
         UniTaskCompletionSource? _done;
         ChapterPopupData? _last;
@@ -40,6 +43,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         protected override void Bind()
         {
             _heading = Q<Label>("heading"); _text = Q<Label>("text"); _art = Q<VisualElement>("art");
+            _memoryArt = Q<VisualElement>("memoryArt");
             _continue = Q<UnityEngine.UIElements.Button>("continue");
             ContinueButton = new HdButtonRef(_continue, this);
             _continue.clicked += () => _done?.TrySetResult();
@@ -49,8 +53,10 @@ namespace N29.HeroesDawn.Presentation.Hub
         void Fill(ChapterPopupData d)
         {
             _heading.text = d.Heading; _text.text = d.Text; _continue.text = d.Continue;
-            _art.style.display = d.Art != null ? DisplayStyle.Flex : DisplayStyle.None; // sans illustration, le texte remonte
+            _art.style.display = d.Art != null && d.MemoryArt == null ? DisplayStyle.Flex : DisplayStyle.None; // sans illustration, le texte remonte
             HdPopupRows.SetArt(_art, d.Art);
+            _memoryArt.style.display = d.MemoryArt != null ? DisplayStyle.Flex : DisplayStyle.None;
+            HdPopupRows.SetArt(_memoryArt, d.MemoryArt);
         }
 
         public UniTask ShowAsync(ChapterPopupData data, CancellationToken ct)

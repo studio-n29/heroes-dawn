@@ -1,5 +1,7 @@
 # New York : « la ville vitrine »
 
+*Dialogues complets : voir `13_Script_New_York.md` (fait foi sur les répliques).*
+
 *Date : 2026-11-09 · Acte I pour Agent D, acte III pour Agent M. Bible : `08_Bible_Narrative.md`.*
 
 ## Thèse
@@ -13,8 +15,8 @@ Progression de la révélation : Brooklyn (soupçon), Queens (preuve), Harlem (c
 - **Général Stroke** (AMIF) : présent à Brooklyn (par son Titan) et à Manhattan (boss).
 - **Crocodile** (Antonio Kribelchi) : mafieux méta-humain, boss de Coney Island. Écarté par l'AMIF à la fin de Brooklyn.
 - **Le Syndicat** : fait régner la peur à Queens.
-- **Le Régisseur** *(à valider)* : intendant du Syndicat, boss de Queens.
-- **Le chef du gang de Harlem** *(à valider)* : celui qui a tué l'ami d'enfance d'Agent D.
+- **Le Régisseur** (Elias Voss, nom validé le 2026-11-16) : intendant du Syndicat, boss de Queens.
+- **Le chef du gang de Harlem** (Dante Reyes, dit « Braise », nom validé le 2026-11-16) : celui qui a tué l'ami d'enfance d'Agent D.
 
 ## Cadrage selon le parcours
 

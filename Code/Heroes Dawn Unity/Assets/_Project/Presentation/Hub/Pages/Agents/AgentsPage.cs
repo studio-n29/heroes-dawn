@@ -97,7 +97,8 @@ namespace N29.HeroesDawn.Presentation.Hub
                 var r = InfoRowData.Basic(name, line);
                 r.Tag = name.Substring(0, 1).ToUpperInvariant();
                 r.TagColor = own ? Theme.FamilyColor(d.Family) : Theme.Surface3;
-                r.Art = AgentArt.For(d.Id.Value);
+                // Agent absent : silhouette « non recruté » de sa famille (le cadenas reste une couche séparée) ; l'illustration seulement à défaut.
+                r.Art = own ? AgentArt.For(d.Id.Value) : UnrecruitedArt.For(d.Family) ?? AgentArt.For(d.Id.Value);
                 var kind = d.Unlock?.Kind ?? UnlockKind.Shop;
                 r.Badge = own ? Loc.T("agents.owned") : Loc.T("agents.kind." + kind);
                 r.Dim = !own;
@@ -105,6 +106,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 rows.Add(r);
                 _rows.Add(d);
             }
+            (View as IRowRanks)?.SetRowRanks(_rows.Select(r => r == null ? 0 : r.Rank).ToArray());
             View.ShowRows(rows.ToArray());
         }
 

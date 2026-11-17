@@ -25,6 +25,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         public IEnumerator TearDown() => PlayModeHarness.TearDown();
 
         [UnityTest]
+        [Description("Vérifie que les boutons Jouer et Se connecter de l'écran titre reçoivent la touche posée à leur centre — parce qu'un élément plein écran transparent captait toutes les touches sur téléphone alors que les tests valident les boutons par événement direct")]
         public IEnumerator TitleScreen_PlayAndAccountButtons_ReceiveThePointer()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
@@ -35,6 +36,7 @@ namespace N29.HeroesDawn.Tests.PlayMode
         }
 
         [UnityTest]
+        [Description("Vérifie que les réglages, les onglets et la mission du QG reçoivent la touche posée à leur centre — parce que le pointeur réel n'est jamais exercé par les parcours de test")]
         public IEnumerator Hq_Buttons_ReceiveThePointer()
         {
             yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway());
@@ -51,6 +53,39 @@ namespace N29.HeroesDawn.Tests.PlayMode
                 AssertReceivesPointer("QG : onglet " + tab, shell.TabButton(tab).Element);
             var qg = Object.FindAnyObjectByType<QgPageView>()!;
             AssertReceivesPointer("QG : mission", qg.MissionButton.Element);
+        }
+
+
+        /// <summary>
+        /// Après la cinématique de lancement (passée ou terminée), aucun voile plein écran ne doit rester au-dessus du jeu :
+        /// le lecteur vidéo laissait son fondu noir sur l'écran de création du personnage (écran noir sur téléphone, sans vidéo dans l'APK).
+        /// </summary>
+        [UnityTest]
+        [Description("Vérifie qu'aucun voile plein écran ne reste au-dessus du jeu après la cinématique de lancement — parce que le fondu noir du lecteur vidéo recouvrait l'écran de création du personnage")]
+        public IEnumerator AfterLaunchCinematic_NoFullScreenVeilStaysOnTop()
+        {
+            // Vrai parcours du premier lancement : Jouer, cinématique (sans vidéo dans le test comme dans l'APK), puis création du personnage.
+            yield return PlayModeHarness.Boot(new MemoryProfileGateway(), new InstantAuthGateway(), withIntro: true);
+            Object.FindAnyObjectByType<LoginView>()!.PlayButton.onClick.Invoke();
+            yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<IntroPopupView>() != null);
+            var intro = Object.FindAnyObjectByType<IntroPopupView>()!;
+            yield return PlayModeHarness.WaitFor(() => intro.Current == IntroPopupView.Stage.Rayner, 1200);
+            for (int i = 0; i < 30; i++) yield return null;
+
+            float screenArea = Screen.width * (float)Screen.height;
+            var offenders = new List<string>();
+            foreach (var canvas in Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None).Where(c => c.isRootCanvas && c.isActiveAndEnabled))
+                foreach (var graphic in canvas.GetComponentsInChildren<UnityEngine.UI.Graphic>(false))
+                {
+                    if (!graphic.isActiveAndEnabled || graphic.canvasRenderer.cull) continue;
+                    float alpha = graphic.color.a * graphic.canvasRenderer.GetInheritedAlpha();
+                    var r = ((RectTransform)graphic.transform).rect;
+                    var corners = new Vector3[4];
+                    ((RectTransform)graphic.transform).GetWorldCorners(corners);
+                    float area = Mathf.Abs((corners[2].x - corners[0].x) * (corners[2].y - corners[0].y));
+                    if (alpha > 0.05f && area > 0.5f * screenArea) offenders.Add($"{canvas.name}/{graphic.name} (alpha {alpha:F2}, ordre {canvas.sortingOrder})");
+                }
+            Assert.That(offenders, Is.Empty, "voile plein écran au-dessus du jeu : " + string.Join(", ", offenders));
         }
 
         /// <summary>Le centre du bouton, vu du panneau qui le porte puis de tous les panneaux actifs : le premier élément touché doit être le bouton.</summary>

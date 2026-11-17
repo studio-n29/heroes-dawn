@@ -20,9 +20,9 @@ namespace N29.HeroesDawn.Presentation.Common
             d["narration.ny_1_1.n23.after.1"] = "Il ne reste qu'à fuir le quai avant que l'AMIF ne revienne.";
             d["speaker.lieutenant"] = "Lieutenant";
             d["speaker.crocodile"] = "Crocodile";
-            d["speaker.stroke"] = "Stroke";
+            d["speaker.stroke"] = "Général Stroke";
             d["speaker.general"] = "Le Général";
-            d["speaker.rayner"] = "Rayner";
+            d["speaker.rayner"] = "Brie Rayner";
             d["narration.ny_1_2.n14.before.0"] = "« Crocodile m'a confié les cellules. Il sera ravi de vous y retrouver. »";
             d["narration.ny_1_2.n14.before.1"] = "Les otages sont derrière lui. On ne s'arrête pas.";
             d["narration.ny_1_2.n14.after.0"] = "« Vous ne savez pas ce que vous venez de déclencher. Crocodile vous le fera payer. »";

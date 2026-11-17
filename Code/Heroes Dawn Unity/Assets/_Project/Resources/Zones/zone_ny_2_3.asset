@@ -1,0 +1,612 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df527a111f48e9749b23b1fde962ba77, type: 3}
+  m_Name: zone_ny_2_3
+  m_EditorClassIdentifier: N29.HeroesDawn.Authoring::N29.HeroesDawn.Authoring.ZoneAsset
+  zoneId: zone_ny_2_3
+  nameKey: zones.ny_2_3.name
+  displayName: 
+  shortName: 
+  description: 
+  code: 2.3
+  act: 2
+  borough: queens
+  recommendedLevel: 15
+  requires:
+  - zone_ny_2_2
+  biome: 2
+  weather: 3
+  entry: n00
+  nodes:
+  - id: n00
+    type: 0
+    isFixed: 1
+    rank: 1
+    x: 0
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n01
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 1
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n02
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 2
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n03
+    type: 4
+    isFixed: 1
+    rank: 1
+    x: 3
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: narrateur
+      text: "La gare de triage de Jamaica dort sous les lampes orange. Un convoi sans marque attend \xE0 la voie 14."
+      key: narration.ny_2_3.intro.0
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: "Pas d'\xE9tiquette, pas de num\xE9ro, et une escorte arm\xE9e. Ce n'est pas du fret."
+      key: narration.ny_2_3.intro.1
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: Dans les wagons, il y a des gens. Je les entends respirer.
+      key: narration.ny_2_3.intro.2
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: Alors on ne ralentit pas. On ouvre le dernier wagon.
+      key: narration.ny_2_3.intro.3
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Je vois qui est mont\xE9 dans ces wagons, et ce qu'on leur a promis. On ne ralentit pas."
+      key: narration.ny_2_3.intro.3.m
+      route: agent_m
+      replaces: narration.ny_2_3.intro.3
+    narrationAfter: []
+  - id: n04
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 4
+    y: 0
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n05
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 5
+    y: 1
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n06
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 3
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n07
+    type: 3
+    isFixed: 0
+    rank: 1
+    x: 4
+    y: 6
+    activity: potion_field
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n08
+    type: 2
+    isFixed: 0
+    rank: 0
+    x: 5
+    y: 5
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n09
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 6
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n10
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 7
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n11
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 8
+    y: 2
+    activity: crate_pick_depot
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n12
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 8
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n13
+    type: 2
+    isFixed: 1
+    rank: 2
+    x: 9
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore:
+    - speaker: enforcer
+      text: Ce convoi est sous contrat. Reculez, ou le contrat vous inclura.
+      key: narration.ny_2_3.elite.before.0
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: "Il r\xE9cite. Il ne sait m\xEAme pas pour qui il travaille."
+      key: narration.ny_2_3.elite.before.1
+      route: 
+      replaces: 
+    narrationAfter:
+    - speaker: captif
+      text: "Vous \xEAtes\u2026 de l'Aube ? On nous avait dit qu'on partait vers un endroit s\xFBr."
+      key: narration.ny_2_3.elite.after.0
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: Qui vous l'a dit ?
+      key: narration.ny_2_3.elite.after.1
+      route: 
+      replaces: 
+    - speaker: captif
+      text: Un homme avec un badge. Il disait que l'agence se chargerait de nous.
+      key: narration.ny_2_3.elite.after.2
+      route: 
+      replaces: 
+  - id: n14
+    type: 4
+    isFixed: 0
+    rank: 1
+    x: 9
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n15
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 10
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n16
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n17
+    type: 6
+    isFixed: 0
+    rank: 1
+    x: 12
+    y: 2
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n18
+    type: 5
+    isFixed: 0
+    rank: 1
+    x: 11
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n19
+    type: 2
+    isFixed: 0
+    rank: 1
+    x: 12
+    y: 4
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n20
+    type: 3
+    isFixed: 1
+    rank: 1
+    x: 13
+    y: 3
+    activity: dna_lab
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter: []
+  - id: n21
+    type: 1
+    isFixed: 1
+    rank: 1
+    x: 14
+    y: 3
+    activity: 
+    hasCombat: 0
+    enemyTable: []
+    rounds: 1
+    enemiesMin: 2
+    enemiesMax: 3
+    narrationBefore: []
+    narrationAfter:
+    - speaker: ilona_varga
+      text: "Des Apex \xE9veill\xE9s, livr\xE9s comme des colis. \xC0 l'agence."
+      key: narration.ny_2_3.exit.0
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: "Le registre de ce convoi sera au terminal de fret. C'est l\xE0 qu'on le trouvera."
+      key: narration.ny_2_3.exit.1
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "\xC0 Moscou, on les appelle des troph\xE9es. Ici, des captifs."
+      key: narration.ny_2_3.exit.2
+      route: agent_m
+      replaces: 
+  links:
+  - a: n00
+    b: n01
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n01
+    b: n02
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n03
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n02
+    b: n06
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n03
+    b: n04
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n04
+    b: n05
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n06
+    b: n07
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n07
+    b: n08
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n05
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n08
+    b: n09
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n09
+    b: n10
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n11
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n10
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n11
+    b: n12
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n11
+    b: n13
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n12
+    b: n14
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n13
+    b: n14
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n13
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n14
+    b: n15
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n15
+    b: n16
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n15
+    b: n18
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n16
+    b: n17
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n18
+    b: n19
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n17
+    b: n20
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n19
+    b: n20
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  - a: n20
+    b: n21
+    cost: 1
+    hasCurve: 0
+    control1: {x: 0, y: 0}
+    control2: {x: 0, y: 0}
+  objectives:
+  - id: obj_wagons
+    type: 2
+    target: n11
+    nameKey: objectives.ny23.wagons
+    text: 
+  - id: obj_escort
+    type: 0
+    target: n13
+    nameKey: objectives.ny23.escort
+    text: 
+  - id: obj_captives
+    type: 2
+    target: n20
+    nameKey: objectives.ny23.captives
+    text: 
+  - id: obj_free
+    type: 1
+    target: n21
+    nameKey: objectives.ny23.free
+    text: 
+  encounters:
+  - rank: 0
+    waves:
+    - enemies:
+      - syn_racketeer
+      - syn_racketeer
+  - rank: 0
+    waves:
+    - enemies:
+      - syn_gunman
+      - syn_hacker
+  - rank: 1
+    waves:
+    - enemies:
+      - brute
+      - syn_gunman
+      - syn_hacker
+  - rank: 2
+    waves:
+    - enemies:
+      - syn_collector
+      - syn_racketeer
+      - street_pyro
+  regions: []
+  hasMapPoint: 0
+  mapPointPermille: {x: 500, y: 500}
+  backgroundKey: zone_ny_2_3_bg
+  backgroundMinX: -1
+  backgroundMinY: -1
+  backgroundMaxX: 15
+  backgroundMaxY: 7
+  backgroundSeed: 1

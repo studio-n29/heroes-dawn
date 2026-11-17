@@ -10,7 +10,12 @@ namespace N29.HeroesDawn.Application.Features.Meta
     /// </summary>
     public static class PlayerAvatars
     {
-        public static readonly IReadOnlyList<string> Gallery = new[] { "avatar_1", "avatar_2", "avatar_3", "avatar_4", "avatar_5", "avatar_6" };
+        public static readonly IReadOnlyList<string> Gallery = new[]
+        {
+            "avatar_1", "avatar_2", "avatar_3", "avatar_4", "avatar_5", "avatar_6",
+            // Ajoutés avec la livraison 2D : les six premiers identifiants (déjà enregistrés dans les sauvegardes) ne changent pas.
+            "avatar_7", "avatar_8", "avatar_9", "avatar_10", "avatar_11", "avatar_12",
+        };
 
         /// <summary>Avatar retenu : celui choisi, s'il existe dans la galerie ; sinon le premier.</summary>
         public static string Resolve(string? chosen) => Gallery.Contains(chosen ?? "") ? chosen! : Gallery[0];

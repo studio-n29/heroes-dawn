@@ -22,13 +22,13 @@ namespace N29.HeroesDawn.Tests.Domain.Application
 
         static ChapterStatus Status(GameSession s, string id) => ChapterProgress.StatusOf(s, Chapters.Find(id)!);
 
-        [Test, Description("Vérifie que les chapitres sans zone sont « Bientôt », que Brooklyn est « En cours » au départ et les suivants « Bientôt » — parce que seul Brooklyn est jouable aujourd'hui")]
+        [Test, Description("Vérifie que Brooklyn est « En cours » au départ et que les sept autres chapitres, désormais tous dotés de zones, sont « Verrouillés » — parce que chaque chapitre se débloque après le précédent")]
         public void Status_AtTheStart()
         {
             var s = FullBrooklyn();
             Assert.That(Status(s, "ny_brooklyn"), Is.EqualTo(ChapterStatus.Current));
             foreach (var id in new[] { "ny_queens", "ny_harlem", "ny_manhattan", "mos_kapotnya", "mos_sadovoye", "mos_place_rouge" })
-                Assert.That(Status(s, id), Is.EqualTo(ChapterStatus.Soon), id);
+                Assert.That(Status(s, id), Is.EqualTo(ChapterStatus.Locked), id);
             Assert.That(Status(s, "mos_sergueiv"), Is.EqualTo(ChapterStatus.Locked), "Sergueiv a ses zones, mais Moscou est l'acte III d'Agent D");
         }
 

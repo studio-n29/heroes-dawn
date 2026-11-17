@@ -1,0 +1,28 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-lair">
+        <ui:VisualElement name="hero" class="hd-lair__hero" picking-mode="Ignore" />
+        <ui:VisualElement class="hd-panel hd-lair__list">
+            <ui:VisualElement class="hd-profile__head"><ui:VisualElement class="hd-profile__star" picking-mode="Ignore" /><ui:Label name="listTitle" class="hd-profile__title" /></ui:VisualElement>
+            <ui:ScrollView name="bossRows" class="hd-lair__rows" />
+        </ui:VisualElement>
+        <ui:VisualElement class="hd-lair__sheet">
+            <ui:VisualElement class="hd-lair__id">
+                <ui:Label name="bossName" class="hd-lair__name" />
+                <ui:Label name="bossSub" class="hd-lair__sub" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-lair__spacer" picking-mode="Ignore" />
+            <ui:VisualElement class="hd-panel hd-lair__info">
+                <ui:Label name="progressTitle" class="hd-lair__head" />
+                <ui:VisualElement class="hd-lair__progressrow">
+                    <ui:VisualElement class="hd-bar hd-lair__bar"><ui:VisualElement name="progressFill" class="hd-bar__fill" /></ui:VisualElement>
+                    <ui:Label name="progressText" class="hd-lair__pct" />
+                </ui:VisualElement>
+                <ui:Label name="loreTitle" class="hd-lair__head" />
+                <ui:Label name="lore" class="hd-lair__lore" />
+                <ui:Label name="reward" class="hd-lair__reward" />
+                <ui:Label name="squad" class="hd-lair__reward" />
+            </ui:VisualElement>
+            <ui:Button name="enter" class="hd-btn hd-btn--primary hd-lair__enter" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

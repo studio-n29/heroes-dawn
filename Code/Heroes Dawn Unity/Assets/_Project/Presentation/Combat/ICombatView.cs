@@ -25,7 +25,11 @@ namespace N29.HeroesDawn.Presentation.Combat
         /// <summary>Carte lâchée : identifiant de l'unité visée, <see cref="DropTerrain"/> (dans le vide) ou <see cref="DropCancel"/> (retour dans l'éventail).</summary>
         event Action<int, int>? SkillDropped;
         event Action<int>? UnitTapped;
+        /// <summary>Carte glissée : emplacement et unité survolée (<see cref="DropTerrain"/> dans le vide, <see cref="DropCancel"/> sur l'éventail) ; levé quand la cible survolée change.</summary>
+        event Action<int, int>? SkillDragOver;
 
+        /// <summary>Aperçu de l'effet de la carte tenue : barres de PV fantômes, statuts, K.O., fantômes de frise ; null l'efface.</summary>
+        void ShowPreview(CombatPreviewData? data);
         void BuildUnits(IReadOnlyList<UnitCardData> units);
         void ShowUnits(IReadOnlyList<UnitStateData> states);
         /// <summary>Agent dont les icônes sont lançables (mêmes données que dans <see cref="UnitStateData.Skills"/>) ; sert aux raccourcis et aux tests.</summary>

@@ -70,7 +70,8 @@ namespace N29.HeroesDawn.Presentation.Common
         public static Sprite? Cutout(string id)
         {
             if (string.IsNullOrEmpty(id)) return null;
-            return TacticalArt.Ext("Agents", id + "-cutout") ?? TacticalArt.Ext("Agents", id);
+            // Repli : poses de dialogue détourées des personnages non jouables (Homme de main, Passeur) livrées avec la production 2D.
+            return TacticalArt.Ext("Agents", id + "-cutout") ?? TacticalArt.Ext("Agents", id) ?? TacticalArt.Load("Missing20261116/Dialogue/" + id);
         }
 
         /// <summary>Une compétence native garde l'illustration de son agent ; une carte équipée garde son propre visuel.</summary>

@@ -25,13 +25,13 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.WaitFor(() => Object.FindAnyObjectByType<QuestLogPopupView>() != null);
         }
 
-        [UnityTest, Timeout(300000), Description("Vérifie que toucher la carte des quêtes du QG ouvre le suivi avec les quatre quêtes principales et une quête secondaire, et que Fermer le referme — parce que c'est le parcours du joueur")]
+        [UnityTest, Timeout(300000), Description("Vérifie que toucher la carte des quêtes du QG ouvre le suivi avec les seize quêtes principales (quatre chapitres de New York) et une quête secondaire, et que Fermer le referme — parce que c'est le parcours du joueur")]
         public IEnumerator Qg_OpensTheQuestLog()
         {
             yield return OpenQuestLog();
             var log = Object.FindAnyObjectByType<QuestLogPopupView>()!;
             yield return null;
-            Assert.That(log.MainRows.Count, Is.EqualTo(4));
+            Assert.That(log.MainRows.Count, Is.EqualTo(16));
             Assert.That(log.MainRows[0].Status, Is.EqualTo(1), "Red Hook est en cours");
             Assert.That(log.SideRows.Count, Is.EqualTo(1));
             log.CloseButton.Button.onClick.Invoke();

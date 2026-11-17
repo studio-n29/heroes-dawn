@@ -857,8 +857,24 @@ Label { flex-shrink: 0; }
 .hd-boost__new { position: absolute; right: -8px; top: -12px; padding: 2px 12px; background-color: var(--hd-danger); border-radius: 4px; }
 .hd-boost__newtext { -unity-font: var(--hd-font-title); font-size: 22px; color: var(--hd-ivory); }
 .hd-boost__skip { position: absolute; right: 50px; bottom: 50px; height: 64px; min-width: 180px; font-size: 30px; display: none; }
-.hd-boost__continue { position: absolute; left: 50%; bottom: 50px; width: 360px; margin-left: -180px; height: 84px; font-size: 38px; display: none; }
 .hd-boost__flash { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: white; opacity: 0; }
+.hd-boost__actions { position: absolute; left: 0; right: 0; bottom: 50px; flex-direction: row; justify-content: center; align-items: center; }
+.hd-boost__continue { width: 360px; height: 84px; margin: 0 14px; font-size: 38px; display: none; }
+.hd-boost__again { min-width: 360px; height: 84px; margin: 0 14px; font-size: 30px; display: none; }
+.hd-boost__packart { position: absolute; left: 0; top: 0; right: 0; bottom: 0; -unity-background-scale-mode: scale-to-fit; display: none; }
+.hd-boost__pack.hd-boost__pack--art { width: 560px; height: 560px; margin-left: -280px; margin-top: -280px; background-color: rgba(0, 0, 0, 0); border-width: 0; }
+.hd-boost__pack.hd-boost__pack--art .hd-boost__packglow, .hd-boost__pack.hd-boost__pack--art .hd-boost__packglyph { display: none; }
+.hd-boost__pack.hd-boost__pack--art .hd-boost__packart { display: flex; }
+.hd-boost__rays { position: absolute; width: 1200px; height: 600px; display: none; opacity: 0.55; -unity-background-scale-mode: scale-to-fit; }
+.hd-boost__rays { left: 50%; top: 50%; margin-left: -600px; margin-top: -600px; }
+.hd-boost__rays.hd-boost__rays--down { margin-top: 0; rotate: 180deg; }
+.hd-boost__cardrays { position: absolute; }
+.hd-boost__new.hd-boost__new--dup { background-color: var(--hd-surface-3); border-width: 2px; border-color: var(--hd-muted); }
+.hd-boost__new--dup .hd-boost__newtext { color: var(--hd-muted); }
+.hd-boost__card.hd-boost__card--best { border-width: 6px; margin-top: -14px; }
+.hd-boost__best { position: absolute; left: 0; right: 0; bottom: 170px; -unity-font: var(--hd-font-heading); font-size: 34px; color: var(--hd-brass); -unity-text-align: middle-center; display: none; }
+.hd-boost__title { position: absolute; top: 24px; left: 0; right: 0; margin-top: 0; -unity-text-align: middle-center; }
+.hd-boost__hint { position: absolute; top: 120px; align-self: center; margin-top: 0; }
 
 /* ---- Premiere connexion : cinematique et creation du personnage ---- */
 .hd-intropop { background-color: rgba(0, 0, 0, 0); }

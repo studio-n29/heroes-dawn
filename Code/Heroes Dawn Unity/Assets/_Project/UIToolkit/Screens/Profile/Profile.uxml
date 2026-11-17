@@ -1,0 +1,52 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="page" class="hd-page hd-profile">
+        <ui:VisualElement name="hero" class="hd-profile__hero" picking-mode="Ignore" />
+        <ui:VisualElement name="main" class="hd-profile__main">
+            <ui:VisualElement class="hd-profile__top">
+                <ui:Button name="avatar" class="hd-profile__avatar">
+                    <ui:Label name="avatarInitial" class="hd-profile__avatar-initial" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:VisualElement class="hd-profile__id">
+                    <ui:Label name="pseudo" class="hd-profile__pseudo" />
+                    <ui:Button name="tag" class="hd-profile__tag"><ui:Label name="tagText" class="hd-profile__tag-text" picking-mode="Ignore" /></ui:Button>
+                    <ui:Label name="rank" class="hd-profile__rank" />
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-grow" picking-mode="Ignore" />
+                <ui:VisualElement name="account" class="hd-panel hd-profile__account">
+                    <ui:Label name="accountLabel" class="hd-profile__account-label" />
+                    <ui:Button name="accountA" class="hd-btn hd-btn--primary hd-btn--small hd-profile__btn" />
+                    <ui:Button name="accountB" class="hd-btn hd-btn--secondary hd-btn--small hd-profile__btn" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-profile__body">
+                <ui:VisualElement class="hd-profile__gap" picking-mode="Ignore" />
+                <ui:VisualElement name="statsPanel" class="hd-panel hd-profile__stats">
+                    <ui:VisualElement class="hd-profile__head"><ui:VisualElement class="hd-profile__star" picking-mode="Ignore" /><ui:Label name="statsTitle" class="hd-profile__title" /></ui:VisualElement>
+                    <ui:VisualElement name="tiles" class="hd-profile__tiles" />
+                </ui:VisualElement>
+                <ui:VisualElement name="friendsPanel" class="hd-panel hd-profile__friends">
+                    <ui:VisualElement class="hd-profile__head"><ui:VisualElement class="hd-profile__star" picking-mode="Ignore" /><ui:Label name="friendsTitle" class="hd-profile__title" /></ui:VisualElement>
+                    <ui:ScrollView name="friendRows" class="hd-profile__friend-rows" />
+                    <ui:Label name="friendsEmpty" class="hd-profile__empty" />
+                    <ui:Button name="addFriend" class="hd-btn hd-btn--primary hd-btn--small hd-profile__add" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="links" class="hd-profile__links">
+                <ui:VisualElement class="hd-profile__gap" picking-mode="Ignore" />
+                <ui:Button name="link0" class="hd-btn hd-btn--secondary hd-btn--small hd-profile__link" />
+                <ui:Button name="link1" class="hd-btn hd-btn--secondary hd-btn--small hd-profile__link" />
+                <ui:Button name="link2" class="hd-btn hd-btn--secondary hd-btn--small hd-profile__link" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="achievements" class="hd-panel hd-profile__achievements">
+            <ui:VisualElement class="hd-profile__head">
+                <ui:Button name="achBack" class="hd-btn hd-btn--secondary hd-btn--small hd-profile__back" />
+                <ui:VisualElement class="hd-profile__ach-text">
+                    <ui:Label name="achTitle" class="hd-profile__title" />
+                    <ui:Label name="achLine" class="hd-profile__caption" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:ScrollView name="achRows" class="hd-profile__ach-rows" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

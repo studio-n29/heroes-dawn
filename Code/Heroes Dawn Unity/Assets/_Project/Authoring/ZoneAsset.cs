@@ -12,6 +12,12 @@ namespace N29.HeroesDawn.Authoring
     {
         public string speaker = "";
         [TextArea] public string text = "";
+        /// <summary>Clé de texte d une réplique issue du code (script narratif) : le texte vit alors dans les dictionnaires de langue, pas dans l asset ; vide : réplique saisie dans l outil.</summary>
+        public string key = "";
+        /// <summary>Parcours pour lequel la réplique est jouée (agent_d, agent_m) ; vide : tous.</summary>
+        public string route = "";
+        /// <summary>Clé de la réplique de base que celle-ci remplace pour son parcours (variante .d / .m) ; vide : réplique ajoutée.</summary>
+        public string replaces = "";
     }
 
     [Serializable]

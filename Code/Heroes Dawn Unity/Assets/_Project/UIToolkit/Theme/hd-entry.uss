@@ -135,6 +135,15 @@
 .hd-chapter__scroll { height: auto; min-height: 120px; max-height: 300px; margin-bottom: 18px; }
 .hd-chapter__text { font-size: 30px; }
 .hd-chapter__buttons > .hd-btn { max-width: 520px; }
+/* Illustration d'un souvenir (fenêtre LIRE) : 16:9 conservé (569 x 320), centrée au-dessus du texte ; cadre laiton fin. */
+.hd-chapter__memoryart {
+    display: none; /* caché tant que la vue n'a pas d'illustration de souvenir (le prefab à vide ne doit pas réserver 320 px) */
+    width: 569px; height: 320px; max-width: 100%; flex-shrink: 0; align-self: center; margin-bottom: 10px;
+    border-width: 2px; border-color: var(--hd-brass-dark);
+    -unity-background-scale-mode: scale-to-fit; background-position: center;
+}
+/* Vignettes de la page Chapitres : un chapitre verrouillé ou à venir garde son image, voilée et assombrie. */
+.hd-listpage .hd-row--dim .hd-row__tag--art { -unity-background-image-tint-color: rgb(105, 110, 120); }
 
 /* ---------------------------------------------------------------- Introduction : cinématique et création du personnage (planche 1.4) */
 .hd-intropop__skip { right: 36px; top: 30px; padding: 0 66px 0 30px; font-size: 28px; opacity: 0.92; }
@@ -156,3 +165,46 @@
     background-image: url("project://database/Assets/_Project/Art/UI/AubeTactiqueKit/Frames/portrait-selected.png");
 }
 .hd-intropop__avatarnum { font-size: 56px; }
+
+/* ---------------------------------------------------------------- Première connexion : Rayner en Full Art, fiche d'identification, choix de la ville */
+.hd-intropop__rayner { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: var(--hd-ink-deep); }
+.hd-intropop__rayner-art { position: absolute; left: 0; top: 0; right: 0; bottom: 0; -unity-background-scale-mode: scale-and-crop; }
+.hd-intropop__rayner-shade { position: absolute; left: 0; right: 0; bottom: 0; height: 52%; background-color: rgba(10, 17, 26, 0.78); }
+.hd-intropop__rayner-box { position: absolute; left: 90px; right: 90px; bottom: 70px; padding: 24px 40px 28px 40px; background-color: rgba(16, 28, 42, 0.94); border-width: 3px; border-color: var(--hd-brass); border-radius: 8px; }
+.hd-intropop__rayner-name { -unity-font: var(--hd-font-title); font-size: 40px; color: var(--hd-brass); }
+.hd-intropop__rayner-text { -unity-font: var(--hd-font-body); font-size: 38px; color: var(--hd-ivory); white-space: normal; margin-top: 10px; min-height: 130px; }
+.hd-intropop__rayner-hint { -unity-font: var(--hd-font-heading); font-size: 26px; color: var(--hd-muted); -unity-text-align: middle-right; margin-top: 6px; }
+
+.hd-intropop__formrow { flex-direction: row; justify-content: center; margin-top: 18px; }
+.hd-intropop__formcol { width: 780px; margin: 0 28px; }
+.hd-intropop__fieldlabel { -unity-font: var(--hd-font-heading); font-size: 28px; color: var(--hd-brass-soft); margin-top: 8px; }
+.hd-intropop__field { width: 100%; margin: 2px 0; }
+.hd-intropop__field--age { width: 220px; }
+.hd-intropop__avatars--form { width: 100%; margin-top: 6px; justify-content: flex-start; }
+.hd-intropop__avatars--form > .hd-intropop__avatar { width: 112px; height: 112px; margin: 0 12px 12px 0; border-radius: 56px; }
+.hd-intropop__power { height: 72px; justify-content: space-between; padding: 0 22px; font-size: 30px; width: 100%; -unity-text-align: middle-left; }
+.hd-intropop__error { -unity-font: var(--hd-font-body); font-size: 28px; color: var(--hd-danger); margin-top: 8px; min-height: 36px; }
+.hd-intropop__char > .hd-intropop__confirm { position: relative; bottom: 0; margin-top: 10px; }
+
+/* Tableau des pouvoirs : une colonne par famille, au-dessus de la fiche. */
+.hd-intropop__powersheet { position: absolute; left: 60px; right: 60px; top: 150px; bottom: 140px; display: none; background-color: rgba(10, 17, 26, 0.97); border-width: 3px; border-color: var(--hd-brass); border-radius: 8px; padding: 18px; }
+.hd-intropop__powersheet--open { display: flex; }
+.hd-intropop__powerscroll { flex-grow: 1; }
+.hd-intropop__powertable { flex-direction: row; justify-content: space-between; }
+.hd-intropop__powercol { flex-grow: 1; flex-basis: 0; margin: 0 8px; }
+.hd-intropop__powerhead { -unity-font: var(--hd-font-title); font-size: 34px; color: var(--hd-ink); background-color: var(--hd-brass); -unity-text-align: middle-center; padding: 8px 4px; border-radius: 6px; margin-bottom: 10px; }
+.hd-intropop__powerhead--matiere { background-color: var(--hd-matter); }
+.hd-intropop__powerhead--elementaire { background-color: var(--hd-elemental); }
+.hd-intropop__powerhead--physique_bio { background-color: var(--hd-physical-bio); }
+.hd-intropop__powerhead--perception { background-color: var(--hd-perception); }
+.hd-intropop__poweritem { height: 72px; margin: 0 0 8px 0; font-size: 28px; -unity-text-align: middle-left; padding: 0 16px; background-color: var(--hd-surface); color: var(--hd-ivory); border-width: 2px; border-color: var(--hd-brass-dark); border-radius: 6px; white-space: normal; }
+.hd-intropop__poweritem--on { background-color: var(--hd-surface-2); border-color: var(--hd-brass-soft); color: var(--hd-brass-soft); }
+
+/* Choix de la ville de départ : deux grandes cartes. */
+.hd-intropop__startcards { flex-direction: row; justify-content: center; margin-top: 70px; }
+.hd-intropop__startcard { width: 640px; min-height: 520px; margin: 0 30px; padding: 36px; background-color: var(--hd-surface-3); border-width: 4px; border-color: var(--hd-brass-dark); border-radius: 12px; align-items: center; }
+.hd-intropop__startcard--off { opacity: 0.45; }
+.hd-intropop__startcity { -unity-font: var(--hd-font-title); font-size: 72px; color: var(--hd-ivory); }
+.hd-intropop__startagent { -unity-font: var(--hd-font-heading); font-size: 40px; color: var(--hd-brass); margin-top: 6px; }
+.hd-intropop__startdesc { -unity-font: var(--hd-font-body-regular); font-size: 32px; color: var(--hd-muted); white-space: normal; margin-top: 30px; -unity-text-align: upper-center; }
+.hd-intropop__startsoon { -unity-font: var(--hd-font-heading); font-size: 36px; color: var(--hd-brass-soft); margin-top: 30px; }

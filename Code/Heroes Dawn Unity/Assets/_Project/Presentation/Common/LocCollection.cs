@@ -207,6 +207,11 @@ namespace N29.HeroesDawn.Presentation.Common
             d["booster.received"] = "{0} cartes ajoutées au Grimoire";
             d["booster.tap"] = "Touche pour ouvrir";
             d["booster.skip"] = "PASSER";
+            d["booster.flip"] = "Touche pour retourner la carte";
+            d["booster.duplicate"] = "Doublon";
+            d["booster.best"] = "Meilleur tirage";
+            d["booster.again"] = "OUVRIR UN AUTRE BOOSTER";
+            d["booster.recap"] = "{0} nouvelle(s) · {1} doublon(s)";
             d["shop.booster_sub"] = "3 cartes de compétences pour ton grimoire.";
             d["shop.grimoire"] = "GRIMOIRE";
             d["board.item_found"] = "Objet trouvé : {0}";

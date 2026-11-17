@@ -85,7 +85,7 @@ MonoBehaviour:
     narrationAfter: []
   - id: n04
     type: 4
-    isFixed: 0
+    isFixed: 1
     rank: 1
     x: 4
     y: 3
@@ -95,7 +95,27 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
-    narrationBefore: []
+    narrationBefore:
+    - speaker: narrateur
+      text: "Le d\xE9p\xF4t est rang\xE9 comme une boutique. Chaque caisse porte une \xE9tiquette, chaque \xE9tiquette un prix."
+      key: narration.mos_1_4.intro.0
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: "Un entrep\xF4t de contrebande avec un syst\xE8me de rangement plus propre que le mien."
+      key: narration.mos_1_4.intro.1
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: 'Ces caisses partent ce soir. Je vois le camion, le chemin, l''adresse : une raffinerie.'
+      key: narration.mos_1_4.intro.2
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: Donc tout converge vers Kapotnya.
+      key: narration.mos_1_4.intro.3
+      route: 
+      replaces: 
     narrationAfter: []
   - id: n05
     type: 2
@@ -235,8 +255,18 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
-    narrationBefore: []
-    narrationAfter: []
+    narrationBefore:
+    - speaker: enforcer
+      text: "Le d\xE9p\xF4t n'est pas ouvert. Vous avez d\xFB vous tromper de guichet."
+      key: narration.mos_1_4.elite.before.0
+      route: 
+      replaces: 
+    narrationAfter:
+    - speaker: ilona_varga
+      text: "Il n'avait pas peur de nous. Il avait peur de celui qui est derri\xE8re."
+      key: narration.mos_1_4.elite.after.0
+      route: 
+      replaces: 
   - id: n15
     type: 1
     isFixed: 1
@@ -293,18 +323,66 @@ MonoBehaviour:
     enemiesMax: 3
     narrationBefore:
     - speaker: passeur
-      text: "\xAB Vous \xEAtes en avance. D'ordinaire mes clients prennent rendez-vous. \xBB"
+      text: "Vous \xEAtes en avance. D'ordinaire mes clients prennent rendez-vous."
+      key: narration.mos_1_4.boss.before.0
+      route: 
+      replaces: 
     - speaker: passeur
-      text: "\xAB Je ne dis pas victimes. Je ne dis pas adversaires. Je dis : clients. \xBB"
+      text: 'Je ne dis pas victimes. Je ne dis pas adversaires. Je dis : clients.'
+      key: narration.mos_1_4.boss.before.1
+      route: 
+      replaces: 
     - speaker: ilona_varga
-      text: "\xAB N'\xE9coute pas. Il compte d\xE9j\xE0 ce qu'il peut vendre de nous. \xBB"
+      text: "N'\xE9coute pas. Il compte d\xE9j\xE0 ce qu'il peut vendre de nous."
+      key: narration.mos_1_4.boss.before.2
+      route: 
+      replaces: 
+    - speaker: passeur
+      text: "Les pouvoirs ont un prix, mademoiselle Varga. Les v\xF4tres aussi."
+      key: narration.mos_1_4.boss.before.3
+      route: 
+      replaces: 
+    - speaker: passeur
+      text: "Votre vue sur le pass\xE9 vaut cher, mademoiselle. Les ench\xE8res sont ouvertes."
+      key: narration.mos_1_4.boss.before.3.m
+      route: agent_m
+      replaces: narration.mos_1_4.boss.before.3
+    - speaker: passeur
+      text: "Une imagination qui devient mati\xE8re. Voil\xE0 un produit que je n'ai jamais eu en rayon."
+      key: narration.mos_1_4.boss.before.3.d
+      route: agent_d
+      replaces: narration.mos_1_4.boss.before.3
     narrationAfter:
     - speaker: passeur
-      text: "\xAB Vous croyez avoir trouv\xE9 quelque chose ? On vous a laiss\xE9 trouver. L'accueil, c'est moi qui l'ai organis\xE9. \xBB"
+      text: "Vous croyez avoir trouv\xE9 quelque chose ? On vous a laiss\xE9 trouver. L'accueil, c'est moi qui l'ai organis\xE9."
+      key: narration.mos_1_4.boss.after.0
+      route: 
+      replaces: 
     - speaker: agent_m
-      text: "\xAB Alors c'\xE9tait pour nous tenir loin de Kapotnya. \xBB"
+      text: "Alors c'\xE9tait pour nous tenir loin de Kapotnya."
+      key: narration.mos_1_4.boss.after.1
+      route: 
+      replaces: 
+    - speaker: passeur
+      text: "Je n'ai jamais dit \xAB loin \xBB. J'ai dit \xAB accueillis \xBB."
+      key: narration.mos_1_4.boss.after.2
+      route: 
+      replaces: 
     - speaker: ilona_varga
-      text: "\xAB Alors c'est l\xE0 que nous irons. \xBB"
+      text: "Alors c'est l\xE0 que nous irons."
+      key: narration.mos_1_4.boss.after.3
+      route: 
+      replaces: 
+    - speaker: passeur
+      text: "La cire, l'encens, les cierges\u2026 c'est un parfum qui revient souvent chez mes clients."
+      key: narration.mos_1_4.boss.after.4
+      route: agent_m
+      replaces: 
+    - speaker: narrateur
+      text: "La Dawn comprend que l'accueil visait \xE0 la tenir loin de Kapotnya. Le convoi suivant part \xE0 l'aube."
+      key: narration.mos_1_4.chapter_end.0
+      route: 
+      replaces: 
   links:
   - a: n00
     b: n01

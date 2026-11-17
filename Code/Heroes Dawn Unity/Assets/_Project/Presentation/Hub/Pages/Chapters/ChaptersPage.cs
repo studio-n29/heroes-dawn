@@ -73,6 +73,7 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.TagColor = status == ChapterStatus.Done ? Theme.Success : status == ChapterStatus.Current ? Theme.Primary : Theme.TextMuted;
                 r.Highlight = chapter.Id == _selected;
                 r.Dim = status == ChapterStatus.Locked || status == ChapterStatus.Soon;
+                r.Art = AgentArt.Chapter(chapter.Id); // vignette de la rangée ; assombrie et désaturée par la classe « dim » (hd-entry.uss) quand le chapitre est verrouillé
                 r.A = RowButtonData.Of(Loc.T("chapter.relire"), status != ChapterStatus.Soon, Loc.T("chapter.soon_reason"), 0);
                 rows.Add(r);
                 _rows.Add(chapter);
@@ -178,7 +179,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             try
             {
                 string body = Loc.T(fragment.TextKey) + (_audio.Has(fragment.AudioKey) ? "" : "\n\n" + Loc.T("fragments.no_audio"));
-                await _modals.ConfirmAsync(new ConfirmData(Loc.T(fragment.TitleKey), body, Loc.T("fragments.close"), "", Tone.Primary), Lifetime);
+                // Fenêtre de lecture : l'illustration du souvenir (nom de fichier = identifiant du fragment) au-dessus du texte.
+                var art = TacticalArt.Load("Missing20261116/Memories/" + fragment.Id);
+                await _intro.ShowMemoryAsync(Loc.T(fragment.TitleKey), body, art, Loc.T("fragments.close"), Lifetime);
             }
             catch (OperationCanceledException) { }
             finally { _reading = false; }

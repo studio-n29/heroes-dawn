@@ -100,6 +100,34 @@ namespace N29.HeroesDawn.Application.Features.Auth
             return null;
         }
 
+        /// <summary>
+        /// Première connexion avec la fiche d'identification : enregistre nom, prénom, âge, avatar et pouvoir, et démarre le parcours choisi
+        /// (Agent D : New York ; Agent M : Moscou, une fois son parcours ouvert). Le prénom devient le nom du compte.
+        /// Renvoie une clé d'erreur (rien n'est enregistré) ou null.
+        /// </summary>
+        public string? CreateAgent(AgentForm form, string routeId)
+        {
+            string last = (form.LastName ?? "").Trim(), first = (form.FirstName ?? "").Trim();
+            if (last.Length == 0 || last.Length > PlayerTag.MaxNameLength || first.Length == 0 || first.Length > PlayerTag.MaxNameLength)
+                return "onboarding.name.invalid";
+            if (form.Age < AgentForm.MinAge || form.Age > AgentForm.MaxAge) return "onboarding.age.invalid";
+            if (HeroPowers.Find(form.Power) == null) return "onboarding.power.invalid";
+            var route = StoryRoutes.For(routeId);
+            if (route.Id != routeId || !route.Available) return "onboarding.campaign.unavailable";
+
+            Save.lastName = last; Save.firstName = first; Save.age = form.Age; Save.power = form.Power;
+            Save.pseudo = first;
+            Save.avatar = PlayerAvatars.Resolve(form.Avatar);
+            Save.campaign = route.ActCities[0];
+            Save.hero = route.Id;
+            if (AllExist(route.StarterTeam)) _c.Session.StartWithTeam(route.StarterTeam);
+            GrantStarterItem();
+            Save.done = true;
+            ApplyPseudo();
+            _c.Touch(MetaArea.Onboarding);
+            return null;
+        }
+
         /// <summary>Un objet courant offert au départ : le tutoriel apprend à l'équiper sur la recrue.</summary>
         void GrantStarterItem()
         {

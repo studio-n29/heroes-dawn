@@ -136,9 +136,13 @@ namespace N29.HeroesDawn.Content.Prototype
 
             enemies.AddRange(PrototypeZones.Enemies());
             enemies.AddRange(PrototypeMoscowEnemies.All());
+            enemies.AddRange(PrototypeQueens.Enemies()); enemies.AddRange(PrototypeHarlem.Enemies()); enemies.AddRange(PrototypeManhattan.Enemies());
+            enemies.AddRange(PrototypeKapotnya.Enemies()); enemies.AddRange(PrototypeSadovoye.Enemies()); enemies.AddRange(PrototypePlaceRouge.Enemies());
             var zones = new List<ZoneDef> { BuildZone11(), BuildTutorialZone() };
             zones.AddRange(PrototypeZones.Zones());
             zones.AddRange(PrototypeMoscowZones.Zones());
+            zones.AddRange(PrototypeQueens.Zones()); zones.AddRange(PrototypeHarlem.Zones()); zones.AddRange(PrototypeManhattan.Zones());
+            zones.AddRange(PrototypeKapotnya.Zones()); zones.AddRange(PrototypeSadovoye.Zones()); zones.AddRange(PrototypePlaceRouge.Zones());
             return new ContentCatalog(balance, members, enemies, synergies, zones, PrototypeActivities.Build(balance), PrototypeCollection.Build(), starterTeam);
         }
 

@@ -109,18 +109,22 @@ namespace N29.HeroesDawn.Tests.PlayMode
             yield return PlayModeHarness.BackToHqConfirmed();
             yield return PlayModeHarness.WaitFor(() => PlayModeHarness.Visible<QgPageView>() && !Flow.IsTransitioning, 600);
 
-            // Les quatre zones, dans l'ordre, jusqu'au Passeur.
-            var zones = session.Content.Zones.Where(z => z.Borough == "sergueiv").OrderBy(z => z.Code).ToList();
-            Assert.That(zones.Count, Is.EqualTo(4));
+            // Les seize zones de Moscou (quatre quartiers), chacune jouée dès qu'elle est ouverte, jusqu'à la Place Rouge ; le Passeur clôt le premier quartier.
+            var moscow = session.Content.Zones.Where(z => !z.IsTutorial && StoryRoutes.CityOfBorough(z.Borough) == StoryRoutes.Moscow).ToList();
+            Assert.That(moscow.Count, Is.EqualTo(16));
             List<string> boss = new List<string>();
-            foreach (var zone in zones)
+            var played = new List<string>();
+            while (moscow.Any(z => ZoneProgress.StatusOf(session, z) != ZoneStatus.Done))
             {
-                Assert.That(ZoneProgress.StatusOf(session, zone), Is.EqualTo(ZoneStatus.Available), zone.Code + " ouverte après la précédente");
-                Assert.That(PlayZone(session, zone, out var b), Is.True, zone.Code + " validée");
+                var zone = moscow.OrderBy(z => z.Code).FirstOrDefault(z => ZoneProgress.StatusOf(session, z) == ZoneStatus.Available);
+                Assert.That(zone, Is.Not.Null, "une zone est toujours ouverte tant que l'acte n'est pas fini (jouées : " + string.Join(",", played) + ")");
+                Assert.That(PlayZone(session, zone!, out var b), Is.True, zone!.Code + " validée");
                 if (zone.Code == "M1.4") boss = b;
                 Assert.That(ZoneProgress.StatusOf(session, zone), Is.EqualTo(ZoneStatus.Done), zone.Code);
+                played.Add(zone.Code);
             }
-            Assert.That(boss, Does.Contain("mos_passeur"), "le dernier boss est le Passeur");
+            Assert.That(played.Count, Is.EqualTo(16));
+            Assert.That(boss, Does.Contain("mos_passeur"), "le boss de Sergueiv est le Passeur");
 
             // Fin de l'acte I : Paris sans zone, plus rien d'ouvert, la carte reste sur Moscou sans bouton mort.
             var act = StoryProgress.Current(session);

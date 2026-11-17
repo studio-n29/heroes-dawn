@@ -56,6 +56,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.ShopAlertClicked += OnShopAlert;
             View.SecondaryClicked += OnSecondaryAlert;
             View.QuestsClicked += OpenQuests;
+            View.SubTabClicked += OpenRoom;
         }
 
         protected override void OnShown()
@@ -83,6 +84,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             View.ShopAlertClicked -= OnShopAlert;
             View.SecondaryClicked -= OnSecondaryAlert;
             View.QuestsClicked -= OpenQuests;
+            View.SubTabClicked -= OpenRoom;
         }
 
         /// <summary>Chaque seconde : le compte à rebours de l'objectif secondaire avance ; sinon une fois par minute (boutique).</summary>

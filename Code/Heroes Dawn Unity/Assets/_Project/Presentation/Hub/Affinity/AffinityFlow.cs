@@ -48,6 +48,9 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 Title = _loc.F("affinity.title", _loc.MemberName(me.Def)).ToUpperInvariant(),
                 Subtitle = _loc.T("affinity.subtitle"),
+                Center = new PortraitData(_loc.MemberName(me.Def), me.Def.Family, art: AgentArt.For(me.Def.Id.Value)),
+                CenterName = _loc.MemberName(me.Def),
+                CenterFamily = _loc.FamilyName(me.Def.Family),
                 Empty = _loc.T("affinity.empty"),
                 Close = _loc.T("ui.close"),
                 Rows = rows,
@@ -66,6 +69,9 @@ namespace N29.HeroesDawn.Presentation.Hub
                 Bonus = synergy == null ? _loc.T("affinity.none") : _loc.SynergyName(synergy) + " : " + _loc.SynergyEffect(synergy, level),
                 HasBonus = synergy != null,
                 Pair = PairText(me.Position, other.Def.Position, wins),
+                FamilyText = _loc.FamilyName(other.Def.Family),
+                Level = level,
+                Wins = wins,
             };
         }
 

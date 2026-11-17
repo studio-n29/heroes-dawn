@@ -85,7 +85,7 @@ MonoBehaviour:
     narrationAfter: []
   - id: n04
     type: 4
-    isFixed: 0
+    isFixed: 1
     rank: 1
     x: 4
     y: 3
@@ -95,7 +95,32 @@ MonoBehaviour:
     rounds: 1
     enemiesMin: 2
     enemiesMax: 3
-    narrationBefore: []
+    narrationBefore:
+    - speaker: narrateur
+      text: "Le maglev file sous la ville, \xE9clair\xE9 comme une f\xEAte. Un convoi roule en parall\xE8le, sans lumi\xE8re."
+      key: narration.mos_1_3.intro.0
+      route: 
+      replaces: 
+    - speaker: giulia_rossi
+      text: Un convoi qui ne figure sur aucun horaire, sur une ligne qui affiche tout.
+      key: narration.mos_1_3.intro.1
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: "Je vois les caisses\u2026 avant qu'on les charge. Ce sont les m\xEAmes que sur la voie 9."
+      key: narration.mos_1_3.intro.2
+      route: 
+      replaces: 
+    - speaker: agent_d
+      text: "Je ne vois pas leur pass\xE9, mais je vois qu'on a emball\xE9 ces caisses \xE0 la main. Quelqu'un tient \xE0 elles."
+      key: narration.mos_1_3.intro.2.d
+      route: agent_d
+      replaces: narration.mos_1_3.intro.2
+    - speaker: lucas_mendes
+      text: "Alors c'est la m\xEAme fili\xE8re."
+      key: narration.mos_1_3.intro.3
+      route: 
+      replaces: 
     narrationAfter: []
   - id: n05
     type: 2
@@ -237,10 +262,26 @@ MonoBehaviour:
     enemiesMax: 3
     narrationBefore:
     - speaker: enforcer
-      text: "\xAB Ce convoi n'existe pas. Vous n'avez rien vu. \xBB"
+      text: Ce convoi n'existe pas. Vous n'avez rien vu.
+      key: narration.mos_1_3.elite.before.0
+      route: 
+      replaces: 
+    - speaker: ilona_varga
+      text: "Il le pense. C'est \xE7a qui me g\xEAne : il a peur pour lui, pas pour la cargaison."
+      key: narration.mos_1_3.elite.before.1
+      route: 
+      replaces: 
     narrationAfter:
     - speaker: agent_m
-      text: "\xAB Ces caisses portent un code sovi\xE9tique. Quelqu'un d\xE9terre de vieilles recherches. \xBB"
+      text: "Ces caisses portent un code sovi\xE9tique. Quelqu'un d\xE9terre de vieilles recherches."
+      key: narration.mos_1_3.elite.after.0
+      route: 
+      replaces: 
+    - speaker: lucas_mendes
+      text: "Sovi\xE9tique ? Cinq ans apr\xE8s la Supernova, qui exhume \xE7a ?"
+      key: narration.mos_1_3.elite.after.1
+      route: 
+      replaces: 
   - id: n15
     type: 1
     isFixed: 1
@@ -298,7 +339,15 @@ MonoBehaviour:
     narrationBefore: []
     narrationAfter:
     - speaker: ilona_varga
-      text: "\xAB Un code d'avant l'Union sur des caisses de cette ann\xE9e. Retiens-le. \xBB"
+      text: "Un code d'avant l'Union sur des caisses de cette ann\xE9e. Retiens-le."
+      key: narration.mos_1_3.exit.0
+      route: 
+      replaces: 
+    - speaker: agent_m
+      text: Je le retiens. Il ne s'efface pas.
+      key: narration.mos_1_3.exit.1
+      route: 
+      replaces: 
   links:
   - a: n00
     b: n01

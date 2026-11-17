@@ -31,7 +31,13 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
         static readonly string[] Foes =
         {
             "thug", "brute", "sniper", "street_pyro", "brick", "canal_chief", "crocodile", "bridge_titan", "amif_trooper", "amif_marksman", "amif_captain",
+            "mos_guard", "mos_smuggler", "mos_enforcer", "mos_passeur",
         };
+
+        static readonly HashSet<string> FoeIds = new HashSet<string>(Foes);
+
+        /// <summary>Ennemis qui changent d'illustration avec la phase du boss (classes « hd-foe--id », « hd-foe--id-2 », « hd-foe--id-3 »).</summary>
+        static readonly HashSet<string> PhasedFoes = new HashSet<string> { "mos_passeur" };
 
         /// <summary>Identifiant d'agent qui a un portrait cadré, ou null.</summary>
         public static string? AgentKey(Sprite? art, string? name)
@@ -52,20 +58,34 @@ namespace N29.HeroesDawn.Presentation.Combat.Hud
             return true;
         }
 
-        /// <summary>Pose l'illustration de l'ennemi qui porte ce nom affiché ; faux s'il n'en a pas.</summary>
-        public static bool ApplyEnemy(VisualElement frame, string? name)
+        /// <summary>
+        /// Pose l'illustration de l'ennemi : par identifiant de définition s'il est connu, sinon par le nom affiché ; faux s'il n'en a pas.
+        /// <paramref name="phase"/> : phase de boss atteinte (0 = première), pour les ennemis qui changent de visage.
+        /// </summary>
+        public static bool ApplyEnemy(VisualElement frame, string? name, string? defId = null, int phase = 0)
         {
             Clear(frame);
-            if (string.IsNullOrEmpty(name)) return false;
-            foreach (var id in Foes)
-            {
-                if (!string.Equals(Loc.T("enemies." + id + ".name"), name, StringComparison.OrdinalIgnoreCase)) continue;
-                frame.AddToClassList(FoePrefix + id);
-                frame.style.backgroundImage = new StyleBackground(StyleKeyword.Null);
-                return true;
-            }
-            return false;
+            string? id = FoeKey(name, defId);
+            if (id == null) return false;
+            string cls = FoePrefix + id;
+            if (phase > 0 && PhasedFoes.Contains(id)) cls += "-" + (Math.Min(phase, 2) + 1);
+            frame.AddToClassList(cls);
+            frame.style.backgroundImage = new StyleBackground(StyleKeyword.Null);
+            return true;
         }
+
+        /// <summary>Identifiant de l'ennemi illustré (par définition, à défaut par nom localisé), ou null.</summary>
+        public static string? FoeKey(string? name, string? defId)
+        {
+            if (!string.IsNullOrEmpty(defId) && FoeIds.Contains(defId!)) return defId;
+            if (string.IsNullOrEmpty(name)) return null;
+            foreach (var id in Foes)
+                if (string.Equals(Loc.T("enemies." + id + ".name"), name, StringComparison.OrdinalIgnoreCase)) return id;
+            return null;
+        }
+
+        /// <summary>Vrai si cet ennemi change d'illustration selon la phase du boss.</summary>
+        public static bool HasPhases(string? foeKey) => foeKey != null && PhasedFoes.Contains(foeKey);
 
         static void Clear(VisualElement frame)
         {

@@ -19,7 +19,7 @@ using NUnit.Framework;
 namespace N29.HeroesDawn.Tests.Presentation
 {
     /// <summary>Vue de liste factice : un seul double pour Pass, Boutique, Opérations, Labo et Archives.</summary>
-    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView, IProfilePageView, IChaptersPageView, ILairPageView, ITournamentPageView, IFilterBarView
+    public sealed class FakeListView : FakeView, IPassPageView, IBoutiquePageView, IOperationsPageView, ILabPageView, IArchivesPageView, ILoadoutPageView, IGrimoirePageView, IInventoryPageView, IAgentsPageView, IChaptersPageView, IFilterBarView
     {
         public event Action<string>? SearchChanged;
         public void Search(string query) => SearchChanged?.Invoke(query);
@@ -202,6 +202,49 @@ namespace N29.HeroesDawn.Tests.Presentation
         }
 
 
+        [Test, Description("Vérifie que « Ouvrir un autre booster » enchaîne une seconde ouverture tant qu'il en reste en réserve, avec le nombre restant dans les données — parce que le joueur ouvre ses boosters à la suite sans repasser par la boutique")]
+        public void Boutique_Boosters_OpenAnotherChainsOpenings()
+        {
+            _host.Register<IBoosterOpeningPopupView>(() => new FakeBoosterOpeningPopup());
+            _app.Session.Wallet.Add(0, 1000);
+            var p = NewBoutique(new HubNavigator { ShopTab = ShopTab.Boosters });
+            _view.ClickRow(0, 0);
+            _view.ClickRow(0, 0);
+            Assert.That(_app.Collection.BoosterStock(BoosterDef.StandardId), Is.EqualTo(2));
+            _view.ClickRow(0, 1);
+            var first = (FakeBoosterOpeningPopup)_host.Spawned.Single(s => s is FakeBoosterOpeningPopup);
+            Assert.That(first.Shown!.Value.RemainingBoosters, Is.EqualTo(1), "il en reste un : le bouton « Ouvrir un autre » est proposé");
+            first.OpenAnother();
+            var popups = _host.Spawned.OfType<FakeBoosterOpeningPopup>().ToList();
+            Assert.That(popups.Count, Is.EqualTo(2), "une seconde fenêtre s'ouvre");
+            Assert.That(_host.Despawned, Does.Contain(first), "la première est fermée");
+            var second = popups[1];
+            Assert.That(second, Is.Not.SameAs(first));
+            Assert.That(second.Shown!.Value.RemainingBoosters, Is.EqualTo(0));
+            Assert.That(_app.Collection.BoosterStock(BoosterDef.StandardId), Is.EqualTo(0));
+            second.Continue();
+            Assert.That(_host.Despawned, Does.Contain(second));
+            p.Dispose();
+        }
+
+        [Test, Description("Vérifie que le booster ouvert fournit les textes (nouvelle, doublon, récapitulatif) en français — parce que la fenêtre n'a plus de texte codé en dur")]
+        public void Boutique_Boosters_OpeningDataCarriesTexts()
+        {
+            _host.Register<IBoosterOpeningPopupView>(() => new FakeBoosterOpeningPopup());
+            _app.Session.Wallet.Add(0, 1000);
+            var p = NewBoutique(new HubNavigator { ShopTab = ShopTab.Boosters });
+            _view.ClickRow(0, 0);
+            _view.ClickRow(0, 1);
+            var popup = (FakeBoosterOpeningPopup)_host.Spawned.Single(s => s is FakeBoosterOpeningPopup);
+            var d = popup.Shown!.Value;
+            Assert.That(d.DuplicateLabel, Is.EqualTo("DOUBLON"));
+            Assert.That(d.OpenAnotherLabel, Is.Not.Empty);
+            Assert.That(d.FlipHint, Is.Not.Empty);
+            Assert.That(d.RecapLine(2, 1), Is.EqualTo("2 nouvelle(s) · 1 doublon(s)"));
+            popup.Continue();
+            p.Dispose();
+        }
+
         [Test, Description("Vérifie que la boutique propose trois packs différents (standard, Opération, Mission) qui s'achètent et s'ouvrent séparément, avec leurs propres cartes et leur prix — parce que chaque pack doit avoir sa place dans l'offre")]
         public void Boutique_Boosters_OffersThreeDistinctPacks()
         {
@@ -375,14 +418,14 @@ namespace N29.HeroesDawn.Tests.Presentation
             return p;
         }
 
-        [Test, Description("Vérifie que la carte montre les cinq quartiers, que seul Brooklyn est ouvert et que les autres sont marqués verrouillés — parce que les actes suivants ne sont pas encore jouables")]
-        public void Map_FiveBoroughs_OnlyBrooklynOpen()
+        [Test, Description("Vérifie que la carte montre les quatre quartiers, que seul Brooklyn est ouvert et que les autres sont verrouillés derrière lui — parce que les chapitres se jouent dans l ordre")]
+        public void Map_FourBoroughs_OnlyBrooklynOpen()
         {
             Make();
-            Assert.That(_view.Last.Boroughs.Length, Is.EqualTo(5));
+            Assert.That(_view.Last.Boroughs.Length, Is.EqualTo(4));
             Assert.That(_view.Last.Boroughs.Where(b => !b.Locked).Select(b => b.Id), Is.EqualTo(new[] { "brooklyn" }));
-            Assert.That(_view.Last.Points.Count(p => p.ZoneId != null), Is.EqualTo(4), "quatre zones jouables");
-            Assert.That(_view.Last.Points.Count(p => p.ZoneId == null), Is.GreaterThan(0), "points à venir dans les quartiers verrouillés");
+            Assert.That(_view.Last.Points.Count(p => p.ZoneId != null), Is.EqualTo(16), "seize zones sur la carte");
+            Assert.That(_view.Last.Points.Where(p => p.ZoneId != null && !p.ZoneId.StartsWith("zone_ny_1_")).All(p => p.Status == N29.HeroesDawn.Application.Features.World.ZoneStatus.Locked), Is.True, "les zones des chapitres suivants sont verrouillées");
         }
 
         [Test, Description("Vérifie que la carte d'Agent M est celle de Moscou (Sergueiv ouvert, trois quartiers à venir), avec les quatre zones de Moscou dans la liste et la première proposée — parce que le parcours d'Agent M commence à Moscou")]
@@ -392,7 +435,8 @@ namespace N29.HeroesDawn.Tests.Presentation
             Make();
             Assert.That(_view.Last.Boroughs.Select(b => b.Id), Is.EquivalentTo(new[] { "sergueiv", "kapotnya", "sadovoye", "place_rouge" }));
             Assert.That(_view.Last.Boroughs.Where(b => !b.Locked).Select(b => b.Id), Is.EqualTo(new[] { "sergueiv" }));
-            Assert.That(_view.Last.Rows.Select(r => r.ZoneId), Is.EqualTo(new[] { "zone_mos_1_1", "zone_mos_1_2", "zone_mos_1_3", "zone_mos_1_4" }));
+            Assert.That(_view.Last.Rows.Count, Is.EqualTo(4), "la liste montre les quatre zones du quartier sélectionné");
+            Assert.That(_view.Last.Rows.Take(4).Select(r => r.ZoneId), Is.EqualTo(new[] { "zone_mos_1_1", "zone_mos_1_2", "zone_mos_1_3", "zone_mos_1_4" }));
             Assert.That(_view.Last.Points.First(p => p.Selected).ZoneId, Is.EqualTo("zone_mos_1_1"));
             Assert.That(_view.Last.Boroughs.All(b => b.Name.Length > 0 && !b.Name.StartsWith("[")), Is.True, "noms de quartiers traduits");
         }
@@ -401,9 +445,10 @@ namespace N29.HeroesDawn.Tests.Presentation
         public void Presenter_AgentM_AfterThePasseur_StaysOnMoscow_ActTwoParis()
         {
             _app.Session.Meta.onboarding.hero = "agent_m";
-            foreach (var z in _app.Session.Content.Zones.Where(z => z.Borough == "sergueiv")) _app.Session.CompletedZones.Add(z.Id.Value);
+            foreach (var z in _app.Session.Content.Zones.Where(z => N29.HeroesDawn.Definitions.StoryRoutes.CityOfBorough(z.Borough) == "moscow")) _app.Session.CompletedZones.Add(z.Id.Value);
             var p = Make();
-            Assert.That(_view.Last.Rows.Select(r => r.ZoneId), Is.EqualTo(new[] { "zone_mos_1_1", "zone_mos_1_2", "zone_mos_1_3", "zone_mos_1_4" }));
+            Assert.That(_view.Last.Rows.Count, Is.EqualTo(4), "la liste montre les quatre zones du quartier sélectionné");
+            Assert.That(_view.Last.Rows.Select(r => r.ZoneId.Substring(0, 10)).Distinct().Count(), Is.EqualTo(1), "les quatre zones sont celles d'un même quartier");
             Assert.That(_view.Last.Rows.All(r => r.Status == N29.HeroesDawn.Application.Features.World.ZoneStatus.Done), Is.True);
             Assert.That(_view.Last.ActTitle, Does.Contain(_loc.T("city.paris")));
             Assert.That(p.Title, Does.Contain(_loc.T("city.paris")));
@@ -416,8 +461,9 @@ namespace N29.HeroesDawn.Tests.Presentation
         {
             _app.Session.Meta.onboarding.hero = "agent_d";
             Make();
-            Assert.That(_view.Last.Boroughs.Length, Is.EqualTo(5));
-            Assert.That(_view.Last.Rows.Select(r => r.ZoneId), Is.EqualTo(new[] { "zone_ny_1_1", "zone_ny_1_2", "zone_ny_1_3", "zone_ny_1_4" }));
+            Assert.That(_view.Last.Boroughs.Length, Is.EqualTo(4));
+            Assert.That(_view.Last.Rows.Count, Is.EqualTo(4), "la liste montre les quatre zones du quartier sélectionné");
+            Assert.That(_view.Last.Rows.Take(4).Select(r => r.ZoneId), Is.EqualTo(new[] { "zone_ny_1_1", "zone_ny_1_2", "zone_ny_1_3", "zone_ny_1_4" }));
         }
 
         [Test, Description("Vérifie que la zone proposée est la première non validée et que DÉPLOYER la démarre — parce que MISSION → carte → Déployer remplace le lancement direct")]

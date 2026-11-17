@@ -76,9 +76,12 @@ namespace N29.HeroesDawn.Presentation.Hub
             {
                 // Puce de famille : son icône du kit devant le nom.
                 var chip = AddChip(filterBox, _filters, Loc.T("family." + f), index++, i => FilterClicked?.Invoke(i));
-                chip.AddToClassList("hd-tm-ibtn");
+                // Icône seule (le nom de la famille reste en infobulle) : le nom écrasait l'icône dans une puce trop étroite.
+                chip.text = "";
+                chip.tooltip = Loc.T("family." + f);
+                chip.AddToClassList("hd-team__chip--icon");
                 var icon = HdTeamUi.FamilyIcon(f);
-                icon.AddToClassList("hd-tm-ibtn__ico");
+                icon.AddToClassList("hd-team__chipicon");
                 chip.Add(icon);
             }
             var sortBox = Q<VisualElement>("sorts");
@@ -212,6 +215,13 @@ namespace N29.HeroesDawn.Presentation.Hub
             portrait.Add(art);
             portrait.Add(Passive("hd-member__frame"));
             portrait.Add(family);
+            // Position (sous la famille, teinte de la famille) et insigne de rang AMIF (coin haut droit).
+            var role = HdTeamUi.PositionIcon(m.Role, m.Card.Family);
+            role.AddToClassList("hd-member__role");
+            portrait.Add(role);
+            var rank = HdTeamUi.RankBadge(m.Card.PowerTier);
+            rank.AddToClassList("hd-member__rank");
+            portrait.Add(rank);
             portrait.Add(PassiveLabel(m.Card.LevelText, "hd-member__level"));
 
             // Pied : nom, état écrit (ou fatigue chiffrée), jauge de fatigue.

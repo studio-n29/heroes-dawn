@@ -39,7 +39,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         DossierData? _lastDossier;
         PickerData? _lastPicker;
         HdTutorialAnchor? _pickAnchor;
-        VisualElement? _statCells, _fatigueRow, _familyIcon, _dossierFace, _dossierFamily;
+        VisualElement? _statCells, _fatigueRow, _familyIcon, _dossierFace, _dossierFamily, _roleIcon, _rankBadge;
         Label? _dossierName, _dossierRole;
 
         public event Action? PreviousClicked;
@@ -82,6 +82,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _pickerRoot = Q<VisualElement>("pickerRoot"); _pickerTitle = Q<Label>("pickerTitle"); _pickerHint = Q<Label>("pickerHint");
             _pickerBox = Q<ScrollView>("pickerTiles"); _pickerRemove = Q<UnityEngine.UIElements.Button>("pickerRemove"); _pickerClose = Q<UnityEngine.UIElements.Button>("pickerClose");
             _statCells = TryQ<VisualElement>("statCells"); _fatigueRow = TryQ<VisualElement>("fatigueRow"); _familyIcon = TryQ<VisualElement>("familyIcon");
+            _roleIcon = null; _rankBadge = null; // recréés dans la nouvelle arborescence au premier affichage
             _dossierFace = TryQ<VisualElement>("dossierFace"); _dossierFamily = TryQ<VisualElement>("dossierFamily");
             _dossierName = TryQ<Label>("dossierName"); _dossierRole = TryQ<Label>("dossierRole");
             var skillsTitle = TryQ<Label>("skillsTitle");
@@ -162,6 +163,25 @@ namespace N29.HeroesDawn.Presentation.Hub
             }
         }
 
+        /// <summary>Icône de position (à côté de la famille, teinte de famille) et insigne de rang AMIF (devant le texte du rang), créés au premier affichage.</summary>
+        void ShowRoleAndRank(MemberSheetData d)
+        {
+            if (_familyIcon == null || _familyIcon.parent == null) return;
+            var meta = _familyIcon.parent;
+            if (_roleIcon == null)
+            {
+                _roleIcon = HdTeamUi.PositionIcon(d.Role, d.Card.Family);
+                _roleIcon.AddToClassList("hd-sheet__famico");
+                meta.Insert(meta.IndexOf(_familyIcon) + 1, _roleIcon);
+                _rankBadge = HdTeamUi.RankBadge(d.Card.PowerTier);
+                _rankBadge.AddToClassList("hd-sheet__rankico");
+                int at = meta.IndexOf(_rarity);
+                if (at >= 0) meta.Insert(at, _rankBadge); else meta.Add(_rankBadge);
+            }
+            HdTeamUi.SetPosition(_roleIcon, d.Role, d.Card.Family);
+            if (_rankBadge != null) HdTeamUi.SetRank(_rankBadge, d.Card.PowerTier);
+        }
+
         static void Visible(VisualElement e, bool on) => e.style.display = on ? DisplayStyle.Flex : DisplayStyle.None;
 
         /// <summary>
@@ -217,6 +237,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _rarity.text = d.Card.RarityText; _rarity.style.color = Theme.RarityColor(d.Card.Rarity);
             _role.text = d.Card.RoleLine;
             if (_familyIcon != null) HdTeamUi.SetFamily(_familyIcon, d.Card.Family);
+            ShowRoleAndRank(d);
             _levelFill.style.width = Length.Percent(Mathf.Clamp01(d.Level01) * 100f);
             _levelFill.style.unityBackgroundImageTintColor = family;
             _levelLabel.text = d.LevelBarText;

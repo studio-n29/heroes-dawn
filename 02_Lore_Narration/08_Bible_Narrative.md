@@ -100,7 +100,7 @@ Les **cultes de Mephisto et d'Eda sont retirés de Paris**. Mephisto n'apparaît
 
 ## 7. Points à valider
 
-- **Noms propres nouveaux** : Dmitri Orlan, le Passeur, le Contremaître, le Conseiller, le Régisseur, Colonel Avrilly, Dr Hélène Marchetti, le Béhémoth, le Prédicateur, l'Écho.
+- **Noms propres nouveaux** : *(validés le 2026-11-16 : Dmitri Orlan, le Passeur, le Contremaître, le Conseiller, le Régisseur)* ; à valider : Colonel Avrilly, Dr Hélène Marchetti, le Béhémoth, le Prédicateur, l'Écho.
 - **Fiche dédiée à la Supernova** : reste à écrire (la nature des résidus est tranchée, pas leurs détails).
 - **Rôle exact des Apex Unit** dans les actes (mentors visibles, ou seulement évoqués).
 - **Fin ouverte vers Eda** : conservée, en cohérence avec le plan LiveOps (arc « Retour d'Eda » à M+24, Eda non recrutable). Voir `05_Production/Live_Ops_Plan_24_mois.md`.
@@ -113,3 +113,9 @@ Les **cultes de Mephisto et d'Eda sont retirés de Paris**. Mephisto n'apparaît
 ## 8. Intégration dans le jeu
 
 Aucun code n'est modifié par ce document. Il alimente, lot par lot, les `ChapterDef` (`Definitions/Chapters.cs`), les textes `chapter.<id>.title` et `chapter.<id>.intro`, et les zones jouables (voir `Code/docs/specs/2026-10-27-narration-chapitres-dossiers-design.md`). Les objectifs précis de chaque zone sont définis dans des lots séparés, ville par ville.
+
+---
+
+## 9. Scripts de dialogues (2026-11-16)
+
+`13_Script_New_York.md` et `14_Script_Moscou.md` contiennent trame, événements, dialogues FR, variantes Agent D/M et épilogues des deux villes. Ils font foi sur les répliques. Noms validés le 2026-11-16 : Elias Voss (Régisseur), Dante Reyes « Braise », Théo, Dr Amina Colby, Fiodor Gromov (Contremaître), Arkadi Zorin (Conseiller), Ilia. Décisions de canon reprises dans les scripts : l'AMIF est courtier (reçoit des captifs du Syndicat, en revend aux gangs) ; l'attentat de la cathédrale est orchestré par la faction interne ; les choix de Harlem et de la Place Rouge ne modifient que l'épilogue.

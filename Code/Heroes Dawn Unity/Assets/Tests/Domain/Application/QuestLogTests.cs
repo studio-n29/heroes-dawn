@@ -23,8 +23,10 @@ namespace N29.HeroesDawn.Tests.Domain.Application
         public void Main_AreTheFourZones_InOrder()
         {
             var main = Q.Main();
-            Assert.That(main.Select(m => m.Zone.Id.Value), Is.EqualTo(new[] { "zone_ny_1_1", "zone_ny_1_2", "zone_ny_1_3", "zone_ny_1_4" }));
-            Assert.That(main.Select(m => m.Status), Is.EqualTo(new[] { ZoneStatus.Available, ZoneStatus.Locked, ZoneStatus.Locked, ZoneStatus.Locked }));
+            Assert.That(main.Count, Is.EqualTo(16), "quatre chapitres de quatre zones");
+            Assert.That(main.Take(4).Select(m => m.Zone.Id.Value), Is.EqualTo(new[] { "zone_ny_1_1", "zone_ny_1_2", "zone_ny_1_3", "zone_ny_1_4" }));
+            Assert.That(main.Select(m => m.Status).Skip(1), Is.All.EqualTo(ZoneStatus.Locked));
+            Assert.That(main[0].Status, Is.EqualTo(ZoneStatus.Available));
             Assert.That(Q.CurrentMain()!.Value.Zone.Id.Value, Is.EqualTo("zone_ny_1_1"));
             _app.Session.CompletedZones.Add("zone_ny_1_1");
             Assert.That(Q.Main()[0].Status, Is.EqualTo(ZoneStatus.Done));

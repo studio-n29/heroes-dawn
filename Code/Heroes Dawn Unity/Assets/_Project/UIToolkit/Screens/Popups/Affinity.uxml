@@ -1,10 +1,19 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="modal" class="hd-modal">
-        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-pop__wide">
+        <ui:VisualElement name="window" class="hd-window hd-modal__window hd-pop__wide hd-aff__window">
             <ui:Label name="title" class="hd-modal__title" />
             <ui:Label name="subtitle" class="hd-pop__hint" />
             <ui:VisualElement class="hd-divider" />
             <ui:Label name="empty" class="hd-pop__text" />
+            <ui:VisualElement name="starBox" class="hd-aff__starbox">
+                <ui:VisualElement name="star" class="hd-aff__star" />
+                <ui:VisualElement name="detail" class="hd-aff__detail">
+                    <ui:Label name="detailName" class="hd-aff__dname" />
+                    <ui:Label name="detailLink" class="hd-aff__dlink" />
+                    <ui:Label name="detailBonus" class="hd-aff__dbonus" />
+                    <ui:Label name="detailPair" class="hd-aff__dpair" />
+                </ui:VisualElement>
+            </ui:VisualElement>
             <ui:ScrollView name="list" class="hd-pop__scroll" />
             <ui:VisualElement class="hd-modal__buttons"><ui:Button name="close" class="hd-btn hd-btn--secondary" /></ui:VisualElement>
         </ui:VisualElement>

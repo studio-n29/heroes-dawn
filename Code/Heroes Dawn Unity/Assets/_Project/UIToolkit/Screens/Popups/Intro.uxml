@@ -6,16 +6,57 @@
                 <ui:VisualElement class="hd-ecta__icon hd-ecta__icon--chevron hd-ecta__icon--light" picking-mode="Ignore" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:VisualElement name="characterLayer" class="hd-intropop__char">
-            <ui:Label name="title" class="hd-intropop__title" />
+
+        <!-- Rayner en Full Art : grand portrait plein écran, voile en bas, bulle de texte ; un toucher passe à la réplique suivante. -->
+        <ui:VisualElement name="raynerLayer" class="hd-intropop__rayner">
+            <ui:VisualElement name="raynerArt" class="hd-intropop__rayner-art" picking-mode="Ignore" />
+            <ui:VisualElement class="hd-intropop__rayner-shade" picking-mode="Ignore" />
+            <ui:VisualElement class="hd-intropop__rayner-box" picking-mode="Ignore">
+                <ui:Label name="raynerName" class="hd-intropop__rayner-name" picking-mode="Ignore" />
+                <ui:Label name="raynerText" class="hd-intropop__rayner-text" picking-mode="Ignore" />
+                <ui:Label name="raynerHint" class="hd-intropop__rayner-hint" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Button name="raynerTap" class="hd-intropop__tap" />
+        </ui:VisualElement>
+
+        <!-- La fiche d'identification de The Dawn : nom, prénom, âge, avatar, pouvoir (tableau groupé par famille). -->
+        <ui:VisualElement name="formLayer" class="hd-intropop__char">
+            <ui:Label name="formTitle" class="hd-intropop__title" />
             <ui:VisualElement class="hd-intropop__divider" picking-mode="Ignore" />
-            <ui:TextField name="nameField" class="hd-pop__field hd-intropop__name" max-length="20" />
-            <ui:Label name="nameHint" class="hd-intropop__hint" />
-            <ui:VisualElement name="avatars" class="hd-intropop__avatars" />
-            <ui:Button name="confirm" class="hd-btn hd-btn--primary hd-intropop__confirm hd-ecta">
+            <ui:VisualElement class="hd-intropop__formrow">
+                <ui:VisualElement class="hd-intropop__formcol">
+                    <ui:Label name="lastNameLabel" class="hd-intropop__fieldlabel" />
+                    <ui:TextField name="lastNameField" class="hd-pop__field hd-intropop__field" max-length="20" />
+                    <ui:Label name="firstNameLabel" class="hd-intropop__fieldlabel" />
+                    <ui:TextField name="firstNameField" class="hd-pop__field hd-intropop__field" max-length="20" />
+                    <ui:Label name="ageLabel" class="hd-intropop__fieldlabel" />
+                    <ui:TextField name="ageField" class="hd-pop__field hd-intropop__field hd-intropop__field--age" max-length="2" />
+                    <ui:Label name="powerLabel" class="hd-intropop__fieldlabel" />
+                    <ui:Button name="powerButton" class="hd-btn hd-btn--ghost hd-intropop__power" />
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-intropop__formcol">
+                    <ui:Label name="avatarLabel" class="hd-intropop__fieldlabel" />
+                    <ui:VisualElement name="avatars" class="hd-intropop__avatars hd-intropop__avatars--form" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="formError" class="hd-intropop__error" />
+            <ui:Button name="formConfirm" class="hd-btn hd-btn--primary hd-intropop__confirm hd-ecta">
                 <ui:VisualElement class="hd-ecta__icon hd-ecta__icon--star" picking-mode="Ignore" />
                 <ui:VisualElement class="hd-ecta__icon hd-ecta__icon--chevron" picking-mode="Ignore" />
             </ui:Button>
+            <!-- Le tableau des pouvoirs, posé par-dessus la fiche : une colonne par famille. -->
+            <ui:VisualElement name="powerSheet" class="hd-intropop__powersheet">
+                <ui:ScrollView name="powerScroll" class="hd-intropop__powerscroll" mode="Vertical">
+                    <ui:VisualElement name="powerTable" class="hd-intropop__powertable" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Choix de la ville de départ : New York (agent D) ou Moscou (agent M). -->
+        <ui:VisualElement name="startLayer" class="hd-intropop__char">
+            <ui:Label name="startTitle" class="hd-intropop__title" />
+            <ui:VisualElement class="hd-intropop__divider" picking-mode="Ignore" />
+            <ui:VisualElement name="startCards" class="hd-intropop__startcards" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

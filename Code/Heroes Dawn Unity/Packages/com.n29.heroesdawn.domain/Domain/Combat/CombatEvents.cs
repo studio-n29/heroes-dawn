@@ -123,7 +123,11 @@ namespace N29.HeroesDawn.Domain.Combat
         public string NameKey { get; }
         /// <summary>Vrai si la phase a remplacé le jeu de compétences du boss (l interface doit rafraîchir ses compétences).</summary>
         public bool KitChanged { get; }
-        public BossPhaseChangedEvent(int t, int unit, int phase, int phaseCount, string nameKey, bool kitChanged = false) : base(t) { Unit = unit; Phase = phase; PhaseCount = phaseCount; NameKey = nameKey; KitChanged = kitChanged; }
+        /// <summary>Répliques du boss à l'ouverture de la phase (affichage seulement).</summary>
+        readonly System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Definitions.NarrationLineDef> _lines;
+        /// <summary>Méthode et non propriété : l empreinte des combats de référence (CombatDigest) lit toutes les propriétés publiques, et ces répliques ne font pas partie du résultat du combat.</summary>
+        public System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Definitions.NarrationLineDef> GetLines() => _lines;
+        public BossPhaseChangedEvent(int t, int unit, int phase, int phaseCount, string nameKey, bool kitChanged = false, System.Collections.Generic.IReadOnlyList<N29.HeroesDawn.Definitions.NarrationLineDef>? lines = null) : base(t) { _lines = lines ?? System.Array.Empty<N29.HeroesDawn.Definitions.NarrationLineDef>(); Unit = unit; Phase = phase; PhaseCount = phaseCount; NameKey = nameKey; KitChanged = kitChanged; }
     }
 
     public sealed class CombatEndedEvent : CombatEvent { public bool Victory { get; } public CombatEndedEvent(int t, bool victory) : base(t) { Victory = victory; } }

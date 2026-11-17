@@ -7,6 +7,7 @@ namespace N29.HeroesDawn.Application.Ports
     // Données de méta-progression sauvegardées dans le profil (schéma v4). Classes simples et listes seulement : JsonUtility.
 
     [Serializable] public sealed class CounterSave { public string id = ""; public int value; }
+    [Serializable] public sealed class StoryChoiceSave { public string id = ""; public string option = ""; }
 
     [Serializable]
     public sealed class DailySave
@@ -152,6 +153,12 @@ namespace N29.HeroesDawn.Application.Ports
         public string hero = "";
         /// <summary>Avatar du personnage créé par le joueur (identifiant de la galerie ; vide : premier avatar).</summary>
         public string avatar = "";
+        // Fiche d'identification de The Dawn (champs ajoutés ; les anciennes sauvegardes les lisent vides ou à 0).
+        public string lastName = "";
+        public string firstName = "";
+        public int age;
+        /// <summary>Pouvoir inscrit sur la fiche (identifiant du catalogue <c>HeroPowers</c> ; vide : aucun).</summary>
+        public string power = "";
     }
 
     /// <summary>Tout ce qui dépasse le noyau (équipe, ressources, boutique de recrutement) : pass, missions, opérations, labo, archives…</summary>
@@ -246,6 +253,9 @@ namespace N29.HeroesDawn.Application.Ports
 
         // Narration (lot G) : chapitres dont l'ouverture a été montrée
         public List<string> chaptersSeen = new List<string>();
+
+        /// <summary>Choix d histoire déjà faits (définitifs, un seul par choix) : voir <see cref="N29.HeroesDawn.Definitions.StoryChoices"/>.</summary>
+        public List<StoryChoiceSave> storyChoices = new List<StoryChoiceSave>();
 
         /// <summary>Fragments de souvenirs déjà lus (voir <see cref="N29.HeroesDawn.Definitions.MemoryFragments"/>).</summary>
         public List<string> fragmentsRead = new List<string>();

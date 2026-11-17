@@ -7,6 +7,7 @@ using N29.HeroesDawn.Presentation.Tutorial;
 using N29.HeroesDawn.Presentation.UiToolkit;
 using UnityEngine;
 using UnityEngine.UIElements;
+using DefPosition = N29.HeroesDawn.Definitions.Position;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
@@ -27,7 +28,7 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         sealed class HeroCard
         {
-            public VisualElement Root = null!, Art = null!, Bust = null!, Frame = null!, FamilyIcon = null!, Body = null!;
+            public VisualElement Root = null!, Art = null!, Bust = null!, Frame = null!, FamilyIcon = null!, Body = null!, Role = null!, Rank = null!;
             public Label Name = null!, Rarity = null!, InTeam = null!;
             public UnityEngine.UIElements.Button Recruit = null!;
             public string BustClass = "";
@@ -74,6 +75,14 @@ namespace N29.HeroesDawn.Presentation.Hub
 
         protected override void Bind()
         {
+            // Zone centrale à défilement vertical tactile : glisser pour défiler, aucune barre visible qui capterait le pointeur.
+            var scroll = Q<ScrollView>("recruitScroll");
+            scroll.mode = ScrollViewMode.Vertical;
+            scroll.verticalScrollerVisibility = ScrollerVisibility.Hidden;
+            scroll.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+            scroll.touchScrollBehavior = ScrollView.TouchScrollBehavior.Elastic;
+            // Un bouton pris au focus (manette, clavier) est ramené dans la zone visible.
+            scroll.RegisterCallback<FocusInEvent>(e => { if (e.target is VisualElement v && v != scroll && v.focusable) scroll.ScrollTo(v); });
             _cardsBox = Q<VisualElement>("cards"); _scrapsBox = Q<VisualElement>("scraps");
             _rule = Q<Label>("rule"); _countdown = Q<Label>("countdown"); _empty = Q<Label>("empty"); _progress = Q<Label>("progress");
             _dName = Q<Label>("detailName"); _dRarity = Q<Label>("detailRarity"); _dRole = Q<Label>("detailRole");
@@ -172,7 +181,10 @@ namespace N29.HeroesDawn.Presentation.Hub
             c.Recruit = new UnityEngine.UIElements.Button();
             c.Recruit.AddToClassList("hd-btn"); c.Recruit.AddToClassList("hd-btn--small"); c.Recruit.AddToClassList("hd-hero__price");
             c.Recruit.clicked += () => RecruitClicked?.Invoke(_slots[index]);
-            c.Art.Add(c.Bust); c.Art.Add(Box("hd-hero__shade")); c.Art.Add(c.FamilyIcon);
+            // Position (teinte de famille, sous l'icône de famille) et insigne de rang AMIF (coin haut droit).
+            c.Role = HdTeamUi.PositionIcon(DefPosition.FrontLine, Family.Matter); c.Role.AddToClassList("hd-hero__role");
+            c.Rank = HdTeamUi.RankBadge(1); c.Rank.AddToClassList("hd-hero__rank");
+            c.Art.Add(c.Bust); c.Art.Add(Box("hd-hero__shade")); c.Art.Add(c.FamilyIcon); c.Art.Add(c.Role); c.Art.Add(c.Rank);
             c.Body.Add(c.Name); c.Body.Add(c.Rarity);
             c.Root.Add(c.Art); c.Root.Add(c.Body); c.Root.Add(c.InTeam); c.Root.Add(c.Recruit); c.Root.Add(c.Frame);
             void Tap()
@@ -212,6 +224,8 @@ namespace N29.HeroesDawn.Presentation.Hub
             c.Root.EnableInClassList("hd-hero--taken", d.InTeam);
             SetFamily(c.Frame, "hd-hero__frame--", d.Card.Family);
             SetFamily(c.FamilyIcon, "hd-famicon--", d.Card.Family);
+            HdTeamUi.SetPosition(c.Role, d.Role, d.Card.Family);
+            HdTeamUi.SetRank(c.Rank, d.Card.PowerTier);
             var art = d.Card.Portrait.Art;
             c.Art.style.backgroundImage = art != null ? new StyleBackground(art) : new StyleBackground(StyleKeyword.Null);
             string bust = "hd-bust--" + d.Card.Id.Value;

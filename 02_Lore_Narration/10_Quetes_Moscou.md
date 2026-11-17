@@ -1,5 +1,7 @@
 # Moscou : « le progrès bâti sur un mensonge »
 
+*Dialogues complets : voir `14_Script_Moscou.md` (fait foi sur les répliques).*
+
 *Date : 2026-11-09 · Acte I pour Agent M, acte III pour Agent D. Bible : `08_Bible_Narrative.md`.*
 
 ## Thèse
@@ -8,9 +10,9 @@ Moscou a accepté les Apex plus vite que n'importe quelle ville. Ils sont intég
 
 ## Antagonistes
 
-- **Les oligarques**, dont **Dmitri Orlan** *(à valider)*, boss de Sadovoye Koltso.
-- **La mafia**, alliée à l'AMIF dans l'ombre : le **Passeur** et le **Contremaître** *(à valider)*.
-- **Le Conseiller** *(à valider)* : haut responsable de la faction interne, boss de la Place Rouge.
+- **Les oligarques**, dont **Dmitri Orlan** *(nom validé le 2026-11-16)*, boss de Sadovoye Koltso.
+- **La mafia**, alliée à l'AMIF dans l'ombre : le **Passeur** et le **Contremaître** (Fiodor Gromov), noms validés le 2026-11-16.
+- **Le Conseiller** (Arkadi Zorin, nom validé le 2026-11-16) : haut responsable de la faction interne, boss de la Place Rouge.
 
 ## Piste vers Salem *(validée le 2026-11-09)*
 

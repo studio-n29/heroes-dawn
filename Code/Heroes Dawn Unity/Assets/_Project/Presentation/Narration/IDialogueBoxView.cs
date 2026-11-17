@@ -17,10 +17,12 @@ namespace N29.HeroesDawn.Presentation.Narration
         public bool Left { get; }
         /// <summary>Clé de la réplique pour sa voix (la clé de son texte) ; vide : pas de voix.</summary>
         public string VoiceKey { get; }
+        /// <summary>Identifiant d'un personnage non jouable (« enforcer », « passeur ») dont la pose détourée remplace son illustration ; vide : aucun.</summary>
+        public string CutoutId { get; }
 
-        public DialogueBoxLine(string speaker, PortraitData portrait, string text, bool left, string voiceKey = "")
+        public DialogueBoxLine(string speaker, PortraitData portrait, string text, bool left, string voiceKey = "", string cutoutId = "")
         {
-            Speaker = speaker; Portrait = portrait; Text = text; Left = left; VoiceKey = voiceKey;
+            Speaker = speaker; Portrait = portrait; Text = text; Left = left; VoiceKey = voiceKey; CutoutId = cutoutId;
         }
     }
 

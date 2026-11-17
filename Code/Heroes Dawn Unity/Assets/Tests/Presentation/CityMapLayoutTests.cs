@@ -16,32 +16,38 @@ namespace N29.HeroesDawn.Tests.Presentation
             return inside;
         }
 
-        [Test, Description("Vérifie que la carte de New York est inchangée : cinq quartiers, quatre zones jouables de Brooklyn — parce que la mise en page de Moscou ne doit rien modifier côté Agent D")]
-        public void For_NewYork_IsUnchanged()
+        [Test, Description("Vérifie que la carte de New York a quatre quartiers (un par chapitre) et seize points jouables, quatre par quartier — parce que chaque chapitre a ses quatre zones")]
+        public void For_NewYork_HasFourBoroughs_WithSixteenPlayableSpots()
         {
             var ny = CityMapLayout.For("new_york");
-            Assert.That(ny.Boroughs.Select(b => b.Id), Is.EqualTo(new[] { "bronx", "manhattan", "queens", "brooklyn", "staten" }));
-            Assert.That(ny.Spots.Where(s => s.ZoneId != null).Select(s => s.ZoneId), Is.EqualTo(new[] { "zone_ny_1_1", "zone_ny_1_2", "zone_ny_1_3", "zone_ny_1_4" }));
-            Assert.That(ny.Spots.Count, Is.EqualTo(10));
-            Assert.That(CityMapLayout.For("paris").Boroughs.Count, Is.EqualTo(5), "une ville sans carte propre retombe sur New York");
+            Assert.That(ny.Boroughs.Select(b => b.Id), Is.EqualTo(new[] { "harlem", "manhattan", "queens", "brooklyn" }));
+            Assert.That(ny.Spots.Where(s => s.ZoneId != null).Select(s => s.ZoneId).Take(4), Is.EqualTo(new[] { "zone_ny_1_1", "zone_ny_1_2", "zone_ny_1_3", "zone_ny_1_4" }));
+            Assert.That(ny.Spots.Count, Is.EqualTo(16));
+            Assert.That(ny.Spots.All(s => s.ZoneId != null), Is.True);
+            Assert.That(CityMapLayout.For("paris").Boroughs.Count, Is.EqualTo(4), "une ville sans carte propre retombe sur New York");
         }
 
-        [Test, Description("Vérifie que la carte de Moscou a quatre quartiers et quatre points jouables, tous dans Sergueiv, les autres quartiers n'ayant que des points à venir — parce que seul le chapitre Sergueiv est livré")]
-        public void For_Moscow_HasFourPlayableSpots_InSergueiv()
+        [Test, Description("Vérifie que la carte de Moscou a quatre quartiers et seize points jouables, quatre par quartier — parce que chaque chapitre a ses quatre zones")]
+        public void For_Moscow_HasSixteenPlayableSpots_FourPerBorough()
         {
             var m = CityMapLayout.For("moscow");
             Assert.That(m.Boroughs.Select(b => b.Id), Is.EquivalentTo(new[] { "sergueiv", "kapotnya", "sadovoye", "place_rouge" }));
             var playable = m.Spots.Where(s => s.ZoneId != null).ToList();
-            Assert.That(playable.Select(s => s.ZoneId), Is.EqualTo(new[] { "zone_mos_1_1", "zone_mos_1_2", "zone_mos_1_3", "zone_mos_1_4" }));
-            Assert.That(playable.All(s => s.Borough == "sergueiv"), Is.True);
-            Assert.That(m.Spots.Where(s => s.ZoneId == null).All(s => s.Borough != "sergueiv"), Is.True);
+            Assert.That(playable.Count, Is.EqualTo(16));
+            Assert.That(playable.Take(4).Select(s => s.ZoneId), Is.EqualTo(new[] { "zone_mos_1_1", "zone_mos_1_2", "zone_mos_1_3", "zone_mos_1_4" }));
+            Assert.That(playable.GroupBy(s => s.Borough).All(g => g.Count() == 4), Is.True);
+            
             Assert.That(m.Boroughs.Where(b => b.Act == 1).Select(b => b.Id), Is.EqualTo(new[] { "sergueiv" }));
         }
 
         [Test, Description("Vérifie que chaque point de la carte de Moscou est dans son quartier et que deux points ne se chevauchent pas — parce que les boutons de zone doivent rester distincts sur les quatre formats")]
-        public void Moscow_SpotsAreInsideTheirBorough_AndDoNotOverlap()
+        public void Moscow_And_NewYork_SpotsAreInsideTheirBorough_AndDoNotOverlap()
         {
-            var m = CityMapLayout.For("moscow");
+            foreach (var city in new[] { "moscow", "new_york" }) CheckCity(CityMapLayout.For(city));
+        }
+
+        static void CheckCity((System.Collections.Generic.IReadOnlyList<BoroughShape> Boroughs, System.Collections.Generic.IReadOnlyList<MapSpot> Spots) m)
+        {
             foreach (var s in m.Spots)
             {
                 var b = m.Boroughs.Single(x => x.Id == s.Borough);

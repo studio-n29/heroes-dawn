@@ -30,8 +30,11 @@ namespace N29.HeroesDawn.Tests.Editor
             Assert.That(lib.Zones.Select(z => z.Id.Value).Distinct().Count(), Is.EqualTo(lib.Zones.Count), "aucune zone en double");
             NarrationDef Of(string zone, string node) => zones.Single(z => z.Id.Value == zone).Nodes.Single(n => n.Id.Value == node).Narration!;
             Assert.That(Of("zone_mos_1_1", "n14").Before.Select(l => l.Speaker), Is.EqualTo(new[] { "enforcer", "ilona_varga" }));
-            Assert.That(Of("zone_mos_1_4", "n18").After.Select(l => l.Speaker), Is.EqualTo(new[] { "passeur", "agent_m", "ilona_varga" }));
-            Assert.That(lib.Texts.ContainsKey("narration.mos_1_4.n18.after.0") && lib.Texts["narration.mos_1_4.n18.after.0"].Length > 10, Is.True);
+            // Parcours d'Agent M : variantes .m et indices de la cathédrale compris ; les clés des répliques sont celles du script (le texte vit dans les dictionnaires de langue).
+            var after = NarrationLineDef.ForRoute(Of("zone_mos_1_4", "n18").After, "agent_m");
+            Assert.That(after.Select(l => l.Speaker), Is.EqualTo(new[] { "passeur", "agent_m", "passeur", "ilona_varga", "passeur", "narrateur" }));
+            Assert.That(after[0].TextKey, Is.EqualTo("narration.mos_1_4.boss.after.0"));
+            Assert.That(N29.HeroesDawn.Presentation.Common.Loc.Has(after[0].TextKey) && N29.HeroesDawn.Presentation.Common.Loc.T(after[0].TextKey).Length > 10, Is.True);
         }
 
         [Test, Description("Vérifie que le validateur accepte les quatre zones de Moscou importées (aucune erreur) et liste leurs avertissements — parce qu'une zone invalide ne se jouerait pas")]

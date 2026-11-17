@@ -42,13 +42,13 @@ namespace N29.HeroesDawn.Tests.Presentation
 
         FakeQuestPopup Popup => (FakeQuestPopup)_host.Spawned.Single();
 
-        [Test, Description("Vérifie que le suivi montre les quatre quêtes principales avec leur état et les quêtes secondaires débloquées avec leur progression — parce que c'est le contenu du suivi des quêtes du QG")]
+        [Test, Description("Vérifie que le suivi montre les seize quêtes principales (quatre chapitres de New York) avec leur état et les quêtes secondaires débloquées avec leur progression — parce que c'est le contenu du suivi des quêtes du QG")]
         public void Log_ShowsMainAndSideQuests()
         {
             _flow.OpenAsync(_app.Session, default).Forget();
             var d = Popup.Shown;
-            Assert.That(d.Main.Length, Is.EqualTo(4));
-            Assert.That(d.Main.Select(m => m.Status), Is.EqualTo(new[] { 1, 0, 0, 0 }));
+            Assert.That(d.Main.Length, Is.EqualTo(16));
+            Assert.That(d.Main.Select(m => m.Status), Is.EqualTo(new[] { 1 }.Concat(Enumerable.Repeat(0, 15))));
             Assert.That(d.Side.Single().Title, Is.EqualTo("Nettoyer les quais"));
             Assert.That(d.Side.Single().ProgressText, Is.EqualTo("0 / 3"));
         }

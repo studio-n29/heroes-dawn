@@ -36,13 +36,14 @@ namespace N29.HeroesDawn.Presentation.Hub
         readonly Dictionary<int, Action> _openActions = new Dictionary<int, Action>();
         bool _buying;
         bool _opening;
+        readonly N29.HeroesDawn.Presentation.Audio.IAudioService? _audio;
 
         public BoutiquePagePresenter(IBoutiquePageView view, Boutique shop, ISessionReadModel session, IModalService modals, ILocalization loc,
                                      IToastService toasts, ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet,
-                                     ISubscriber<RosterChanged> roster, IClock clock, CollectionBook collection, HubNavigator nav)
+                                     ISubscriber<RosterChanged> roster, IClock clock, CollectionBook collection, HubNavigator nav, N29.HeroesDawn.Presentation.Audio.IAudioService? audio = null)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
-            _shop = shop; _session = session; _modals = modals; _collection = collection; _nav = nav;
+            _shop = shop; _session = session; _modals = modals; _collection = collection; _nav = nav; _audio = audio;
         }
 
         public override string Title => Loc.T("page.shop");
@@ -261,7 +262,7 @@ namespace N29.HeroesDawn.Presentation.Hub
             _opening = true;
             try
             {
-                await BoosterOpening.OpenAndShowAsync(_collection, _session.Content.Collection, _modals, Loc, Toasts, Lifetime, CollectionText.ReferenceStats(_session), boosterId);
+                await BoosterOpening.OpenAndShowAsync(_collection, _session.Content.Collection, _modals, Loc, Toasts, Lifetime, CollectionText.ReferenceStats(_session), boosterId, _audio);
             }
             catch (OperationCanceledException) { }
             finally { _opening = false; if (!Disposed) Refresh(); }

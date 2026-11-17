@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Heroes Dawn — Rapport d'état au 16 novembre 2026</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+  :root { --ink:#101C29; --brass:#9a762f; --brass-l:#D6AF5B; --muted:#5b6773; --line:#d9dde1; --ok:#1f7a55; --warn:#b36b00; --bad:#a82e36; --bg:#f4f1ea; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; color:#1b2631; font-size:10.3pt; line-height:1.45; margin:0; }
+  h1 { font-size:26pt; margin:0 0 4px 0; color:var(--ink); letter-spacing:.5px; }
+  h2 { font-size:15pt; color:var(--ink); border-bottom:2px solid var(--brass-l); padding-bottom:3px; margin:22px 0 8px 0; page-break-after:avoid; }
+  h3 { font-size:11.5pt; color:var(--brass); margin:14px 0 4px 0; page-break-after:avoid; }
+  p { margin:5px 0; }
+  .cover { background:var(--ink); color:#ECE7DC; padding:34px 30px; border-radius:4px; margin-bottom:16px; }
+  .cover h1 { color:#ECE7DC; }
+  .cover .sub { color:var(--brass-l); font-size:12.5pt; margin-bottom:14px; }
+  .cover .meta { font-size:9.5pt; color:#c1cdd2; }
+  .kpis { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px 0; }
+  .kpi { flex:1 1 30%; min-width:150px; border:1px solid var(--line); border-left:4px solid var(--brass-l); background:var(--bg); padding:7px 10px; border-radius:3px; page-break-inside:avoid; }
+  .kpi b { display:block; font-size:15pt; color:var(--ink); }
+  .kpi span { font-size:8.8pt; color:var(--muted); }
+  table { border-collapse:collapse; width:100%; margin:6px 0 10px 0; font-size:9.3pt; }
+  th { background:var(--ink); color:#ECE7DC; text-align:left; padding:5px 7px; font-weight:600; }
+  td { border-bottom:1px solid var(--line); padding:4px 7px; vertical-align:top; }
+  tr { page-break-inside:avoid; }
+  tr:nth-child(even) td { background:#fafaf8; }
+  .tag { display:inline-block; padding:1px 7px; border-radius:9px; font-size:8.3pt; font-weight:600; color:#fff; white-space:nowrap; }
+  .t-ok { background:var(--ok); } .t-warn { background:var(--warn); } .t-bad { background:var(--bad); } .t-na { background:#7d8791; }
+  ul { margin:4px 0 6px 0; padding-left:18px; } li { margin:2px 0; }
+  .note { background:var(--bg); border-left:4px solid var(--brass-l); padding:7px 11px; margin:8px 0; font-size:9.6pt; page-break-inside:avoid; }
+  .alert { background:#fbeeee; border-left:4px solid var(--bad); padding:7px 11px; margin:8px 0; font-size:9.6pt; page-break-inside:avoid; }
+  .small { font-size:8.6pt; color:var(--muted); }
+  .pb { page-break-before:always; }
+  code { font-family:Consolas, monospace; font-size:8.8pt; background:#eef0f2; padding:0 3px; border-radius:2px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="sub">✦ STUDIO N29</div>
+  <h1>HEROES ✦ DAWN</h1>
+  <div class="sub">Rapport d'état du jeu et de ce qu'il reste à livrer</div>
+  <div class="meta">Version 1.0.0 (code Android 10000) · Unity 6000.6.3f1 · Windows + Android<br>
+  Situation au 16 novembre 2026 · branche <code>develop</code> (dernier commit <code>e076c86e</code>) · build de test : <code>HeroesDawn-1.0.0-test.apk</code></div>
+</div>
+
+<h2>1. En bref</h2>
+<p><b>Le jeu est jouable de bout en bout et stable en test automatique</b> : Brooklyn complet, Agent D et Agent M (4 zones de Moscou, boss le Passeur), combats au tour par tour à frise active, plateau à dé, boutique, recrutement, tournois JcJ, achats intégrés branchés. L'interface vient d'être entièrement refaite sur les planches de référence « Aube tactique ». Un APK de test avec compteur d'images par seconde est prêt.</p>
+<p><b>Il n'est pas encore prêt à sortir.</b> Il manque surtout ce qu'aucun test automatique ne peut remplacer : mesures de fluidité sur téléphone, playtests réels, recette sur appareils, relecture des textes, volet légal et publication (identité du studio, classification d'âge, suppression de compte). La date visée reste <b>rc1 vers le 22/01/2027, stable le 29/01/2027</b>, soit 10 semaines.</p>
+
+<div class="kpis">
+  <div class="kpi"><b>1569 / 1573</b><span>tests EditMode réussis (0 échec, 4 ignorés)</span></div>
+  <div class="kpi"><b>114 / 142</b><span>tests PlayMode réussis (0 échec, 28 ignorés)</span></div>
+  <div class="kpi"><b>≈ 47 500</b><span>lignes de C# de production (≈ 32 300 de tests)</span></div>
+  <div class="kpi"><b>282 Mo</b><span>taille de l'APK de test (ARM64)</span></div>
+  <div class="kpi"><b>495</b><span>commits ; tout est poussé sur origin/develop</span></div>
+  <div class="kpi"><b>10 semaines</b><span>jusqu'à la stable (29/01/2027)</span></div>
+</div>
+
+<h2>2. Périmètre de la 1.0.0 (décisions du 12/11/2026)</h2>
+<table>
+<tr><th style="width:18%">Décision</th><th>Contenu</th></tr>
+<tr><td><b>H1</b> — contenu</td><td>Brooklyn complet ; Agent D et Agent M jouables (chapitre Sergueiv de Moscou, 4 zones) ; Paris et Salem hors périmètre.</td></tr>
+<tr><td><b>H2</b> — dates</td><td>Early Access du 14/11 abandonné ; <b>1.0.0-rc1 le 22/01/2027</b>, <b>stable le 29/01/2027</b>.</td></tr>
+<tr><td><b>H3</b> — plateformes</td><td>Windows et Android ; ni iOS ni Switch ; achats branchés, testés en bac à sable seulement.</td></tr>
+<tr><td>16/11/2026</td><td>Toutes les valeurs de conception ⚑ validées en bloc (énergie, rangs AMIF, coûts, tournois, boutique de confort…), réglables ensuite par décision consignée.</td></tr>
+</table>
+
+<h2>3. État par domaine</h2>
+
+<h3>3.1 Jeu et contenu</h3>
+<table>
+<tr><th style="width:27%">Élément</th><th style="width:14%">État</th><th>Détail</th></tr>
+<tr><td>Brooklyn (4 zones)</td><td><span class="tag t-ok">Livré</span></td><td>Parcours complet couvert par le test <code>FullRunTests</code> (connexion → recrutement → déploiement → combat → résultats → QG).</td></tr>
+<tr><td>Agent M / Moscou (Sergueiv)</td><td><span class="tag t-ok">Livré</span> <span class="tag t-warn">à relire</span></td><td>4 zones, boss le Passeur, élite « homme de main », 4 fragments de souvenirs, fin « à suivre ». Parcours testé (<code>MoscowFullRunTests</code>). Textes à relire par l'équipe, anglais à valider.</td></tr>
+<tr><td>Combat (frise active, cartes, boss à phases)</td><td><span class="tag t-ok">Livré</span></td><td>2 compétences de base + 3 cartes équipables, synergies, liens de paire, 5 styles d'IA, boss de 2 à 4 phases.</td></tr>
+<tr><td>Plateau, mini-jeux, activités</td><td><span class="tag t-ok">Livré</span></td><td>9 mini-jeux 2D placés dans Brooklyn, pêche, potion, arène, survie, rempart, course des toits.</td></tr>
+<tr><td>Atelier de fabrication, grimoire, inventaire</td><td><span class="tag t-ok">Livré</span></td><td>Composants, recettes, objets 1 à 6 étoiles ; catalogue de 48 cartes ; laboratoire de recherche supprimé (Crédits remboursés).</td></tr>
+<tr><td>Tournois JcJ</td><td><span class="tag t-ok">Livré</span></td><td>8 tournois annuels, duels hors ligne et en ligne (repli hors ligne après 15 s), classement, paliers. Serveur appliqué le 16/11.</td></tr>
+<tr><td>Boutique, pass, monétisation</td><td><span class="tag t-ok">Livré</span> <span class="tag t-warn">sandbox</span></td><td>7 produits consommables Unity IAP ; pass de 42 jours ; garde anti pay-to-win vérifiée par test. Jamais testé avec un vrai compte Google Play.</td></tr>
+<tr><td>Textes et langues</td><td><span class="tag t-warn">Partiel</span></td><td>Français et anglais. Une clé anglaise manque (<code>sheet.skills</code>) ; l'anglais de Moscou n'a pas été validé par un natif.</td></tr>
+<tr><td>Voix</td><td><span class="tag t-na">Hors 1.0</span></td><td>Aucune voix ; sous-titres et textes font foi. Fiche de casting à produire si l'on veut des voix.</td></tr>
+<tr><td>Paris, Salem, iOS, Switch, Steam</td><td><span class="tag t-na">Reporté</span></td><td>À replanifier après la stable ; non engagé.</td></tr>
+</table>
+
+<h3>3.2 Interface (refonte sur les 21 planches « Aube tactique »)</h3>
+<p>Les 75 écrans du jeu ont été capturés en conditions réelles avant et après, comparés aux planches, puis retravaillés par zones. Le rendu est maintenant proche des planches sur les écrans principaux ; les écarts restants sont listés plus bas.</p>
+<table>
+<tr><th style="width:24%">Zone</th><th style="width:14%">État</th><th>Réalisé / écarts restants</th></tr>
+<tr><td>Coque commune</td><td><span class="tag t-ok">Fait</span></td><td>Pastilles de monnaie à pièces colorées, bouton réglages à icône, retour à chevron, navigation à 5 onglets avec pastilles ancrées, boutons principaux à étoile et chevron, bulles d'information compactes, fenêtres modales unifiées. <i>Reste :</i> croix de fermeture des fenêtres (planche 16), bulle de tutoriel ivoire à buste.</td></tr>
+<tr><td>Titre et compte</td><td><span class="tag t-ok">Fait</span></td><td>Logotype posé sur l'illustration, cadre laiton, boutons compacts, fenêtre de compte en deux colonnes. <i>Reste :</i> puce de langue (la vue n'a pas la fonction), libellé court « JOUER », avatars (aucune image), logos Google/Apple absents du kit.</td></tr>
+<tr><td>QG et pages de gestion</td><td><span class="tag t-ok">Fait</span> <span class="tag t-warn">partiel</span></td><td>QG recomposé (quête, activités à cocher, prochaine mission, pièces illustrées avec cadenas) ; rangées de liste à coin coupé et icônes. <i>Reste :</i> Profil, Pass, Tournoi, Repaire n'ont que l'habillage de liste (les planches demandent des données absentes : grille de paliers, portraits d'amis, portrait du boss).</td></tr>
+<tr><td>Équipe et collections</td><td><span class="tag t-ok">Fait</span></td><td>Vignettes à portrait cadré sur le visage, icônes de famille, escouade avec jauge, fiche d'agent à statistiques en icônes, registre et grimoire. <i>Reste :</i> graphe d'affinités en étoile, comparatif avant/après d'une carte.</td></tr>
+<tr><td>Carte, plateau, repos</td><td><span class="tag t-ok">Fait</span></td><td>Objectifs à cocher, boutons à icônes, dé illustré, bandeau bas réorganisé, cartouches de quartier. Défaut du panneau de carte (texte qui se chevauchait) corrigé. <i>Reste :</i> le cartouche « Manhattan » recouvre le point de zone 1.4 ; page Chapitres (planche 6.4) non refaite.</td></tr>
+<tr><td>Combat et narration</td><td><span class="tag t-ok">Fait</span></td><td>Fiches d'unités à portrait de visage, agent actif détouré, cartes de compétence à plat, frise affinée, résultats et dialogues. <i>Reste :</i> 4 ennemis de Moscou sans illustration (silhouette), pas de « VS » ni de lieu/difficulté sur l'entrée en combat.</td></tr>
+<tr><td>Boutique, recrutement, réglages</td><td><span class="tag t-ok">Fait</span></td><td>Onglets verticaux à icônes, prix à pièces, curseurs et interrupteurs du kit, confirmations. <i>Reste :</i> « contenu du pack » en texte à puces, paquet de booster non illustré.</td></tr>
+<tr><td>Mini-jeux (planches 17 à 20)</td><td><span class="tag t-bad">Non repris</span></td><td>Hors de ce premier tour ; à traiter si le budget le permet.</td></tr>
+</table>
+<div class="note"><b>Limite de la méthode :</b> la comparaison a été faite sur captures du jeu en 1920×1080 dans l'éditeur. Elle ne remplace ni le rendu réel sur téléphone (zones sûres, encoche, lisibilité à la taille réelle), ni la mesure de fluidité. Les 4 formats (16:9, 20:9, 4:3, 1280×720) et la navigation à la manette sont couverts par des tests automatiques, tous verts.</div>
+
+<h3>3.3 Équilibrage</h3>
+<table>
+<tr><th style="width:26%">Rencontre</th><th style="width:20%">Cible</th><th>Résultat mesuré (équipe de départ + objets, niveaux 5 et 10)</th></tr>
+<tr><td>Crocodile</td><td>40–60 %</td><td><span class="tag t-ok">Dans la cible</span> 31 à 59 % selon le cas (ATQ 135 → 405).</td></tr>
+<tr><td>Titan du pont</td><td>40–60 %</td><td><span class="tag t-ok">Dans la cible</span> 37 à 63 % (ATQ 120 → 720).</td></tr>
+<tr><td>Le Passeur (boss de Moscou)</td><td>40–60 %</td><td><span class="tag t-ok">Dans la cible</span> 51 % en moyenne (32 à 70 %) (ATQ 405 → 830).</td></tr>
+<tr><td>Élites de Moscou</td><td>60–85 %</td><td><span class="tag t-ok">Dans la cible</span> 63 à 80 % au niveau recommandé.</td></tr>
+<tr><td><b>Brick</b> (boss de Brooklyn)</td><td>40–60 %</td><td><span class="tag t-bad">Non réglé</span> 100 % de victoires : l'attaque seule ne change rien, sa conception est à revoir.</td></tr>
+</table>
+<p class="small">Limites : la simulation exclut les cartes équipées (l'IA automatique les joue mal) ; un cas du simulateur (ItemsStrong plus faible qu'ItemsOnly) reste inexpliqué. Seul un playtest humain tranche.</p>
+
+<h3>3.4 Services en ligne (Supabase, projet N29 HQ)</h3>
+<table>
+<tr><th style="width:30%">Élément</th><th style="width:14%">État</th><th>Détail</th></tr>
+<tr><td>Comptes et sauvegarde cloud (<code>hd_profiles</code>)</td><td><span class="tag t-ok">En service</span></td><td>Sécurité par ligne forcée, profil limité à 512 Ko, aucune suppression côté client, écriture conditionnelle (jamais d'écrasement sans choix du joueur).</td></tr>
+<tr><td>Arène des tournois (<code>hd_arena_*</code>)</td><td><span class="tag t-ok">Appliquée le 16/11</span></td><td>3 tables + 5 fonctions ; scores et journal en lecture seule pour le client ; aucun accès anonyme ; durcissement <code>003</code> appliqué. Le conseiller de sécurité ne signale plus que les 5 fonctions appelables par un joueur connecté, ce qui est voulu (elles vérifient l'identité et les plafonds).</td></tr>
+<tr><td>Quotas Realtime (duels en ligne)</td><td><span class="tag t-warn">Notés</span></td><td>Palier gratuit : 200 connexions simultanées, 100 messages/s, 2 millions de messages/mois. À surveiller avant une ouverture large ; au-delà, repli hors ligne.</td></tr>
+<tr><td>Protection contre les mots de passe compromis</td><td><span class="tag t-bad">À activer</span></td><td>Réglage du tableau de bord (Authentication ▸ Attack Protection) : non accessible par les outils de développement. <b>Action de votre part, 2 minutes.</b></td></tr>
+<tr><td>Connexions Google et Apple</td><td><span class="tag t-warn">À configurer</span></td><td>Fournisseurs à activer dans le tableau de bord (identifiants OAuth, URL de rappel <code>heroesdawn://auth</code>) ; non testé sur appareil.</td></tr>
+<tr><td>Suppression de compte</td><td><span class="tag t-bad">Manque</span></td><td>Le jeu efface la sauvegarde mais pas l'utilisateur en ligne. Obligatoire pour Google Play (bouton dans le jeu + page web + fonction serveur).</td></tr>
+<tr><td>Validation des reçus d'achat</td><td><span class="tag t-na">Hors 1.0</span></td><td>Contrôle côté client seulement ; validation serveur prévue après la 1.0.</td></tr>
+<tr><td>Statistiques d'usage (UGS Analytics)</td><td><span class="tag t-warn">Code prêt</span></td><td>Opt-in, silencieux tant que le projet Unity n'est pas lié à un projet UGS (action du propriétaire).</td></tr>
+</table>
+
+<h3>3.5 Légal, stores et release</h3>
+<table>
+<tr><th style="width:32%">Point</th><th style="width:14%">État</th><th>Détail</th></tr>
+<tr><td>Politique de confidentialité</td><td><span class="tag t-warn">Projet rédigé</span></td><td>FR et EN dans <code>05_Production/Legal/</code>. Manquent : identité légale du studio, adresse de contact, durées de conservation, région UGS ; relecture par un juriste ; publication à une adresse web publique ; lien dans les réglages.</td></tr>
+<tr><td>Classification d'âge (IARC / PEGI)</td><td><span class="tag t-warn">Réponses préparées</span></td><td>Résultat attendu PEGI 7 à 12 (violence fantastique). Questionnaire à remplir dans Play Console. Boosters payés en PR (monnaie gagnée) : pas d'objets aléatoires payants tant que les PR ne se vendent pas.</td></tr>
+<tr><td>Sécurité des données (Google Play)</td><td><span class="tag t-warn">Réponses préparées</span></td><td>Tableau complet dans le dossier de conformité ; à saisir dans Play Console.</td></tr>
+<tr><td>Contenus générés par IA (R3)</td><td><span class="tag t-warn">Mention rédigée</span></td><td>Traçabilité des prompts versionnée. <b>À vérifier :</b> conditions d'usage commercial des outils (images « Aube tactique », Google Flow Music) à la date de génération, à archiver en PDF.</td></tr>
+<tr><td>Noms et marque (R8, R9)</td><td><span class="tag t-warn">Partiel</span></td><td>« SCP » absent du code et des textes (vérifié) ; « Adam West » et antériorité « Heroes Dawn » à confier à un juriste.</td></tr>
+<tr><td>Achats : déclaration des 7 produits, prix par pays</td><td><span class="tag t-bad">À faire</span></td><td>Dans Play Console (compte développeur requis), mêmes identifiants que le code.</td></tr>
+<tr><td>Écran d'âge (mineurs)</td><td><span class="tag t-bad">Non fait</span></td><td>À trancher avec le juriste (cible 13+ ou 16+ sans écran d'âge, ou écran dédié).</td></tr>
+<tr><td>Notes de version, étiquette <code>v1.0.0-rc1</code></td><td><span class="tag t-warn">Notes faites</span></td><td><code>release-notes-1.0.0.md</code> écrites ; étiquette et branche de release non créées.</td></tr>
+</table>
+
+<h3>3.6 Performances et poids</h3>
+<table>
+<tr><th style="width:30%">Mesure</th><th style="width:14%">État</th><th>Détail</th></tr>
+<tr><td>Fluidité 60 images/s sur Android</td><td><span class="tag t-bad">Non mesurée</span></td><td><b>Condition du « go » UI Toolkit</b> (repli possible sur les écrans lourds si échec). Le compteur FPS de l'APK de test sert précisément à cela.</td></tr>
+<tr><td>Mémoire stable sur 30 minutes</td><td><span class="tag t-bad">Non mesurée</span></td><td>À faire sur un Android milieu de gamme.</td></tr>
+<tr><td>Poids de l'APK</td><td><span class="tag t-warn">282 Mo</span></td><td>Passé de 1,59 Go à 251 Mo le 13/11, puis 282 Mo sur ce build de test. La limite de la base d'un AAB sur Google Play est de 200 Mo : réduire encore (compression ASTC plus large, groupes d'illustrations) ou passer par Play Asset Delivery.</td></tr>
+<tr><td>Signature</td><td><span class="tag t-warn">Clé de débogage</span></td><td>Installable à la main ; le Play Store exige une clé d'envoi à créer.</td></tr>
+</table>
+
+<h3>3.7 Qualité et dépôt</h3>
+<table>
+<tr><th style="width:30%">Critère de « stable » (plan)</th><th style="width:14%">État</th><th>Détail</th></tr>
+<tr><td>1. EditMode et PlayMode verts 3 fois de suite</td><td><span class="tag t-warn">Presque</span></td><td>EditMode vert à 3 reprises le 16/11 ; PlayMode vert à 2 reprises après correction. 28 tests PlayMode et 4 EditMode ignorés (hérités) : motifs à écrire.</td></tr>
+<tr><td>2. Aucune entrée « WIP » visible</td><td><span class="tag t-ok">Fait</span></td><td>Mécanisme supprimé le 12/11.</td></tr>
+<tr><td>3. Parcours Brooklyn sur 2 appareils sans plantage</td><td><span class="tag t-bad">À faire</span></td><td>Aucun test sur téléphone à ce jour.</td></tr>
+<tr><td>4. Navigation tactile, souris, clavier, manette sur 4 formats</td><td><span class="tag t-ok">Fait</span></td><td>Tests automatiques verts (balayage de 47 fenêtres × 4 formats, focus manette).</td></tr>
+<tr><td>5. Profil 0.15.x chargé sans perte ; pas de double octroi d'achat</td><td><span class="tag t-ok">Fait (tests)</span></td><td>Migration de sauvegarde et reprise d'achat confirmées par tests ; pas vérifié sur appareil réel.</td></tr>
+<tr><td>6. Analytics reçoivent les événements clés</td><td><span class="tag t-bad">À faire</span></td><td>Exige le lien du projet UGS.</td></tr>
+<tr><td>7. Boss dans la cible, valeurs ⚑ consignées</td><td><span class="tag t-warn">Partiel</span></td><td>Valeurs consignées ; <b>Brick hors cible</b>.</td></tr>
+<tr><td>8. Dépôt propre</td><td><span class="tag t-warn">Presque</span></td><td>Tout est poussé. Restent : 3 branches anciennes (<code>feat/ui-moco</code>, <code>feature/campagne-brooklyn</code>, <code>feature/refonte-ui-aube-tactique</code>), 1 stash ancien, anciens APK et dossier <code>_deploy</code> à nettoyer, test <code>FullRunTests</code> à timeout intermittent (a passé sur les dernières exécutions, cause racine non traitée).</td></tr>
+</table>
+
+<h2 class="pb">4. Ce qu'il reste à inclure ou à faire</h2>
+
+<h3>4.1 Bloquant pour la rc1 (22/01/2027)</h3>
+<table>
+<tr><th style="width:4%">#</th><th style="width:46%">Chantier</th><th style="width:16%">Qui</th><th>Remarque</th></tr>
+<tr><td>1</td><td>Installer l'APK sur 2 Android (dont milieu de gamme), relever les FPS et la stabilité, faire le parcours Brooklyn complet</td><td>Vous</td><td>Compteur FPS déjà dans l'APK. Résultat conditionne le go de l'interface.</td></tr>
+<tr><td>2</td><td>2 à 3 sessions de playtest réel avec <code>playtest-formulaire.md</code></td><td>Vous + testeurs</td><td>Seule façon de valider l'équilibrage, la durée des sessions et le plaisir de jeu.</td></tr>
+<tr><td>3</td><td>Décider du sort de <b>Brick</b> (refonte de ses phases ou assouplissement de la cible)</td><td>Vous (design)</td><td>Seul boss hors cible.</td></tr>
+<tr><td>4</td><td>Relire les textes de Moscou (FR) et faire valider l'anglais ; ajouter la clé anglaise <code>sheet.skills</code></td><td>Vous</td><td>Gel du contenu prévu le 15/01/2027.</td></tr>
+<tr><td>5</td><td>Politique de confidentialité : compléter, faire relire, publier ; lier dans les réglages</td><td>Vous + juriste</td><td>Projet prêt dans <code>05_Production/Legal/</code>.</td></tr>
+<tr><td>6</td><td>Suppression de compte : bouton, fonction serveur, page web</td><td>Développement</td><td>Obligatoire avant le Play Store, pas pour un APK distribué à la main.</td></tr>
+<tr><td>7</td><td>Activer « leaked password protection » ; configurer Google et Apple ; lier le projet UGS</td><td>Vous</td><td>Tableaux de bord Supabase et Unity.</td></tr>
+<tr><td>8</td><td>Recette achats en bac à sable (testeurs de licence Google Play), reprise après coupure réseau</td><td>Vous</td><td>Exige un compte Play Console et la déclaration des 7 produits.</td></tr>
+<tr><td>9</td><td>Réduire le poids (cible 200 Mo de base d'AAB) ou adopter Play Asset Delivery ; créer la clé d'envoi</td><td>Développement + vous</td><td>282 Mo actuellement.</td></tr>
+<tr><td>10</td><td>Régression finale 3 fois verte, motif écrit pour chaque test ignoré, correction du timeout de <code>FullRunTests</code></td><td>Développement</td><td>Critère n°1 de la stable.</td></tr>
+</table>
+
+<h3>4.2 Avant la stable (29/01/2027)</h3>
+<ul>
+<li><b>Interface, reliquat</b> : page Chapitres (planche 6.4), croix de fermeture des fenêtres, graphe d'affinités, Profil / Pass / Tournoi / Repaire recomposés (nécessite d'enrichir les données des vues), illustrations d'ennemis de Moscou, avatars de création, mini-jeux (planches 17 à 20), cartouche de carte qui chevauche une zone.</li>
+<li><b>Portraits et icônes</b> : au minimum ceux du parcours Brooklyn et de l'équipe de départ (en place) ; vérifier les autres agents au fil des recrutements.</li>
+<li><b>Écart connu</b> : consignes d'Ingénierie de secours qui chevauchent le manuel à l'introduction.</li>
+<li><b>Stores</b> : questionnaire IARC, formulaire de sécurité des données, fiche de store (mention des contenus IA), prix TTC par pays.</li>
+<li><b>Juridique</b> : « Adam West » et antériorité de la marque « Heroes Dawn » ; décision sur l'écran d'âge.</li>
+<li><b>Dépôt</b> : branche <code>release/1.0.0</code>, étiquettes <code>v1.0.0-rc1</code> puis <code>v1.0.0</code>, nettoyage des branches, du stash et des anciens builds.</li>
+</ul>
+
+<h3>4.3 Après la 1.0 (non engagé)</h3>
+<ul>
+<li>Paris, Salem, Kapotnya / Sadovoye Koltso / Place Rouge ; Early Access Steam ; iOS ; Switch ; voix FR/EN ; notifications locales ; validation serveur des reçus ; arène classée avec vérification serveur des combats ; remappage des contrôles ; objectifs secondaires visibles.</li>
+</ul>
+
+<h2>5. Risques principaux</h2>
+<table>
+<tr><th style="width:28%">Risque</th><th style="width:10%">Niveau</th><th>Pourquoi et parade</th></tr>
+<tr><td>Fluidité insuffisante sur Android milieu de gamme</td><td><span class="tag t-bad">Élevé</span></td><td>L'interface est entièrement en UI Toolkit, jamais mesurée sur téléphone. Parade prévue : repli limité aux écrans lourds (plateau, combat) en uGUI. À mesurer en premier.</td></tr>
+<tr><td>Refonte d'interface jamais vue sur appareil</td><td><span class="tag t-warn">Moyen</span></td><td>Validée par tests et captures éditeur seulement : zones sûres, encoche, tailles de texte réelles à vérifier.</td></tr>
+<tr><td>Équipe de 1 à 2 personnes (R11)</td><td><span class="tag t-bad">Élevé</span></td><td>Si un retard apparaît, couper une plateforme ou le JcJ en ligne plutôt que décaler la date.</td></tr>
+<tr><td>Conformité stores (suppression de compte, confidentialité, IA, classement d'âge)</td><td><span class="tag t-warn">Moyen</span></td><td>Documents prêts ; délais externes (relecture juridique, Play Console).</td></tr>
+<tr><td>Poids au-dessus de 200 Mo</td><td><span class="tag t-warn">Moyen</span></td><td>Réduction ou Play Asset Delivery.</td></tr>
+<tr><td>Équilibrage non confirmé par des humains</td><td><span class="tag t-warn">Moyen</span></td><td>Mesures par simulateur sans cartes équipées ; Brick non réglé.</td></tr>
+<tr><td>Droits sur les contenus générés par IA (R3)</td><td><span class="tag t-warn">Moyen</span></td><td>Archiver les conditions d'usage commercial de chaque outil.</td></tr>
+</table>
+
+<h2>6. Calendrier proposé</h2>
+<table>
+<tr><th style="width:26%">Période</th><th>Objectif</th></tr>
+<tr><td>16 – 30 novembre</td><td>Test de l'APK sur téléphones, mesure FPS et mémoire ; décision sur Brick ; compléter et faire relire la politique de confidentialité ; activer les réglages Supabase ; créer le compte Play Console.</td></tr>
+<tr><td>1er – 18 décembre</td><td>Corrections issues du test appareil ; reliquat d'interface ; suppression de compte ; réduction du poids ; premières sessions de playtest.</td></tr>
+<tr><td>19 décembre – 8 janvier</td><td>Playtests (2 à 3 sessions), rééquilibrage, relecture et validation des textes (FR/EN).</td></tr>
+<tr><td>9 – 15 janvier</td><td>Gel du contenu (15/01) ; régression complète ; dossiers de stores.</td></tr>
+<tr><td>16 – 22 janvier</td><td>Recette appareils, achats en bac à sable ; <b>rc1 le 22/01/2027</b>.</td></tr>
+<tr><td>22 – 29 janvier</td><td>Correctifs bloquants uniquement ; <b>stable le 29/01/2027</b>.</td></tr>
+</table>
+<p class="small">Seules la rc1 et la stable sont des décisions ; les dates intermédiaires sont des propositions.</p>
+
+<h2>7. Ce que vous pouvez faire dès maintenant</h2>
+<ol>
+<li>Installer <code>HeroesDawn-1.0.0-test.apk</code> sur votre téléphone, jouer 15 à 20 minutes (titre → QG → équipe → mission Red Hook → combat) et noter les FPS (compteur en haut à gauche), les textes coupés et tout ce qui paraît trop petit ou mal placé.</li>
+<li>Activer la protection contre les mots de passe compromis dans Supabase.</li>
+<li>Choisir la voie pour Brick et pour la cible de poids (200 Mo ou Play Asset Delivery).</li>
+<li>Me donner l'identité légale du studio et l'adresse de contact pour finaliser la politique de confidentialité.</li>
+</ol>
+
+<h2>Annexe — Travail réalisé le 16 novembre 2026</h2>
+<ul>
+<li>Poussée de 116 commits en attente sur origin/develop (puis 2 nouveaux commits : refonte de l'interface, backend et documents).</li>
+<li>Installation d'Unity 6000.6.3f1 avec module Android (SDK, NDK, JDK 17) sur ce PC.</li>
+<li>Supabase : arène appliquée (<code>002_hd_arena</code>) et durcie (<code>003_hd_arena_durcissement</code>) ; aucun accès anonyme ; conseiller de sécurité relu.</li>
+<li>Valeurs ⚑ validées et consignées (<code>Decisions.md</code>, GDD, specs, plan).</li>
+<li>Dossier légal : politique de confidentialité FR/EN, dossier de conformité (IARC, sécurité des données, IA).</li>
+<li>Interface : 75 captures avant/après, 7 zones retravaillées, 9 feuilles de style, 5 nouvelles aides C#, correctif d'un défaut réel (XML invalide dans la fiche d'agent détecté par les tests, corrigé).</li>
+<li>Correctif audio : exception à la fermeture d'une fenêtre (source sonore détruite).</li>
+<li>Compteur FPS léger : <code>FpsOverlay</code>, activé par l'option de build <code>-fpsOverlay</code>, sans allocation par image, absent des builds de diffusion.</li>
+<li>Notes de version 1.0.0, plan de stabilisation à jour.</li>
+<li>APK de test : <code>E:\Projets\HeroesDawn\build\apk\HeroesDawn-1.0.0-test.apk</code>.</li>
+</ul>
+<p class="small">Sources : dépôt <code>principal</code> (commits, plans, specs, rapports de test), registre <code>Decisions.md</code>, <code>Roadmap.md</code>, <code>Risques.md</code>, <code>Obligations_Legales.md</code>, mesures Unity du 16/11/2026. Les chiffres de lignes de code sont des ordres de grandeur (production hors packages et bibliothèques tierces).</p>
+
+</body>
+</html>

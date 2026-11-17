@@ -1,5 +1,6 @@
 #nullable enable
 using N29.HeroesDawn.Core;
+using N29.HeroesDawn.Definitions;
 
 namespace N29.HeroesDawn.Presentation.Hub
 {
@@ -8,6 +9,8 @@ namespace N29.HeroesDawn.Presentation.Hub
     {
         public MemberId Id;
         public MemberCardData Card;
+        /// <summary>Position de l'agent (icône à côté de la famille sur la vignette).</summary>
+        public Position Role;
         public bool InSquad;
         public int Fatigue;
         public float Fatigue01;

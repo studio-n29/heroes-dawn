@@ -14,6 +14,7 @@ namespace N29.HeroesDawn.Presentation.Common
             d["onboarding.character.name_hint"] = "Nom de ton agent (1 à 20 caractères)";
             d["onboarding.character.confirm"] = "COMMENCER";
             d["onboarding.campaign.unavailable"] = "Ce parcours n est pas encore disponible.";
+            ExtendOnboardingRayner(d);
             d["campaign.agent_d.name"] = "AGENT D";
             d["campaign.agent_d.desc"] = "Illustrateur de rue à Harlem : ce qu il imagine devient réel. Tu diriges l unité à travers lui, sans qu il combatte. Parcours : New York, Paris, Moscou, puis Salem. Mentor de l unité.";
             d["campaign.agent_m.name"] = "AGENT M";
