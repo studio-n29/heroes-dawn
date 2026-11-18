@@ -37,13 +37,15 @@ namespace N29.HeroesDawn.Presentation.Hub
         bool _buying;
         bool _opening;
         readonly N29.HeroesDawn.Presentation.Audio.IAudioService? _audio;
+        readonly CosmeticShop? _cosmetics;
 
         public BoutiquePagePresenter(IBoutiquePageView view, Boutique shop, ISessionReadModel session, IModalService modals, ILocalization loc,
                                      IToastService toasts, ISubscriber<MetaChanged> meta, ISubscriber<WalletChanged> wallet,
-                                     ISubscriber<RosterChanged> roster, IClock clock, CollectionBook collection, HubNavigator nav, N29.HeroesDawn.Presentation.Audio.IAudioService? audio = null)
+                                     ISubscriber<RosterChanged> roster, IClock clock, CollectionBook collection, HubNavigator nav, N29.HeroesDawn.Presentation.Audio.IAudioService? audio = null,
+                                     CosmeticShop? cosmetics = null)
             : base(view, loc, toasts, meta, wallet, roster, clock)
         {
-            _shop = shop; _session = session; _modals = modals; _collection = collection; _nav = nav; _audio = audio;
+            _shop = shop; _session = session; _modals = modals; _collection = collection; _nav = nav; _audio = audio; _cosmetics = cosmetics;
         }
 
         public override string Title => Loc.T("page.shop");
@@ -180,20 +182,97 @@ namespace N29.HeroesDawn.Presentation.Hub
                 r.Badge = p.PriceText;
                 Add(rows, r, () => BuyAsync(pack).Forget());
             }
+            AddSection(rows, Loc.T("shop.cat.comfort"), Loc.T("shop.cat.comfort_sub"), "exchange_rest");
+            AddAccelerator(rows);
+            AddExpeditionSlot(rows);
             AddSection(rows, Loc.T("shop.cat.exchange"), Loc.T("shop.cat.exchange_sub"), "exchange_credits");
             foreach (var e in Boutique.Exchanges)
             {
                 var ex = e;
                 string gain = e.FullRest ? Loc.T("shop.desc.ex_rest") : MetaFormat.RewardText(e.Reward, Loc);
-                var r = InfoRowData.Basic(Loc.T("shop." + e.Id), gain + " · " + Loc.F("shop.cost_gems", e.GemCost));
+                int left = _shop.ExchangesLeftToday(e);
+                string limit = e.DailyLimit > 0 ? " · " + Loc.F("shop.limit_today", Math.Min(left, e.DailyLimit), e.DailyLimit) : "";
+                var r = InfoRowData.Basic(Loc.T("shop." + e.Id), gain + " · " + Loc.F("shop.cost_gems", e.GemCost) + limit);
                 r.Art = AgentArt.Shop(ExchangeArt(e.Id));
-                r.Tag = e.FullRest ? "+" : e.Reward.Pr > 0 ? "PR" : "CR";
-                r.TagColor = e.FullRest ? Theme.Success : e.Reward.Pr > 0 ? Theme.Pr : Theme.Credits;
-                bool can = _session.Wallet.Gems >= e.GemCost;
+                r.Tag = e.FullRest ? "+" : "CR";
+                r.TagColor = e.FullRest ? Theme.Success : Theme.Credits;
+                bool can = _session.Wallet.Gems >= e.GemCost && left > 0;
                 r.Badge = e.GemCost + " GM";
-                r.A = RowButtonData.Of(Loc.F("shop.exchange", e.GemCost), can, Loc.F("shop.need_gems", e.GemCost - _session.Wallet.Gems), 1);
+                string why = left <= 0 ? Loc.T("shop.limit_reason") : Loc.F("shop.need_gems", e.GemCost - _session.Wallet.Gems);
+                r.A = RowButtonData.Of(Loc.F("shop.exchange", e.GemCost), can, why, 1);
                 Add(rows, r, () => Report(_shop.Exchange(ex.Id), Loc.T("shop.exchanged")));
             }
+            AddCosmetics(rows);
+        }
+
+        /// <summary>Accélérateur de 8 heures : du temps gagné, jamais de la puissance (pay-to-fast).</summary>
+        void AddAccelerator(List<InfoRowData> rows)
+        {
+            int cost = Boutique.AcceleratorGems, hours = Boutique.AcceleratorMinutes / 60;
+            var r = InfoRowData.Basic(Loc.F("shop.accel", hours), Loc.F("shop.desc.accel", hours, cost));
+            r.Tag = "+"; r.TagColor = Theme.Info;
+            r.Art = AgentArt.Shop("exchange_rest");
+            r.Badge = cost + " GM";
+            r.A = RowButtonData.Of(Loc.F("shop.exchange", cost), _session.Wallet.Gems >= cost, Loc.F("shop.need_gems", cost - _session.Wallet.Gems), 1);
+            Add(rows, r, () => Report(_shop.BuyAccelerator(), Loc.T("shop.accel_bought")));
+        }
+
+        /// <summary>4e et 5e emplacements d'expédition (achat permanent) : plus d'expéditions en parallèle, pas plus de puissance.</summary>
+        void AddExpeditionSlot(List<InfoRowData> rows)
+        {
+            int next = _shop.NextSlotNumber;
+            if (next > Expeditions.MaxSlots) return;
+            int cost = Boutique.SlotPrice(next);
+            var r = InfoRowData.Basic(Loc.F("shop.slot", next), Loc.F("shop.desc.slot", next, cost));
+            r.Tag = "+"; r.TagColor = Theme.Info;
+            r.Art = AgentArt.Shop("exchange_rest");
+            r.Badge = cost + " GM";
+            r.A = RowButtonData.Of(Loc.F("shop.exchange", cost), _session.Wallet.Gems >= cost, Loc.F("shop.need_gems", cost - _session.Wallet.Gems), 1);
+            Add(rows, r, () => ConfirmThenAsync(Loc.F("shop.slot.confirm.title", next), Loc.F("shop.slot.confirm.body", next, cost),
+                                                () => _shop.BuyExpeditionSlot(), Loc.T("shop.slot_bought")).Forget());
+        }
+
+        /// <summary>Rotation hebdomadaire de cosmétiques (tenues, thèmes de QG, dés, pions) : l'apparence seule, aucune statistique.</summary>
+        void AddCosmetics(List<InfoRowData> rows)
+        {
+            if (_cosmetics == null) return;
+            AddSection(rows, Loc.T("shop.cat.cosmetics"), Loc.T("shop.cat.cosmetics_sub"), "gift");
+            var offers = _cosmetics.WeeklyNow();
+            if (offers.Count == 0)
+            {
+                var none = InfoRowData.Basic(Loc.T("shop.cosmetics_none"), Loc.T("shop.cosmetics_none_sub"));
+                none.Tag = ""; none.TagColor = Theme.Surface3; none.Dim = true;
+                none.Art = AgentArt.Shop("gift");
+                Add(rows, none, null);
+                return;
+            }
+            foreach (var o in offers)
+            {
+                string id = o.Def.Id; int price = o.Def.Price;
+                string name = Loc.Has(o.Def.NameKey) ? Loc.T(o.Def.NameKey) : id;
+                var r = InfoRowData.Basic(name, Loc.F("shop.desc.cosmetic", price));
+                r.Tag = "C"; r.TagColor = Theme.Accent;
+                r.Art = AgentArt.Shop("gift");
+                r.Badge = price + " GM";
+                r.A = RowButtonData.Of(Loc.F("shop.exchange", price), _session.Wallet.Gems >= price, Loc.F("shop.need_gems", price - _session.Wallet.Gems), 1);
+                Add(rows, r, () => ConfirmThenAsync(Loc.T("shop.cosmetic.confirm.title"), Loc.F("shop.cosmetic.confirm.body", name, price),
+                                                    () => _cosmetics!.Buy(id), Loc.T("shop.cosmetic_bought")).Forget());
+            }
+        }
+
+        /// <summary>Confirmation d'une dépense de Gemmes élevée, puis exécution (rien n'est dépensé si le joueur refuse).</summary>
+        async UniTaskVoid ConfirmThenAsync(string title, string body, Func<N29.HeroesDawn.Core.Result> action, string successText)
+        {
+            if (_buying) return;
+            _buying = true;
+            try
+            {
+                bool ok = await _modals.ConfirmAsync(new ConfirmData(title, body, Loc.T("shop.confirm.spend"), Loc.T("ui.cancel"), Tone.Primary), Lifetime);
+                if (!ok || Disposed) return;
+                Report(action(), successText);
+            }
+            catch (OperationCanceledException) { }
+            finally { _buying = false; if (!Disposed) Refresh(); }
         }
 
         static readonly Dictionary<string, Sprite?> BoosterArts = new Dictionary<string, Sprite?>();
@@ -242,7 +321,7 @@ namespace N29.HeroesDawn.Presentation.Hub
         /// <summary>Icône d'un paquet de gemmes selon sa taille.</summary>
         static string PackArt(string packId) => packId == "gems_100" ? "gems_small" : packId == "gems_520" ? "gems_medium" : "gems_large";
 
-        static string ExchangeArt(string id) => id == "ex_pr" ? "exchange_pr" : id == "ex_rest" ? "exchange_rest" : "exchange_credits";
+        static string ExchangeArt(string id) => id == "ex_rest" ? "exchange_rest" : "exchange_credits";
 
         protected override void OnHeader(int index)
         {

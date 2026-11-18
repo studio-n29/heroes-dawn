@@ -10,7 +10,7 @@ Modèle **F2P + pass saisonnier**. Principe directeur : **l'argent réel fait un
 |---|---|---|
 | **Crédits** (soft) | Campagne, coffres, expéditions, pass | Amélioration du QG, validation des paliers de compétences, consommables de mission, objets du salon, renouvellements de pool |
 | **PR** — Points de Recherche | Campagne, expéditions, pass, boutique | Recrutement |
-| **Gemmes** (premium) | Achat en argent réel, petite dose dans la piste premium du pass, échanges | Accélération des expéditions, repos complet, renouvellements au-delà de l'échelle en Crédits, emplacements d'expédition, cosmétiques, échanges contre Crédits / PR. **Jamais** de Composants, de catalyseurs, de recettes, de duels ni de points de tournoi |
+| **Gemmes** (premium) | Achat en argent réel, petite dose dans la piste premium du pass, échanges | Accélération des expéditions, repos complet, renouvellements au-delà de l'échelle en Crédits, emplacements d'expédition, cosmétiques, échanges contre Crédits (5 par jour), accélérateur de 8 h. **Jamais** de PR, de Composants, de catalyseurs, de recettes, de duels ni de points de tournoi |
 
 ## Recrutement
 - **Pool quotidienne** de recrues, propre à la ville.
@@ -91,6 +91,7 @@ Soit 3 € / 6 € / 10 € pour une tenue ; aucun cosmétique au-delà de 10 �
 | Caisse | `gems_1080` | 9,99 € | 1 080 | +8 % |
 | Coffre | `gems_2250` | 19,99 € | 2 250 | +12 % |
 | Chambre forte | `gems_6000` | 49,99 € | 6 000 | +20 % |
+| Réserve | `gems_13000` | 99,99 € | 13 000 | +30 % |
 | Offre de bienvenue (1 fois par profil) | `welcome` | 2,99 € | 500 + 1 accélérateur 8 h | — |
 
 Les anciens identifiants `gems_550` et `gems_1200` ont disparu ; leurs compteurs d'achats dans une vieille sauvegarde sont ignorés. Tous les produits sont des **consommables** (pas de restauration d'achats). Le prix affiché vient du store (taxes par pays) ; reçu contrôlé côté client pour la 1.0.0 (validation serveur : plan LiveOps).
@@ -132,7 +133,7 @@ Les anciens identifiants `gems_550` et `gems_1200` ont disparu ; leurs compteurs
 - **Emplacements d'expédition** : 3 de base, **4e à 300 Gemmes, 5e à 500 Gemmes**, achat unique et permanent ; les expéditions en cours ne changent pas de place.
 - **Renouvellements** : 1 gratuit par jour, puis 100 / 200 / 400 / 800 Crédits, puis **10 Gemmes** (`ShopRerollGemCost`).
 - **Accélérations** : **20 Gemmes par heure**, minutes arrondies au-dessus (1 Gemme par 3 minutes entamées, au moins 1), pour les expéditions. Un **accélérateur** (minutes offertes : 480 pour l'offre de bienvenue, minutes du pass) est dépensé avant les Gemmes. Le repos complet (10 Gemmes) reste. L'Atelier est instantané et un duel de tournoi ne s'accélère pas.
-- Échanges conservés : Gemmes → Crédits (20 → 1 000) et → PR (30 → 60).
+- Échanges (révisé le 2026-11-18) : Gemmes → Crédits (20 → 1 000, 5 par jour) et repos complet (10). L'échange Gemmes → PR (30 → 60) est supprimé : les PR achètent des recrues et des boosters aléatoires, ils ne se vendent pas.
 
 ## Garde anti pay-to-win
 Tout ce que l'argent réel ou les Gemmes achètent est du temps, du confort ou du cosmétique. Interdits (vérifiés par `NoPayToWinTests`) : Composants, catalyseurs ou recettes contre des Gemmes ou de l'argent ; duel ou point de tournoi ; recrue exclusive au premium ; loot box ou gacha ; cosmétique qui modifie une statistique. Seul le pass donne des Composants (Commun / Raffiné) et des catalyseurs, et il se mérite en jouant (la piste gratuite en donne aussi).

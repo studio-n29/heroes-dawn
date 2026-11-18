@@ -50,7 +50,7 @@ Pour retoucher un écran : ouvrir son prefab (`Prefabs/Screens/…`, `Prefabs/Pa
 Le dépôt est à la racine **`Documents/Heroes Dawn/`** (documentation + code). Les fichiers binaires (images, polices, xlsx, docx, pdf) passent par Git LFS.
 
 ## 8. Achats intégrés (Unity IAP)
-Le jeu vend sept **produits consommables** (package `com.unity.purchasing` 5.4.3). Sur appareil, `UnityIapGateway` parle au vrai magasin ; dans l'éditeur et les tests, le simulateur `FakePurchaseGateway` ne débite rien.
+Le jeu vend huit **produits consommables** (package `com.unity.purchasing` 5.4.3). Sur appareil, `UnityIapGateway` parle au vrai magasin ; dans l'éditeur et les tests, le simulateur `FakePurchaseGateway` ne débite rien.
 
 À déclarer **à la main** (rien n'est créé par le code ni par ce dépôt), avec le **même identifiant** dans Google Play Console et App Store Connect :
 
@@ -61,6 +61,7 @@ Le jeu vend sept **produits consommables** (package `com.unity.purchasing` 5.4.3
 | `gems_1080` | 1 080 Gemmes | 9,99 € |
 | `gems_2250` | 2 250 Gemmes | 19,99 € |
 | `gems_6000` | 6 000 Gemmes | 49,99 € |
+| `gems_13000` | 13 000 Gemmes | 99,99 € |
 | `welcome` | 500 Gemmes + accélérateur de 8 h (une fois par profil) | 2,99 € |
 | `pass_premium` | pass premium de la saison en cours | 9,99 € |
 

@@ -29,6 +29,7 @@ Le code s'aligne sur la doc. Le jeu n'est pas publié : le pass repart de zéro,
 | `gems_1080` Caisse | 9,99 € | 1 080 |
 | `gems_2250` Coffre | 19,99 € | 2 250 |
 | `gems_6000` Chambre forte | 49,99 € | 6 000 |
+| `gems_13000` Réserve | 99,99 € | 13 000 (ajouté le 2026-11-18, +30 %) |
 | `welcome` Offre de bienvenue (1 fois) | 2,99 € | 500 + 1 accélérateur de 8 h |
 
 Les identifiants `gems_550` et `gems_1200` disparaissent.
@@ -44,7 +45,9 @@ Les identifiants `gems_550` et `gems_1200` disparaissent.
 - **Emplacements d'expédition** : 3 de base, 4e à 300 gemmes, 5e à 500 gemmes, achat unique permanent ⚑.
 - **Renouvellements** (pool de recrues, boutique du jour, offres de Composants) : 1 gratuit par jour, puis Crédits (barème actuel jusqu'à 800), puis **10 gemmes** chacun ⚑.
 - **Accélérations** : 20 gemmes par heure, arrondi à la minute supérieure, pour les expéditions ; le repos complet (10 gemmes) reste. L'Atelier est instantané et un duel de tournoi ne s'accélère pas : aucune accélération pour eux.
-- Les échanges Crédits et PR contre gemmes (`ex_credits`, `ex_pr`) sont conservés.
+- Échanges de gemmes (révisé le 2026-11-18) : `ex_credits` (20 gemmes pour 1 000 Crédits, **5 par jour**) et `ex_rest` (repos complet, 10 gemmes). **`ex_pr` supprimé** : les PR achètent des recrues et des boosters tirés au hasard, ils ne s'obtiennent pas contre des gemmes ni de l'argent (réponse « non » aux objets aléatoires payants).
+- Accélérateur de 8 h : **140 gemmes** (soit 12,5 % de moins que 160 gemmes en accélération directe), qui ajoute 480 minutes.
+- La boutique en jeu (onglet Gemmes) expose maintenant : packs, accélérateur, 4e et 5e emplacements d'expédition (300 / 500, achat permanent, avec confirmation), échanges, cosmétiques de la semaine (avec confirmation).
 
 ## 4. Cosmétiques
 - Catalogue `Resources/Content/cosmetics.json` : `id`, `nameKey`, `type` (Outfit, HqTheme, Dice, Pawn, Frame, Title), `rarity` (Agent, Élite, Légende, pour le prix), `source` (Shop, Pass, Tournament, Achievement, Event).

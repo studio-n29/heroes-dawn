@@ -91,14 +91,14 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             Assert.That(_store.Confirmed, Is.Empty);
         }
 
-        [Test, Description("Vérifie qu'un produit hors de la liste des sept consommables est refusé sans appeler le store — parce qu'un identifiant inconnu ne doit jamais partir vers un paiement")]
+        [Test, Description("Vérifie qu'un produit hors de la liste des huit consommables est refusé sans appeler le store — parce qu'un identifiant inconnu ne doit jamais partir vers un paiement")]
         public void Un_produit_inconnu_est_refuse()
         {
             var gw = new UnityIapGateway(_store);
             var r = gw.PurchaseAsync("gems_550", CancellationToken.None).GetAwaiter().GetResult();
             Assert.That(Code(r), Is.EqualTo("meta.unknown"));
             Assert.That(_store.Connects, Is.EqualTo(0));
-            Assert.That(UnityIapGateway.Products, Is.EquivalentTo(new[] { "gems_100", "gems_520", "gems_1080", "gems_2250", "gems_6000", "welcome", "pass_premium" }));
+            Assert.That(UnityIapGateway.Products, Is.EquivalentTo(new[] { "gems_100", "gems_520", "gems_1080", "gems_2250", "gems_6000", "gems_13000", "welcome", "pass_premium" }));
         }
 
         [Test, Description("Vérifie qu'un achat payé mais jamais octroyé (appli fermée) est repris au lancement suivant, octroyé et confirmé une seule fois, même si la reprise est rappelée — parce qu'un joueur qui a payé doit recevoir son achat sans double octroi")]

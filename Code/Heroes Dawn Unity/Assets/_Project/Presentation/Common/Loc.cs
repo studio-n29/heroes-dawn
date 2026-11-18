@@ -63,7 +63,7 @@ namespace N29.HeroesDawn.Presentation.Common
             ["shop.recruited"] = "RECRUTÉ",
             ["shop.empty"] = "Collection de New York complète !",
             ["shop.cat.gems"] = "GEMMES", ["shop.cat.gems_sub"] = "Paquets de gemmes à l'achat",
-            ["shop.cat.exchange"] = "ÉCHANGES", ["shop.cat.exchange_sub"] = "Transformer des gemmes en crédits ou en PR",
+            ["shop.cat.exchange"] = "ÉCHANGES", ["shop.cat.exchange_sub"] = "Transformer des gemmes en crédits, ou reposer toute l'équipe",
             ["power.tier"] = "PUISSANCE {0} / 5",
             ["shop.scrap_lot"] = "{0} × {1}", ["shop.scrap_sold"] = "ACHETÉ",
             ["shop.scrap.confirm.title"] = "Acheter ce lot ?", ["shop.scrap.confirm.body"] = "{0} Crédits seront débités.",

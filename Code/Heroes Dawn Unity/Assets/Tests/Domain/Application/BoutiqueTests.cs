@@ -18,12 +18,56 @@ namespace N29.HeroesDawn.Tests.Domain.Application
 
         static string Code<T>(N29.HeroesDawn.Core.Result<T> r) => r.Error?.Code ?? "ok";
 
-        [Test, Description("Vérifie que la boutique vend les cinq packs de la spec (100, 520, 1 080, 2 250 et 6 000 Gemmes) aux identifiants de produit prévus — parce que ces identifiants sont ceux à déclarer dans les stores")]
-        public void Les_packs_sont_les_cinq_de_la_spec()
+        [Test, Description("Vérifie que la boutique vend les six packs (100, 520, 1 080, 2 250, 6 000 et 13 000 Gemmes) aux identifiants de produit prévus — parce que ces identifiants sont ceux à déclarer dans les stores")]
+        public void Les_packs_sont_les_six_de_la_spec()
         {
-            Assert.That(Boutique.Packs.Select(p => p.Id), Is.EqualTo(new[] { "gems_100", "gems_520", "gems_1080", "gems_2250", "gems_6000" }));
-            Assert.That(Boutique.Packs.Select(p => p.Gems), Is.EqualTo(new[] { 100, 520, 1080, 2250, 6000 }));
-            Assert.That(Boutique.Packs.Select(p => p.PriceText), Is.EqualTo(new[] { "0,99 €", "4,99 €", "9,99 €", "19,99 €", "49,99 €" }));
+            Assert.That(Boutique.Packs.Select(p => p.Id), Is.EqualTo(new[] { "gems_100", "gems_520", "gems_1080", "gems_2250", "gems_6000", "gems_13000" }));
+            Assert.That(Boutique.Packs.Select(p => p.Gems), Is.EqualTo(new[] { 100, 520, 1080, 2250, 6000, 13000 }));
+            Assert.That(Boutique.Packs.Select(p => p.PriceText), Is.EqualTo(new[] { "0,99 €", "4,99 €", "9,99 €", "19,99 €", "49,99 €", "99,99 €" }));
+        }
+
+        [Test, Description("Vérifie que le pack à 99,99 € donne 13 000 Gemmes après confirmation du store — parce que le plus gros pack suit la progression du bonus (130 Gemmes par euro)")]
+        public void Le_pack_de_99_99_donne_13000_gemmes()
+        {
+            int before = _app.Session.Wallet.Gems;
+            var r = _app.Boutique.BuyPackAsync("gems_13000", CancellationToken.None).GetAwaiter().GetResult();
+            Assert.That(r.IsSuccess);
+            Assert.That(_app.Session.Wallet.Gems, Is.EqualTo(before + 13000));
+        }
+
+        [Test, Description("Vérifie qu'aucun échange de Gemmes ne donne de PR et que la boutique ne vend plus l'échange « ex_pr » — parce que les PR achètent des recrues et des boosters tirés au hasard : les vendre contre de l'argent ferait des objets aléatoires payants")]
+        public void Aucun_echange_ne_donne_de_PR()
+        {
+            Assert.That(Boutique.Exchanges.Select(e => e.Id), Is.EqualTo(new[] { "ex_credits", "ex_rest" }));
+            Assert.That(Boutique.Exchanges.All(e => e.Reward.Pr == 0));
+            Assert.That(_app.Boutique.Exchange("ex_pr").Error!.Code, Is.EqualTo("meta.unknown"));
+        }
+
+        [Test, Description("Vérifie que l'échange de Crédits est limité à cinq par jour, puis de nouveau possible le lendemain — parce que les Gemmes achètent du temps et du confort, pas toute la progression d'un coup")]
+        public void L_echange_de_credits_est_limite_a_cinq_par_jour()
+        {
+            _app.Session.Wallet.SetGems(1000);
+            int credits = _app.Session.Wallet.Credits;
+            for (int i = 0; i < 5; i++) Assert.That(_app.Boutique.Exchange("ex_credits").IsSuccess, "échange " + (i + 1));
+            var sixth = _app.Boutique.Exchange("ex_credits");
+            Assert.That(sixth.Error!.Code, Is.EqualTo("meta.daily_limit"));
+            Assert.That(_app.Session.Wallet.Gems, Is.EqualTo(900), "le sixième ne dépense rien");
+            Assert.That(_app.Session.Wallet.Credits, Is.EqualTo(credits + 5000));
+            _app.Time.LocalNow = _app.Time.LocalNow.AddDays(1);
+            Assert.That(_app.Boutique.Exchange("ex_credits").IsSuccess, "le lendemain, la limite repart");
+        }
+
+        [Test, Description("Vérifie que l'accélérateur de 8 heures coûte 140 Gemmes, ajoute 480 minutes d'accélération et est refusé sans assez de Gemmes — parce que c'est du temps gagné (pay-to-fast), pas de la puissance")]
+        public void L_accelerateur_de_8_heures_s_achete_en_gemmes()
+        {
+            _app.Session.Wallet.SetGems(139);
+            int tokens = _app.Session.Meta.speedUpTokens;
+            Assert.That(_app.Boutique.BuyAccelerator().Error!.Code, Is.EqualTo("meta.gems"));
+            Assert.That(_app.Session.Meta.speedUpTokens, Is.EqualTo(tokens));
+            _app.Session.Wallet.SetGems(140);
+            Assert.That(_app.Boutique.BuyAccelerator().IsSuccess);
+            Assert.That(_app.Session.Wallet.Gems, Is.EqualTo(0));
+            Assert.That(_app.Session.Meta.speedUpTokens, Is.EqualTo(tokens + 480));
         }
 
         [Test, Description("Vérifie qu'un pack acheté donne ses Gemmes une fois le paiement confirmé — parce que les Gemmes ne se versent qu'après la confirmation du store")]

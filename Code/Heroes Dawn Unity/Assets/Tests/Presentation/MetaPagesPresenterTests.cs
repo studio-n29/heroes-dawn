@@ -132,8 +132,8 @@ namespace N29.HeroesDawn.Tests.Presentation
             p.Dispose();
         }
 
-        // Lignes : titre Gemmes, paquets, titre Échanges, échanges.
-        static int BoutiqueRow(string exchangeId) => 1 + Boutique.Packs.Count + 1 + Boutique.Exchanges.ToList().FindIndex(e => e.Id == exchangeId);
+        // Lignes : titre Gemmes, paquets, titre Temps et confort, accélérateur, emplacement, titre Échanges, échanges.
+        static int BoutiqueRow(string exchangeId) => 1 + Boutique.Packs.Count + 4 + Boutique.Exchanges.ToList().FindIndex(e => e.Id == exchangeId);
 
         [Test, Description("Vérifie que l'achat d'un paquet de Gemmes passe par une confirmation qui précise que le paiement est simulé, puis ajoute les Gemmes — parce qu'aucun argent réel ne doit être suggéré")]
         public void Boutique_PackPurchase_ConfirmsThenGrantsGems()
@@ -161,7 +161,7 @@ namespace N29.HeroesDawn.Tests.Presentation
             Assert.That(_view.ShopTabShown, Is.EqualTo((int)ShopTab.Boosters), "les héros ont leur page : on retombe sur les boosters");
             Assert.That(_view.Rows.Length, Is.EqualTo(3), "trois packs : standard, Opération, Mission");
             _view.ClickShopTab((int)ShopTab.Gems);
-            Assert.That(_view.Rows.Length, Is.EqualTo(Boutique.Packs.Count + Boutique.Exchanges.Count + 2), "deux titres de catégorie : gemmes et échanges");
+            Assert.That(_view.Rows.Length, Is.EqualTo(Boutique.Packs.Count + Boutique.Exchanges.Count + 5), "trois titres (gemmes, temps et confort, échanges) + accélérateur + emplacement ; pas de cosmétiques sans la boutique de cosmétiques");
             _view.ClickShopTab((int)ShopTab.Heroes);
             Assert.That(nav.Current.Page, Is.EqualTo(HubPage.Recruit));
             p.Dispose();

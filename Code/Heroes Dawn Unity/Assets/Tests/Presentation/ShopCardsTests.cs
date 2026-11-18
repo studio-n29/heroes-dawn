@@ -51,6 +51,30 @@ namespace N29.HeroesDawn.Tests.Presentation
             }
         }
 
+        [Test, Description("Vérifie que l'onglet Gemmes propose les packs, un accélérateur, l'emplacement d'expédition suivant, les échanges de Crédits et de repos et les cosmétiques de la semaine, sans aucun échange de PR — parce que les Gemmes achètent du temps et du confort, jamais de puissance")]
+        public void GemsTab_ListsTimeComfortAndCosmetics_ButNoPrExchange()
+        {
+            _app = new TestApp();
+            _app.SignInDirect("p1");
+            _view = new FakeListView();
+            _nav = new HubNavigator { ShopTab = ShopTab.Gems };
+            var p = new BoutiquePagePresenter(_view, _app.Boutique, _app.Session, new ModalService(new FakeModalHost()), _loc, new FakeToasts(),
+                                              _app.Subscriber<MetaChanged>(), _app.Subscriber<WalletChanged>(), _app.Subscriber<RosterChanged>(), _app.Time,
+                                              _app.Collection, _nav, null, _app.Cosmetics);
+            _view.Show();
+            ((VContainer.Unity.IStartable)p).Start();
+            var titles = _view.Rows.Select(r => r.Title).ToList();
+            Assert.That(titles, Does.Contain(_loc.F("shop.accel", 8)), "accélérateur de 8 h");
+            Assert.That(titles, Does.Contain(_loc.F("shop.slot", 4)), "4e emplacement d'expédition");
+            Assert.That(titles, Does.Contain(_loc.T("shop.ex_credits")));
+            Assert.That(titles, Does.Not.Contain("60 PR"), "plus d'échange de PR");
+            int cosmetics = _app.Cosmetics.WeeklyNow().Count;
+            Assert.That(cosmetics, Is.GreaterThan(0));
+            Assert.That(_view.Rows.Count(r => r.Subtitle == _loc.F("shop.desc.cosmetic", _app.Cosmetics.WeeklyNow().First().Def.Price)), Is.GreaterThan(0));
+            Assert.That(_view.Rows.Length, Is.EqualTo(1 + Boutique.Packs.Count + 3 + 1 + Boutique.Exchanges.Count + 1 + cosmetics), "titre, packs, confort (titre, accélérateur, emplacement), échanges (titre + lignes), cosmétiques (titre + articles)");
+            p.Dispose();
+        }
+
         [Test, Description("Vérifie que l'en-tête de la boutique n'affiche plus le texte « achats simulés » — parce que l'écran doit rester léger")]
         public void Header_NoLongerShowsTheSimulatedNote()
         {

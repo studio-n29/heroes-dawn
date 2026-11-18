@@ -1,0 +1,448 @@
+<title>Modèle financier Heroes Dawn</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Concept : une page de travail en trois temps. Verdict en haut, hypothèses modifiables au milieu, preuves (KPI, plan, sources) en bas. */
+:root{
+  --bg:#F3F5F7; --surface:#FFFFFF; --ink:#14202B; --muted:#566774; --line:#D9E0E6;
+  --accent:#0E7C86; --accent-soft:#DDF1F3; --good:#1F7A46; --good-soft:#E1F3E8;
+  --warn:#9A6411; --warn-soft:#FBEFD6; --bad:#B23A2D; --bad-soft:#F9E1DD;
+  --s-rev:#0E7C86; --s-cost:#B7791F; --s-net:#14202B;
+  --f-head:"Space Grotesk","Segoe UI",system-ui,sans-serif;
+  --f-body:"Inter","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1519; --surface:#151F25; --ink:#E6EEF2; --muted:#93A4B0; --line:#263640;
+    --accent:#3CC0CC; --accent-soft:#12343A; --good:#4CC07F; --good-soft:#12301F;
+    --warn:#E0A83C; --warn-soft:#37290E; --bad:#EF7B6B; --bad-soft:#3A1B16;
+    --s-rev:#3CC0CC; --s-cost:#E0A83C; --s-net:#E6EEF2; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1519; --surface:#151F25; --ink:#E6EEF2; --muted:#93A4B0; --line:#263640;
+  --accent:#3CC0CC; --accent-soft:#12343A; --good:#4CC07F; --good-soft:#12301F;
+  --warn:#E0A83C; --warn-soft:#37290E; --bad:#EF7B6B; --bad-soft:#3A1B16;
+  --s-rev:#3CC0CC; --s-cost:#E0A83C; --s-net:#E6EEF2; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);padding-block:28px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1060px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:var(--f-head);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(26px,4.4vw,38px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:21px;font-weight:600}
+h3{font-size:16px;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+.lede{color:var(--muted);max-width:68ch;margin-top:10px}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+section{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.num{font-family:var(--f-head);font-variant-numeric:tabular-nums;font-weight:600}
+.tile .big{font-size:26px;display:block;margin-top:4px}
+.tile .sub{color:var(--muted);font-size:13px;margin-top:2px}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.info{background:var(--accent-soft);color:var(--accent)}
+.verdict .head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.verdict p{font-size:14px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#0E1519}}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#0E1519}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px 26px}
+.ctl label{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:500}
+.ctl output{font-family:var(--f-head);font-variant-numeric:tabular-nums;font-weight:600}
+.ctl input[type=range]{width:100%;accent-color:var(--accent);margin-top:6px}
+.ctl .hint{font-size:12px;color:var(--muted);margin-top:2px}
+.toggle{display:flex;gap:10px;align-items:center;font-size:14px;font-weight:500}
+.toggle input{width:18px;height:18px;accent-color:var(--accent)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font:11px var(--f-body)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;margin-top:8px}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.note{font-size:13px;color:var(--muted);max-width:80ch}
+ul.clean{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.phase{display:grid;grid-template-columns:110px 1fr;gap:6px 16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.phase:last-child{border-bottom:0}
+.phase .when{font-family:var(--f-head);font-weight:600}
+@media (max-width:560px){.phase{grid-template-columns:1fr}}
+code{font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px}
+@media (prefers-reduced-motion:no-preference){.seg button{transition:background .15s}}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Studio N29 · Analyse du 18 novembre 2026</p>
+  <h1>Où publier Heroes Dawn et comment le faire connaître</h1>
+  <p class="lede">Modèle sur 12 mois après le lancement : coûts, rétention, conversion, retour sur investissement. Les trois scénarios s’appuient sur des repères de marché cités en bas de page. Tout ce qui n’a pas de source est une hypothèse que tu peux modifier plus bas.</p>
+</header>
+
+<section aria-labelledby="h-verdict">
+  <h2 id="h-verdict">Ce que le modèle conclut</h2>
+  <div class="grid3" id="verdicts"></div>
+  <p class="note">Les conclusions se recalculent quand tu changes les hypothèses. Elles valent pour une équipe de une à deux personnes, un jeu gratuit sans avantage payant et un lancement sans éditeur.</p>
+</section>
+
+<section aria-labelledby="h-hyp">
+  <h2 id="h-hyp">Hypothèses</h2>
+  <div class="seg" role="group" aria-label="Scénario" id="scen"></div>
+  <p class="note" id="scenNote"></p>
+  <div class="card controls" id="controls"></div>
+  <label class="toggle"><input type="checkbox" id="iosOn"> Inclure iOS dans le calcul (compte Apple, Mac loué, 8 jours de travail)</label>
+</section>
+
+<section aria-labelledby="h-res">
+  <h2 id="h-res">Résultats sur 12 mois</h2>
+  <div class="grid4" id="tiles"></div>
+  <div class="card">
+    <h3>Trésorerie cumulée</h3>
+    <svg class="chart" id="chart" viewBox="0 0 700 280" role="img" aria-label="Revenus nets, coûts et solde cumulés sur douze mois"></svg>
+    <div class="legend">
+      <span><i style="background:var(--s-rev)"></i>Revenus nets cumulés</span>
+      <span><i style="background:var(--s-cost)"></i>Coûts cumulés</span>
+      <span><i style="background:var(--s-net)"></i>Solde</span>
+    </div>
+  </div>
+  <div class="tablewrap"><table id="platTable"></table></div>
+</section>
+
+<section aria-labelledby="h-ue">
+  <h2 id="h-ue">Faut-il payer de la publicité ?</h2>
+  <p class="note">Un joueur acquis par publicité ne rapporte de l’argent que si ce qu’il dépense (valeur nette sur 12 mois, après TVA et commission du store) dépasse ce que coûte son installation. Le tableau compare les deux, canal par canal.</p>
+  <div class="tablewrap"><table id="ueTable"></table></div>
+</section>
+
+<section aria-labelledby="h-kpi">
+  <h2 id="h-kpi">Indicateurs à suivre et seuils de décision</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Indicateur</th><th>Cible du projet</th><th>Repères de marché</th><th>Lecture</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Rétention J1</strong></td><td class="n">40 %</td><td>Médiane tous jeux 22 % ; 10 % meilleurs 40 % ; RPG 30,5 % (Mistplay)</td><td>La cible équivaut au top 10 % du marché. Un résultat de 30 % reste bon pour un RPG.</td></tr>
+      <tr><td><strong>Rétention J7</strong></td><td class="n">15 %</td><td>Médiane 4 % ; 10 % meilleurs 12 % ; RPG 9,9 %</td><td>Seuil <strong>D1 du plan live-ops</strong> : sous 15 %, on corrige l’onboarding avant tout contenu.</td></tr>
+      <tr><td><strong>Rétention J30</strong></td><td class="n">6 %</td><td>RPG 3,5 % ; stratégie 3,1 % ; meilleurs jeux 10 %</td><td>6 % est ambitieux. Prévois 3 à 4 % comme cas central.</td></tr>
+      <tr><td><strong>Conversion payeurs</strong></td><td class="n">2 à 3 %</td><td>Médiane quotidienne 0,4 % ; 10 % meilleurs 0,8 à 1,2 % ; RPG de tête jusqu’à 3 %</td><td>Seuil <strong>D3</strong> : sous 1 % à M+12, on revoit pass et cosmétiques. Les sources divergent, mesure la tienne tôt.</td></tr>
+      <tr><td><strong>Dépense par payeur (90 j)</strong></td><td class="n">non fixée</td><td>9,80 $ en moyenne pour le mid-core (AppsFlyer via Playio)</td><td>Ton pass à 9,99 € et ton pack à 4,99 € sont dans cette zone. La dépense élevée viendra des gros payeurs, peu nombreux.</td></tr>
+      <tr><td><strong>Fin du prologue</strong></td><td class="n">&gt; 85 %</td><td>Pas de repère fiable trouvé</td><td>C’est le premier goulot. À mesurer dès la première version publique.</td></tr>
+      <tr><td><strong>Coût d’installation</strong></td><td class="n">non fixé</td><td>RPG Android 2,50 à 6 $ ; iOS 4 à 12 $ (Admiral). États-Unis environ 8 à 9 $ (AppsFlyer)</td><td>Seuil de décision : n’élargir la publicité que si la valeur nette à 12 mois dépasse 1,5 fois ce coût.</td></tr>
+      <tr><td><strong>Wishlists Steam au lancement</strong></td><td class="n">non fixé</td><td>Guides : 5 000 à 30 000 selon l’ambition ; chaque wishlist rapporte moitié moins qu’avant</td><td>À suivre chaque semaine dès la page publique. Ratio ventes/wishlist moyen de 10 à 16 % pour un jeu payant (pas de repère pour le gratuit).</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="h-plan">
+  <h2 id="h-plan">Plan de promotion</h2>
+  <p class="note">La répartition de ton budget marketing suit les parts ci-dessous. Elle favorise ce qui coûte peu par joueur et ce qui se mesure.</p>
+  <div class="tablewrap"><table id="chanTable"></table></div>
+  <div class="card">
+    <h3 style="margin-bottom:6px">Calendrier autour du lancement</h3>
+    <div class="phase"><span class="when">T − 90 à − 30 j</span><div>Page Steam publique avec capsule et bande-annonce, démo ou Playtest, inscription au Steam Next Fest, serveur Discord ouvert, premiers devlogs. Fiche Google Play préparée en 5 langues. <em>Objectif : wishlists et premiers testeurs.</em></div></div>
+    <div class="phase"><span class="when">T − 30 à 0 j</span><div>Envoi de clés à 30 à 50 créateurs de niche, annonce aux lecteurs de Hell Rising, test de la publicité sur 1 ou 2 pays à faible coût (budget plafonné) pour mesurer la rétention. <em>Objectif : vérifier D1 et D7 avant d’ouvrir en grand.</em></div></div>
+    <div class="phase"><span class="when">T à + 30 j</span><div>Lancement Android et Steam le même jour, relais des créateurs, pic de presse. Rafale de publicité plafonnée par jour sur les deux premières semaines, pour profiter du pic de visibilité ; on suit les entonnoirs et on coupe si D1 passe sous 25 %. <em>Objectif : installations organiques, premiers avis.</em></div></div>
+    <div class="phase"><span class="when">T + 30 à + 90 j</span><div>Première saison du pass, correctifs d’onboarding, point de décision <strong>D1</strong> du plan live-ops. Montée de la publicité uniquement si la valeur nette à 12 mois dépasse 1,5 fois le coût d’installation. <em>Objectif : rentabiliser chaque euro avant de le multiplier.</em></div></div>
+  </div>
+</section>
+
+<section aria-labelledby="h-risk">
+  <h2 id="h-risk">Risques et limites du modèle</h2>
+  <ul class="clean">
+    <li><strong>Peu de données de référence pour ton genre.</strong> Les benchmarks de rétention varient du simple au triple selon la source. Le modèle te donne un ordre de grandeur, pas une prévision.</li>
+    <li><strong>Le revenu des RPG mobiles recule</strong> (13,7 à 11,6 Md$ de 2024 à 2025, selon AppMagic), et Google Play montre une baisse de la dépense à 90 jours pour les RPG.</li>
+    <li><strong>Le public Steam gratuit n’est pas le public mobile</strong> (risque R12). Le modèle réduit la conversion sur PC ; mesure-la pendant l’Early Access.</li>
+    <li><strong>Les installations organiques</strong> sont l’hypothèse la plus incertaine : sans visibilité, aucune promotion ne les remplace. Elles dépendent de la qualité de la fiche, des avis et de la mise en avant par les stores.</li>
+    <li><strong>Non inclus :</strong> salaires, impôts, coût d’une version console, éventuel éditeur, obligation de suppression de compte, taux de change. La ligne « charges mensuelles » te permet d’ajouter ton coût d’équipe.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="h-src">
+  <h2 id="h-src">Sources</h2>
+  <ul class="clean note">
+    <li>Marché mondial 2025 : <a href="https://www.pocketgamer.biz/global-games-revenue-surpasses-200bn-for-the-first-time-mobile-generates-113bn/">Newzoo via PocketGamer.biz</a></li>
+    <li>Rétention : <a href="https://gameindustrylibrary.com/documents/gameanalytics-mobile-and-pc-game-benchmarks-in-2026-sponsored-by-pwn-games">GameAnalytics 2026</a> · <a href="https://segwise.ai/blog/mobile-gaming-app-user-retention-strategies.md">Mistplay via Segwise</a> · <a href="https://blog.playio.co/retention-by-game-genre">Playio</a> (chiffres plus élevés, non retenus)</li>
+    <li>Coût d’installation : <a href="https://www.appsflyer.com/?p=549948">AppsFlyer</a> · <a href="https://admiral.media/?p=281107">Admiral Media</a> · <a href="https://foxdata.com/en/blogs/2026-mobile-game-user-acquisition-cost-benchmarks-how-much-should-you-spend/">Fox Data</a></li>
+    <li>Conversion et dépense : <a href="https://blog.playio.co/arppu-mobile-games">Playio</a> · <a href="https://gamedevreports.substack.com/p/appmagic-mobile-games-monetization">AppMagic</a></li>
+    <li>Wishlists Steam : <a href="https://gamedevreports.substack.com/p/gamediscoverco-the-state-of-steam">GameDiscoverCo</a></li>
+    <li>Frais : <a href="https://developer.apple.com/app-store/small-business-program/?page=2">Apple</a> · <a href="https://support.google.com/googleplay/android-developer/answer/112622?hl=en">Google Play</a> · <a href="https://fungies.io/how-to-sell-a-game-on-steam-3/">Steam (guide)</a>. La grille Google Play change en 2026 : vérifie-la avant de publier.</li>
+    <li>Documents du projet : <code>Live_Ops.md</code>, <code>Live_Ops_Plan_24_mois.md</code>, <code>Risques.md</code>, <code>Dossier_Conformite_1.0.0.md</code></li>
+  </ul>
+</section>
+</div>
+
+<script>
+(function(){
+  /* ---- Hypothèses par scénario ---- */
+  var SCEN = {
+    prudent:  {label:"Prudent",  d1:22, d7:4,  d30:1.5, conv:1.0, arppu:9,  cpi:4.0, wl:3000,  orgA:2000,  pc:0.6,
+      note:"Médiane du marché : rétention 22 / 4 / 1,5 %, 1 % de payeurs, 9 € par payeur. Le jeu n’est pas repéré, peu de joueurs arrivent seuls."},
+    realiste: {label:"Réaliste", d1:30, d7:10, d30:3.5, conv:2.0, arppu:14, cpi:3.0, wl:10000, orgA:8000,  pc:0.7,
+      note:"Moyenne des RPG mobiles (Mistplay) : 30 / 10 / 3,5 %. 2 % de payeurs, 14 € par payeur, 10 000 wishlists Steam."},
+    ambitieux:{label:"Ambitieux",d1:40, d7:15, d30:6,   conv:3.0, arppu:22, cpi:2.0, wl:30000, orgA:25000, pc:0.8,
+      note:"Tes cibles du plan live-ops : 40 / 15 / 6 %, 3 % de payeurs. Il faut un lancement remarqué (30 000 wishlists, 25 000 installations seul)."}
+  };
+  var COMMON = {budget:2000, team:0, iosDev:2000};
+  var CTL = [
+    {k:"d1",   l:"Rétention J1",  min:10,max:60, step:1,   fmt:function(v){return v+" %"}, h:"Joueurs encore là le lendemain"},
+    {k:"d7",   l:"Rétention J7",  min:1, max:30, step:0.5, fmt:function(v){return v+" %"}, h:"Seuil du plan live-ops : 15 %"},
+    {k:"d30",  l:"Rétention J30", min:0.5,max:12,step:0.5, fmt:function(v){return v+" %"}, h:"Détermine la durée de vie d’un joueur"},
+    {k:"conv", l:"Joueurs qui paient", min:0.3,max:5,step:0.1,fmt:function(v){return v.toFixed(1)+" %"}, h:"Part des installations qui paient dans les 90 jours"},
+    {k:"arppu",l:"Dépense par payeur (90 j)", min:4,max:40,step:1,fmt:function(v){return v+" €"}, h:"Prix TTC payé, avant TVA et commission"},
+    {k:"cpi",  l:"Coût d’une installation payante", min:0.5,max:8,step:0.1,fmt:function(v){return v.toFixed(1)+" €"}, h:"Marchés occidentaux, mid-core"},
+    {k:"wl",   l:"Wishlists Steam au lancement", min:500,max:50000,step:500,fmt:function(v){return v.toLocaleString("fr-FR")}, h:"Hypothèse : 20 % deviennent des installations"},
+    {k:"orgA", l:"Installations Android sans publicité (12 mois)", min:500,max:50000,step:500,fmt:function(v){return v.toLocaleString("fr-FR")}, h:"L’hypothèse la plus incertaine"},
+    {k:"pc",   l:"Conversion sur PC relative au mobile", min:0.3,max:1,step:0.05,fmt:function(v){return Math.round(v*100)+" %"}, h:"Public Steam gratuit moins payeur (risque R12)"},
+    {k:"budget",l:"Budget marketing total", min:0,max:20000,step:250,fmt:function(v){return v.toLocaleString("fr-FR")+" €"}, h:"Sur 12 mois, plus fort au lancement"},
+    {k:"team", l:"Charges mensuelles (équipe, outils)", min:0,max:6000,step:100,fmt:function(v){return v.toLocaleString("fr-FR")+" €"}, h:"0 € = équipe non rémunérée sur ce calcul"},
+    {k:"iosDev",l:"Coût du travail iOS (une fois)", min:0,max:6000,step:250,fmt:function(v){return v.toLocaleString("fr-FR")+" €"}, h:"Mac, signature, tests, formalités"}
+  ];
+  var VAT=0.18, STEAM_WL_TO_INST=0.20, CREATOR_CPI_FACTOR=0.5, ASIA_LTV_FACTOR=0.3;
+  var SHARES = [
+    {k:"creators",l:"Créateurs de contenu",s:0.35},
+    {k:"paid",l:"Publicité payante",s:0.30},
+    {k:"steam",l:"Page Steam, bande-annonce, démo",s:0.15},
+    {k:"aso",l:"Fiches des stores (5 langues)",s:0.10},
+    {k:"community",l:"Communauté (Discord, événements)",s:0.10}
+  ];
+  var FEES = {android:0.15, steam:0.30, ios:0.15};
+  var S = {}; var scenKey = "realiste";
+  var $ = function(id){return document.getElementById(id)};
+  var eur = function(n){var r=Math.round(n); return (r<0?"−":"")+Math.abs(r).toLocaleString("fr-FR")+" €"};
+  var eur2 = function(n){return n.toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2})+" €"};
+  var pct = function(n){return Math.round(n*100)+" %"};
+
+  /* ---- Modèle ---- */
+  function weights(){
+    var r=0.7, w=[], sum=0, m;
+    for(m=0;m<12;m++){w[m]=Math.pow(r,m); sum+=w[m]}
+    return w.map(function(x){return x/sum});
+  }
+  function realized(age){ /* part de la valeur 12 mois réalisée jusqu'à l'âge (en mois) */
+    if(age<0) return 0;
+    var k=0.45;
+    return (1-Math.exp(-k*(age+1)))/(1-Math.exp(-k*12));
+  }
+  function ltv(p, plat){
+    var mult = 1.3 + 14*(p.d30/100);
+    var cf = plat==="steam" ? p.pc : (plat==="ios" ? 1.2 : 1);
+    var af = plat==="ios" ? 1.25 : 1;
+    var gross90 = (p.conv/100)*cf * p.arppu*af;
+    var net = (1/(1+VAT))*(1-FEES[plat]);
+    return {gross90:gross90, net365:gross90*mult*net, mult:mult};
+  }
+  function run(p, iosOn){
+    var w = weights(), plats = iosOn ? ["android","steam","ios"] : ["android","steam"];
+    var split = iosOn ? {android:0.55,steam:0.30,ios:0.15} : {android:0.70,steam:0.30,ios:0};
+    var B = p.budget;
+    var paidInst = B*0.30/p.cpi, creatorInst = B*0.35/(p.cpi*CREATOR_CPI_FACTOR);
+    var out = {plats:{}, rev:new Array(12).fill(0), cost:new Array(12).fill(0)}, m, c, t;
+    plats.forEach(function(pl){
+      var org = pl==="android" ? p.orgA : pl==="steam" ? p.wl*STEAM_WL_TO_INST : p.orgA*0.6;
+      var inst = org + (paidInst+creatorInst)*split[pl];
+      var L = ltv(p,pl), rev = new Array(12).fill(0);
+      for(c=0;c<12;c++){
+        for(t=c;t<12;t++){
+          rev[t] += inst*w[c]*L.net365*(realized(t-c)-realized(t-c-1));
+        }
+      }
+      out.plats[pl]={inst:inst, org:org, ltv:L, rev:rev, total:rev.reduce(function(a,b){return a+b},0)};
+      for(t=0;t<12;t++) out.rev[t]+=rev[t];
+    });
+    var oneOff = 25 + 100 + 0 + 1500; /* Google, Steam, juriste (fait avec l'IA : 0), localisation */
+    var iosOne = iosOn ? (99 + 250 + p.iosDev) : 0;
+    for(m=0;m<12;m++){
+      /* publicité concentrée au lancement : 55 % le mois 1, 15 % le mois 2, le reste étalé ; Supabase gratuit 3 mois puis 25 € */
+      out.cost[m] = B*(m===0?0.55:(m===1?0.15:0.03)) + p.team + (m>=3?25:0);
+    }
+    out.cost[0] += oneOff + (iosOn ? 99+250+p.iosDev : 0);
+    out.fixedOneOff = oneOff + iosOne;
+    var cumR=0,cumC=0; out.cumR=[]; out.cumC=[]; out.cumN=[]; out.be=null;
+    for(m=0;m<12;m++){
+      cumR+=out.rev[m]; cumC+=out.cost[m];
+      out.cumR.push(cumR); out.cumC.push(cumC); out.cumN.push(cumR-cumC);
+      if(out.be===null && cumR-cumC>=0) out.be=m+1;
+    }
+    out.totalRev=cumR; out.totalCost=cumC; out.net=cumR-cumC;
+    out.roi = cumC>0 ? (cumR-cumC)/cumC : 0;
+    out.installs = plats.reduce(function(a,pl){return a+out.plats[pl].inst},0);
+    out.payers = plats.reduce(function(a,pl){
+      var cf = pl==="steam"?p.pc:(pl==="ios"?1.2:1);
+      return a + out.plats[pl].inst*(p.conv/100)*cf;
+    },0);
+    return out;
+  }
+
+  /* ---- Rendu ---- */
+  function renderControls(){
+    var h="";
+    CTL.forEach(function(c){
+      h+='<div class="ctl"><label for="c_'+c.k+'"><span>'+c.l+'</span><output id="o_'+c.k+'"></output></label>'+
+         '<input type="range" id="c_'+c.k+'" min="'+c.min+'" max="'+c.max+'" step="'+c.step+'">'+
+         '<div class="hint">'+c.h+'</div></div>';
+    });
+    $("controls").innerHTML=h;
+    CTL.forEach(function(c){
+      $("c_"+c.k).addEventListener("input",function(e){
+        S[c.k]=parseFloat(e.target.value); setCustom(); update();
+      });
+    });
+  }
+  function syncControls(){
+    CTL.forEach(function(c){
+      $("c_"+c.k).value=S[c.k];
+      $("o_"+c.k).textContent=c.fmt(S[c.k]);
+    });
+  }
+  function renderScen(){
+    var h="";
+    Object.keys(SCEN).forEach(function(k){
+      h+='<button type="button" data-k="'+k+'" aria-pressed="'+(k===scenKey)+'">'+SCEN[k].label+'</button>';
+    });
+    h+='<button type="button" data-k="custom" aria-pressed="'+(scenKey==="custom")+'" '+(scenKey==="custom"?"":"hidden")+'>Personnalisé</button>';
+    $("scen").innerHTML=h;
+    Array.prototype.forEach.call($("scen").querySelectorAll("button"),function(b){
+      b.addEventListener("click",function(){
+        var k=b.getAttribute("data-k"); if(k==="custom") return; loadScen(k);
+      });
+    });
+    $("scenNote").textContent = scenKey==="custom" ? "Valeurs modifiées à la main. Choisis un scénario pour revenir aux repères." : SCEN[scenKey].note;
+  }
+  function loadScen(k){
+    scenKey=k; var s=SCEN[k];
+    ["d1","d7","d30","conv","arppu","cpi","wl","orgA","pc"].forEach(function(x){S[x]=s[x]});
+    Object.keys(COMMON).forEach(function(x){ if(S[x]===undefined) S[x]=COMMON[x]; });
+    renderScen(); syncControls(); update();
+  }
+  function setCustom(){
+    if(scenKey!=="custom"){scenKey="custom"; renderScen();}
+    CTL.forEach(function(c){$("o_"+c.k).textContent=c.fmt(S[c.k])});
+  }
+  function tile(label,value,sub,cls){
+    return '<div class="card tile"><span class="eyebrow">'+label+'</span><span class="big num '+(cls||"")+'">'+value+'</span><div class="sub">'+sub+'</div></div>';
+  }
+  function badge(txt,cls){return '<span class="pill '+cls+'">'+txt+'</span>'}
+
+  function update(){
+    var iosOn=$("iosOn").checked;
+    var R=run(S,iosOn), Rno=run(S,false), Ri=run(S,true);
+    var La=ltv(S,"android"), roas=La.net365/S.cpi, roasCre=La.net365/(S.cpi*CREATOR_CPI_FACTOR);
+    var iosGain = Ri.net - Rno.net;
+
+    /* verdicts */
+    var v="";
+    var c1 = R.net>=0 ? "good" : (R.net>-3000 ? "warn":"bad");
+    v+='<div class="card verdict"><div class="head"><h3>Publier</h3>'+badge(R.net>=0?"Rentable à 12 mois":"Déficitaire à 12 mois",c1)+'</div>'+
+       '<p>Android et Steam, déjà validés : solde de <strong>'+eur(Rno.net)+'</strong> sur 12 mois'+(Rno.be?', équilibre au mois '+Rno.be:', sans équilibre dans l’année')+'. Les coûts d’entrée sont bas ('+eur(Rno.fixedOneOff)+' dont traductions) : le risque porte sur le volume de joueurs, pas sur la mise de départ.</p></div>';
+    var ic = iosGain>0 ? "good" : (iosGain>-1500?"warn":"bad");
+    v+='<div class="card verdict"><div class="head"><h3>iOS</h3>'+badge(iosGain>0?"À ajouter":"À reporter",ic)+'</div>'+
+       '<p>Ajouter iOS change le solde de <strong>'+(iosGain>=0?"+":"")+eur(iosGain)+'</strong> à 12 mois (compte Apple 99 €, Mac loué, travail de mise en place, public iOS plus payeur). '+
+       (iosGain>0?'Le gain couvre son coût : prévoyable après Android.':'Tant que le volume Android reste faible, iOS ne se rembourse pas. Attends les premières données de rétention et de conversion.')+'</p></div>';
+    var pc = roas>=1.5?"good":(roas>=1?"warn":"bad");
+    v+='<div class="card verdict"><div class="head"><h3>Publicité</h3>'+badge(roas>=1.5?"Peut monter en charge":"Tests seulement",pc)+'</div>'+
+       '<p>Un joueur apporte <strong>'+eur2(La.net365)+'</strong> net sur 12 mois et coûte <strong>'+eur2(S.cpi)+'</strong> à acquérir par publicité : retour de <strong>'+roas.toFixed(2).replace(".",",")+'</strong> pour 1 € dépensé. '+
+       (roas>=1.5?'La publicité se rembourse : on peut augmenter progressivement.':'Elle ne se rembourse pas à ce niveau. Privilégie créateurs, Steam et communauté, et limite la publicité à des tests pour mesurer.')+'</p></div>';
+    $("verdicts").innerHTML=v;
+
+    /* tiles */
+    var t="";
+    t+=tile("Joueurs acquis",Math.round(R.installs).toLocaleString("fr-FR"),"installations, "+Math.round(R.payers).toLocaleString("fr-FR")+" payeurs");
+    t+=tile("Revenus nets",eur(R.totalRev),"après TVA et commission des stores");
+    t+=tile("Coûts totaux",eur(R.totalCost),"dont marketing "+eur(S.budget)+" et frais fixes");
+    t+=tile("Solde à 12 mois",eur(R.net),"retour sur investissement : "+(R.roi>=0?"+":"")+Math.round(R.roi*100)+" %",R.net>=0?"":"");
+    $("tiles").innerHTML=t;
+    drawChart(R);
+
+    /* plateformes */
+    var pl=["android","steam"].concat(iosOn?["ios"]:[]);
+    var names={android:"Google Play",steam:"Steam",ios:"App Store"};
+    var entry={android:"25 $ une fois",steam:"100 $ par jeu (remboursés après 1 000 $ de ventes)",ios:"99 $ par an + un Mac"};
+    var comm={android:"15 % (1er million), puis 30 %",steam:"30 % (25 % puis 20 % aux paliers de 10 et 50 M$)",ios:"15 % sous 1 M$ (programme à demander), sinon 30 %"};
+    var h='<thead><tr><th>Plateforme</th><th>Coût d’entrée</th><th>Commission</th><th class="n">Installations</th><th class="n">Valeur nette par joueur (12 mois)</th><th class="n">Revenus nets</th><th>Statut</th></tr></thead><tbody>';
+    pl.forEach(function(k){
+      var d=R.plats[k];
+      var status = k==="ios" ? badge(iosGain>0?"À ajouter":"À reporter",ic) : badge("Validé","info");
+      h+='<tr><td><strong>'+names[k]+'</strong></td><td>'+entry[k]+'</td><td>'+comm[k]+'</td><td class="n">'+Math.round(d.inst).toLocaleString("fr-FR")+'</td><td class="n">'+eur2(d.ltv.net365)+'</td><td class="n">'+eur(d.total)+'</td><td>'+status+'</td></tr>';
+    });
+    if(!iosOn){
+      h+='<tr><td><strong>App Store</strong></td><td>'+entry.ios+'</td><td>'+comm.ios+'</td><td class="n" colspan="3">coche la case iOS pour l’inclure</td><td>'+badge(iosGain>0?"À ajouter":"À reporter",ic)+'</td></tr>';
+    }
+    h+='<tr><td><strong>Consoles</strong></td><td>kits et accords à obtenir</td><td>30 % (non vérifié)</td><td class="n" colspan="3">hors modèle</td><td>'+badge("Pas avant 2028","warn")+'</td></tr></tbody>';
+    $("platTable").innerHTML=h;
+
+    /* unit economics */
+    var rows=[
+      {n:"Créateurs de contenu (micro, niche)",cpi:S.cpi*CREATOR_CPI_FACTOR,ltv:La.net365,why:"Hypothèse : la moitié du coût de la publicité, car le contenu reste en ligne et le public est ciblé."},
+      {n:"Publicité payante, marchés occidentaux",cpi:S.cpi,ltv:La.net365,why:"Fourchette sourcée : 2,50 à 6 $ sur Android pour un RPG mid-core."},
+      {n:"Publicité payante, Asie du Sud-Est / Inde",cpi:1.0,ltv:La.net365*ASIA_LTV_FACTOR,why:"Installations à 0,40 à 1,60 $ (AppsFlyer), mais joueurs bien moins dépensiers : hypothèse de 30 % de la valeur. Sert à tester la rétention, pas à gagner de l’argent."}
+    ];
+    var u='<thead><tr><th>Canal</th><th class="n">Coût / installation</th><th class="n">Valeur nette 12 mois</th><th class="n">Retour pour 1 €</th><th>Verdict</th><th>Pourquoi</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      var ro=r.ltv/r.cpi, cls=ro>=1.5?"good":(ro>=1?"warn":"bad"), txt=ro>=1.5?"À développer":(ro>=1?"À surveiller":"À limiter à des tests");
+      u+='<tr><td><strong>'+r.n+'</strong></td><td class="n">'+eur2(r.cpi)+'</td><td class="n">'+eur2(r.ltv)+'</td><td class="n">'+ro.toFixed(2).replace(".",",")+'</td><td>'+badge(txt,cls)+'</td><td>'+r.why+'</td></tr>';
+    });
+    u+='<tr><td><strong>Coût maximum rentable</strong></td><td class="n" colspan="2">'+eur2(La.net365)+'</td><td class="n" colspan="3">Au-dessus de ce coût par installation, chaque euro de publicité perd de l’argent à 12 mois.</td></tr></tbody>';
+    $("ueTable").innerHTML=u;
+
+    /* canaux */
+    var ch={
+      creators:{how:"Envoi de clés et partenariats rémunérés avec des créateurs de 1 000 à 50 000 abonnés : RPG tactiques, univers de super-héros, fans de Hell Rising.",why:"Contenu durable, public déjà intéressé, coût mesurable par lien de suivi.",kpi:"Installations par lien, coût par installation"},
+      paid:{how:"Campagnes Meta, TikTok et Google plafonnées à 1 ou 2 pays, puis par palier. Vidéos de combat de 15 secondes.",why:"Sert d’abord à mesurer D1, D7 et le retour par pays, avant de dépenser plus.",kpi:"Coût par installation, D7, retour à 30 jours"},
+      steam:{how:"Page publique tôt, capsule et bande-annonce soignées, démo, Steam Next Fest, mise à jour régulière de la page.",why:"Les wishlists sont le meilleur prédicteur de lancement sur Steam.",kpi:"Wishlists par semaine, conversion en installations"},
+      aso:{how:"Fiche Google Play en 5 langues, captures, vidéo, mots-clés, réponse aux avis.",why:"Gratuit en publicité, améliore la conversion de chaque visiteur du store.",kpi:"Taux de conversion de la fiche"},
+      community:{how:"Discord, devlog, e-mails aux fans de l’univers Hell Rising, événements de saison, concours sans avantage payant.",why:"Rétention et retours gratuits ; amorce le bouche-à-oreille.",kpi:"Membres actifs, retours exploitables"}
+    };
+    var c='<thead><tr><th>Canal</th><th class="n">Part</th><th class="n">Budget</th><th>Comment</th><th>Pourquoi</th><th>Indicateur</th></tr></thead><tbody>';
+    SHARES.forEach(function(s){
+      var x=ch[s.k];
+      c+='<tr><td><strong>'+s.l+'</strong></td><td class="n">'+Math.round(s.s*100)+' %</td><td class="n">'+eur(S.budget*s.s)+'</td><td>'+x.how+'</td><td>'+x.why+'</td><td>'+x.kpi+'</td></tr>';
+    });
+    c+='</tbody>';
+    $("chanTable").innerHTML=c;
+  }
+
+  function drawChart(R){
+    var W=700,H=280,L=62,Rr=16,T=14,B=30, pw=W-L-Rr, ph=H-T-B;
+    var all=R.cumR.concat(R.cumC,R.cumN,[0]);
+    var mx=Math.max.apply(null,all), mn=Math.min.apply(null,all);
+    var span=(mx-mn)||1; mx+=span*0.06; if(mn<0) mn-=span*0.06;
+    var sx=function(i){return L+pw*i/11}, sy=function(v){return T+ph*(1-(v-mn)/(mx-mn))};
+    var s="";
+    var step=niceStep((mx-mn)/4), v0=Math.ceil(mn/step)*step, v;
+    for(v=v0;v<=mx;v+=step){
+      s+='<line x1="'+L+'" x2="'+(W-Rr)+'" y1="'+sy(v)+'" y2="'+sy(v)+'" stroke="var(--line)" stroke-width="'+(Math.abs(v)<1e-9?1.5:1)+'"/>';
+      s+='<text x="'+(L-8)+'" y="'+(sy(v)+4)+'" text-anchor="end">'+(Math.round(v/1000*10)/10).toLocaleString("fr-FR")+' k€</text>';
+    }
+    for(var i=0;i<12;i+=1){
+      if(i%2===0||i===11) s+='<text x="'+sx(i)+'" y="'+(H-8)+'" text-anchor="middle">M'+(i+1)+'</text>';
+    }
+    function path(a){return a.map(function(x,i){return (i?"L":"M")+sx(i).toFixed(1)+" "+sy(x).toFixed(1)}).join(" ")}
+    s+='<path d="'+path(R.cumC)+'" fill="none" stroke="var(--s-cost)" stroke-width="2.5"/>';
+    s+='<path d="'+path(R.cumR)+'" fill="none" stroke="var(--s-rev)" stroke-width="2.5"/>';
+    s+='<path d="'+path(R.cumN)+'" fill="none" stroke="var(--s-net)" stroke-width="2.5" stroke-dasharray="6 4"/>';
+    var lastN=R.cumN[11], anchor="end", ly=sy(lastN)-8;
+    s+='<circle cx="'+sx(11)+'" cy="'+sy(lastN)+'" r="4" fill="var(--s-net)"/>';
+    s+='<text x="'+(sx(11)-8)+'" y="'+ly+'" text-anchor="'+anchor+'" style="fill:var(--ink);font-weight:600">'+eur(lastN)+'</text>';
+    $("chart").innerHTML=s;
+  }
+  function niceStep(raw){
+    var p=Math.pow(10,Math.floor(Math.log10(raw||1))), n=raw/p;
+    return (n<=1?1:n<=2?2:n<=5?5:10)*p;
+  }
+
+  /* ---- Démarrage ---- */
+  renderControls();
+  $("iosOn").addEventListener("change",update);
+  loadScen("realiste");
+})();
+</script>

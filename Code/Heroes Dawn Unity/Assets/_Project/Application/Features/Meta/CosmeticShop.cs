@@ -51,6 +51,9 @@ namespace N29.HeroesDawn.Application.Features.Meta
             return pool.Where(d => !CosmeticOps.Owns(_c.Meta, d.Id)).Take(WeeklyCount).Select(d => new CosmeticOffer(d, false)).ToList();
         }
 
+        /// <summary>Les articles de la semaine en cours (selon l'horloge du jeu).</summary>
+        public IReadOnlyList<CosmeticOffer> WeeklyNow() => Weekly(_c.LocalNow);
+
         /// <summary>Achète un article de la rotation de la semaine ; refusé (rien n'est dépensé) s'il est déjà possédé, hors rotation ou si les Gemmes manquent.</summary>
         public Result Buy(string cosmeticId)
         {

@@ -46,6 +46,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public static readonly DomainError NotEnoughComponents = new DomainError("meta.components", "errors.not_enough_components");
         public static readonly DomainError GradeTooLow = new DomainError("meta.grade_too_low", "errors.grade_too_low");
         public static readonly DomainError NoCatalyst = new DomainError("meta.no_catalyst", "errors.no_catalyst");
+        public static readonly DomainError DailyLimit = new DomainError("meta.daily_limit", "errors.meta_daily_limit");
     }
 
     /// <summary>Services communs aux systèmes de méta-progression : session, horloge, sauvegarde, diffusion.</summary>

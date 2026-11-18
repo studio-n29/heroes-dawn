@@ -51,7 +51,10 @@ namespace N29.HeroesDawn.Application.Features.Meta
         public Reward Reward { get; }
         /// <summary>Repos complet : toute l'équipe retombe à 0 de fatigue.</summary>
         public bool FullRest { get; }
-        public GemExchange(string id, int gemCost, Reward reward, bool fullRest = false) { Id = id; GemCost = gemCost; Reward = reward; FullRest = fullRest; }
+        /// <summary>Nombre maximum d'échanges par jour (0 = illimité) : les Gemmes achètent du temps, pas toute la progression d'un coup.</summary>
+        public int DailyLimit { get; }
+        public GemExchange(string id, int gemCost, Reward reward, bool fullRest = false, int dailyLimit = 0)
+        { Id = id; GemCost = gemCost; Reward = reward; FullRest = fullRest; DailyLimit = dailyLimit; }
     }
 
     /// <summary>Boutique : paquets de Gemmes (achat simulé), échanges Gemmes → ressources, cadeau quotidien gratuit.</summary>
@@ -66,18 +69,25 @@ namespace N29.HeroesDawn.Application.Features.Meta
             new GemPack("gems_1080", 1080, "9,99 €"),
             new GemPack("gems_2250", 2250, "19,99 €"),
             new GemPack("gems_6000", 6000, "49,99 €"),
+            new GemPack("gems_13000", 13000, "99,99 €"),
         };
 
         /// <summary>Offre de bienvenue (une seule fois par profil) : 500 Gemmes et un accélérateur de 8 heures. Le texte du prix ne sert qu'au simulateur : le vrai prix vient du store.</summary>
         public static readonly GemPack Welcome = new GemPack("welcome", 500, "2,99 €");
         public const int WelcomeSpeedUpMinutes = 480;
 
+        /// <summary>
+        /// Échanges de Gemmes : du confort, jamais de puissance. Les PR (recrues, boosters tirés au hasard) ne s'achètent pas avec des Gemmes :
+        /// c'est ce qui permet de répondre « non » aux objets aléatoires payants dans les stores.
+        /// </summary>
         public static readonly IReadOnlyList<GemExchange> Exchanges = new[]
         {
-            new GemExchange("ex_credits", 20, new Reward(credits: 1000)),
-            new GemExchange("ex_pr", 30, new Reward(pr: 60)),
+            new GemExchange("ex_credits", 20, new Reward(credits: 1000), dailyLimit: 5),
             new GemExchange("ex_rest", 10, new Reward(), fullRest: true),
         };
+
+        /// <summary>Accélérateur de 8 heures : 140 Gemmes, soit 12,5 % de moins que les 160 Gemmes de l'accélération directe (20 par heure).</summary>
+        public const int AcceleratorGems = 140, AcceleratorMinutes = 480;
 
         /// <summary>Prix en Gemmes du n-ième emplacement d'expédition (le 4e et le 5e s'achètent) ; 0 pour les emplacements de base.</summary>
         public static int SlotPrice(int slotNumber) => slotNumber == 4 ? 300 : slotNumber == 5 ? 500 : 0;
@@ -148,11 +158,47 @@ namespace N29.HeroesDawn.Application.Features.Meta
             return Result.Ok();
         }
 
+        /// <summary>Numéro de l'emplacement d'expédition que l'achat suivant débloquerait (au-delà du maximum : plus rien à acheter).</summary>
+        public int NextSlotNumber => Expeditions.SlotCount(_c.Meta) + 1;
+
+        /// <summary>Achète un accélérateur de 8 heures (minutes offertes, dépensées avant les Gemmes lors d'une accélération) ; refusé sans assez de Gemmes.</summary>
+        public Result BuyAccelerator()
+        {
+            if (!_c.Session.Wallet.TrySpendGems(AcceleratorGems)) return Result.Fail(MetaErrors.NotEnoughGems);
+            _c.Meta.speedUpTokens += AcceleratorMinutes;
+            _c.PublishWallet();
+            _c.Touch(MetaArea.Operations);
+            _c.Touch(MetaArea.Boutique);
+            return Result.Ok();
+        }
+
+        static string DayKey(string id) => "exchange_day:" + id;
+        static string CountKey(string id) => "exchange_count:" + id;
+        int TodayNumber => int.TryParse(_c.Today.Replace("-", ""), out var n) ? n : 0;
+
+        /// <summary>Échanges encore possibles aujourd'hui (int.MaxValue si l'échange n'a pas de limite).</summary>
+        public int ExchangesLeftToday(GemExchange ex)
+        {
+            if (ex.DailyLimit <= 0) return int.MaxValue;
+            if (_c.Meta.GetCounter(_c.Meta.stats, DayKey(ex.Id)) != TodayNumber) return ex.DailyLimit;
+            return System.Math.Max(0, ex.DailyLimit - _c.Meta.GetCounter(_c.Meta.stats, CountKey(ex.Id)));
+        }
+
+        void RecordExchange(GemExchange ex)
+        {
+            if (ex.DailyLimit <= 0) return;
+            int today = TodayNumber;
+            bool sameDay = _c.Meta.GetCounter(_c.Meta.stats, DayKey(ex.Id)) == today;
+            _c.Meta.SetCounter(_c.Meta.stats, DayKey(ex.Id), today);
+            _c.Meta.SetCounter(_c.Meta.stats, CountKey(ex.Id), sameDay ? _c.Meta.GetCounter(_c.Meta.stats, CountKey(ex.Id)) + 1 : 1);
+        }
+
         public Result Exchange(string id)
         {
             GemExchange? ex = null;
             foreach (var e in Exchanges) if (e.Id == id) ex = e;
             if (ex == null) return Result.Fail(MetaErrors.Unknown);
+            if (ExchangesLeftToday(ex) <= 0) return Result.Fail(MetaErrors.DailyLimit);
             if (ex.FullRest)
             {
                 bool tired = false;
@@ -166,6 +212,7 @@ namespace N29.HeroesDawn.Application.Features.Meta
                 _roster.PublishRoster();
             }
             _c.Grant(ex.Reward);
+            RecordExchange(ex);
             _c.Touch(MetaArea.Boutique);
             return Result.Ok();
         }

@@ -49,6 +49,22 @@ namespace N29.HeroesDawn.Tests.Domain.Application
             foreach (var e in Boutique.Exchanges) Assert.That(e.Reward.PassXp, Is.EqualTo(0), e.Id);
         }
 
+        [Test, Description("Vérifie qu'aucun produit payé en Gemmes ni en argent réel ne donne de PR, et que l'accélérateur et les emplacements ne donnent que du temps — parce que les PR achètent des recrues et des boosters aléatoires : ce serait de la puissance et un objet aléatoire payant")]
+        public void Les_gemmes_n_achetent_ni_PR_ni_recrue_ni_booster()
+        {
+            Assert.That(Boutique.Exchanges.All(e => e.Reward.Pr == 0), "aucun échange de Gemmes ne donne de PR");
+            Assert.That(Boutique.Exchanges.All(e => e.Reward.Gems == 0), "aucun échange ne donne de Gemmes");
+            int prBefore = _app.Session.Wallet.Pr;
+            int boostersBefore = _app.Collection.BoosterStock(N29.HeroesDawn.Definitions.BoosterDef.StandardId);
+            _app.Session.Wallet.SetGems(1_000_000);
+            _app.Boutique.BuyAccelerator();
+            _app.Boutique.BuyExpeditionSlot();
+            foreach (var e in Boutique.Exchanges) _app.Boutique.Exchange(e.Id);
+            foreach (var o in _app.Cosmetics.Weekly(_app.Time.LocalNow)) _app.Cosmetics.Buy(o.Def.Id);
+            Assert.That(_app.Session.Wallet.Pr, Is.EqualTo(prBefore), "aucun achat en Gemmes ne change les PR");
+            Assert.That(_app.Collection.BoosterStock(N29.HeroesDawn.Definitions.BoosterDef.StandardId), Is.EqualTo(boostersBefore), "aucun booster n'est donné");
+        }
+
         [Test, Description("Vérifie que les deux pistes du pass ne donnent ni recette ni point de tournoi, et que ses Composants sont limités aux qualités Commun et Raffiné — parce que seul le jeu donne l'Exceptionnel et les recettes")]
         public void Les_pistes_du_pass_ne_donnent_ni_recette_ni_composant_exceptionnel()
         {

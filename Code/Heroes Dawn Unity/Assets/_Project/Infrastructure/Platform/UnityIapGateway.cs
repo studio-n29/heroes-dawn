@@ -32,8 +32,8 @@ namespace N29.HeroesDawn.Infrastructure.Platform
     /// </summary>
     public sealed class UnityIapGateway : IPurchaseGateway, IPendingPurchaseSource, IDisposable
     {
-        /// <summary>Les sept produits consommables à déclarer dans Google Play Console et App Store Connect (identifiants identiques).</summary>
-        public static readonly IReadOnlyList<string> Products = new[] { "gems_100", "gems_520", "gems_1080", "gems_2250", "gems_6000", "welcome", PassTrack.PremiumProduct };
+        /// <summary>Les huit produits consommables à déclarer dans Google Play Console et App Store Connect (identifiants identiques).</summary>
+        public static readonly IReadOnlyList<string> Products = new[] { "gems_100", "gems_520", "gems_1080", "gems_2250", "gems_6000", "gems_13000", "welcome", PassTrack.PremiumProduct };
 
         sealed class Entry { public string ProductId = ""; public string TransactionId = ""; public bool Claimed; }
 
